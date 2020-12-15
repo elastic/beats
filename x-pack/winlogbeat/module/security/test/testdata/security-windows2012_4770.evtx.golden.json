@@ -3,13 +3,17 @@
     "@timestamp": "2020-04-01T07:32:55.0104462Z",
     "event": {
       "action": "kerberos-service-ticket-renewed",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4770,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"

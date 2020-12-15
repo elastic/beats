@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 )
 
 const (
@@ -24,6 +25,7 @@ const (
 	logsProcessName    = "filebeat"
 	metricsProcessName = "metricbeat"
 	artifactPrefix     = "beats"
+	agentName          = "elastic-agent"
 )
 
 func (o *Operator) handleStartSidecar(s configrequest.Step) (result error) {
@@ -186,6 +188,7 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
 			},
 			"index": "logs-elastic_agent-default",
 			"processors": []map[string]interface{}{
@@ -215,6 +218,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							"version":  o.agentInfo.Version(),
 							"snapshot": o.agentInfo.Snapshot(),
 						},
+					},
+				},
+				{
+					"drop_fields": map[string]interface{}{
+						"fields": []string{
+							"ecs.version", //coming from logger, already added by libbeat
+						},
+						"ignore_missing": true,
 					},
 				},
 			},
@@ -261,6 +272,14 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 							},
 						},
 					},
+					{
+						"drop_fields": map[string]interface{}{
+							"fields": []string{
+								"ecs.version", //coming from logger, already added by libbeat
+							},
+							"ignore_missing": true,
+						},
+					},
 				},
 			})
 		}
@@ -285,6 +304,8 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 		return nil, false
 	}
 	var modules []interface{}
+	fixedAgentName := strings.ReplaceAll(agentName, "-", "_")
+
 	for name, endpoints := range hosts {
 		modules = append(modules, map[string]interface{}{
 			"module":     "beat",
@@ -322,8 +343,171 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 					},
 				},
 			},
+		}, map[string]interface{}{
+			"module":     "http",
+			"metricsets": []string{"json"},
+			"namespace":  "agent",
+			"period":     "10s",
+			"path":       "/stats",
+			"hosts":      endpoints,
+			"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
+			"processors": []map[string]interface{}{
+				{
+					"add_fields": map[string]interface{}{
+						"target": "data_stream",
+						"fields": map[string]interface{}{
+							"type":      "metrics",
+							"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+							"namespace": "default",
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "event",
+						"fields": map[string]interface{}{
+							"dataset": fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "elastic_agent",
+						"fields": map[string]interface{}{
+							"id":       o.agentInfo.AgentID(),
+							"version":  o.agentInfo.Version(),
+							"snapshot": o.agentInfo.Snapshot(),
+							"process":  name,
+						},
+					},
+				},
+				{
+					"copy_fields": map[string]interface{}{
+						"fields": []map[string]interface{}{
+							// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
+							{
+								"from": "http.agent.beat.cpu",
+								"to":   "system.process.cpu",
+							},
+							// I should be able to see the Memory usage of Elastic Agent. Is the Elastic Agent using too much memory?
+							{
+								"from": "http.agent.beat.memstats.memory_sys",
+								"to":   "system.process.memory.size",
+							},
+							// I should be able to see the system memory. Am I running out of memory?
+							// TODO: with APM agent: total and free
+
+							// I should be able to see Disk usage on the running machine. Am I running out of disk space?
+							// TODO: with APM agent
+
+							// I should be able to see fd usage. Am I keep too many files open?
+							{
+								"from": "http.agent.beat.handles",
+								"to":   "system.process.fd",
+							},
+							// Cgroup reporting
+							{
+								"from": "http.agent.beat.cgrgit loup",
+								"to":   "system.process.cgroup",
+							},
+						},
+						"ignore_missing": true,
+					},
+				},
+				{
+					"drop_fields": map[string]interface{}{
+						"fields": []string{
+							"http",
+						},
+						"ignore_missing": true,
+					},
+				},
+			},
 		})
 	}
+
+	modules = append(modules, map[string]interface{}{
+		"module":     "http",
+		"metricsets": []string{"json"},
+		"namespace":  "agent",
+		"period":     "10s",
+		"path":       "/stats",
+		"hosts":      []string{beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS())},
+		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
+		"processors": []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"target": "data_stream",
+					"fields": map[string]interface{}{
+						"type":      "metrics",
+						"dataset":   fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+						"namespace": "default",
+					},
+				},
+			},
+			{
+				"add_fields": map[string]interface{}{
+					"target": "event",
+					"fields": map[string]interface{}{
+						"dataset": fmt.Sprintf("elastic_agent.%s", fixedAgentName),
+					},
+				},
+			},
+			{
+				"add_fields": map[string]interface{}{
+					"target": "elastic_agent",
+					"fields": map[string]interface{}{
+						"id":       o.agentInfo.AgentID(),
+						"version":  o.agentInfo.Version(),
+						"snapshot": o.agentInfo.Snapshot(),
+						"process":  "elastic-agent",
+					},
+				},
+			},
+			{
+				"copy_fields": map[string]interface{}{
+					"fields": []map[string]interface{}{
+						// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
+						{
+							"from": "http.agent.beat.cpu",
+							"to":   "system.process.cpu",
+						},
+						// I should be able to see the Memory usage of Elastic Agent. Is the Elastic Agent using too much memory?
+						{
+							"from": "http.agent.beat.memstats.memory_sys",
+							"to":   "system.process.memory.size",
+						},
+						// I should be able to see the system memory. Am I running out of memory?
+						// TODO: with APM agent: total and free
+
+						// I should be able to see Disk usage on the running machine. Am I running out of disk space?
+						// TODO: with APM agent
+
+						// I should be able to see fd usage. Am I keep too many files open?
+						{
+							"from": "http.agent.beat.handles",
+							"to":   "system.process.fd",
+						},
+						// Cgroup reporting
+						{
+							"from": "http.agent.beat.cgroup",
+							"to":   "system.process.cgroup",
+						},
+					},
+					"ignore_missing": true,
+				},
+			},
+			{
+				"drop_fields": map[string]interface{}{
+					"fields": []string{
+						"http",
+					},
+					"ignore_missing": true,
+				},
+			},
+		},
+	})
+
 	result := map[string]interface{}{
 		"metricbeat": map[string]interface{}{
 			"modules": modules,

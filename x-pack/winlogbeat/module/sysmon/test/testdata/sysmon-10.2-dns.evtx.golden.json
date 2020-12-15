@@ -18,7 +18,9 @@
       ],
       "question": {
         "name": "go.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "go",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.223.14.67"
@@ -48,7 +50,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -69,7 +71,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 66,
       "user": {
@@ -97,7 +99,9 @@
       ],
       "question": {
         "name": "www.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
@@ -127,7 +131,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -148,7 +152,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 67,
       "user": {
@@ -176,7 +180,9 @@
       ],
       "question": {
         "name": "static-global-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-global-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.192",
@@ -207,7 +213,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -228,7 +234,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 68,
       "user": {
@@ -260,7 +266,9 @@
       ],
       "question": {
         "name": "www.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -291,7 +299,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -312,7 +320,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 69,
       "user": {
@@ -340,7 +348,9 @@
       ],
       "question": {
         "name": "linkmaker.itunes.apple.com",
-        "registered_domain": "apple.com"
+        "registered_domain": "apple.com",
+        "subdomain": "linkmaker.itunes",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.64.104.249"
@@ -370,7 +380,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -391,7 +401,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 70,
       "user": {
@@ -423,7 +433,8 @@
       ],
       "question": {
         "name": "confiant-integrations.global.ssl.fastly.net",
-        "registered_domain": "confiant-integrations.global.ssl.fastly.net"
+        "registered_domain": "confiant-integrations.global.ssl.fastly.net",
+        "top_level_domain": "global.ssl.fastly.net"
       },
       "resolved_ip": [
         "151.101.1.194",
@@ -456,7 +467,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -477,7 +488,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 71,
       "user": {
@@ -501,7 +512,9 @@
       ],
       "question": {
         "name": "c.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.253.92"
@@ -531,7 +544,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -552,7 +565,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 72,
       "user": {
@@ -584,7 +597,9 @@
       ],
       "question": {
         "name": "c.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "13.107.21.200",
@@ -615,7 +630,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -636,7 +651,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 73,
       "user": {
@@ -656,7 +671,9 @@
       ],
       "question": {
         "name": "contextual.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "contextual",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -686,7 +703,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -707,7 +724,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 74,
       "user": {
@@ -743,7 +760,9 @@
       ],
       "question": {
         "name": "at.atwola.com",
-        "registered_domain": "atwola.com"
+        "registered_domain": "atwola.com",
+        "subdomain": "at",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.120"
@@ -773,7 +792,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -794,7 +813,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 75,
       "user": {
@@ -854,7 +873,9 @@
       ],
       "question": {
         "name": "m.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "m",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.13.192.56",
@@ -892,7 +913,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -913,7 +934,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 76,
       "user": {
@@ -937,7 +958,9 @@
       ],
       "question": {
         "name": "cms.analytics.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "cms.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.6.137.78"
@@ -967,7 +990,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -988,7 +1011,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 77,
       "user": {
@@ -1016,7 +1039,9 @@
       ],
       "question": {
         "name": "cvision.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "cvision",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -1046,7 +1071,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1067,7 +1092,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 78,
       "user": {
@@ -1099,7 +1124,9 @@
       ],
       "question": {
         "name": "g.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "g",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -1130,7 +1157,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1151,7 +1178,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 79,
       "user": {
@@ -1171,7 +1198,9 @@
       ],
       "question": {
         "name": "lg3.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "lg3",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -1201,7 +1230,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1222,7 +1251,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 80,
       "user": {
@@ -1254,7 +1283,9 @@
       ],
       "question": {
         "name": "service.sp.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "service.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.88.96.255",
@@ -1286,7 +1317,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1307,7 +1338,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 81,
       "user": {
@@ -1335,7 +1366,9 @@
       ],
       "question": {
         "name": "sb.scorecardresearch.com",
-        "registered_domain": "scorecardresearch.com"
+        "registered_domain": "scorecardresearch.com",
+        "subdomain": "sb",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "184.25.176.117"
@@ -1365,7 +1398,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1386,7 +1419,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 82,
       "user": {
@@ -1414,7 +1447,9 @@
       ],
       "question": {
         "name": "otf.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "otf",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.114.54.223"
@@ -1444,7 +1479,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1465,7 +1500,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 83,
       "user": {
@@ -1513,7 +1548,9 @@
       ],
       "question": {
         "name": "ping.chartbeat.net",
-        "registered_domain": "chartbeat.net"
+        "registered_domain": "chartbeat.net",
+        "subdomain": "ping",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.171.101.225",
@@ -1550,7 +1587,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1571,7 +1608,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 84,
       "user": {
@@ -1603,7 +1640,8 @@
       ],
       "question": {
         "name": "clarium.freetls.fastly.net",
-        "registered_domain": "clarium.freetls.fastly.net"
+        "registered_domain": "clarium.freetls.fastly.net",
+        "top_level_domain": "freetls.fastly.net"
       },
       "resolved_ip": [
         "151.101.194.79",
@@ -1636,7 +1674,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1657,7 +1695,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 85,
       "user": {
@@ -1725,7 +1763,9 @@
       ],
       "question": {
         "name": "nym1-ib.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "nym1-ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.178.252",
@@ -1767,7 +1807,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1788,7 +1828,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 86,
       "user": {
@@ -1848,7 +1888,9 @@
       ],
       "question": {
         "name": "eb2.3lift.com",
-        "registered_domain": "3lift.com"
+        "registered_domain": "3lift.com",
+        "subdomain": "eb2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.196.86.129",
@@ -1886,7 +1928,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -1907,7 +1949,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 87,
       "user": {
@@ -1971,7 +2013,9 @@
       ],
       "question": {
         "name": "px.ads.linkedin.com",
-        "registered_domain": "linkedin.com"
+        "registered_domain": "linkedin.com",
+        "subdomain": "px.ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "108.174.10.14",
@@ -2010,7 +2054,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2031,7 +2075,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 88,
       "user": {
@@ -2067,7 +2111,9 @@
       ],
       "question": {
         "name": "login.live.com",
-        "registered_domain": "live.com"
+        "registered_domain": "live.com",
+        "subdomain": "login",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.90.23.239",
@@ -2099,7 +2145,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2120,7 +2166,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 89,
       "user": {
@@ -2184,7 +2230,9 @@
       ],
       "question": {
         "name": "dis.criteo.com",
-        "registered_domain": "criteo.com"
+        "registered_domain": "criteo.com",
+        "subdomain": "dis",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.119.119.150",
@@ -2225,7 +2273,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2246,7 +2294,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 90,
       "user": {
@@ -2314,7 +2362,9 @@
       ],
       "question": {
         "name": "ib.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.180.12",
@@ -2354,7 +2404,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2375,7 +2425,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 91,
       "user": {
@@ -2399,7 +2449,9 @@
       ],
       "question": {
         "name": "cm.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "cm.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -2429,7 +2481,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2450,7 +2502,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 92,
       "user": {
@@ -2510,7 +2562,9 @@
       ],
       "question": {
         "name": "match.adsrvr.org",
-        "registered_domain": "adsrvr.org"
+        "registered_domain": "adsrvr.org",
+        "subdomain": "match",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "54.208.129.24",
@@ -2549,7 +2603,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2570,7 +2624,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 93,
       "user": {
@@ -2598,7 +2652,9 @@
       ],
       "question": {
         "name": "ssum-sec.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "ssum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -2628,7 +2684,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2649,7 +2705,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 94,
       "user": {
@@ -2709,7 +2765,9 @@
       ],
       "question": {
         "name": "protected-by.clarium.io",
-        "registered_domain": "clarium.io"
+        "registered_domain": "clarium.io",
+        "subdomain": "protected-by",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "18.204.130.216",
@@ -2748,7 +2806,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2769,7 +2827,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 95,
       "user": {
@@ -2793,7 +2851,9 @@
       ],
       "question": {
         "name": "pagead2.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "pagead2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -2823,7 +2883,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2844,7 +2904,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 96,
       "user": {
@@ -2868,7 +2928,9 @@
       ],
       "question": {
         "name": "googleads.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -2898,7 +2960,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -2919,7 +2981,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 97,
       "user": {
@@ -2975,7 +3037,9 @@
       ],
       "question": {
         "name": "pixel.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.22.184.73",
@@ -3012,7 +3076,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3033,7 +3097,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 98,
       "user": {
@@ -3081,7 +3145,9 @@
       ],
       "question": {
         "name": "onevideosync.uplynk.com",
-        "registered_domain": "uplynk.com"
+        "registered_domain": "uplynk.com",
+        "subdomain": "onevideosync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.210.214.197",
@@ -3115,7 +3181,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3136,7 +3202,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 99,
       "user": {
@@ -3160,7 +3226,9 @@
       ],
       "question": {
         "name": "ad.turn.com",
-        "registered_domain": "turn.com"
+        "registered_domain": "turn.com",
+        "subdomain": "ad",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "50.116.194.21"
@@ -3190,7 +3258,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3211,7 +3279,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 100,
       "user": {
@@ -3263,7 +3331,9 @@
       ],
       "question": {
         "name": "ups.analytics.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "ups.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.225.20.218",
@@ -3300,7 +3370,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3321,7 +3391,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 101,
       "user": {
@@ -3385,7 +3455,9 @@
       ],
       "question": {
         "name": "pm.w55c.net",
-        "registered_domain": "w55c.net"
+        "registered_domain": "w55c.net",
+        "subdomain": "pm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "34.237.248.89",
@@ -3425,7 +3497,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3446,7 +3518,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 102,
       "user": {
@@ -3510,7 +3582,9 @@
       ],
       "question": {
         "name": "cm.eyereturn.com",
-        "registered_domain": "eyereturn.com"
+        "registered_domain": "eyereturn.com",
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.239.238",
@@ -3551,7 +3625,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3572,7 +3646,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 103,
       "user": {
@@ -3596,7 +3670,9 @@
       ],
       "question": {
         "name": "www.googletagservices.com",
-        "registered_domain": "googletagservices.com"
+        "registered_domain": "googletagservices.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -3626,7 +3702,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3647,7 +3723,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 104,
       "user": {
@@ -3711,7 +3787,9 @@
       ],
       "question": {
         "name": "cm.adgrx.com",
-        "registered_domain": "adgrx.com"
+        "registered_domain": "adgrx.com",
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "173.231.178.117",
@@ -3751,7 +3829,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3772,7 +3850,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 105,
       "user": {
@@ -3832,7 +3910,9 @@
       ],
       "question": {
         "name": "csm2waycm-atl.netmng.com",
-        "registered_domain": "netmng.com"
+        "registered_domain": "netmng.com",
+        "subdomain": "csm2waycm-atl",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.193.83.156",
@@ -3870,7 +3950,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3891,7 +3971,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 106,
       "user": {
@@ -3915,7 +3995,9 @@
       ],
       "question": {
         "name": "pr-bh.ybp.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "pr-bh.ybp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.30.2.182"
@@ -3945,7 +4027,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -3966,7 +4048,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 107,
       "user": {
@@ -3986,7 +4068,9 @@
       ],
       "question": {
         "name": "ps.eyeota.net",
-        "registered_domain": "eyeota.net"
+        "registered_domain": "eyeota.net",
+        "subdomain": "ps",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "3.83.220.223"
@@ -4016,7 +4100,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4037,7 +4121,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 108,
       "user": {
@@ -4073,7 +4157,9 @@
       ],
       "question": {
         "name": "idpix.media6degrees.com",
-        "registered_domain": "media6degrees.com"
+        "registered_domain": "media6degrees.com",
+        "subdomain": "idpix",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.2.197.201",
@@ -4104,7 +4190,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4125,7 +4211,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 109,
       "user": {
@@ -4181,7 +4267,9 @@
       ],
       "question": {
         "name": "tpc.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.1",
@@ -4219,7 +4307,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4240,7 +4328,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 110,
       "user": {
@@ -4300,7 +4388,9 @@
       ],
       "question": {
         "name": "image2.pubmatic.com",
-        "registered_domain": "pubmatic.com"
+        "registered_domain": "pubmatic.com",
+        "subdomain": "image2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "162.248.19.147",
@@ -4338,7 +4428,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4359,7 +4449,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 111,
       "user": {
@@ -4391,7 +4481,9 @@
       ],
       "question": {
         "name": "sam.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "sam",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
@@ -4421,7 +4513,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4442,7 +4534,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 112,
       "user": {
@@ -4506,7 +4598,9 @@
       ],
       "question": {
         "name": "ocsp.sca1b.amazontrust.com",
-        "registered_domain": "amazontrust.com"
+        "registered_domain": "amazontrust.com",
+        "subdomain": "ocsp.sca1b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.85.89.250",
@@ -4547,7 +4641,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4568,7 +4662,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 113,
       "user": {
@@ -4600,7 +4694,9 @@
       ],
       "question": {
         "name": "c1.adform.net",
-        "registered_domain": "adform.net"
+        "registered_domain": "adform.net",
+        "subdomain": "c1",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "185.167.164.43",
@@ -4631,7 +4727,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4652,7 +4748,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 114,
       "user": {
@@ -4700,7 +4796,9 @@
       ],
       "question": {
         "name": "urs.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.84.140.84",
@@ -4735,7 +4833,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4756,7 +4854,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 115,
       "user": {
@@ -4784,7 +4882,9 @@
       ],
       "question": {
         "name": "dsum-sec.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "dsum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -4814,7 +4914,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4835,7 +4935,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 116,
       "user": {
@@ -4859,7 +4959,9 @@
       ],
       "question": {
         "name": "ocsp.godaddy.com",
-        "registered_domain": "godaddy.com"
+        "registered_domain": "godaddy.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.167.239.239"
@@ -4889,7 +4991,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4910,7 +5012,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 117,
       "user": {
@@ -4924,7 +5026,9 @@
     "dns": {
       "question": {
         "name": "googleads.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       }
     },
     "event": {
@@ -4951,7 +5055,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -4972,7 +5076,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 118,
       "user": {
@@ -4986,7 +5090,9 @@
     "dns": {
       "question": {
         "name": "tpc.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -5013,7 +5119,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5034,7 +5140,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 119,
       "user": {
@@ -5094,7 +5200,9 @@
       ],
       "question": {
         "name": "ocsp.usertrust.com",
-        "registered_domain": "usertrust.com"
+        "registered_domain": "usertrust.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -5133,7 +5241,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5154,7 +5262,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 120,
       "user": {
@@ -5186,7 +5294,9 @@
       ],
       "question": {
         "name": "isrg.trustid.ocsp.identrust.com",
-        "registered_domain": "identrust.com"
+        "registered_domain": "identrust.com",
+        "subdomain": "isrg.trustid.ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -5217,7 +5327,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5238,7 +5348,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 121,
       "user": {
@@ -5262,7 +5372,9 @@
       ],
       "question": {
         "name": "ad.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "ad",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.6.198"
@@ -5292,7 +5404,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5313,7 +5425,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 122,
       "user": {
@@ -5373,7 +5485,9 @@
       ],
       "question": {
         "name": "ocsp.sectigo.com",
-        "registered_domain": "sectigo.com"
+        "registered_domain": "sectigo.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -5412,7 +5526,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5433,7 +5547,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 123,
       "user": {
@@ -5465,7 +5579,9 @@
       ],
       "question": {
         "name": "ocsp.int-x3.letsencrypt.org",
-        "registered_domain": "letsencrypt.org"
+        "registered_domain": "letsencrypt.org",
+        "subdomain": "ocsp.int-x3",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -5496,7 +5612,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5517,7 +5633,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 124,
       "user": {
@@ -5577,7 +5693,9 @@
       ],
       "question": {
         "name": "ocsp.pki.goog",
-        "registered_domain": "pki.goog"
+        "registered_domain": "pki.goog",
+        "subdomain": "ocsp",
+        "top_level_domain": "goog"
       },
       "resolved_ip": [
         "172.217.12.195",
@@ -5616,7 +5734,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5637,7 +5755,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 125,
       "user": {
@@ -5661,7 +5779,9 @@
       ],
       "question": {
         "name": "googleads4.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads4.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -5691,7 +5811,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5712,7 +5832,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 126,
       "user": {
@@ -5748,7 +5868,9 @@
       ],
       "question": {
         "name": "images.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "images",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.2.2",
@@ -5781,7 +5903,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5802,7 +5924,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 127,
       "user": {
@@ -5838,7 +5960,9 @@
       ],
       "question": {
         "name": "api-s2s.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "api-s2s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.66.2",
@@ -5871,7 +5995,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5892,7 +6016,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 128,
       "user": {
@@ -5916,7 +6040,9 @@
       ],
       "question": {
         "name": "x.bidswitch.net",
-        "registered_domain": "bidswitch.net"
+        "registered_domain": "bidswitch.net",
+        "subdomain": "x",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.231.30.22",
@@ -5947,7 +6073,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -5968,7 +6094,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 129,
       "user": {
@@ -6028,7 +6154,9 @@
       ],
       "question": {
         "name": "pixel.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.26",
@@ -6067,7 +6195,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6088,7 +6216,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 130,
       "user": {
@@ -6152,7 +6280,8 @@
       ],
       "question": {
         "name": "ml314.com",
-        "registered_domain": "ml314.com"
+        "registered_domain": "ml314.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.171.48.231",
@@ -6193,7 +6322,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6214,7 +6343,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 131,
       "user": {
@@ -6278,7 +6407,9 @@
       ],
       "question": {
         "name": "aa.agkn.com",
-        "registered_domain": "agkn.com"
+        "registered_domain": "agkn.com",
+        "subdomain": "aa",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "156.154.200.36",
@@ -6319,7 +6450,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6340,7 +6471,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 132,
       "user": {
@@ -6400,7 +6531,9 @@
       ],
       "question": {
         "name": "s0.2mdn.net",
-        "registered_domain": "2mdn.net"
+        "registered_domain": "2mdn.net",
+        "subdomain": "s0",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.134",
@@ -6439,7 +6572,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6460,7 +6593,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 133,
       "user": {
@@ -6492,7 +6625,9 @@
       ],
       "question": {
         "name": "b.scorecardresearch.com",
-        "registered_domain": "scorecardresearch.com"
+        "registered_domain": "scorecardresearch.com",
+        "subdomain": "b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.195",
@@ -6523,7 +6658,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6544,7 +6679,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 134,
       "user": {
@@ -6580,7 +6715,9 @@
       ],
       "question": {
         "name": "edw.edmunds.com",
-        "registered_domain": "edmunds.com"
+        "registered_domain": "edmunds.com",
+        "subdomain": "edw",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -6613,7 +6750,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6634,7 +6771,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 135,
       "user": {
@@ -6658,7 +6795,9 @@
       ],
       "question": {
         "name": "ocsp.digicert.com",
-        "registered_domain": "digicert.com"
+        "registered_domain": "digicert.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -6688,7 +6827,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6709,7 +6848,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 136,
       "user": {
@@ -6769,7 +6908,9 @@
       ],
       "question": {
         "name": "pre-usermatch.targeting.unrulymedia.com",
-        "registered_domain": "unrulymedia.com"
+        "registered_domain": "unrulymedia.com",
+        "subdomain": "pre-usermatch.targeting",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.167.55.0",
@@ -6808,7 +6949,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6829,7 +6970,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 137,
       "user": {
@@ -6897,7 +7038,9 @@
       ],
       "question": {
         "name": "farm.plista.com",
-        "registered_domain": "plista.com"
+        "registered_domain": "plista.com",
+        "subdomain": "farm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "144.76.67.119",
@@ -6938,7 +7081,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -6959,7 +7102,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 138,
       "user": {
@@ -7019,7 +7162,9 @@
       ],
       "question": {
         "name": "beacon.krxd.net",
-        "registered_domain": "krxd.net"
+        "registered_domain": "krxd.net",
+        "subdomain": "beacon",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "50.17.180.35",
@@ -7057,7 +7202,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7078,7 +7223,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 139,
       "user": {
@@ -7106,7 +7251,9 @@
       ],
       "question": {
         "name": "dsum.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "dsum",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -7136,7 +7283,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7157,7 +7304,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 140,
       "user": {
@@ -7221,7 +7368,9 @@
       ],
       "question": {
         "name": "sync.mathtag.com",
-        "registered_domain": "mathtag.com"
+        "registered_domain": "mathtag.com",
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "216.200.232.235",
@@ -7261,7 +7410,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7282,7 +7431,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 141,
       "user": {
@@ -7310,7 +7459,9 @@
       ],
       "question": {
         "name": "status.rapidssl.com",
-        "registered_domain": "rapidssl.com"
+        "registered_domain": "rapidssl.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -7340,7 +7491,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7361,7 +7512,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 142,
       "user": {
@@ -7425,7 +7576,9 @@
       ],
       "question": {
         "name": "sync.extend.tv",
-        "registered_domain": "extend.tv"
+        "registered_domain": "extend.tv",
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "34.197.195.131",
@@ -7465,7 +7618,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7486,7 +7639,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 143,
       "user": {
@@ -7546,7 +7699,9 @@
       ],
       "question": {
         "name": "ocsp.comodoca.com",
-        "registered_domain": "comodoca.com"
+        "registered_domain": "comodoca.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -7585,7 +7740,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7606,7 +7761,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 144,
       "user": {
@@ -7650,7 +7805,9 @@
       ],
       "question": {
         "name": "sync-tm.everesttech.net",
-        "registered_domain": "everesttech.net"
+        "registered_domain": "everesttech.net",
+        "subdomain": "sync-tm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "151.101.2.49",
@@ -7683,7 +7840,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7704,7 +7861,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 145,
       "user": {
@@ -7768,7 +7925,9 @@
       ],
       "question": {
         "name": "idsync.rlcdn.com",
-        "registered_domain": "rlcdn.com"
+        "registered_domain": "rlcdn.com",
+        "subdomain": "idsync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.95.92.78",
@@ -7809,7 +7968,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7830,7 +7989,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 146,
       "user": {
@@ -7874,7 +8033,9 @@
       ],
       "question": {
         "name": "cm.adform.net",
-        "registered_domain": "adform.net"
+        "registered_domain": "adform.net",
+        "subdomain": "cm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "37.157.2.239",
@@ -7909,7 +8070,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -7930,7 +8091,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 147,
       "user": {
@@ -7950,7 +8111,9 @@
       ],
       "question": {
         "name": "dm.hybrid.ai",
-        "registered_domain": "hybrid.ai"
+        "registered_domain": "hybrid.ai",
+        "subdomain": "dm",
+        "top_level_domain": "ai"
       },
       "resolved_ip": [
         "37.18.16.16"
@@ -7980,7 +8143,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8001,7 +8164,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 148,
       "user": {
@@ -8061,7 +8224,9 @@
       ],
       "question": {
         "name": "static.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "static",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.32",
@@ -8100,7 +8265,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8121,7 +8286,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 149,
       "user": {
@@ -8157,7 +8322,9 @@
       ],
       "question": {
         "name": "trc.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "trc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -8190,7 +8357,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8211,7 +8378,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 150,
       "user": {
@@ -8231,7 +8398,8 @@
       ],
       "question": {
         "name": "pippio.com",
-        "registered_domain": "pippio.com"
+        "registered_domain": "pippio.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.178.254.65"
@@ -8261,7 +8429,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8282,7 +8450,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 151,
       "user": {
@@ -8342,7 +8510,9 @@
       ],
       "question": {
         "name": "pixel-sync.sitescout.com",
-        "registered_domain": "sitescout.com"
+        "registered_domain": "sitescout.com",
+        "subdomain": "pixel-sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "209.15.36.34",
@@ -8381,7 +8551,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8402,7 +8572,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 152,
       "user": {
@@ -8462,7 +8632,9 @@
       ],
       "question": {
         "name": "prod.y-medialink.com",
-        "registered_domain": "y-medialink.com"
+        "registered_domain": "y-medialink.com",
+        "subdomain": "prod",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.202.217",
@@ -8502,7 +8674,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8523,7 +8695,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 153,
       "user": {
@@ -8567,7 +8739,9 @@
       ],
       "question": {
         "name": "jadserve.postrelease.com",
-        "registered_domain": "postrelease.com"
+        "registered_domain": "postrelease.com",
+        "subdomain": "jadserve",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.80.117.178",
@@ -8602,7 +8776,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8623,7 +8797,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 154,
       "user": {
@@ -8683,7 +8857,9 @@
       ],
       "question": {
         "name": "appnexus-partners.tremorhub.com",
-        "registered_domain": "tremorhub.com"
+        "registered_domain": "tremorhub.com",
+        "subdomain": "appnexus-partners",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.43.184",
@@ -8722,7 +8898,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8743,7 +8919,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 155,
       "user": {
@@ -8795,7 +8971,9 @@
       ],
       "question": {
         "name": "x.dlx.addthis.com",
-        "registered_domain": "addthis.com"
+        "registered_domain": "addthis.com",
+        "subdomain": "x.dlx",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.14.70",
@@ -8831,7 +9009,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8852,7 +9030,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 156,
       "user": {
@@ -8904,7 +9082,9 @@
       ],
       "question": {
         "name": "dh.serving-sys.com",
-        "registered_domain": "serving-sys.com"
+        "registered_domain": "serving-sys.com",
+        "subdomain": "dh",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "18.205.112.71",
@@ -8940,7 +9120,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -8961,7 +9141,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 157,
       "user": {
@@ -9029,7 +9209,9 @@
       ],
       "question": {
         "name": "match.sharethrough.com",
-        "registered_domain": "sharethrough.com"
+        "registered_domain": "sharethrough.com",
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.55.160.246",
@@ -9070,7 +9252,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9091,7 +9273,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 158,
       "user": {
@@ -9151,7 +9333,9 @@
       ],
       "question": {
         "name": "tags.rd.linksynergy.com",
-        "registered_domain": "linksynergy.com"
+        "registered_domain": "linksynergy.com",
+        "subdomain": "tags.rd",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.241.16.233",
@@ -9191,7 +9375,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9212,7 +9396,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 159,
       "user": {
@@ -9268,7 +9452,9 @@
       ],
       "question": {
         "name": "rtb-csync.smartadserver.com",
-        "registered_domain": "smartadserver.com"
+        "registered_domain": "smartadserver.com",
+        "subdomain": "rtb-csync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.187.193.166",
@@ -9305,7 +9491,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9326,7 +9512,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 160,
       "user": {
@@ -9386,7 +9572,9 @@
       ],
       "question": {
         "name": "sc.iasds01.com",
-        "registered_domain": "iasds01.com"
+        "registered_domain": "iasds01.com",
+        "subdomain": "sc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.200",
@@ -9425,7 +9613,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9446,7 +9634,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 161,
       "user": {
@@ -9506,7 +9694,9 @@
       ],
       "question": {
         "name": "dt.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "dt",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.38.20",
@@ -9545,7 +9735,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9566,7 +9756,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 162,
       "user": {
@@ -9594,7 +9784,9 @@
       ],
       "question": {
         "name": "status.thawte.com",
-        "registered_domain": "thawte.com"
+        "registered_domain": "thawte.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -9624,7 +9816,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9645,7 +9837,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 163,
       "user": {
@@ -9705,7 +9897,9 @@
       ],
       "question": {
         "name": "ads.stickyadstv.com",
-        "registered_domain": "stickyadstv.com"
+        "registered_domain": "stickyadstv.com",
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "38.134.110.101",
@@ -9742,7 +9936,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9763,7 +9957,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 164,
       "user": {
@@ -9791,7 +9985,9 @@
       ],
       "question": {
         "name": "hbx.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "hbx",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -9821,7 +10017,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9842,7 +10038,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 165,
       "user": {
@@ -9878,7 +10074,9 @@
       ],
       "question": {
         "name": "match.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.194.49",
@@ -9911,7 +10109,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -9932,7 +10130,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 166,
       "user": {
@@ -9960,7 +10158,9 @@
       ],
       "question": {
         "name": "img-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "img-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.185",
@@ -9991,7 +10191,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10012,7 +10212,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 167,
       "user": {
@@ -10040,7 +10240,9 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -10071,7 +10273,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10092,7 +10294,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 168,
       "user": {
@@ -10120,7 +10322,9 @@
       ],
       "question": {
         "name": "radarmaps.weather.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "radarmaps.weather",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.217.149.91"
@@ -10150,7 +10354,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10171,7 +10375,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 169,
       "user": {
@@ -10199,7 +10403,9 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -10230,7 +10436,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -10251,7 +10457,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 170,
       "user": {
@@ -10275,7 +10481,9 @@
       ],
       "question": {
         "name": "tag.sp.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "tag.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.163"
@@ -10305,7 +10513,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10326,7 +10534,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 171,
       "user": {
@@ -10358,7 +10566,9 @@
       ],
       "question": {
         "name": "www.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -10389,7 +10599,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10410,7 +10620,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 172,
       "user": {
@@ -10438,7 +10648,9 @@
       ],
       "question": {
         "name": "cdn.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "cdn",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
@@ -10468,7 +10680,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10489,7 +10701,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 173,
       "user": {
@@ -10521,7 +10733,9 @@
       ],
       "question": {
         "name": "cdn3.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "cdn3",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
@@ -10551,7 +10765,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10572,7 +10786,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 174,
       "user": {
@@ -10600,7 +10814,9 @@
       ],
       "question": {
         "name": "rtb0.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "rtb0",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -10630,7 +10846,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10651,7 +10867,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 175,
       "user": {
@@ -10679,7 +10895,9 @@
       ],
       "question": {
         "name": "dev.virtualearth.net",
-        "registered_domain": "virtualearth.net"
+        "registered_domain": "virtualearth.net",
+        "subdomain": "dev",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "20.36.236.157"
@@ -10709,7 +10927,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10730,7 +10948,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 176,
       "user": {
@@ -10758,7 +10976,9 @@
       ],
       "question": {
         "name": "t.ssl.ak.dynamic.tiles.virtualearth.net",
-        "registered_domain": "virtualearth.net"
+        "registered_domain": "virtualearth.net",
+        "subdomain": "t.ssl.ak.dynamic.tiles",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.161.238"
@@ -10788,7 +11008,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10809,7 +11029,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 177,
       "user": {
@@ -10873,7 +11093,9 @@
       ],
       "question": {
         "name": "rp.gwallet.com",
-        "registered_domain": "gwallet.com"
+        "registered_domain": "gwallet.com",
+        "subdomain": "rp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.217.253.61",
@@ -10914,7 +11136,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -10935,7 +11157,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 178,
       "user": {
@@ -10971,7 +11193,9 @@
       ],
       "question": {
         "name": "ads.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "98.139.225.43",
@@ -11004,7 +11228,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11025,7 +11249,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 179,
       "user": {
@@ -11053,7 +11277,9 @@
       ],
       "question": {
         "name": "um.simpli.fi",
-        "registered_domain": "simpli.fi"
+        "registered_domain": "simpli.fi",
+        "subdomain": "um",
+        "top_level_domain": "fi"
       },
       "resolved_ip": [
         "169.55.104.49",
@@ -11085,7 +11311,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11106,7 +11332,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 180,
       "user": {
@@ -11166,7 +11392,9 @@
       ],
       "question": {
         "name": "mpp.vindicosuite.com",
-        "registered_domain": "vindicosuite.com"
+        "registered_domain": "vindicosuite.com",
+        "subdomain": "mpp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.236.204",
@@ -11206,7 +11434,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11227,7 +11455,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 181,
       "user": {
@@ -11247,7 +11475,9 @@
       ],
       "question": {
         "name": "sync.1rx.io",
-        "registered_domain": "1rx.io"
+        "registered_domain": "1rx.io",
+        "subdomain": "sync",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "8.41.222.152"
@@ -11277,7 +11507,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11298,7 +11528,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 182,
       "user": {
@@ -11326,7 +11556,9 @@
       ],
       "question": {
         "name": "sync.teads.tv",
-        "registered_domain": "teads.tv"
+        "registered_domain": "teads.tv",
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "23.52.160.7"
@@ -11356,7 +11588,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11377,7 +11609,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 183,
       "user": {
@@ -11441,7 +11673,9 @@
       ],
       "question": {
         "name": "s.thebrighttag.com",
-        "registered_domain": "thebrighttag.com"
+        "registered_domain": "thebrighttag.com",
+        "subdomain": "s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "3.15.109.176",
@@ -11481,7 +11715,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11502,7 +11736,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 184,
       "user": {
@@ -11526,7 +11760,9 @@
       ],
       "question": {
         "name": "t.a3cloud.net",
-        "registered_domain": "a3cloud.net"
+        "registered_domain": "a3cloud.net",
+        "subdomain": "t",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.192.55.189"
@@ -11556,7 +11792,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11577,7 +11813,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 186,
       "user": {
@@ -11605,7 +11841,9 @@
       ],
       "question": {
         "name": "tps618.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps618",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -11635,7 +11873,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11656,7 +11894,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 187,
       "user": {
@@ -11720,7 +11958,9 @@
       ],
       "question": {
         "name": "dpm.demdex.net",
-        "registered_domain": "demdex.net"
+        "registered_domain": "demdex.net",
+        "subdomain": "dpm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.157.69.185",
@@ -11758,7 +11998,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11779,7 +12019,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 188,
       "user": {
@@ -11847,7 +12087,9 @@
       ],
       "question": {
         "name": "secure.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "secure",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.179.228",
@@ -11887,7 +12129,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11908,7 +12150,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 189,
       "user": {
@@ -11936,7 +12178,9 @@
       ],
       "question": {
         "name": "tps.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -11966,7 +12210,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -11987,7 +12231,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 190,
       "user": {
@@ -12051,7 +12295,9 @@
       ],
       "question": {
         "name": "i.liadm.com",
-        "registered_domain": "liadm.com"
+        "registered_domain": "liadm.com",
+        "subdomain": "i",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.71.175.22",
@@ -12091,7 +12337,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12112,7 +12358,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 191,
       "user": {
@@ -12176,7 +12422,9 @@
       ],
       "question": {
         "name": "pixel.s3xified.com",
-        "registered_domain": "s3xified.com"
+        "registered_domain": "s3xified.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "67.231.251.189",
@@ -12217,7 +12465,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12238,7 +12486,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 192,
       "user": {
@@ -12298,7 +12546,9 @@
       ],
       "question": {
         "name": "router.infolinks.com",
-        "registered_domain": "infolinks.com"
+        "registered_domain": "infolinks.com",
+        "subdomain": "router",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.20.252.85",
@@ -12338,7 +12588,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12359,7 +12609,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 193,
       "user": {
@@ -12415,7 +12665,9 @@
       ],
       "question": {
         "name": "grey.erne.co",
-        "registered_domain": "erne.co"
+        "registered_domain": "erne.co",
+        "subdomain": "grey",
+        "top_level_domain": "co"
       },
       "resolved_ip": [
         "94.23.171.206",
@@ -12454,7 +12706,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12475,7 +12727,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 194,
       "user": {
@@ -12539,7 +12791,9 @@
       ],
       "question": {
         "name": "sync.jivox.com",
-        "registered_domain": "jivox.com"
+        "registered_domain": "jivox.com",
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.243.145.203",
@@ -12580,7 +12834,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12601,7 +12855,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 195,
       "user": {
@@ -12829,7 +13083,9 @@
       ],
       "question": {
         "name": "b1sync.zemanta.com",
-        "registered_domain": "zemanta.com"
+        "registered_domain": "zemanta.com",
+        "subdomain": "b1sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "207.244.121.25",
@@ -12910,7 +13166,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -12931,7 +13187,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 196,
       "user": {
@@ -13007,7 +13263,9 @@
       ],
       "question": {
         "name": "tg.socdm.com",
-        "registered_domain": "socdm.com"
+        "registered_domain": "socdm.com",
+        "subdomain": "tg",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "124.146.215.43",
@@ -13050,7 +13308,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13071,7 +13329,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 197,
       "user": {
@@ -13095,7 +13353,9 @@
       ],
       "question": {
         "name": "prebid.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "prebid",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.153.75"
@@ -13125,7 +13385,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13146,7 +13406,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 198,
       "user": {
@@ -13178,7 +13438,9 @@
       ],
       "question": {
         "name": "ul1.dvtps.com",
-        "registered_domain": "dvtps.com"
+        "registered_domain": "dvtps.com",
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -13208,7 +13470,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13229,7 +13491,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 199,
       "user": {
@@ -13243,7 +13505,9 @@
     "dns": {
       "question": {
         "name": "ul1.dvtps.com",
-        "registered_domain": "dvtps.com"
+        "registered_domain": "dvtps.com",
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -13270,7 +13534,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13291,7 +13555,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 200,
       "user": {
@@ -13319,7 +13583,9 @@
       ],
       "question": {
         "name": "tags.bluekai.com",
-        "registered_domain": "bluekai.com"
+        "registered_domain": "bluekai.com",
+        "subdomain": "tags",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.3.125.199"
@@ -13349,7 +13615,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13370,7 +13636,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 201,
       "user": {
@@ -13434,7 +13700,9 @@
       ],
       "question": {
         "name": "cdnjs.cloudflare.com",
-        "registered_domain": "cloudflare.com"
+        "registered_domain": "cloudflare.com",
+        "subdomain": "cdnjs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.19.195.151",
@@ -13475,7 +13743,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13496,7 +13764,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 202,
       "user": {
@@ -13560,7 +13828,9 @@
       ],
       "question": {
         "name": "pixel.onaudience.com",
-        "registered_domain": "onaudience.com"
+        "registered_domain": "onaudience.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "85.194.243.23",
@@ -13601,7 +13871,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13622,7 +13892,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 203,
       "user": {
@@ -13650,7 +13920,9 @@
       ],
       "question": {
         "name": "status.geotrust.com",
-        "registered_domain": "geotrust.com"
+        "registered_domain": "geotrust.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -13680,7 +13952,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13701,7 +13973,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 204,
       "user": {
@@ -13761,7 +14033,9 @@
       ],
       "question": {
         "name": "ocsp.trust-provider.com",
-        "registered_domain": "trust-provider.com"
+        "registered_domain": "trust-provider.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -13800,7 +14074,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13821,7 +14095,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 205,
       "user": {
@@ -13881,7 +14155,9 @@
       ],
       "question": {
         "name": "ocsp.comodoca4.com",
-        "registered_domain": "comodoca4.com"
+        "registered_domain": "comodoca4.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -13920,7 +14196,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -13941,7 +14217,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 206,
       "user": {
@@ -14001,7 +14277,9 @@
       ],
       "question": {
         "name": "sync.crwdcntrl.net",
-        "registered_domain": "crwdcntrl.net"
+        "registered_domain": "crwdcntrl.net",
+        "subdomain": "sync",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "52.4.111.14",
@@ -14039,7 +14317,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14060,7 +14338,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 207,
       "user": {
@@ -14112,7 +14390,9 @@
       ],
       "question": {
         "name": "match.sync.ad.cpe.dotomi.com",
-        "registered_domain": "dotomi.com"
+        "registered_domain": "dotomi.com",
+        "subdomain": "match.sync.ad.cpe",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "159.127.42.114",
@@ -14147,7 +14427,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14168,7 +14448,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 208,
       "user": {
@@ -14196,7 +14476,9 @@
       ],
       "question": {
         "name": "tps10230.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps10230",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -14226,7 +14508,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14247,7 +14529,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 209,
       "user": {
@@ -14275,7 +14557,9 @@
       ],
       "question": {
         "name": "tps10221.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps10221",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -14305,7 +14589,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14326,7 +14610,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 210,
       "user": {
@@ -14386,7 +14670,9 @@
       ],
       "question": {
         "name": "www.facebook.com",
-        "registered_domain": "facebook.com"
+        "registered_domain": "facebook.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "31.13.71.36",
@@ -14425,7 +14711,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14446,7 +14732,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 212,
       "user": {
@@ -14486,7 +14772,9 @@
       ],
       "question": {
         "name": "platform.twitter.com",
-        "registered_domain": "twitter.com"
+        "registered_domain": "twitter.com",
+        "subdomain": "platform",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "192.229.163.25"
@@ -14516,7 +14804,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14537,7 +14825,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 213,
       "user": {
@@ -14601,7 +14889,9 @@
       ],
       "question": {
         "name": "syndication.twitter.com",
-        "registered_domain": "twitter.com"
+        "registered_domain": "twitter.com",
+        "subdomain": "syndication",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.42.8",
@@ -14642,7 +14932,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14663,7 +14953,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 214,
       "user": {
@@ -14687,7 +14977,9 @@
       ],
       "question": {
         "name": "ade.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "ade",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -14717,7 +15009,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A9-5D2F-0000-001053699900}",
+      "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
       "executable": "C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 2736
@@ -14738,7 +15030,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 215,
       "user": {
@@ -14766,7 +15058,9 @@
       ],
       "question": {
         "name": "iecvlist.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "iecvlist",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.81.200"
@@ -14796,7 +15090,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -14817,7 +15111,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 216,
       "user": {
@@ -14841,7 +15135,9 @@
       ],
       "question": {
         "name": "tsfe.trafficshaping.dsp.mp.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "tsfe.trafficshaping.dsp.mp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.77.232.95"
@@ -14871,7 +15167,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-00106ACA0000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 844
@@ -14892,7 +15188,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 220,
       "user": {
@@ -14906,7 +15202,9 @@
     "dns": {
       "question": {
         "name": "isatap.local.crowbird.com",
-        "registered_domain": "crowbird.com"
+        "registered_domain": "crowbird.com",
+        "subdomain": "isatap.local",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -14933,7 +15231,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-00106ACA0000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 844
@@ -14954,7 +15252,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 221,
       "user": {
@@ -14994,7 +15292,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E9F7-5D2F-0000-001031039C00}",
+      "entity_id": "{fa4a0de6-e9f7-5d2f-0000-001031039c00}",
       "executable": "C:\\Program Files\\Puppet Labs\\Puppet\\sys\\ruby\\bin\\ruby.exe",
       "name": "ruby.exe",
       "pid": 676
@@ -15015,7 +15313,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 230,
       "user": {
@@ -15055,7 +15353,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A2-5D2F-0000-001016F70000}",
+      "entity_id": "{fa4a0de6-b1a2-5d2f-0000-001016f70000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 636
@@ -15076,7 +15374,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 231,
       "user": {
@@ -15108,7 +15406,9 @@
       ],
       "question": {
         "name": "v10.vortex-win.data.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "v10.vortex-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "65.55.44.109"
@@ -15138,7 +15438,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A3-5D2F-0000-00102F440100}",
+      "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 1788
@@ -15159,7 +15459,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 232,
       "user": {
@@ -15183,7 +15483,9 @@
       ],
       "question": {
         "name": "settings-win.data.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "settings-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.218.63"
@@ -15213,7 +15515,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-B1A3-5D2F-0000-00102F440100}",
+      "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "name": "svchost.exe",
       "pid": 1788
@@ -15234,7 +15536,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 233,
       "user": {
@@ -15286,7 +15588,9 @@
       ],
       "question": {
         "name": "c.urs.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "c.urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.121.17.79",
@@ -15322,7 +15626,7 @@
       "protocol": "dns"
     },
     "process": {
-      "entity_id": "{FA4A0DE6-E8A8-5D2F-0000-001094619900}",
+      "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
       "executable": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
       "name": "iexplore.exe",
       "pid": 356
@@ -15343,7 +15647,7 @@
           "id": 1684
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 234,
       "user": {

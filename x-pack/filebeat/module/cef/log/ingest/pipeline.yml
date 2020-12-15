@@ -87,6 +87,10 @@ processors:
   - pipeline:
         name: '{< IngestPipeline "cp-pipeline" >}'
         if: "ctx.cef?.device?.vendor == 'Check Point'"
+  - remove:
+      field:
+        - _temp_
+      ignore_missing: true
 on_failure:
   - set:
         field: error.message

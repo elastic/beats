@@ -669,6 +669,10 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
   # Kafka version Winlogbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 

@@ -21,12 +21,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7880,
         "related.hosts": [
-            "boNemoe4402.www.invalid",
-            "litesse6379.api.domain"
+            "litesse6379.api.domain",
+            "boNemoe4402.www.invalid"
         ],
         "related.ip": [
-            "10.102.123.34",
-            "10.150.92.220"
+            "10.150.92.220",
+            "10.102.123.34"
         ],
         "related.user": [
             "sumdo"
@@ -47,6 +47,9 @@
         "rsa.network.domain": "litesse6379.api.domain",
         "rsa.network.network_service": "http",
         "server.domain": "litesse6379.api.domain",
+        "server.registered_domain": "api.domain",
+        "server.subdomain": "litesse6379",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.150.92.220"
@@ -80,12 +83,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4539,
         "related.hosts": [
-            "olupt4880.api.home",
-            "gnaali6189.internal.localhost"
+            "gnaali6189.internal.localhost",
+            "olupt4880.api.home"
         ],
         "related.ip": [
-            "10.33.212.159",
-            "10.149.203.46"
+            "10.149.203.46",
+            "10.33.212.159"
         ],
         "related.user": [
             "mipsumq"
@@ -106,6 +109,9 @@
         "rsa.network.domain": "gnaali6189.internal.localhost",
         "rsa.network.network_service": "https",
         "server.domain": "gnaali6189.internal.localhost",
+        "server.registered_domain": "internal.localhost",
+        "server.subdomain": "gnaali6189",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.33.212.159"
@@ -139,8 +145,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 445,
         "related.hosts": [
-            "aqu1628.internal.domain",
-            "quis1130.internal.corp"
+            "quis1130.internal.corp",
+            "aqu1628.internal.domain"
         ],
         "related.ip": [
             "10.173.116.41",
@@ -165,6 +171,9 @@
         "rsa.network.domain": "quis1130.internal.corp",
         "rsa.network.network_service": "smtp",
         "server.domain": "quis1130.internal.corp",
+        "server.registered_domain": "internal.corp",
+        "server.subdomain": "quis1130",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.173.116.41"
@@ -198,8 +207,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5712,
         "related.hosts": [
-            "tinculp2940.internal.local",
-            "reprehe189.internal.home"
+            "reprehe189.internal.home",
+            "tinculp2940.internal.local"
         ],
         "related.ip": [
             "10.134.137.177",
@@ -224,6 +233,9 @@
         "rsa.network.domain": "reprehe189.internal.home",
         "rsa.network.network_service": "https",
         "server.domain": "reprehe189.internal.home",
+        "server.registered_domain": "internal.home",
+        "server.subdomain": "reprehe189",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.134.137.177"
@@ -257,12 +269,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6557,
         "related.hosts": [
-            "rad2103.api.domain",
-            "enimad2283.internal.domain"
+            "enimad2283.internal.domain",
+            "rad2103.api.domain"
         ],
         "related.ip": [
-            "10.70.0.60",
-            "10.245.142.250"
+            "10.245.142.250",
+            "10.70.0.60"
         ],
         "related.user": [
             "eos"
@@ -283,6 +295,9 @@
         "rsa.network.domain": "enimad2283.internal.domain",
         "rsa.network.network_service": "pop3",
         "server.domain": "enimad2283.internal.domain",
+        "server.registered_domain": "internal.domain",
+        "server.subdomain": "enimad2283",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.245.142.250"
@@ -316,8 +331,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2061,
         "related.hosts": [
-            "enim5316.www5.local",
-            "doloreeu3553.www5.home"
+            "doloreeu3553.www5.home",
+            "enim5316.www5.local"
         ],
         "related.ip": [
             "10.200.188.142",
@@ -342,6 +357,9 @@
         "rsa.network.domain": "doloreeu3553.www5.home",
         "rsa.network.network_service": "smtp",
         "server.domain": "doloreeu3553.www5.home",
+        "server.registered_domain": "www5.home",
+        "server.subdomain": "doloreeu3553",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.202.72.124"
@@ -375,12 +393,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5722,
         "related.hosts": [
-            "reetdolo2770.www5.local",
-            "iutal13.api.localdomain"
+            "iutal13.api.localdomain",
+            "reetdolo2770.www5.local"
         ],
         "related.ip": [
-            "10.214.225.125",
-            "10.12.44.169"
+            "10.12.44.169",
+            "10.214.225.125"
         ],
         "related.user": [
             "erep"
@@ -401,6 +419,9 @@
         "rsa.network.domain": "iutal13.api.localdomain",
         "rsa.network.network_service": "pop3",
         "server.domain": "iutal13.api.localdomain",
+        "server.registered_domain": "api.localdomain",
+        "server.subdomain": "iutal13",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.12.44.169"
@@ -434,8 +455,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5037,
         "related.hosts": [
-            "isiu1114.internal.corp",
-            "uovol492.www.localhost"
+            "uovol492.www.localhost",
+            "isiu1114.internal.corp"
         ],
         "related.ip": [
             "10.66.108.11",
@@ -460,6 +481,9 @@
         "rsa.network.domain": "uovol492.www.localhost",
         "rsa.network.network_service": "http",
         "server.domain": "uovol492.www.localhost",
+        "server.registered_domain": "www.localhost",
+        "server.subdomain": "uovol492",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.66.108.11"
@@ -493,12 +517,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 776,
         "related.hosts": [
-            "usmodte1296.www.corp",
-            "osquir6997.corp"
+            "osquir6997.corp",
+            "usmodte1296.www.corp"
         ],
         "related.ip": [
-            "10.69.20.77",
-            "10.178.244.31"
+            "10.178.244.31",
+            "10.69.20.77"
         ],
         "related.user": [
             "umdolor"
@@ -519,6 +543,8 @@
         "rsa.network.domain": "osquir6997.corp",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "osquir6997.corp",
+        "server.registered_domain": "osquir6997.corp",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.178.244.31"
@@ -552,12 +578,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6096,
         "related.hosts": [
-            "tatno4987.www5.localhost",
-            "eniam7007.api.invalid"
+            "eniam7007.api.invalid",
+            "tatno4987.www5.localhost"
         ],
         "related.ip": [
-            "10.203.5.162",
-            "10.54.231.100"
+            "10.54.231.100",
+            "10.203.5.162"
         ],
         "related.user": [
             "umdolore"
@@ -578,6 +604,9 @@
         "rsa.network.domain": "eniam7007.api.invalid",
         "rsa.network.network_service": "pop3",
         "server.domain": "eniam7007.api.invalid",
+        "server.registered_domain": "api.invalid",
+        "server.subdomain": "eniam7007",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.231.100"
@@ -611,8 +640,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7307,
         "related.hosts": [
-            "tatno6787.internal.localhost",
-            "snulapar3794.api.domain"
+            "snulapar3794.api.domain",
+            "tatno6787.internal.localhost"
         ],
         "related.ip": [
             "10.136.252.240",
@@ -637,6 +666,9 @@
         "rsa.network.domain": "snulapar3794.api.domain",
         "rsa.network.network_service": "pop3",
         "server.domain": "snulapar3794.api.domain",
+        "server.registered_domain": "api.domain",
+        "server.subdomain": "snulapar3794",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.65.83.160"
@@ -670,8 +702,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2703,
         "related.hosts": [
-            "essecill2595.mail.local",
-            "liq5883.localdomain"
+            "liq5883.localdomain",
+            "essecill2595.mail.local"
         ],
         "related.ip": [
             "10.57.40.29",
@@ -696,6 +728,8 @@
         "rsa.network.domain": "liq5883.localdomain",
         "rsa.network.network_service": "http",
         "server.domain": "liq5883.localdomain",
+        "server.registered_domain": "liq5883.localdomain",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.57.40.29"
@@ -729,8 +763,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5166,
         "related.hosts": [
-            "ali6446.localhost",
-            "rsint7026.test"
+            "rsint7026.test",
+            "ali6446.localhost"
         ],
         "related.ip": [
             "10.144.82.69",
@@ -755,6 +789,8 @@
         "rsa.network.domain": "rsint7026.test",
         "rsa.network.network_service": "smtp",
         "server.domain": "rsint7026.test",
+        "server.registered_domain": "rsint7026.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.144.82.69"
@@ -788,12 +824,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7668,
         "related.hosts": [
-            "torev7118.internal.domain",
-            "qua2945.www.local"
+            "qua2945.www.local",
+            "torev7118.internal.domain"
         ],
         "related.ip": [
-            "10.109.232.112",
-            "10.72.58.135"
+            "10.72.58.135",
+            "10.109.232.112"
         ],
         "related.user": [
             "xea"
@@ -814,6 +850,9 @@
         "rsa.network.domain": "qua2945.www.local",
         "rsa.network.network_service": "smtp",
         "server.domain": "qua2945.www.local",
+        "server.registered_domain": "www.local",
+        "server.subdomain": "qua2945",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.109.232.112"
@@ -847,8 +886,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1044,
         "related.hosts": [
-            "dolore6103.www5.example",
-            "luptat6494.www.example"
+            "luptat6494.www.example",
+            "dolore6103.www5.example"
         ],
         "related.ip": [
             "10.72.29.73",
@@ -873,6 +912,9 @@
         "rsa.network.domain": "luptat6494.www.example",
         "rsa.network.network_service": "http",
         "server.domain": "luptat6494.www.example",
+        "server.registered_domain": "www.example",
+        "server.subdomain": "luptat6494",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.22.45"
@@ -906,12 +948,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7183,
         "related.hosts": [
-            "errorsi6996.www.domain",
-            "moenimi6317.internal.invalid"
+            "moenimi6317.internal.invalid",
+            "errorsi6996.www.domain"
         ],
         "related.ip": [
-            "10.70.95.74",
-            "10.76.72.111"
+            "10.76.72.111",
+            "10.70.95.74"
         ],
         "related.user": [
             "ivelits"
@@ -932,6 +974,9 @@
         "rsa.network.domain": "moenimi6317.internal.invalid",
         "rsa.network.network_service": "smtp",
         "server.domain": "moenimi6317.internal.invalid",
+        "server.registered_domain": "internal.invalid",
+        "server.subdomain": "moenimi6317",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.70.95.74"
@@ -965,12 +1010,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6907,
         "related.hosts": [
-            "lumquido5839.api.corp",
-            "tion1761.home"
+            "tion1761.home",
+            "lumquido5839.api.corp"
         ],
         "related.ip": [
-            "10.19.201.13",
-            "10.73.69.75"
+            "10.73.69.75",
+            "10.19.201.13"
         ],
         "related.user": [
             "tat"
@@ -991,6 +1036,8 @@
         "rsa.network.domain": "tion1761.home",
         "rsa.network.network_service": "https",
         "server.domain": "tion1761.home",
+        "server.registered_domain": "tion1761.home",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.19.201.13"
@@ -1024,8 +1071,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 499,
         "related.hosts": [
-            "aperia4409.www5.invalid",
-            "santium4235.api.local"
+            "santium4235.api.local",
+            "aperia4409.www5.invalid"
         ],
         "related.ip": [
             "10.78.151.178",
@@ -1050,6 +1097,9 @@
         "rsa.network.domain": "santium4235.api.local",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "santium4235.api.local",
+        "server.registered_domain": "api.local",
+        "server.subdomain": "santium4235",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.78.151.178"
@@ -1083,8 +1133,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1531,
         "related.hosts": [
-            "tem2496.api.lan",
-            "CSed2857.www5.example"
+            "CSed2857.www5.example",
+            "tem2496.api.lan"
         ],
         "related.ip": [
             "10.135.233.146",
@@ -1109,6 +1159,9 @@
         "rsa.network.domain": "CSed2857.www5.example",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "CSed2857.www5.example",
+        "server.registered_domain": "www5.example",
+        "server.subdomain": "CSed2857",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.135.233.146"
@@ -1142,12 +1195,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6051,
         "related.hosts": [
-            "eme6710.mail.invalid",
-            "equep5085.mail.domain"
+            "equep5085.mail.domain",
+            "eme6710.mail.invalid"
         ],
         "related.ip": [
-            "10.121.219.204",
-            "10.104.134.200"
+            "10.104.134.200",
+            "10.121.219.204"
         ],
         "related.user": [
             "uptat"
@@ -1168,6 +1221,9 @@
         "rsa.network.domain": "equep5085.mail.domain",
         "rsa.network.network_service": "https",
         "server.domain": "equep5085.mail.domain",
+        "server.registered_domain": "mail.domain",
+        "server.subdomain": "equep5085",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.121.219.204"
@@ -1201,8 +1257,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6994,
         "related.hosts": [
-            "ihilm1669.mail.invalid",
-            "conseq557.mail.lan"
+            "conseq557.mail.lan",
+            "ihilm1669.mail.invalid"
         ],
         "related.ip": [
             "10.191.105.82",
@@ -1227,6 +1283,9 @@
         "rsa.network.domain": "conseq557.mail.lan",
         "rsa.network.network_service": "https",
         "server.domain": "conseq557.mail.lan",
+        "server.registered_domain": "mail.lan",
+        "server.subdomain": "conseq557",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.191.105.82"
@@ -1260,8 +1319,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5200,
         "related.hosts": [
-            "umexerci1284.internal.localdomain",
-            "ite2026.www.invalid"
+            "ite2026.www.invalid",
+            "umexerci1284.internal.localdomain"
         ],
         "related.ip": [
             "10.141.44.153",
@@ -1286,6 +1345,9 @@
         "rsa.network.domain": "ite2026.www.invalid",
         "rsa.network.network_service": "smtp",
         "server.domain": "ite2026.www.invalid",
+        "server.registered_domain": "www.invalid",
+        "server.subdomain": "ite2026",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.141.44.153"
@@ -1319,8 +1381,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3365,
         "related.hosts": [
-            "adol485.example",
-            "lit5929.test"
+            "lit5929.test",
+            "adol485.example"
         ],
         "related.ip": [
             "10.6.167.7",
@@ -1345,6 +1407,8 @@
         "rsa.network.domain": "lit5929.test",
         "rsa.network.network_service": "https",
         "server.domain": "lit5929.test",
+        "server.registered_domain": "lit5929.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.153.111.103"
@@ -1378,12 +1442,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1835,
         "related.hosts": [
-            "evita5008.www.localdomain",
-            "oru6938.invalid"
+            "oru6938.invalid",
+            "evita5008.www.localdomain"
         ],
         "related.ip": [
-            "10.248.204.182",
-            "10.134.148.219"
+            "10.134.148.219",
+            "10.248.204.182"
         ],
         "related.user": [
             "uioffi"
@@ -1404,6 +1468,8 @@
         "rsa.network.domain": "oru6938.invalid",
         "rsa.network.network_service": "pop3",
         "server.domain": "oru6938.invalid",
+        "server.registered_domain": "oru6938.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.248.204.182"
@@ -1437,8 +1503,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2019,
         "related.hosts": [
-            "tsedqu2456.www5.invalid",
-            "etdol5473.local"
+            "etdol5473.local",
+            "tsedqu2456.www5.invalid"
         ],
         "related.ip": [
             "10.163.5.243",
@@ -1463,6 +1529,8 @@
         "rsa.network.domain": "etdol5473.local",
         "rsa.network.network_service": "smtp",
         "server.domain": "etdol5473.local",
+        "server.registered_domain": "etdol5473.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.178.77.231"
@@ -1496,8 +1564,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2493,
         "related.hosts": [
-            "ris3314.mail.invalid",
-            "nimid893.mail.corp"
+            "nimid893.mail.corp",
+            "ris3314.mail.invalid"
         ],
         "related.ip": [
             "10.221.89.228",
@@ -1522,6 +1590,9 @@
         "rsa.network.domain": "nimid893.mail.corp",
         "rsa.network.network_service": "smtp",
         "server.domain": "nimid893.mail.corp",
+        "server.registered_domain": "mail.corp",
+        "server.subdomain": "nimid893",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.177.194.18"
@@ -1555,12 +1626,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3022,
         "related.hosts": [
-            "reme622.mail.example",
-            "rumwritt6003.host"
+            "rumwritt6003.host",
+            "reme622.mail.example"
         ],
         "related.ip": [
-            "10.32.239.1",
-            "10.241.65.49"
+            "10.241.65.49",
+            "10.32.239.1"
         ],
         "related.user": [
             "idata"
@@ -1581,6 +1652,8 @@
         "rsa.network.domain": "rumwritt6003.host",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "rumwritt6003.host",
+        "server.registered_domain": "rumwritt6003.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.241.65.49"
@@ -1614,12 +1687,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2328,
         "related.hosts": [
-            "non3341.mail.invalid",
-            "xeacomm6855.api.corp"
+            "xeacomm6855.api.corp",
+            "non3341.mail.invalid"
         ],
         "related.ip": [
-            "10.101.57.120",
-            "10.168.90.81"
+            "10.168.90.81",
+            "10.101.57.120"
         ],
         "related.user": [
             "eporr"
@@ -1640,6 +1713,9 @@
         "rsa.network.domain": "xeacomm6855.api.corp",
         "rsa.network.network_service": "http",
         "server.domain": "xeacomm6855.api.corp",
+        "server.registered_domain": "api.corp",
+        "server.subdomain": "xeacomm6855",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.168.90.81"
@@ -1673,8 +1749,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1156,
         "related.hosts": [
-            "ris727.api.local",
-            "icabo4125.mail.domain"
+            "icabo4125.mail.domain",
+            "ris727.api.local"
         ],
         "related.ip": [
             "10.130.14.60",
@@ -1699,6 +1775,9 @@
         "rsa.network.domain": "icabo4125.mail.domain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "icabo4125.mail.domain",
+        "server.registered_domain": "mail.domain",
+        "server.subdomain": "icabo4125",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.14.211.43"
@@ -1732,12 +1811,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6003,
         "related.hosts": [
-            "stquido5705.api.host",
-            "ionofdeF5643.www.localhost"
+            "ionofdeF5643.www.localhost",
+            "stquido5705.api.host"
         ],
         "related.ip": [
-            "10.60.129.15",
-            "10.248.101.25"
+            "10.248.101.25",
+            "10.60.129.15"
         ],
         "related.user": [
             "evolup"
@@ -1758,6 +1837,9 @@
         "rsa.network.domain": "ionofdeF5643.www.localhost",
         "rsa.network.network_service": "http",
         "server.domain": "ionofdeF5643.www.localhost",
+        "server.registered_domain": "www.localhost",
+        "server.subdomain": "ionofdeF5643",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.60.129.15"
@@ -1791,8 +1873,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5651,
         "related.hosts": [
-            "etcons7378.api.lan",
-            "orem6702.invalid"
+            "orem6702.invalid",
+            "etcons7378.api.lan"
         ],
         "related.ip": [
             "10.111.187.12",
@@ -1817,6 +1899,8 @@
         "rsa.network.domain": "orem6702.invalid",
         "rsa.network.network_service": "https",
         "server.domain": "orem6702.invalid",
+        "server.registered_domain": "orem6702.invalid",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.72.93.28"
@@ -1850,12 +1934,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3470,
         "related.hosts": [
-            "vita2681.www5.local",
-            "oin6780.mail.domain"
+            "oin6780.mail.domain",
+            "vita2681.www5.local"
         ],
         "related.ip": [
-            "10.27.14.168",
-            "10.66.2.232"
+            "10.66.2.232",
+            "10.27.14.168"
         ],
         "related.user": [
             "uirati"
@@ -1876,6 +1960,9 @@
         "rsa.network.domain": "oin6780.mail.domain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "oin6780.mail.domain",
+        "server.registered_domain": "mail.domain",
+        "server.subdomain": "oin6780",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.27.14.168"
@@ -1909,12 +1996,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6932,
         "related.hosts": [
-            "tnulapa7592.www.local",
-            "eprehen3224.www5.localdomain"
+            "eprehen3224.www5.localdomain",
+            "tnulapa7592.www.local"
         ],
         "related.ip": [
-            "10.75.99.127",
-            "10.195.2.130"
+            "10.195.2.130",
+            "10.75.99.127"
         ],
         "related.user": [
             "inibusB"
@@ -1935,6 +2022,9 @@
         "rsa.network.domain": "eprehen3224.www5.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "eprehen3224.www5.localdomain",
+        "server.registered_domain": "www5.localdomain",
+        "server.subdomain": "eprehen3224",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.75.99.127"
@@ -1968,12 +2058,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6945,
         "related.hosts": [
-            "lup2134.www.localhost",
-            "ptasn6599.www.localhost"
+            "ptasn6599.www.localhost",
+            "lup2134.www.localhost"
         ],
         "related.ip": [
-            "10.245.104.182",
-            "10.201.238.90"
+            "10.201.238.90",
+            "10.245.104.182"
         ],
         "related.user": [
             "ovol"
@@ -1994,6 +2084,9 @@
         "rsa.network.domain": "ptasn6599.www.localhost",
         "rsa.network.network_service": "pop3",
         "server.domain": "ptasn6599.www.localhost",
+        "server.registered_domain": "www.localhost",
+        "server.subdomain": "ptasn6599",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.201.238.90"
@@ -2027,12 +2120,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 853,
         "related.hosts": [
-            "tanimid3337.mail.corp",
-            "nisist2752.home"
+            "nisist2752.home",
+            "tanimid3337.mail.corp"
         ],
         "related.ip": [
-            "10.217.150.196",
-            "10.105.91.31"
+            "10.105.91.31",
+            "10.217.150.196"
         ],
         "related.user": [
             "con"
@@ -2053,6 +2146,8 @@
         "rsa.network.domain": "nisist2752.home",
         "rsa.network.network_service": "http",
         "server.domain": "nisist2752.home",
+        "server.registered_domain": "nisist2752.home",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.217.150.196"
@@ -2086,12 +2181,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4153,
         "related.hosts": [
-            "eumiu765.api.lan",
-            "gitsedqu2649.mail.lan"
+            "gitsedqu2649.mail.lan",
+            "eumiu765.api.lan"
         ],
         "related.ip": [
-            "10.4.157.1",
-            "10.184.18.202"
+            "10.184.18.202",
+            "10.4.157.1"
         ],
         "related.user": [
             "oditem"
@@ -2112,6 +2207,9 @@
         "rsa.network.domain": "gitsedqu2649.mail.lan",
         "rsa.network.network_service": "https",
         "server.domain": "gitsedqu2649.mail.lan",
+        "server.registered_domain": "mail.lan",
+        "server.subdomain": "gitsedqu2649",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.4.157.1"
@@ -2145,8 +2243,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1693,
         "related.hosts": [
-            "mquelau5326.mail.lan",
-            "entsunt3962.www.example"
+            "entsunt3962.www.example",
+            "mquelau5326.mail.lan"
         ],
         "related.ip": [
             "10.113.95.59",
@@ -2171,6 +2269,9 @@
         "rsa.network.domain": "entsunt3962.www.example",
         "rsa.network.network_service": "https",
         "server.domain": "entsunt3962.www.example",
+        "server.registered_domain": "www.example",
+        "server.subdomain": "entsunt3962",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.255.39.252"
@@ -2204,12 +2305,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 337,
         "related.hosts": [
-            "idestlab2631.www.lan",
-            "tut2703.www.host"
+            "tut2703.www.host",
+            "idestlab2631.www.lan"
         ],
         "related.ip": [
-            "10.83.177.2",
-            "10.27.16.118"
+            "10.27.16.118",
+            "10.83.177.2"
         ],
         "related.user": [
             "borios"
@@ -2230,6 +2331,9 @@
         "rsa.network.domain": "tut2703.www.host",
         "rsa.network.network_service": "http",
         "server.domain": "tut2703.www.host",
+        "server.registered_domain": "www.host",
+        "server.subdomain": "tut2703",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.27.16.118"
@@ -2263,12 +2367,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7041,
         "related.hosts": [
-            "inesci6789.test",
-            "entorev160.test"
+            "entorev160.test",
+            "inesci6789.test"
         ],
         "related.ip": [
-            "10.167.227.44",
-            "10.38.54.72"
+            "10.38.54.72",
+            "10.167.227.44"
         ],
         "related.user": [
             "riamea"
@@ -2289,6 +2393,8 @@
         "rsa.network.domain": "entorev160.test",
         "rsa.network.network_service": "http",
         "server.domain": "entorev160.test",
+        "server.registered_domain": "entorev160.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.54.72"
@@ -2322,8 +2428,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3854,
         "related.hosts": [
-            "ccaeca7077.internal.corp",
-            "proide3714.mail.localdomain"
+            "proide3714.mail.localdomain",
+            "ccaeca7077.internal.corp"
         ],
         "related.ip": [
             "10.215.205.216",
@@ -2348,6 +2454,9 @@
         "rsa.network.domain": "proide3714.mail.localdomain",
         "rsa.network.network_service": "http",
         "server.domain": "proide3714.mail.localdomain",
+        "server.registered_domain": "mail.localdomain",
+        "server.subdomain": "proide3714",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.216.54.184"
@@ -2381,12 +2490,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 55,
         "related.hosts": [
-            "ima2031.api.corp",
-            "tot5313.mail.invalid"
+            "tot5313.mail.invalid",
+            "ima2031.api.corp"
         ],
         "related.ip": [
-            "10.9.12.248",
-            "10.9.18.237"
+            "10.9.18.237",
+            "10.9.12.248"
         ],
         "related.user": [
             "uradi"
@@ -2407,6 +2516,9 @@
         "rsa.network.domain": "tot5313.mail.invalid",
         "rsa.network.network_service": "smtp",
         "server.domain": "tot5313.mail.invalid",
+        "server.registered_domain": "mail.invalid",
+        "server.subdomain": "tot5313",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.9.12.248"
@@ -2440,8 +2552,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 228,
         "related.hosts": [
-            "ian867.internal.corp",
-            "rumet3801.internal.domain"
+            "rumet3801.internal.domain",
+            "ian867.internal.corp"
         ],
         "related.ip": [
             "10.83.130.226",
@@ -2466,6 +2578,9 @@
         "rsa.network.domain": "rumet3801.internal.domain",
         "rsa.network.network_service": "https",
         "server.domain": "rumet3801.internal.domain",
+        "server.registered_domain": "internal.domain",
+        "server.subdomain": "rumet3801",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.83.130.226"
@@ -2499,8 +2614,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4253,
         "related.hosts": [
-            "lorin4249.corp",
-            "liqua2834.www5.lan"
+            "liqua2834.www5.lan",
+            "lorin4249.corp"
         ],
         "related.ip": [
             "10.175.112.197",
@@ -2525,6 +2640,9 @@
         "rsa.network.domain": "liqua2834.www5.lan",
         "rsa.network.network_service": "pop3",
         "server.domain": "liqua2834.www5.lan",
+        "server.registered_domain": "www5.lan",
+        "server.subdomain": "liqua2834",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.175.112.197"
@@ -2558,8 +2676,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2200,
         "related.hosts": [
-            "gnaaliqu3935.api.test",
-            "sequat7273.api.host"
+            "sequat7273.api.host",
+            "gnaaliqu3935.api.test"
         ],
         "related.ip": [
             "10.142.25.100",
@@ -2584,6 +2702,9 @@
         "rsa.network.domain": "sequat7273.api.host",
         "rsa.network.network_service": "smtp",
         "server.domain": "sequat7273.api.host",
+        "server.registered_domain": "api.host",
+        "server.subdomain": "sequat7273",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.134.18.114"
@@ -2617,12 +2738,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5717,
         "related.hosts": [
-            "nsequat1859.internal.localhost",
-            "uidol4575.localhost"
+            "uidol4575.localhost",
+            "nsequat1859.internal.localhost"
         ],
         "related.ip": [
-            "10.223.119.218",
-            "10.28.118.160"
+            "10.28.118.160",
+            "10.223.119.218"
         ],
         "related.user": [
             "ntsunt"
@@ -2643,6 +2764,8 @@
         "rsa.network.domain": "uidol4575.localhost",
         "rsa.network.network_service": "http",
         "server.domain": "uidol4575.localhost",
+        "server.registered_domain": "uidol4575.localhost",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.28.118.160"
@@ -2676,12 +2799,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4469,
         "related.hosts": [
-            "ritin2495.api.corp",
-            "oremq2000.api.corp"
+            "oremq2000.api.corp",
+            "ritin2495.api.corp"
         ],
         "related.ip": [
-            "10.47.28.48",
-            "10.110.114.175"
+            "10.110.114.175",
+            "10.47.28.48"
         ],
         "related.user": [
             "plicab"
@@ -2702,6 +2825,9 @@
         "rsa.network.domain": "oremq2000.api.corp",
         "rsa.network.network_service": "https",
         "server.domain": "oremq2000.api.corp",
+        "server.registered_domain": "api.corp",
+        "server.subdomain": "oremq2000",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.110.114.175"
@@ -2735,12 +2861,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5524,
         "related.hosts": [
-            "tetur2694.mail.local",
-            "oremi1485.api.localhost"
+            "oremi1485.api.localhost",
+            "tetur2694.mail.local"
         ],
         "related.ip": [
-            "10.40.251.202",
-            "10.90.33.138"
+            "10.90.33.138",
+            "10.40.251.202"
         ],
         "related.user": [
             "nvolupt"
@@ -2761,6 +2887,9 @@
         "rsa.network.domain": "oremi1485.api.localhost",
         "rsa.network.network_service": "pop3",
         "server.domain": "oremi1485.api.localhost",
+        "server.registered_domain": "api.localhost",
+        "server.subdomain": "oremi1485",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.40.251.202"
@@ -2794,12 +2923,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3624,
         "related.hosts": [
-            "rem7043.localhost",
-            "sequatD5469.www5.lan"
+            "sequatD5469.www5.lan",
+            "rem7043.localhost"
         ],
         "related.ip": [
-            "10.65.2.106",
-            "10.227.173.252"
+            "10.227.173.252",
+            "10.65.2.106"
         ],
         "related.user": [
             "itation"
@@ -2820,6 +2949,9 @@
         "rsa.network.domain": "sequatD5469.www5.lan",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "sequatD5469.www5.lan",
+        "server.registered_domain": "www5.lan",
+        "server.subdomain": "sequatD5469",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.65.2.106"
@@ -2853,12 +2985,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1609,
         "related.hosts": [
-            "emqu2846.internal.home",
-            "item2738.test"
+            "item2738.test",
+            "emqu2846.internal.home"
         ],
         "related.ip": [
-            "10.28.84.106",
-            "10.193.233.229"
+            "10.193.233.229",
+            "10.28.84.106"
         ],
         "related.user": [
             "tla"
@@ -2879,6 +3011,8 @@
         "rsa.network.domain": "item2738.test",
         "rsa.network.network_service": "https",
         "server.domain": "item2738.test",
+        "server.registered_domain": "item2738.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.193.233.229"
@@ -2912,8 +3046,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6248,
         "related.hosts": [
-            "dqu6144.api.localhost",
-            "iosamnis1047.internal.localdomain"
+            "iosamnis1047.internal.localdomain",
+            "dqu6144.api.localhost"
         ],
         "related.ip": [
             "10.150.245.88",
@@ -2938,6 +3072,9 @@
         "rsa.network.domain": "iosamnis1047.internal.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "iosamnis1047.internal.localdomain",
+        "server.registered_domain": "internal.localdomain",
+        "server.subdomain": "iosamnis1047",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.150.245.88"
@@ -2971,8 +3108,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7224,
         "related.hosts": [
-            "giatquov1918.internal.example",
-            "orroq6677.internal.example"
+            "orroq6677.internal.example",
+            "giatquov1918.internal.example"
         ],
         "related.ip": [
             "10.180.195.43",
@@ -2997,6 +3134,9 @@
         "rsa.network.domain": "orroq6677.internal.example",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "orroq6677.internal.example",
+        "server.registered_domain": "internal.example",
+        "server.subdomain": "orroq6677",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.180.195.43"
@@ -3030,12 +3170,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 430,
         "related.hosts": [
-            "estl5804.internal.local",
-            "onevo4326.internal.local"
+            "onevo4326.internal.local",
+            "estl5804.internal.local"
         ],
         "related.ip": [
-            "10.210.28.247",
-            "10.207.211.230"
+            "10.207.211.230",
+            "10.210.28.247"
         ],
         "related.user": [
             "tate"
@@ -3056,6 +3196,9 @@
         "rsa.network.domain": "onevo4326.internal.local",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "onevo4326.internal.local",
+        "server.registered_domain": "internal.local",
+        "server.subdomain": "onevo4326",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.207.211.230"
@@ -3089,12 +3232,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3589,
         "related.hosts": [
-            "Sedut1775.www.domain",
-            "itaedict7233.mail.localdomain"
+            "itaedict7233.mail.localdomain",
+            "Sedut1775.www.domain"
         ],
         "related.ip": [
-            "10.248.165.185",
-            "10.86.11.48"
+            "10.86.11.48",
+            "10.248.165.185"
         ],
         "related.user": [
             "dquiac"
@@ -3115,6 +3258,9 @@
         "rsa.network.domain": "itaedict7233.mail.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "itaedict7233.mail.localdomain",
+        "server.registered_domain": "mail.localdomain",
+        "server.subdomain": "itaedict7233",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.86.11.48"
@@ -3148,12 +3294,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4814,
         "related.hosts": [
-            "mac7484.www5.test",
-            "numquam5869.internal.example"
+            "numquam5869.internal.example",
+            "mac7484.www5.test"
         ],
         "related.ip": [
-            "10.47.125.38",
-            "10.118.6.177"
+            "10.118.6.177",
+            "10.47.125.38"
         ],
         "related.user": [
             "quunt"
@@ -3174,6 +3320,9 @@
         "rsa.network.domain": "numquam5869.internal.example",
         "rsa.network.network_service": "http",
         "server.domain": "numquam5869.internal.example",
+        "server.registered_domain": "internal.example",
+        "server.subdomain": "numquam5869",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.118.6.177"
@@ -3207,8 +3356,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 276,
         "related.hosts": [
-            "oin1140.mail.localhost",
-            "onu6137.api.home"
+            "onu6137.api.home",
+            "oin1140.mail.localhost"
         ],
         "related.ip": [
             "10.50.233.155",
@@ -3233,6 +3382,9 @@
         "rsa.network.domain": "onu6137.api.home",
         "rsa.network.network_service": "pop3",
         "server.domain": "onu6137.api.home",
+        "server.registered_domain": "api.home",
+        "server.subdomain": "onu6137",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.50.233.155"
@@ -3266,12 +3418,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2452,
         "related.hosts": [
-            "naaliq3710.api.local",
-            "aecatcup2241.www5.test"
+            "aecatcup2241.www5.test",
+            "naaliq3710.api.local"
         ],
         "related.ip": [
-            "10.120.10.211",
-            "10.28.82.189"
+            "10.28.82.189",
+            "10.120.10.211"
         ],
         "related.user": [
             "rcit"
@@ -3292,6 +3444,9 @@
         "rsa.network.domain": "aecatcup2241.www5.test",
         "rsa.network.network_service": "http",
         "server.domain": "aecatcup2241.www5.test",
+        "server.registered_domain": "www5.test",
+        "server.subdomain": "aecatcup2241",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.28.82.189"
@@ -3325,8 +3480,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3453,
         "related.hosts": [
-            "volupta3552.internal.localhost",
-            "labor6360.mail.local"
+            "labor6360.mail.local",
+            "volupta3552.internal.localhost"
         ],
         "related.ip": [
             "10.31.237.225",
@@ -3351,6 +3506,9 @@
         "rsa.network.domain": "labor6360.mail.local",
         "rsa.network.network_service": "pop3",
         "server.domain": "labor6360.mail.local",
+        "server.registered_domain": "mail.local",
+        "server.subdomain": "labor6360",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.31.237.225"
@@ -3384,12 +3542,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2302,
         "related.hosts": [
-            "onse380.internal.localdomain",
-            "mveleum4322.www5.host"
+            "mveleum4322.www5.host",
+            "onse380.internal.localdomain"
         ],
         "related.ip": [
-            "10.125.165.144",
-            "10.226.5.189"
+            "10.226.5.189",
+            "10.125.165.144"
         ],
         "related.user": [
             "mvolu"
@@ -3410,6 +3568,9 @@
         "rsa.network.domain": "mveleum4322.www5.host",
         "rsa.network.network_service": "https",
         "server.domain": "mveleum4322.www5.host",
+        "server.registered_domain": "www5.host",
+        "server.subdomain": "mveleum4322",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.226.5.189"
@@ -3443,12 +3604,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7079,
         "related.hosts": [
-            "queips4947.mail.example",
-            "archite1843.mail.home"
+            "archite1843.mail.home",
+            "queips4947.mail.example"
         ],
         "related.ip": [
-            "10.46.56.204",
-            "10.97.149.97"
+            "10.97.149.97",
+            "10.46.56.204"
         ],
         "related.user": [
             "dolorsit"
@@ -3469,6 +3630,9 @@
         "rsa.network.domain": "archite1843.mail.home",
         "rsa.network.network_service": "smtp",
         "server.domain": "archite1843.mail.home",
+        "server.registered_domain": "mail.home",
+        "server.subdomain": "archite1843",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.97.149.97"
@@ -3502,8 +3666,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5773,
         "related.hosts": [
-            "oloreseo5039.test",
-            "itanim4024.api.example"
+            "itanim4024.api.example",
+            "oloreseo5039.test"
         ],
         "related.ip": [
             "10.28.105.124",
@@ -3528,6 +3692,9 @@
         "rsa.network.domain": "itanim4024.api.example",
         "rsa.network.network_service": "https",
         "server.domain": "itanim4024.api.example",
+        "server.registered_domain": "api.example",
+        "server.subdomain": "itanim4024",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.218.0.197"
@@ -3561,12 +3728,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1586,
         "related.hosts": [
-            "minim459.mail.local",
-            "nreprehe715.api.home"
+            "nreprehe715.api.home",
+            "minim459.mail.local"
         ],
         "related.ip": [
-            "10.123.199.198",
-            "10.17.87.79"
+            "10.17.87.79",
+            "10.123.199.198"
         ],
         "related.user": [
             "ratvolu"
@@ -3587,6 +3754,9 @@
         "rsa.network.domain": "nreprehe715.api.home",
         "rsa.network.network_service": "https",
         "server.domain": "nreprehe715.api.home",
+        "server.registered_domain": "api.home",
+        "server.subdomain": "nreprehe715",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.123.199.198"
@@ -3620,8 +3790,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5137,
         "related.hosts": [
-            "eratv211.api.host",
-            "unte893.internal.host"
+            "unte893.internal.host",
+            "eratv211.api.host"
         ],
         "related.ip": [
             "10.115.68.40",
@@ -3646,6 +3816,9 @@
         "rsa.network.domain": "unte893.internal.host",
         "rsa.network.network_service": "https",
         "server.domain": "unte893.internal.host",
+        "server.registered_domain": "internal.host",
+        "server.subdomain": "unte893",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.38.86.177"
@@ -3679,12 +3852,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5704,
         "related.hosts": [
-            "aparia1179.www.localdomain",
-            "aspe951.mail.domain"
+            "aspe951.mail.domain",
+            "aparia1179.www.localdomain"
         ],
         "related.ip": [
-            "10.115.174.107",
-            "10.193.118.163"
+            "10.193.118.163",
+            "10.115.174.107"
         ],
         "related.user": [
             "exeacomm"
@@ -3705,6 +3878,9 @@
         "rsa.network.domain": "aspe951.mail.domain",
         "rsa.network.network_service": "https",
         "server.domain": "aspe951.mail.domain",
+        "server.registered_domain": "mail.domain",
+        "server.subdomain": "aspe951",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.193.118.163"
@@ -3738,12 +3914,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2310,
         "related.hosts": [
-            "iatqu6203.mail.corp",
-            "dipiscin4957.www.home"
+            "dipiscin4957.www.home",
+            "iatqu6203.mail.corp"
         ],
         "related.ip": [
-            "10.77.77.208",
-            "10.37.128.49"
+            "10.37.128.49",
+            "10.77.77.208"
         ],
         "related.user": [
             "moles"
@@ -3764,6 +3940,9 @@
         "rsa.network.domain": "dipiscin4957.www.home",
         "rsa.network.network_service": "http",
         "server.domain": "dipiscin4957.www.home",
+        "server.registered_domain": "www.home",
+        "server.subdomain": "dipiscin4957",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.37.128.49"
@@ -3797,12 +3976,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5398,
         "related.hosts": [
-            "ptasnula6576.api.invalid",
-            "econs2687.internal.localdomain"
+            "econs2687.internal.localdomain",
+            "ptasnula6576.api.invalid"
         ],
         "related.ip": [
-            "10.54.73.158",
-            "10.1.96.93"
+            "10.1.96.93",
+            "10.54.73.158"
         ],
         "related.user": [
             "lloinven"
@@ -3823,6 +4002,9 @@
         "rsa.network.domain": "econs2687.internal.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "econs2687.internal.localdomain",
+        "server.registered_domain": "internal.localdomain",
+        "server.subdomain": "econs2687",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.73.158"
@@ -3856,8 +4038,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2465,
         "related.hosts": [
-            "mag1506.internal.domain",
-            "tiumto5834.api.lan"
+            "tiumto5834.api.lan",
+            "mag1506.internal.domain"
         ],
         "related.ip": [
             "10.182.152.242",
@@ -3882,6 +4064,9 @@
         "rsa.network.domain": "tiumto5834.api.lan",
         "rsa.network.network_service": "smtp",
         "server.domain": "tiumto5834.api.lan",
+        "server.registered_domain": "api.lan",
+        "server.subdomain": "tiumto5834",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.131.126.109"
@@ -3915,12 +4100,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6064,
         "related.hosts": [
-            "fugits1163.host",
-            "iutal6032.www.test"
+            "iutal6032.www.test",
+            "fugits1163.host"
         ],
         "related.ip": [
-            "10.181.247.224",
-            "10.77.229.168"
+            "10.77.229.168",
+            "10.181.247.224"
         ],
         "related.user": [
             "adol"
@@ -3941,6 +4126,9 @@
         "rsa.network.domain": "iutal6032.www.test",
         "rsa.network.network_service": "http",
         "server.domain": "iutal6032.www.test",
+        "server.registered_domain": "www.test",
+        "server.subdomain": "iutal6032",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.181.247.224"
@@ -3974,12 +4162,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2861,
         "related.hosts": [
-            "gitse2463.www5.invalid",
-            "inculp2078.host"
+            "inculp2078.host",
+            "gitse2463.www5.invalid"
         ],
         "related.ip": [
-            "10.235.116.121",
-            "10.72.162.6"
+            "10.72.162.6",
+            "10.235.116.121"
         ],
         "related.user": [
             "oinv"
@@ -4000,6 +4188,8 @@
         "rsa.network.domain": "inculp2078.host",
         "rsa.network.network_service": "http",
         "server.domain": "inculp2078.host",
+        "server.registered_domain": "inculp2078.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.235.116.121"
@@ -4033,8 +4223,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3559,
         "related.hosts": [
-            "temse6953.www.example",
-            "mexerc2757.internal.home"
+            "mexerc2757.internal.home",
+            "temse6953.www.example"
         ],
         "related.ip": [
             "10.28.124.236",
@@ -4059,6 +4249,9 @@
         "rsa.network.domain": "mexerc2757.internal.home",
         "rsa.network.network_service": "https",
         "server.domain": "mexerc2757.internal.home",
+        "server.registered_domain": "internal.home",
+        "server.subdomain": "mexerc2757",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.149.193.117"
@@ -4092,8 +4285,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1710,
         "related.hosts": [
-            "deriti6952.mail.domain",
-            "squira4455.api.domain"
+            "squira4455.api.domain",
+            "deriti6952.mail.domain"
         ],
         "related.ip": [
             "10.34.131.224",
@@ -4118,6 +4311,9 @@
         "rsa.network.domain": "squira4455.api.domain",
         "rsa.network.network_service": "http",
         "server.domain": "squira4455.api.domain",
+        "server.registered_domain": "api.domain",
+        "server.subdomain": "squira4455",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.34.131.224"
@@ -4151,12 +4347,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4984,
         "related.hosts": [
-            "abor1370.www.domain",
-            "emveleum3661.localhost"
+            "emveleum3661.localhost",
+            "abor1370.www.domain"
         ],
         "related.ip": [
-            "10.97.236.123",
-            "10.77.78.180"
+            "10.77.78.180",
+            "10.97.236.123"
         ],
         "related.user": [
             "nisi"
@@ -4177,6 +4373,8 @@
         "rsa.network.domain": "emveleum3661.localhost",
         "rsa.network.network_service": "https",
         "server.domain": "emveleum3661.localhost",
+        "server.registered_domain": "emveleum3661.localhost",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.97.236.123"
@@ -4210,8 +4408,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3421,
         "related.hosts": [
-            "emullamc5418.mail.test",
-            "sedquiac6517.internal.localhost"
+            "sedquiac6517.internal.localhost",
+            "emullamc5418.mail.test"
         ],
         "related.ip": [
             "10.82.133.66",
@@ -4236,6 +4434,9 @@
         "rsa.network.domain": "sedquiac6517.internal.localhost",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "sedquiac6517.internal.localhost",
+        "server.registered_domain": "internal.localhost",
+        "server.subdomain": "sedquiac6517",
+        "server.top_level_domain": "localhost",
         "service.type": "fortinet",
         "source.ip": [
             "10.82.133.66"
@@ -4269,12 +4470,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4020,
         "related.hosts": [
-            "squirati7050.www5.lan",
-            "veniam3148.www5.home"
+            "veniam3148.www5.home",
+            "squirati7050.www5.lan"
         ],
         "related.ip": [
-            "10.170.252.219",
-            "10.180.180.230"
+            "10.180.180.230",
+            "10.170.252.219"
         ],
         "related.user": [
             "nse"
@@ -4295,6 +4496,9 @@
         "rsa.network.domain": "veniam3148.www5.home",
         "rsa.network.network_service": "pop3",
         "server.domain": "veniam3148.www5.home",
+        "server.registered_domain": "www5.home",
+        "server.subdomain": "veniam3148",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.180.180.230"
@@ -4328,8 +4532,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 617,
         "related.hosts": [
-            "venia2079.mail.example",
-            "unt3559.www.home"
+            "unt3559.www.home",
+            "venia2079.mail.example"
         ],
         "related.ip": [
             "10.5.11.205",
@@ -4354,6 +4558,9 @@
         "rsa.network.domain": "unt3559.www.home",
         "rsa.network.network_service": "http",
         "server.domain": "unt3559.www.home",
+        "server.registered_domain": "www.home",
+        "server.subdomain": "unt3559",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.5.11.205"
@@ -4387,8 +4594,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 487,
         "related.hosts": [
-            "snostrum3450.www5.localhost",
-            "rere5274.mail.domain"
+            "rere5274.mail.domain",
+            "snostrum3450.www5.localhost"
         ],
         "related.ip": [
             "10.76.122.196",
@@ -4413,6 +4620,9 @@
         "rsa.network.domain": "rere5274.mail.domain",
         "rsa.network.network_service": "smtp",
         "server.domain": "rere5274.mail.domain",
+        "server.registered_domain": "mail.domain",
+        "server.subdomain": "rere5274",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.195.223.82"
@@ -4446,12 +4656,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2442,
         "related.hosts": [
-            "gelitsed3249.corp",
-            "uaeabi3728.www5.invalid"
+            "uaeabi3728.www5.invalid",
+            "gelitsed3249.corp"
         ],
         "related.ip": [
-            "10.225.255.211",
-            "10.138.210.116"
+            "10.138.210.116",
+            "10.225.255.211"
         ],
         "related.user": [
             "fugiatn"
@@ -4472,6 +4682,9 @@
         "rsa.network.domain": "uaeabi3728.www5.invalid",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "uaeabi3728.www5.invalid",
+        "server.registered_domain": "www5.invalid",
+        "server.subdomain": "uaeabi3728",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.138.210.116"
@@ -4505,12 +4718,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6311,
         "related.hosts": [
-            "dolor7082.internal.localhost",
-            "uamqu2804.test"
+            "uamqu2804.test",
+            "dolor7082.internal.localhost"
         ],
         "related.ip": [
-            "10.250.81.189",
-            "10.219.1.151"
+            "10.219.1.151",
+            "10.250.81.189"
         ],
         "related.user": [
             "ori"
@@ -4531,6 +4744,8 @@
         "rsa.network.domain": "uamqu2804.test",
         "rsa.network.network_service": "smtp",
         "server.domain": "uamqu2804.test",
+        "server.registered_domain": "uamqu2804.test",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.250.81.189"
@@ -4564,8 +4779,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 7128,
         "related.hosts": [
-            "totam6886.api.localhost",
-            "olor5201.host"
+            "olor5201.host",
+            "totam6886.api.localhost"
         ],
         "related.ip": [
             "10.54.23.133",
@@ -4590,6 +4805,8 @@
         "rsa.network.domain": "olor5201.host",
         "rsa.network.network_service": "https",
         "server.domain": "olor5201.host",
+        "server.registered_domain": "olor5201.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.54.23.133"
@@ -4623,8 +4840,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2780,
         "related.hosts": [
-            "laborum5749.www.example",
-            "eufug3348.www.lan"
+            "eufug3348.www.lan",
+            "laborum5749.www.example"
         ],
         "related.ip": [
             "10.189.42.62",
@@ -4649,6 +4866,9 @@
         "rsa.network.domain": "eufug3348.www.lan",
         "rsa.network.network_service": "http",
         "server.domain": "eufug3348.www.lan",
+        "server.registered_domain": "www.lan",
+        "server.subdomain": "eufug3348",
+        "server.top_level_domain": "lan",
         "service.type": "fortinet",
         "source.ip": [
             "10.36.110.69"
@@ -4682,8 +4902,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3284,
         "related.hosts": [
-            "lup3313.api.home",
-            "stquidol239.www5.invalid"
+            "stquidol239.www5.invalid",
+            "lup3313.api.home"
         ],
         "related.ip": [
             "10.47.179.68",
@@ -4708,6 +4928,9 @@
         "rsa.network.domain": "stquidol239.www5.invalid",
         "rsa.network.network_service": "https",
         "server.domain": "stquidol239.www5.invalid",
+        "server.registered_domain": "www5.invalid",
+        "server.subdomain": "stquidol239",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.47.179.68"
@@ -4741,12 +4964,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2314,
         "related.hosts": [
-            "edq5397.www.test",
-            "gia6531.mail.invalid"
+            "gia6531.mail.invalid",
+            "edq5397.www.test"
         ],
         "related.ip": [
-            "10.73.28.165",
-            "10.221.206.74"
+            "10.221.206.74",
+            "10.73.28.165"
         ],
         "related.user": [
             "quas"
@@ -4767,6 +4990,9 @@
         "rsa.network.domain": "gia6531.mail.invalid",
         "rsa.network.network_service": "pop3",
         "server.domain": "gia6531.mail.invalid",
+        "server.registered_domain": "mail.invalid",
+        "server.subdomain": "gia6531",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.73.28.165"
@@ -4800,12 +5026,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5284,
         "related.hosts": [
-            "udan6536.www5.test",
-            "lamcola4879.www5.localdomain"
+            "lamcola4879.www5.localdomain",
+            "udan6536.www5.test"
         ],
         "related.ip": [
-            "10.85.104.146",
-            "10.14.204.36"
+            "10.14.204.36",
+            "10.85.104.146"
         ],
         "related.user": [
             "emp"
@@ -4826,6 +5052,9 @@
         "rsa.network.domain": "lamcola4879.www5.localdomain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "lamcola4879.www5.localdomain",
+        "server.registered_domain": "www5.localdomain",
+        "server.subdomain": "lamcola4879",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.85.104.146"
@@ -4859,8 +5088,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3990,
         "related.hosts": [
-            "rumet6923.www5.lan",
-            "edquian330.mail.local"
+            "edquian330.mail.local",
+            "rumet6923.www5.lan"
         ],
         "related.ip": [
             "10.30.246.132",
@@ -4885,6 +5114,9 @@
         "rsa.network.domain": "edquian330.mail.local",
         "rsa.network.network_service": "https",
         "server.domain": "edquian330.mail.local",
+        "server.registered_domain": "mail.local",
+        "server.subdomain": "edquian330",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.208.18.210"
@@ -4918,8 +5150,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4337,
         "related.hosts": [
-            "itse522.internal.localdomain",
-            "santi837.api.domain"
+            "santi837.api.domain",
+            "itse522.internal.localdomain"
         ],
         "related.ip": [
             "10.106.249.91",
@@ -4944,6 +5176,9 @@
         "rsa.network.domain": "santi837.api.domain",
         "rsa.network.network_service": "pop3",
         "server.domain": "santi837.api.domain",
+        "server.registered_domain": "api.domain",
+        "server.subdomain": "santi837",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.106.249.91"
@@ -4977,12 +5212,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5275,
         "related.hosts": [
-            "amc3059.local",
-            "lpaquiof804.internal.invalid"
+            "lpaquiof804.internal.invalid",
+            "amc3059.local"
         ],
         "related.ip": [
-            "10.29.109.126",
-            "10.181.41.154"
+            "10.181.41.154",
+            "10.29.109.126"
         ],
         "related.user": [
             "labo"
@@ -5003,6 +5238,9 @@
         "rsa.network.domain": "lpaquiof804.internal.invalid",
         "rsa.network.network_service": "http",
         "server.domain": "lpaquiof804.internal.invalid",
+        "server.registered_domain": "internal.invalid",
+        "server.subdomain": "lpaquiof804",
+        "server.top_level_domain": "invalid",
         "service.type": "fortinet",
         "source.ip": [
             "10.29.109.126"
@@ -5036,8 +5274,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2286,
         "related.hosts": [
-            "enbyCi3813.api.domain",
-            "nonn4478.host"
+            "nonn4478.host",
+            "enbyCi3813.api.domain"
         ],
         "related.ip": [
             "10.164.120.197",
@@ -5062,6 +5300,8 @@
         "rsa.network.domain": "nonn4478.host",
         "rsa.network.network_service": "https",
         "server.domain": "nonn4478.host",
+        "server.registered_domain": "nonn4478.host",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.164.207.42"
@@ -5095,8 +5335,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2990,
         "related.hosts": [
-            "liquipex1155.mail.corp",
-            "amquaer3985.www5.example"
+            "amquaer3985.www5.example",
+            "liquipex1155.mail.corp"
         ],
         "related.ip": [
             "10.154.191.225",
@@ -5121,6 +5361,9 @@
         "rsa.network.domain": "amquaer3985.www5.example",
         "rsa.network.network_service": "smtp",
         "server.domain": "amquaer3985.www5.example",
+        "server.registered_domain": "www5.example",
+        "server.subdomain": "amquaer3985",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.183.189.133"
@@ -5154,8 +5397,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 226,
         "related.hosts": [
-            "isn3991.local",
-            "orem6317.local"
+            "orem6317.local",
+            "isn3991.local"
         ],
         "related.ip": [
             "10.103.189.199",
@@ -5180,6 +5423,8 @@
         "rsa.network.domain": "orem6317.local",
         "rsa.network.network_service": "smtp",
         "server.domain": "orem6317.local",
+        "server.registered_domain": "orem6317.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.29.120.226"
@@ -5213,12 +5458,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4691,
         "related.hosts": [
-            "iumtotam1010.www5.corp",
-            "velill3230.www.corp"
+            "velill3230.www.corp",
+            "iumtotam1010.www5.corp"
         ],
         "related.ip": [
-            "10.133.254.23",
-            "10.210.153.7"
+            "10.210.153.7",
+            "10.133.254.23"
         ],
         "related.user": [
             "voluptas"
@@ -5239,6 +5484,9 @@
         "rsa.network.domain": "velill3230.www.corp",
         "rsa.network.network_service": "https",
         "server.domain": "velill3230.www.corp",
+        "server.registered_domain": "www.corp",
+        "server.subdomain": "velill3230",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.133.254.23"
@@ -5272,12 +5520,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5647,
         "related.hosts": [
-            "onsecte91.www5.localdomain",
-            "orumS757.www5.corp"
+            "orumS757.www5.corp",
+            "onsecte91.www5.localdomain"
         ],
         "related.ip": [
-            "10.126.245.73",
-            "10.91.2.135"
+            "10.91.2.135",
+            "10.126.245.73"
         ],
         "related.user": [
             "olore"
@@ -5298,6 +5546,9 @@
         "rsa.network.domain": "orumS757.www5.corp",
         "rsa.network.network_service": "pop3",
         "server.domain": "orumS757.www5.corp",
+        "server.registered_domain": "www5.corp",
+        "server.subdomain": "orumS757",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.126.245.73"
@@ -5331,8 +5582,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 2313,
         "related.hosts": [
-            "abori7686.internal.host",
-            "emi4534.www.localdomain"
+            "emi4534.www.localdomain",
+            "abori7686.internal.host"
         ],
         "related.ip": [
             "10.183.243.246",
@@ -5357,6 +5608,9 @@
         "rsa.network.domain": "emi4534.www.localdomain",
         "rsa.network.network_service": "https",
         "server.domain": "emi4534.www.localdomain",
+        "server.registered_domain": "www.localdomain",
+        "server.subdomain": "emi4534",
+        "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
         "source.ip": [
             "10.183.243.246"
@@ -5390,8 +5644,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1585,
         "related.hosts": [
-            "reprehen3513.test",
-            "inimav1576.mail.example"
+            "inimav1576.mail.example",
+            "reprehen3513.test"
         ],
         "related.ip": [
             "10.61.225.196",
@@ -5416,6 +5670,9 @@
         "rsa.network.domain": "inimav1576.mail.example",
         "rsa.network.network_service": "smtp",
         "server.domain": "inimav1576.mail.example",
+        "server.registered_domain": "mail.example",
+        "server.subdomain": "inimav1576",
+        "server.top_level_domain": "example",
         "service.type": "fortinet",
         "source.ip": [
             "10.61.225.196"
@@ -5449,12 +5706,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 3141,
         "related.hosts": [
-            "orroquis284.api.domain",
-            "aturQu7083.mail.host"
+            "aturQu7083.mail.host",
+            "orroquis284.api.domain"
         ],
         "related.ip": [
-            "10.125.143.153",
-            "10.79.73.195"
+            "10.79.73.195",
+            "10.125.143.153"
         ],
         "related.user": [
             "emip"
@@ -5475,6 +5732,9 @@
         "rsa.network.domain": "aturQu7083.mail.host",
         "rsa.network.network_service": "http",
         "server.domain": "aturQu7083.mail.host",
+        "server.registered_domain": "mail.host",
+        "server.subdomain": "aturQu7083",
+        "server.top_level_domain": "host",
         "service.type": "fortinet",
         "source.ip": [
             "10.125.143.153"
@@ -5508,12 +5768,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6331,
         "related.hosts": [
-            "tionula2060.www5.localhost",
-            "lumqui7769.mail.local"
+            "lumqui7769.mail.local",
+            "tionula2060.www5.localhost"
         ],
         "related.ip": [
-            "10.64.139.17",
-            "10.240.216.85"
+            "10.240.216.85",
+            "10.64.139.17"
         ],
         "related.user": [
             "nimadmin"
@@ -5534,6 +5794,9 @@
         "rsa.network.domain": "lumqui7769.mail.local",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "lumqui7769.mail.local",
+        "server.registered_domain": "mail.local",
+        "server.subdomain": "lumqui7769",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.240.216.85"
@@ -5567,8 +5830,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4474,
         "related.hosts": [
-            "rumSecti111.www5.domain",
-            "siarc6339.internal.corp"
+            "siarc6339.internal.corp",
+            "rumSecti111.www5.domain"
         ],
         "related.ip": [
             "10.87.90.49",
@@ -5593,6 +5856,9 @@
         "rsa.network.domain": "siarc6339.internal.corp",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "siarc6339.internal.corp",
+        "server.registered_domain": "internal.corp",
+        "server.subdomain": "siarc6339",
+        "server.top_level_domain": "corp",
         "service.type": "fortinet",
         "source.ip": [
             "10.87.90.49"
@@ -5626,8 +5892,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4855,
         "related.hosts": [
-            "olores7881.local",
-            "ptatev6552.www.test"
+            "ptatev6552.www.test",
+            "olores7881.local"
         ],
         "related.ip": [
             "10.87.144.208",
@@ -5652,6 +5918,9 @@
         "rsa.network.domain": "ptatev6552.www.test",
         "rsa.network.network_service": "pop3",
         "server.domain": "ptatev6552.www.test",
+        "server.registered_domain": "www.test",
+        "server.subdomain": "ptatev6552",
+        "server.top_level_domain": "test",
         "service.type": "fortinet",
         "source.ip": [
             "10.143.53.214"
@@ -5685,12 +5954,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 1729,
         "related.hosts": [
-            "tDuis3281.www5.localdomain",
-            "byC5766.internal.home"
+            "byC5766.internal.home",
+            "tDuis3281.www5.localdomain"
         ],
         "related.ip": [
-            "10.204.178.19",
-            "10.105.97.134"
+            "10.105.97.134",
+            "10.204.178.19"
         ],
         "related.user": [
             "mexercit"
@@ -5711,6 +5980,9 @@
         "rsa.network.domain": "byC5766.internal.home",
         "rsa.network.network_service": "pop3",
         "server.domain": "byC5766.internal.home",
+        "server.registered_domain": "internal.home",
+        "server.subdomain": "byC5766",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.204.178.19"
@@ -5744,12 +6016,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 4493,
         "related.hosts": [
-            "uptasnul2751.www5.corp",
-            "hender6628.local"
+            "hender6628.local",
+            "uptasnul2751.www5.corp"
         ],
         "related.ip": [
-            "10.194.67.223",
-            "10.161.64.168"
+            "10.161.64.168",
+            "10.194.67.223"
         ],
         "related.user": [
             "tion"
@@ -5770,6 +6042,8 @@
         "rsa.network.domain": "hender6628.local",
         "rsa.network.network_service": "smtp",
         "server.domain": "hender6628.local",
+        "server.registered_domain": "hender6628.local",
+        "server.top_level_domain": "local",
         "service.type": "fortinet",
         "source.ip": [
             "10.161.64.168"
@@ -5803,12 +6077,12 @@
         "observer.vendor": "Fortinet",
         "process.pid": 6094,
         "related.hosts": [
-            "upt6017.api.localdomain",
-            "xercit7649.www5.home"
+            "xercit7649.www5.home",
+            "upt6017.api.localdomain"
         ],
         "related.ip": [
-            "10.120.148.241",
-            "10.100.154.220"
+            "10.100.154.220",
+            "10.120.148.241"
         ],
         "related.user": [
             "rsitam"
@@ -5829,6 +6103,9 @@
         "rsa.network.domain": "xercit7649.www5.home",
         "rsa.network.network_service": "smtp",
         "server.domain": "xercit7649.www5.home",
+        "server.registered_domain": "www5.home",
+        "server.subdomain": "xercit7649",
+        "server.top_level_domain": "home",
         "service.type": "fortinet",
         "source.ip": [
             "10.100.154.220"
@@ -5862,8 +6139,8 @@
         "observer.vendor": "Fortinet",
         "process.pid": 5012,
         "related.hosts": [
-            "tpers2217.internal.lan",
-            "porissu1470.domain"
+            "porissu1470.domain",
+            "tpers2217.internal.lan"
         ],
         "related.ip": [
             "10.116.153.19",
@@ -5888,6 +6165,8 @@
         "rsa.network.domain": "porissu1470.domain",
         "rsa.network.network_service": "ms-wbt-server",
         "server.domain": "porissu1470.domain",
+        "server.registered_domain": "porissu1470.domain",
+        "server.top_level_domain": "domain",
         "service.type": "fortinet",
         "source.ip": [
             "10.116.153.19"

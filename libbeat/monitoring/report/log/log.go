@@ -35,6 +35,7 @@ import (
 // TODO: Replace this with a proper solution that uses the metric type from
 // where it is defined. See: https://github.com/elastic/beats/issues/5433
 var gauges = map[string]bool{
+	"libbeat.output.events.active":   true,
 	"libbeat.pipeline.events.active": true,
 	"libbeat.pipeline.clients":       true,
 	"libbeat.config.module.running":  true,
@@ -43,15 +44,13 @@ var gauges = map[string]bool{
 	"filebeat.harvester.open_files":  true,
 	"beat.memstats.memory_total":     true,
 	"beat.memstats.memory_alloc":     true,
+	"beat.memstats.rss":              true,
 	"beat.memstats.gc_next":          true,
 	"beat.info.uptime.ms":            true,
 	"beat.cpu.user.ticks":            true,
-	"beat.cpu.user.time":             true,
 	"beat.cpu.system.ticks":          true,
-	"beat.cpu.system.time":           true,
 	"beat.cpu.total.value":           true,
 	"beat.cpu.total.ticks":           true,
-	"beat.cpu.total.time":            true,
 	"beat.handles.open":              true,
 	"beat.handles.limit.hard":        true,
 	"beat.handles.limit.soft":        true,
