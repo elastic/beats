@@ -52,15 +52,13 @@ func TestFetchEventContents(t *testing.T) {
 
 	// Values are based on the result 'df -k'.
 	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes", "capacity.used.pct"}
+		"capacity.used.bytes"}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
 			t.Error(err)
 		} else {
-			if field != "capacity.used.pct" {
-				isNonNegativeInt64(t, field, value)
-			}
+			isNonNegativeInt64(t, field, value)
 		}
 	}
 }
