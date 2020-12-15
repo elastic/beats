@@ -221,9 +221,10 @@ func (m *LoadMetrics) Averages() LoadAverages {
 // NormalizedAverages return the CPU load averages normalized by the NumCPU.
 // These values should range from 0 to 1.
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
+	cpus := runtime.NumCPU()
 	return LoadAverages{
-		OneMinute:     common.Round(m.sample.One/float64(runtime.NumCPU()), common.DefaultDecimalPlacesCount),
-		FiveMinute:    common.Round(m.sample.Five/float64(runtime.NumCPU()), common.DefaultDecimalPlacesCount),
-		FifteenMinute: common.Round(m.sample.Fifteen/float64(runtime.NumCPU()), common.DefaultDecimalPlacesCount),
+		OneMinute:     common.Round(m.sample.One/float64(cpus), common.DefaultDecimalPlacesCount),
+		FiveMinute:    common.Round(m.sample.Five/float64(cpus), common.DefaultDecimalPlacesCount),
+		FifteenMinute: common.Round(m.sample.Fifteen/float64(cpus), common.DefaultDecimalPlacesCount),
 	}
 }
