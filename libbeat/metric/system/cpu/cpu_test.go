@@ -29,6 +29,12 @@ import (
 	"github.com/elastic/gosigar"
 )
 
+var (
+	// NumCores is the number of CPU cores in the system. Changes to operating
+	// system CPU allocation after process startup are not reflected.
+	NumCores = runtime.NumCPU()
+)
+
 func TestMonitorSample(t *testing.T) {
 	cpu := &Monitor{lastSample: &gosigar.Cpu{}}
 	s, err := cpu.Sample()

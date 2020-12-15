@@ -33,6 +33,9 @@ import (
 	"github.com/elastic/gosigar"
 )
 
+// NumCPU is the number of CPUs of the host
+var NumCPU = runtime.NumCPU()
+
 func TestPids(t *testing.T) {
 	pids, err := Pids()
 
