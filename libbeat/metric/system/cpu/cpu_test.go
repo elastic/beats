@@ -30,9 +30,9 @@ import (
 )
 
 var (
-	// NumCores is the number of CPU cores in the system. Changes to operating
+	// numCores is the number of CPU cores in the system. Changes to operating
 	// system CPU allocation after process startup are not reflected.
-	NumCores = runtime.NumCPU()
+	numCores = runtime.NumCPU()
 )
 
 func TestMonitorSample(t *testing.T) {
@@ -61,7 +61,7 @@ func TestMonitorSample(t *testing.T) {
 }
 
 func TestCoresMonitorSample(t *testing.T) {
-	cores := &CoresMonitor{lastSample: make([]gosigar.Cpu, NumCores)}
+	cores := &CoresMonitor{lastSample: make([]gosigar.Cpu, numCores)}
 	sample, err := cores.Sample()
 	if err != nil {
 		t.Fatal(err)
@@ -108,8 +108,8 @@ func TestMetricsRounding(t *testing.T) {
 // TestMetricsPercentages tests that Metrics returns the correct
 // percentages and normalized percentages.
 func TestMetricsPercentages(t *testing.T) {
-	NumCores = 10
-	defer func() { NumCores = runtime.NumCPU() }()
+	numCores = 10
+	defer func() { numCores = runtime.NumCPU() }()
 
 	// This test simulates 30% user and 70% system (normalized), or 3% and 7%
 	// respectively when there are 10 CPUs.
@@ -139,8 +139,8 @@ func TestMetricsPercentages(t *testing.T) {
 	assert.EqualValues(t, 1., pct.Total)
 
 	pct = sample.Percentages()
-	assert.EqualValues(t, .3*float64(NumCores), pct.User)
-	assert.EqualValues(t, .7*float64(NumCores), pct.System)
-	assert.EqualValues(t, .0*float64(NumCores), pct.Idle)
-	assert.EqualValues(t, 1.*float64(NumCores), pct.Total)
+	assert.EqualValues(t, .3*float64(numCores), pct.User)
+	assert.EqualValues(t, .7*float64(numCores), pct.System)
+	assert.EqualValues(t, .0*float64(numCores), pct.Idle)
+	assert.EqualValues(t, 1.*float64(numCores), pct.Total)
 }
