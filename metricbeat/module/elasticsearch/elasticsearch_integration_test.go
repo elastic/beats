@@ -162,11 +162,6 @@ func TestXPackEnabled(t *testing.T) {
 				require.NoError(t, err)
 				require.Len(t, events, numShards)
 
-				for _, event := range events {
-					require.Equal(t, "shards", event.RootFields["type"])
-					require.Regexp(t, `^.monitoring-es-\d-mb`, event.Index)
-				}
-
 				return
 			}
 
