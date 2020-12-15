@@ -10,8 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Google Workspace module
 
-beta[]
-
 This is a module for ingesting data from the different Google Workspace audit reports APIs.
 
 include::../include/gs-link.asciidoc[]
