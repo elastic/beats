@@ -33491,46 +33491,6 @@ type: long
 
 --
 
-
-*`logstash.node.stats.os.cgroup.cpuact.usage_nanos`*::
-+
---
-type: long
-
---
-
-
-
-*`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`*::
-+
---
-TODO
-
-
-type: long
-
---
-
-*`logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos`*::
-+
---
-TODO
-
-
-type: long
-
---
-
-*`logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled`*::
-+
---
-TODO
-
-
-type: long
-
---
-
 *`logstash.node.stats.process.cpu.percent`*::
 +
 --
