@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err := m.CheckPipelineGraphAPIsAvailable(); err != nil {
 		return err
 	}
-	
+
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
 		return err
