@@ -127,6 +127,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			scheduler,
 			rep,
 			newNoopAcker(),
+			&noopController{},
 		)
 
 		require.NoError(t, err)
@@ -251,6 +252,7 @@ func TestFleetGateway(t *testing.T) {
 			scheduler,
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
+			&noopController{},
 		)
 
 		require.NoError(t, err)
@@ -339,6 +341,7 @@ func TestFleetGateway(t *testing.T) {
 			scheduler,
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
+			&noopController{},
 		)
 
 		require.NoError(t, err)
