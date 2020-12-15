@@ -58,7 +58,9 @@ func TestFetchEventContents(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		} else {
-			isNonNegativeInt64(t, field, value)
+			if field != "capacity.used.pct" {
+				isNonNegativeInt64(t, field, value)
+			}
 		}
 	}
 }
