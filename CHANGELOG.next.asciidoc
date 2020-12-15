@@ -950,6 +950,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- The experimental modules for Citrix Netscaler and Symantec Endpoint Protection
+  were removed. {issue}23129[23129]
 
 *Heartbeat*
 
