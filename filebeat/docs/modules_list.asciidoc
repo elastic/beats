@@ -23,6 +23,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
   * <<filebeat-module-gcp>>
+  * <<filebeat-module-google_workspace>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
@@ -57,6 +58,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-redis>>
   * <<filebeat-module-santa>>
   * <<filebeat-module-snort>>
+  * <<filebeat-module-snyk>>
   * <<filebeat-module-sonicwall>>
   * <<filebeat-module-sophos>>
   * <<filebeat-module-squid>>
@@ -93,6 +95,7 @@ include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
 include::modules/gcp.asciidoc[]
+include::modules/google_workspace.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
@@ -127,6 +130,7 @@ include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/santa.asciidoc[]
 include::modules/snort.asciidoc[]
+include::modules/snyk.asciidoc[]
 include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
