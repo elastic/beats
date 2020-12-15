@@ -27,8 +27,15 @@ import (
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
-func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys bool, addErrKey bool) {
+func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
 	logger := logp.NewLogger("jsonhelper")
+	if expandKeys {
+		if err := expandFields(keys); err != nil {
+			logger.Errorf("JSON: failed to expand fields: %s", err)
+			event.SetErrorWithOption(createJSONError(err.Error()), addErrKey)
+			return
+		}
+	}
 	if !overwriteKeys {
 		// @timestamp and @metadata fields are root-level fields. We remove them so they
 		// don't become part of event.Fields.

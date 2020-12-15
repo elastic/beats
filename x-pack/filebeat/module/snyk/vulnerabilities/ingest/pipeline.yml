@@ -1,0 +1,181 @@
+description: Pipeline for Snyk vulnerability logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: vulnerability.classification
+    value: CVSS
+- set:
+    field: vulnerability.category
+    value: Github
+- set:
+    field: vulnerability.scanner.vendor
+    value: Snyk
+- script:
+    lang: painless
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+- rename:
+    field: json
+    target_field: snyk
+    ignore_missing: true
+- rename:
+    field: snyk.issue
+    target_field: snyk.vulnerabilities
+    ignore_missing: true
+- set:
+    field: vulnerability.score.version
+    value: "3.0"
+- set:
+    field: vulnerability.enumeration
+    value: CVE
+    if: ctx?.snyk?.vulnerabilities?.identifiers?.CVE != null
+- set:
+    field: vulnerability.enumeration
+    value: SNYK
+    if: ctx?.snyk?.vulnerabilities?.identifiers?.CVE == null && ctx?.snyk?.vulnerabilities?.identifiers?.ALTERNATIVE != null
+- rename:
+    field: snyk.vulnerabilities.description
+    target_field: vulnerability.description
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.identifiers.CVE
+    target_field: vulnerability.id
+    ignore_missing: true
+    if: ctx?.snyk?.vulnerabilities?.identifiers?.CVE != null
+- rename:
+    field: snyk.vulnerabilities.identifiers.ALTERNATIVE
+    target_field: vulnerability.id
+    ignore_missing: true
+    if: ctx?.vulnerability?.id == null && ctx?.snyk?.vulnerabilities?.identifiers?.ALTERNATIVE != null
+- rename:
+    field: snyk.vulnerabilities.cvssScore
+    target_field: vulnerability.score.base
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.severity
+    target_field: vulnerability.severity
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.CVSSv3
+    target_field: snyk.vulnerabilities.cvss3
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.disclosureTime
+    target_field: snyk.vulnerabilities.disclosure_time
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.exploitMaturity
+    target_field: snyk.vulnerabilities.exploit_maturity
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.identifiers.ALTERNATIVE
+    target_field: snyk.vulnerabilities.identifiers.alternative
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.identifiers.CWE
+    target_field: snyk.vulnerabilities.identifiers.cwe
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.isIgnored
+    target_field: snyk.vulnerabilities.is_ignored
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.isPatchable
+    target_field: snyk.vulnerabilities.is_patchable
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.isPatched
+    target_field: snyk.vulnerabilities.is_patched
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.isPinnable
+    target_field: snyk.vulnerabilities.is_pinnable
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.isUpgradable
+    target_field: snyk.vulnerabilities.is_upgradable
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.priorityScore
+    target_field: snyk.vulnerabilities.priority_score
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.publicationTime
+    target_field: snyk.vulnerabilities.publication_time
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.uniqueSeveritiesList
+    target_field: snyk.vulnerabilities.unique_severities_list
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.packageManager
+    target_field: snyk.vulnerabilities.package_manager
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.jiraIssueUrl
+    target_field: snyk.vulnerabilities.jira_issue_url
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.originalSeverity
+    target_field: snyk.vulnerabilities.original_severity
+    ignore_missing: true
+- rename:
+    field: snyk.isFixed
+    target_field: snyk.vulnerabilities.is_fixed
+    ignore_missing: true
+- rename:
+    field: snyk.introducedDate
+    target_field: snyk.vulnerabilities.introduced_date
+    ignore_missing: true
+- rename:
+    field: snyk.vulnerabilities.url
+    target_field: vulnerability.reference
+    ignore_missing: true
+- foreach:
+    field: snyk.vulnerabilities.patches
+    processor:
+      rename:
+        field: "{{ _ingest._value.modificationTime }}"
+        target_field: "{{ _ingest._value.modification_time }}"
+        ignore_missing: true
+    ignore_failure: true
+    if: ctx?.snyk?.vulnerabilities?.patches != null
+- foreach:
+    field: snyk.projects
+    processor:
+      append:
+        field: snyk.related.projects
+        value: "{{_ingest._value.name }}"
+        ignore_failure: true
+    ignore_failure: true
+    if: ctx?.snyk?.projects != null
+- remove:
+    field:
+    - message
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

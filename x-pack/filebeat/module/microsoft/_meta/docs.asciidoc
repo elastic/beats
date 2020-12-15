@@ -24,8 +24,6 @@ include::../include/config-option-intro.asciidoc[]
 [float]
 ==== `m365_defender` fileset settings
 
-beta[]
-
 To configure access for Filebeat to Microsoft 365 Defender you will have to create a new Azure Application registration, this will again return Oauth tokens with access to the Microsoft 365 Defender API
 
 The procedure to create an application is found on the below link:
@@ -101,8 +99,6 @@ This is a list of 365 Defender fields that are mapped to ECS.
 
 [float]
 ==== `defender_atp` fileset settings
-
-beta[]
 
 To allow the filebeat module to ingest data from the Microsoft Defender API, you would need to create a new application on your Azure domain.
 

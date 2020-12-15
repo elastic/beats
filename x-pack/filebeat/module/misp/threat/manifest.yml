@@ -4,35 +4,15 @@ var:
   - name: input
     default: httpjson
   - name: api_key
-    default: ""
-  - name: http_client_timeout
-    default: 60
-  - name: http_method
-    default: GET
-  - name: http_headers
-    default: |-
-      {}
   - name: http_request_body
-    default: |-
-      {}
+    default:
+      limit: 1000
+  - name: http_client_timeout
+    default: "60s"
   - name: interval
-    default: 0
-  - name: json_objects_array
-    default: "response.Attribute"
-  - name: pagination
-    default: |-
-      {
-        "enabled": false,
-        "extra_body_content": {},
-        "id_field": "",
-        "req_field": "",
-        "url": ""
-      }
+    default: "60s"
   - name: url
-    default: ""
   - name: ssl
-    default: |-
-      {}
 
 input: config/input.yml
 ingest_pipeline: ingest/pipeline.json

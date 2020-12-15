@@ -371,8 +371,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " RECV",
@@ -873,8 +872,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "hitect",
-            "lit5929.test"
+            "lit5929.test",
+            "hitect"
         ],
         "related.ip": [
             "10.198.6.166"
@@ -896,6 +895,8 @@
         "rsa.time.endtime": "2017-02-03T21:16:50.000Z",
         "rsa.time.starttime": "2017-02-03T21:16:50.000Z",
         "server.domain": "lit5929.test",
+        "server.registered_domain": "lit5929.test",
+        "server.top_level_domain": "test",
         "service.type": "barracuda",
         "source.ip": [
             "10.198.6.166"
@@ -980,6 +981,9 @@
         "rsa.time.endtime": "2017-03-04T11:21:59.000Z",
         "rsa.time.starttime": "2017-03-04T11:21:59.000Z",
         "server.domain": "uptat3156.www5.test",
+        "server.registered_domain": "www5.test",
+        "server.subdomain": "uptat3156",
+        "server.top_level_domain": "test",
         "service.type": "barracuda",
         "source.ip": [
             "10.77.137.72"
@@ -1027,6 +1031,9 @@
         "rsa.time.endtime": "2017-03-18T18:24:33.000Z",
         "rsa.time.starttime": "2017-03-18T18:24:33.000Z",
         "server.domain": "neav6028.internal.domain",
+        "server.registered_domain": "internal.domain",
+        "server.subdomain": "neav6028",
+        "server.top_level_domain": "domain",
         "service.type": "barracuda",
         "source.ip": [
             "10.128.114.77"
@@ -1165,8 +1172,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": "deny",
@@ -1640,8 +1646,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.code": "web",
@@ -1844,8 +1849,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " SCAN",
@@ -1861,8 +1865,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "aveni",
-            "oremagna3521.mail.home"
+            "oremagna3521.mail.home",
+            "aveni"
         ],
         "related.ip": [
             "10.29.155.171"
@@ -1884,6 +1888,9 @@
         "rsa.time.endtime": "2018-03-25T09:31:24.000Z",
         "rsa.time.starttime": "2018-03-25T09:31:24.000Z",
         "server.domain": "oremagna3521.mail.home",
+        "server.registered_domain": "mail.home",
+        "server.subdomain": "oremagna3521",
+        "server.top_level_domain": "home",
         "service.type": "barracuda",
         "source.ip": [
             "10.29.155.171"
@@ -1927,8 +1934,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": " RECV",
@@ -2044,8 +2050,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.code": "reports",
@@ -2720,8 +2725,7 @@
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
-        ],
-        "url.domain": ""
+        ]
     },
     {
         "event.action": "CHANGE",
@@ -3265,8 +3269,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "der",
-            "piciatis2460.api.host"
+            "piciatis2460.api.host",
+            "der"
         ],
         "related.ip": [
             "10.77.182.191"
@@ -3288,6 +3292,9 @@
         "rsa.time.endtime": "2019-11-30T00:21:57.000Z",
         "rsa.time.starttime": "2019-11-30T00:21:57.000Z",
         "server.domain": "piciatis2460.api.host",
+        "server.registered_domain": "api.host",
+        "server.subdomain": "piciatis2460",
+        "server.top_level_domain": "host",
         "service.type": "barracuda",
         "source.ip": [
             "10.77.182.191"
