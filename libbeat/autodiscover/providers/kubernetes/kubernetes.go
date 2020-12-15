@@ -171,7 +171,13 @@ func (p *Provider) publish(events []bus.Event) {
 	}
 
 	configs := make([]*common.Config, 0)
+	id, _ := events[0]["id"]
 	for _, event := range events {
+		// Ensure that all events have the same ID. If not panic
+		if event["id"] != id {
+			panic("events from Kubernetes can't have different id fields")
+		}
+
 		// Try to match a config
 		if config := p.templates.GetConfig(event); config != nil {
 			configs = append(configs, config...)
