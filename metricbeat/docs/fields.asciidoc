@@ -18253,6 +18253,15 @@ alias to: elasticsearch.node.name
 
 --
 
+*`job_stats.job_id`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.id
+
+--
+
 
 *`index_stats.index`*::
 +
@@ -21148,17 +21157,175 @@ type: keyword
 
 --
 
-*`elasticsearch.ml.job.data_counts.processed_record_count`*::
+
+*`elasticsearch.ml.job.model_size.result_type`*::
 +
 --
-Processed data events.
+type: keyword
+
+--
+
+*`elasticsearch.ml.job.model_size.model.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.bucket_allocation_failures.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.memory_status`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.log_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.timestamp.ms`*::
++
+--
+type: long
+
+--
 
 
+*`elasticsearch.ml.job.model_size.total.field.by.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.total.field.over.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.model_size.total.field.partition.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ml.job.data_counts.field.processed.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.input.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.input.field.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.missing_field.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.out_of_order.timestamp.count`*::
++
+--
 type: long
 
 --
 
 *`elasticsearch.ml.job.data_counts.invalid_date_count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.last_data_time`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.ml.job.data_counts.bucket.empty.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.bucket.sparse.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.bucket.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.processed_record_count`*::
++
+--
+Processed data events.
+
+type: long
+
+--
+
+
+*`elasticsearch.ml.job.data_counts.record.earliest.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.record.latest.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data_counts.record.input.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.ml.job.data.invalid_date.count`*::
 +
 --
 The number of records with either a missing date field or a date that could not be parsed.

@@ -1,33 +1,101 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "cluster": {
-            "id": "3LbUkLkURz--FR-YO0wLNA",
-            "name": "es1"
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
         },
         "ml": {
             "job": {
                 "data_counts": {
+                    "bucket": {
+                        "count": 2,
+                        "empty": {
+                            "count": 0
+                        },
+                        "sparse": {
+                            "count": 0
+                        }
+                    },
+                    "field": {
+                        "processed": {
+                            "count": 28
+                        }
+                    },
+                    "input": {
+                        "bytes": 1254,
+                        "field": {
+                            "count": 28
+                        }
+                    },
                     "invalid_date_count": 0,
-                    "processed_record_count": 0
+                    "last_data_time": 1525848008257,
+                    "missing_field": {
+                        "count": 0
+                    },
+                    "out_of_order": {
+                        "timestamp": {
+                            "count": 0
+                        }
+                    },
+                    "processed_record_count": 14,
+                    "record": {
+                        "earliest": {
+                            "ms": 1525847665298
+                        },
+                        "input": {
+                            "count": 14
+                        },
+                        "latest": {
+                            "ms": 1525847795423
+                        }
+                    }
                 },
-                "id": "total-requests",
+                "id": "55",
+                "model_size": {
+                    "bucket_allocation_failures": {
+                        "count": 0
+                    },
+                    "log_time": {
+                        "ms": 1525848008000
+                    },
+                    "model": {
+                        "bytes": 49176
+                    },
+                    "result_type": "model_size_stats",
+                    "timestamp": {
+                        "ms": 1525847700000
+                    },
+                    "total": {
+                        "field": {
+                            "by": {
+                                "count": 3
+                            },
+                            "over": {
+                                "count": 0
+                            },
+                            "partition": {
+                                "count": 2
+                            }
+                        }
+                    }
+                },
                 "state": "closed"
             }
         }
     },
+    "event": {
+        "dataset": "elasticsearch.ml.job",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "ml_job",
-        "namespace": "elasticsearch.ml.job",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:45215",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }
