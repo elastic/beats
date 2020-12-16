@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
+deprecated::[7.12]
+
 This is a module for ingesting data from the different GSuite audit reports API's.
 
 include::../include/gs-link.asciidoc[]

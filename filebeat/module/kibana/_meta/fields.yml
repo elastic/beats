@@ -6,4 +6,45 @@
     - name: kibana
       type: group
       description: >
+        Module for parsing Kibana logs.
       fields:
+        - name: session_id
+          description: The ID of the user session associated with this event. Each login attempt results in a unique session id.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          type: keyword
+        - name: space_id
+          description: "The id of the space associated with this event."
+          example: "default"
+          type: keyword
+        - name: saved_object.type
+          description: "The type of the saved object associated with this event."
+          example: "dashboard"
+          type: keyword
+        - name: saved_object.id
+          description: "The id of the saved object associated with this event."
+          example: "6295bdd0-0a0e-11e7-825f-6748cda7d858"
+          type: keyword
+        - name: add_to_spaces
+          description: "The set of space ids that a saved object was shared to."
+          example: "['default', 'marketing']"
+          type: keyword
+        - name: delete_from_spaces
+          description: "The set of space ids that a saved object was removed from."
+          example: "['default', 'marketing']"
+          type: keyword
+        - name: authentication_provider
+          description: "The authentication provider associated with a login event."
+          example: "basic1"
+          type: keyword
+        - name: authentication_type
+          description: "The authentication provider type associated with a login event."
+          example: "basic"
+          type: keyword
+        - name: authentication_realm
+          description: "The Elasticsearch authentication realm name which fulfilled a login event."
+          example: "native"
+          type: keyword
+        - name: lookup_realm
+          description: "The Elasticsearch lookup realm which fulfilled a login event."
+          example: "native"
+          type: keyword

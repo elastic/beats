@@ -36,6 +36,9 @@
         "observer.product": "Email",
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
+        "related.hosts": [
+            "enatus"
+        ],
         "rsa.internal.messageid": "session_store",
         "rsa.misc.client": "mipsumq",
         "rsa.misc.event_source": "enatus",
@@ -943,6 +946,9 @@
         "observer.product": "Email",
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
+        "related.hosts": [
+            "lamc"
+        ],
         "rsa.internal.messageid": "session_store",
         "rsa.misc.client": "eaqueip",
         "rsa.misc.event_source": "lamc",
@@ -1667,6 +1673,9 @@
         "observer.product": "Email",
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
+        "related.hosts": [
+            "turQuis"
+        ],
         "rsa.internal.messageid": "session_judge",
         "rsa.misc.client": "session_judge",
         "rsa.misc.event_source": "turQuis",
@@ -1982,6 +1991,9 @@
         "observer.product": "Email",
         "observer.type": "Firewall",
         "observer.vendor": "Proofpoint",
+        "related.hosts": [
+            "inimve"
+        ],
         "rsa.counters.dclass_c1": 5821,
         "rsa.counters.dclass_c1_str": "No of attachments:",
         "rsa.counters.dclass_c2": 296,

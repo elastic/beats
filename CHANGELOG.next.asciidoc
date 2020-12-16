@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 - Update to ECS 1.7.0. {pull}22571[22571]
+- Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 
 *Auditbeat*
 
@@ -35,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add fileset to ingest Kibana's ECS audit logs. {pull}22696[22696]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -62,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 
 *Heartbeat*
+- Adds negative body match. {pull}20728[20728]
 
 *Journalbeat*
 
@@ -151,12 +154,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak and events duplication in docker autodiscover and add_docker_metadata. {pull}21851[21851]
 - Fix parsing of expired licences. {issue}21112[21112] {pull}22180[22180]
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
+- Fix FileVersion contained in Windows exe files. {pull}22581[22581]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
 - Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
+
 
 *Auditbeat*
 
@@ -237,7 +242,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
+- Fix aws s3 overview dashboard. {pull}23045[23045]
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
+- Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 
 *Heartbeat*
 
@@ -363,11 +371,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
 - Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
+- Add `expand_keys` option to `decode_json_fields` processor and `json` input, to recusively de-dot and expand json keys into hierarchical object structures {pull}22849[22849]
 - Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
+- Improve event normalization performance {pull}22974[22974]
 - Add tini as init system in docker images {pull}22137[22137]
 - Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
 - Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
+- Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 
 *Auditbeat*
 
@@ -494,6 +505,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `http.request.mime_type` for Elasticsearch audit log fileset. {pull}22975[22975]
 - Add new httpjson input features and mark old config ones for deprecation {pull}22320[22320]
 - Add configuration option to set external and internal networks for panw panos fileset {pull}22998[22998]
+- Add `subbdomain` fields for rsa2elk modules. {pull}23035[23035]
 - Add subdomain enrichment for suricata/eve fileset. {pull}23011[23011]
 - Add subdomain enrichment for zeek/dns fileset. {pull}23011[23011]
 - Add `event.category` "configuration" to auditd module events. {pull}23010[23010]
@@ -513,6 +525,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network.direction` override by specifying `internal_networks` in gcp module. {pull}23081[23081]
 - Migrate microsoft/defender_atp to httpjson v2 config {pull}23017[23017]
 - Migrate microsoft/m365_defender to httpjson v2 config {pull}23018[23018]
+- Migrate okta to httpjson v2 config {pull}23059[23059]
+- Add support for Snyk Vulnerability and Audit API. {pull}22677[22677]
+- Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
+- Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
+- Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
 
 *Heartbeat*
 
@@ -604,6 +621,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
+- Release MSSQL as GA {pull}23146[23146]
 
 *Packetbeat*
 
@@ -656,7 +674,6 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 

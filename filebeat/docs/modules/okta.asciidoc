@@ -10,8 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Okta module
 
-beta[]
-
 The Okta module collects events from the
 https://developer.okta.com/docs/reference/[Okta API]. Specifically this supports
 reading from the https://developer.okta.com/docs/reference/api/system-log/[Okta
