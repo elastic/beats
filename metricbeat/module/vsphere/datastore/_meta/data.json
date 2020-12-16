@@ -1,27 +1,30 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "vsphere.datastore",
+        "duration": 115000,
+        "module": "vsphere"
     },
     "metricset": {
-        "host": "http://127.0.0.1:36937/sdk",
-        "module": "vsphere",
         "name": "datastore",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "http://127.0.0.1:51027/sdk",
+        "type": "vsphere"
     },
     "vsphere": {
         "datastore": {
             "capacity": {
                 "free": {
-                    "bytes": 50021150720
+                    "bytes": 267958476800
                 },
                 "total": {
-                    "bytes": 63918878720
+                    "bytes": 484736266240
                 },
                 "used": {
-                    "bytes": 13897728000,
-                    "pct": 21
+                    "bytes": 216777789440,
+                    "pct": 0.44720769733509097
                 }
             },
             "fstype": "local",
