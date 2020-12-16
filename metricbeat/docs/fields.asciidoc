@@ -28594,11 +28594,15 @@ Kibana module
 
 
 
-[float]
-=== kibana
 
+*`kibana.stats.usage.name`*::
++
+--
+type: alias
 
+alias to: kibana.stats.usage.index
 
+--
 
 [float]
 === stats
@@ -28606,6 +28610,14 @@ Kibana module
 Kibana stats and run-time metrics.
 
 
+
+
+*`kibana.stats.usage.index`*::
++
+--
+type: keyword
+
+--
 
 *`kibana.stats.uuid`*::
 +
