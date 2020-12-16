@@ -24,9 +24,9 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
-* <<exported-fields-script>>
 * <<exported-fields-socks5>>
 * <<exported-fields-summary>>
+* <<exported-fields-synthetics>>
 * <<exported-fields-tcp>>
 * <<exported-fields-tls>>
 
@@ -9571,42 +9571,6 @@ type: long
 
 --
 
-[[exported-fields-script]]
-== HTTP monitor fields
-
-None
-
-
-[float]
-=== script
-
-Script related fields.
-
-
-
-*`script.stderr`*::
-+
---
-type: text
-
---
-
-*`script.stdout`*::
-+
---
-type: text
-
---
-
-*`script.journey`*::
-+
---
-type: object
-
-Object is not enabled.
-
---
-
 [[exported-fields-socks5]]
 == SOCKS5 proxy fields
 
@@ -9672,6 +9636,122 @@ The number of endpoints that failed
 
 
 type: integer
+
+--
+
+[[exported-fields-synthetics]]
+== Synthetics types fields
+
+None
+
+
+[float]
+=== synthetics
+
+Synthetics related fields.
+
+
+
+*`synthetics.type`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.package_version`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.index`*::
++
+--
+Indexed used for creating total order of all events in this invocation.
+
+
+type: integer
+
+--
+
+*`synthetics.payload`*::
++
+--
+type: object
+
+Object is not enabled.
+
+--
+
+*`synthetics.blob`*::
++
+--
+binary data payload
+
+type: binary
+
+--
+
+*`synthetics.blob_mime`*::
++
+--
+mime type of blob data
+
+type: keyword
+
+--
+
+
+*`synthetics.step.name`*::
++
+--
+type: text
+
+--
+
+*`synthetics.step.index`*::
++
+--
+type: integer
+
+--
+
+
+*`synthetics.journey.name`*::
++
+--
+type: text
+
+--
+
+*`synthetics.journey.id`*::
++
+--
+type: keyword
+
+--
+
+
+*`synthetics.error.name`*::
++
+--
+type: keyword
+
+--
+
+*`synthetics.error.message`*::
++
+--
+type: text
+
+--
+
+*`synthetics.error.stack`*::
++
+--
+type: text
 
 --
 
