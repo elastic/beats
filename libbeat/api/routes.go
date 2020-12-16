@@ -81,6 +81,10 @@ func prettyPrint(w http.ResponseWriter, data common.MapStr, u *url.URL) {
 }
 
 // AddHandlerFunc provides interface to add customized handlerFunc
-func AddHandlerFunc(api string, h handlerFunc) {
+func AddHandlerFunc(api string, h handlerFunc) error {
+	if _, exist := handlerFuncMap[api]; exist {
+		return fmt.Errorf("%s already exist", api)
+	}
 	handlerFuncMap[api] = h
+	return nil
 }
