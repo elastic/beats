@@ -9,8 +9,6 @@
 <titleabbrev>HTTP JSON</titleabbrev>
 ++++
 
-beta[]
-
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
 This input supports:
@@ -529,6 +527,11 @@ Valid when used with `type: map`. When not empty, defines a new field where the 
 ==== `response.split[].split`
 
 Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
+
+[float]
+==== `response.request_body_on_pagination`
+
+If set to true, the values in `request.body` are sent for pagination requests. Default: `false`.
 
 [[response-pagination]]
 [float]

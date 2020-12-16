@@ -37,6 +37,21 @@ image:images/fleet-agents.png[Upgrade menu for bulk upgrade in {fleet}]
 [[upgrade-standalone]]
 == Upgrade standalone agents
 
-To upgrade a standalone agent running on an edge node, download the new version
-to your host, then run the `install` command to upgrade to the new version. See
-<<elastic-agent-installation>>.
+To upgrade a standalone agent running on an edge node:
+
+. Make sure the `elastic-agent` service is running.
+. From the directory where {agent} is installed, run the `upgrade` command to
+upgrade to a new version. Not sure where the agent is
+installed? See <<installation-layout>>.
++
+For example, on macOS, to upgrade the agent from version 7.10.0 to 7.10.1, you
+would run:
++
+[source,shell]
+----
+cd /Library/Elastic/Agent/
+sudo elastic-agent upgrade 7.10.1 
+----
+
+For more command-line options, see the help for the
+<<elastic-agent-upgrade-command,`upgrade`>> command.

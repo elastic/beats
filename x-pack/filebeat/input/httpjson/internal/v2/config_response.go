@@ -15,9 +15,10 @@ const (
 )
 
 type responseConfig struct {
-	Transforms transformsConfig `config:"transforms"`
-	Pagination transformsConfig `config:"pagination"`
-	Split      *splitConfig     `config:"split"`
+	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
+	Transforms              transformsConfig `config:"transforms"`
+	Pagination              transformsConfig `config:"pagination"`
+	Split                   *splitConfig     `config:"split"`
 }
 
 type splitConfig struct {
