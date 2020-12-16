@@ -802,3 +802,46 @@ func TestProcessWildcardPreSupport(t *testing.T) {
 
 	assert.Equal(t, expectedOutput, output)
 }
+
+func TestProcessNestedSupport(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "nested",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "wildcard",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"type": "nested",
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "keyword",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
