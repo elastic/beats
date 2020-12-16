@@ -27,7 +27,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -99,8 +98,15 @@ func TestSocket(t *testing.T) {
 		}()
 
 		c := client(sockFile)
-		verifyApi("http://unix/echo-hello", c.Get, verifyBodyString(t, "ehlo!"))
 
+		r, err := c.Get("http://unix/echo-hello")
+		require.NoError(t, err)
+		defer r.Body.Close()
+
+		body, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+
+		assert.Equal(t, "ehlo!", string(body))
 		fi, err := os.Stat(sockFile)
 		assert.Equal(t, socketFileMode, fi.Mode().Perm())
 	})
@@ -161,53 +167,14 @@ func TestHTTP(t *testing.T) {
 	go s.Start()
 	defer s.Stop()
 
-	verifyApi("http://"+s.l.Addr().String()+"/echo-hello", http.Get, verifyBodyString(t, "ehlo!"))
-}
-
-func TestDynamicRoutes(t *testing.T) {
-	// select a random free port.
-	url := "http://localhost:0"
-
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"host": url,
-	})
-	s, err := NewWithDefaultRoutes(nil, cfg, func(string) *monitoring.Namespace {
-		return &monitoring.Namespace{}
-	})
+	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello")
 	require.NoError(t, err)
-	go s.Start()
-	defer s.Stop()
+	defer r.Body.Close()
 
-	api := "/echo-hello"
-	uri := "http://" + s.l.Addr().String() + api
-	require.NoError(t, Register(api, simpleHandler))
-	require.EqualError(t, Register(api, simpleHandler), fmt.Sprintf("route %s is already in use", api))
-	verifyApi(uri, http.Get, verifyBodyString(t, "ehlo!"))
+	body, err := ioutil.ReadAll(r.Body)
+	require.NoError(t, err)
 
-	require.NoError(t, Deregister(api))
-	require.EqualError(t, Deregister(api), fmt.Sprintf("route %s is not registered", api))
-	verifyApi(uri, http.Get, verifyBodyString(t, "404 page not found\n"))
-}
-
-type verifyFunc func(resp *http.Response, err error)
-
-func verifyApi(url string, visit func(url string) (resp *http.Response, err error), verify verifyFunc) {
-	verify(visit(url))
-}
-
-func verifyBodyString(t *testing.T, s string) verifyFunc {
-	return func(r *http.Response, err error) {
-		require.NoError(t, err)
-		defer r.Body.Close()
-
-		body, err := ioutil.ReadAll(r.Body)
-		require.NoError(t, err)
-		assert.Equal(t, s, string(body))
-	}
-}
-
-func simpleHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "ehlo!")
+	assert.Equal(t, "ehlo!", string(body))
 }
 
 func simpleMux() *http.ServeMux {
