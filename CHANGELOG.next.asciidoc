@@ -660,6 +660,9 @@ port. {pull}19209[19209]
 
 *Filebeat*
 
+- The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
+  As we continue to expand our coverage of common security data sources, we may consider supporting
+  Citrix Netscaler and Symantec Endpoint Protection in a future release. {issue}23129[23129] {pull}23130[23130]
 
 *Heartbeat*
 
