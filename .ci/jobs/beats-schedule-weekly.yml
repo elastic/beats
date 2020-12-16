@@ -1,9 +1,9 @@
 ---
 - job:
     name: beats-schedule-weekly
-    display-name: Jobs scheduled weekly (Monday)
-    description: Jobs scheduled weekly (Monday)
-    view: APM-CI
+    display-name: Jobs scheduled weekly (Sunday)
+    description: Jobs scheduled weekly (Sunday)
+    view: Beats
     project-type: pipeline
     parameters:
       - string:
@@ -24,4 +24,4 @@
             branches:
               - $branch_specifier
     triggers:
-      - timed: 'H H(1-4) * * 1'
+      - timed: 'H H(1-4) * * 0'

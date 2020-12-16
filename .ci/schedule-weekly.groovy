@@ -1,7 +1,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'master' }
+  agent none
   environment {
     NOTIFY_TO = credentials('notify-to')
     PIPELINE_LOG_LEVEL = 'INFO'
@@ -15,19 +15,19 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
   }
   triggers {
-    cron('H H(1-4) * * 1')
+    cron('H H(1-4) * * 0')
   }
   stages {
     stage('Nighly beats builds') {
       steps {
-        echo 'TBD'
-        // awsCloudTests
+        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true)])
+        build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true)])
       }
     }
   }
   post {
     cleanup {
-      notifyBuildResult()
+      notifyBuildResult(prComment: false)
     }
   }
 }
