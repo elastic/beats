@@ -138,7 +138,8 @@ func TestMetricsPercentages(t *testing.T) {
 	assert.EqualValues(t, .0, pct.Idle)
 	assert.EqualValues(t, 1., pct.Total)
 
-	pct = sample.Percentages()
+	//bypass the Metrics API so we can have a constant CPU value
+	pct = cpuPercentages(&s0, &s1, numCores)
 	assert.EqualValues(t, .3*float64(numCores), pct.User)
 	assert.EqualValues(t, .7*float64(numCores), pct.System)
 	assert.EqualValues(t, .0*float64(numCores), pct.Idle)
