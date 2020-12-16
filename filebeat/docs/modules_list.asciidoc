@@ -13,7 +13,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cef>>
   * <<filebeat-module-checkpoint>>
   * <<filebeat-module-cisco>>
-  * <<filebeat-module-citrix>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cyberark>>
@@ -63,7 +62,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-sophos>>
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
-  * <<filebeat-module-symantec>>
   * <<filebeat-module-system>>
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
@@ -85,7 +83,6 @@ include::modules/bluecoat.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
-include::modules/citrix.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cyberark.asciidoc[]
@@ -135,7 +132,6 @@ include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
-include::modules/symantec.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
