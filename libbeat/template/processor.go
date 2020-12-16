@@ -207,7 +207,9 @@ func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr
 	if err := p.Process(f.Fields, groupState, properties); err != nil {
 		return nil, err
 	}
-	indexMapping["properties"] = properties
+	if len(properties) != 0 {
+		indexMapping["properties"] = properties
+	}
 	return indexMapping, nil
 }
 
