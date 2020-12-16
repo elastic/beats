@@ -18,35 +18,6 @@
             Date and time sample was analyzed by VirusTotal.
           type: date
           default_field: false
-        - name: results
-          description: >
-            Contains each engine's resulting data about sample
-          type: nested
-          fields:
-            - name: method
-              description: >
-                Method used by VirusTotal for analysis.
-              type: keyword
-            - name: category
-              description: >
-                Category of the sample.
-              type: keyword
-            - name: result
-              description: >
-                Result of the VirusTotal analysis.
-              type: keyword
-            - name: engine_name
-              description: >
-                Name of the engine used for analysis.
-              type: keyword
-            - name: engine_version
-              description: >
-                Version of the engine used for analysis.
-              type: keyword
-            - name: engine_update
-              description: >
-                Last update of the engine used for analysis.
-              type: date
         - name: stats
           default_field: false
           description: >
@@ -57,11 +28,11 @@
             - name: failure
               type: integer
               description: >
-                number of AV engines that fail when analysing that file
+                Number of AV engines that fail when analysing that file
             - name: undetected
               type: integer
               description: >
-                number of reports saying that is undetected
+                Number of reports saying that is undetected
             - name: confirmed-timeout
               type: integer
               description: >
@@ -69,31 +40,29 @@
             - name: harmless
               type: integer
               description: >
-                number of reports saying that is harmless
+                Number of reports saying that is harmless
             - name: malicious
               type: integer
               description: >
-                number of reports saying that is malicious
+                Number of reports saying that is malicious
             - name: suspicious
               type: integer
               description: >
-                number of reports saying that is suspicious
+                Number of reports saying that is suspicious
             - name: timeout
               type: integer
               description: >
-                number of timeouts when analyzing this URL/file
+                Number of timeouts when analyzing this URL/file
             - name: type-unsupported
               type: integer
               description: >
-                number of AV engines that don't support that type of file
-
+                Number of AV engines that don't support that type of file
     - name: attributes
       type: flattened
       release: beta
       default_field: false
       description: >
         Fields returned by VirusTotal that are not yet mapped into a standard schema
-
     - name: community
       type: group
       release: beta
@@ -160,7 +129,6 @@
           description: >
             Time of live hunt notification.
           type: date
-          default_field: false
         - name: snippet
           description: >
             VirusTotal's context notification snippets.
@@ -172,6 +140,7 @@
         Metadata about this submission
       release: beta
       type: group
+      default_field: false
       fields:
         - name: source.geo.country_iso_code
           description: >
@@ -185,12 +154,10 @@
           description: >
             Date when the file was first seen in VirusTotal
           type: date
-          default_field: false
         - name: last_submitted
           description: >
             Most recent date the file was posted to VirusTotal
           type: date
-          default_field: false
         - name: submission_count
           description: >
             Number of times the sample has been submitted to VirusTotal
@@ -203,6 +170,7 @@
       description: >
         This sample is able to be downloaded from VirusTotal.
       type: boolean
+      default_field: false
     - name: last_modified
       description: >
         Date when the object itself was last modified.
@@ -219,107 +187,86 @@
           description: >
             Contains the app's activity names
           type: keyword
-
         - name: version
           description: >
             AndroGuard version used
           type: keyword
-
         - name: android_application
           description: >
             android file type in integer format
           type: integer
-
         - name: android_application_error
           description: >
             Whether there was an error processing the application or not
           type: boolean
-
         - name: android_application_info
           description: >
             Android file type in readable form ("apk", "dex", "axml")
           type: keyword
-
         - name: android_version_code
           description: >
             Android version code, read from the manifest
           type: keyword
-
         - name: android_version_name
           description: >
             Android version name, read from the manifest
           type: keyword
-
         - name: libraries
           description: >
             Library names used in the app
           type: keyword
-
         - name: main_activity
           description: >
             Main activity name, read from the manifest
           type: keyword
-
         - name: minimum_sdk_version
           description: >
             Minimum supported sdk version
           type: keyword
-
         - name: package
           description: >
             Package name, read from the manifest
           type: keyword
-
         - name: providers
           description: >
             Providers used by the app
           type: keyword
-
         - name: receivers
           description: >
             Receivers used by the app
           type: keyword
-
         - name: risk_indicator
           description: >
-            contains two keys: "apk" (structure) and "perm" (permissions) risk indicators
+            Contains two keys: "apk" (structure) and "perm" (permissions) risk indicators
           type: flattened
-
         - name: services
           description: >
             Services used by the app
           type: keyword
-
         - name: strings_information
           description: >
-            contains interesting strings found in the app
+            Contains interesting strings found in the app
           type: keyword
-
         - name: target_sdk_version
           description: >
             Android version the app has been tested for
           type: keyword
-
         - name: vt_android_info
           description: >
-            internal version of the Androguard tool used by VT
+            Internal version of the Androguard tool used by VT
           type: float
-
         - name: certificate
           description: >
-            app certificate details. Check SSL Certificate object to know more about its structure
+            App certificate details. Check SSL Certificate object to know more about its structure
           type: flattened
-
         - name: intent_filters
           description: >
-            contains the app's intent filters
+            Contains the app's intent filters
           type: flattened
-
         - name: permission_details
           description: >
             Details about the app's required permissions. Keys are permission names and values are dictionaries containing the following fields
           type: flattened
-
     - name: capabilities
       description: >
         List of representative tags related to the file's capabilities.
@@ -327,7 +274,7 @@
     - name: bytehero_info
       type: keyword
       description: >
-        TODO
+        Information provided by ByteHero heuristic detection engine
       release: beta
     - name: exiftool
       default_field: false
@@ -336,6 +283,10 @@
       release: beta
       type: group
       fields:
+        - name: assembly_version
+          description: >
+            Exiftool assembly version
+          type: keyword
         - name: character_set
           description: >
             Exiftool character set
@@ -411,6 +362,14 @@
         - name: legal_copyright
           description: >
             Exiftool legal copyright
+          type: keyword
+        - name: legal_trademarks1
+          description: >
+            Exiftool legal trademark1
+          type: keyword
+        - name: legal_trademarks2
+          description: >
+            Exiftool legal trademark2
           type: keyword
         - name: linker_version
           description: >
@@ -546,20 +505,6 @@
       description: >
         A guess of the file type, based on a popular parsing tool from unix
       type: keyword
-
-    - name: packers
-      type: nested
-      description: >
-        List of packer detection tools and their result.
-      fields:
-        - name: tool_name
-          description: >
-            Name of tool used to detect packer used.
-          type: keyword
-        - name: name
-          description: >
-            Name of identified packer(s).
-          type: keyword
     - name: sigma_analysis
       type: flattened
       description: >
@@ -606,6 +551,62 @@
       description: >
         Tags representing the file type
       type: keyword
+    - name: type_extension
+      description: >
+        File extension that commonly represents the file type
+      type: keyword
+    - name: first_seen_in_the_wild
+      description: >
+        Date that VirusTotal first observed this file object on the internet, typically by URL
+      type: keyword
+- name: virustotal.analysis.results
+  description: >
+    Contains each engine's resulting data about sample
+  type: nested
+- name: virustotal.analysis.results
+  type: group
+  fields:
+    - name: method
+      description: >
+        Method used by VirusTotal for analysis.
+      type: keyword
+    - name: category
+      description: >
+        Category of the sample.
+      type: keyword
+    - name: result
+      description: >
+        Result of the VirusTotal analysis.
+      type: keyword
+    - name: engine_name
+      description: >
+        Name of the engine used for analysis.
+      type: keyword
+    - name: engine_version
+      description: >
+        Version of the engine used for analysis.
+      type: keyword
+    - name: engine_update
+      description: >
+        Last update of the engine used for analysis.
+      type: date
+- name: virustotal.packers
+  type: nested
+  description: >
+    List of packer detection tools and their result.
+- name: virustotal.packers
+  type: group
+  description: >
+    List of packer detection tools and their result.
+  fields:
+    - name: tool_name
+      description: >
+        Name of tool used to detect packer used.
+      type: keyword
+    - name: name
+      description: >
+        Name of identified packer(s).
+      type: keyword
 - name: file.hash.ssdeep
   default_field: false
   description: >
@@ -618,7 +619,7 @@
     Fuzzy hash of the file using tlsh.
   release: beta
   type: keyword
-
+### ELF file extensions ###
 - name: file.elf
   default_field: false
   description: >
@@ -677,7 +678,6 @@
           type: keyword
           description: >
             "0x1" for original ELF files.
-
     - name: number_program_headers
       description: >
         Number of ELF Program Headers.
@@ -686,93 +686,6 @@
       description: >
         Number of ELF Section Headers.
       type: long
-
-    - name: sections
-      default_field: false
-      description: >
-        Section information of the binary executable file.
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Binary Section name.
-          type: keyword
-        - name: physical_offset
-          description: >
-            Binary Section offset on disk.
-          type: keyword
-        - name: physical_size
-          description: >
-            Binary Section size in bytes
-          type: long
-          format: bytes
-        - name: virtual_address
-          description: >
-            Binary Section virtual address.
-          format: string
-          type: long
-        - name: virtual_size
-          description: >
-            Binary Section virtual size in bytes.
-          format: bytes
-          type: long
-        - name: flags
-          description: >
-            Binary Section flags.
-          type: keyword
-        - name: type
-          description: >
-            Binary Section type.
-          type: keyword
-        - name: segment_name
-          description: >
-            Binary Section name of containing segment.
-          type: keyword
-        - name: entropy
-          description: >
-            Binary Section measurement of Shannon entropy.
-          type: float
-        - name: chi2
-          description: >
-            Binary Section measurement of Chi squared distribution.
-          type: float
-
-
-    - name: exports
-      description: >
-        List of exported element names and types
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Name of exported symbol
-          type: keyword
-          default_field: false
-        - name: type
-          description: >
-            Type of exported symbol
-          type: keyword
-          default_field: false
-
-    - name: imports
-      description: >
-        List of imported element names and types
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Name of imported symbol
-          type: keyword
-          default_field: false
-        - name: type
-          description: >
-            Type of imported symbol
-          type: keyword
-          default_field: false
-
     - name: shared_libraries
       description: >
         List of shared libraries used by this ELF object
@@ -792,7 +705,127 @@
           description: >
             ELF object segment list.
           type: flattened
-
+- name: file.elf.exports
+  default_field: false
+  description: >
+    List of exported element names and types
+  release: beta
+  type: nested
+- name: file.elf.exports
+  type: group
+  fields:
+    - name: name
+      description: >
+        Name of exported symbol
+      type: keyword
+      default_field: false
+    - name: type
+      description: >
+        Type of exported symbol
+      type: keyword
+      default_field: false
+- name: file.elf.sections
+  default_field: false
+  description: >
+    Section information of the binary executable file.
+  release: beta
+  type: nested
+- name: file.elf.sections
+  type: group
+  fields:
+    - name: name
+      description: >
+        Binary Section name.
+      type: keyword
+    - name: physical_offset
+      description: >
+        Binary Section offset on disk.
+      type: keyword
+    - name: physical_size
+      description: >
+        Binary Section size in bytes
+      type: long
+      format: bytes
+    - name: virtual_address
+      description: >
+        Binary Section virtual address.
+      format: string
+      type: long
+    - name: virtual_size
+      description: >
+        Binary Section virtual size in bytes.
+      format: bytes
+      type: long
+    - name: flags
+      description: >
+        Binary Section flags.
+      type: keyword
+    - name: type
+      description: >
+        Binary Section type.
+      type: keyword
+    - name: segment_name
+      description: >
+        Binary Section name of containing segment.
+      type: keyword
+    - name: entropy
+      description: >
+        Binary Section measurement of Shannon entropy.
+      type: float
+    - name: chi2
+      description: >
+        Binary Section measurement of Chi squared distribution.
+      type: float
+- name: file.elf.imports
+  default_field: false
+  description: >
+    List of imported element names and types
+  release: beta
+  type: nested
+- name: file.elf.imports
+  type: group
+  fields:
+    - name: name
+      description: >
+        Name of imported symbol
+      type: keyword
+      default_field: false
+    - name: type
+      description: >
+        Type of imported symbol
+      type: keyword
+      default_field: false
+### PE file extensions ###
+- name: file.pe.overlay
+  type: nested
+- name: file.pe.overlay
+  type: group
+  fields:
+    - name: chi2
+      description: >
+        Chi2 information of the PE file.
+      type: float
+    - name: entropy
+      description: >
+        Entropy information of the PE file.
+      type: float
+    - name: filetype
+      description: >
+        Filetype of the PE file.
+      type: keyword
+    - name: md5
+      description: >
+        Overlay MD5 hash of the PE file.
+      type: keyword
+    - name: offset
+      description: >
+        Offset of the overlay information of the PE file.
+      type: long
+    - name: size
+      description: >
+        Size of the PE file.
+      format: bytes
+      type: long
 - name: file.pe
   type: group
   fields:
@@ -806,100 +839,11 @@
           description: >
             Debug information, if present
           type: flattened
-
         - name: resources
           default_field: false
           type: flattened
           description: >
             If the PE contains resources, some info about them
-
-
-    - name: sections
-      default_field: false
-      description: >
-        Section information of the binary executable file.
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Binary Section name.
-          type: keyword
-        - name: physical_offset
-          description: >
-            Binary Section offset on disk.
-          type: keyword
-        - name: physical_size
-          description: >
-            Binary Section size in bytes
-          type: long
-          format: bytes
-        - name: virtual_address
-          description: >
-            Binary Section virtual address.
-          format: string
-          type: long
-        - name: virtual_size
-          description: >
-            Binary Section virtual size in bytes.
-          format: bytes
-          type: long
-        - name: flags
-          description: >
-            Binary Section flags.
-          type: keyword
-        - name: type
-          description: >
-            Binary Section type.
-          type: keyword
-        - name: segment_name
-          description: >
-            Binary Section name of containing segment.
-          type: keyword
-        - name: entropy
-          description: >
-            Binary Section measurement of Shannon entropy.
-          type: float
-        - name: chi2
-          description: >
-            Binary Section measurement of Chi squared distribution.
-          type: float
-
-
-    - name: exports
-      description: >
-        List of exported element names and types
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Name of exported symbol
-          type: keyword
-          default_field: false
-        - name: type
-          description: >
-            Type of exported symbol
-          type: keyword
-          default_field: false
-
-    - name: imports
-      description: >
-        List of imported element names and types
-      release: beta
-      type: nested
-      fields:
-        - name: name
-          description: >
-            Name of imported symbol
-          type: keyword
-          default_field: false
-        - name: type
-          description: >
-            Type of imported symbol
-          type: keyword
-          default_field: false
-
     - name: creation_date
       default_field: false
       description: >
@@ -929,7 +873,6 @@
           description: >
             MD5 hash of raw icon data
           release: beta
-
     - name: compilers
       type: keyword
       description: >
@@ -947,44 +890,101 @@
       description: >
         Machine type of the PE file.
       type: keyword
-
-    - name: overlay
+- name: file.pe.sections
+  type: nested
+- name: file.pe.sections
+  type: group
+  fields:
+    - name: name
       description: >
-        Overlay information of the PE file.
-      release: beta
-      type: nested
-      fields:
-        - name: chi2
-          description: >
-            Chi2 information of the PE file.
-          type: float
-        - name: entropy
-          description: >
-            Entropy information of the PE file.
-          type: float
-        - name: filetype
-          description: >
-            Filetype of the PE file.
-          type: keyword
-        - name: md5
-          description: >
-            Overlay MD5 hash of the PE file.
-          type: keyword
-        - name: offset
-          description: >
-            Offset of the overlay information of the PE file.
-          type: long
-        - name: size
-          description: >
-            Size of the PE file.
-          format: bytes
-          type: long
+        Binary Section name.
+      type: keyword
+    - name: physical_offset
+      description: >
+        Binary Section offset on disk.
+      type: keyword
+    - name: physical_size
+      description: >
+        Binary Section size in bytes
+      type: long
+      format: bytes
+    - name: virtual_address
+      description: >
+        Binary Section virtual address.
+      format: string
+      type: long
+    - name: virtual_size
+      description: >
+        Binary Section virtual size in bytes.
+      format: bytes
+      type: long
+    - name: flags
+      description: >
+        Binary Section flags.
+      type: keyword
+    - name: type
+      description: >
+        Binary Section type.
+      type: keyword
+    - name: segment_name
+      description: >
+        Binary Section name of containing segment.
+      type: keyword
+    - name: entropy
+      description: >
+        Binary Section measurement of Shannon entropy.
+      type: float
+    - name: chi2
+      description: >
+        Binary Section measurement of Chi squared distribution.
+      type: float
+- name: file.pe.exports
+  description: >
+    List of exported element names and types
+  release: beta
+  type: nested
+- name: file.pe.exports
+  description: >
+    List of exported element names and types
+  release: beta
+  type: group
+  fields:
+    - name: name
+      description: >
+        Name of exported symbol
+      type: keyword
+      default_field: false
+    - name: type
+      description: >
+        Type of exported symbol
+      type: keyword
+      default_field: false
+- name: file.pe.imports
+  description: >
+    List of imported element names and types
+  release: beta
+  type: nested
+- name: file.pe.imports
+  description: >
+    List of imported element names and types
+  release: beta
+  type: group
+  fields:
+    - name: name
+      description: >
+        Name of imported symbol
+      type: keyword
+      default_field: false
+    - name: type
+      description: >
+        Type of imported symbol
+      type: keyword
+      default_field: false
 
 - name: rule
   default_field: false
   description: >
     Specifics of any observer or agent rules that generate alerts.
-  release: beta
   type: group
   fields:
     - name: ruleset_id

@@ -35,7 +35,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.6.0
+        ecs.version: 1.7.0
 
   - rename:
       fields:
@@ -125,10 +125,31 @@ processors:
         - {from: virustotal.attributes.bytehero_info, to: virustotal.bytehero_info}
         - {from: virustotal.attributes.type_description, to: virustotal.type_description}
         - {from: virustotal.attributes.type_tag, to: virustotal.type_tag}
+        - {from: virustotal.attributes.type_extension, to: virustotal.type_extension}
+        - {from: virustotal.attributes.first_seen_itw_date, to: virustotal.first_seen_in_the_wild}
 
         # Android data
         - {from: virustotal.attributes.androguard, to: virustotal.androguard}
 
+  - script:
+    # Remove empty fields
+      when:
+         has_fields: ["rule.tags"]
+      lang: javascript
+      id: cleanup-empty_rule-tags
+      params:
+        field: "rule.tags"
+      file: ${path.home}/module/virustotal/livehunt/config/cleanup-empty.js
+
+  - script:
+    # Remove empty fields
+      when:
+         has_fields: ["virustotal.community.rule"]
+      lang: javascript
+      id: cleanup-empty_virustotal-community-rules
+      params:
+        field: "virustotal.community.rule"
+      file: ${path.home}/module/virustotal/livehunt/config/cleanup-empty.js
 
   - script:
       lang: javascript
@@ -185,11 +206,13 @@ processors:
             - {from: virustotal.attributes.signature_info.comments, to: file.pe.comments}
             - {from: virustotal.attributes.signature_info.description, to: file.pe.description}
             - {from: "virustotal.attributes.signature_info.file version", to: file.pe.file_version}
+            - {from: "virustotal.attributes.signature_info.original name", to: file.pe.original_file_name}
             - {from: virustotal.creation_date, to: file.pe.creation_date}
             - {from: virustotal.attributes.main_icon, to: file.pe.main_icon.hash}
             - {from: file.pe.main_icon.hash.raw_md5, to: file.pe.main_icon.hash.md5}
             - {from: file.pe.authentihash, to: file.pe.hash.authentihash}
-            - {from: file.pe.rich_pe_header_hash, to: file.pe.hash.richpe_header}
+            - {from: file.pe.rich_pe_header_hash, to: file.pe.rich_pe_header.hash}
+            - {from: file.pe.compiler_product_versions, to: file.pe.compilers}
 
             # Normalized binary info
             - {from: file.pe.import_list,      to: file.pe.imports}
@@ -198,7 +221,16 @@ processors:
             - {from: file.pe.resource_details, to: file.pe.flattened.resources}
             - {from: file.pe.debug,            to: file.pe.flattened.debug}
 
+      - drop_fields:
+          ignore_missing: True
+          fields:
+            # these are duplicates of data derivable from file.pe.resources
+            - file.pe.resource_langs
+            - file.pe.resource_types
+
+
       - script:
           lang: javascript
           id: virustotal-pe
           file: ${path.home}/module/virustotal/livehunt/config/virustotal-pe.js
+

@@ -23,7 +23,7 @@ var vtPE = (function () {
             var norm_imports = Array();
             for (var i = 0; i < imports.length; i++) {
                 var libname = imports[i].library_name;
-                for (var j = 0; i < imports[i].imported_functions.length; j++) {
+                for (var j = 0; j < imports[i].imported_functions.length; j++) {
                     norm_imports.push(
                         {
                             "name": imports[i].imported_functions[j],
@@ -34,6 +34,7 @@ var vtPE = (function () {
                 }
             }
 
+            console.debug("normalized imports[" + norm_imports.length + "]: \n" + JSON.stringify(norm_imports, undefined, 2));
             evt.Delete("file.pe.imports");
             evt.Put("file.pe.imports", norm_imports);
         }
@@ -48,7 +49,7 @@ var vtPE = (function () {
         if (exports != null) {
             console.debug("exports[" + exports.length + "]: \n" + JSON.stringify(exports, undefined, 2));
 
-            /* The goal is to normalize import list to the following
+            /* The goal is to normalize export list to the following
              * structure:
              * {
              *  "name": "MY_SYMBOL", (keyword)
@@ -78,7 +79,7 @@ var vtPE = (function () {
         .Add(function (evt) {
             normalizeImports(evt);
             normalizeExports(evt);
-            normalizeSections(evt);
+            // normalizeSections(evt);
         })
         .Build();
 

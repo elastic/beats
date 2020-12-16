@@ -31,7 +31,7 @@ cloud.auth: "INSERT-YOUR-CLOUD-AUTH"
 Run filebeat setup to establish ILM policies, Elasticsearch mapping patterns, Kibana index patterns. This needs to happen every time you change a `fields.yml`. This configuration will overwrite existing items, except maybe Kibana index pattern. I just manually delete that before I run setup. I also delete the existing `filebeat-*` index in Elasticsearch too, to avoid mapping conflicts. See notes on `kafka` and `elastidump` below.
 
 ```shell
-./filebeat -c filebeat.dev.yml -e setup -E setup.template.overwrite=true -E setup.ilm.overwrite=true
+./filebeat -c filebeat.dev.yml -e setup -E setup.template.overwrite=true -E setup.ilm.overwrite=true -E setup.dashboards.directory=build/kibana
 ```
 
 ## Kafka
@@ -99,8 +99,6 @@ Configure filebeat to use the kafka input as show above, and run it until all ev
 ```shell
 ./filebeat -c filebeat.dev.yml -e
 ```
-
-
 ## Delete all Kibana saved objects between test runs
 
 ```bash
@@ -110,17 +108,21 @@ Configure filebeat to use the kafka input as show above, and run it until all ev
 # Types can be: visualization, dashboard, search, index-pattern, config, timelion-sheet
 # You can also have a map type, which isn't in the docs linked above
 
-export KIBANA_API_URL='http://elastic:password@127.0.0.1:5601'
-export OBJECTS=$(curl "${KIBANA_API_URL}/api/saved_objects/_find?fields=id&type=index-pattern&type=visualization&type=dashboard&type=search&type=index-pattern&type=timelion-sheet&type=map&per_page=1000" | jq -rc '.saved_objects[] | {"type": .type, "id": .id } | @base64')
+function clear_kibana() {
+  export KIBANA_API_URL="${KIBANA_API_URL:-http://elastic:password@127.0.0.1:5601}"
+  export OBJECTS=$(curl -s "${KIBANA_API_URL}/api/saved_objects/_find?fields=id&type=index-pattern&type=visualization&type=dashboard&type=search&type=index-pattern&type=timelion-sheet&type=map&per_page=1000" | jq -rc '.saved_objects[] | {"type": .type, "id": .id } | @base64')
 
-# Loops through the base64-encoded JSON objects
-for item in ${OBJECTS};
-do
-  TYPE=$(echo "${item}" | base64 -d | jq -r '.type')
-  ID=$(echo "${item}" | base64 -d | jq -r '.id')
+  # Loops through the base64-encoded JSON objects
+  for item in ${OBJECTS};
+  do
+    TYPE=$(echo "${item}" | base64 -d | jq -r '.type')
+    ID=$(echo "${item}" | base64 -d | jq -r '.id')
 
-  echo "Deleting ${TYPE} with ID ${ID}"
-  curl -s -H 'kbn-xsrf: true' -XDELETE "${KIBANA_API_URL}/api/saved_objects/${TYPE}/${ID}"
+    echo "Deleting ${TYPE} with ID ${ID}"
+    curl -s -H 'kbn-xsrf: true' -XDELETE "${KIBANA_API_URL}/api/saved_objects/${TYPE}/${ID}" >/dev/null
 
-done
+  done
+}
+
+clear_kibana
 ```
