@@ -1,5 +1,8 @@
 description: Pipeline for parsing system authorisation/secure logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     ignore_missing: true
@@ -139,6 +142,11 @@ processors:
     field: related.ip
     value: "{{source.ip}}"
     if: "ctx?.source?.ip != null"
+- append:
+    field: related.hosts
+    value: "{{host.hostname}}"
+    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+    allow_duplicates: false
 on_failure:
 - set:
     field: error.message

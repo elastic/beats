@@ -19,6 +19,7 @@ package prometheus
 
 import (
 	"bytes"
+	"compress/gzip"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -185,10 +186,17 @@ var _ = httpfetcher(&mockFetcher{})
 // FetchResponse returns an HTTP response but for the Body, which
 // returns the mockFetcher.Response contents
 func (m mockFetcher) FetchResponse() (*http.Response, error) {
+	body := bytes.NewBuffer(nil)
+	writer := gzip.NewWriter(body)
+	writer.Write([]byte(m.response))
+	writer.Close()
+
 	return &http.Response{
 		StatusCode: 200,
-		Header:     make(http.Header),
-		Body:       ioutil.NopCloser(bytes.NewReader([]byte(m.response))),
+		Header: http.Header{
+			"Content-Encoding": []string{"gzip"},
+		},
+		Body: ioutil.NopCloser(body),
 	}, nil
 }
 

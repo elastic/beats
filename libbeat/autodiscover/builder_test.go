@@ -55,10 +55,10 @@ func TestBuilderRegistry(t *testing.T) {
 	cfg, err := common.NewConfigFrom(&config)
 
 	// Make sure that config building doesn't fail
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	builder, err := reg.BuildBuilder(cfg)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, builder)
 
 	// Try to create a config with fake builder and assert length

@@ -4,6 +4,8 @@
 {beatname_uc} <<running-on-docker,Docker images>> can be used on Kubernetes to
 check files integrity.
 
+TIP: Running {ecloud} on Kubernetes? See {eck-ref}/k8s-beat.html[Run {beats} on ECK].
+
 ifeval::["{release-state}"=="unreleased"]
 
 However, version {version} of {beatname_uc} has not yet been

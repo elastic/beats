@@ -112,7 +112,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: filebeat-config
       - name: varlibdockercontainers
         hostPath:
@@ -123,6 +123,7 @@ spec:
       # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
         hostPath:
+          # When filebeat runs as non-root user, this directory needs to be writable by group (g+w).
           path: /var/lib/filebeat-data
           type: DirectoryOrCreate
 ---

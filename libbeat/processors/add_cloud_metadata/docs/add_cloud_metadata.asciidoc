@@ -52,11 +52,15 @@ List of names the `providers` setting supports:
 - "aws", or "ec2" for Amazon Web Services (enabled by default).
 - "gcp" for Google Copmute Enging (enabled by default).
 - "openstack", or "nova" for Openstack Nova (enabled by default).
+- "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 
 The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
 default).
+
+The `add_cloud_metadata` processor supports SSL options to configure the http
+client used to query cloud metadata. See <<configuration-ssl>> for more information.
 
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.
@@ -143,7 +147,7 @@ _Azure Virtual Machine_
 -------------------------------------------------------------------------------
 {
   "cloud": {
-    "provider": "az",
+    "provider": "azure",
     "instance.id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
     "instance.name": "test-az-vm",
     "machine.type": "Standard_D3_v2",

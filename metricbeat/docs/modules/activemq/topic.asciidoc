@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-activemq-topic]]
+[role="xpack"]
 === ActiveMQ topic metricset
 
 include::../../../../x-pack/metricbeat/module/activemq/topic/_meta/docs.asciidoc[]

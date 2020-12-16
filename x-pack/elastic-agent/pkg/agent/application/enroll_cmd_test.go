@@ -19,6 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -43,17 +44,16 @@ func (m *mockStore) Save(in io.Reader) error {
 }
 
 func TestEnroll(t *testing.T) {
-	log, _ := logger.New()
+	log, _ := logger.New("tst")
 
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -102,12 +102,11 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll with TLS and save access api key in the store", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -154,22 +153,21 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
 	t.Run("successfully enroll when a slash is defined at the end of host", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -199,6 +197,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -214,22 +213,21 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
 	t.Run("successfully enroll without TLS and save access api key in the store", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -259,6 +257,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -274,17 +273,17 @@ func TestEnroll(t *testing.T) {
 			config, err := readConfig(store.Content)
 
 			require.NoError(t, err)
-			require.Equal(t, "my-access-api-key", config.API.AccessAPIKey)
-			require.Equal(t, host, config.API.Kibana.Host)
-			require.Equal(t, "", config.API.Kibana.Username)
-			require.Equal(t, "", config.API.Kibana.Password)
+			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
+			require.Equal(t, host, config.Kibana.Host)
+			require.Equal(t, "", config.Kibana.Username)
+			require.Equal(t, "", config.Kibana.Password)
 		},
 	))
 
 	t.Run("fail to enroll without TLS", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`
 {
@@ -303,6 +302,7 @@ func TestEnroll(t *testing.T) {
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-token",
+					Insecure:             true,
 					UserProvidedMetadata: map[string]interface{}{"custom": "customize"},
 				},
 				"",
@@ -374,16 +374,16 @@ func bytesToTMPFile(b []byte) (string, error) {
 	return f.Name(), nil
 }
 
-func readConfig(raw []byte) (*FleetAgentConfig, error) {
+func readConfig(raw []byte) (*configuration.FleetAgentConfig, error) {
 	r := bytes.NewReader(raw)
 	config, err := config.NewConfigFrom(r)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg := defaultFleetAgentConfig()
+	cfg := configuration.DefaultConfiguration()
 	if err := config.Unpack(cfg); err != nil {
 		return nil, err
 	}
-	return cfg, nil
+	return cfg.Fleet, nil
 }

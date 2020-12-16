@@ -171,7 +171,31 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			return
 		}
 
-		metaGen := metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nil, nil)
+		metaConf := config.AddResourceMetadata
+		if metaConf == nil {
+			metaConf = metadata.GetDefaultResourceMetadataConfig()
+		}
+
+		options := kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Node:        config.Host,
+		}
+		if config.Namespace != "" {
+			options.Namespace = config.Namespace
+		}
+		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
+		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
+		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
+		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
@@ -194,8 +218,22 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			},
 		})
 
+		// NOTE: order is important here since pod meta will include node meta and hence node.Store() should
+		// be populated before trying to generate metadata for Pods.
+		if nodeWatcher != nil {
+			if err := nodeWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+				return
+			}
+		}
+		if namespaceWatcher != nil {
+			if err := namespaceWatcher.Start(); err != nil {
+				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				return
+			}
+		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start watcher: %v", err)
+			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
@@ -218,11 +256,38 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
+	metaClone := metadata.Clone()
+	metaClone.Delete("container.name")
+	containerImage, err := metadata.GetValue("container.image")
+	if err == nil {
+		metaClone.Delete("container.image")
+		metaClone.Put("container.image.name", containerImage)
+	}
+	cmeta, err := metaClone.Clone().GetValue("container")
+	if err == nil {
+		event.Fields.DeepUpdate(common.MapStr{
+			"container": cmeta,
+		})
+	}
+
+	kubeMeta := metadata.Clone()
+	kubeMeta.Delete("container.id")
+	kubeMeta.Delete("container.runtime")
 	event.Fields.DeepUpdate(common.MapStr{
-		"kubernetes": metadata.Clone(),
+		"kubernetes": kubeMeta,
 	})
 
 	return event, nil
+}
+
+func (k *kubernetesAnnotator) Close() error {
+	if k.watcher != nil {
+		k.watcher.Stop()
+	}
+	if k.cache != nil {
+		k.cache.stop()
+	}
+	return nil
 }
 
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {

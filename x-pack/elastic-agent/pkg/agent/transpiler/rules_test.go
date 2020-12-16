@@ -31,59 +31,59 @@ inputs:
       - paths: /var/log/mysql/error.log
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
   - name: Specified dataset
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    data_stream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        data_stream.dataset: ""
 `,
 			expectedYAML: `
 inputs:
   - name: All default
     type: file
-    dataset.namespace: default
+    data_stream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        data_stream.dataset: generic
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        data_stream.dataset: generic
   - name: Specified dataset
     type: file
-    dataset.namespace: default
+    data_stream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: default
+    data_stream.namespace: default
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: generic
+        data_stream.dataset: generic
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -101,7 +101,7 @@ inputs:
       - paths: /var/log/mysql/error.log
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
 
@@ -109,19 +109,19 @@ inputs:
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    data_stream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        data_stream.dataset: ""
 `,
 			expectedYAML: `
 inputs:
@@ -132,7 +132,7 @@ inputs:
         index: mytype-generic-default
   - name: Specified namespace
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
         index: mytype-generic-nsns
@@ -141,26 +141,71 @@ inputs:
     type: file
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
         index: mytype-dsds-default
   - name: All specified
     type: file
-    dataset.namespace: nsns
+    data_stream.namespace: nsns
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: dsds
+        data_stream.dataset: dsds
         index: mytype-dsds-nsns
   - name: All specified with empty strings
     type: file
-    dataset.namespace: ""
+    data_stream.namespace: ""
     streams:
       - paths: /var/log/mysql/error.log
-        dataset.name: ""
+        data_stream.dataset: ""
         index: mytype-generic-default
 `,
 			rule: &RuleList{
 				Rules: []Rule{
 					InjectIndex("mytype"),
+				},
+			},
+		},
+
+		"inject agent info": {
+			givenYAML: `
+inputs:
+  - name: No processors
+    type: file
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+`,
+			expectedYAML: `
+inputs:
+  - name: No processors
+    type: file
+    processors:
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+  - name: With processors
+    type: file
+    processors:
+      - add_fields:
+          target: other
+          fields:
+            data: more
+      - add_fields:
+          target: elastic_agent
+          fields:
+            id: agent-id
+            snapshot: false
+            version: 8.0.0
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectAgentInfo(),
 				},
 			},
 		},
@@ -259,6 +304,34 @@ output:
 			rule: &RuleList{
 				Rules: []Rule{
 					Rename("donoexist", "what"),
+				},
+			},
+		},
+		"select into": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					SelectInto("level_one.level_two", "level_one.key1", "level_one.key2"),
 				},
 			},
 		},
@@ -587,7 +660,7 @@ logs:
 			a, err := makeASTFromYAML(test.givenYAML)
 			require.NoError(t, err)
 
-			err = test.rule.Apply(a)
+			err = test.rule.Apply(FakeAgentInfo(), a)
 			require.NoError(t, err)
 
 			v := &MapVisitor{}
@@ -642,6 +715,7 @@ func TestSerialization(t *testing.T) {
 		CopyToList("t1", "t2", "insert_after"),
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
+		SelectInto("target", "s1", "s2"),
 	)
 
 	y := `- rename:
@@ -702,6 +776,11 @@ func TestSerialization(t *testing.T) {
     - b
     on_conflict: insert_before
 - fix_stream: {}
+- select_into:
+    selectors:
+    - s1
+    - s2
+    path: target
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {
@@ -716,4 +795,22 @@ func TestSerialization(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, value, v)
 	})
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
+}
+
+func FakeAgentInfo() AgentInfo {
+	return &fakeAgentInfo{}
 }

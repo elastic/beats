@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 
 	"github.com/elastic/beats/v7/journalbeat/checkpoint"
@@ -38,7 +39,6 @@ type Input struct {
 	readers    []*reader.Reader
 	done       chan struct{}
 	config     Config
-	pipeline   beat.Pipeline
 	client     beat.Client
 	states     map[string]checkpoint.JournalState
 	logger     *logp.Logger
@@ -49,7 +49,7 @@ type Input struct {
 // New returns a new Inout
 func New(
 	c *common.Config,
-	b *beat.Beat,
+	info beat.Info,
 	done chan struct{},
 	states map[string]checkpoint.JournalState,
 ) (*Input, error) {
@@ -79,7 +79,7 @@ func New(
 		state := states[cfg.CheckpointID]
 		r, err := reader.NewLocal(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for local journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for local journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}
@@ -99,12 +99,12 @@ func New(
 		state := states[cfg.CheckpointID]
 		r, err := reader.New(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}
 
-	inputProcessors, err := processorsForInput(b.Info, config)
+	inputProcessors, err := processorsForInput(info, config)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,6 @@ func New(
 		readers:    readers,
 		done:       done,
 		config:     config,
-		pipeline:   b.Publisher,
 		states:     states,
 		logger:     logger,
 		eventMeta:  config.EventMetadata,
@@ -125,18 +124,18 @@ func New(
 
 // Run connects to the output, collects entries from the readers
 // and then publishes the events.
-func (i *Input) Run() {
+func (i *Input) Run(pipeline beat.Pipeline) {
 	var err error
-	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
+	i.client, err = pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.GuaranteedSend,
 		Processing: beat.ProcessingConfig{
 			EventMetadata: i.eventMeta,
 			Meta:          nil,
 			Processor:     i.processors,
 		},
-		ACKCount: func(n int) {
+		ACKHandler: acker.Counting(func(n int) {
 			i.logger.Debugw("journalbeat successfully published events", "event.count", n)
-		},
+		}),
 	})
 	if err != nil {
 		i.logger.Error("Error connecting to output: %v", err)

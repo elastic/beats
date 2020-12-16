@@ -14,9 +14,19 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
+
+	"github.com/elastic/go-ucfg"
 )
 
-const selectorSep = "."
+const (
+	selectorSep = "."
+	// conditionKey is the name of the reserved key that will be computed using EQL to a boolean result.
+	//
+	// This makes the key "condition" inside of a dictionary a reserved name.
+	conditionKey = "condition"
+)
 
 // Selector defines a path to access an element in the Tree, currently selectors only works when the
 // target is a Dictionary, accessing list values are not currently supported by any methods using
@@ -27,6 +37,9 @@ var (
 	trueVal  = []byte{1}
 	falseVal = []byte{0}
 )
+
+// Processors represent an attached list of processors.
+type Processors []map[string]interface{}
 
 // Node represents a node in the configuration Tree a Node can point to one or multiples children
 // nodes.
@@ -44,6 +57,12 @@ type Node interface {
 
 	// Hash compute a sha256 hash of the current node and recursively call any children.
 	Hash() []byte
+
+	// Apply apply the current vars, returning the new value for the node.
+	Apply(*Vars) (Node, error)
+
+	// Processors returns any attached processors, because of variable substitution.
+	Processors() Processors
 }
 
 // AST represents a raw configuration which is purely data, only primitives are currently supported,
@@ -61,12 +80,18 @@ func (a *AST) String() string {
 // Dict represents a dictionary in the Tree, where each key is a entry into an array. The Dict will
 // keep the ordering.
 type Dict struct {
-	value []Node
+	value      []Node
+	processors []map[string]interface{}
 }
 
 // NewDict creates a new dict with provided nodes.
 func NewDict(nodes []Node) *Dict {
-	return &Dict{nodes}
+	return NewDictWithProcessors(nodes, nil)
+}
+
+// NewDictWithProcessors creates a new dict with provided nodes and attached processors.
+func NewDictWithProcessors(nodes []Node, processors Processors) *Dict {
+	return &Dict{nodes, processors}
 }
 
 // Find takes a string which is a key and try to find the elements in the associated K/V.
@@ -115,6 +140,45 @@ func (d *Dict) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// Apply applies the vars to all the nodes in the dictionary.
+func (d *Dict) Apply(vars *Vars) (Node, error) {
+	nodes := make([]Node, 0, len(d.value))
+	for _, v := range d.value {
+		k := v.(*Key)
+		n, err := k.Apply(vars)
+		if err != nil {
+			return nil, err
+		}
+		if n == nil {
+			continue
+		}
+		if k.name == conditionKey {
+			b := n.Value().(*BoolVal)
+			if !b.value {
+				// condition failed; whole dictionary should be removed
+				return nil, nil
+			}
+			// condition successful, but don't include condition in result
+			continue
+		}
+		nodes = append(nodes, n)
+	}
+	return &Dict{nodes, nil}, nil
+}
+
+// Processors returns any attached processors, because of variable substitution.
+func (d *Dict) Processors() Processors {
+	if d.processors != nil {
+		return d.processors
+	}
+	for _, v := range d.value {
+		if p := v.Processors(); p != nil {
+			return p
+		}
+	}
+	return nil
+}
+
 // sort sorts the keys in the dictionary
 func (d *Dict) sort() {
 	sort.Slice(d.value, func(i, j int) bool {
@@ -157,6 +221,11 @@ func (k *Key) Find(key string) (Node, bool) {
 	}
 }
 
+// Name returns the name for the key.
+func (k *Key) Name() string {
+	return k.name
+}
+
 // Value returns the raw value.
 func (k *Key) Value() interface{} {
 	return k.value
@@ -181,26 +250,68 @@ func (k *Key) Hash() []byte {
 	return h.Sum(nil)
 }
 
+// Apply applies the vars to the value.
+func (k *Key) Apply(vars *Vars) (Node, error) {
+	if k.value == nil {
+		return k, nil
+	}
+	if k.name == conditionKey {
+		switch v := k.value.(type) {
+		case *BoolVal:
+			return k, nil
+		case *StrVal:
+			cond, err := eql.Eval(v.value, vars)
+			if err != nil {
+				return nil, fmt.Errorf(`condition "%s" evaluation failed: %s`, v.value, err)
+			}
+			return &Key{k.name, NewBoolVal(cond)}, nil
+		}
+		return nil, fmt.Errorf("condition key's value must be a string; recieved %T", k.value)
+	}
+	v, err := k.value.Apply(vars)
+	if err != nil {
+		return nil, err
+	}
+	if v == nil {
+		return nil, nil
+	}
+	return &Key{k.name, v}, nil
+}
+
+// Processors returns any attached processors, because of variable substitution.
+func (k *Key) Processors() Processors {
+	if k.value != nil {
+		return k.value.Processors()
+	}
+	return nil
+}
+
 // List represents a slice in our Tree.
 type List struct {
-	value []Node
+	value      []Node
+	processors Processors
 }
 
 // NewList creates a new list with provided nodes.
 func NewList(nodes []Node) *List {
-	return &List{nodes}
+	return NewListWithProcessors(nodes, nil)
+}
+
+// NewListWithProcessors creates a new list with provided nodes with processors attached.
+func NewListWithProcessors(nodes []Node, processors Processors) *List {
+	return &List{nodes, processors}
 }
 
 func (l *List) String() string {
 	var sb strings.Builder
+	sb.WriteString("[")
 	for i := 0; i < len(l.value); i++ {
-		sb.WriteString("[")
 		sb.WriteString(l.value[i].String())
-		sb.WriteString("]")
 		if i < len(l.value)-1 {
 			sb.WriteString(",")
 		}
 	}
+	sb.WriteString("]")
 	return sb.String()
 }
 
@@ -244,14 +355,49 @@ func (l *List) Clone() Node {
 	return &List{value: nodes}
 }
 
+// Apply applies the vars to all nodes in the list.
+func (l *List) Apply(vars *Vars) (Node, error) {
+	nodes := make([]Node, 0, len(l.value))
+	for _, v := range l.value {
+		n, err := v.Apply(vars)
+		if err != nil {
+			return nil, err
+		}
+		if n == nil {
+			continue
+		}
+		nodes = append(nodes, n)
+	}
+	return NewList(nodes), nil
+}
+
+// Processors returns any attached processors, because of variable substitution.
+func (l *List) Processors() Processors {
+	if l.processors != nil {
+		return l.processors
+	}
+	for _, v := range l.value {
+		if p := v.Processors(); p != nil {
+			return p
+		}
+	}
+	return nil
+}
+
 // StrVal represents a string.
 type StrVal struct {
-	value string
+	value      string
+	processors Processors
 }
 
 // NewStrVal creates a new string value node with provided value.
 func NewStrVal(val string) *StrVal {
-	return &StrVal{val}
+	return NewStrValWithProcessors(val, nil)
+}
+
+// NewStrValWithProcessors creates a new string value node with provided value and processors.
+func NewStrValWithProcessors(val string, processors Processors) *StrVal {
+	return &StrVal{val, processors}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -279,14 +425,30 @@ func (s *StrVal) Hash() []byte {
 	return []byte(s.value)
 }
 
+// Apply applies the vars to the string value.
+func (s *StrVal) Apply(vars *Vars) (Node, error) {
+	return vars.Replace(s.value)
+}
+
+// Processors returns any linked processors that are now connected because of Apply.
+func (s *StrVal) Processors() Processors {
+	return s.processors
+}
+
 // IntVal represents an int.
 type IntVal struct {
-	value int
+	value      int
+	processors Processors
 }
 
 // NewIntVal creates a new int value node with provided value.
 func NewIntVal(val int) *IntVal {
-	return &IntVal{val}
+	return NewIntValWithProcessors(val, nil)
+}
+
+// NewIntValWithProcessors creates a new int value node with provided value and attached processors.
+func NewIntValWithProcessors(val int, processors Processors) *IntVal {
+	return &IntVal{val, processors}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -309,19 +471,35 @@ func (s *IntVal) Clone() Node {
 	return &k
 }
 
+// Apply does nothing.
+func (s *IntVal) Apply(_ *Vars) (Node, error) {
+	return s, nil
+}
+
 // Hash we convert the value into a string and return the byte slice.
 func (s *IntVal) Hash() []byte {
 	return []byte(s.String())
 }
 
+// Processors returns any linked processors that are now connected because of Apply.
+func (s *IntVal) Processors() Processors {
+	return s.processors
+}
+
 // UIntVal represents an int.
 type UIntVal struct {
-	value uint64
+	value      uint64
+	processors Processors
 }
 
 // NewUIntVal creates a new uint value node with provided value.
 func NewUIntVal(val uint64) *UIntVal {
-	return &UIntVal{val}
+	return NewUIntValWithProcessors(val, nil)
+}
+
+// NewUIntValWithProcessors creates a new uint value node with provided value with processors attached.
+func NewUIntValWithProcessors(val uint64, processors Processors) *UIntVal {
+	return &UIntVal{val, processors}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -349,15 +527,31 @@ func (s *UIntVal) Hash() []byte {
 	return []byte(s.String())
 }
 
+// Apply does nothing.
+func (s *UIntVal) Apply(_ *Vars) (Node, error) {
+	return s, nil
+}
+
+// Processors returns any linked processors that are now connected because of Apply.
+func (s *UIntVal) Processors() Processors {
+	return s.processors
+}
+
 // FloatVal represents a float.
 // NOTE: We will convert float32 to a float64.
 type FloatVal struct {
-	value float64
+	value      float64
+	processors Processors
 }
 
 // NewFloatVal creates a new float value node with provided value.
 func NewFloatVal(val float64) *FloatVal {
-	return &FloatVal{val}
+	return NewFloatValWithProcessors(val, nil)
+}
+
+// NewFloatValWithProcessors creates a new float value node with provided value with processors attached.
+func NewFloatValWithProcessors(val float64, processors Processors) *FloatVal {
+	return &FloatVal{val, processors}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -385,14 +579,30 @@ func (s *FloatVal) Hash() []byte {
 	return []byte(strconv.FormatFloat(s.value, 'f', -1, 64))
 }
 
+// Apply does nothing.
+func (s *FloatVal) Apply(_ *Vars) (Node, error) {
+	return s, nil
+}
+
+// Processors returns any linked processors that are now connected because of Apply.
+func (s *FloatVal) Processors() Processors {
+	return s.processors
+}
+
 // BoolVal represents a boolean in our Tree.
 type BoolVal struct {
-	value bool
+	value      bool
+	processors Processors
 }
 
 // NewBoolVal creates a new bool value node with provided value.
 func NewBoolVal(val bool) *BoolVal {
-	return &BoolVal{val}
+	return NewBoolValWithProcessors(val, nil)
+}
+
+// NewBoolValWithProcessors creates a new bool value node with provided value with processors attached.
+func NewBoolValWithProcessors(val bool, processors Processors) *BoolVal {
+	return &BoolVal{val, processors}
 }
 
 // Find receive a key and return false since the node is not a List or Dict.
@@ -426,13 +636,22 @@ func (s *BoolVal) Hash() []byte {
 	return falseVal
 }
 
+// Apply does nothing.
+func (s *BoolVal) Apply(_ *Vars) (Node, error) {
+	return s, nil
+}
+
+// Processors returns any linked processors that are now connected because of Apply.
+func (s *BoolVal) Processors() Processors {
+	return s.processors
+}
+
 // NewAST takes a map and convert it to an internal Tree, allowing us to executes rules on the
 // data to shape it in a different way or to filter some of the information.
 func NewAST(m map[string]interface{}) (*AST, error) {
-	val := reflect.ValueOf(m)
-	root, err := load(val)
+	root, err := loadForNew(m)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse configuration into a tree, error: %+v", err)
+		return nil, err
 	}
 	return &AST{root: root}, nil
 }
@@ -444,6 +663,40 @@ func MustNewAST(m map[string]interface{}) *AST {
 		panic(err)
 	}
 	return v
+}
+
+// NewASTFromConfig takes a config and converts it to an internal Tree, allowing us to executes rules on the
+// data to shape it in a different way or to filter some of the information.
+func NewASTFromConfig(cfg *ucfg.Config) (*AST, error) {
+	var v interface{}
+	if cfg.IsDict() {
+		var m map[string]interface{}
+		if err := cfg.Unpack(&m); err != nil {
+			return nil, err
+		}
+		v = m
+	} else if cfg.IsArray() {
+		var l []string
+		if err := cfg.Unpack(&l); err != nil {
+			return nil, err
+		}
+		v = l
+	} else {
+		return nil, fmt.Errorf("cannot create AST from none dict or array type")
+	}
+	root, err := loadForNew(v)
+	if err != nil {
+		return nil, err
+	}
+	return &AST{root: root}, nil
+}
+
+func loadForNew(val interface{}) (Node, error) {
+	root, err := load(reflect.ValueOf(val))
+	if err != nil {
+		return nil, fmt.Errorf("could not parse configuration into a tree, error: %+v", err)
+	}
+	return root, nil
 }
 
 func load(val reflect.Value) (Node, error) {
@@ -557,6 +810,36 @@ func (a *AST) MarshalJSON() ([]byte, error) {
 	return b, nil
 }
 
+// Apply applies the variables to the replacement in the AST.
+func (a *AST) Apply(vars *Vars) error {
+	n, err := a.root.Apply(vars)
+	if err != nil {
+		return err
+	}
+	a.root = n
+	return nil
+}
+
+// Lookup looks for a value from the AST.
+//
+// Return type is in the native form and not in the Node types from the AST.
+func (a *AST) Lookup(name string) (interface{}, bool) {
+	node, ok := Lookup(a, name)
+	if !ok {
+		return nil, false
+	}
+	_, isKey := node.(*Key)
+	if isKey {
+		// matched on a key, return the value
+		node = node.Value().(Node)
+	}
+
+	m := &MapVisitor{}
+	a.dispatch(node, m)
+
+	return m.Content, true
+}
+
 func splitPath(s Selector) []string {
 	if s == "" {
 		return nil
@@ -666,6 +949,26 @@ func lookupVal(val reflect.Value) reflect.Value {
 	return val
 }
 
+func attachProcessors(node Node, processors Processors) Node {
+	switch n := node.(type) {
+	case *Dict:
+		n.processors = processors
+	case *List:
+		n.processors = processors
+	case *StrVal:
+		n.processors = processors
+	case *IntVal:
+		n.processors = processors
+	case *UIntVal:
+		n.processors = processors
+	case *FloatVal:
+		n.processors = processors
+	case *BoolVal:
+		n.processors = processors
+	}
+	return node
+}
+
 // Select takes an AST and a selector and will return a sub AST based on the selector path, will
 // return false if the path could not be found.
 func Select(a *AST, selector Selector) (*AST, bool) {
@@ -721,6 +1024,19 @@ func Insert(a *AST, node Node, to Selector) error {
 		n, ok := current.Find(part)
 		if !ok {
 			switch t := current.(type) {
+			case *Key:
+				d, ok := t.value.(*Dict)
+				if !ok {
+					return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
+				}
+
+				newNode := &Key{name: part, value: &Dict{}}
+				d.value = append(d.value, newNode)
+
+				d.sort()
+
+				current = newNode
+				continue
 			case *Dict:
 				newNode := &Key{name: part, value: &Dict{}}
 				t.value = append(t.value, newNode)
@@ -730,7 +1046,7 @@ func Insert(a *AST, node Node, to Selector) error {
 				current = newNode
 				continue
 			default:
-				return fmt.Errorf("expecting Dict and received %T", t)
+				return fmt.Errorf("expecting Dict and received %T for '%s'", t, part)
 			}
 		}
 
@@ -750,7 +1066,7 @@ func Insert(a *AST, node Node, to Selector) error {
 	case *List:
 		d.value = node
 	default:
-		d.value = &Dict{[]Node{node}}
+		d.value = &Dict{[]Node{node}, nil}
 	}
 	return nil
 }

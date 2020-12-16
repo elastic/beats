@@ -3,6 +3,7 @@ import subprocess
 import sys
 import unittest
 from winlogbeat import BaseTest
+from beat import common_tests
 
 """
 Contains tests for config parsing.
@@ -10,7 +11,7 @@ Contains tests for config parsing.
 
 
 @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_valid_config(self):
         """

@@ -72,6 +72,8 @@ type ApplicationState struct {
 	expectedConfig    string
 	status            proto.StateObserved_Status
 	statusMessage     string
+	statusPayload     map[string]interface{}
+	statusPayloadStr  string
 	statusConfigIdx   uint64
 	statusTime        time.Time
 	checkinConn       bool
@@ -88,7 +90,7 @@ type ApplicationState struct {
 // Handler is the used by the server to inform of status changes.
 type Handler interface {
 	// OnStatusChange called when a registered application observed status is changed.
-	OnStatusChange(*ApplicationState, proto.StateObserved_Status, string)
+	OnStatusChange(*ApplicationState, proto.StateObserved_Status, string, map[string]interface{})
 }
 
 // Server is the GRPC server that the launched applications connect back to.
@@ -524,6 +526,7 @@ func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
 // the application times out during stop and ErrApplication
 func (as *ApplicationState) Stop(timeout time.Duration) error {
 	as.checkinLock.Lock()
+	wasConn := as.checkinDone != nil
 	cfgIdx := as.statusConfigIdx
 	as.expected = proto.StateExpected_STOPPING
 	as.checkinLock.Unlock()
@@ -546,8 +549,10 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 		s := as.status
 		doneChan := as.checkinDone
 		as.checkinLock.RUnlock()
-		if s == proto.StateObserved_STOPPING && doneChan == nil {
-			// sent stopping and now is disconnected (so its stopped)
+		if (wasConn && doneChan == nil) || (!wasConn && s == proto.StateObserved_STOPPING && doneChan == nil) {
+			// either occurred
+			// * client was connected then disconnected on stop
+			// * client was not connected; connected; received stopping; then disconnected
 			as.Destroy()
 			return nil
 		}
@@ -646,34 +651,51 @@ func (as *ApplicationState) Config() string {
 }
 
 // Status returns the current observed status.
-func (as *ApplicationState) Status() (proto.StateObserved_Status, string) {
+func (as *ApplicationState) Status() (proto.StateObserved_Status, string, map[string]interface{}) {
 	as.checkinLock.RLock()
 	defer as.checkinLock.RUnlock()
-	return as.status, as.statusMessage
+	return as.status, as.statusMessage, as.statusPayload
 }
 
 // SetStatus allows the status to be overwritten by the agent.
 //
 // This status will be overwritten by the client if it reconnects and updates it status.
-func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg string) {
+func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg string, payload map[string]interface{}) error {
+	payloadStr, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
 	as.checkinLock.RLock()
 	as.status = status
 	as.statusMessage = msg
+	as.statusPayload = payload
+	as.statusPayloadStr = string(payloadStr)
 	as.checkinLock.RUnlock()
+	return nil
 }
 
 // updateStatus updates the current observed status from the application, sends the expected state back to the
 // application if the server expects it to be different then its observed state, and alerts the handler on the
 // server when the application status has changed.
 func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForReader bool) {
+	// convert payload from string to JSON
+	var payload map[string]interface{}
+	if checkin.Payload != "" {
+		// ignore the error, if client is sending bad JSON, then payload will just be nil
+		_ = json.Unmarshal([]byte(checkin.Payload), &payload)
+	}
+
 	as.checkinLock.Lock()
 	expectedStatus := as.expected
 	expectedConfigIdx := as.expectedConfigIdx
 	expectedConfig := as.expectedConfig
 	prevStatus := as.status
 	prevMessage := as.statusMessage
+	prevPayloadStr := as.statusPayloadStr
 	as.status = checkin.Status
 	as.statusMessage = checkin.Message
+	as.statusPayloadStr = checkin.Payload
+	as.statusPayload = payload
 	as.statusConfigIdx = checkin.ConfigStateIdx
 	as.statusTime = time.Now().UTC()
 	as.checkinLock.Unlock()
@@ -697,8 +719,8 @@ func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForRe
 	}
 
 	// alert the service handler that status has changed for the application
-	if prevStatus != checkin.Status || prevMessage != checkin.Message {
-		as.srv.handler.OnStatusChange(as, checkin.Status, checkin.Message)
+	if prevStatus != checkin.Status || prevMessage != checkin.Message || prevPayloadStr != checkin.Payload {
+		as.srv.handler.OnStatusChange(as, checkin.Status, checkin.Message, payload)
 	}
 }
 
@@ -821,17 +843,21 @@ func (s *Server) watchdog() {
 					message = "Missed two check-ins"
 					serverApp.status = s
 					serverApp.statusMessage = message
+					serverApp.statusPayload = nil
+					serverApp.statusPayloadStr = ""
 					serverApp.statusTime = now
 				} else if serverApp.status != proto.StateObserved_FAILED {
 					s = proto.StateObserved_DEGRADED
 					message = "Missed last check-in"
 					serverApp.status = s
 					serverApp.statusMessage = message
+					serverApp.statusPayload = nil
+					serverApp.statusPayloadStr = ""
 					serverApp.statusTime = now
 				}
 				serverApp.checkinLock.Unlock()
 				if prevStatus != s || prevMessage != message {
-					serverApp.srv.handler.OnStatusChange(serverApp, s, message)
+					serverApp.srv.handler.OnStatusChange(serverApp, s, message, nil)
 				}
 			}
 			serverApp.flushExpiredActions()
@@ -868,11 +894,12 @@ func (s *Server) getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, err
 
 // getListenAddr returns the listening address of the server.
 func (s *Server) getListenAddr() string {
-	if s.listenAddr != ":0" {
-		return s.listenAddr
+	addr := strings.SplitN(s.listenAddr, ":", 2)
+	if len(addr) == 2 && addr[1] == "0" {
+		port := s.listener.Addr().(*net.TCPAddr).Port
+		return fmt.Sprintf("%s:%d", addr[0], port)
 	}
-	port := s.listener.Addr().(*net.TCPAddr).Port
-	return fmt.Sprintf(":%d", port)
+	return s.listenAddr
 }
 
 type pendingAction struct {

@@ -82,17 +82,17 @@ type flowDirection uint8
 
 const (
 	directionUnknown flowDirection = iota
-	directionInbound
-	directionOutbound
+	directionIngress
+	directionEgress
 )
 
 // String returns the textual representation of the flowDirection.
 func (d flowDirection) String() string {
 	switch d {
-	case directionInbound:
-		return "inbound"
-	case directionOutbound:
-		return "outbound"
+	case directionIngress:
+		return "ingress"
+	case directionEgress:
+		return "egress"
 	default:
 		return "unknown"
 	}
@@ -214,6 +214,9 @@ func (f *flow) Timestamp() time.Time {
 }
 
 type process struct {
+	// RWMutex is used to arbitrate reads and writes to resolvedDomains.
+	sync.RWMutex
+
 	pid                  uint32
 	name, path           string
 	args                 []string
@@ -229,6 +232,8 @@ type process struct {
 }
 
 func (p *process) addTransaction(tr dns.Transaction) {
+	p.Lock()
+	defer p.Unlock()
 	if p.resolvedDomains == nil {
 		p.resolvedDomains = make(map[string]string)
 	}
@@ -239,6 +244,8 @@ func (p *process) addTransaction(tr dns.Transaction) {
 
 // ResolveIP returns the domain associated with the given IP.
 func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
+	p.RLock()
+	defer p.RUnlock()
 	domain, found = p.resolvedDomains[ip.String()]
 	return
 }
@@ -523,7 +530,7 @@ func (s *state) ExpireOlder() {
 	deadline = s.clock().Add(-s.socketTimeout)
 	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
 		if sock, ok := item.(*socket); ok {
-			s.onSockDestroyed(sock.sock, 0)
+			s.onSockDestroyed(sock.sock, sock, 0)
 		} else {
 			s.socketLRU.get()
 		}
@@ -542,13 +549,13 @@ func (s *state) ExpireOlder() {
 	s.dns.CleanUp()
 }
 
-func (s *state) CreateProcess(p process) error {
+func (s *state) CreateProcess(p *process) error {
 	if p.pid == 0 {
 		return errors.New("can't create process with PID 0")
 	}
 	s.Lock()
 	defer s.Unlock()
-	s.processes[p.pid] = &p
+	s.processes[p.pid] = p
 	if p.createdTime == (time.Time{}) {
 		p.createdTime = s.kernTimestampToTime(p.created)
 	}
@@ -704,13 +711,16 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 	s.Lock()
 	defer s.Unlock()
 
-	return s.onSockDestroyed(ptr, pid)
+	return s.onSockDestroyed(ptr, nil, pid)
 }
 
-func (s *state) onSockDestroyed(ptr uintptr, pid uint32) error {
-	sock, found := s.socks[ptr]
-	if !found {
-		return nil
+func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
+	var found bool
+	if sock == nil {
+		sock, found = s.socks[ptr]
+		if !found {
+			return nil
+		}
 	}
 	// Enrich with pid
 	if sock.pid == 0 && pid != 0 {
@@ -890,7 +900,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	}
 
 	src, dst := local, remote
-	if f.dir == directionInbound {
+	if f.dir == directionIngress {
 		src, dst = dst, src
 	}
 

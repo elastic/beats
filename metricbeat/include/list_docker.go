@@ -42,6 +42,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/scheduler"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_container"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_cronjob"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_daemonset"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_deployment"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_persistentvolume"

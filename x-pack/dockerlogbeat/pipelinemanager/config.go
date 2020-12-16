@@ -27,6 +27,7 @@ type ContainerOutputConfig struct {
 	CloudID     string   `struct:"cloud.id,omitempty"`
 	CloudAuth   string   `struct:"cloud.auth,omitempty"`
 	ProxyURL    string   `struct:"output.elasticsearch.proxy_url,omitempty"`
+	BeatName    string   `struct:"-"`
 }
 
 // NewCfgFromRaw returns a ContainerOutputConfig based on a raw config we get from the API
@@ -35,7 +36,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg := ContainerOutputConfig{}
 	endpoint, ok := input["hosts"]
 	if !ok {
-		return newCfg, errors.New("An endpoint flag is required")
+		return newCfg, errors.New("A hosts flag is required")
 	}
 
 	endpointList := strings.Split(endpoint, ",")
@@ -53,6 +54,7 @@ func NewCfgFromRaw(input map[string]string) (ContainerOutputConfig, error) {
 	newCfg.Timeout = input["timeout"]
 	newCfg.BackoffInit = input["backoff_init"]
 	newCfg.BackoffMax = input["backoff_max"]
+	newCfg.BeatName = input["name"]
 
 	return newCfg, nil
 }

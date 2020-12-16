@@ -20,7 +20,8 @@ package reader
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/journalbeat/config"
+	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
+	"github.com/elastic/beats/v7/journalbeat/pkg/journalread"
 )
 
 // Config stores the options of a reder.
@@ -29,16 +30,16 @@ type Config struct {
 	Path string
 	// Seek specifies the seeking stategy.
 	// Possible values: head, tail, cursor.
-	Seek config.SeekMode
+	Seek journalread.SeekMode
 	// CursorSeekFallback sets where to seek if registry file is not available.
-	CursorSeekFallback config.SeekMode
+	CursorSeekFallback journalread.SeekMode
 	// MaxBackoff is the limit of the backoff time.
 	MaxBackoff time.Duration
 	// Backoff is the current interval to wait before
 	// attemting to read again from the journal.
 	Backoff time.Duration
 	// Matches store the key value pairs to match entries.
-	Matches []string
+	Matches []journalfield.Matcher
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool
 	// CheckpointID is the identifier to use when persisting state.

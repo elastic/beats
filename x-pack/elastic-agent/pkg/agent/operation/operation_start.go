@@ -7,10 +7,9 @@ package operation
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // operationStart start installed process
@@ -18,14 +17,14 @@ import (
 type operationStart struct {
 	logger         *logger.Logger
 	program        Descriptor
-	operatorConfig *config.Config
+	operatorConfig *configuration.SettingsConfig
 	cfg            map[string]interface{}
 }
 
 func newOperationStart(
 	logger *logger.Logger,
 	program Descriptor,
-	operatorConfig *config.Config,
+	operatorConfig *configuration.SettingsConfig,
 	cfg map[string]interface{}) *operationStart {
 	// TODO: make configurable
 
@@ -58,7 +57,7 @@ func (o *operationStart) Check(_ context.Context, application Application) (bool
 func (o *operationStart) Run(ctx context.Context, application Application) (err error) {
 	defer func() {
 		if err != nil {
-			application.SetState(state.Failed, err.Error())
+			application.SetState(state.Failed, err.Error(), nil)
 		}
 	}()
 

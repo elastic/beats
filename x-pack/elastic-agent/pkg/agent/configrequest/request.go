@@ -13,6 +13,8 @@ import (
 // Request is the minimal interface a config request must have.
 type Request interface {
 	ID() string
+	ShortID() string
 	CreatedAt() time.Time
 	Programs() []program.Program
+	ProgramNames() []string
 }

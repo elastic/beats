@@ -1,13 +1,15 @@
 # coding=utf-8
 
-from filebeat import BaseTest
-import os
-import codecs
-import time
 import base64
+import codecs
 import io
+import os
+import platform
 import re
+import time
 import unittest
+
+from filebeat import BaseTest
 from parameterized import parameterized
 
 """
@@ -17,6 +19,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skipIf(platform.system() == 'Windows', 'Flaky test: https://github.com/elastic/beats/issues/22613')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
@@ -79,7 +82,7 @@ class Test(BaseTest):
 
     def test_close_removed(self):
         """
-        Checks that a file is closed if removed
+        Checks that a file is closed if removed with native file identifier
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
@@ -109,8 +112,7 @@ class Test(BaseTest):
 
         # Make sure state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Wait until error shows up on windows
@@ -595,10 +597,9 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # Make sure state is written
+        # Make sure some state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Make sure symlink is skipped

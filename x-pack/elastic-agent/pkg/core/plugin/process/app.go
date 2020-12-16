@@ -8,21 +8,22 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"reflect"
 	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -38,7 +39,7 @@ type Application struct {
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         app.Specifier
+	desc         *app.Descriptor
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
@@ -50,11 +51,10 @@ type Application struct {
 	uid int
 	gid int
 
-	monitor monitoring.Monitor
+	monitor        monitoring.Monitor
+	statusReporter status.Reporter
 
-	processConfig  *process.Config
-	downloadConfig *artifact.Config
-	retryConfig    *retry.Config
+	processConfig *process.Config
 
 	logger *logger.Logger
 
@@ -69,14 +69,15 @@ type ArgsDecorator func([]string) []string
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
-	spec app.Specifier,
+	desc *app.Descriptor,
 	srv *server.Server,
-	cfg *config.Config,
+	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Application, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Application, error) {
 
-	s := spec.Spec()
+	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
@@ -89,23 +90,27 @@ func NewApplication(
 		name:           appName,
 		pipelineID:     pipelineID,
 		logLevel:       logLevel,
-		spec:           spec,
+		desc:           desc,
 		srv:            srv,
 		processConfig:  cfg.ProcessConfig,
-		downloadConfig: cfg.DownloadConfig,
-		retryConfig:    cfg.RetryConfig,
 		logger:         logger,
 		limiter:        b,
 		reporter:       reporter,
 		monitor:        monitor,
 		uid:            uid,
 		gid:            gid,
+		statusReporter: statusController.Register(id),
 	}, nil
 }
 
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// Spec returns the program spec of this app.
+func (a *Application) Spec() program.Spec {
+	return a.desc.Spec()
 }
 
 // State returns the application state.
@@ -122,26 +127,32 @@ func (a *Application) Name() string {
 
 // Started returns true if the application is started.
 func (a *Application) Started() bool {
-	return a.state.Status != state.Stopped
+	return a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed
 }
 
 // Stop stops the current application.
 func (a *Application) Stop() {
 	a.appLock.Lock()
-	defer a.appLock.Unlock()
+	status := a.state.Status
+	srvState := a.srvState
+	a.appLock.Unlock()
 
-	if a.state.Status == state.Stopped {
+	if status == state.Stopped {
 		return
 	}
 
 	stopSig := os.Interrupt
-	if a.srvState != nil {
-		if err := a.srvState.Stop(a.processConfig.StopTimeout); err != nil {
+	if srvState != nil {
+		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
 			// kill the process if stop through GRPC doesn't work
 			stopSig = os.Kill
 		}
-		a.srvState = nil
 	}
+
+	a.appLock.Lock()
+	defer a.appLock.Unlock()
+
+	a.srvState = nil
 	if a.state.ProcessInfo != nil {
 		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
 			// no error on signal, so wait for it to stop
@@ -152,14 +163,20 @@ func (a *Application) Stop() {
 		// cleanup drops
 		a.cleanUp()
 	}
-	a.setState(state.Stopped, "Stopped")
+	a.setState(state.Stopped, "Stopped", nil)
+}
+
+// Shutdown stops the application (aka. subprocess).
+func (a *Application) Shutdown() {
+	a.logger.Infof("Signaling application to stop because of shutdown: %s", a.id)
+	a.Stop()
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string) {
+func (a *Application) SetState(s state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg)
+	a.setState(s, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -189,7 +206,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		}
 
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg)
+		a.setState(state.Crashed, msg, nil)
 
 		// it was a crash, cleanup anything required
 		go a.cleanUp()
@@ -214,7 +231,7 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string) {
+func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	var status state.Status
 	switch pstatus {
 	case proto.StateObserved_STARTING:
@@ -230,19 +247,29 @@ func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg 
 	case proto.StateObserved_STOPPING:
 		status = state.Stopping
 	}
-	a.setState(status, msg)
+	a.setState(status, msg, payload)
 }
 
-func (a *Application) setState(status state.Status, msg string) {
-	if a.state.Status != status || a.state.Message != msg {
-		a.state.Status = status
+func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		a.state.Status = s
 		a.state.Message = msg
+		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
+		}
+
+		switch s {
+		case state.Configuring, state.Restarting, state.Starting, state.Stopping, state.Updating:
+			// no action
+		case state.Crashed, state.Failed, state.Degraded:
+			a.statusReporter.Update(status.Degraded)
+		default:
+			a.statusReporter.Update(status.Healthy)
 		}
 	}
 }
 
 func (a *Application) cleanUp() {
-	a.monitor.Cleanup(a.name, a.pipelineID)
+	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
 }

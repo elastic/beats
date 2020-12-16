@@ -7,7 +7,6 @@ package server
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -26,16 +25,6 @@ func DefaultGRPCConfig() *Config {
 }
 
 // NewFromConfig creates a new GRPC server for clients to connect to.
-func NewFromConfig(logger *logger.Logger, cfg *config.Config, handler Handler) (*Server, error) {
-	wrappedConfig := &struct {
-		GRPC *Config `config:"grpc"`
-	}{
-		GRPC: DefaultGRPCConfig(),
-	}
-
-	if err := cfg.Unpack(&wrappedConfig); err != nil {
-		return nil, err
-	}
-
-	return New(logger, fmt.Sprintf("%s:%d", wrappedConfig.GRPC.Address, wrappedConfig.GRPC.Port), handler)
+func NewFromConfig(logger *logger.Logger, cfg *Config, handler Handler) (*Server, error) {
+	return New(logger, fmt.Sprintf("%s:%d", cfg.Address, cfg.Port), handler)
 }

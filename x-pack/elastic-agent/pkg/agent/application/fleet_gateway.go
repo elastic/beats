@@ -11,19 +11,21 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
+
+const maxUnauthCounter int = 6
 
 // Default Configuration for the Fleet Gateway.
 var defaultGatewaySettings = &fleetGatewaySettings{
 	Duration: 1 * time.Second,        // time between successful calls
 	Jitter:   500 * time.Millisecond, // used as a jitter for duration
 	Backoff: backoffSettings{ // time after a failed call
-		Init: 5 * time.Second,
-		Max:  60 * time.Second,
+		Init: 60 * time.Second,
+		Max:  10 * time.Minute,
 	},
 }
 
@@ -60,47 +62,46 @@ type fleetAcker interface {
 // call the API to send the events and will receive actions to be executed locally.
 // The only supported action for now is a "ActionPolicyChange".
 type fleetGateway struct {
-	bgContext  context.Context
-	log        *logger.Logger
-	dispatcher dispatcher
-	client     clienter
-	scheduler  scheduler.Scheduler
-	backoff    backoff.Backoff
-	settings   *fleetGatewaySettings
-	agentInfo  agentInfo
-	reporter   fleetReporter
-	done       chan struct{}
-	wg         sync.WaitGroup
-	acker      fleetAcker
+	bgContext        context.Context
+	log              *logger.Logger
+	dispatcher       dispatcher
+	client           clienter
+	scheduler        scheduler.Scheduler
+	backoff          backoff.Backoff
+	settings         *fleetGatewaySettings
+	agentInfo        agentInfo
+	reporter         fleetReporter
+	done             chan struct{}
+	wg               sync.WaitGroup
+	acker            fleetAcker
+	unauthCounter    int
+	statusController status.Controller
+	statusReporter   status.Reporter
 }
 
 func newFleetGateway(
 	ctx context.Context,
 	log *logger.Logger,
-	rawConfig *config.Config,
 	agentInfo agentInfo,
 	client clienter,
 	d dispatcher,
 	r fleetReporter,
 	acker fleetAcker,
+	statusController status.Controller,
 ) (*fleetGateway, error) {
 
-	settings := defaultGatewaySettings
-	if err := rawConfig.Unpack(settings); err != nil {
-		return nil, errors.New(err, "fail to read gateway configuration")
-	}
-
-	scheduler := scheduler.NewPeriodicJitter(settings.Duration, settings.Jitter)
+	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
 	return newFleetGatewayWithScheduler(
 		ctx,
 		log,
-		settings,
+		defaultGatewaySettings,
 		agentInfo,
 		client,
 		d,
 		scheduler,
 		r,
 		acker,
+		statusController,
 	)
 }
 
@@ -114,6 +115,7 @@ func newFleetGatewayWithScheduler(
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
 	acker fleetAcker,
+	statusController status.Controller,
 ) (*fleetGateway, error) {
 
 	// Backoff implementation doesn't support the using context as the shutdown mechanism.
@@ -133,9 +135,11 @@ func newFleetGatewayWithScheduler(
 			settings.Backoff.Init,
 			settings.Backoff.Max,
 		),
-		done:     done,
-		reporter: r,
-		acker:    acker,
+		done:             done,
+		reporter:         r,
+		acker:            acker,
+		statusReporter:   statusController.Register("gateway"),
+		statusController: statusController,
 	}, nil
 }
 
@@ -151,6 +155,7 @@ func (f *fleetGateway) worker() {
 			resp, err := f.doExecute()
 			if err != nil {
 				f.log.Error(err)
+				f.statusReporter.Update(status.Failed)
 				continue
 			}
 
@@ -161,9 +166,11 @@ func (f *fleetGateway) worker() {
 
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
 				f.log.Errorf("failed to dispatch actions, error: %s", err)
+				f.statusReporter.Update(status.Degraded)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
+			f.statusReporter.Update(status.Healthy)
 		case <-f.bgContext.Done():
 			f.stop()
 			return
@@ -207,9 +214,24 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	req := &fleetapi.CheckinRequest{
 		Events:   ee,
 		Metadata: ecsMeta,
+		Status:   f.statusController.StatusString(),
 	}
 
 	resp, err := cmd.Execute(ctx, req)
+	if isUnauth(err) {
+		f.unauthCounter++
+
+		if f.shouldUnroll() {
+			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
+			return &fleetapi.CheckinResponse{
+				Actions: []fleetapi.Action{&fleetapi.ActionUnenroll{ActionID: "", ActionType: "UNENROLL", IsDetected: true}},
+			}, nil
+		}
+
+		return nil, err
+	}
+
+	f.unauthCounter = 0
 	if err != nil {
 		return nil, err
 	}
@@ -217,6 +239,14 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// ack events so they are dropped from queue
 	ack()
 	return resp, nil
+}
+
+func (f *fleetGateway) shouldUnroll() bool {
+	return f.unauthCounter >= maxUnauthCounter
+}
+
+func isUnauth(err error) bool {
+	return errors.Is(err, fleetapi.ErrInvalidAPIKey)
 }
 
 func (f *fleetGateway) Start() {
@@ -232,6 +262,11 @@ func (f *fleetGateway) Start() {
 func (f *fleetGateway) stop() {
 	f.log.Info("Fleet gateway is stopping")
 	defer f.scheduler.Stop()
+	f.statusReporter.Unregister()
 	close(f.done)
 	f.wg.Wait()
+}
+
+func (f *fleetGateway) SetClient(client clienter) {
+	f.client = client
 }

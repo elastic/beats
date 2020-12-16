@@ -98,15 +98,17 @@ type PackageSpec struct {
 
 // PackageFile represents a file or directory within a package.
 type PackageFile struct {
-	Source   string                  `yaml:"source,omitempty"`    // Regular source file or directory.
-	Content  string                  `yaml:"content,omitempty"`   // Inline template string.
-	Template string                  `yaml:"template,omitempty"`  // Input template file.
-	Target   string                  `yaml:"target,omitempty"`    // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
-	Mode     os.FileMode             `yaml:"mode,omitempty"`      // Target mode for file. Does not apply when source is a directory.
-	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
-	Modules  bool                    `yaml:"modules"`             // Mark directory as directory with modules.
-	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
-	Owner    string                  `yaml:"owner,omitempty"`     // File Owner, for user and group name (rpm only).
+	Source        string                  `yaml:"source,omitempty"`          // Regular source file or directory.
+	Content       string                  `yaml:"content,omitempty"`         // Inline template string.
+	Template      string                  `yaml:"template,omitempty"`        // Input template file.
+	Target        string                  `yaml:"target,omitempty"`          // Target location in package. Relative paths are added to a package specific directory (e.g. metricbeat-7.0.0-linux-x86_64).
+	Mode          os.FileMode             `yaml:"mode,omitempty"`            // Target mode for file. Does not apply when source is a directory.
+	Config        bool                    `yaml:"config"`                    // Mark file as config in the package (deb and rpm only).
+	Modules       bool                    `yaml:"modules"`                   // Mark directory as directory with modules.
+	Dep           func(PackageSpec) error `yaml:"-" hash:"-" json:"-"`       // Dependency to invoke during Evaluate.
+	Owner         string                  `yaml:"owner,omitempty"`           // File Owner, for user and group name (rpm only).
+	SkipOnMissing bool                    `yaml:"skip_on_missing,omitempty"` // Prevents build failure if the file is missing.
+	Symlink       bool                    `yaml:"symlink"`                   // Symlink marks file as a symlink pointing from target to source.
 }
 
 // OSArchNames defines the names of architectures for use in packages.
@@ -475,6 +477,10 @@ func copyInstallScript(spec PackageSpec, script string, local *string) error {
 		*local = strings.TrimSuffix(*local, ".tmpl")
 	}
 
+	if strings.HasSuffix(*local, "."+spec.Name) {
+		*local = strings.TrimSuffix(*local, "."+spec.Name)
+	}
+
 	if err := spec.ExpandFile(script, createDir(*local)); err != nil {
 		return errors.Wrap(err, "failed to copy install script to package dir")
 	}
@@ -538,6 +544,11 @@ func PackageZip(spec PackageSpec) error {
 
 	// Add files to zip.
 	for _, pkgFile := range spec.Files {
+		if pkgFile.Symlink {
+			// not supported on zip archives
+			continue
+		}
+
 		if err := addFileToZip(w, baseDir, pkgFile); err != nil {
 			p, _ := filepath.Abs(pkgFile.Source)
 			return errors.Wrapf(err, "failed adding file=%+v to zip", p)
@@ -583,7 +594,28 @@ func PackageTarGz(spec PackageSpec) error {
 
 	// Add files to tar.
 	for _, pkgFile := range spec.Files {
+		if pkgFile.Symlink {
+			continue
+		}
+
 		if err := addFileToTar(w, baseDir, pkgFile); err != nil {
+			return errors.Wrapf(err, "failed adding file=%+v to tar", pkgFile)
+		}
+	}
+
+	// same for symlinks so they can point to files in tar
+	for _, pkgFile := range spec.Files {
+		if !pkgFile.Symlink {
+			continue
+		}
+
+		tmpdir, err := ioutil.TempDir("", "TmpSymlinkDropPath")
+		if err != nil {
+			return err
+		}
+		defer os.RemoveAll(tmpdir)
+
+		if err := addSymlinkToTar(tmpdir, w, baseDir, pkgFile); err != nil {
 			return errors.Wrapf(err, "failed adding file=%+v to tar", pkgFile)
 		}
 	}
@@ -758,6 +790,10 @@ func addUidGidEnvArgs(args []string) ([]string, error) {
 func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
 	return filepath.Walk(pkgFile.Source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
+				return nil
+			}
+
 			return err
 		}
 
@@ -819,6 +855,10 @@ func addFileToZip(ar *zip.Writer, baseDir string, pkgFile PackageFile) error {
 func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 	return filepath.Walk(pkgFile.Source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
+				return nil
+			}
+
 			return err
 		}
 
@@ -870,6 +910,56 @@ func addFileToTar(ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
 			return err
 		}
 		return file.Close()
+	})
+}
+
+// addSymlinkToTar adds a symlink file  to a tar archive.
+func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile PackageFile) error {
+	// create symlink we can work with later, header will be updated later
+	link := filepath.Join(tmpdir, "link")
+	target := tmpdir
+	if err := os.Symlink(target, link); err != nil {
+		return err
+	}
+
+	return filepath.Walk(link, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			if pkgFile.SkipOnMissing && os.IsNotExist(err) {
+				return nil
+			}
+
+			return err
+		}
+
+		header, err := tar.FileInfoHeader(info, info.Name())
+		if err != nil {
+			return err
+		}
+		header.Uname, header.Gname = "root", "root"
+		header.Uid, header.Gid = 0, 0
+
+		if info.Mode().IsRegular() && pkgFile.Mode > 0 {
+			header.Mode = int64(pkgFile.Mode & os.ModePerm)
+		} else if info.IsDir() {
+			header.Mode = int64(0755)
+		}
+
+		header.Name = filepath.Join(baseDir, pkgFile.Target)
+		if filepath.IsAbs(pkgFile.Target) {
+			header.Name = pkgFile.Target
+		}
+
+		header.Linkname = pkgFile.Source
+		header.Typeflag = tar.TypeSymlink
+
+		if mg.Verbose() {
+			log.Println("Adding", os.FileMode(header.Mode), header.Name)
+		}
+		if err := ar.WriteHeader(header); err != nil {
+			return err
+		}
+
+		return nil
 	})
 }
 

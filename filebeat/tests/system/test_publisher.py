@@ -1,11 +1,9 @@
-from filebeat import BaseTest
-
 import os
 import platform
 import time
 import shutil
 import json
-from nose.plugins.skip import Skip, SkipTest
+from filebeat import BaseTest
 
 
 # Additional tests: to be implemented

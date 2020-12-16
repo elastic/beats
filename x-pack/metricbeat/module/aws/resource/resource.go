@@ -6,6 +6,7 @@ package resource
 
 import (
 	"context"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -148,7 +149,7 @@ func (m *MetricSet) createEvents(resources []ResourceNameARN, regionName string)
 	for _, resource := range resources {
 		identifier := regionName + m.AccountID + resource.arn
 		if _, ok := events[identifier]; !ok {
-			events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
+			events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, time.Now())
 		}
 		events[identifier].MetricSetFields.Put("resource.name", resource.name)
 		events[identifier].MetricSetFields.Put("resource.arn", resource.arn)

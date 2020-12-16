@@ -5,7 +5,7 @@
 :type: s3
 
 [id="{beatname_lc}-input-{type}"]
-=== s3 input
+=== S3 input
 
 ++++
 <titleabbrev>S3</titleabbrev>
@@ -38,19 +38,32 @@ The `s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-==== `queue_url`
+==== `api_timeout`
 
-URL of the AWS SQS queue that messages will be received from. Required.
+The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
+call will be interrupted.
+The default AWS API call timeout for a message is 120 seconds. The minimum
+is 0 seconds. The maximum is half of the visibility timeout value.
 
-[float]
-==== `visibility_timeout`
-
-The duration that the received messages are hidden from subsequent
-retrieve requests after being retrieved by a ReceiveMessage request.
-This value needs to be a lot bigger than {beatname_uc} collection frequency so
-if it took too long to read the s3 log, this sqs message will not be reprocessed.
-The default visibility timeout for a message is 300 seconds. The minimum
-is 0 seconds. The maximum is 12 hours.
+["source","json"]
+----
+{
+    "Records": [
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:51:00Z",
+            "awsRegion": "us-east-1",
+            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
+        },
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:52:00Z",
+            "awsRegion": "us-east-1",
+            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
+        }
+    ]
+}
+----
 
 [float]
 ==== `expand_event_list_from_field`
@@ -68,35 +81,53 @@ If a file has "application/json" content-type, `expand_event_list_from_field`
 becomes required to read the json file.
 
 [float]
-==== `api_timeout`
+==== `file_selectors`
 
-The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
-will be interrupted.
-The default AWS API timeout for a message is 120 seconds. The minimum
-is 0 seconds. The maximum is half of the visibility timeout value.
+If the SQS queue will have events that correspond to files that
+{beatname_uc} shouldn't process `file_selectors` can be used to limit
+the files that are downloaded.  This is a list of selectors which are
+made up of `regex` and `expand_event_list_from_field` options.  The
+`regex` should match the S3 object key in the SQS message, and the
+optional `expand_event_list_from_field` is the same as the global
+setting.  If `file_selectors` is given, then any global
+`expand_event_list_from_field` value is ignored in favor of the ones
+specified in the `file_selectors`.  Regex syntax is the same as the Go
+language.  Files that don't match one of the regexes won't be
+processed.
 
-["source","json"]
+["source", "yml"]
 ----
-{
-    "Records": [
-        {
-            "eventVersion": "1.07",
-            "eventTime": "2019-11-14T00:51:00Z",
-            "awsRegion": "us-east-1",
-            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
-            ...
-        },
-        {
-            "eventVersion": "1.07",
-            "eventTime": "2019-11-14T00:52:00Z",
-            "awsRegion": "us-east-1",
-            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
-            ...
-        }
-    ]
-}
-```
+file_selectors:
+  - regex: '^AWSLogs/\d+/CloudTrail/'
+    expand_event_list_from_field: 'Records'
+  - regex: '^AWSLogs/\d+/CloudTrail-Digest'
 ----
+
+[float]
+==== `fips_enabled`
+
+Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint. For example: `s3-fips.us-gov-east-1.amazonaws.com`.
+
+[float]
+==== `max_number_of_messages`
+The maximum number of messages to return. Amazon SQS never returns more messages
+than this value (however, fewer messages might be returned).
+Valid values: 1 to 10. Default: 5.
+
+[float]
+==== `queue_url`
+
+URL of the AWS SQS queue that messages will be received from. Required.
+
+[float]
+==== `visibility_timeout`
+
+The duration that the received messages are hidden from subsequent
+retrieve requests after being retrieved by a ReceiveMessage request.
+This value needs to be a lot bigger than {beatname_uc} collection frequency so
+if it took too long to read the s3 log, this sqs message will not be reprocessed.
+The default visibility timeout for a message is 300 seconds. The minimum
+is 0 seconds. The maximum is 12 hours.
 
 [float]
 ==== `aws credentials`

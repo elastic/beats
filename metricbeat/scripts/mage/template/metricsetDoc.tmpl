@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[{{getBeatName}}-metricset-{{.Mod.Base}}-{{.Metricset.Title}}]]
+{{- if .Mod.IsXpack}}
+[role="xpack"]{{end}}
 === {{.Mod.Title}} {{.Metricset.Title}} metricset
 
 {{if not ( eq .Metricset.Release "ga") -}}

@@ -5,83 +5,59 @@
 package cloudfoundry
 
 import (
-	"sync"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
-// InputV1 defines a udp input to receive event on a specific host:port.
-type InputV1 struct {
-	sync.Mutex
-	consumer *cloudfoundry.DopplerConsumer
-	started  bool
-	log      *logp.Logger
-	outlet   channel.Outleter
+// inputV1 defines a udp input to receive event on a specific host:port.
+type inputV1 struct {
+	config cloudfoundry.Config
 }
 
-func newInputV1(log *logp.Logger, conf cloudfoundry.Config, out channel.Outleter, context input.Context) (*InputV1, error) {
-	hub := cloudfoundry.NewHub(&conf, "filebeat", log)
-	forwarder := harvester.NewForwarder(out)
+func configureV1(config cloudfoundry.Config) (*inputV1, error) {
+	return &inputV1{config: config}, nil
+}
+
+func (i *inputV1) Name() string { return "cloudfoundry-v1" }
+
+func (i *inputV1) Test(ctx v2.TestContext) error {
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", ctx.Logger)
+	_, err := hub.Client()
+	return err
+}
+
+func (i *inputV1) Run(ctx v2.Context, publisher stateless.Publisher) error {
+	log := ctx.Logger
+	hub := cloudfoundry.NewHub(&i.config, "filebeat", log)
+
+	log.Info("Starting cloudfoundry input")
+	defer log.Info("Stopped cloudfoundry input")
 
 	callbacks := cloudfoundry.DopplerCallbacks{
 		Log: func(evt cloudfoundry.Event) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
+			publisher.Publish(createEvent(evt))
 		},
 		Error: func(evt cloudfoundry.EventError) {
-			forwarder.Send(beat.Event{
-				Timestamp: evt.Timestamp(),
-				Fields:    evt.ToFields(),
-			})
+			publisher.Publish(createEvent(&evt))
 		},
 	}
 
 	consumer, err := hub.DopplerConsumer(callbacks)
 	if err != nil {
-		return nil, errors.Wrapf(err, "initializing doppler consumer")
+		return errors.Wrapf(err, "initializing doppler consumer")
 	}
-	return &InputV1{
-		outlet:   out,
-		consumer: consumer,
-		started:  false,
-		log:      log,
-	}, nil
-}
 
-// Run starts the consumer of cloudfoundry events
-func (p *InputV1) Run() {
-	p.Lock()
-	defer p.Unlock()
+	stopCtx, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+		// wait stops the consumer and waits for all internal go-routines to be stopped.
+		consumer.Wait()
+	})
+	defer cancel()
 
-	if !p.started {
-		p.log.Info("starting cloudfoundry input")
-		p.consumer.Run()
-		p.started = true
-	}
-}
-
-// Stop stops cloudfoundry doppler consumer
-func (p *InputV1) Stop() {
-	defer p.outlet.Close()
-	p.Lock()
-	defer p.Unlock()
-
-	p.log.Info("stopping cloudfoundry input")
-	p.consumer.Stop()
-	p.started = false
-}
-
-// Wait waits for the input to finalize, and stops it
-func (p *InputV1) Wait() {
-	p.Stop()
-	p.consumer.Wait()
+	consumer.Run()
+	<-stopCtx.Done()
+	return nil
 }

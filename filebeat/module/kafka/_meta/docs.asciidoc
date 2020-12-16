@@ -6,6 +6,8 @@
 The +{modulename}+ module collects and parses the logs created by
 https://kafka.apache.org/[Kafka].
 
+The module has additional support for parsing thread ID from logs.
+
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]

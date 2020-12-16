@@ -53,7 +53,7 @@ func TestFetch(t *testing.T) {
 	module, metricsets, err := mb.NewModule(c, mb.Registry)
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	ms, ok := metricsets[0].(*MetricSet)
 	assert.Equal(t, len(ms.Client.Config.Resources), 1)
 	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace))

@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
@@ -32,29 +30,26 @@ type Config struct {
 	TLS *tlscommon.Config `config:"ssl"`
 
 	// Override URLs returned from the CF client
-	APIAddress     string `config:"api_address"`
+	APIAddress     string `config:"api_address" validate:"required"`
 	DopplerAddress string `config:"doppler_address"`
 	UaaAddress     string `config:"uaa_address"`
 	RlpAddress     string `config:"rlp_address"`
 
 	// ShardID when retrieving events from loggregator, sharing this ID across
 	// multiple filebeats will shard the load of receiving and sending events.
-	ShardID string `config:"shard_id"`
+	ShardID string `config:"shard_id" validate:"required"`
 
-	// Maximum amount of time to cache application objects from CF client
+	// Maximum amount of time to cache application objects from CF client.
 	CacheDuration time.Duration `config:"cache_duration"`
+
+	// Time to wait before retrying to get application info in case of error.
+	CacheRetryDelay time.Duration `config:"cache_retry_delay"`
 }
 
 // InitDefaults initialize the defaults for the configuration.
 func (c *Config) InitDefaults() {
-	// If not provided by the user; subscription ID should be a unique string to avoid clustering by default.
-	// Default to using a UUID4 string.
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
-	c.ShardID = uuid.String()
 	c.CacheDuration = 120 * time.Second
+	c.CacheRetryDelay = 20 * time.Second
 	c.Version = ConsumerVersionV1
 }
 

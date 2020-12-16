@@ -30,14 +30,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type KubernetesKeystores map[string]keystore.Keystore
-
-// KubernetesKeystoresRegistry holds KubernetesKeystores for known namespaces. Once a Keystore for one k8s namespace
-// is initialized it will be reused every time it is needed.
+// KubernetesKeystoresRegistry implements a Provider for Keystore.
 type KubernetesKeystoresRegistry struct {
-	kubernetesKeystores KubernetesKeystores
-	logger              *logp.Logger
-	client              k8s.Interface
+	logger *logp.Logger
+	client k8s.Interface
 }
 
 // KubernetesSecretsKeystore allows to retrieve passwords from Kubernetes secrets for a given namespace
@@ -56,9 +52,8 @@ func Factoryk8s(keystoreNamespace string, ks8client k8s.Interface, logger *logp.
 // NewKubernetesKeystoresRegistry initializes a KubernetesKeystoresRegistry
 func NewKubernetesKeystoresRegistry(logger *logp.Logger, client k8s.Interface) keystore.Provider {
 	return &KubernetesKeystoresRegistry{
-		kubernetesKeystores: KubernetesKeystores{},
-		logger:              logger,
-		client:              client,
+		logger: logger,
+		client: client,
 	}
 }
 
@@ -75,12 +70,7 @@ func (kr *KubernetesKeystoresRegistry) GetKeystore(event bus.Event) keystore.Key
 		namespace = ns.(string)
 	}
 	if namespace != "" {
-		// either retrieve already stored keystore or create a new one for the namespace
-		if storedKeystore, ok := kr.kubernetesKeystores[namespace]; ok {
-			return storedKeystore
-		}
 		k8sKeystore, _ := Factoryk8s(namespace, kr.client, kr.logger)
-		kr.kubernetesKeystores["namespace"] = k8sKeystore
 		return k8sKeystore
 	}
 	kr.logger.Debugf("Cannot retrieve kubernetes namespace from event: %s", event)
@@ -101,6 +91,9 @@ func NewKubernetesSecretsKeystore(keystoreNamespace string, ks8client k8s.Interf
 func (k *KubernetesSecretsKeystore) Retrieve(key string) (*keystore.SecureString, error) {
 	// key = "kubernetes.somenamespace.somesecret.value"
 	tokens := strings.Split(key, ".")
+	if len(tokens) > 0 && tokens[0] != "kubernetes" {
+		return nil, keystore.ErrKeyDoesntExists
+	}
 	if len(tokens) != 4 {
 		k.logger.Debugf(
 			"not valid secret key: %v. Secrets should be of the following format %v",

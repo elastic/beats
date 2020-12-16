@@ -111,7 +111,7 @@ func (c *DopplerConsumer) firehose(cb func(evt Event), filter consumer.EnvelopeF
 			if !filterFn(env) {
 				continue
 			}
-			event := envelopeToEvent(env)
+			event := EnvelopeToEvent(env)
 			if event == nil {
 				c.log.Debugf("Envelope couldn't be converted to event: %+v", env)
 				continue

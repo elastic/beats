@@ -88,10 +88,10 @@ func TestConfigValidate(t *testing.T) {
 
 			err := config.Validate()
 			if test.result {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				assert.Equal(t, test.convertedHost, config.Hosts[0])
 			} else {
-				assert.NotNil(t, err)
+				assert.Error(t, err)
 			}
 
 		})

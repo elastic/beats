@@ -6,10 +6,8 @@ package o365audit
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -77,23 +75,6 @@ func getDateKey(m common.MapStr, key string, formats dateFormats) (t time.Time, 
 		return t, err
 	}
 	return formats.Parse(str)
-}
-
-// Sort a slice of maps by one of its keys parsed as a date in the given format(s).
-func sortMapSliceByDate(s []common.MapStr, dateKey string, formats dateFormats) error {
-	var errs multierror.Errors
-	sort.Slice(s, func(i, j int) bool {
-		di, e1 := getDateKey(s[i], dateKey, formats)
-		dj, e2 := getDateKey(s[j], dateKey, formats)
-		if e1 != nil {
-			errs = append(errs, e1)
-		}
-		if e2 != nil {
-			errs = append(errs, e2)
-		}
-		return di.Before(dj)
-	})
-	return errors.Wrapf(errs.Err(), "failed sorting by date key:%s", dateKey)
 }
 
 func inRange(d, maxLimit time.Duration) bool {

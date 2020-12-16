@@ -21,6 +21,7 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<configuring-internal-queue>>
 * <<configuration-logging>>
 * <<regexp-support>>
+* <<configuration-instrumentation>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -33,6 +34,10 @@ include::./general-options.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/outputconfig.asciidoc[]
+
+ifndef::no_kerberos[]
+include::{libbeat-dir}/shared-kerberos-config.asciidoc[]
+endif::[]
 
 [role="xpack"]
 include::{libbeat-dir}/shared-ssl-config.asciidoc[]
@@ -56,6 +61,9 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/regexp.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/reference-yml.asciidoc[]

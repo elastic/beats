@@ -30,6 +30,8 @@ const (
 	Crashed
 	// Restarting is status describing application is restarting.
 	Restarting
+	// Updating is status describing application is updating.
+	Updating
 )
 
 // State wraps the process state and application status.
@@ -37,6 +39,7 @@ type State struct {
 	ProcessInfo *process.Info
 	Status      Status
 	Message     string
+	Payload     map[string]interface{}
 }
 
 // Reporter is interface that is called when a state is changed.

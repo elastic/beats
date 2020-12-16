@@ -18,9 +18,12 @@
 package memlog
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -56,43 +59,211 @@ type entry struct {
 // If an error in in the log file is detected, the store opening routine continues from the last known valid state and will trigger a checkpoint
 // operation on subsequent writes, also truncating the log file.
 // Old data files are scheduled for deletion later.
-func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, checkpoint CheckpointPredicate) (*store, error) {
-	panic("TODO: implement me")
+func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, ignoreVersionCheck bool, checkpoint CheckpointPredicate) (*store, error) {
+	fi, err := os.Stat(home)
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(home, os.ModeDir|0770)
+		if err != nil {
+			return nil, err
+		}
+
+		err = writeMetaFile(home, mode)
+		if err != nil {
+			return nil, err
+		}
+	} else if !fi.Mode().IsDir() {
+		return nil, fmt.Errorf("'%v' is not a directory", home)
+	} else {
+		if err := pathEnsurePermissions(filepath.Join(home, metaFileName), mode); err != nil {
+			return nil, fmt.Errorf("failed to update meta file permissions: %w", err)
+		}
+	}
+
+	if !ignoreVersionCheck {
+		meta, err := readMetaFile(home)
+		if err != nil {
+			return nil, err
+		}
+		if err := checkMeta(meta); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := pathEnsurePermissions(filepath.Join(home, activeDataFileName), mode); err != nil {
+		return nil, fmt.Errorf("failed to update active file permissions: %w", err)
+	}
+
+	dataFiles, err := listDataFiles(home)
+	if err != nil {
+		return nil, err
+	}
+	for _, df := range dataFiles {
+		if err := pathEnsurePermissions(df.path, mode); err != nil {
+			return nil, fmt.Errorf("failed to update data file permissions: %w", err)
+		}
+	}
+	if err := pathEnsurePermissions(filepath.Join(home, logFileName), mode); err != nil {
+		return nil, fmt.Errorf("failed to update log file permissions: %w", err)
+	}
+
+	tbl := map[string]entry{}
+	var txid uint64
+	if L := len(dataFiles); L > 0 {
+		active := dataFiles[L-1]
+		txid = active.txid
+		if err := loadDataFile(active.path, tbl); err != nil {
+			return nil, err
+		}
+	}
+
+	logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
+
+	var entries uint
+	memstore := memstore{tbl}
+	txid, entries, err = loadLogFile(&memstore, txid, home)
+	logp.Info("Finished loading transaction log file for '%v'. Active transaction id=%v", home, txid)
+
+	if err != nil {
+		// Error indicates the log file was incomplete or corrupted.
+		// Anyways, we already have the table in a valid state and will
+		// continue opening the store from here.
+		logp.Warn("Incomplete or corrupted log file in %v. Continue with last known complete and consistent state. Reason: %v", home, err)
+	}
+
+	diskstore, err := newDiskStore(log, home, dataFiles, txid, mode, entries, err != nil, bufSz, checkpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return &store{
+		disk: diskstore,
+		mem:  memstore,
+	}, nil
 }
 
 // Close closes access to the update log file and clears the in memory key
 // value store. Access to the store after close can lead to a panic.
 func (s *store) Close() error {
-	panic("TODO: implement me")
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.mem = memstore{}
+	return s.disk.Close()
 }
 
 // Has checks if the key is known. The in memory store does not report any
 // errors.
 func (s *store) Has(key string) (bool, error) {
-	panic("TODO: implement me")
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	return s.mem.Has(key), nil
 }
 
 // Get retrieves and decodes the key-value pair into to.
 func (s *store) Get(key string, to interface{}) error {
-	panic("TODO: implement me")
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	dec := s.mem.Get(key)
+	if dec == nil {
+		return errKeyUnknown
+	}
+	return dec.Decode(to)
 }
 
 // Set inserts or overwrites a key-value pair.
 // If encoding was successful the in-memory state will be updated and a
 // set-operation is logged to the diskstore.
 func (s *store) Set(key string, value interface{}) error {
-	panic("TODO: implement me")
+	var tmp common.MapStr
+	if err := typeconv.Convert(&tmp, value); err != nil {
+		return err
+	}
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.mem.Set(key, tmp)
+	return s.logOperation(&opSet{K: key, V: tmp})
 }
 
 // Remove removes a key from the in memory store and logs a remove operation to
 // the diskstore. The operation does not check if the key exists.
 func (s *store) Remove(key string) error {
-	panic("TODO: implement me")
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	s.mem.Remove(key)
+	return s.logOperation(&opRemove{K: key})
+}
+
+// Checkpoint triggers a state checkpoint operation. All state will be written
+// to a new transaction data file and fsync'ed. The log file will be reset after
+// a successful write.
+func (s *store) Checkpoint() error {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	return s.disk.WriteCheckpoint(s.mem.table)
+}
+
+// lopOperation ensures that the diskstore reflects the recent changes to the
+// in memory store by either triggering a checkpoint operations or adding the
+// operation type to the update log file.
+func (s *store) logOperation(op op) error {
+	if s.disk.mustCheckpoint() {
+		err := s.disk.WriteCheckpoint(s.mem.table)
+		if err != nil {
+			// if writing the new checkpoint file failed we try to fallback to
+			// appending the log operation.
+			// TODO: make append configurable and retry checkpointing with backoff.
+			s.disk.LogOperation(op)
+		}
+
+		return err
+	}
+
+	return s.disk.LogOperation(op)
 }
 
 // Each iterates over all key-value pairs in the store.
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
-	panic("TODO: implement me")
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	for k, entry := range s.mem.table {
+		cont, err := fn(k, entry)
+		if !cont || err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *memstore) Has(key string) bool {
+	_, exists := m.table[key]
+	return exists
+}
+
+func (m *memstore) Get(key string) backend.ValueDecoder {
+	entry, exists := m.table[key]
+	if !exists {
+		return nil
+	}
+	return entry
+}
+
+func (m *memstore) Set(key string, value common.MapStr) {
+	m.table[key] = entry{value: value}
+}
+
+func (m *memstore) Remove(key string) bool {
+	_, exists := m.table[key]
+	if !exists {
+		return false
+	}
+	delete(m.table, key)
+	return true
 }
 
 func (e entry) Decode(to interface{}) error {

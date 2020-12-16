@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-compute_vm_scaleset]]
+[role="xpack"]
 === Azure compute_vm_scaleset metricset
 
 include::../../../../x-pack/metricbeat/module/azure/compute_vm_scaleset/_meta/docs.asciidoc[]

@@ -24,7 +24,7 @@ func TestLazyAcker(t *testing.T) {
 		Events []fleetapi.AckEvent `json:"events"`
 	}
 
-	log, _ := logger.New()
+	log, _ := logger.New("")
 	client := newTestingClient()
 	agentInfo := &testAgentInfo{}
 	acker, err := newActionAcker(log, agentInfo, client)
@@ -64,7 +64,7 @@ func TestLazyAcker(t *testing.T) {
 			assert.EqualValues(t, 1, len(cr.Events))
 		}
 
-		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+		resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 		return resp, nil
 	})
 

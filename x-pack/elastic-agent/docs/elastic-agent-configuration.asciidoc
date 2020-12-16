@@ -1,21 +1,21 @@
 [[elastic-agent-configuration]]
 [role="xpack"]
-= Configuration settings
+= Policy settings
 
-experimental[]
+beta[]
 
-By default {agent} runs in standalone mode to ingest system data and send it to
-a local {es} instance running on port 9200. It uses the demo credentials of the
-`elastic` user. It's also configured to monitor all {beats} managed by the Agent
-and send the {beats} logs and metrics to the same {es) instance.
+The policy settings for {fleet}-managed agents are specified through the UI.
+You do not set them explicitly in a configuration file.
 
-To alter this behavior, configure the output and other configuration settings:
+For standalone agents, you need to configure settings in the `elastic-agent.yml`
+file. Prior to installation, edit the file located in the extracted {agent}
+package. After installation, edit the file located in the directory
+described in <<installation-layout>>. 
 
-* <<elastic-agent-output-configuration>>
-* <<elastic-agent-monitoring-configuration>>
-* <<elastic-agent-datasource-configuration>>
+TIP: To get started quickly, you can use {fleet} to generate a standalone
+configuration. For more information, see <<run-elastic-agent-standalone>>.
 
-[float]
+[discrete]
 [[elastic-agent-output-configuration]]
 == Output settings
 
@@ -51,16 +51,16 @@ username and password pair, and the second one contains an API key.
 A default output configuration is required.
 ==============
 
-[float]
+[discrete]
 [[elastic-agent-monitoring-configuration]]
 == {beats} monitoring settings
 
 {agent} monitors {beats} by default. To disable or change monitoring
-settings, set options under `settings.monitoring`:
+settings, set options under `agent.monitoring`:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
-settings.monitoring:
+agent.monitoring:
   # enabled turns on monitoring of running processes
   enabled: true
   # enables log monitoring
@@ -72,17 +72,18 @@ settings.monitoring:
 -------------------------------------------------------------------------------------
 
 
-To disable monitoring, set `settings.monitoring.enabled` to `false`. When set to
+To disable monitoring, set `agent.monitoring.enabled` to `false`. When set to
 `false`, {beats} monitoring is turned off, and all other options in this section
 are ignored.
 
-To enable monitoring, set `settings.monitoring.enabled` to `true`. Also set the
+To enable monitoring, set `agent.monitoring.enabled` to `true`. Also set the
 `logs` and `metrics` settings to control whether logs, metrics, or both are
 collected. If neither setting is specified, monitoring is disabled. Set
 `use_output` to specify the output to which monitoring events are sent.
 
-[[elastic-agent-datasource-configuration]]
-== Datasource settings
+[discrete]
+[[elastic-agent-input-configuration]]
+== Input settings
 
 By default {agent} collects system metrics, such as cpu, memory, network, and
 filesystem metrics, and sends them to the default output. For example:
@@ -92,20 +93,29 @@ filesystem metrics, and sends them to the default output. For example:
 -------------------------------------------------------------------------------------
 inputs:
   - type: system/metrics
-    dataset.namespace: default
+    data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
-        dataset.name: system.cpu
+        data_stream.dataset: system.cpu
       - metricset: memory
-        dataset.name: system.memory
+        data_stream.dataset: system.memory
       - metricset: network
-        dataset.name: system.network
+        data_stream.dataset: system.network
       - metricset: filesystem
-        dataset.name: system.filesystem
+        data_stream.dataset: system.filesystem
 -------------------------------------------------------------------------------------
 
 If `use_output` is not specified, the `default` output is used.
 
-//For more examples, see
-//<<elastic-agent-configuration-example,`elastic-agent_configuration_example.yml`>>.
+== Reference yaml
+
+The {agent} installation includes an `elastic-agent.reference.yml` file that
+describes all the settings available in a standalone configuration.
+
+The contents of the file are included here for your convenience.
+
+[source,yaml]
+----
+include::elastic-agent-reference-yaml.yml[]
+----

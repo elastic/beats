@@ -20,6 +20,7 @@ package pipetool
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 )
 
 // connectEditPipeline modifies the client configuration using edit before calling
@@ -81,6 +82,17 @@ func WithDefaultGuarantees(pipeline beat.PipelineConnector, mode beat.PublishMod
 	return WithClientConfigEdit(pipeline, func(cfg beat.ClientConfig) (beat.ClientConfig, error) {
 		if cfg.PublishMode == beat.DefaultGuarantees {
 			cfg.PublishMode = mode
+		}
+		return cfg, nil
+	})
+}
+
+func WithACKer(pipeline beat.PipelineConnector, a beat.ACKer) beat.PipelineConnector {
+	return WithClientConfigEdit(pipeline, func(cfg beat.ClientConfig) (beat.ClientConfig, error) {
+		if h := cfg.ACKHandler; h != nil {
+			cfg.ACKHandler = acker.Combine(a, h)
+		} else {
+			cfg.ACKHandler = a
 		}
 		return cfg, nil
 	})

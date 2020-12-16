@@ -81,7 +81,7 @@ func TestReadQueryResult(t *testing.T) {
 	json := queryResult.Source
 	result, err := readQueryResult(json)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, queryResult.Ok, result.Ok)
 	assert.Equal(t, queryResult.Index, result.Index)
 	assert.Equal(t, queryResult.Type, result.Type)
@@ -96,7 +96,7 @@ func TestReadQueryResult(t *testing.T) {
 func TestReadQueryResult_empty(t *testing.T) {
 	result, err := readQueryResult(nil)
 	assert.Nil(t, result)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 // Check invalid query result object
@@ -125,7 +125,7 @@ func TestReadSearchResult(t *testing.T) {
 
 		results, err := readSearchResult(json)
 
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, resultsObject.Took, results.Took)
 		assert.Equal(t, resultsObject.Hits, results.Hits)
 		assert.Equal(t, resultsObject.Shards, results.Shards)
@@ -147,7 +147,7 @@ func TestReadSearchResult(t *testing.T) {
 
 		results, err := readSearchResult(json)
 
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, resultsObject.Took, results.Took)
 		assert.Equal(t, resultsObject.Hits, results.Hits)
 		assert.Equal(t, resultsObject.Shards, results.Shards)
@@ -158,7 +158,7 @@ func TestReadSearchResult(t *testing.T) {
 func TestReadSearchResult_empty(t *testing.T) {
 	results, err := readSearchResult(nil)
 	assert.Nil(t, results)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestReadSearchResult_invalid(t *testing.T) {

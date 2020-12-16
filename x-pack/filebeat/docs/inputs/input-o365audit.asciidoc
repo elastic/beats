@@ -38,6 +38,7 @@ Example configuration:
 
 Multi-tenancy and certificate-based authentication is also supported:
 
+["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: o365audit

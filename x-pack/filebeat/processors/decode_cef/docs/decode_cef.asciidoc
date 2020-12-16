@@ -28,7 +28,7 @@ The `decode_cef` processor has the following configuration settings.
 .Decode CEF options
 [options="header"]
 |======
-| Name             | Required | Default | Description
+| Name             | Required | Default | Description |
 | `field`          | no       | message | Source field containing the CEF message to be parsed.                        |
 | `target_field`   | no       | cef     | Target field where the parsed CEF object will be written.                    |
 | `ecs`            | no       | true    | Generate Elastic Common Schema (ECS) fields from the CEF data.

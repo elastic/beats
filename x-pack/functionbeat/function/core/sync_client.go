@@ -8,7 +8,9 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
 // Client implements the interface used by all the functionbeat function, we only implement a synchronous
@@ -49,32 +51,10 @@ func NewSyncClient(log *logp.Logger, pipeline beat.Pipeline, cfg beat.ClientConf
 	}
 	s := &SyncClient{log: log.Named("sync client")}
 
-	// Proxy any callbacks to the original client.
-	//
-	// Notes: it's not supported to have multiple callback defined, but to support any configuration
-	// we map all of them.
-	if cfg.ACKCount != nil {
-		s.ackCount = cfg.ACKCount
-		cfg.ACKCount = s.onACKCount
-	}
-
-	if cfg.ACKEvents != nil {
-		s.ackEvents = cfg.ACKEvents
-		cfg.ACKEvents = s.onACKEvents
-	}
-
-	if cfg.ACKLastEvent != nil {
-		s.ackLastEvent = cfg.ACKLastEvent
-		cfg.ACKLastEvent = nil
-		cfg.ACKEvents = s.onACKEvents
-	}
-
-	// No calls is defined on the target on the config but we still need to track
-	// the ack to unblock.
-	hasACK := cfg.ACKCount != nil || cfg.ACKEvents != nil || cfg.ACKLastEvent != nil
-	if !hasACK {
-		cfg.ACKCount = s.onACKCount
-	}
+	pipeline = pipetool.WithACKer(pipeline, acker.TrackingCounter(func(_, total int) {
+		log.Debugf("ack callback receives with events count of %d", total)
+		s.onACK(total)
+	}))
 
 	c, err := pipeline.ConnectWith(cfg)
 	if err != nil {
@@ -114,28 +94,6 @@ func (s *SyncClient) Wait() {
 	s.wg.Wait()
 }
 
-// AckEvents receives an array with all the event acked for this client.
-func (s *SyncClient) onACKEvents(data []interface{}) {
-	s.log.Debugf("onACKEvents callback receives with events count of %d", len(data))
-	count := len(data)
-	if count == 0 {
-		return
-	}
-
-	s.onACKCount(count)
-	if s.ackEvents != nil {
-		s.ackEvents(data)
-	}
-
-	if s.ackLastEvent != nil {
-		s.ackLastEvent(data[len(data)-1])
-	}
-}
-
-func (s *SyncClient) onACKCount(c int) {
-	s.log.Debugf("onACKCount callback receives with events count of %d", c)
-	s.wg.Add(c * -1)
-	if s.ackCount != nil {
-		s.ackCount(c)
-	}
+func (s *SyncClient) onACK(n int) {
+	s.wg.Add(-1 * n)
 }

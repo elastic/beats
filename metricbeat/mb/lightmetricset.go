@@ -18,9 +18,6 @@
 package mb
 
 import (
-	"fmt"
-	"net/url"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -55,13 +52,17 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
+	// Disable the host parser, we will call it as part of the factory so the original
+	// host in the base module is not modified.
+	originalHostParser := registration.HostParser
+	registration.HostParser = nil
+
 	// Light modules factory has to override defaults and reproduce builder
 	// functionality with the resulting configuration, it does:
 	// - Override defaults
 	// - Call module factory if registered (it wouldn't have been called
 	//   if light module is really a registered mixed module)
-	// - Call host parser if defined (it would have already been called
-	//   without the light module defaults)
+	// - Call host parser if there was one defined
 	// - Finally, call the original factory for the registered metricset
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		// Override default config on base module and metricset
@@ -83,11 +84,9 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 			base.module = module
 		}
 
-		// At this point host parser was already run, we need to run this again
-		// with the overriden defaults
-		if registration.HostParser != nil {
-			host := m.useHostURISchemeIfPossible(base.host, base.hostData.URI)
-			base.hostData, err = registration.HostParser(base.module, host)
+		// Run the host parser if there was anyone defined
+		if originalHostParser != nil {
+			base.hostData, err = originalHostParser(base.module, base.host)
 			if err != nil {
 				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
 			}
@@ -98,18 +97,6 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	}
 
 	return registration, nil
-}
-
-// useHostURISchemeIfPossible method parses given URI to extract protocol scheme and prepend it to the host.
-// It prevents from skipping protocol scheme (e.g. https) while executing HostParser.
-func (m *LightMetricSet) useHostURISchemeIfPossible(host, uri string) string {
-	u, err := url.ParseRequestURI(uri)
-	if err == nil {
-		if u.Scheme != "" {
-			return fmt.Sprintf("%s://%s", u.Scheme, u.Host)
-		}
-	}
-	return host
 }
 
 // baseModule does the configuration overrides in the base module configuration

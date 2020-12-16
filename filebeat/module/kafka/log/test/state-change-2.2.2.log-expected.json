@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2020-04-23T00:28:21.796-02:00",
+        "event.dataset": "kafka.log",
+        "event.kind": "event",
+        "event.module": "kafka",
+        "event.timezone": "-02:00",
+        "event.type": "info",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kafka.log.class": "state.change.logger",
+        "kafka.log.component": "Broker id=1",
+        "kafka.log.thread": "kafka-request-handler-7",
+        "log.level": "WARN",
+        "log.offset": 0,
+        "message": "Ignoring LeaderAndIsr request from controller 1 with correlation id 1 epoch 27 for partition xxx.xxx.inventory.test.1-0-2 since its associated leader epoch 5 is not higher than the current leader epoch 5 ",
+        "service.type": "kafka"
+    },
+    {
+        "@timestamp": "2020-01-20T01:32:00.705-02:00",
+        "event.dataset": "kafka.log",
+        "event.kind": "event",
+        "event.module": "kafka",
+        "event.timezone": "-02:00",
+        "event.type": "error",
+        "fileset.name": "log",
+        "input.type": "log",
+        "kafka.log.class": "state.change.logger",
+        "kafka.log.component": "Controller id=1 epoch=25",
+        "kafka.log.thread": "controller-event-thread",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "ERROR",
+        "log.offset": 303,
+        "message": "Controller 1 epoch 25 failed to change state for partition xxx.xxx.na.och.aud.1-0-2 from OfflinePartition to OnlinePartition",
+        "service.type": "kafka"
+    }
+]

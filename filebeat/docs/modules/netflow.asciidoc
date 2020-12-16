@@ -44,7 +44,7 @@ traffic from network devices.
       netflow_port: 2055
 -----
 
-`var.netflow_host`:: Address to find to. Defaults to `localhost`.
+`var.netflow_host`:: Address to bind to. Defaults to `localhost`.
 
 `var.netflow_port`:: Port to listen on. Defaults to `2055`.
 

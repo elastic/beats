@@ -7,15 +7,13 @@ package query
 import (
 	"context"
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -81,167 +79,81 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
-	db, err := m.DB()
+	db, err := sql.NewDBClient(m.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
 		return errors.Wrap(err, "error opening connection")
 	}
-
-	rows, err := db.QueryxContext(ctx, m.Query)
-	if err != nil {
-		return errors.Wrap(err, "error executing query")
-	}
-	defer rows.Close()
+	defer db.Close()
 
 	if m.ResponseFormat == tableResponseFormat {
-		return m.fetchTableMode(rows, report)
-	}
-
-	return m.fetchVariableMode(rows, report)
-}
-
-// DB gets a client ready to query the database
-func (m *MetricSet) DB() (*sqlx.DB, error) {
-	if m.db == nil {
-		db, err := sqlx.Open(switchDriverName(m.Driver), m.HostData().URI)
+		mss, err := db.FetchTableMode(ctx, m.Query)
 		if err != nil {
-			return nil, errors.Wrap(err, "opening connection")
-		}
-		err = db.Ping()
-		if err != nil {
-			return nil, errors.Wrap(err, "testing connection")
+			return err
 		}
 
-		m.db = db
+		for _, ms := range mss {
+			report.Event(m.getEvent(ms))
+		}
+
+		return nil
 	}
-	return m.db, nil
-}
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (m *MetricSet) fetchTableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
-
-	// Extracted from
-	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
-	cols, err := rows.Columns()
+	ms, err := db.FetchVariableMode(ctx, m.Query)
 	if err != nil {
-		return errors.Wrap(err, "error getting columns")
+		return err
 	}
-
-	for k, v := range cols {
-		cols[k] = strings.ToLower(v)
-	}
-
-	vals := make([]interface{}, len(cols))
-	for i := 0; i < len(cols); i++ {
-		vals[i] = new(interface{})
-	}
-
-	for rows.Next() {
-		err = rows.Scan(vals...)
-		if err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to scan rows"))
-			continue
-		}
-
-		numericMetrics := common.MapStr{}
-		stringMetrics := common.MapStr{}
-
-		for i := 0; i < len(vals); i++ {
-			value := getValue(vals[i].(*interface{}))
-			num, err := strconv.ParseFloat(value, 64)
-			if err == nil {
-				numericMetrics[cols[i]] = num
-			} else {
-				stringMetrics[cols[i]] = value
-			}
-
-		}
-
-		report.Event(mb.Event{
-			RootFields: common.MapStr{
-				"sql": common.MapStr{
-					"driver": m.Driver,
-					"query":  m.Query,
-					"metrics": common.MapStr{
-						"numeric": numericMetrics,
-						"string":  stringMetrics,
-					},
-				},
-			},
-		})
-	}
-
-	if err = rows.Err(); err != nil {
-		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
-	}
+	report.Event(m.getEvent(ms))
 
 	return nil
 }
 
-// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
-func (m *MetricSet) fetchVariableMode(rows *sqlx.Rows, report mb.ReporterV2) error {
-	data := common.MapStr{}
-	for rows.Next() {
-		var key string
-		var val interface{}
-		err := rows.Scan(&key, &val)
-		if err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to scan rows"))
-			continue
-		}
-
-		key = strings.ToLower(key)
-		data[key] = val
+func (m *MetricSet) getEvent(ms common.MapStr) mb.Event {
+	return mb.Event{
+		RootFields: common.MapStr{
+			"sql": common.MapStr{
+				"driver":  m.Driver,
+				"query":   m.Query,
+				"metrics": getMetrics(ms),
+			},
+		},
 	}
+}
 
-	if err := rows.Err(); err != nil {
-		m.Logger().Debug(errors.Wrap(err, "error trying to read rows"))
-	}
+func getMetrics(ms common.MapStr) (ret common.MapStr) {
+	ret = common.MapStr{}
 
 	numericMetrics := common.MapStr{}
 	stringMetrics := common.MapStr{}
+	boolMetrics := common.MapStr{}
 
-	for key, value := range data {
-		value := getValue(&value)
-		num, err := strconv.ParseFloat(value, 64)
-		if err == nil {
-			numericMetrics[key] = num
-		} else {
-			stringMetrics[key] = value
+	for k, v := range ms {
+		switch v.(type) {
+		case float64:
+			numericMetrics.Put(k, v)
+		case string:
+			stringMetrics.Put(k, v)
+		case bool:
+			boolMetrics.Put(k, v)
+		case nil:
+		//Ignore because a nil has no data type and thus cannot be indexed
+		default:
+			stringMetrics.Put(k, v)
 		}
 	}
 
-	report.Event(mb.Event{
-		RootFields: common.MapStr{
-			"sql": common.MapStr{
-				"driver": m.Driver,
-				"query":  m.Query,
-				"metrics": common.MapStr{
-					"numeric": numericMetrics,
-					"string":  stringMetrics,
-				},
-			},
-		},
-	})
-
-	return nil
-}
-
-func getValue(pval *interface{}) string {
-	switch v := (*pval).(type) {
-	case nil:
-		return "NULL"
-	case bool:
-		if v {
-			return "true"
-		}
-		return "false"
-	case []byte:
-		return string(v)
-	case time.Time:
-		return v.Format(time.RFC3339Nano)
-	default:
-		return fmt.Sprint(v)
+	if len(numericMetrics) > 0 {
+		ret.Put("numeric", numericMetrics)
 	}
+
+	if len(stringMetrics) > 0 {
+		ret.Put("string", stringMetrics)
+	}
+
+	if len(boolMetrics) > 0 {
+		ret.Put("bool", boolMetrics)
+	}
+
+	return
 }
 
 // Close closes the connection pool releasing its resources
@@ -250,14 +162,4 @@ func (m *MetricSet) Close() error {
 		return nil
 	}
 	return errors.Wrap(m.db.Close(), "closing connection")
-}
-
-// switchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
-// 'godror' so this detail implementation must be hidden to the user, that should only choose and see 'oracle' as driver
-func switchDriverName(d string) string {
-	if d == "oracle" {
-		return "godror"
-	}
-
-	return d
 }

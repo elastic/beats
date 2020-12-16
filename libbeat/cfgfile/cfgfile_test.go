@@ -47,7 +47,7 @@ func TestRead(t *testing.T) {
 	os.Setenv("TEST_KEY", "test_value")
 
 	assert.NotNil(t, absPath)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	config := &TestConfig{}
 

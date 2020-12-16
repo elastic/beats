@@ -92,10 +92,10 @@ func TestCommonPaths(t *testing.T) {
 
 		event, err := runExtractField(t, testConfig, input)
 		if test.Error {
-			assert.NotNil(t, err)
+			assert.Error(t, err)
 		} else {
 
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			result, err := event.Fields.GetValue(test.Target)
 			if err != nil {
 				t.Fatalf("could not get target field: %s", err)

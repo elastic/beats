@@ -5,7 +5,11 @@
 package pipelinemanager
 
 import (
+	"encoding/binary"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/mitchellh/hashstructure"
@@ -14,7 +18,11 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/docker/docker/daemon/logger"
+	"github.com/docker/docker/daemon/logger/jsonfilelog"
+
+	protoio "github.com/gogo/protobuf/io"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -41,14 +49,26 @@ type PipelineManager struct {
 	pipelines map[uint64]*Pipeline
 	// clients config: filepath
 	clients map[string]*ClientLogger
+	// Client Logger key: container hash
+	clientLogger map[string]logger.Logger
+	// logDirectory is the bindmount for local container logsd
+	logDirectory string
+	// destroyLogsOnStop indicates for the client to remove log files when a container stops
+	destroyLogsOnStop bool
+	// hostname of the docker host
+	hostname string
 }
 
 // NewPipelineManager creates a new Pipeline map
-func NewPipelineManager(logCfg *common.Config) *PipelineManager {
+func NewPipelineManager(logDestroy bool, hostname string) *PipelineManager {
 	return &PipelineManager{
-		Logger:    logp.NewLogger("PipelineManager"),
-		pipelines: make(map[uint64]*Pipeline),
-		clients:   make(map[string]*ClientLogger),
+		Logger:            logp.NewLogger("PipelineManager"),
+		pipelines:         make(map[uint64]*Pipeline),
+		clients:           make(map[string]*ClientLogger),
+		clientLogger:      make(map[string]logger.Logger),
+		logDirectory:      "/var/log/docker/containers",
+		destroyLogsOnStop: logDestroy,
+		hostname:          hostname,
 	}
 }
 
@@ -62,13 +82,16 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 
 	hash := cl.pipelineHash
 
+	// remove the logger
+	pm.removeLogger(cl.ContainerMeta)
+
 	pm.Logger.Debugf("Closing Client first from pipelineManager")
 	err = cl.Close()
 	if err != nil {
 		return errors.Wrap(err, "error closing client")
 	}
 
-	//if the pipeline is no longer in use, clean up
+	// if the pipeline is no longer in use, clean up
 	pm.removePipelineIfNeeded(hash)
 
 	return nil
@@ -82,25 +105,95 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating config hash")
 	}
-	pipeline, err := pm.getOrCreatePipeline(containerConfig, file, hashstring)
+	pipeline, err := pm.getOrCreatePipeline(containerConfig, hashstring)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting pipeline")
 	}
 
 	reader, err := pipereader.NewReaderFromPath(file)
 	if err != nil {
-		return nil, errors.Wrap(err, "")
+		return nil, errors.Wrap(err, "error creating reader for docker log stream")
+	}
+
+	// Why is this empty by default? What should be here? Who knows!
+	if info.LogPath == "" {
+		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID, fmt.Sprintf("%s-json.log", info.ContainerID))
+	}
+	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating directory for local logs")
+	}
+	// set a default log size
+	if _, ok := info.Config["max-size"]; !ok {
+		info.Config["max-size"] = "10M"
+	}
+	// set a default log count
+	if _, ok := info.Config["max-file"]; !ok {
+		info.Config["max-file"] = "5"
+	}
+
+	localLog, err := jsonfilelog.New(info)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating local log")
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info)
+	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating client")
 	}
 
 	pm.registerClient(cl, hashstring, file)
-
+	pm.registerLogger(localLog, info)
 	return cl, nil
+}
+
+// CreateReaderForContainer responds to docker logs requests to pull local logs from the json logger
+func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config logger.ReadConfig) (io.ReadCloser, error) {
+	logObject, exists := pm.getLogger(info)
+	if !exists {
+		return nil, fmt.Errorf("Could not find logger for %s", info.ContainerID)
+	}
+	pipeReader, pipeWriter := io.Pipe()
+	logReader, ok := logObject.(logger.LogReader)
+	if !ok {
+		return nil, fmt.Errorf("logger does not support reading")
+	}
+
+	go func() {
+		watcher := logReader.ReadLogs(config)
+
+		enc := protoio.NewUint32DelimitedWriter(pipeWriter, binary.BigEndian)
+		defer enc.Close()
+		defer watcher.ConsumerGone()
+		var rawLog logdriver.LogEntry
+		for {
+			select {
+			case msg, ok := <-watcher.Msg:
+				if !ok {
+					pipeWriter.Close()
+					return
+				}
+				rawLog.Line = msg.Line
+				rawLog.Partial = msg.PLogMetaData != nil
+				rawLog.TimeNano = msg.Timestamp.UnixNano()
+				rawLog.Source = msg.Source
+
+				if err := enc.WriteMsg(&rawLog); err != nil {
+					pipeWriter.CloseWithError(err)
+					return
+				}
+
+			case err := <-watcher.Err:
+				pipeWriter.CloseWithError(err)
+				return
+
+			}
+		}
+
+	}()
+
+	return pipeReader, nil
 }
 
 //===================
@@ -108,7 +201,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 
 // checkAndCreatePipeline performs the pipeline check and creation as one atomic operation
 // It will either return a new pipeline, or an existing one from the pipeline map
-func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, file string, hash uint64) (*Pipeline, error) {
+func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConfig, hash uint64) (*Pipeline, error) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
@@ -116,7 +209,7 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 	var err error
 	pipeline, test := pm.pipelines[hash]
 	if !test {
-		pipeline, err = loadNewPipeline(logOptsConfig, file, pm.Logger)
+		pipeline, err = loadNewPipeline(logOptsConfig, pm.hostname, pm.Logger)
 		if err != nil {
 			return nil, errors.Wrap(err, "error loading pipeline")
 		}
@@ -132,6 +225,13 @@ func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
 	defer pm.mu.Unlock()
 	cli, exists := pm.clients[file]
 	return cli, exists
+}
+
+func (pm *PipelineManager) getLogger(info logger.Info) (logger.Logger, bool) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	logger, exists := pm.clientLogger[info.ContainerID]
+	return logger, exists
 }
 
 // removePipeline removes a pipeline from the manager if it's refcount is zero.
@@ -159,6 +259,35 @@ func (pm *PipelineManager) registerClient(cl *ClientLogger, hash uint64, clientF
 	defer pm.mu.Unlock()
 	pm.clients[clientFile] = cl
 	pm.pipelines[hash].refCount++
+}
+
+// registerLogger registers a local logger used for reading back logs
+func (pm *PipelineManager) registerLogger(log logger.Logger, info logger.Info) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	pm.clientLogger[info.ContainerID] = log
+}
+
+// removeLogger removes a logging instace
+func (pm *PipelineManager) removeLogger(info logger.Info) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+	logger, exists := pm.clientLogger[info.ContainerID]
+	if !exists {
+		return
+	}
+	logger.Close()
+	delete(pm.clientLogger, info.ContainerID)
+	if pm.destroyLogsOnStop {
+		pm.removeLogFile(info.ContainerID)
+	}
+}
+
+// removeLogFile removes a log file for a given container. Disabled by default.
+func (pm *PipelineManager) removeLogFile(id string) error {
+	toRemove := filepath.Join(pm.logDirectory, id)
+
+	return os.Remove(toRemove)
 }
 
 // removeClient deregisters a client

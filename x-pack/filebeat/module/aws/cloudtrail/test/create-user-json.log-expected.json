@@ -2,6 +2,12 @@
     {
         "@timestamp": "2014-03-24T21:11:59.000Z",
         "aws.cloudtrail.event_version": "1.0",
+        "aws.cloudtrail.flattened.request_parameters.userName": "Bob",
+        "aws.cloudtrail.flattened.response_elements.user.arn": "arn:aws:iam::123456789012:user/Bob",
+        "aws.cloudtrail.flattened.response_elements.user.createDate": "Mar 24, 2014 9:11:59 PM",
+        "aws.cloudtrail.flattened.response_elements.user.path": "/",
+        "aws.cloudtrail.flattened.response_elements.user.userId": "EXAMPLEUSERID",
+        "aws.cloudtrail.flattened.response_elements.user.userName": "Bob",
         "aws.cloudtrail.request_parameters": "{userName=Bob}",
         "aws.cloudtrail.response_elements": "{user={path=/, userName=Bob, arn=arn:aws:iam::123456789012:user/Bob, userId=EXAMPLEUSERID, createDate=Mar 24, 2014 9:11:59 PM}}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY_ID",

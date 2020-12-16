@@ -3,6 +3,7 @@
         "@timestamp": "2020-01-09T20:09:51.000Z",
         "aws.cloudtrail.event_type": "AwsApiCall",
         "aws.cloudtrail.event_version": "1.05",
+        "aws.cloudtrail.flattened.request_parameters.name": "arn:aws:cloudtrail:us-west-2:0123456789012:trail/test-trail",
         "aws.cloudtrail.read_only": false,
         "aws.cloudtrail.recipient_account_id": "0123456789012",
         "aws.cloudtrail.request_parameters": "{name=arn:aws:cloudtrail:us-west-2:0123456789012:trail/test-trail}",

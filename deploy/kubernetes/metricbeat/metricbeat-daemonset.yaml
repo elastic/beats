@@ -64,8 +64,6 @@ spec:
         - name: modules
           mountPath: /usr/share/metricbeat/modules.d
           readOnly: true
-        - name: dockersock
-          mountPath: /var/run/docker.sock
         - name: proc
           mountPath: /hostfs/proc
           readOnly: true
@@ -79,18 +77,16 @@ spec:
       - name: cgroup
         hostPath:
           path: /sys/fs/cgroup
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-daemonset-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: metricbeat-daemonset-modules
       - name: data
         hostPath:
+          # When metricbeat runs as non-root user, this directory needs to be writable by group (g+w)
           path: /var/lib/metricbeat-data
           type: DirectoryOrCreate

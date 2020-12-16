@@ -24,7 +24,10 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -33,18 +36,13 @@ const logSelector = "tls"
 
 // LoadCertificate will load a certificate from disk and return a tls.Certificate or error
 func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
 	certificate := config.Certificate
 	key := config.Key
-
-	hasCertificate := certificate != ""
-	hasKey := key != ""
-
-	switch {
-	case hasCertificate && !hasKey:
-		return nil, ErrCertificateNoKey
-	case !hasCertificate && hasKey:
-		return nil, ErrKeyNoCertificate
-	case !hasCertificate && !hasKey:
+	if certificate == "" {
 		return nil, nil
 	}
 
@@ -68,17 +66,23 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 		return nil, err
 	}
 
-	log.Debugf("tls", "loading certificate: %v and key %v", certificate, key)
+	log.Debugf("Loading certificate: %v and key %v", certificate, key)
 	return &cert, nil
 }
 
-// ReadPEMFile reads a PEM format file on disk and decrypt it with the privided password and
-// return the raw content.
-func ReadPEMFile(log *logp.Logger, path, passphrase string) ([]byte, error) {
+// ReadPEMFile reads a PEM formatted string either from disk or passed as a plain text starting with a "-"
+// and decrypt it with the provided password and  return the raw content.
+func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 	pass := []byte(passphrase)
 	var blocks []*pem.Block
 
-	content, err := ioutil.ReadFile(path)
+	r, err := NewPEMReader(s)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	content, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +111,7 @@ func ReadPEMFile(log *logp.Logger, path, passphrase string) ([]byte, error) {
 
 			if err != nil {
 				log.Errorf("Dropping encrypted pem '%v' block read from %v. %+v",
-					block.Type, path, err)
+					block.Type, r, err)
 				continue
 			}
 
@@ -144,20 +148,28 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 
 	log := logp.NewLogger(logSelector)
 	roots := x509.NewCertPool()
-	for _, path := range CAs {
-		pemData, err := ioutil.ReadFile(path)
+	for _, s := range CAs {
+		r, err := NewPEMReader(s)
 		if err != nil {
 			log.Errorf("Failed reading CA certificate: %+v", err)
-			errors = append(errors, fmt.Errorf("%v reading %v", err, path))
+			errors = append(errors, fmt.Errorf("%v reading %v", err, r))
+			continue
+		}
+		defer r.Close()
+
+		pemData, err := ioutil.ReadAll(r)
+		if err != nil {
+			log.Errorf("Failed reading CA certificate: %+v", err)
+			errors = append(errors, fmt.Errorf("%v reading %v", err, r))
 			continue
 		}
 
 		if ok := roots.AppendCertsFromPEM(pemData); !ok {
-			log.Error("Failed to add CA to the cert pool, CA is not a valid PEM file")
-			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, path))
+			log.Error("Failed to add CA to the cert pool, CA is not a valid PEM document")
+			errors = append(errors, fmt.Errorf("%v adding %v to the list of known CAs", ErrNotACertificate, r))
 			continue
 		}
-		log.Debugf("tls", "successfully loaded CA certificate: %v", path)
+		log.Debugf("Successfully loaded CA certificate: %v", r)
 	}
 
 	return roots, errors
@@ -191,4 +203,46 @@ func ResolveTLSVersion(v uint16) string {
 // ResolveCipherSuite takes the integer representation and return the cipher name.
 func ResolveCipherSuite(cipher uint16) string {
 	return tlsCipherSuite(cipher).String()
+}
+
+// PEMReader allows to read a certificate in PEM format either through the disk or from a string.
+type PEMReader struct {
+	reader   io.ReadCloser
+	debugStr string
+}
+
+// NewPEMReader returns a new PEMReader.
+func NewPEMReader(certificate string) (*PEMReader, error) {
+	if IsPEMString(certificate) {
+		// Take a substring of the certificate so we do not leak the whole certificate or private key in the log.
+		debugStr := certificate[0:256] + "..."
+		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate)), debugStr: debugStr}, nil
+	}
+
+	r, err := os.Open(certificate)
+	if err != nil {
+		return nil, err
+	}
+	return &PEMReader{reader: r, debugStr: certificate}, nil
+}
+
+// Close closes the target io.ReadCloser.
+func (p *PEMReader) Close() error {
+	return p.reader.Close()
+}
+
+// Read read bytes from the io.ReadCloser.
+func (p *PEMReader) Read(b []byte) (n int, err error) {
+	return p.reader.Read(b)
+}
+
+func (p *PEMReader) String() string {
+	return p.debugStr
+}
+
+// IsPEMString returns true if the provided string match a PEM formatted certificate. try to pem decode to validate.
+func IsPEMString(s string) bool {
+	// Trim the certificates to make sure we tolerate any yaml weirdness, we assume that the string starts
+	// with "-" and let further validation verifies the PEM format.
+	return strings.HasPrefix(strings.TrimSpace(s), "-")
 }

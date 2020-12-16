@@ -18,17 +18,48 @@
 package memlog
 
 import (
+	"io"
 	"os"
+	"runtime"
 	"syscall"
 )
 
-// isTxIDLessEqual compares two IDs by checking that their distance is < 2^63.
-// It always returns true if
-//  - a == b
-//  - a < b (mod 2^63)
-//  - b > a after an integer rollover that is still within the distance of <2^63-1
-func isTxIDLessEqual(a, b uint64) bool {
-	return int64(a-b) <= 0
+// ensureWriter writes the buffer to the underlying writer
+// for as long as w returns a retryable error (e.g. EAGAIN)
+// or the input buffer has been exhausted.
+//
+// XXX: this code was written and tested with go1.13 and go1.14, which does not
+//      handled EINTR. Some users report EINTR getting triggered more often in
+//      go1.14 due to changes in the signal handling for implementing
+//      preemption.
+//      In future versions EINTR will be handled by go for us.
+//      See: https://github.com/golang/go/issues/38033
+type ensureWriter struct {
+	w io.Writer
+}
+
+// countWriter keeps track of the amount of bytes written over time.
+type countWriter struct {
+	n uint64
+	w io.Writer
+}
+
+func (c *countWriter) Write(p []byte) (int, error) {
+	n, err := c.w.Write(p)
+	c.n += uint64(n)
+	return n, err
+}
+
+func (e *ensureWriter) Write(p []byte) (int, error) {
+	var N int
+	for len(p) > 0 {
+		n, err := e.w.Write(p)
+		N, p = N+n, p[n:]
+		if err != nil && !isRetryErr(err) {
+			return N, err
+		}
+	}
+	return N, nil
 }
 
 func isRetryErr(err error) bool {
@@ -45,4 +76,46 @@ func trySyncPath(path string) {
 	}
 	defer f.Close()
 	syncFile(f)
+}
+
+// pathEnsurePermissions checks if the file permissions for the given file match wantPerm.
+// The permissions are updated using chmod if needed.
+// No file will be created if the file does not yet exist.
+func pathEnsurePermissions(path string, wantPerm os.FileMode) error {
+	f, err := os.OpenFile(path, os.O_RDWR, wantPerm)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+	return fileEnsurePermissions(f, wantPerm)
+}
+
+// fileEnsurePermissions checks if the file permissions for the given file
+// matches wantPerm. If not fileEnsurePermissions tries to update
+// the current permissions via chmod.
+// The file is not created or updated if it does not exist.
+func fileEnsurePermissions(f *os.File, wantPerm os.FileMode) error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+
+	fi, err := f.Stat()
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	wantPerm = wantPerm & os.ModePerm
+	perm := fi.Mode() & os.ModePerm
+	if wantPerm == perm {
+		return nil
+	}
+
+	return f.Chmod((fi.Mode() &^ os.ModePerm) | wantPerm)
 }

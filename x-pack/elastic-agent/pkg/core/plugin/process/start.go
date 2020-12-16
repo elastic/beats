@@ -39,7 +39,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	}()
 
 	// already started if not stopped or crashed
-	if a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed {
+	if a.Started() {
 		return nil
 	}
 
@@ -54,8 +54,8 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 
 	// Failed applications can be started again.
 	if srvState != nil {
-		a.setState(state.Starting, "Starting")
-		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message)
+		a.setState(state.Starting, "Starting", nil)
+		srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
 		srvState.UpdateConfig(string(cfgStr))
 	} else {
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
@@ -66,9 +66,9 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 
 	if a.state.Status != state.Stopped {
 		// restarting as it was previously in a different state
-		a.setState(state.Restarting, "Restarting")
+		a.setState(state.Restarting, "Restarting", nil)
 	} else {
-		a.setState(state.Starting, "Starting")
+		a.setState(state.Starting, "Starting", nil)
 	}
 
 	defer func() {
@@ -84,7 +84,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
+	if err := a.monitor.Prepare(a.desc.Spec(), a.pipelineID, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -92,12 +92,12 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.limiter.Add()
 	}
 
-	spec := a.spec.Spec()
+	spec := a.desc.ProcessSpec()
 	spec.Args = injectLogLevel(a.logLevel, spec.Args)
 
 	// use separate file
 	isSidecar := app.IsSidecar(t)
-	spec.Args = a.monitor.EnrichArgs(a.name, a.pipelineID, spec.Args, isSidecar)
+	spec.Args = a.monitor.EnrichArgs(a.desc.Spec(), a.pipelineID, spec.Args, isSidecar)
 
 	// specify beat name to avoid data lock conflicts
 	// as for https://github.com/elastic/beats/v7/pull/14030 more than one instance
@@ -136,8 +136,6 @@ func injectLogLevel(logLevel string, args []string) []string {
 	var level string
 	// Translate to level beat understands
 	switch logLevel {
-	case "trace":
-		level = "debug"
 	case "info":
 		level = "info"
 	case "debug":
@@ -154,6 +152,6 @@ func injectLogLevel(logLevel string, args []string) []string {
 }
 
 func injectDataPath(args []string, pipelineID, id string) []string {
-	dataPath := filepath.Join(paths.Data(), "run", pipelineID, id)
+	dataPath := filepath.Join(paths.Home(), "run", pipelineID, id)
 	return append(args, "-E", "path.data="+dataPath)
 }

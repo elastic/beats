@@ -34,6 +34,9 @@ Pods share an identical host. If only the `{data.host}` variable is interpolated
 then one config will be generated per host. The configs will be identical.
 After they are de-duplicated, only one will be used.
 
+In order to target one specific exposed port `{data.host}:{data.ports.web}` can be used
+in template config, where `web` is the name of the exposed container port.
+
 [float]
 [[kubernetes-secrets]]
 ===== Metricbeat Autodiscover Secret Management

@@ -102,10 +102,9 @@ monitoring:
   elasticsearch:
     hosts: ["https://example.com:9200", "https://example2.com:9200"]
     username: ""
-    ssl:
-      ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-      ssl.certificate: "/etc/pki/client/cert.pem"
-      ssl.key: "/etc/pki/client/cert.key"
+    ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+    ssl.certificate: "/etc/pki/client/cert.pem"
+    ssl.key: "/etc/pki/client/cert.key"
 --------------------
 +
 You must specify the `username` as `""` explicitly so that

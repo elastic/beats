@@ -11,9 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
@@ -22,12 +19,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
 	regionName  = "us-west-1"
-	timestamp   = time.Now()
+	timestamp   = time.Date(2020, 10, 06, 00, 00, 00, 0, time.UTC)
 	accountID   = "123456789012"
 	accountName = "test"
 
@@ -446,8 +445,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					ResourceTypeFilter: "ec2:instance",
-					Statistic:          []string{"Average"},
+					ResourceType: "ec2:instance",
+					Statistic:    []string{"Average"},
 				},
 			},
 			nil,
@@ -466,8 +465,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					ResourceTypeFilter: "ec2:instance",
-					Statistic:          []string{"Average"},
+					ResourceType: "ec2:instance",
+					Statistic:    []string{"Average"},
 				},
 				{
 					Namespace: "AWS/S3",
@@ -489,8 +488,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					Statistic:          []string{"Average"},
-					ResourceTypeFilter: "ec2:instance",
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
 				},
 				{
 					Namespace: "AWS/Lambda",
@@ -508,8 +507,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "READER",
 						},
 					},
-					Statistic:          []string{"Average"},
-					ResourceTypeFilter: "rds",
+					Statistic:    []string{"Average"},
+					ResourceType: "rds",
 				},
 			},
 			nil,
@@ -520,13 +519,13 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			"Test a specific metric (only with metric name) and a namespace",
 			[]Config{
 				{
-					Namespace:          "AWS/EC2",
-					MetricName:         []string{"CPUUtilization"},
-					ResourceTypeFilter: resourceTypeEC2,
+					Namespace:    "AWS/EC2",
+					MetricName:   []string{"CPUUtilization"},
+					ResourceType: resourceTypeEC2,
 				},
 				{
-					Namespace:          "AWS/S3",
-					ResourceTypeFilter: "s3",
+					Namespace:    "AWS/S3",
+					ResourceType: "s3",
 				},
 			},
 			nil,
@@ -539,8 +538,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			"test EBS namespace",
 			[]Config{
 				{
-					Namespace:          "AWS/EBS",
-					ResourceTypeFilter: "ec2",
+					Namespace:    "AWS/EBS",
+					ResourceType: "ec2",
 				},
 			},
 			nil,
@@ -553,10 +552,10 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			"test with two metrics and no dimension",
 			[]Config{
 				{
-					Namespace:          "AWS/EC2",
-					MetricName:         []string{"CPUUtilization", "StatusCheckFailed"},
-					ResourceTypeFilter: resourceTypeEC2,
-					Statistic:          []string{"Average", "Maximum"},
+					Namespace:    "AWS/EC2",
+					MetricName:   []string{"CPUUtilization", "StatusCheckFailed"},
+					ResourceType: resourceTypeEC2,
+					Statistic:    []string{"Average", "Maximum"},
 				},
 			},
 			nil,
@@ -583,21 +582,21 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			"Test with different statistics",
 			[]Config{
 				{
-					Namespace:          "AWS/EC2",
-					MetricName:         []string{"CPUUtilization"},
-					ResourceTypeFilter: resourceTypeEC2,
+					Namespace:    "AWS/EC2",
+					MetricName:   []string{"CPUUtilization"},
+					ResourceType: resourceTypeEC2,
 				},
 				{
-					Namespace:          "AWS/ELB",
-					MetricName:         []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
-					Statistic:          []string{"Sum"},
-					ResourceTypeFilter: "elasticloadbalancing",
+					Namespace:    "AWS/ELB",
+					MetricName:   []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
+					Statistic:    []string{"Sum"},
+					ResourceType: "elasticloadbalancing",
 				},
 				{
-					Namespace:          "AWS/ELB",
-					MetricName:         []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
-					Statistic:          []string{"Maximum"},
-					ResourceTypeFilter: "elasticloadbalancing",
+					Namespace:    "AWS/ELB",
+					MetricName:   []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
+					Statistic:    []string{"Maximum"},
+					ResourceType: "elasticloadbalancing",
 				},
 			},
 			[]aws.Tag{
@@ -615,16 +614,16 @@ func TestReadCloudwatchConfig(t *testing.T) {
 			"Test with different statistics and a specific metric",
 			[]Config{
 				{
-					Namespace:          "AWS/ELB",
-					MetricName:         []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
-					Statistic:          []string{"Sum"},
-					ResourceTypeFilter: "elasticloadbalancing",
+					Namespace:    "AWS/ELB",
+					MetricName:   []string{"BackendConnectionErrors", "HTTPCode_Backend_2XX", "HTTPCode_Backend_3XX"},
+					Statistic:    []string{"Sum"},
+					ResourceType: "elasticloadbalancing",
 				},
 				{
-					Namespace:          "AWS/ELB",
-					MetricName:         []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
-					Statistic:          []string{"Maximum"},
-					ResourceTypeFilter: "elasticloadbalancing",
+					Namespace:    "AWS/ELB",
+					MetricName:   []string{"HealthyHostCount", "SurgeQueueLength", "UnHealthyHostCount"},
+					Statistic:    []string{"Maximum"},
+					ResourceType: "elasticloadbalancing",
 				},
 				{
 					Namespace: "AWS/Lambda",
@@ -638,8 +637,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					Statistic:          []string{"Average"},
-					ResourceTypeFilter: "ec2:instance",
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
 				},
 				{
 					Namespace:  "AWS/RDS",
@@ -654,8 +653,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "READER",
 						},
 					},
-					Statistic:          []string{"Average"},
-					ResourceTypeFilter: "rds",
+					Statistic:    []string{"Average"},
+					ResourceType: "rds",
 				},
 			},
 			[]aws.Tag{
@@ -678,8 +677,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					Statistic:          []string{"Average"},
-					ResourceTypeFilter: "ec2:instance",
+					Statistic:    []string{"Average"},
+					ResourceType: "ec2:instance",
 				},
 			},
 			nil,
@@ -700,8 +699,8 @@ func TestReadCloudwatchConfig(t *testing.T) {
 							Value: "i-1",
 						},
 					},
-					ResourceTypeFilter: "ec2:instance",
-					Statistic:          []string{"Average"},
+					ResourceType: "ec2:instance",
+					Statistic:    []string{"Average"},
 				},
 			},
 			nil,
@@ -832,6 +831,60 @@ func TestCompareAWSDimensions(t *testing.T) {
 				{Name: awssdk.String("owner"), Value: awssdk.String("ks")},
 			},
 			[]cloudwatch.Dimension{},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, one same name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, one different name dimension",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("IDx"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, two same name dimensions",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			true,
+		},
+		{
+			"compare with wildcard dimension value, different length, case1",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String("222")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
+			false,
+		},
+		{
+			"compare with wildcard dimension value, different length, case2",
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+			},
+			[]cloudwatch.Dimension{
+				{Name: awssdk.String("ID1"), Value: awssdk.String("111")},
+				{Name: awssdk.String("ID2"), Value: awssdk.String(dimensionValueWildcard)},
+			},
 			false,
 		},
 	}
@@ -1303,7 +1356,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 			Value: "test-ec2",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1345,7 +1398,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1393,7 +1446,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 			Value: "foo",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1407,10 +1460,14 @@ func TestInsertTags(t *testing.T) {
 	tagValue1 := "engineering"
 	tagKey2 := "owner"
 	tagValue2 := "foo"
+	identifierContainsArn := "arn:aws:ec2:ap-northeast-1:111111111111:eip-allocation/eipalloc-0123456789abcdef,SYNFlood"
+	tagKey3 := "env"
+	tagValue3 := "dev"
 
 	events := map[string]mb.Event{}
-	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
-	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
@@ -1423,6 +1480,12 @@ func TestInsertTags(t *testing.T) {
 		{
 			Key:   awssdk.String(tagKey2),
 			Value: awssdk.String(tagValue2),
+		},
+	}
+	resourceTagMap["eipalloc-0123456789abcdef"] = []resourcegroupstaggingapi.Tag{
+		{
+			Key:   awssdk.String(tagKey3),
+			Value: awssdk.String(tagValue3),
 		},
 	}
 
@@ -1444,6 +1507,12 @@ func TestInsertTags(t *testing.T) {
 			"aws.tags.owner",
 			tagValue2,
 		},
+		{
+			"test identifier with arn value",
+			identifierContainsArn,
+			"aws.tags.env",
+			tagValue3,
+		},
 	}
 
 	for _, c := range cases {
@@ -1454,4 +1523,74 @@ func TestInsertTags(t *testing.T) {
 			assert.Equal(t, c.expectedTagValue, value)
 		})
 	}
+}
+
+func TestConfigDimensionValueContainsWildcard(t *testing.T) {
+	cases := []struct {
+		title          string
+		dimensions     []Dimension
+		expectedResult bool
+	}{
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: "i-2222",
+				},
+			},
+			false,
+		},
+		{
+			"test dimensions without wolidcard value",
+			[]Dimension{
+				{
+					Name:  "InstanceId",
+					Value: "i-111111",
+				},
+				{
+					Name:  "InstanceId",
+					Value: dimensionValueWildcard,
+				},
+			},
+			true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			result := configDimensionValueContainsWildcard(c.dimensions)
+			assert.Equal(t, c.expectedResult, result)
+		})
+	}
+}
+
+func TestCreateEventsTimestamp(t *testing.T) {
+	m := MetricSet{
+		logger:            logp.NewLogger("test"),
+		CloudwatchConfigs: []Config{{Statistic: []string{"Average"}}},
+		MetricSet:         &aws.MetricSet{Period: 5, AccountID: accountID},
+	}
+
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			cloudwatch.Metric{
+				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+			nil,
+		},
+	}
+
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+
+	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
 }

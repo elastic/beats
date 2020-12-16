@@ -45,7 +45,7 @@ def collect(beat_name, beat_path, full=False):
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
-            fields = yaml.load(f.read())
+            fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
 
             # Check if short config was disabled in fields.yml

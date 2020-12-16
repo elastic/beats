@@ -58,8 +58,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: mysql
   metricsets:
-    - "status"
-  #  - "galera_status"
+    - status
+  #  - galera_status
+  #  - performance
+  #  - query
   period: 10s
 
   # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
@@ -86,9 +88,17 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-mysql-galera_status,galera_status>>
 
+* <<metricbeat-metricset-mysql-performance,performance>>
+
+* <<metricbeat-metricset-mysql-query,query>>
+
 * <<metricbeat-metricset-mysql-status,status>>
 
 include::mysql/galera_status.asciidoc[]
+
+include::mysql/performance.asciidoc[]
+
+include::mysql/query.asciidoc[]
 
 include::mysql/status.asciidoc[]
 

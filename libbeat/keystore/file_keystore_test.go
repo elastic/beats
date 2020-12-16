@@ -280,7 +280,7 @@ func createAndReadKeystoreSecret(t *testing.T, password []byte, key string, valu
 	defer os.Remove(path)
 
 	keyStore, err := NewFileKeystoreWithPassword(path, NewSecureString(password))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	writableKeystore, err := AsWritableKeystore(keyStore)
 	assert.NoError(t, err)

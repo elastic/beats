@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// TestPromHistogramToES tests that calling promHistogramToES multiple
+// TestPromHistogramToES tests that calling PromHistogramToES multiple
 // times with the same cache produces each time the expected results.
 func TestPromHistogramToES(t *testing.T) {
 	type sample struct {
@@ -398,7 +398,7 @@ func TestPromHistogramToES(t *testing.T) {
 
 			for i, s := range c.samples {
 				t.Logf("#%d: %+v", i, s.histogram)
-				result := promHistogramToES(cache, metricName, labels, &s.histogram)
+				result := PromHistogramToES(cache, metricName, labels, &s.histogram)
 				assert.EqualValues(t, s.expected, result)
 			}
 		})

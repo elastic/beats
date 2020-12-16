@@ -5,10 +5,8 @@
 package cloudfoundry
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pkg/errors"
@@ -19,11 +17,20 @@ import (
 // Client interface exposed by Hub.Client.
 type Client interface {
 	// GetAppByGuid returns the application from cloudfoundry.
-	GetAppByGuid(guid string) (*cfclient.App, error)
-	// StartJanitor keeps the cache of applications clean.
-	StartJanitor(interval time.Duration)
-	// StopJanitor stops the running janitor.
-	StopJanitor()
+	GetAppByGuid(guid string) (*AppMeta, error)
+
+	// Close releases resources associated with this client.
+	Close() error
+}
+
+// AppMeta is the metadata associated with a cloudfoundry application
+type AppMeta struct {
+	Guid      string `json:"guid"`
+	Name      string `json:"name"`
+	SpaceGuid string `json:"space_guid"`
+	SpaceName string `json:"space_name"`
+	OrgGuid   string `json:"org_guid"`
+	OrgName   string `json:"org_name"`
 }
 
 // Hub is central place to get all the required clients to communicate with cloudfoundry.
@@ -39,7 +46,7 @@ func NewHub(cfg *Config, userAgent string, log *logp.Logger) *Hub {
 }
 
 // Client returns the cloudfoundry client.
-func (h *Hub) Client() (Client, error) {
+func (h *Hub) Client() (*cfclient.Client, error) {
 	httpClient, insecure, err := h.httpClient()
 	if err != nil {
 		return nil, err
@@ -67,7 +74,15 @@ func (h *Hub) Client() (Client, error) {
 	if h.cfg.UaaAddress != "" {
 		cf.Endpoint.AuthEndpoint = h.cfg.UaaAddress
 	}
-	return newClientCacheWrap(cf, h.cfg.CacheDuration, h.log), nil
+	return cf, nil
+}
+
+func (h *Hub) ClientWithCache() (Client, error) {
+	c, err := h.Client()
+	if err != nil {
+		return nil, err
+	}
+	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through
@@ -85,7 +100,7 @@ func (h *Hub) RlpListener(callbacks RlpListenerCallbacks) (*RlpListener, error) 
 //
 // In the case that the cloudfoundry client was already needed by the code path, call this method
 // as not to create a intermediate client that will not be used.
-func (h *Hub) RlpListenerFromClient(client Client, callbacks RlpListenerCallbacks) (*RlpListener, error) {
+func (h *Hub) RlpListenerFromClient(client *cfclient.Client, callbacks RlpListenerCallbacks) (*RlpListener, error) {
 	var rlpAddress string
 	if h.cfg.RlpAddress != "" {
 		rlpAddress = h.cfg.RlpAddress
@@ -107,47 +122,29 @@ func (h *Hub) DopplerConsumer(callbacks DopplerCallbacks) (*DopplerConsumer, err
 	return h.DopplerConsumerFromClient(client, callbacks)
 }
 
-func (h *Hub) DopplerConsumerFromClient(client Client, callbacks DopplerCallbacks) (*DopplerConsumer, error) {
+func (h *Hub) DopplerConsumerFromClient(client *cfclient.Client, callbacks DopplerCallbacks) (*DopplerConsumer, error) {
 	dopplerAddress := h.cfg.DopplerAddress
 	if dopplerAddress == "" {
-		endpoint, err := cfEndpoint(client)
-		if err != nil {
-			return nil, errors.Wrap(err, "getting endpoints from client")
-		}
-		dopplerAddress = endpoint.DopplerEndpoint
+		dopplerAddress = client.Endpoint.DopplerEndpoint
 	}
 	httpClient, _, err := h.httpClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "getting http client")
 	}
 
-	// TODO: Refactor Client so it is easier to access the cfclient
-	ccw, ok := client.(*clientCacheWrap)
-	if !ok {
-		return nil, fmt.Errorf("client without cache wrap")
-	}
-	cfc, ok := ccw.client.(*cfclient.Client)
-	if !ok {
-		return nil, fmt.Errorf("client is not a cloud foundry client")
-	}
-
-	tr := TokenRefresherFromCfClient(cfc)
+	tr := TokenRefresherFromCfClient(client)
 	return newDopplerConsumer(dopplerAddress, h.cfg.ShardID, h.log, httpClient, tr, callbacks)
 }
 
 // doerFromClient returns an auth token doer using uaa.
-func (h *Hub) doerFromClient(client Client) (*authTokenDoer, error) {
+func (h *Hub) doerFromClient(client *cfclient.Client) (*authTokenDoer, error) {
 	httpClient, _, err := h.httpClient()
 	if err != nil {
 		return nil, err
 	}
 	url := h.cfg.UaaAddress
 	if url == "" {
-		endpoint, err := cfEndpoint(client)
-		if err != nil {
-			return nil, errors.Wrap(err, "getting endpoints from client")
-		}
-		url = endpoint.AuthEndpoint
+		url = client.Endpoint.AuthEndpoint
 	}
 	return newAuthTokenDoer(url, h.cfg.ClientID, h.cfg.ClientSecret, httpClient, h.log), nil
 }
@@ -163,18 +160,6 @@ func (h *Hub) httpClient() (*http.Client, bool, error) {
 	tp.TLSClientConfig = tls
 	httpClient.Transport = tp
 	return httpClient, tls.InsecureSkipVerify, nil
-}
-
-func cfEndpoint(client Client) (cfclient.Endpoint, error) {
-	ccw, ok := client.(*clientCacheWrap)
-	if !ok {
-		return cfclient.Endpoint{}, fmt.Errorf("client without cache wrap")
-	}
-	cfc, ok := ccw.client.(*cfclient.Client)
-	if !ok {
-		return cfclient.Endpoint{}, fmt.Errorf("client is not a cloud foundry client")
-	}
-	return cfc.Endpoint, nil
 }
 
 // defaultTransport returns a new http.Transport for http.Client

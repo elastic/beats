@@ -18,10 +18,12 @@
 package cursor
 
 import (
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -126,7 +128,25 @@ type (
 var closeStore = (*store).close
 
 func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
-	panic("TODO: implement me")
+	ok := false
+
+	persistentStore, err := statestore.Access()
+	if err != nil {
+		return nil, err
+	}
+	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
+
+	states, err := readStates(log, persistentStore, prefix)
+	if err != nil {
+		return nil, err
+	}
+
+	ok = true
+	return &store{
+		log:             log,
+		persistentStore: persistentStore,
+		ephemeralStore:  states,
+	}, nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
@@ -137,7 +157,9 @@ func (s *store) Release() {
 }
 
 func (s *store) close() {
-	panic("TODO: implement me")
+	if err := s.persistentStore.Close(); err != nil {
+		s.log.Errorf("Closing registry store did report an error: %+v", err)
+	}
 }
 
 // Get returns the resource for the key.
@@ -152,18 +174,62 @@ func (s *store) Get(key string) *resource {
 // On update the resource its `cursor` state is used, to keep the cursor state in sync with the current known
 // on disk store state.
 func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
-	panic("TODO: implement me")
+	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
+	if resource.stored && resource.internalState.TTL == ttl {
+		return
+	}
+
+	resource.internalState.TTL = ttl
+	if resource.internalState.Updated.IsZero() {
+		resource.internalState.Updated = time.Now()
+	}
+
+	err := s.persistentStore.Set(resource.key, state{
+		TTL:     resource.internalState.TTL,
+		Updated: resource.internalState.Updated,
+		Cursor:  resource.cursor,
+	})
+	if err != nil {
+		s.log.Errorf("Failed to update resource management fields for '%v'", resource.key)
+		resource.internalInSync = false
+	} else {
+		resource.stored = true
+		resource.internalInSync = true
+	}
 }
 
 // Find returns the resource for a given key. If the key is unknown and create is set to false nil will be returned.
 // The resource returned by Find is marked as active. (*resource).Release must be called to mark the resource as inactive again.
 func (s *states) Find(key string, create bool) *resource {
-	panic("TODO: implement me")
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if resource := s.table[key]; resource != nil {
+		resource.Retain()
+		return resource
+	}
+
+	if !create {
+		return nil
+	}
+
+	// resource is owned by table(session) and input that uses the resource.
+	resource := &resource{
+		stored: false,
+		key:    key,
+		lock:   unison.MakeMutex(),
+	}
+	s.table[key] = resource
+	resource.Retain()
+	return resource
 }
 
 // IsNew returns true if we have no state recorded for the current resource.
 func (r *resource) IsNew() bool {
-	panic("TODO: implement me")
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.pendingCursor == nil && r.cursor == nil
 }
 
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
@@ -200,4 +266,59 @@ func (r *resource) inSyncStateSnapshot() state {
 		Updated: r.internalState.Updated,
 		Cursor:  r.cursor,
 	}
+}
+
+// stateSnapshot returns the current in memory state, that already contains state updates
+// not yet ACKed.
+func (r *resource) stateSnapshot() state {
+	cursor := r.pendingCursor
+	if r.activeCursorOperations == 0 {
+		cursor = r.cursor
+	}
+
+	return state{
+		TTL:     r.internalState.TTL,
+		Updated: r.internalState.Updated,
+		Cursor:  cursor,
+	}
+}
+
+func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*states, error) {
+	keyPrefix := prefix + "::"
+	states := &states{
+		table: map[string]*resource{},
+	}
+
+	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+		if !strings.HasPrefix(string(key), keyPrefix) {
+			return true, nil
+		}
+
+		var st state
+		if err := dec.Decode(&st); err != nil {
+			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+				key, err)
+			return true, nil
+		}
+
+		resource := &resource{
+			key:            key,
+			stored:         true,
+			lock:           unison.MakeMutex(),
+			internalInSync: true,
+			internalState: stateInternal{
+				TTL:     st.TTL,
+				Updated: st.Updated,
+			},
+			cursor: st.Cursor,
+		}
+		states.table[resource.key] = resource
+
+		return true, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return states, nil
 }

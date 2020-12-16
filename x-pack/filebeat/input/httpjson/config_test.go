@@ -6,10 +6,12 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
+	"time"
 
-	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -23,7 +25,7 @@ func TestConfigValidationCase1(t *testing.T) {
 		"url":               "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and http_request_body cannot coexist.")
 	}
@@ -37,7 +39,7 @@ func TestConfigValidationCase2(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.extra_body_content cannot coexist.")
 	}
@@ -51,7 +53,7 @@ func TestConfigValidationCase3(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. no_http_body and pagination.req_field cannot coexist.")
 	}
@@ -64,7 +66,7 @@ func TestConfigValidationCase4(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.req_field cannot coexist.")
 	}
@@ -77,7 +79,7 @@ func TestConfigValidationCase5(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and pagination.id_field cannot coexist.")
 	}
@@ -90,7 +92,7 @@ func TestConfigValidationCase6(t *testing.T) {
 		"url":         "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. pagination.header and extra_body_content cannot coexist.")
 	}
@@ -103,10 +105,20 @@ func TestConfigValidationCase7(t *testing.T) {
 		"url":          "localhost",
 	}
 	cfg := common.MustNewConfigFrom(m)
-	conf := defaultConfig()
+	conf := newDefaultConfig()
 	if err := cfg.Unpack(&conf); err == nil {
 		t.Fatal("Configuration validation failed. http_method DELETE is not allowed.")
 	}
+}
+
+func TestConfigMustFailWithInvalidURL(t *testing.T) {
+	m := map[string]interface{}{
+		"url": "::invalid::",
+	}
+	cfg := common.MustNewConfigFrom(m)
+	conf := newDefaultConfig()
+	err := cfg.Unpack(&conf)
+	assert.EqualError(t, err, `parse "::invalid::": missing protocol scheme accessing 'url'`)
 }
 
 func TestConfigOauth2Validation(t *testing.T) {
@@ -350,6 +362,44 @@ func TestConfigOauth2Validation(t *testing.T) {
 				"url": "localhost",
 			},
 		},
+		{
+			name:        "date_cursor.date_format will fail if invalid",
+			expectedErr: "invalid configuration: date_format is not a valid date layout accessing 'date_cursor'",
+			input: map[string]interface{}{
+				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": "1234"},
+				"url":         "localhost",
+			},
+		},
+		{
+			name: "date_cursor must work with a valid date_format",
+			input: map[string]interface{}{
+				"date_cursor": map[string]interface{}{"field": "foo", "url_field": "foo", "date_format": time.RFC3339},
+				"url":         "localhost",
+			},
+		},
+		{
+			name:        "google must fail if the delegated_account is set without jwt_file",
+			expectedErr: "invalid configuration: google.delegated_account can only be provided with a jwt_file accessing 'oauth2'",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.credentials_file":  "./testdata/credentials.json",
+					"google.delegated_account": "delegated@account.com",
+				},
+				"url": "localhost",
+			},
+		},
+		{
+			name: "google must work with delegated_account and a valid jwt_file",
+			input: map[string]interface{}{
+				"oauth2": map[string]interface{}{
+					"provider":                 "google",
+					"google.jwt_file":          "./testdata/credentials.json",
+					"google.delegated_account": "delegated@account.com",
+				},
+				"url": "localhost",
+			},
+		},
 	}
 
 	for _, c := range cases {
@@ -364,7 +414,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 			}
 
 			cfg := common.MustNewConfigFrom(c.input)
-			conf := defaultConfig()
+			conf := newDefaultConfig()
 			err := cfg.Unpack(&conf)
 
 			switch {

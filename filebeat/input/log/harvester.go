@@ -58,7 +58,7 @@ import (
 
 var (
 	harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
-	filesMetrics     = harvesterMetrics.NewRegistry("files")
+	filesMetrics     = monitoring.GetNamespace("dataset").GetRegistry()
 
 	harvesterStarted   = monitoring.NewInt(harvesterMetrics, "started")
 	harvesterClosed    = monitoring.NewInt(harvesterMetrics, "closed")
@@ -83,6 +83,7 @@ type Harvester struct {
 
 	// shutdown handling
 	done     chan struct{}
+	doneWg   *sync.WaitGroup
 	stopOnce sync.Once
 	stopWg   *sync.WaitGroup
 	stopLock sync.Mutex
@@ -132,12 +133,13 @@ func NewHarvester(
 	}
 
 	h := &Harvester{
-		config:        defaultConfig,
+		config:        defaultConfig(),
 		state:         state,
 		states:        states,
 		publishState:  publishState,
 		done:          make(chan struct{}),
 		stopWg:        &sync.WaitGroup{},
+		doneWg:        &sync.WaitGroup{},
 		id:            id,
 		outletFactory: outletFactory,
 	}
@@ -291,12 +293,19 @@ func (h *Harvester) Run() error {
 		}
 
 		h.stop()
-		h.log.Close()
+		err := h.reader.Close()
+		if err != nil {
+			logp.Err("Failed to stop harvester for file %s: %v", h.state.Source, err)
+		}
 	}(h.state.Source)
 
 	logp.Info("Harvester started for file: %s", h.state.Source)
 
-	go h.monitorFileSize()
+	h.doneWg.Add(1)
+	go func() {
+		h.monitorFileSize()
+		h.doneWg.Done()
+	}()
 
 	for {
 		select {
@@ -375,7 +384,8 @@ func (h *Harvester) monitorFileSize() {
 func (h *Harvester) stop() {
 	h.stopOnce.Do(func() {
 		close(h.done)
-
+		// Wait for goroutines monitoring h.done to terminate before closing source.
+		h.doneWg.Wait()
 		filesMetrics.Remove(h.id.String())
 	})
 }
@@ -505,6 +515,14 @@ func (h *Harvester) shouldExportLine(line string) bool {
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
 func (h *Harvester) openFile() error {
+	fi, err := os.Stat(h.state.Source)
+	if err != nil {
+		return fmt.Errorf("failed to stat source file %s: %v", h.state.Source, err)
+	}
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return fmt.Errorf("failed to open file %s, named pipes are not supported", h.state.Source)
+	}
+
 	f, err := file_helper.ReadOpen(h.state.Source)
 	if err != nil {
 		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
@@ -631,6 +649,8 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	var r reader.Reader
 	var err error
 
+	logp.Debug("harvester", "newLogFileReader with config.MaxBytes: %d", h.config.MaxBytes)
+
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
@@ -644,10 +664,17 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
+	// Configure MaxBytes limit for EncodeReader as multiplied by 4
+	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
+	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
+	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
+	encReaderMaxBytes := h.config.MaxBytes * 4
+
 	r, err = readfile.NewEncodeReader(reader, readfile.Config{
 		Codec:      h.encoding,
 		BufferSize: h.config.BufferSize,
 		Terminator: h.config.LineTerminator,
+		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
 		return nil, err

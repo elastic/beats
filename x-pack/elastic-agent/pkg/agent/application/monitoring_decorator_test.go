@@ -7,17 +7,22 @@ package application
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
 
 func TestMonitoringInjection(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMap)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +30,7 @@ func TestMonitoringInjection(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -83,12 +88,16 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDefaults(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMapDefaults)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +105,7 @@ func TestMonitoringInjectionDefaults(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -154,12 +163,16 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDisabled(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMapDisabled)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,7 +180,7 @@ func TestMonitoringInjectionDisabled(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -204,13 +217,13 @@ GROUPLOOP:
 
 			monitoringObj, found := settingsMap["monitoring"]
 			if !found {
-				t.Errorf("settings.monitoring not found for '%s(%s)': %v", group, p.Spec.Name, cm)
+				t.Errorf("agent.monitoring not found for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
 			}
 
 			monitoringMap, ok := monitoringObj.(map[string]interface{})
 			if !ok {
-				t.Errorf("settings.monitoring not a map for '%s(%s)': %v", group, p.Spec.Name, cm)
+				t.Errorf("agent.monitoring not a map for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
 			}
 
@@ -222,12 +235,12 @@ GROUPLOOP:
 
 			monitoringEnabled, ok := enabledVal.(bool)
 			if !ok {
-				t.Errorf("settings.monitoring.enabled is not a bool for '%s'", group)
+				t.Errorf("agent.monitoring.enabled is not a bool for '%s'", group)
 				continue GROUPLOOP
 			}
 
 			if monitoringEnabled {
-				t.Errorf("settings.monitoring.enabled is enabled, should be disabled for '%s'", group)
+				t.Errorf("agent.monitoring.enabled is enabled, should be disabled for '%s'", group)
 				continue GROUPLOOP
 			}
 		}
@@ -235,7 +248,7 @@ GROUPLOOP:
 }
 
 var inputConfigMap = map[string]interface{}{
-	"settings.monitoring": map[string]interface{}{
+	"agent.monitoring": map[string]interface{}{
 		"enabled":    true,
 		"logs":       true,
 		"metrics":    true,
@@ -369,7 +382,7 @@ var inputConfigMapDefaults = map[string]interface{}{
 }
 
 var inputConfigMapDisabled = map[string]interface{}{
-	"settings.monitoring": map[string]interface{}{
+	"agent.monitoring": map[string]interface{}{
 		"enabled": false,
 	},
 	"outputs": map[string]interface{}{

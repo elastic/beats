@@ -33,24 +33,30 @@ import (
 )
 
 // Name of this beat
-var Name = "filebeat"
+const Name = "filebeat"
 
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-func init() {
+// FilebeatSettings contains the default settings for filebeat
+func FilebeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
-	settings := instance.Settings{
+	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.New, settings)
-	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
-	RootCmd.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
-	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
-	RootCmd.AddCommand(genGenerateCmd())
+}
+
+// Filebeat build the beat root command for executing filebeat and it's subcommands.
+func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.BeatsRootCmd {
+	command := cmd.GenRootCmdWithSettings(beater.New(inputs), settings)
+	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
+	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
+	command.AddCommand(genGenerateCmd())
+	return command
 }

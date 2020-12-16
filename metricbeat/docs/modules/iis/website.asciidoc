@@ -3,9 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-iis-website]]
+[role="xpack"]
 === IIS website metricset
-
-beta[]
 
 include::../../../../x-pack/metricbeat/module/iis/website/_meta/docs.asciidoc[]
 
