@@ -4048,19 +4048,31 @@ type: long
 
 
 
-*`aws.resource.name`*::
+*`aws.resource.arn`*::
 +
 --
-resource name in AWS
+resource ARN in AWS.
+
 
 type: keyword
 
 --
 
-*`aws.resource.arn`*::
+*`aws.resource.name`*::
 +
 --
-resource ARN in AWS
+The resource name in AWS. The content of this part of the ARN varies by service. It often includes an indicator of the type of resource followed by a slash (/) or a colon (:), followed by the resource name itself.
+
+
+type: keyword
+
+--
+
+*`aws.resource.service_name`*::
++
+--
+The service namespace that identifies the AWS product (for example, Amazon S3, IAM, or Amazon RDS).
+
 
 type: keyword
 

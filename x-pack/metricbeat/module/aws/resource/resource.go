@@ -6,6 +6,7 @@ package resource
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
@@ -13,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
@@ -21,12 +23,6 @@ import (
 var (
 	metricsetName = "resource"
 )
-
-// ResourceNameARN contains resource name and ARN
-type ResourceNameARN struct {
-	name string
-	arn  string
-}
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -63,6 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	currentTime := time.Now()
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 		awsConfig.Region = regionName
@@ -70,36 +67,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		svcResourceAPI := resourcegroupstaggingapi.New(awscommon.EnrichAWSConfigWithEndpoint(
 			m.Endpoint, "tagging", regionName, awsConfig))
 
-		resources, err := getResourcesPerRegion(svcResourceAPI)
+		events, err := m.getResourceEventsPerRegion(svcResourceAPI, regionName, currentTime)
 		if err != nil {
-			err = errors.Wrap(err, "getResourcesPerRegion failed, skipping region "+regionName)
-			m.Logger().Errorf(err.Error())
-			report.Error(err)
-			continue
-		}
-
-		// Create Cloudwatch Events for EC2
-		events, err := m.createEvents(resources, regionName)
-		if err != nil {
-			m.Logger().Error(err.Error())
-			report.Error(err)
+			err = fmt.Errorf("getResourceEventsPerRegion failed in region %s: %w", regionName, err)
+			m.Logger().Error(err)
 			continue
 		}
 
 		for _, event := range events {
-			if len(event.MetricSetFields) != 0 {
-				if reported := report.Event(event); !reported {
-					m.Logger().Debug("Fetch interrupted, failed to emit event")
-					return nil
-				}
+			if reported := report.Event(event); !reported {
+				m.Logger().Debug("Fetch interrupted, failed to emit event")
+				return nil
 			}
 		}
 	}
 	return nil
 }
 
-func getResourcesPerRegion(svc resourcegroupstaggingapiiface.ClientAPI) ([]ResourceNameARN, error) {
-	var resources []ResourceNameARN
+func (m *MetricSet) getResourceEventsPerRegion(svc resourcegroupstaggingapiiface.ClientAPI, regionName string, currentTime time.Time) ([]mb.Event, error) {
+	var events []mb.Event
 	getResourcesInput := &resourcegroupstaggingapi.GetResourcesInput{
 		PaginationToken: nil,
 	}
@@ -110,49 +96,39 @@ func getResourcesPerRegion(svc resourcegroupstaggingapiiface.ClientAPI) ([]Resou
 		output, err := getResourcesRequest.Send(context.TODO())
 		if err != nil {
 			err = errors.Wrap(err, "error GetResources")
-			return nil, err
+			return events, err
 		}
 
 		getResourcesInput.PaginationToken = output.PaginationToken
 		if len(output.ResourceTagMappingList) == 0 {
-			return nil, err
+			return events, err
 		}
 
 		for _, resource := range output.ResourceTagMappingList {
-			var discoveredResource ResourceNameARN
-			serviceName, err := findServiceNameFromARN(*resource.ResourceARN)
-			if err != nil {
-				err = errors.Wrap(err, "error findServiceNameFromARN")
-				return nil, err
-			}
-			discoveredResource.name = serviceName
-			discoveredResource.arn = *resource.ResourceARN
-			resources = append(resources, discoveredResource)
+			events = append(events, m.createEvent(resource, regionName, currentTime))
 		}
-	}
-	return resources, nil
-}
-
-func findServiceNameFromARN(resourceARN string) (string, error) {
-	arnParsed, err := arn.Parse(resourceARN)
-	if err != nil {
-		err = errors.Wrap(err, "error Parse arn")
-		return "", err
-	}
-
-	return arnParsed.Service, nil
-}
-
-func (m *MetricSet) createEvents(resources []ResourceNameARN, regionName string) (map[string]mb.Event, error) {
-	// Initialize events and each event only contain one resource
-	events := map[string]mb.Event{}
-	for _, resource := range resources {
-		identifier := regionName + m.AccountID + resource.arn
-		if _, ok := events[identifier]; !ok {
-			events[identifier] = aws.InitEvent(regionName, m.AccountName, m.AccountID, time.Now())
-		}
-		events[identifier].MetricSetFields.Put("resource.name", resource.name)
-		events[identifier].MetricSetFields.Put("resource.arn", resource.arn)
 	}
 	return events, nil
+}
+
+func (m *MetricSet) createEvent(resource resourcegroupstaggingapi.ResourceTagMapping, regionName string, currentTime time.Time) mb.Event {
+	// Initialize events and each event only contain one resource
+	event := aws.InitEvent(regionName, m.AccountName, m.AccountID, currentTime)
+	event.MetricSetFields.Put("arn", *resource.ResourceARN)
+
+	arnParsed, err := arn.Parse(*resource.ResourceARN)
+	if err != nil {
+		err = fmt.Errorf("arn.Parse failed: %w", *resource.ResourceARN)
+		return event
+	}
+
+	event.MetricSetFields.Put("name", arnParsed.Resource)
+	event.MetricSetFields.Put("service_name", arnParsed.Service)
+
+	// By default, replace dot "." using underscore "_" for tag keys.
+	// Note: tag values are not dedotted.
+	for _, tag := range resource.Tags {
+		event.ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
+	}
+	return event
 }

@@ -4,9 +4,18 @@
     `resource` contains the metrics that reports what services are running on a specific AWS account.
   release: experimental
   fields:
-    - name: name
-      type: keyword
-      description: resource name in AWS
     - name: arn
       type: keyword
-      description: resource ARN in AWS
+      description: >
+        resource ARN in AWS.
+    - name: name
+      type: keyword
+      description: >
+        The resource name in AWS. The content of this part of the ARN
+        varies by service. It often includes an indicator of the type of resource
+        followed by a slash (/) or a colon (:), followed by the resource name itself.
+    - name: service_name
+      type: keyword
+      description: >
+        The service namespace that identifies the AWS product (for example,
+        Amazon S3, IAM, or Amazon RDS).

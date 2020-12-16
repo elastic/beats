@@ -1,3 +1,6 @@
+The `resource` metricset of aws module collects all existing resources in a given
+AWS account with its resource type, ARN and attached tags.
+
 [float]
 === AWS Permissions
 Some specific AWS permissions are required for IAM user to collect resource metrics.
@@ -5,4 +8,21 @@ Some specific AWS permissions are required for IAM user to collect resource metr
 tag:getResources
 sts:GetCallerIdentity
 iam:ListAccountAliases
+----
+
+[float]
+=== Dashboard
+
+The aws resource metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-resource-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 1h
+  metricsets:
+    - resource
 ----
