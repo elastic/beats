@@ -11,7 +11,9 @@ list of supported hints:
 Filebeat gets logs from all containers by default, you can set this hint to `false` to ignore
 the output of the container. Filebeat won't read or send logs from it. If default config is
 disabled, you can use this annotation to enable log retrieval only for containers with this
-set to `true`.
+set to `true`. If you are aiming to use this with Kubernetes, have in mind that annotation
+values can only be of string type so you will need to explicitly define this as `"true"`
+or `"false"` accordingly.
 
 [float]
 ===== `co.elastic.logs/multiline.*`
