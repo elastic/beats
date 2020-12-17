@@ -1,12 +1,23 @@
 #spellchecker: disable
 {{ if eq .input "httpjson" }}
 type: httpjson
-url: https://www.virustotal.com/api/v3/intelligence/hunting_notification_files?limit={{ .limit }}
-http_method: GET
-http_headers:
-  x-apikey: {{ .api_key }}
-json_objects_array: data
+config_version: 2
 interval: 1m
+request:
+  url: https://www.virustotal.com/api/v3/intelligence/hunting_notification_files?limit={{ .limit }}
+  method: GET
+  transforms:
+    - set:
+        target: header.x-apikey
+        value: {{ .api_key }}
+response:
+  split:
+    target: body.data
+    type: array
+  pagination:
+    - set:
+        target: url.params.cursor
+        value: '[[.last_response.body.meta.cursor]]'
 {{ end }}
 
 {{ if eq .input "file" }}

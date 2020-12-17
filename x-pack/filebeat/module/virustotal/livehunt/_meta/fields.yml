@@ -18,6 +18,33 @@
             Date and time sample was analyzed by VirusTotal.
           type: date
           default_field: false
+        - name: results
+          type: nested
+          fields:
+            - name: method
+              description: >
+                Method used by VirusTotal for analysis.
+              type: keyword
+            - name: category
+              description: >
+                Category of the sample.
+              type: keyword
+            - name: result
+              description: >
+                Result of the VirusTotal analysis.
+              type: keyword
+            - name: engine_name
+              description: >
+                Name of the engine used for analysis.
+              type: keyword
+            - name: engine_version
+              description: >
+                Version of the engine used for analysis.
+              type: keyword
+            - name: engine_update
+              description: >
+                Last update of the engine used for analysis.
+              type: date
         - name: stats
           default_field: false
           description: >
@@ -92,7 +119,7 @@
         - name: rule
           description: >
             YARA matches for the file
-          type: group
+          type: nested
           fields:
             - name: name
               description: >
@@ -117,6 +144,19 @@
             - name: reference
               description: >
                 ruleset source
+              type: keyword
+        - name: packers
+          type: nested
+          description: >
+            List of packer detection tools and their result.
+          fields:
+            - name: tool_name
+              description: >
+                Name of tool used to detect packer used.
+              type: keyword
+            - name: name
+              description: >
+                Name of identified packer(s).
               type: keyword
     - name: notification
       default_field: false
@@ -559,54 +599,7 @@
       description: >
         Date that VirusTotal first observed this file object on the internet, typically by URL
       type: keyword
-- name: virustotal.analysis.results
-  description: >
-    Contains each engine's resulting data about sample
-  type: nested
-- name: virustotal.analysis.results
-  type: group
-  fields:
-    - name: method
-      description: >
-        Method used by VirusTotal for analysis.
-      type: keyword
-    - name: category
-      description: >
-        Category of the sample.
-      type: keyword
-    - name: result
-      description: >
-        Result of the VirusTotal analysis.
-      type: keyword
-    - name: engine_name
-      description: >
-        Name of the engine used for analysis.
-      type: keyword
-    - name: engine_version
-      description: >
-        Version of the engine used for analysis.
-      type: keyword
-    - name: engine_update
-      description: >
-        Last update of the engine used for analysis.
-      type: date
-- name: virustotal.packers
-  type: nested
-  description: >
-    List of packer detection tools and their result.
-- name: virustotal.packers
-  type: group
-  description: >
-    List of packer detection tools and their result.
-  fields:
-    - name: tool_name
-      description: >
-        Name of tool used to detect packer used.
-      type: keyword
-    - name: name
-      description: >
-        Name of identified packer(s).
-      type: keyword
+
 - name: file.hash.ssdeep
   default_field: false
   description: >
@@ -690,6 +683,86 @@
       description: >
         List of shared libraries used by this ELF object
       type: keyword
+    - name: exports
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of exported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of exported symbol
+          type: keyword
+          default_field: false
+    - name: imports
+      default_field: false
+      description: >
+        List of imported element names and types
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of imported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of imported symbol
+          type: keyword
+          default_field: false
+    - name: sections
+      default_field: false
+      description: >
+        Section information of the binary executable file.
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Binary Section name.
+          type: keyword
+        - name: physical_offset
+          description: >
+            Binary Section offset on disk.
+          type: keyword
+        - name: physical_size
+          description: >
+            Binary Section size in bytes
+          type: long
+          format: bytes
+        - name: virtual_address
+          description: >
+            Binary Section virtual address.
+          format: string
+          type: long
+        - name: virtual_size
+          description: >
+            Binary Section virtual size in bytes.
+          format: bytes
+          type: long
+        - name: flags
+          description: >
+            Binary Section flags.
+          type: keyword
+        - name: type
+          description: >
+            Binary Section type.
+          type: keyword
+        - name: segment_name
+          description: >
+            Binary Section name of containing segment.
+          type: keyword
+        - name: entropy
+          description: >
+            Binary Section measurement of Shannon entropy.
+          type: float
+        - name: chi2
+          description: >
+            Binary Section measurement of Chi squared distribution.
+          type: float
     - name: hash.telfhash
       description: >
         telfhash hash for ELF files.
@@ -705,127 +778,8 @@
           description: >
             ELF object segment list.
           type: flattened
-- name: file.elf.exports
-  default_field: false
-  description: >
-    List of exported element names and types
-  release: beta
-  type: nested
-- name: file.elf.exports
-  type: group
-  fields:
-    - name: name
-      description: >
-        Name of exported symbol
-      type: keyword
-      default_field: false
-    - name: type
-      description: >
-        Type of exported symbol
-      type: keyword
-      default_field: false
-- name: file.elf.sections
-  default_field: false
-  description: >
-    Section information of the binary executable file.
-  release: beta
-  type: nested
-- name: file.elf.sections
-  type: group
-  fields:
-    - name: name
-      description: >
-        Binary Section name.
-      type: keyword
-    - name: physical_offset
-      description: >
-        Binary Section offset on disk.
-      type: keyword
-    - name: physical_size
-      description: >
-        Binary Section size in bytes
-      type: long
-      format: bytes
-    - name: virtual_address
-      description: >
-        Binary Section virtual address.
-      format: string
-      type: long
-    - name: virtual_size
-      description: >
-        Binary Section virtual size in bytes.
-      format: bytes
-      type: long
-    - name: flags
-      description: >
-        Binary Section flags.
-      type: keyword
-    - name: type
-      description: >
-        Binary Section type.
-      type: keyword
-    - name: segment_name
-      description: >
-        Binary Section name of containing segment.
-      type: keyword
-    - name: entropy
-      description: >
-        Binary Section measurement of Shannon entropy.
-      type: float
-    - name: chi2
-      description: >
-        Binary Section measurement of Chi squared distribution.
-      type: float
-- name: file.elf.imports
-  default_field: false
-  description: >
-    List of imported element names and types
-  release: beta
-  type: nested
-- name: file.elf.imports
-  type: group
-  fields:
-    - name: name
-      description: >
-        Name of imported symbol
-      type: keyword
-      default_field: false
-    - name: type
-      description: >
-        Type of imported symbol
-      type: keyword
-      default_field: false
+
 ### PE file extensions ###
-- name: file.pe.overlay
-  type: nested
-- name: file.pe.overlay
-  type: group
-  fields:
-    - name: chi2
-      description: >
-        Chi2 information of the PE file.
-      type: float
-    - name: entropy
-      description: >
-        Entropy information of the PE file.
-      type: float
-    - name: filetype
-      description: >
-        Filetype of the PE file.
-      type: keyword
-    - name: md5
-      description: >
-        Overlay MD5 hash of the PE file.
-      type: keyword
-    - name: offset
-      description: >
-        Offset of the overlay information of the PE file.
-      type: long
-    - name: size
-      description: >
-        Size of the PE file.
-      format: bytes
-      type: long
 - name: file.pe
   type: group
   fields:
@@ -890,96 +844,116 @@
       description: >
         Machine type of the PE file.
       type: keyword
-- name: file.pe.sections
-  type: nested
-- name: file.pe.sections
-  type: group
-  fields:
-    - name: name
+    - name: overlay
+      type: nested
       description: >
-        Binary Section name.
-      type: keyword
-    - name: physical_offset
+        TODO
+      fields:
+        - name: chi2
+          description: >
+            Chi2 information of the PE file.
+          type: float
+        - name: entropy
+          description: >
+            Entropy information of the PE file.
+          type: float
+        - name: filetype
+          description: >
+            Filetype of the PE file.
+          type: keyword
+        - name: md5
+          description: >
+            Overlay MD5 hash of the PE file.
+          type: keyword
+        - name: offset
+          description: >
+            Offset of the overlay information of the PE file.
+          type: long
+        - name: size
+          description: >
+            Size of the PE file.
+          format: bytes
+          type: long
+    - name: sections
+      type: nested
       description: >
-        Binary Section offset on disk.
-      type: keyword
-    - name: physical_size
+        TODO
+      fields:
+        - name: name
+          description: >
+            Binary Section name.
+          type: keyword
+        - name: physical_offset
+          description: >
+            Binary Section offset on disk.
+          type: keyword
+        - name: physical_size
+          description: >
+            Binary Section size in bytes
+          type: long
+          format: bytes
+        - name: virtual_address
+          description: >
+            Binary Section virtual address.
+          format: string
+          type: long
+        - name: virtual_size
+          description: >
+            Binary Section virtual size in bytes.
+          format: bytes
+          type: long
+        - name: flags
+          description: >
+            Binary Section flags.
+          type: keyword
+        - name: type
+          description: >
+            Binary Section type.
+          type: keyword
+        - name: segment_name
+          description: >
+            Binary Section name of containing segment.
+          type: keyword
+        - name: entropy
+          description: >
+            Binary Section measurement of Shannon entropy.
+          type: float
+        - name: chi2
+          description: >
+            Binary Section measurement of Chi squared distribution.
+          type: float
+    - name: exports
       description: >
-        Binary Section size in bytes
-      type: long
-      format: bytes
-    - name: virtual_address
+        List of exported element names and types
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of exported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of exported symbol
+          type: keyword
+          default_field: false
+    - name: imports
       description: >
-        Binary Section virtual address.
-      format: string
-      type: long
-    - name: virtual_size
-      description: >
-        Binary Section virtual size in bytes.
-      format: bytes
-      type: long
-    - name: flags
-      description: >
-        Binary Section flags.
-      type: keyword
-    - name: type
-      description: >
-        Binary Section type.
-      type: keyword
-    - name: segment_name
-      description: >
-        Binary Section name of containing segment.
-      type: keyword
-    - name: entropy
-      description: >
-        Binary Section measurement of Shannon entropy.
-      type: float
-    - name: chi2
-      description: >
-        Binary Section measurement of Chi squared distribution.
-      type: float
-- name: file.pe.exports
-  description: >
-    List of exported element names and types
-  release: beta
-  type: nested
-- name: file.pe.exports
-  description: >
-    List of exported element names and types
-  release: beta
-  type: group
-  fields:
-    - name: name
-      description: >
-        Name of exported symbol
-      type: keyword
-      default_field: false
-    - name: type
-      description: >
-        Type of exported symbol
-      type: keyword
-      default_field: false
-- name: file.pe.imports
-  description: >
-    List of imported element names and types
-  release: beta
-  type: nested
-- name: file.pe.imports
-  description: >
-    List of imported element names and types
-  release: beta
-  type: group
-  fields:
-    - name: name
-      description: >
-        Name of imported symbol
-      type: keyword
-      default_field: false
-    - name: type
-      description: >
-        Type of imported symbol
-      type: keyword
-      default_field: false
+        List of imported element names and types
+      release: beta
+      type: nested
+      fields:
+        - name: name
+          description: >
+            Name of imported symbol
+          type: keyword
+          default_field: false
+        - name: type
+          description: >
+            Type of imported symbol
+          type: keyword
+          default_field: false
 
 - name: rule
   default_field: false

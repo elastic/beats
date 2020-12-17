@@ -59,15 +59,12 @@ var vtPE = (function () {
              */
             var norm_exports = Array();
             for (var i = 0; i < exports.length; i++) {
-                var libname = exports[i].library_name;
-                for (var j = 0; i < exports[i].imported_functions.length; j++) {
-                    norm_exports.push(
-                        {
-                            "name": exports[i].imported_functions[j],
-                            "type": "function",
-                        }
-                    );
-                }
+                norm_exports.push(
+                    {
+                        "name": exports[i],
+                        "type": "function",
+                    }
+                );
             }
 
             evt.Delete("file.pe.exports");

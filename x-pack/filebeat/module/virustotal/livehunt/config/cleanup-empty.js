@@ -16,9 +16,11 @@ function isEmpty(obj) {
 }
 
 function process(evt) {
+    var console = require("console");
+
     console.debug("cleanup.cleanEmptyList");
 
-    if (field == "") {
+    if (params.field == "") {
         console.debug("Empty field parameter. Skipping.");
         return;
     }
