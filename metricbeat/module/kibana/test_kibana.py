@@ -60,10 +60,7 @@ class Test(metricbeat.BaseTest):
                 "stats"
             ],
             "hosts": self.get_hosts(),
-            "period": "1s",
-            "extras": {
-                "xpack.enabled": "true"
-            }
+            "period": "1s"
         }])
 
         proc = self.start_beat()

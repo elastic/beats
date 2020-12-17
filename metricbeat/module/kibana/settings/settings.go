@@ -19,6 +19,7 @@ package settings
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -33,14 +34,10 @@ func init() {
 	)
 }
 
-const (
-	settingsPath = "api/settings"
-)
-
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		DefaultPath:   settingsPath,
+		DefaultPath:   kibana.SettingsPath,
 		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
@@ -48,7 +45,7 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	settingsHTTP      *helper.HTTP
+	settingsHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -80,7 +77,7 @@ func (m *MetricSet) init() (err error) {
 		return err
 	}
 
-	kibanaVersion, err := kibana.GetVersion(httpHelper, settingsPath)
+	kibanaVersion, err := kibana.GetVersion(httpHelper, kibana.SettingsPath)
 	if err != nil {
 		return err
 	}

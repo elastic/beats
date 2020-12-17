@@ -186,32 +186,3 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	r.Event(event)
 	return nil
 }
-
-func settingsDataParser(r mb.ReporterV2, content []byte) error {
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana API response")
-	}
-
-	schema := s.Schema{
-		"elasticsearch": s.Object{
-			"cluster": s.Object{
-				"id": c.Str("cluster_uuid"),
-			},
-		},
-		"settings": c.Ifc("settings.kibana"),
-	}
-
-	res, err := schema.Apply(data)
-	if err != nil {
-		return err
-	}
-
-	r.Event(mb.Event{
-		ModuleFields:    res,
-		MetricSetFields: nil,
-	})
-
-	return nil
-}
