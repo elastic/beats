@@ -508,6 +508,8 @@
         "event.start": "2018-07-05T19:51:23.453Z",
         "event.type": [
             "connection",
+            "start",
+            "start",
             "start"
         ],
         "fileset.name": "eve",

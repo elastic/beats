@@ -46384,7 +46384,7 @@ format: bytes
 Used percent of the datastore
 
 
-type: long
+type: scaled_float
 
 format: percent
 

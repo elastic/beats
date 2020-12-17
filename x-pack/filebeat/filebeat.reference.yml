@@ -616,27 +616,6 @@ filebeat.modules:
     # Maximum duration before AWS API request will be interrupted
     #var.api_timeout: 120s
 
-#--------------------------- Citrix NetScaler Module ---------------------------
-- module: citrix
-  netscaler:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9526
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
@@ -1311,8 +1290,16 @@ filebeat.modules:
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
-  # All logs
+  # Server logs
   log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Audit logs
+  audit:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -1967,27 +1954,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
-
-#---------------- Symantec AntiVirus/Endpoint Protection Module ----------------
-- module: symantec
-  endpointprotection:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9534
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
