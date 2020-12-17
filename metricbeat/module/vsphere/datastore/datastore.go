@@ -111,9 +111,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, ds := range dst {
-		var usedSpacePercent int64
+		var usedSpacePercent float64
 		if ds.Summary.Capacity > 0 {
-			usedSpacePercent = 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
+			usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
 		}
 		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
