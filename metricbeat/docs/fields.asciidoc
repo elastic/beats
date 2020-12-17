@@ -29590,6 +29590,241 @@ alias to: kibana.stats.usage.index
 --
 
 [float]
+=== settings
+
+Kibana stats and run-time metrics.
+
+
+
+
+*`kibana.settings.usage.index`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.settings.uuid`*::
++
+--
+Kibana instance UUID
+
+
+type: alias
+
+alias to: service.id
+
+--
+
+*`kibana.settings.name`*::
++
+--
+Kibana instance name
+
+
+type: keyword
+
+--
+
+*`kibana.settings.index`*::
++
+--
+Name of Kibana's internal index
+
+
+type: keyword
+
+--
+
+*`kibana.settings.host.name`*::
++
+--
+Kibana instance hostname
+
+
+type: keyword
+
+--
+
+*`kibana.settings.transport_address`*::
++
+--
+Kibana server's hostname and port
+
+
+type: alias
+
+alias to: service.address
+
+--
+
+*`kibana.settings.version`*::
++
+--
+Kibana version
+
+
+type: alias
+
+alias to: service.version
+
+--
+
+*`kibana.settings.snapshot`*::
++
+--
+Whether the Kibana build is a snapshot build
+
+
+type: boolean
+
+--
+
+*`kibana.settings.status`*::
++
+--
+Kibana instance's health status
+
+
+type: keyword
+
+--
+
+*`kibana.settings.concurrent_connections`*::
++
+--
+Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
+
+
+type: long
+
+--
+
+[float]
+=== process
+
+Process metrics
+
+
+
+*`kibana.settings.process.event_loop_delay.ms`*::
++
+--
+Event loop delay in milliseconds
+
+
+type: scaled_float
+
+--
+
+[float]
+=== memory.heap
+
+Process heap metrics
+
+
+
+*`kibana.settings.process.memory.heap.total.bytes`*::
++
+--
+Total heap allocated to process in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`kibana.settings.process.memory.heap.used.bytes`*::
++
+--
+Heap used by process in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`kibana.settings.process.memory.heap.size_limit.bytes`*::
++
+--
+Max. old space size allocated to Node.js process, in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`kibana.settings.process.memory.heap.uptime.ms`*::
++
+--
+Uptime of process in milliseconds
+
+
+type: long
+
+--
+
+[float]
+=== request
+
+Request count metrics
+
+
+
+*`kibana.settings.request.disconnects`*::
++
+--
+Number of requests that were disconnected
+
+
+type: long
+
+--
+
+*`kibana.settings.request.total`*::
++
+--
+Total number of requests
+
+
+type: long
+
+--
+
+[float]
+=== response_time
+
+Response times metrics
+
+
+
+*`kibana.settings.response_time.avg.ms`*::
++
+--
+Average response time in milliseconds
+
+
+type: long
+
+--
+
+*`kibana.settings.response_time.max.ms`*::
++
+--
+Maximum response time in milliseconds
+
+
+type: long
+
+--
+
+[float]
 === stats
 
 Kibana stats and run-time metrics.

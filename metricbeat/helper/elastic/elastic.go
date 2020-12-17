@@ -134,17 +134,17 @@ func FixTimestampField(m common.MapStr, field string) error {
 func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
 	moduleName := base.Name()
 
-	config := struct {
-		XPackEnabled bool `config:"xpack.enabled"`
-	}{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
-	}
+	//config := struct {
+	//	XPackEnabled bool `config:"xpack.enabled"`
+	//}{}
+	//if err := base.UnpackConfig(&config); err != nil {
+	//	return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+	//}
 
-	// No special configuration is needed if xpack.enabled != true
-	if !config.XPackEnabled {
-		return base, nil
-	}
+	//// No special configuration is needed if xpack.enabled != true
+	//if !config.XPackEnabled {
+	//	return base, nil
+	//}
 
 	var raw common.MapStr
 	if err := base.UnpackConfig(&raw); err != nil {
