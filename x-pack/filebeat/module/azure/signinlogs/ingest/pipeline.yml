@@ -307,6 +307,9 @@ processors:
     field: source.as.organization_name
     target_field: source.as.organization.name
     ignore_missing: true
+- user_agent:
+    field: azure.signinlogs.properties.userAgent
+    ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "azure-shared-pipeline" >}'
 on_failure:
