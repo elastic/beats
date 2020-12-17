@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
 - Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
+- Fix typo in config docs {pull}23185[23185]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 
 
