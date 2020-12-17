@@ -802,3 +802,73 @@ func TestProcessWildcardPreSupport(t *testing.T) {
 
 	assert.Equal(t, expectedOutput, output)
 }
+
+func TestProcessNestedSupport(t *testing.T) {
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "nested",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "keyword",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"type": "nested",
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "keyword",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessNestedSupportNoSubfields(t *testing.T) {
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "nested",
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"type": "nested",
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
