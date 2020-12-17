@@ -21,8 +21,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
 	// mage:import
@@ -31,7 +30,6 @@ import (
 
 func init() {
 	common.RegisterCheckDeps(Update)
-	unittest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatLicense = "Elastic License"
 }
@@ -68,13 +66,13 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
-func Fields() error {
-	return heartbeat.Fields()
-}
-
 // Update updates the generated files (aka make update).
 func Update() {
 	mg.SerialDeps(Fields, Config)
+}
+
+func Fields() error {
+	return heartbeat.Fields()
 }
 
 // Config generates both the short/reference/docker configs.

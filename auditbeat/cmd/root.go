@@ -35,7 +35,7 @@ const (
 	Name = "auditbeat"
 
 	// ecsVersion specifies the version of ECS that Auditbeat is implementing.
-	ecsVersion = "1.6.0"
+	ecsVersion = "1.7.0"
 )
 
 // RootCmd for running auditbeat.
@@ -54,19 +54,29 @@ var withECSVersion = processing.WithFields(common.MapStr{
 	},
 })
 
-func init() {
-	create := beater.Creator(
-		beater.WithModuleOptions(
-			module.WithEventModifier(core.AddDatasetToEvent),
-		),
-	)
+// AuditbeatSettings contains the default settings for auditbeat
+func AuditbeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	settings := instance.Settings{
+	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(create, settings)
-	RootCmd.AddCommand(ShowCmd)
+}
+
+// Initialize initializes the entrypoint commands for journalbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	create := beater.Creator(
+		beater.WithModuleOptions(
+			module.WithEventModifier(core.AddDatasetToEvent),
+		),
+	)
+	rootCmd := cmd.GenRootCmdWithSettings(create, settings)
+	rootCmd.AddCommand(ShowCmd)
+	return rootCmd
+}
+
+func init() {
+	RootCmd = Initialize(AuditbeatSettings())
 }

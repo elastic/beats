@@ -270,6 +270,16 @@ see the following published transactions (when `ignore_outgoing` is true):
  - Beat2: t1
  - Beat3: t2
 
+ [float]
+==== `internal_networks`
+
+If the `internal_networks` option is specified, when monitoring network taps or mirror ports, Packetbeat
+will attempt to classify the network directionality of traffic not intended for this host as it
+relates to a network perimeter. Any CIDR block specified in `internal_networks` is treated internal to
+the perimeter, and any IP address falling outside of these CIDR blocks is considered external.
+
+This is useful when Packetbeat is running on an appliance that sits at a network boundary such as
+a firewall or VPN. Note that this only affects how the directionality of network traffic is classified.
 
 [[configuration-flows]]
 == Configure flows to monitor network traffic
@@ -431,6 +441,11 @@ processors in your config.
 If this option is set to true, fields with `null` values will be published in
 the output document. By default, `keep_null` is set to `false`.
 
+[float]
+==== `index`
+
+Overrides the index that flow events are published to.
+
 [[configuration-protocols]]
 == Configure which transaction protocols to monitor
 
@@ -553,6 +568,12 @@ grouped under a `fields` sub-dictionary in the output document. To store the
 custom fields as top-level fields, set the `fields_under_root` option to true.
 If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
+
+[float]
+[[packetbeat-configuration-index]]
+==== `index`
+
+Overrides the index that events for the given protocol are published to.
 
 [source,yaml]
 --------------------------------------------------------------------------------

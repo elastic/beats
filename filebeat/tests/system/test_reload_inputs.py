@@ -251,7 +251,7 @@ class Test(BaseTest):
         assert output[1]["message"] == second_line
 
     # 1/20 build fails https://github.com/elastic/beats/issues/21307
-    @pytest.mark.flaky(reruns=1, reruns_delay=10)
+    @pytest.mark.flaky(reruns=2, reruns_delay=10)
     def test_reload_same_config(self):
         """
         Test reload same config with same file but different config. Makes sure reloading also works on conflicts.

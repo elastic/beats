@@ -13,6 +13,16 @@
 # "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
+# The network CIDR blocks that are considered "internal" networks for
+# the purpose of network perimeter boundary classification. The valid
+# values for internal_networks are the same as those that can be used
+# with processor network conditions.
+#
+# For a list of available values see:
+# https://www.elastic.co/guide/en/beats/packetbeat/current/defining-processors.html#condition-network
+packetbeat.interfaces.internal_networks:
+  - private
+
 # =================================== Flows ====================================
 
 # Set `enabled: false` or comment out all options to disable flows reporting.
@@ -214,6 +224,12 @@ processors:
       - add_host_metadata: ~
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
+  - detect_mime_type:
+      field: http.request.body.content
+      target: http.request.mime_type
+  - detect_mime_type:
+      field: http.response.body.content
+      target: http.response.mime_type
 
 # ================================== Logging ===================================
 
@@ -223,7 +239,7 @@ processors:
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
+# "publisher", "service".
 #logging.selectors: ["*"]
 
 # ============================= X-Pack Monitoring ==============================

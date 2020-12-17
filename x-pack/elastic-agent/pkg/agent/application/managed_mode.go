@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -62,12 +63,9 @@ func newManaged(
 	log *logger.Logger,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
-	}
-
+	statusController := status.NewController(log)
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
@@ -154,7 +152,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusController))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -173,7 +171,7 @@ func newManaged(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info())},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info(), agentInfo)},
 		},
 		monitor,
 	)
@@ -242,6 +240,15 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionSettings{},
+		&handlerSettings{
+			log:       log,
+			reexec:    reexec,
+			agentInfo: agentInfo,
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)
@@ -265,6 +272,7 @@ func newManaged(
 		actionDispatcher,
 		fleetR,
 		actionAcker,
+		statusController,
 	)
 	if err != nil {
 		return nil, err

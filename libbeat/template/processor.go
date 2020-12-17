@@ -28,8 +28,9 @@ import (
 
 // Processor struct to process fields to template
 type Processor struct {
-	EsVersion common.Version
-	Migration bool
+	EsVersion       common.Version
+	Migration       bool
+	ElasticLicensed bool
 }
 
 var (
@@ -73,6 +74,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.integer(&field)
 		case "text":
 			indexMapping = p.text(&field)
+		case "wildcard":
+			noWildcards := p.EsVersion.LessThan(common.MustNewVersion("7.9.0"))
+			if !p.ElasticLicensed || noWildcards {
+				indexMapping = p.keyword(&field)
+			} else {
+				indexMapping = p.wildcard(&field)
+			}
 		case "", "keyword":
 			indexMapping = p.keyword(&field)
 		case "object":
@@ -83,33 +91,18 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.alias(&field)
 		case "histogram":
 			indexMapping = p.histogram(&field)
-		case "group":
-			indexMapping = common.MapStr{}
-			if field.Dynamic.Value != nil {
-				indexMapping["dynamic"] = field.Dynamic.Value
-			}
-
-			// Combine properties with previous field definitions (if any)
-			properties := common.MapStr{}
-			key := mapping.GenerateKey(field.Name) + ".properties"
-			currentProperties, err := output.GetValue(key)
-			if err == nil {
-				var ok bool
-				properties, ok = currentProperties.(common.MapStr)
-				if !ok {
-					// This should never happen
-					return errors.New(key + " is expected to be a MapStr")
-				}
-			}
-
-			groupState := &fieldState{Path: field.Name, DefaultField: *field.DefaultField}
-			if state.Path != "" {
-				groupState.Path = state.Path + "." + field.Name
-			}
-			if err := p.Process(field.Fields, groupState, properties); err != nil {
+		case "nested":
+			mapping, err := p.nested(&field, output)
+			if err != nil {
 				return err
 			}
-			indexMapping["properties"] = properties
+			indexMapping = mapping
+		case "group":
+			mapping, err := p.group(&field, output)
+			if err != nil {
+				return err
+			}
+			indexMapping = mapping
 		default:
 			indexMapping = p.other(&field)
 		}
@@ -179,6 +172,47 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 	return property
 }
 
+func (p *Processor) nested(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	mapping, err := p.group(f, output)
+	if err != nil {
+		return nil, err
+	}
+	mapping["type"] = "nested"
+	return mapping, nil
+}
+
+func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	indexMapping := common.MapStr{}
+	if f.Dynamic.Value != nil {
+		indexMapping["dynamic"] = f.Dynamic.Value
+	}
+
+	// Combine properties with previous field definitions (if any)
+	properties := common.MapStr{}
+	key := mapping.GenerateKey(f.Name) + ".properties"
+	currentProperties, err := output.GetValue(key)
+	if err == nil {
+		var ok bool
+		properties, ok = currentProperties.(common.MapStr)
+		if !ok {
+			// This should never happen
+			return nil, errors.New(key + " is expected to be a MapStr")
+		}
+	}
+
+	groupState := &fieldState{Path: f.Name, DefaultField: *f.DefaultField}
+	if f.Path != "" {
+		groupState.Path = f.Path + "." + f.Name
+	}
+	if err := p.Process(f.Fields, groupState, properties); err != nil {
+		return nil, err
+	}
+	if len(properties) != 0 {
+		indexMapping["properties"] = properties
+	}
+	return indexMapping, nil
+}
+
 func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "half_float"
@@ -218,6 +252,28 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
 		property["index"] = "not_analyzed"
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, nil, fields)
+		property["fields"] = fields
+	}
+
+	return property
+}
+
+func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
+	property := getDefaultProperties(f)
+
+	property["type"] = "wildcard"
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
+		property["ignore_above"] = defaultIgnoreAbove
+	case -1: // Use ES default
+	default: // Use user value
+		property["ignore_above"] = f.IgnoreAbove
 	}
 
 	if len(f.MultiFields) > 0 {
