@@ -23,7 +23,7 @@ func init() {
 	monitors.RegisterActive("synthetic/browser", create)
 }
 
-var experimentalWarning = sync.Once{}
+var showExperimentalOnce = sync.Once{}
 
 var NotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
 
@@ -35,7 +35,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		return nil, 0, NotSyntheticsCapableError
 	}
 
-	experimentalWarning.Do(func() {
+	showExperimentalOnce.Do(func() {
 		logp.Info("Synthetic monitor detected! Please note synthetic monitors are an experimental unsupported feature!")
 	})
 
