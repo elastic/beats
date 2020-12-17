@@ -93,7 +93,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
-// service clients when endpoint is given in config.
+// service clients when endpoint or aws_partition is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
 	if endpoint != "" {
 		if regionName == "" {
@@ -103,4 +103,45 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 		}
 	}
 	return awsConfig
+}
+
+// GetInitRegionFromPartition function sets region by aws_partition, default is aws global partition
+// refer https://github.com/aws/aws-sdk-go/blob/master/models/endpoints/endpoints.json
+func GetInitRegionFromPartition(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	switch config.AWSPartition {
+	case "aws-cn":
+		awsConfig.Region = "cn-north-1"
+	case "aws-us-gov":
+		awsConfig.Region = "us-gov-east-1"
+	case "aws-iso":
+		awsConfig.Region = "us-iso-east-1"
+	case "aws-iso-b":
+		awsConfig.Region = "us-isob-east-1"
+	default:
+		awsConfig.Region = "us-east-1"
+	}
+	return awsConfig
+}
+
+// GetEndpoint function gets DNS suffix from given partition name
+func GetEndpoint(config ConfigAWS) ConfigAWS {
+	if config.Endpoint != "" {
+		return config
+	}
+
+	// Get DNS suffix endpoint from given partition name
+	switch config.AWSPartition {
+	case "aws-cn":
+		config.Endpoint = "amazonaws.com.cn"
+	case "aws-us-gov":
+		config.Endpoint = "amazonaws.com"
+	case "aws-iso":
+		config.Endpoint = "c2s.ic.gov"
+	case "aws-iso-b":
+		config.Endpoint = "sc2s.sgov.gov"
+	default:
+		config.Endpoint = "amazonaws.com"
+	}
+
+	return config
 }

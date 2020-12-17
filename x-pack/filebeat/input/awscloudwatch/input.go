@@ -79,7 +79,7 @@ func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new aws-cloudwatch input
 func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
-	cfgwarn.Beta("aws-clouwatch input type is used")
+	cfgwarn.Beta("aws-cloudwatch input type is used")
 	logger := logp.NewLogger(inputName)
 
 	// Extract and validate the input's configuration.
