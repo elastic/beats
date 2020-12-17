@@ -5,7 +5,6 @@
 package main
 
 import (
-	"fmt"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -77,7 +76,6 @@ func init() {
 			"with",
 			"write"}
 
-		fmt.Println("SYSCALLS !!!\n")
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
 			panic(err)
 		}
