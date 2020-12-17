@@ -94,16 +94,6 @@ var (
 				"ms": c.Int("max_ms", s.Optional),
 			},
 		}),
-		"kibana": c.Dict("kibana", s.Schema{
-			"uuid":              c.Str("uuid"),
-			"name":              c.Str("name"),
-			"index":             c.Str("index"),
-			"host":              c.Str("host"),
-			"transport_address": c.Str("transport_address"),
-			"version":           c.Str("version"),
-			"snapshot":          c.Bool("snapshot"),
-			"status":            c.Str("status"),
-		}),
 	}
 
 	// RequestsDict defines how to convert the requests field

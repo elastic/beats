@@ -17,16 +17,6 @@
                 "name": "0"
             },
             "index": "kibana",
-            "kibana": {
-                "host": "0",
-                "index": ".kibana",
-                "name": "kibana",
-                "snapshot": false,
-                "status": "green",
-                "transport_address": "0:5601",
-                "uuid": "47c5b96a-e3c4-430c-afee-5c7e27683b80",
-                "version": "7.9.0"
-            },
             "name": "kibana",
             "os": {
                 "distro": "Centos",
