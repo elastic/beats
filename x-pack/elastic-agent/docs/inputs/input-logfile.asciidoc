@@ -85,7 +85,7 @@ readable by {beatname_uc} and set the path in the option `path` of `inode_marker
 The content of this file must be unique to the device. You can put the
 UUID of the device or mountpoint where the input is stored. The following
 example oneliner generates a hidden marker file for the selected mountpoint `/logs`:
-Please note that you should not use this option on Windows as file identifiers might be
+Please note that you should not use this option on Windows because file identifiers are
 more volatile.
 
 ["source","sh",subs="attributes"]
