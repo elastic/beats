@@ -93,7 +93,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
-// service clients when endpoint or aws_partition is given in config.
+// service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
 	if endpoint != "" {
 		if regionName == "" {
