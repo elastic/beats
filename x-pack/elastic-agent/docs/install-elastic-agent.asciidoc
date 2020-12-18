@@ -39,7 +39,7 @@ include::{beats-repo-dir}/x-pack/elastic-agent/docs/tab-widgets/download-widget.
 . From the agent directory, run the appropriate command to install {agent} as
 a managed service, enroll it in {fleet}, and start the service. Don't have a
 {fleet} enrollment key? Read the
-{ingest-guide}/fleet-quick-start.html[Quick start guide] to learn how to get one
+{fleet-guide}/fleet-quick-start.html[Quick start guide] to learn how to get one
 from {fleet}.
 +
 --
