@@ -80,7 +80,7 @@ will be reread and resubmitted.
 The option `inode_marker` can be used if the inodes stay the same even if
 the device ID is changed. If possible, you should choose this method
 instead of `path` if your files are rotated. You have to configure a marker file
-readable by {beatname_uc} and set the path in the option `path` of `inode_marker`.
+readable by {beatname_uc}, and set the path in the option `path` of `inode_marker`.
 
 The content of this file must be unique to the device. You can put the
 UUID of the device or mountpoint where the input is stored. The following
