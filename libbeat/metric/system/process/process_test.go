@@ -33,6 +33,9 @@ import (
 	"github.com/elastic/gosigar"
 )
 
+// numCPU is the number of CPUs of the host
+var numCPU = runtime.NumCPU()
+
 func TestPids(t *testing.T) {
 	pids, err := Pids()
 
@@ -157,11 +160,14 @@ func TestProcCpuPercentage(t *testing.T) {
 		SampleTime: p1.SampleTime.Add(time.Second),
 	}
 
-	NumCPU = 48
-	defer func() { NumCPU = runtime.NumCPU() }()
-
 	totalPercentNormalized, totalPercent, totalValue := GetProcCPUPercentage(p1, p2)
-	assert.EqualValues(t, 0.0721, totalPercentNormalized)
+	//GetProcCPUPercentage wil return a number that varies based on the host, due to NumCPU()
+	// So "un-normalize" it, then re-normalized with a constant.
+	cpu := float64(runtime.NumCPU())
+	unNormalized := totalPercentNormalized * cpu
+	normalizedTest := common.Round(unNormalized/48, common.DefaultDecimalPlacesCount)
+
+	assert.EqualValues(t, 0.0721, normalizedTest)
 	assert.EqualValues(t, 3.459, totalPercent)
 	assert.EqualValues(t, 14841, totalValue)
 }

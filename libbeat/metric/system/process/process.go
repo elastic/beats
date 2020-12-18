@@ -36,9 +36,6 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
-// NumCPU is the number of CPUs of the host
-var NumCPU = runtime.NumCPU()
-
 // ProcsMap is a map where the keys are the names of processes and the value is the Process with that name
 type ProcsMap map[int]*Process
 
@@ -365,7 +362,7 @@ func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64
 		totalCPUDeltaMillis := int64(s1.Cpu.Total - s0.Cpu.Total)
 
 		pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
-		normalizedPct := pct / float64(NumCPU)
+		normalizedPct := pct / float64(runtime.NumCPU())
 
 		return common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
 			common.Round(pct, common.DefaultDecimalPlacesCount),
