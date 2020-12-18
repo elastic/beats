@@ -72,7 +72,10 @@ type mockAdapter struct {
 }
 
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-func (m *mockAdapter) CreateConfig(bus.Event) ([]*common.Config, error) {
+func (m *mockAdapter) CreateConfig(event bus.Event) ([]*common.Config, error) {
+	if cfgs, ok := event["config"]; ok {
+		return cfgs.([]*common.Config), nil
+	}
 	return m.configs, nil
 }
 
@@ -84,7 +87,6 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	c.Unpack(&config)
 
 	if config.Broken {
-		fmt.Println("broken")
 		return fmt.Errorf("Broken config")
 	}
 
@@ -373,6 +375,131 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// As only the second config is valid, total runners will be 1
 	wait(t, func() bool { return len(adapter.Runners()) == 1 })
 	assert.Equal(t, 1, len(autodiscover.configs["mock:foo"]))
+}
+
+func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+
+	// Create a mock adapter
+	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+		"runner": "1",
+	})
+	adapter := mockAdapter{
+		configs: []*common.Config{runnerConfig},
+	}
+
+	// and settings:
+	providerConfig, _ := common.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*common.Config{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore("test")
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Test start event
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": common.MapStr{
+			"foo": "bar",
+		},
+		"config": []*common.Config{
+			common.MustNewConfigFrom(map[string]interface{}{
+				"a": "b",
+			}),
+			common.MustNewConfigFrom(map[string]interface{}{
+				"x": "y",
+			}),
+		},
+	})
+	wait(t, func() bool { return len(adapter.Runners()) == 2 })
+
+	runners := adapter.Runners()
+	assert.Equal(t, len(runners), 2)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.True(t, runners[0].started)
+	assert.False(t, runners[0].stopped)
+	assert.True(t, runners[1].started)
+	assert.False(t, runners[1].stopped)
+	assert.Equal(t, runners[1].config, common.MustNewConfigFrom(map[string]interface{}{"x": "y"}))
+
+	// Test start event with changed configurations
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": common.MapStr{
+			"foo": "bar",
+		},
+		"config": []*common.Config{
+			common.MustNewConfigFrom(map[string]interface{}{
+				"a": "b",
+			}),
+			common.MustNewConfigFrom(map[string]interface{}{
+				"x": "c",
+			}),
+		},
+	})
+	wait(t, func() bool { return len(adapter.Runners()) == 3 })
+	runners = adapter.Runners()
+	// Ensure the first config is the same as before
+	assert.Equal(t, runners[0].config, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}))
+	assert.Equal(t, len(runners), 3)
+	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.True(t, runners[0].started)
+	assert.False(t, runners[0].stopped)
+	// Ensure that the runner for the stale config is stopped
+	wait(t, func() bool { return adapter.Runners()[1].stopped == true })
+
+	// Ensure that the new runner is started
+	assert.False(t, runners[2].stopped)
+	assert.True(t, runners[2].started)
+	assert.Equal(t, runners[2].config, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}))
+
+	// Stop all the configs
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
+		"meta": common.MapStr{
+			"foo": "bar",
+		},
+		"config": []*common.Config{
+			common.MustNewConfigFrom(map[string]interface{}{
+				"a": "b",
+			}),
+			common.MustNewConfigFrom(map[string]interface{}{
+				"x": "c",
+			}),
+		},
+	})
+
+	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
+	runners = adapter.Runners()
+	assert.True(t, runners[0].stopped)
 }
 
 func wait(t *testing.T, test func() bool) {
