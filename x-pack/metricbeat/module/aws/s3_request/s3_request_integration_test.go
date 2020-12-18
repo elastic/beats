@@ -12,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )

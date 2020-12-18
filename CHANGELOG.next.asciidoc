@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add fileset to ingest Kibana's ECS audit logs. {pull}22696[22696]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -224,6 +225,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
 - Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
+- Fix typo in config docs {pull}23185[23185]
+- Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 
 *Auditbeat*
 
@@ -349,7 +352,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Fix aws s3 overview dashboard. {pull}23045[23045]
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
+- Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
+- Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 
 *Heartbeat*
 
@@ -464,6 +470,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
+- Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 
 *Packetbeat*
 
@@ -553,6 +560,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add tini as init system in docker images {pull}22137[22137]
 - Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
+- Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 
 *Auditbeat*
 
@@ -775,6 +783,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate okta to httpjson v2 config {pull}23059[23059]
 - Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 - Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
+- Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
 
 *Heartbeat*
 
@@ -902,6 +911,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add process.state, process.cpu.pct, process.cpu.start_time and process.memory.pct. {pull}22845[22845]
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
+- Release MSSQL as GA {pull}23146[23146]
 
 *Packetbeat*
 
@@ -945,6 +955,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
+  As we continue to expand our coverage of common security data sources, we may consider supporting
+  Citrix Netscaler and Symantec Endpoint Protection in a future release. {issue}23129[23129] {pull}23130[23130]
 
 *Heartbeat*
 
@@ -962,7 +975,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 

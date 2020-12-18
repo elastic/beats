@@ -9,8 +9,6 @@
 <titleabbrev>HTTP JSON</titleabbrev>
 ++++
 
-beta[]
-
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
 This input supports:
