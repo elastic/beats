@@ -60,6 +60,7 @@ type tlsPlugin struct {
 	fingerprints           []*FingerprintAlgorithm
 	transactionTimeout     time.Duration
 	results                protos.Reporter
+	watcher                procs.ProcessesWatcher
 }
 
 var (
@@ -78,6 +79,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &tlsPlugin{}
@@ -88,18 +90,19 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (plugin *tlsPlugin) init(results protos.Reporter, config *tlsConfig) error {
+func (plugin *tlsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *tlsConfig) error {
 	if err := plugin.setFromConfig(config); err != nil {
 		return err
 	}
 
 	plugin.results = results
+	plugin.watcher = watcher
 	isDebug = logp.IsDebug("tls")
 
 	return nil
@@ -178,7 +181,7 @@ func (plugin *tlsPlugin) doParse(
 	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(tcptuple)
-		st.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+		st.cmdlineTuple = plugin.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 		conn.streams[dir] = st
 	}
 

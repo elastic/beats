@@ -8,5 +8,7 @@
   fields:
     - name: kibana
       type: group
-      description: >
       fields:
+        - name: stats.usage.name
+          type: alias
+          path: kibana.stats.usage.index

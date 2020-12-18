@@ -2,11 +2,258 @@
   "objects": [
     {
       "attributes": {
+        "description": "Overview of NATS server statistics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Message Types Timeline"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "1",
+              "w": 17,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "1",
+            "panelRefName": "panel_0",
+            "title": "Message Types Timeline",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Communication Directions"
+            },
+            "gridData": {
+              "h": 11,
+              "i": "2",
+              "w": 17,
+              "x": 31,
+              "y": 0
+            },
+            "panelIndex": "2",
+            "panelRefName": "panel_1",
+            "title": "Communication Directions",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Topics Timeline"
+            },
+            "gridData": {
+              "h": 12,
+              "i": "3",
+              "w": 25,
+              "x": 0,
+              "y": 20
+            },
+            "panelIndex": "3",
+            "panelRefName": "panel_2",
+            "title": "Topics Timeline",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": " Bytes Timeline",
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 9,
+              "i": "4",
+              "w": 12,
+              "x": 11,
+              "y": 11
+            },
+            "panelIndex": "4",
+            "panelRefName": "panel_3",
+            "title": " Bytes Timeline",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Communication Directions Distribution",
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 9,
+              "i": "5",
+              "w": 11,
+              "x": 0,
+              "y": 11
+            },
+            "panelIndex": "5",
+            "panelRefName": "panel_4",
+            "title": "Communication Directions Distribution",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Log Level Distribution",
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 9,
+              "i": "6",
+              "w": 11,
+              "x": 37,
+              "y": 11
+            },
+            "panelIndex": "6",
+            "panelRefName": "panel_5",
+            "title": "Log Level Distribution",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Message Type Distribution",
+              "vis": {
+                "legendOpen": false
+              }
+            },
+            "gridData": {
+              "h": 11,
+              "i": "7",
+              "w": 14,
+              "x": 17,
+              "y": 0
+            },
+            "panelIndex": "7",
+            "panelRefName": "panel_6",
+            "title": "Message Type Distribution",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Log Level Timeline"
+            },
+            "gridData": {
+              "h": 9,
+              "i": "8",
+              "w": 14,
+              "x": 23,
+              "y": 11
+            },
+            "panelIndex": "8",
+            "panelRefName": "panel_7",
+            "title": "Log Level Timeline",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Client IP Count Timeline"
+            },
+            "gridData": {
+              "h": 12,
+              "i": "9",
+              "w": 22,
+              "x": 25,
+              "y": 20
+            },
+            "panelIndex": "9",
+            "panelRefName": "panel_8",
+            "title": "Client IP Count Timeline",
+            "version": "7.10.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat NATS] Overview ECS",
+        "version": 1
+      },
+      "id": "Filebeat-nats-overview-ecs",
+      "migrationVersion": {
+        "dashboard": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "6987a800-41a8-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "0b2061d0-41ad-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "4a6d9ec0-41a8-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "c3d1ab80-41a8-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "7716c780-41ad-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "3f6cca40-41ae-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "7ed62870-41ae-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "04083600-41af-11e9-a4da-b1df688edbcd-ecs",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "c669ae20-41ed-11e9-ac5c-71ffa38a62e3-ecs",
+          "name": "panel_8",
+          "type": "visualization"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-11-23T16:25:23.231Z",
+      "version": "WzYyNywxXQ=="
+    },
+    {
+      "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -118,9 +365,22 @@
         }
       },
       "id": "6987a800-41a8-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:47:49.627Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwMSwxXQ=="
     },
     {
       "attributes": {
@@ -128,7 +388,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": "service.type: nats"
@@ -237,9 +497,22 @@
         }
       },
       "id": "0b2061d0-41ad-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:54:53.381Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwMiwxXQ=="
     },
     {
       "attributes": {
@@ -247,7 +520,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -356,9 +629,22 @@
         }
       },
       "id": "4a6d9ec0-41a8-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:49:49.112Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwMywxXQ=="
     },
     {
       "attributes": {
@@ -366,7 +652,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -468,9 +754,22 @@
         }
       },
       "id": "c3d1ab80-41a8-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:38:11.578Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwNCwxXQ=="
     },
     {
       "attributes": {
@@ -478,7 +777,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": "service.type: nats"
@@ -526,9 +825,22 @@
         }
       },
       "id": "7716c780-41ad-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:39:03.899Z",
-      "version": 5
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwNSwxXQ=="
     },
     {
       "attributes": {
@@ -536,7 +848,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": "service.type: nats"
@@ -584,9 +896,22 @@
         }
       },
       "id": "3f6cca40-41ae-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:44:31.263Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwNiwxXQ=="
     },
     {
       "attributes": {
@@ -594,7 +919,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
@@ -642,9 +967,22 @@
         }
       },
       "id": "7ed62870-41ae-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:48:10.554Z",
-      "version": 3
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwNywxXQ=="
     },
     {
       "attributes": {
@@ -652,7 +990,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": "service.type: nats"
@@ -762,9 +1100,22 @@
         }
       },
       "id": "04083600-41af-11e9-a4da-b1df688edbcd-ecs",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
       "type": "visualization",
-      "updated_at": "2019-03-08T21:48:44.582Z",
-      "version": 2
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwOCwxXQ=="
     },
     {
       "attributes": {
@@ -772,7 +1123,7 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "filebeat-*",
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": "service.type: nats"
@@ -901,181 +1252,23 @@
         }
       },
       "id": "c669ae20-41ed-11e9-ac5c-71ffa38a62e3-ecs",
-      "type": "visualization",
-      "updated_at": "2019-03-08T22:01:50.337Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "Overview of NATS server statistics",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "1",
-              "w": 17,
-              "x": 0,
-              "y": 0
-            },
-            "id": "6987a800-41a8-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "2",
-              "w": 17,
-              "x": 31,
-              "y": 0
-            },
-            "id": "0b2061d0-41ad-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 12,
-              "i": "3",
-              "w": 25,
-              "x": 0,
-              "y": 20
-            },
-            "id": "4a6d9ec0-41a8-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
-            },
-            "gridData": {
-              "h": 9,
-              "i": "4",
-              "w": 12,
-              "x": 11,
-              "y": 11
-            },
-            "id": "c3d1ab80-41a8-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
-            },
-            "gridData": {
-              "h": 9,
-              "i": "5",
-              "w": 11,
-              "x": 0,
-              "y": 11
-            },
-            "id": "7716c780-41ad-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "5",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
-            },
-            "gridData": {
-              "h": 9,
-              "i": "6",
-              "w": 11,
-              "x": 37,
-              "y": 11
-            },
-            "id": "3f6cca40-41ae-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "vis": {
-                "legendOpen": false
-              }
-            },
-            "gridData": {
-              "h": 11,
-              "i": "7",
-              "w": 14,
-              "x": 17,
-              "y": 0
-            },
-            "id": "7ed62870-41ae-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 9,
-              "i": "8",
-              "w": 14,
-              "x": 23,
-              "y": 11
-            },
-            "id": "04083600-41af-11e9-a4da-b1df688edbcd-ecs",
-            "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 12,
-              "i": "9",
-              "w": 22,
-              "x": 25,
-              "y": 20
-            },
-            "id": "c669ae20-41ed-11e9-ac5c-71ffa38a62e3-ecs",
-            "panelIndex": "9",
-            "type": "visualization",
-            "version": "6.6.0"
-          }
-        ],
-        "timeRestore": false,
-        "title": "[Filebeat NATS] Overview ECS",
-        "version": 1
+      "migrationVersion": {
+        "visualization": "7.10.0"
       },
-      "id": "Filebeat-nats-overview-ecs",
-      "type": "dashboard",
-      "updated_at": "2019-03-08T22:02:50.580Z",
-      "version": 5
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-11-23T16:05:55.609Z",
+      "version": "WzEwOSwxXQ=="
     }
   ],
-  "version": "6.6.0"
+  "version": "7.10.0"
 }

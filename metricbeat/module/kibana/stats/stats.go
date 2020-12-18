@@ -19,9 +19,10 @@ package stats
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -38,9 +39,8 @@ func init() {
 }
 
 const (
-	statsPath             = "api/stats"
-	settingsPath          = "api/settings"
-	usageCollectionPeriod = 24 * time.Hour
+	statsPath    = "api/stats"
+	settingsPath = "api/settings"
 )
 
 var (
@@ -54,10 +54,9 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP            *helper.HTTP
-	settingsHTTP         *helper.HTTP
-	usageLastCollectedOn time.Time
-	isUsageExcludable    bool
+	statsHTTP         *helper.HTTP
+	settingsHTTP      *helper.HTTP
+	isUsageExcludable bool
 }
 
 // New create a new instance of the MetricSet
@@ -78,26 +77,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	err := m.init()
 	if err != nil {
-		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
 	now := time.Now()
 
-	err = m.fetchStats(r, now)
-	if err != nil {
-		if m.XPackEnabled {
-			m.Logger().Error(err)
-			return nil
-		}
-		return err
+	if err = m.fetchStats(r, now); err != nil {
+		return errors.Wrap(err, "error trying to get stats data from Kibana")
 	}
 
-	if m.XPackEnabled {
-		m.fetchSettings(r, now)
+	if err = m.fetchSettings(r); err != nil {
+		return errors.Wrap(err, "error trying to get settings data from Kibana")
 	}
 
 	return nil
@@ -119,29 +109,22 @@ func (m *MetricSet) init() error {
 		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
-	if m.XPackEnabled {
-		// Use legacy API response so we can passthru usage as-is
-		statsHTTP.SetURI(statsHTTP.GetURI() + "&legacy=true")
+
+	isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+	if !isSettingsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
 	}
 
-	var settingsHTTP *helper.HTTP
-	if m.XPackEnabled {
-		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
-		if !isSettingsAPIAvailable {
-			const errorMsg = "the %v metricset with X-Pack enabled is only supported with Kibana >= %v. You are currently running Kibana %v"
-			return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
-		}
-
-		settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
-		if err != nil {
-			return err
-		}
-
-		// HACK! We need to do this because there might be a basepath involved, so we
-		// only search/replace the actual API paths
-		settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
-		settingsHTTP.SetURI(settingsURI)
+	settingsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
 	}
+
+	// HACK! We need to do this because there might be a basepath involved, so we
+	// only search/replace the actual API paths
+	settingsURI := strings.Replace(statsHTTP.GetURI(), statsPath, settingsPath, 1)
+	settingsHTTP.SetURI(settingsURI)
 
 	m.statsHTTP = statsHTTP
 	m.settingsHTTP = settingsHTTP
@@ -155,65 +138,35 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2, now time.Time) error {
 	var content []byte
 	var err error
 
-	// Collect usage stats only once every usageCollectionPeriod
+	// Add exclude_usage=true if the Kibana Version supports it
 	if m.isUsageExcludable {
 		origURI := m.statsHTTP.GetURI()
 		defer m.statsHTTP.SetURI(origURI)
 
-		shouldCollectUsage := m.shouldCollectUsage(now)
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=" + strconv.FormatBool(!shouldCollectUsage))
-
-		content, err = m.statsHTTP.FetchContent()
-		if err != nil {
-			return err
-		}
-
-		if shouldCollectUsage {
-			m.usageLastCollectedOn = now
-		}
-	} else {
-		content, err = m.statsHTTP.FetchContent()
-		if err != nil {
-			return err
-		}
+		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
 	}
 
-	if m.XPackEnabled {
-		intervalMs := m.calculateIntervalMs()
-		err = eventMappingStatsXPack(r, intervalMs, now, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventMapping(r, content)
+	content, err = m.statsHTTP.FetchContent()
+	if err != nil {
+		return err
+	}
+
+	return eventMapping(r, content)
+}
+
+func (m *MetricSet) fetchSettings(r mb.ReporterV2) error {
+	content, err := m.settingsHTTP.FetchContent()
+	if err != nil {
+		return err
+	}
+
+	if err = settingsDataParser(r, content); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (m *MetricSet) fetchSettings(r mb.ReporterV2, now time.Time) {
-	content, err := m.settingsHTTP.FetchContent()
-	if err != nil {
-		m.Logger().Error(err)
-		return
-	}
-
-	intervalMs := m.calculateIntervalMs()
-	err = eventMappingSettingsXPack(r, intervalMs, now, content)
-	if err != nil {
-		m.Logger().Error(err)
-		return
-	}
-}
-
 func (m *MetricSet) calculateIntervalMs() int64 {
 	return m.Module().Config().Period.Nanoseconds() / 1000 / 1000
-}
-
-func (m *MetricSet) shouldCollectUsage(now time.Time) bool {
-	return now.Sub(m.usageLastCollectedOn) > usageCollectionPeriod
 }

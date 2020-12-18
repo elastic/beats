@@ -27,17 +27,35 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/kibana"
 )
 
 var (
 	schema = s.Schema{
+		"os": c.Dict("os", s.Schema{
+			"load": c.Dict("load", s.Schema{
+				"1m":  c.Float("1m"),
+				"5m":  c.Float("5m"),
+				"15m": c.Float("15m"),
+			}),
+			"memory": c.Dict("memory", s.Schema{
+				"total_in_bytes": c.Int("total_bytes"),
+				"free_in_bytes":  c.Int("free_bytes"),
+				"used_in_bytes":  c.Int("used_bytes"),
+			}),
+			"uptime_in_millis": c.Int("uptime_ms"),
+			"distro":           c.Str("distro", s.Optional),
+			"distroRelease":    c.Str("distro_release", s.Optional),
+			"platform":         c.Str("platform", s.Optional),
+			"platformRelease":  c.Str("platform_release", s.Optional),
+		}),
+
 		"uuid":  c.Str("kibana.uuid"),
 		"name":  c.Str("kibana.name"),
 		"index": c.Str("kibana.name"),
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
+		"usage":                  c.Ifc("usage.kibana", s.Optional),
 		"transport_address":      c.Str("kibana.transport_address"),
 		"version":                c.Str("kibana.version"),
 		"snapshot":               c.Bool("kibana.snapshot"),
@@ -48,6 +66,9 @@ var (
 				"ms": c.Float("event_loop_delay"),
 			},
 			"memory": c.Dict("memory", s.Schema{
+				"resident_set_size": s.Object{
+					"bytes": c.Int("resident_set_size_bytes"),
+				},
 				"heap": c.Dict("heap", s.Schema{
 					"total": s.Object{
 						"bytes": c.Int("total_bytes"),
@@ -73,6 +94,16 @@ var (
 				"ms": c.Int("max_ms", s.Optional),
 			},
 		}),
+		"kibana": c.Dict("kibana", s.Schema{
+			"uuid":              c.Str("uuid"),
+			"name":              c.Str("name"),
+			"index":             c.Str("index"),
+			"host":              c.Str("host"),
+			"transport_address": c.Str("transport_address"),
+			"version":           c.Str("version"),
+			"snapshot":          c.Bool("snapshot"),
+			"status":            c.Str("status"),
+		}),
 	}
 
 	// RequestsDict defines how to convert the requests field
@@ -94,9 +125,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure to apply stats schema")
 	}
 
-	var event mb.Event
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", kibana.ModuleName)
+	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
@@ -105,7 +134,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		r.Event(event)
 		return event.Error
 	}
-	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})
@@ -155,5 +184,34 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.MetricSetFields = dataFields
 
 	r.Event(event)
+	return nil
+}
+
+func settingsDataParser(r mb.ReporterV2, content []byte) error {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Kibana API response")
+	}
+
+	schema := s.Schema{
+		"elasticsearch": s.Object{
+			"cluster": s.Object{
+				"id": c.Str("cluster_uuid"),
+			},
+		},
+		"settings": c.Ifc("settings.kibana"),
+	}
+
+	res, err := schema.Apply(data)
+	if err != nil {
+		return err
+	}
+
+	r.Event(mb.Event{
+		ModuleFields:    res,
+		MetricSetFields: nil,
+	})
+
 	return nil
 }

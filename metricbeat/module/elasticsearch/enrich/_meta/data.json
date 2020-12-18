@@ -2,23 +2,23 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
         "cluster": {
-            "id": "et6blfihSoytMUvkpYtEKQ",
+            "id": "8l_zoGznQRmtoX9iSC-goA",
             "name": "docker-cluster"
         },
         "enrich": {
             "executed_searches": {
-                "total": 1
+                "total": 0
             },
             "queue": {
                 "size": 0
             },
             "remote_requests": {
                 "current": 0,
-                "total": 1
+                "total": 0
             }
         },
         "node": {
-            "id": "l_XOyQ65Teyn4kW4PUFjVg"
+            "id": "1sFM8cmSROZYhPxVsiWew"
         }
     },
     "event": {
@@ -31,8 +31,7 @@
         "period": 10000
     },
     "service": {
-        "address": "localhost:32780",
-        "name": "elasticsearch",
+        "address": "127.0.0.1:51380",
         "type": "elasticsearch"
     }
 }

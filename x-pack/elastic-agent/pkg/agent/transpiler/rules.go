@@ -14,6 +14,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+// AgentInfo is an interface to get the agent info.
+type AgentInfo interface {
+	AgentID() string
+	Version() string
+	Snapshot() bool
+}
+
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
 type RuleList struct {
 	Rules []Rule
@@ -21,15 +28,15 @@ type RuleList struct {
 
 // Rule defines a rule that can be Applied on the Tree.
 type Rule interface {
-	Apply(*AST) error
+	Apply(AgentInfo, *AST) error
 }
 
 // Apply applies a list of rules over the same tree and use the result of the previous execution
 // as the input of the next rule, will return early if any error is raise during the execution.
-func (r *RuleList) Apply(ast *AST) error {
+func (r *RuleList) Apply(agentInfo AgentInfo, ast *AST) error {
 	var err error
 	for _, rule := range r.Rules {
-		err = rule.Apply(ast)
+		err = rule.Apply(agentInfo, ast)
 		if err != nil {
 			return err
 		}
@@ -73,6 +80,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "inject_index"
 		case *InjectStreamProcessorRule:
 			name = "inject_stream_processor"
+		case *InjectAgentInfoRule:
+			name = "inject_agent_info"
 		case *MakeArrayRule:
 			name = "make_array"
 		case *RemoveKeyRule:
@@ -154,6 +163,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &InjectIndexRule{}
 		case "inject_stream_processor":
 			r = &InjectStreamProcessorRule{}
+		case "inject_agent_info":
+			r = &InjectAgentInfoRule{}
 		case "make_array":
 			r = &MakeArrayRule{}
 		case "remove_key":
@@ -181,7 +192,7 @@ type SelectIntoRule struct {
 }
 
 // Apply applies select into rule.
-func (r *SelectIntoRule) Apply(ast *AST) error {
+func (r *SelectIntoRule) Apply(_ AgentInfo, ast *AST) error {
 	target := &Dict{}
 
 	for _, selector := range r.Selectors {
@@ -214,7 +225,7 @@ type RemoveKeyRule struct {
 }
 
 // Apply applies remove key rule.
-func (r *RemoveKeyRule) Apply(ast *AST) error {
+func (r *RemoveKeyRule) Apply(_ AgentInfo, ast *AST) error {
 	sourceMap, ok := ast.root.(*Dict)
 	if !ok {
 		return nil
@@ -250,7 +261,7 @@ type MakeArrayRule struct {
 }
 
 // Apply applies make array rule.
-func (r *MakeArrayRule) Apply(ast *AST) error {
+func (r *MakeArrayRule) Apply(_ AgentInfo, ast *AST) error {
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		return nil
@@ -286,7 +297,7 @@ type CopyToListRule struct {
 }
 
 // Apply copies specified node into every item of the list.
-func (r *CopyToListRule) Apply(ast *AST) error {
+func (r *CopyToListRule) Apply(_ AgentInfo, ast *AST) error {
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		// nothing to copy
@@ -347,7 +358,7 @@ type CopyAllToListRule struct {
 }
 
 // Apply copies all nodes into every item of the list.
-func (r *CopyAllToListRule) Apply(ast *AST) error {
+func (r *CopyAllToListRule) Apply(agentInfo AgentInfo, ast *AST) error {
 	// get list of nodes
 	astMap, err := ast.Map()
 	if err != nil {
@@ -370,7 +381,7 @@ func (r *CopyAllToListRule) Apply(ast *AST) error {
 			continue
 		}
 
-		if err := CopyToList(item, r.To, r.OnConflict).Apply(ast); err != nil {
+		if err := CopyToList(item, r.To, r.OnConflict).Apply(agentInfo, ast); err != nil {
 			return err
 		}
 	}
@@ -393,7 +404,7 @@ type FixStreamRule struct {
 }
 
 // Apply stream fixes.
-func (r *FixStreamRule) Apply(ast *AST) error {
+func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) error {
 	const defaultDataset = "generic"
 	const defaultNamespace = "default"
 
@@ -526,7 +537,7 @@ type InjectIndexRule struct {
 }
 
 // Apply injects index into input.
-func (r *InjectIndexRule) Apply(ast *AST) error {
+func (r *InjectIndexRule) Apply(_ AgentInfo, ast *AST) error {
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -583,7 +594,7 @@ type InjectStreamProcessorRule struct {
 }
 
 // Apply injects processor into input.
-func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
+func (r *InjectStreamProcessorRule) Apply(_ AgentInfo, ast *AST) error {
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -665,6 +676,63 @@ func InjectStreamProcessor(onMerge, streamType string) *InjectStreamProcessorRul
 	}
 }
 
+// InjectAgentInfoRule injects agent information into each rule.
+type InjectAgentInfoRule struct{}
+
+// Apply injects index into input.
+func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) error {
+	inputsNode, found := Lookup(ast, "inputs")
+	if !found {
+		return nil
+	}
+
+	inputsList, ok := inputsNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, inputNode := range inputsList.value {
+		inputMap, ok := inputNode.(*Dict)
+		if !ok {
+			continue
+		}
+
+		// get processors node
+		processorsNode, found := inputMap.Find("processors")
+		if !found {
+			processorsNode = &Key{
+				name:  "processors",
+				value: &List{value: make([]Node, 0)},
+			}
+
+			inputMap.value = append(inputMap.value, processorsNode)
+		}
+
+		processorsList, ok := processorsNode.Value().(*List)
+		if !ok {
+			return errors.New("InjectAgentInfoRule: processors is not a list")
+		}
+
+		// elastic.agent
+		processorMap := &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+			&Key{name: "version", value: &StrVal{value: agentInfo.Version()}},
+			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
+		}}})
+		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+	}
+
+	return nil
+}
+
+// InjectAgentInfo creates a InjectAgentInfoRule
+func InjectAgentInfo() *InjectAgentInfoRule {
+	return &InjectAgentInfoRule{}
+}
+
 // ExtractListItemRule extract items with specified name from a list of maps.
 // The result is store in a new array.
 // Example:
@@ -679,7 +747,7 @@ type ExtractListItemRule struct {
 }
 
 // Apply extracts items from array.
-func (r *ExtractListItemRule) Apply(ast *AST) error {
+func (r *ExtractListItemRule) Apply(_ AgentInfo, ast *AST) error {
 	node, found := Lookup(ast, r.Path)
 	if !found {
 		return nil
@@ -740,7 +808,7 @@ type RenameRule struct {
 
 // Apply renames the last items of a Selector to a new name and keep all the other values and will
 // return an error on failure.
-func (r *RenameRule) Apply(ast *AST) error {
+func (r *RenameRule) Apply(_ AgentInfo, ast *AST) error {
 	// Skip rename when node is not found.
 	node, ok := Lookup(ast, r.From)
 	if !ok {
@@ -773,7 +841,7 @@ func Copy(from, to Selector) *CopyRule {
 }
 
 // Apply copy a part of a tree into a new destination.
-func (r CopyRule) Apply(ast *AST) error {
+func (r CopyRule) Apply(_ AgentInfo, ast *AST) error {
 	node, ok := Lookup(ast, r.From)
 	// skip when the `from` node is not found.
 	if !ok {
@@ -800,7 +868,7 @@ func Translate(path Selector, mapper map[string]interface{}) *TranslateRule {
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateRule) Apply(ast *AST) error {
+func (r *TranslateRule) Apply(_ AgentInfo, ast *AST) error {
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -873,7 +941,7 @@ func TranslateWithRegexp(path Selector, re *regexp.Regexp, with string) *Transla
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateWithRegexpRule) Apply(ast *AST) error {
+func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -914,7 +982,7 @@ func Map(path Selector, rules ...Rule) *MapRule {
 }
 
 // Apply maps multiples rules over a subset of the tree.
-func (r *MapRule) Apply(ast *AST) error {
+func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 	node, ok := Lookup(ast, r.Path)
 	// Skip map  when node is not found.
 	if !ok {
@@ -931,15 +999,15 @@ func (r *MapRule) Apply(ast *AST) error {
 
 	switch t := n.Value().(type) {
 	case *List:
-		return mapList(r, t)
+		return mapList(agentInfo, r, t)
 	case *Dict:
-		return mapDict(r, t)
+		return mapDict(agentInfo, r, t)
 	case *Key:
 		switch t := n.Value().(type) {
 		case *List:
-			return mapList(r, t)
+			return mapList(agentInfo, r, t)
 		case *Dict:
-			return mapDict(r, t)
+			return mapDict(agentInfo, r, t)
 		default:
 			return fmt.Errorf(
 				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
@@ -954,13 +1022,13 @@ func (r *MapRule) Apply(ast *AST) error {
 	)
 }
 
-func mapList(r *MapRule, l *List) error {
+func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
 		newAST := &AST{root: item}
 		for _, rule := range r.Rules {
-			err := rule.Apply(newAST)
+			err := rule.Apply(agentInfo, newAST)
 			if err != nil {
 				return err
 			}
@@ -970,10 +1038,10 @@ func mapList(r *MapRule, l *List) error {
 	return nil
 }
 
-func mapDict(r *MapRule, l *Dict) error {
+func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) error {
 	newAST := &AST{root: l}
 	for _, rule := range r.Rules {
-		err := rule.Apply(newAST)
+		err := rule.Apply(agentInfo, newAST)
 		if err != nil {
 			return err
 		}
@@ -1024,7 +1092,7 @@ func Filter(selectors ...Selector) *FilterRule {
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterRule) Apply(ast *AST) error {
+func (r *FilterRule) Apply(_ AgentInfo, ast *AST) error {
 	mergedAST := &AST{root: &Dict{}}
 	var err error
 	for _, selector := range r.Selectors {
@@ -1054,7 +1122,7 @@ func FilterValues(selector Selector, key Selector, values ...interface{}) *Filte
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesRule) Apply(ast *AST) error {
+func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) error {
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {
@@ -1167,7 +1235,7 @@ func (r *FilterValuesWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) e
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
+func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) error {
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {

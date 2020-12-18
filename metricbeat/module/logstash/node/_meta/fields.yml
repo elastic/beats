@@ -4,6 +4,13 @@
     node
   release: ga
   fields:
+    - name: state.pipeline
+      type: group
+      fields:
+        - name: id
+          type: keyword
+        - name: hash
+          type: keyword
     - name: host
       type: alias
       path: host.hostname

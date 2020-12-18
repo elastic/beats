@@ -105,7 +105,6 @@ func (n *node) OnUpdate(obj interface{}) {
 		time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(node, "stop") })
 	} else {
 		n.logger.Debugf("Watcher Node update: %+v", obj)
-		// TODO: figure out how to avoid stop starting when node status is periodically being updated by kubelet
 		n.emit(node, "stop")
 		n.emit(node, "start")
 	}
@@ -166,6 +165,11 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 
 	// If a node doesn't have an IP then dont monitor it
 	if host == "" && flag != "stop" {
+		return
+	}
+
+	// If the node is not in ready state then dont monitor it unless its a stop event
+	if !isNodeReady(node) && flag != "stop" {
 		return
 	}
 
@@ -234,6 +238,12 @@ func getAddress(node *kubernetes.Node) string {
 
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeInternalIP && address.Address != "" {
+			return address.Address
+		}
+	}
+
+	for _, address := range node.Status.Addresses {
+		if address.Type == v1.NodeHostName && address.Address != "" {
 			return address.Address
 		}
 	}

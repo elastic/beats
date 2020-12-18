@@ -19,8 +19,12 @@ package shard
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"path/filepath"
 	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 
 	"github.com/stretchr/testify/require"
 
@@ -40,5 +44,36 @@ func TestStats(t *testing.T) {
 
 		require.True(t, len(reporter.GetEvents()) >= 1)
 		require.Equal(t, 0, len(reporter.GetErrors()))
+	}
+}
+
+func TestData(t *testing.T) {
+	mux := http.NewServeMux()
+
+	mux.Handle("/_nodes/_local/nodes", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
+	}))
+	mux.Handle("/_cluster/state/master_node", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"master_node": "foobar"}`))
+	}))
+	mux.Handle("/_cluster/state/version,nodes,master_node,routing_table", http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			input, _ := ioutil.ReadFile("./_meta/test/routing_table.710.json")
+			w.Write(input)
+		}))
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
+}
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     elasticsearch.ModuleName,
+		"metricsets": []string{"shard"},
+		"hosts":      []string{host},
 	}
 }

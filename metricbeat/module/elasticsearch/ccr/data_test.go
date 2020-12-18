@@ -21,6 +21,8 @@ package ccr
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -46,4 +48,20 @@ func TestEmpty(t *testing.T) {
 	eventsMapping(reporter, info, input)
 	require.Equal(t, 0, len(reporter.GetErrors()))
 	require.Equal(t, 0, len(reporter.GetEvents()))
+}
+
+func TestData(t *testing.T) {
+	mux := createEsMuxer("7.6.0", "platinum", true)
+	mux.Handle("/_ccr/stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		input, _ := ioutil.ReadFile("./_meta/test/ccr_stats.700.json")
+		w.Write(input)
+	}))
+
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
 }

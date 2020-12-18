@@ -20,16 +20,13 @@ package stats
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	"github.com/pkg/errors"
-
-	"strconv"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/nats/util"
 )
 
 var (
@@ -68,96 +65,25 @@ var (
 	}
 )
 
-// Converts uptime from formatted string to seconds
-// input: "1y20d22h3m30s", output: 33343410
-func convertUptime(uptime string) (seconds int64, err error) {
-
-	var split []string
-	var years, days, hours, minutes, secs int64
-	if strings.Contains(uptime, "y") {
-		split = strings.Split(uptime, "y")
-		uptime = split[1]
-		years, err = strconv.ParseInt(split[0], 10, 64)
-		if err != nil {
-			err = errors.Wrap(err, "invalid years format in json data")
-			return
-		}
-		seconds += years * 31536000
-	}
-
-	if strings.Contains(uptime, "d") {
-		split = strings.Split(uptime, "d")
-		uptime = split[1]
-		days, err = strconv.ParseInt(split[0], 10, 64)
-		if err != nil {
-			err = errors.Wrap(err, "invalid days format in json data")
-			return
-		}
-		seconds += days * 86400
-	}
-
-	if strings.Contains(uptime, "h") {
-		split = strings.Split(uptime, "h")
-		uptime = split[1]
-		hours, err = strconv.ParseInt(split[0], 10, 64)
-		if err != nil {
-			err = errors.Wrap(err, "invalid hours format in json data")
-			return
-		}
-		seconds += hours * 3600
-	}
-
-	if strings.Contains(uptime, "m") {
-		split = strings.Split(uptime, "m")
-		uptime = split[1]
-		minutes, err = strconv.ParseInt(split[0], 10, 64)
-		if err != nil {
-			err = errors.Wrap(err, "invalid minutes format in json data")
-			return
-		}
-		seconds += minutes * 60
-	}
-
-	if strings.Contains(uptime, "s") {
-		split = strings.Split(uptime, "s")
-		uptime = split[1]
-		secs, err = strconv.ParseInt(split[0], 10, 64)
-		if err != nil {
-			err = errors.Wrap(err, "invalid seconds format in json data")
-			return
-		}
-		seconds += secs
-	}
-	return
-}
-
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var event common.MapStr
+	var metricsetMetrics common.MapStr
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Nats stats API response")
 	}
-	event, err = statsSchema.Apply(inInterface)
+	metricsetMetrics, err = statsSchema.Apply(inInterface)
 	if err != nil {
 		return errors.Wrap(err, "failure applying stats schema")
 	}
 
-	uptime, err := event.GetValue("uptime")
-	if err != nil {
-		return errors.Wrap(err, "failure retrieving uptime key")
-	}
-	uptime, err = convertUptime(uptime.(string))
-	if err != nil {
-		return errors.Wrap(err, "failure converting uptime from string to integer")
-	}
-	_, err = event.Put("uptime", uptime)
+	err = util.UpdateDuration(metricsetMetrics, "uptime")
 	if err != nil {
 		return errors.Wrap(err, "failure updating uptime key")
 	}
 
-	d, err := event.GetValue("http_req_stats")
+	d, err := metricsetMetrics.GetValue("http_req_stats")
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving http_req_stats key")
 	}
@@ -166,12 +92,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure casting http_req_stats to common.Mapstr")
 
 	}
-	err = event.Delete("http_req_stats")
+	err = metricsetMetrics.Delete("http_req_stats")
 	if err != nil {
 		return errors.Wrap(err, "failure deleting http_req_stats key")
 
 	}
-	event["http"] = common.MapStr{
+	metricsetMetrics["http"] = common.MapStr{
 		"req_stats": common.MapStr{
 			"uri": common.MapStr{
 				"root":   httpStats["root_uri"],
@@ -182,7 +108,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 			},
 		},
 	}
-	cpu, err := event.GetValue("cpu")
+	cpu, err := metricsetMetrics.GetValue("cpu")
 	if err != nil {
 		return errors.Wrap(err, "failure retrieving cpu key")
 	}
@@ -190,7 +116,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if !ok {
 		return errors.Wrap(err, "failure casting cpu to float64")
 	}
-	_, err = event.Put("cpu", cpuUtil/100.0)
+	_, err = metricsetMetrics.Put("cpu", cpuUtil/100.0)
 	if err != nil {
 		return errors.Wrap(err, "failure updating cpu key")
 	}
@@ -198,6 +124,15 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "failure applying module schema")
 	}
-	r.Event(mb.Event{MetricSetFields: event, ModuleFields: moduleMetrics})
+	timestamp, err := util.GetNatsTimestamp(moduleMetrics)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing server timestamp")
+	}
+	evt := mb.Event{
+		MetricSetFields: metricsetMetrics,
+		ModuleFields:    moduleMetrics,
+		Timestamp:       timestamp,
+	}
+	r.Event(evt)
 	return nil
 }

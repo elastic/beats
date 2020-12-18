@@ -23,8 +23,13 @@ endif::[]
 You can adjust the following settings to load your own template or overwrite an
 existing one.
 
-*`setup.template.enabled`*:: Set to false to disable template loading. If set this to false,
+*`setup.template.enabled`*:: Set to false to disable template loading. If this is set to false,
 you must <<load-template-manually,load the template manually>>.
+
+*`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
+before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `component`
+and `index`. Selecting `component` loads a component template which can be included in new index templates.
+The option `index` loads the new index template.
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given
@@ -55,7 +60,8 @@ relative path is set, it is considered relative to the config path. See the <<di
 section for details.
 
 *`setup.template.overwrite`*:: A boolean that specifies whether to overwrite the existing template. The default
-is false.
+is false. Do not enable this option if you start more than one instance of {beatname_uc} at the same time. It
+can overload {es} by sending too many template update requests.
 
 *`setup.template.settings`*:: A dictionary of settings to place into the `settings.index` dictionary of the
 Elasticsearch template. For more details about the available Elasticsearch mapping options, please

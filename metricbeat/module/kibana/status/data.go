@@ -63,10 +63,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return errors.Wrap(err, "failure parsing Kibana Status API response")
 	}
 
-	dataFields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure to apply status schema")
-	}
+	dataFields, _ := schema.Apply(data)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")

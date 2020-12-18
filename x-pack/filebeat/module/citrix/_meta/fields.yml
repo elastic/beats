@@ -1,5 +1,5 @@
 - key: citrix
-  title: Citrix XenApp
+  title: Citrix NetScaler
   description: >
     citrix fields.
   fields:

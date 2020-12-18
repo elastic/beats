@@ -1,0 +1,139 @@
+[[debug-configs]]
+== Debugging 
+
+To debug configurations that include variable substitution and conditions, use 
+the `inspect` command. This command shows the configuration that's generated
+after variables are replaced and conditions are applied.
+
+First run the {agent}. For this example, we'll use the following agent policy:
+
+
+[source,yaml]
+----
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200]
+    username: elastic
+    password: changeme
+
+providers:
+  local_dynamic:
+    items:
+      - vars:
+          key: value1
+        processors:
+          - add_fields:
+              fields:
+                custom: match1
+              target: dynamic
+      - vars:
+          key: value2
+        processors:
+          - add_fields:
+              fields:
+                custom: match2
+              target: dynamic
+      - vars:
+          key: value3
+        processors:
+          - add_fields:
+              fields:
+                custom: match3
+              target: dynamic
+
+inputs:
+  - type: logfile
+    enabled: true
+    streams:
+      - paths:
+          - /var/log/{{local_dynamic.key}}
+----
+
+Then run `elastic-agent inspect` to see the generated configuration. For
+example:
+
+[source,shell]
+----
+$ ./elastic-agent inspect output -o default
+[default] filebeat:
+filebeat:
+  inputs:
+  - index: logs-generic-default
+    paths:
+    - /var/log/value1
+    processors:
+    - add_fields:
+        fields:
+          custom: match1
+        target: dynamic
+    - add_fields:
+        fields:
+          dataset: generic
+          namespace: default
+          type: logs
+        target: data_stream
+    - add_fields:
+        fields:
+          dataset: generic
+        target: event
+    type: log
+  - index: logs-generic-default
+    paths:
+    - /var/log/value2
+    processors:
+    - add_fields:
+        fields:
+          custom: match2
+        target: dynamic
+    - add_fields:
+        fields:
+          dataset: generic
+          namespace: default
+          type: logs
+        target: data_stream
+    - add_fields:
+        fields:
+          dataset: generic
+        target: event
+    type: log
+  - index: logs-generic-default
+    paths:
+    - /var/log/value3
+    processors:
+    - add_fields:
+        fields:
+          custom: match3
+        target: dynamic
+    - add_fields:
+        fields:
+          dataset: generic
+          namespace: default
+          type: logs
+        target: data_stream
+    - add_fields:
+        fields:
+          dataset: generic
+        target: event
+    type: log
+output:
+  elasticsearch:
+    hosts:
+    - 127.0.0.1:9200
+    password: changeme
+    username: elastic
+
+---
+[default] FLEET_MONITORING:
+output:
+  elasticsearch:
+    hosts:
+    - 127.0.0.1:9200
+    password: changeme
+    type: elasticsearch
+    username: elastic
+programs:
+- filebeat
+
+---
+----

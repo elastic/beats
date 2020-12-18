@@ -24,6 +24,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -132,7 +133,7 @@ func (d *KubernetesIntegrationTester) Test(dir string, mageTarget string, env ma
 
 	destDir := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	workDir := filepath.Join(destDir, repo.SubDir)
-	remote, err := NewKubeRemote(kubeConfig, "default", kubernetesPodName(), workDir, destDir, repo.RootDir)
+	remote, err := NewKubeRemote(kubeConfig, "default", kubernetesClusterName(), workDir, destDir, repo.RootDir)
 	if err != nil {
 		return err
 	}
@@ -172,8 +173,8 @@ func waitKubeStateMetricsReadiness(env map[string]string, stdOut, stdErr io.Writ
 	return nil
 }
 
-// kubernetesPodName returns the pod name to use with kubernetes.
-func kubernetesPodName() string {
+// kubernetesClusterName generates a name for the Kubernetes cluster.
+func kubernetesClusterName() string {
 	commit, err := mage.CommitHash()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to construct kind cluster name"))
@@ -183,13 +184,29 @@ func kubernetesPodName() string {
 	if err != nil {
 		panic(errors.Wrap(err, "failed to construct kind cluster name"))
 	}
-	version = strings.NewReplacer(".", "_").Replace(version)
+	version = strings.NewReplacer(".", "-").Replace(version)
 
-	clusterName := "{{.BeatName}}_{{.Version}}_{{.ShortCommit}}-{{.StackEnvironment}}"
+	clusterName := "{{.BeatName}}-{{.Version}}-{{.ShortCommit}}-{{.StackEnvironment}}"
 	clusterName = mage.MustExpand(clusterName, map[string]interface{}{
 		"StackEnvironment": mage.StackEnvironment,
 		"ShortCommit":      commit[:10],
 		"Version":          version,
 	})
+
+	// The cluster name may be used as a component of Kubernetes resource names.
+	// kind does this, for example.
+	//
+	// Since Kubernetes resources are required to have names that are valid DNS
+	// names, we should ensure that the cluster name also meets this criterion.
+	subDomainPattern := `^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$`
+	// Note that underscores, in particular, are not permitted.
+	matched, err := regexp.MatchString(subDomainPattern, clusterName)
+	if err != nil {
+		panic(errors.Wrap(err, "error while validating kind cluster name"))
+	}
+	if !matched {
+		panic("constructed invalid kind cluster name")
+	}
+
 	return clusterName
 }
