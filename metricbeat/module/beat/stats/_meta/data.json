@@ -1,51 +1,110 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2020-09-23T22:12:35.762Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "service": {
+        "name": "beat",
+        "address": "localhost:5066",
+        "type": "beat"
+    },
+    "event": {
+        "module": "beat",
+        "duration": 2863058,
+        "dataset": "beat.stats"
+    },
+    "metricset": {
+        "period": 10000,
+        "name": "stats"
+    },
     "beat": {
-        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "type": "metricbeat",
         "stats": {
+            "memstats": {
+                "gc_next": 8757616,
+                "memory": {
+                    "alloc": 6218912,
+                    "total": 19186256
+                },
+                "rss": 59068416
+            },
+            "uptime": {
+                "ms": 70
+            },
+            "runtime": {
+                "goroutines": 26
+            },
+            "handles": {
+                "open": 11,
+                "limit": {
+                    "hard": 524288,
+                    "soft": 1024
+                }
+            },
             "libbeat": {
-                "output": {
+                "pipeline": {
+                    "clients": 1,
+                    "queue": {
+                        "acked": 0
+                    },
                     "events": {
-                        "acked": 0,
                         "active": 0,
+                        "dropped": 0,
+                        "failed": 0,
+                        "filtered": 0,
+                        "published": 0,
+                        "retry": 0,
+                        "total": 0
+                    }
+                },
+                "config": {
+                    "running": 1,
+                    "starts": 1,
+                    "stops": 0
+                },
+                "output": {
+                    "type": "elasticsearch",
+                    "events": {
                         "batches": 0,
                         "dropped": 0,
                         "duplicates": 0,
                         "failed": 0,
                         "toomany": 0,
-                        "total": 0
+                        "total": 0,
+                        "acked": 0,
+                        "active": 0
                     },
                     "read": {
                         "bytes": 0,
                         "errors": 0
                     },
-                    "type": "elasticsearch",
                     "write": {
-                        "bytes": 0,
-                        "errors": 0
+                        "errors": 0,
+                        "bytes": 0
                     }
                 }
             },
-            "runtime": {
-                "goroutines": 39
-            },
-            "uptime": {
-                "ms": 12019
+            "state": {
+                "success": 0,
+                "events": 0,
+                "failures": 0
             }
-        },
-        "type": "metricbeat"
+        }
     },
-    "event": {
-        "dataset": "beat.stats",
-        "duration": 115000,
-        "module": "beat"
+    "ecs": {
+        "version": "1.5.0"
     },
-    "metricset": {
-        "name": "stats"
+    "host": {
+        "name": "mcastro"
     },
-    "service": {
-        "address": "127.0.0.1:5066",
-        "name": "beat",
-        "type": "beat"
+    "agent": {
+        "ephemeral_id": "9f03c068-294e-4105-96bc-1f1d9c96202f",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro",
+        "type": "metricbeat",
+        "version": "8.0.0"
     }
 }
