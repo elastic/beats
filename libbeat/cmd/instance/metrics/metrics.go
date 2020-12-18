@@ -264,7 +264,7 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
+	monitoring.ReportInt(V, "cores", int64(runtime.NumCPU()))
 }
 
 func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {

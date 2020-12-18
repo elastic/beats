@@ -20,6 +20,8 @@
 package load
 
 import (
+	"runtime"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -58,7 +60,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	normAvgs := load.NormalizedAverages()
 
 	event := common.MapStr{
-		"cores": cpu.NumCores,
+		"cores": runtime.NumCPU(),
 		"1":     avgs.OneMinute,
 		"5":     avgs.FiveMinute,
 		"15":    avgs.FifteenMinute,
