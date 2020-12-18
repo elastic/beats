@@ -81,8 +81,8 @@ func TestXPackEnabled(t *testing.T) {
 
 func getXPackConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
-		"module":        beat.ModuleName,
-		"metricsets":    metricSets,
-		"hosts":         []string{host},
+		"module":     beat.ModuleName,
+		"metricsets": metricSets,
+		"hosts":      []string{host},
 	}
 }

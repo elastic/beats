@@ -19,6 +19,7 @@ package state
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
@@ -128,7 +129,6 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 
 	return nil
 }
-
 
 func getClusterUUID(state map[string]interface{}) string {
 	o, exists := state["outputs"]
