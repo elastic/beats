@@ -8,8 +8,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"sync"
 	"time"
+
+	"google.golang.org/grpc"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
@@ -147,15 +150,7 @@ func (in *pubsubInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	// Make pubsub client.
-	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
-	if in.CredentialsFile != "" {
-		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
-	} else if len(in.CredentialsJSON) > 0 {
-		option.WithCredentialsJSON(in.CredentialsJSON)
-	}
-
-	client, err := pubsub.NewClient(ctx, in.ProjectID, opts...)
+	client, err := in.newPubsubClient(ctx)
 	if err != nil {
 		return err
 	}
@@ -249,4 +244,21 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 	}
 
 	return nil, errors.New("no subscription exists and 'subscription.create' is not enabled")
+}
+
+func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, error) {
+	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
+	if in.PubsubAlternativeHost != "" {
+		// this will be typically set because we want to point the input to a testing pubsub emulator
+		conn, err := grpc.Dial(in.PubsubAlternativeHost, grpc.WithInsecure())
+		if err != nil {
+			return nil, fmt.Errorf("grpc.Dial: %v", err)
+		}
+		opts = append(opts, option.WithGRPCConn(conn), option.WithTelemetryDisabled())
+	} else if in.CredentialsFile != "" {
+		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
+	} else if len(in.CredentialsJSON) > 0 {
+		opts = append(opts, option.WithCredentialsJSON(in.CredentialsJSON))
+	}
+	return pubsub.NewClient(ctx, in.ProjectID, opts...)
 }

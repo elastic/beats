@@ -36,6 +36,8 @@ type config struct {
 
 	// JSON blob containing authentication credentials and key.
 	CredentialsJSON []byte `config:"credentials_json"`
+
+	PubsubAlternativeHost string `config:"pubsub_alternative_host"`
 }
 
 func (c *config) Validate() error {
