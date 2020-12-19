@@ -97,7 +97,7 @@ func getPlatformCPUMetrics(sample *cpu.Metrics, selectors []string, event common
 
 // gather CPU metrics
 func collectCPUMetrics(selectors []string, sample *cpu.Metrics) mb.Event {
-	event := common.MapStr{"cores": cpu.NumCores}
+	event := common.MapStr{"cores": runtime.NumCPU()}
 	getPlatformCPUMetrics(sample, selectors, event)
 
 	//generate the host fields here, since we don't want users disabling it.

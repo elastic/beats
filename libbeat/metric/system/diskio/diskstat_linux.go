@@ -20,10 +20,10 @@
 package diskio
 
 import (
+	"runtime"
+
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/disk"
-
-	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 )
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall
@@ -63,7 +63,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	}
 
 	// calculate the delta ms between the CloseSampling and OpenSampling
-	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(cpu.NumCores) / float64(GetCLKTCK())
+	deltams := 1000.0 * float64(stat.curCPU.Total()-stat.lastCPU.Total()) / float64(runtime.NumCPU()) / float64(GetCLKTCK())
 	if deltams <= 0 {
 		return IOMetric{}, errors.New("The delta cpu time between close sampling and open sampling is less or equal to 0")
 	}
