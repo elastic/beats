@@ -248,17 +248,21 @@ func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubs
 
 func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, error) {
 	opts := []option.ClientOption{option.WithUserAgent(useragent.UserAgent("Filebeat"))}
-	if in.PubsubAlternativeHost != "" {
+
+	if in.AlternativeHost != "" {
 		// this will be typically set because we want to point the input to a testing pubsub emulator
-		conn, err := grpc.Dial(in.PubsubAlternativeHost, grpc.WithInsecure())
+		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithInsecure())
 		if err != nil {
-			return nil, fmt.Errorf("grpc.Dial: %v", err)
+			return nil, fmt.Errorf("grpc.Dial: %w", err)
 		}
 		opts = append(opts, option.WithGRPCConn(conn), option.WithTelemetryDisabled())
-	} else if in.CredentialsFile != "" {
+	}
+
+	if in.CredentialsFile != "" {
 		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
 	} else if len(in.CredentialsJSON) > 0 {
 		opts = append(opts, option.WithCredentialsJSON(in.CredentialsJSON))
 	}
+
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)
 }
