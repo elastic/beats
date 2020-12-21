@@ -80,7 +80,11 @@ func Fields() error {
 
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, Config)
+	mg.SerialDeps(Fields, FieldDocs, Config)
+}
+
+func FieldDocs() error {
+	return devtools.Docs.FieldDocs("fields.yml")
 }
 
 // Config generates both the short/reference/docker configs.
