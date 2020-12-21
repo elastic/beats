@@ -12,11 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -253,7 +252,7 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		// this will be typically set because we want to point the input to a testing pubsub emulator
 		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithInsecure())
 		if err != nil {
-			return nil, fmt.Errorf("grpc.Dial: %w", err)
+			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
 		opts = append(opts, option.WithGRPCConn(conn), option.WithTelemetryDisabled())
 	}
