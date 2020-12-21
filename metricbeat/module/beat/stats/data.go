@@ -87,7 +87,7 @@ var (
 				"stops":   c.Int("stops"),
 			}),
 		}),
-		"state": c.Dict("metricbeat.beat.stats", s.Schema{
+		"state": c.Dict("metricbeat.beat.state", s.Schema{
 			"events":   c.Int("events"),
 			"failures": c.Int("failures"),
 			"success":  c.Int("success"),

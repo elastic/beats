@@ -1,62 +1,45 @@
 {
-    "@timestamp": "2020-09-23T21:49:35.919Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "host": {
-        "architecture": "x86_64",
-        "hostname": "mcastro",
-        "id": "54f70115bae545cbac2b150f254472a0",
-        "name": "mcastro"
-    },
-    "service": {
-        "address": "localhost:5066",
-        "type": "metricbeat"
-    },
-    "event": {
-        "dataset": "beat.state",
-        "module": "beat",
-        "duration": 4447168
-    },
-    "metricset": {
-        "name": "state",
-        "period": 10000
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "state": {
+            "host": {
+                "containerized": "containerized",
+                "os": {
+                    "kernel": "5.6.10-arch1-1",
+                    "name": "CentOS Linux",
+                    "platform": "centos",
+                    "version": "7 (Core)"
+                }
+            },
+            "management": {
+                "enabled": false
+            },
             "module": {
-                "count": 1
+                "count": 10
             },
             "output": {
                 "name": "elasticsearch"
             },
             "queue": {
                 "name": "mem"
-            },
-            "host": {
-                "containerized": "containerized",
-                "os": {
-                    "platform": "antergos",
-                    "version": "",
-                    "kernel": "5.6.10-arch1-1",
-                    "name": "Antergos Linux"
-                }
-            },
-            "management": {
-                "enabled": false
             }
         }
     },
-    "agent": {
-        "version": "8.0.0",
-        "ephemeral_id": "7d702dc7-449d-4e96-b5ad-ecf1fd09c47a",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro",
-        "type": "metricbeat"
+    "event": {
+        "dataset": "beat.state",
+        "duration": 115000,
+        "module": "beat"
     },
-    "ecs": {
-        "version": "1.5.0"
+    "host": {
+        "architecture": "x86_64",
+        "hostname": "1e43167a954e"
+    },
+    "metricset": {
+        "name": "state",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.20.0.2:5066",
+        "type": "metricbeat"
     }
 }
