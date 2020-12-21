@@ -933,6 +933,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 
+*Heartbeat*
+
+- Add support for script processor. {pull}23229[23229]
+
 *Winlogbeat*
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
