@@ -36,6 +36,9 @@ type config struct {
 
 	// JSON blob containing authentication credentials and key.
 	CredentialsJSON []byte `config:"credentials_json"`
+
+	// Overrides the default Pub/Sub service address and disables TLS. For testing.
+	AlternativeHost string `config:"alternative_host"`
 }
 
 func (c *config) Validate() error {
