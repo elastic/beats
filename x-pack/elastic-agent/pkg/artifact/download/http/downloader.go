@@ -151,5 +151,9 @@ func (e *Downloader) downloadFile(ctx context.Context, artifactName, filename, f
 	}
 
 	_, err = io.Copy(destinationFile, resp.Body)
+	if err != nil {
+		return "", errors.New(err, "fetching package failed", errors.TypeNetwork, errors.M(errors.MetaKeyURI, sourceURI))
+	}
+
 	return fullPath, nil
 }
