@@ -23,8 +23,10 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // ModuleName is the name of this module
@@ -50,6 +52,18 @@ var (
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
 	SettingsAPIAvailableVersion = v6_5_0
 )
+
+func init() {
+	// Register the ModuleFactory function for this module.
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+		panic(err)
+	}
+}
+
+// NewModule creates a new module.
+func NewModule(base mb.BaseModule) (mb.Module, error) {
+	return elastic.NewModule(&base, []string{"stats"}, logp.NewLogger(ModuleName))
+}
 
 // GetVersion returns the version of the Kibana instance
 func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) {

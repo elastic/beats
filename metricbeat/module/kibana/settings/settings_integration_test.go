@@ -72,7 +72,7 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
-		t.Skip("Kibana stats API is not available until 6.4.0")
+		t.Skip("Kibana settings API is not available until 6.4.0")
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
