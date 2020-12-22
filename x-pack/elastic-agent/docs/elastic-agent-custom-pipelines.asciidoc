@@ -1,0 +1,20 @@
+[[custom-pipelines]]
+== Custom pipelines and custom templates
+
+The Elastic Agent ships all its data based on the new data stream naming scheme (TODO: add link to blog). One of the features of this naming scheme is that now which ingest pipeline should be used for a specific event is not defined anymore on ingest but by the data stream itself. The ingest pipeline is a setting of the data stream.
+
+Note: It is still possible to set a custom ingest pipeline but it is strongly discouraged as it might break the existing data stream.
+
+Fleet with the integrations has a long list where processing data works out of the box. But there are cases where you want to process your own logs or the specific log type is not supported. In this case your own template and ingest pipeline must be defined.
+
+First, it is recommended to specifiy your own dataset name for your dataset. This dataset name must then be specified in the policy. Assuming the Custom Logs integrations is used, there the dataset can be configured.
+
+Assuming the dataset was set to `foo`, that will now land in `logs-foo-default`. Do define your own mapping and ingest pipeline, a template for `logs-foo-*` must be created and an ingest pipeline that is configured in the settings.
+
+NOTE: Make sure your dataset name does not conflict with any packages as otherwise the template and ingest pipeline might be overwritten.
+
+As soon as the template with the ingest pipeline is configured, a rollover on the data stream should be triggered and all new data coming in will use the template and in the ingest pipeline.
+
+TODO:
+
+* Add template example
