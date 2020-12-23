@@ -8,7 +8,7 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
+RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
@@ -19,6 +19,13 @@ RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+    mkdir -p {{ $beatHome }}/.node \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/suites \
+{{- end }}
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
 FROM {{ .from }}
@@ -28,8 +35,18 @@ RUN microdnf -y --setopt=tsflags=nodocs update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN yum -y --setopt=tsflags=nodocs update && yum clean all
+RUN yum -y --setopt=tsflags=nodocs update \
+  {{- if (eq .BeatName "heartbeat") }}
+    && yum -y install epel-release \
+    && yum -y install atk cups gtk gdk xrandr pango.x86_64 libXcomposite.x86_64 libXcursor.x86_64 libXdamage.x86_64 \
+	  libXext.x86_64 libXi.x86_64 libXtst.x86_64 cups-libs.x86_64 libXScrnSaver.x86_64 libXrandr.x86_64 GConf2.x86_64 \
+	  alsa-lib.x86_64 atk.x86_64 gtk3.x86_64 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
+	  xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
+  {{- end }}
+  && yum clean all && rm -rf /var/cache/yum
+  # See https://access.redhat.com/discussions/3195102 for why rm is needed
 {{- end }}
+
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \
@@ -80,6 +97,23 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV SUITES_DIR={{ $beatHome }}/suites
+ENV NODE_PATH={{ $beatHome }}/.node
+
+# Setup node
+RUN  cd /usr/share/heartbeat/.node \
+      && mkdir node \
+      && curl https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz | tar -xJ --strip 1 -C node
+ENV PATH="/usr/share/heartbeat/.node/node/bin:$PATH"
+# Install the latest version of @elastic/synthetics forcefully ignoring the previously
+# cached node_modules, hearbeat then calls the global executable to run test suites
+RUN npm i -g -f @elastic/synthetics
+{{- end }}
+
+
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
@@ -98,35 +132,3 @@ ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
 CMD ["-environment", "container"]
-
-{{- if not (and (eq .BeatName "heartbeat") (contains .from "ubi-minimal"))  }}
-# Setup synthetics deps for heartbeat
-ENV ELASTIC_SYNTHETICS_CAPABLE=true
-USER root
-RUN yum -y install epel-release && \
-     yum -y install atk cups gtk gdk xrandr pango.x86_64 libXcomposite.x86_64 libXcursor.x86_64 libXdamage.x86_64 \
-	  libXext.x86_64 libXi.x86_64 libXtst.x86_64 cups-libs.x86_64 libXScrnSaver.x86_64 libXrandr.x86_64 GConf2.x86_64 \
-	  alsa-lib.x86_64 atk.x86_64 gtk3.x86_64 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
-	  xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
-	  yum clean all && \
-    rm -rf /var/cache/yum
-
-ENV SUITES_DIR=/usr/share/heartbeat/suites
-
-# or docker run your-image /your/program ...
-RUN echo /usr/share/heartbeat/.node \\
-      /usr/share/heartbeat/.npm \\
-      /usr/share/heartbeat/.cache \\
-      /usr/share/heartbeat/.config \\
-      $SUITES_DIR \\
-      /opt/elastic-synthetics | xargs -IDIR sh -c "mkdir DIR && chown -R heartbeat:heartbeat DIR"
-ENV NODE_PATH=/usr/share/heartbeat/.node
-USER heartbeat
-RUN  cd /usr/share/heartbeat/.node \\
-      && mkdir node \\
-      && curl https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz | tar -xJ --strip 1 -C node
-ENV PATH="/usr/share/heartbeat/.node/node/bin:$PATH"
-# Install the latest version of @elastic/synthetics forcefully ignoring the previously
-# cached node_modules, hearbeat then calls the global executable to run test suites
-RUN npm i -g -f @elastic/synthetics
-{{- end }}
