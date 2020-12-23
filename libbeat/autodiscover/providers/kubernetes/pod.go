@@ -66,11 +66,14 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
+	fmt.Println(config.Sharding)
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
+		Instance:     config.Sharding.Instance,
+		ShardCount:   config.Sharding.Count,
 	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)

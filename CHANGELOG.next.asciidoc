@@ -578,6 +578,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
 - Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
 - Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
+- Add support for customized monitoring API. {pull}22605[22605]
+- Enable sharding of beats when running in cluster mode of Kubernetes autodiscover [pull]23257{23257}
 
 *Auditbeat*
 

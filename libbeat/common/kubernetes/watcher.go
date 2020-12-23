@@ -71,6 +71,10 @@ type WatchOptions struct {
 	IsUpdated func(old, new interface{}) bool
 	// HonorReSyncs allows resync events to be requeued on the worker
 	HonorReSyncs bool
+	// ShardCount defines the total number of instances that the beat has been sharded into.
+	ShardCount int
+	// Instance defines the nth instance of a sharded fleet a given beat is
+	Instance int
 }
 
 type item struct {

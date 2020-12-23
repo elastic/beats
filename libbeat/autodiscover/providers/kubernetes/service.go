@@ -57,6 +57,8 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
+		Instance:     config.Sharding.Instance,
+		ShardCount:   config.Sharding.Count,
 	}, nil)
 
 	if err != nil {

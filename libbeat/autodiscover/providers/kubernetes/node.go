@@ -69,6 +69,8 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		Node:         config.Node,
 		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
+		Instance:     config.Sharding.Instance,
+		ShardCount:   config.Sharding.Count,
 	}, nil)
 
 	if err != nil {
