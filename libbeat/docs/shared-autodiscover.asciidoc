@@ -280,7 +280,7 @@ metricbeat.autodiscover:
 The above configuration when deployed on one or more Metribceat instances will enable `state_node`
 metricset only for the Metricbeat instance that will gain the leader lease/lock. With this deployment
 strategy we can ensure that cluster-wide metricsets are only enabled by one Beat instance when
-deploying a Beat as Daemonset.
+deploying a Beat as DaemonSet.
 endif::[]
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
