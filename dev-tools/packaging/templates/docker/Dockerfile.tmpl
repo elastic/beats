@@ -99,7 +99,7 @@ WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
 CMD ["-environment", "container"]
 
-{{- if not (contains .from "ubi-minimal")  }}
+{{- if not (and (eq .BeatName "heartbeat") (contains .from "ubi-minimal"))  }}
 # Setup synthetics deps for heartbeat
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 USER root
