@@ -8,6 +8,14 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+RUN mkdir -p {{ $beatHome }}/.node \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/suites && \
+{{- end }}
+
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
@@ -18,13 +26,6 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
-{{- end }}
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
-    mkdir -p {{ $beatHome }}/.node \
-    {{ $beatHome }}/.npm \
-    {{ $beatHome }}/.cache \
-    {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites \
 {{- end }}
     chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
 
