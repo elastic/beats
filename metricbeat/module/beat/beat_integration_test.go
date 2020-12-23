@@ -60,11 +60,3 @@ func TestData(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
-
-func getXPackConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     beat.ModuleName,
-		"metricsets": metricSets,
-		"hosts":      []string{host},
-	}
-}
