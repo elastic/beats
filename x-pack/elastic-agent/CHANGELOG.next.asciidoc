@@ -29,6 +29,7 @@
 - Fix sysv init files for deb/rpm installation {pull}22543[22543]
 - Fix shell wrapper for deb/rpm packaging {pull}23038[23038]
 - Fixed parsing of npipe URI {pull}22978[22978]
+- Remove artifacts on transient download errors {pull}23235[23235]
 
 ==== New features
 
