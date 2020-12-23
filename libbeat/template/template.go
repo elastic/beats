@@ -161,11 +161,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 		return nil, err
 	}
 
-	dynamicTemplates := make([]common.MapStr, 0, len(processor.dynamicTemplates))
-	for _, tmpl := range processor.dynamicTemplates {
-		dynamicTemplates = append(dynamicTemplates, tmpl)
-	}
-	output := t.Generate(properties, dynamicTemplates)
+	output := t.Generate(properties, processor.dynamicTemplates)
 
 	return output, nil
 }

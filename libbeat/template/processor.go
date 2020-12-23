@@ -32,8 +32,10 @@ type Processor struct {
 	Migration       bool
 	ElasticLicensed bool
 
-	// dynamicTemplates records which dynamic templates have been added, to prevent duplicates.
-	dynamicTemplates map[dynamicTemplateKey]common.MapStr
+	// dynamicTemplatesMap records which dynamic templates have been added, to prevent duplicates.
+	dynamicTemplatesMap map[dynamicTemplateKey]common.MapStr
+	// dynamicTemplates records the dynamic templates in the order they were added.
+	dynamicTemplates []common.MapStr
 }
 
 var (
@@ -446,20 +448,20 @@ type dynamicTemplateKey struct {
 }
 
 func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
-	dk := dynamicTemplateKey{
+	key := dynamicTemplateKey{
 		path:      path,
 		pathMatch: pathMatch,
 		matchType: matchType,
 	}
-	if p.dynamicTemplates == nil {
-		p.dynamicTemplates = make(map[dynamicTemplateKey]common.MapStr)
+	if p.dynamicTemplatesMap == nil {
+		p.dynamicTemplatesMap = make(map[dynamicTemplateKey]common.MapStr)
 	} else {
-		if _, ok := p.dynamicTemplates[dk]; ok {
+		if _, ok := p.dynamicTemplatesMap[key]; ok {
 			// Dynamic template already added.
 			return
 		}
 	}
-	p.dynamicTemplates[dk] = common.MapStr{
+	dynamicTemplate := common.MapStr{
 		// Set the path of the field as name
 		path: common.MapStr{
 			"mapping":            properties,
@@ -467,6 +469,8 @@ func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties
 			"path_match":         pathMatch,
 		},
 	}
+	p.dynamicTemplatesMap[key] = dynamicTemplate
+	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
 }
 
 func getDefaultProperties(f *mapping.Field) common.MapStr {

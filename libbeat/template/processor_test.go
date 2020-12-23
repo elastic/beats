@@ -495,11 +495,7 @@ func TestDynamicTemplates(t *testing.T) {
 		p := &Processor{}
 		p.object(&test.field)
 		p.object(&test.field) // should not be added twice
-		dynamicTemplates := make([]common.MapStr, 0, len(p.dynamicTemplates))
-		for _, tmpl := range p.dynamicTemplates {
-			dynamicTemplates = append(dynamicTemplates, tmpl)
-		}
-		assert.Equal(t, test.expected, dynamicTemplates)
+		assert.Equal(t, test.expected, p.dynamicTemplates)
 	}
 }
 
