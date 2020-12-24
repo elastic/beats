@@ -16,6 +16,7 @@ import (
 type config struct {
 	udp.Config                `config:",inline"`
 	harvester.ForwarderConfig `config:",inline"`
+	InternalNetworks          []string      `config:"internal_networks"`
 	Protocols                 []string      `config:"protocols"`
 	ExpirationTimeout         time.Duration `config:"expiration_timeout"`
 	PacketQueueSize           int           `config:"queue_size"`

@@ -31,6 +31,9 @@ processors:
       file: ${path.home}/module/gcp/vpcflow/config/pipeline.js
       params:
         keep_original_message: {{ .keep_original_message }}
+        {{ if .internal_networks }}
+        internal_networks: {{ .internal_networks | tojson }}
+        {{ end }}
   - add_fields:
       target: ''
       fields:

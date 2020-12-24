@@ -65,6 +65,7 @@ LABEL \
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
+ENV GODEBUG="madvdontneed=1"
 
 # Add an init process, check the checksum to make sure it's a match
 RUN set -e ; \

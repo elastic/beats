@@ -56,7 +56,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 
 	// check the lock to ensure that elastic-agent is not already running in this directory
-	locker := application.NewAppLocker(paths.Data())
+	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		if err == application.ErrAppAlreadyRunning {
 			return fmt.Errorf("cannot perform installation as Elastic Agent is already running from this directory")

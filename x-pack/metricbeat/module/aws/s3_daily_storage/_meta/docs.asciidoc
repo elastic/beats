@@ -20,6 +20,10 @@ The aws s3_daily_storage metricset and s3_request metricset shares one predefine
 
 image::./images/metricbeat-aws-s3-overview.png[]
 
+Note: If only `s3_daily_storage` metricset is enabled or s3 request metrics are
+not enabled for the specific S3 bucket, some visualizations in this dashboard
+will be empty.
+
 [float]
 === Configuration example
 [source,yaml]

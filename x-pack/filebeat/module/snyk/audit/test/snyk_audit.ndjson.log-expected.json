@@ -1,0 +1,81 @@
+[
+    {
+        "@timestamp": "2020-11-17T14:30:13.800Z",
+        "event.action": "user.logged_in",
+        "event.dataset": "snyk.audit",
+        "event.module": "snyk",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "snyk",
+        "snyk.audit.content.sessionPublicId": "sessionId123-t34123-sdfa234-asd",
+        "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
+        "tags": [
+            "snyk-audit",
+            "forwarded"
+        ],
+        "user.group.id": "groupid123test-543123-54312sadf-123ad",
+        "user.id": "userid123test-234sdfa2-423sdfa-2134"
+    },
+    {
+        "@timestamp": "2020-11-12T13:24:40.317Z",
+        "event.action": "api.access",
+        "event.dataset": "snyk.audit",
+        "event.module": "snyk",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 285,
+        "service.type": "snyk",
+        "snyk.audit.content.url": "/api/v1/org/orgid123test-5643asd234-asdfasdf/projects",
+        "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
+        "tags": [
+            "snyk-audit",
+            "forwarded"
+        ],
+        "user.group.id": "groupid123test-543123-54312sadf-123ad",
+        "user.id": "userid123test-234sdfa2-423sdfa-2134"
+    },
+    {
+        "@timestamp": "2020-11-11T21:00:00.000Z",
+        "event.action": "org.user.invite",
+        "event.dataset": "snyk.audit",
+        "event.module": "snyk",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 576,
+        "service.type": "snyk",
+        "snyk.audit.content.email": "someone@snyk.io",
+        "snyk.audit.content.isAdmin": false,
+        "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
+        "tags": [
+            "snyk-audit",
+            "forwarded"
+        ],
+        "user.group.id": "groupid123test-543123-54312sadf-123ad",
+        "user.id": "userid123test-234sdfa2-423sdfa-2134"
+    },
+    {
+        "@timestamp": "2020-11-15T06:02:45.497Z",
+        "event.action": "org.user.role.edit",
+        "event.dataset": "snyk.audit",
+        "event.module": "snyk",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 852,
+        "service.type": "snyk",
+        "snyk.audit.content.after": "ADMIN",
+        "snyk.audit.content.before": "COLLABORATOR",
+        "snyk.audit.content.userPublicId": "userid123test-234sdfa2-423sdfa-2134",
+        "snyk.audit.org_id": "orgid123test-5643asd234-asdfasdf",
+        "tags": [
+            "snyk-audit",
+            "forwarded"
+        ],
+        "user.group.id": "groupid123test-543123-54312sadf-123ad",
+        "user.id": "userid123test-234sdfa2-423sdfa-2134"
+    }
+]

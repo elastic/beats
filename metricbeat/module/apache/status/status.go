@@ -109,6 +109,13 @@ func adjustFleetEvent(event mb.Event) mb.Event {
 	var adjusted mb.Event
 	adjusted.MetricSetFields = event.MetricSetFields.Clone()
 
+	// Convert apache.status.total_kbytes to apache.status.total_bytes
+	totalKBytes, err := adjusted.MetricSetFields.GetValue("total_kbytes")
+	if err == nil {
+		adjusted.MetricSetFields.Put("total_bytes", totalKBytes.(int64)*1024)
+		adjusted.MetricSetFields.Delete("total_kbytes")
+	}
+
 	// Remove apache.hostname
 	adjusted.MetricSetFields.Delete("hostname")
 	return adjusted

@@ -16,10 +16,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-// changeSymlink changes root symlink so it points to updated version
-func (u *Upgrader) changeSymlink(ctx context.Context, newHash string) error {
+// ChangeSymlink updates symlink paths to match current version.
+func ChangeSymlink(ctx context.Context, targetHash string) error {
 	// create symlink to elastic-agent-{hash}
-	hashedDir := fmt.Sprintf("%s-%s", agentName, newHash)
+	hashedDir := fmt.Sprintf("%s-%s", agentName, targetHash)
 
 	agentPrevName := agentName + ".prev"
 	symlinkPath := filepath.Join(paths.Top(), agentName)

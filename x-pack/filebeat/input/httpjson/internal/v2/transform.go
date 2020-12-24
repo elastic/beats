@@ -105,13 +105,13 @@ func (tr transformable) setHeader(v http.Header) {
 func (tr transformable) header() http.Header {
 	val, err := tr.GetValue("header")
 	if err != nil {
-		return http.Header{}
+		// if it does not exist, initialize it
+		header := http.Header{}
+		tr.setHeader(header)
+		return header
 	}
 
-	header, ok := val.(http.Header)
-	if !ok {
-		return http.Header{}
-	}
+	header, _ := val.(http.Header)
 
 	return header
 }
@@ -123,13 +123,13 @@ func (tr transformable) setBody(v common.MapStr) {
 func (tr transformable) body() common.MapStr {
 	val, err := tr.GetValue("body")
 	if err != nil {
-		return common.MapStr{}
+		// if it does not exist, initialize it
+		body := common.MapStr{}
+		tr.setBody(body)
+		return body
 	}
 
-	body, ok := val.(common.MapStr)
-	if !ok {
-		return common.MapStr{}
-	}
+	body, _ := val.(common.MapStr)
 
 	return body
 }

@@ -68,8 +68,15 @@ func TestFetchFleetMode(t *testing.T) {
 		t.Fatal("Too few top-level elements in the event")
 	}
 
-	_, err := event.MetricSetFields.GetValue("hostname")
-	assert.Equal(t, common.ErrKeyNotFound, err, "apache.hostname shouldn't be present in the fleet mode")
+	_, err := event.MetricSetFields.GetValue("total_kbytes")
+	assert.Equal(t, common.ErrKeyNotFound, err, "apache.status.total_kbytes shouldn't be present in the fleet mode")
+
+	totalBytes, err := event.MetricSetFields.GetValue("total_bytes")
+	assert.NoError(t, err, "apache.status.total_bytes should be present in the fleet mode")
+	assert.GreaterOrEqual(t, totalBytes.(int64), int64(0), "apache.status.total_bytes should be non-negative")
+
+	_, err = event.MetricSetFields.GetValue("hostname")
+	assert.Equal(t, common.ErrKeyNotFound, err, "apache.status.hostname shouldn't be present in the fleet mode")
 }
 
 func getConfig(host string) map[string]interface{} {

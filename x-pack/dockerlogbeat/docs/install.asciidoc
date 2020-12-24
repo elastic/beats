@@ -6,7 +6,6 @@
 <titleabbrev>Install and configure</titleabbrev>
 ++++
 
-experimental[]
 
 [float]
 === Before you begin

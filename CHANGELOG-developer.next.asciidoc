@@ -52,6 +52,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
 - Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
+- Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 
 ==== Bugfixes
 

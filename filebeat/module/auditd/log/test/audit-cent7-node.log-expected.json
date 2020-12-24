@@ -31,10 +31,16 @@
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
         "event.action": "config_change",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "1",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 234,
@@ -50,10 +56,16 @@
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
         "event.action": "config_change",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "1",
+        "event.type": [
+            "change"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 425,

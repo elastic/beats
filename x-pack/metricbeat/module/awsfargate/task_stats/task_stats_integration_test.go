@@ -30,6 +30,7 @@ func TestData(t *testing.T) {
 		"metricsets": []string{"task_stats"},
 	}
 
+	os.Setenv("ECS_CONTAINER_METADATA_URI_V4", "1.2.3.4")
 	m := mbtest.NewFetcher(t, config)
 
 	taskStatsFile, err := os.Open("./_meta/testdata/task_stats.json")

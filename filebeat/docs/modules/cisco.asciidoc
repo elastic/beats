@@ -388,7 +388,7 @@ will be found under `rsa.raw`. The default is false.
 
 The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
 
-To configure Cisco Umbrella to log to either your own S3 bucket or one that is managed by Cisco please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide.]
+To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-s3.html[S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
 
 This fileset supports all 4 log types:
 - Proxy
@@ -401,7 +401,6 @@ The Cisco Umbrella fileset depends on the original file path structure being fol
 <subfolder>/<YYYY>-<MM>-<DD>/<YYYY>-<MM>-<DD>-<hh>-<mm>-<xxxx>.csv.gz
 dnslogs/<year>-<month>-<day>/<year>-<month>-<day>-<hour>-<minute>.csv.gz
 
-When configuring the fileset, please ensure that the Queue URL is set to the root folder that includes each of these subfolders above.
 
 Example config:
 

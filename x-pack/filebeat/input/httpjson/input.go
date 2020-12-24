@@ -70,7 +70,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
 	sim := stateless.NewInputManager(statelessConfigure)
 	return inputv2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Manager: inputManager{
 			v2inputManager: v2.NewInputManager(log, store),

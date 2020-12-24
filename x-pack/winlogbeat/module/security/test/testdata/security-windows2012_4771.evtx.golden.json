@@ -3,13 +3,17 @@
     "@timestamp": "2020-03-31T07:50:27.1681182Z",
     "event": {
       "action": "kerberos-preauth-failed",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4771,
       "kind": "event",
       "module": "security",
       "outcome": "failure",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"
