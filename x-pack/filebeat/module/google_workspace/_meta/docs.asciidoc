@@ -100,9 +100,9 @@ some minutes up to 3 days of delay. For more details on this, you can read more 
 
 Specifies the user key to fetch reports from. Defaults to `all`.
 
-*`var.cursor_default_tpl`*::
+*`var.initial_interval`*::
 
-The template used by the input to define the default initial interval. Defaults to `{{now (parseDuration "-24h")}}`.
+It will poll events up to this time period when the module starts. This is to prevent polling too many or repeated events on module restarts. Defaults to `24h`.
 
 [float]
 ==== Google Workspace Reports ECS fields
