@@ -26,6 +26,10 @@
 - Ensure shell wrapper path exists before writing wrapper on install {pull}22144[22144]
 - Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
 - Fix composable input processor promotion to fix duplicates {pull}22344[22344]
+- Fix sysv init files for deb/rpm installation {pull}22543[22543]
+- Fix shell wrapper for deb/rpm packaging {pull}23038[23038]
+- Fixed parsing of npipe URI {pull}22978[22978]
+- Remove artifacts on transient download errors {pull}23235[23235]
 
 ==== New features
 
@@ -49,3 +53,7 @@
 - Update `fleet.kibana.path` from a POLICY_CHANGE {pull}21804[21804]
 - Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]
 - Add `priority` to `AddOrUpdate` on dynamic composable input providers communication channel {pull}22352[22352]
+- Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]
+- Log level reloadable from fleet {pull}22690[22690]
+- Push log level downstream {pull}22815[22815]
+- Add metrics collection for Agent {pull}22793[22793]

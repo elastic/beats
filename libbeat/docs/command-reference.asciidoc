@@ -1012,7 +1012,7 @@ default config file, +{beatname_lc}.yml+, is used.
 Enables debugging for the specified selectors. For the selectors, you can
 specify a comma-separated
 list of components, or you can use `-d "*"` to enable debugging for all
-components. For example, `-d "publish"` displays all the "publish" related
+components. For example, `-d "publisher"` displays all the publisher-related
 messages.
 
 *`-e, --e`*::

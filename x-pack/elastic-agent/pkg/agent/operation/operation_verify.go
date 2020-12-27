@@ -45,7 +45,7 @@ func (o *operationVerify) Name() string {
 // Only if the artifacts exists does it need to be verified.
 func (o *operationVerify) Check(_ context.Context, _ Application) (bool, error) {
 	downloadConfig := o.operatorConfig.DownloadConfig
-	fullPath, err := artifact.GetArtifactPath(o.program.BinaryName(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(o.program.Spec(), o.program.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
 		return false, err
 	}
@@ -66,7 +66,7 @@ func (o *operationVerify) Run(_ context.Context, application Application) (err e
 		}
 	}()
 
-	isVerified, err := o.verifier.Verify(o.program.BinaryName(), o.program.Version(), o.program.ArtifactName(), true)
+	isVerified, err := o.verifier.Verify(o.program.Spec(), o.program.Version(), true)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("operation '%s' failed to verify %s.%s", o.Name(), o.program.BinaryName(), o.program.Version()),

@@ -5,7 +5,6 @@
 <titleabbrev>Usage examples</titleabbrev>
 ++++
 
-experimental[]
 
 The following examples show common configurations for the {log-driver}.
 

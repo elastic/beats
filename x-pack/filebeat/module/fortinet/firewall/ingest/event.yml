@@ -61,7 +61,7 @@ processors:
     field: fortinet.firewall.remip
     target_field: destination.ip
     ignore_missing: true
-    if: "ctx.destination?.ip == null"  
+    if: "ctx.destination?.ip == null"
 - convert:
     field: fortinet.firewall.dstport
     target_field: destination.port
@@ -183,11 +183,30 @@ processors:
     field: fortinet.firewall.dir
     target_field: network.direction
     ignore_missing: true
+    if: 'ctx.network?.direction == null'
 - rename:
     field: fortinet.firewall.direction
     target_field: network.direction
     ignore_missing: true
     if: "ctx.network?.direction == null"
+# Normalize the network direction
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      outgoing: outbound
+      incoming: inbound
+    source: >-
+      if (ctx.network?.direction == null) {
+        return;
+      }
+      def k = ctx.network?.direction.toLowerCase();
+      def normalized = params.get(k);
+      if (normalized != null) {
+        ctx.network.direction = normalized;
+        return
+      }
+      ctx.network.direction = k;
 - rename:
     field: fortinet.firewall.service
     target_field: network.protocol
@@ -320,6 +339,8 @@ processors:
     - fortinet.firewall.locport
     - fortinet.firewall.filesize
     - fortinet.firewall.sess_duration
+    - fortinet.firewall.dir
+    - fortinet.firewall.direction
     ignore_missing: true
 on_failure:
 - set:

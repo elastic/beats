@@ -55,19 +55,9 @@ processors:
         ignore_missing: true
   - append:
         field: related.hosts
-        value: '{{rsa.web.fqdn}}'
+        value: '{{host.name}}'
         allow_duplicates: false
-        if: ctx?.rsa?.web?.fqdn != null && ctx.rsa?.web?.fqdn != ''
-  - append:
-        field: related.hosts
-        value: '{{rsa.web.web_ref_domain}}'
-        allow_duplicates: false
-        if: ctx?.rsa?.web?.web_ref_domain != null && ctx.rsa?.web?.web_ref_domain != ''
-  - append:
-        field: related.hosts
-        value: '{{url.domain}}'
-        allow_duplicates: false
-        if: ctx?.url?.domain != null && ctx.url?.domain != ''
+        if: ctx.host?.name != null && ctx.host?.name != ''
 on_failure:
   - append:
         field: error.message

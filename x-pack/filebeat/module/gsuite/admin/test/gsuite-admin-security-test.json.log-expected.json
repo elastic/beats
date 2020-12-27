@@ -2,7 +2,8 @@
     {
         "event.action": "ALLOW_STRONG_AUTHENTICATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -52,7 +53,8 @@
     {
         "event.action": "ALLOW_SERVICE_FOR_OAUTH2_ACCESS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -101,7 +103,8 @@
     {
         "event.action": "DISALLOW_SERVICE_FOR_OAUTH2_ACCESS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -150,7 +153,8 @@
     {
         "event.action": "CHANGE_APP_ACCESS_SETTINGS_COLLECTION_ID",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -353,7 +357,8 @@
     {
         "event.action": "CHANGE_TWO_STEP_VERIFICATION_ENROLLMENT_PERIOD_DURATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -406,7 +411,8 @@
     {
         "event.action": "CHANGE_TWO_STEP_VERIFICATION_FREQUENCY",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -459,7 +465,8 @@
     {
         "event.action": "CHANGE_TWO_STEP_VERIFICATION_GRACE_PERIOD_DURATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -512,7 +519,8 @@
     {
         "event.action": "CHANGE_TWO_STEP_VERIFICATION_START_DATE",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -565,7 +573,8 @@
     {
         "event.action": "CHANGE_ALLOWED_TWO_STEP_VERIFICATION_METHODS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -862,7 +871,8 @@
     {
         "event.action": "ENABLE_NON_ADMIN_USER_PASSWORD_RECOVERY",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -915,7 +925,8 @@
     {
         "event.action": "ENFORCE_STRONG_AUTHENTICATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -970,7 +981,8 @@
     {
         "event.action": "UPDATE_ERROR_MSG_FOR_RESTRICTED_OAUTH2_APPS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1020,7 +1032,8 @@
     {
         "event.action": "WEAK_PROGRAMMATIC_LOGIN_SETTINGS_CHANGED",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1073,7 +1086,8 @@
     {
         "event.action": "SESSION_CONTROL_SETTINGS_CHANGE",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1124,7 +1138,8 @@
     {
         "event.action": "CHANGE_SESSION_LENGTH",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

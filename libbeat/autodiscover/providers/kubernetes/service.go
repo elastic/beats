@@ -39,13 +39,13 @@ type service struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func(bus.Event)
+	publish          func([]bus.Event)
 	watcher          kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
+func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()
@@ -55,8 +55,9 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 	}
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
+		SyncTimeout:  config.SyncPeriod,
+		Namespace:    config.Namespace,
+		HonorReSyncs: true,
 	}, nil)
 
 	if err != nil {
@@ -65,20 +66,17 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 
 	var namespaceMeta metadata.MetaGen
 	var namespaceWatcher kubernetes.Watcher
-	metaConf := config.AddResourceMetadata
-	if metaConf != nil {
-		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
-			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-				Namespace:   config.Namespace,
-			}, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-			}
 
-			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
-		}
+	metaConf := metadata.GetDefaultResourceMetadataConfig()
+	namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Namespace:   config.Namespace,
+	}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
+
+	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
 
 	p := &service{
 		config:           config,
@@ -217,6 +215,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		}
 	}
 
+	var events []bus.Event
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
 			"provider":   s.uuid,
@@ -229,7 +228,8 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				"kubernetes": meta,
 			},
 		}
-		s.publish(event)
+		events = append(events, event)
 	}
+	s.publish(events)
 
 }

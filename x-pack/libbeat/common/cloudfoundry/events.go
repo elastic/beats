@@ -461,7 +461,7 @@ func newEventError(env *events.Envelope) *EventError {
 	}
 }
 
-func envelopeToEvent(env *events.Envelope) Event {
+func EnvelopeToEvent(env *events.Envelope) Event {
 	switch *env.EventType {
 	case events.Envelope_HttpStartStop:
 		return newEventHttpAccess(env)

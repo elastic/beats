@@ -7,6 +7,8 @@ var:
     default: 300
   - name: api_timeout
     default: 120
+  - name: input
+    default: s3
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

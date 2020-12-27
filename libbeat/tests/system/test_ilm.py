@@ -68,7 +68,7 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
@@ -234,7 +234,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 

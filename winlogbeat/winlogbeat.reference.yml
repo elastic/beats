@@ -669,6 +669,10 @@ output.elasticsearch:
   #username: ''
   #password: ''
 
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
   # Kafka version Winlogbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
@@ -1275,7 +1279,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 

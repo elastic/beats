@@ -20,9 +20,10 @@ import (
 )
 
 const (
-	defaultConfig = "elastic-agent.yml"
-	hashLen       = 6
-	commitFile    = ".elastic-agent.active.commit"
+	defaultConfig     = "elastic-agent.yml"
+	hashLen           = 6
+	commitFile        = ".elastic-agent.active.commit"
+	agentLockFileName = "agent.lock"
 )
 
 type globalFlags struct {
@@ -71,6 +72,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(newUpgradeCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newWatchCommandWithArgs(flags, args, streams))
 
 	// windows special hidden sub-command (only added on windows)
 	reexec := newReExecWindowsCommand(flags, args, streams)

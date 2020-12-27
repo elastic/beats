@@ -33,3 +33,8 @@ include::../include/var-paths.asciidoc[]
 :fileset_ex!:
 
 :modulename!:
+[float]
+==== `audit` fileset settings
+
+include::../include/var-paths.asciidoc[]
+

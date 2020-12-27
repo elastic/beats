@@ -18,15 +18,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
 const (
-	beatName      = "filebeat"
-	artifactName  = "beats/filebeat"
 	version       = "7.5.1"
 	sourcePattern = "/downloads/beats/filebeat/"
 	source        = "http://artifacts.elastic.co/downloads/"
+)
+
+var (
+	beatSpec = program.Spec{
+		Name:     "Filebeat",
+		Cmd:      "filebeat",
+		Artifact: "beats/filebeat",
+	}
 )
 
 type testCase struct {
@@ -57,7 +64,7 @@ func TestDownload(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifactPath, err := testClient.Download(context.Background(), beatName, artifactName, version)
+			artifactPath, err := testClient.Download(context.Background(), beatSpec, version)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -95,7 +102,7 @@ func TestVerify(t *testing.T) {
 			config.Architecture = testCase.arch
 
 			testClient := NewDownloaderWithClient(config, elasticClient)
-			artifact, err := testClient.Download(context.Background(), beatName, artifactName, version)
+			artifact, err := testClient.Download(context.Background(), beatSpec, version)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -110,7 +117,7 @@ func TestVerify(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			isOk, err := testVerifier.Verify(beatName, version, artifactName, false)
+			isOk, err := testVerifier.Verify(beatSpec, version, false)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -152,15 +159,15 @@ func getRandomTestCases() []testCase {
 
 func getElasticCoClient() http.Client {
 	correctValues := map[string]struct{}{
-		fmt.Sprintf("%s-%s-%s", beatName, version, "i386.deb"):             struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "amd64.deb"):            struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "i686.rpm"):             struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "x86_64.rpm"):           struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86.tar.gz"):     struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "linux-x86_64.tar.gz"):  struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86.zip"):      struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "windows-x86_64.zip"):   struct{}{},
-		fmt.Sprintf("%s-%s-%s", beatName, version, "darwin-x86_64.tar.gz"): struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "i386.deb"):             struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "amd64.deb"):            struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "i686.rpm"):             struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "x86_64.rpm"):           struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "linux-x86.tar.gz"):     struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "linux-x86_64.tar.gz"):  struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "windows-x86.zip"):      struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "windows-x86_64.zip"):   struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "darwin-x86_64.tar.gz"): struct{}{},
 	}
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
