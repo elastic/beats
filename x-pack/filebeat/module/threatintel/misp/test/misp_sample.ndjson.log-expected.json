@@ -8,7 +8,7 @@
         "log.offset": 0,
         "service.type": "threatintel",
         "tags": [
-            "threatintel",
+            "threatintel-misp",
             "forwarded"
         ],
         "threatintel.misp.analysis": "2",
@@ -68,7 +68,7 @@
         "log.offset": 3705,
         "service.type": "threatintel",
         "tags": [
-            "threatintel",
+            "threatintel-misp",
             "forwarded"
         ],
         "threatintel.misp.analysis": "2",

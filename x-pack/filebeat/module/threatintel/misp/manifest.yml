@@ -5,10 +5,14 @@ var:
     default: httpjson
   - name: interval
     default: 60m
+  - name: first_interval
+    default: 24h
+  - name: api_token
+  - name: ssl
   - name: url
-    default: "https://urlhaus-api.abuse.ch/v1/urls/recent/"
+    default: "https://localhost/events/restSearch"
   - name: tags
-    default: [threatintel, forwarded]
+    default: [threatintel-misp, forwarded]
 
 ingest_pipeline:
   - ingest/pipeline.yml

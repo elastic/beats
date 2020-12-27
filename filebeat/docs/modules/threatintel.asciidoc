@@ -17,16 +17,12 @@ This module is a collection of different threat intelligence sources.
 Currently supporting:
 - `abuseurl` fileset: Supports URL entities from Abuse.ch
 - `abusemalware` fileset: Supports Malware/Payload entities from Abuse.ch
+- `misp` fileset: Supports gathering threat intel attributes from MISP
+- `otx` fileset: Supports gathering threat intel attributes from Alienvault OTX
+- `limo` fileset: Supports gathering threat intel attributes from Anomali Limo
 
 include::../include/gs-link.asciidoc[]
 
-
-[float]
-=== Compatibility
-
-This module has been tested against the Abuse.ch APIs documented below:
-https://urlhaus-api.abuse.ch/#urls-recent
-https://urlhaus-api.abuse.ch/#payloads-recent
 
 [float]
 ==== `abuseurl` fileset settings
@@ -96,6 +92,108 @@ AbuseCH Malware Threat Intel is mapped to the following ECS fields
 | file_size                  | file.size                      |
 |==============================================================
 
+[float]
+==== `misp` fileset settings
+
+To configure the module, please utilize the default URL unless specified as the example below:
+
+[source,yaml]
+----
+- module: threatintel
+  abusemalware:
+    enabled: true
+    var.input: httpjson
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.interval: 60m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+AbuseCH Malware Threat Intel is mapped to the following ECS fields
+[options="header"]
+|==============================================================
+| Malware Threat IntelFields | ECS Fields                     |
+| md5_hash                   | file.hash.md5                  |
+| sha256_hash                | file.hash.sha256               |
+| file_size                  | file.size                      |
+|==============================================================
+
+
+[float]
+==== `otx` fileset settings
+
+To configure the module, please utilize the default URL unless specified as the example below:
+
+[source,yaml]
+----
+- module: threatintel
+  abusemalware:
+    enabled: true
+    var.input: httpjson
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.interval: 60m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+AbuseCH Malware Threat Intel is mapped to the following ECS fields
+[options="header"]
+|==============================================================
+| Malware Threat IntelFields | ECS Fields                     |
+| md5_hash                   | file.hash.md5                  |
+| sha256_hash                | file.hash.sha256               |
+| file_size                  | file.size                      |
+|==============================================================
+
+[float]
+==== `limo` fileset settings
+
+To configure the module, please utilize the default URL unless specified as the example below:
+
+[source,yaml]
+----
+- module: threatintel
+  abusemalware:
+    enabled: true
+    var.input: httpjson
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+    var.interval: 60m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+AbuseCH Malware Threat Intel is mapped to the following ECS fields
+[options="header"]
+|==============================================================
+| Malware Threat IntelFields | ECS Fields                     |
+| md5_hash                   | file.hash.md5                  |
+| sha256_hash                | file.hash.sha256               |
+| file_size                  | file.size                      |
+|==============================================================
 
 :modulename!:
 

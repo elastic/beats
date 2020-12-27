@@ -26,10 +26,10 @@
   misp:
     enabled: true
 
-    # Input used for ingesting threat intel data
+    # Input used for ingesting threat intel data, defaults to JSON.
     var.input: httpjson
 
-    # The URL used for Threat Intel API calls
+    # The URL of the MISP instance, should end with "/events/restSearch"
     var.url: https://SERVER/events/restSearch
 
     # The interval to poll the API for updates

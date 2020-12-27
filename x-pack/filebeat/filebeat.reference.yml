@@ -619,7 +619,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -628,7 +628,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-
+  
   falcon:
     enabled: true
 
@@ -715,7 +715,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -1955,27 +1955,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#---------------- Symantec AntiVirus/Endpoint Protection Module ----------------
-- module: symantec
-  endpointprotection:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9534
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #----------------------------- Threatintel Module -----------------------------
 - module: threatintel
   abuseurl:
@@ -2005,10 +1984,10 @@ filebeat.modules:
   misp:
     enabled: true
 
-    # Input used for ingesting threat intel data
+    # Input used for ingesting threat intel data, defaults to JSON.
     var.input: httpjson
 
-    # The URL used for Threat Intel API calls
+    # The URL of the MISP instance, should end with "/events/restSearch"
     var.url: https://SERVER/events/restSearch
 
     # The interval to poll the API for updates
@@ -2084,7 +2063,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true
+    enabled: true    
   irc:
     enabled: true
   kerberos:
@@ -2910,14 +2889,14 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-
+  
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-
+    
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
