@@ -19,7 +19,7 @@ processors:
     - threatintel.misp.EventReport
     ignore_missing: true
 - date:
-    field: threatintel.misp.timestamp
+    field: threatintel.misp.Attribute.timestamp
     formats:
       - UNIX
 - rename:
