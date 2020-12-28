@@ -58,7 +58,7 @@ const (
 	ModeDisabled
 )
 
-const ilmDefaultPattern = "{now/d}-000001"
+const ilmDefaultPattern = "{now/d}-000000"
 
 // DefaultPolicy defines the default policy to be used if no custom policy is
 // configured.
