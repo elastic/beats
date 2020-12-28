@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build integration
 
 package elasticsearch_test
 
@@ -42,6 +41,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ccr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/cluster_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/enrich"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
@@ -60,7 +60,6 @@ var metricSets = []string{
 	"ml_job",
 	"node",
 	"node_stats",
-	"pending_tasks",
 	"shard",
 }
 
