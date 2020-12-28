@@ -33,7 +33,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
- - Changed Changed ilmDefaultPattern to start with 0 insted of 1 {issue}20648[20648] {pull}23296[23296]
+- Changed Changed ilmDefaultPattern to start with 0 insted of 1 {issue}20648[20648] {pull}23296[23296]
+
 *Auditbeat*
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
