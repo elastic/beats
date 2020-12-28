@@ -62,7 +62,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance

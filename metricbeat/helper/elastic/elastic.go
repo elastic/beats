@@ -131,7 +131,7 @@ func FixTimestampField(m common.MapStr, field string) error {
 }
 
 // NewModule returns a new Elastic stack module with the appropriate metricsets configured.
-func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
+func NewModule(base *mb.BaseModule, logger *logp.Logger) (*mb.BaseModule, error) {
 	moduleName := base.Name()
 
 	var raw common.MapStr
