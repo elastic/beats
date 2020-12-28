@@ -69,11 +69,13 @@ func TestContextProvider(t *testing.T) {
 
 	curr1, ok1 := comm.Current("0")
 	assert.True(t, ok1)
+	assert.Equal(t, ItemPriority, curr1.Priority)
 	assert.Equal(t, mapping1, curr1.Mapping)
 	assert.Equal(t, processors1, curr1.Processors)
 
 	curr2, ok2 := comm.Current("1")
 	assert.True(t, ok2)
+	assert.Equal(t, ItemPriority, curr2.Priority)
 	assert.Equal(t, mapping2, curr2.Mapping)
 	assert.Equal(t, processors2, curr2.Processors)
 }

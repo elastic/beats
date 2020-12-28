@@ -64,7 +64,8 @@
         "event.action": "approval_canceled",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -124,7 +125,8 @@
         "event.action": "approval_comment_added",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -184,7 +186,8 @@
         "event.action": "approval_requested",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -244,7 +247,8 @@
         "event.action": "approval_reviewer_responded",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1257,7 +1261,8 @@
         "event.action": "change_acl_editors",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1321,7 +1326,8 @@
         "event.action": "change_document_access_scope",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1386,7 +1392,8 @@
         "event.action": "change_document_visibility",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1451,7 +1458,8 @@
         "event.action": "shared_drive_membership_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1516,7 +1524,8 @@
         "event.action": "shared_drive_settings_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1581,7 +1590,8 @@
         "event.action": "sheets_import_range_access_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1641,7 +1651,8 @@
         "event.action": "change_user_access",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",

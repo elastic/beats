@@ -11,7 +11,9 @@ list of supported hints:
 Filebeat gets logs from all containers by default, you can set this hint to `false` to ignore
 the output of the container. Filebeat won't read or send logs from it. If default config is
 disabled, you can use this annotation to enable log retrieval only for containers with this
-set to `true`.
+set to `true`. If you are aiming to use this with Kubernetes, have in mind that annotation
+values can only be of string type so you will need to explicitly define this as `"true"`
+or `"false"` accordingly.
 
 [float]
 ===== `co.elastic.logs/multiline.*`
@@ -172,7 +174,7 @@ The above configuration would generate two input configurations. The first input
 tokenizer. The second input handles everything but debug logs.
 
 [float]
-===== Configuring Namespace Defaults
+=====  Namespace Defaults
 
 Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
 The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
@@ -186,7 +188,7 @@ filebeat.autodiscover:
       hints.enabled: true
       add_resource_metadata:
         namespace:
-          enabled: true
+          include_annotations: ["nsannotation1"]
 -------------------------------------------------------------------------------------
 
 

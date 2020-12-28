@@ -101,6 +101,9 @@
     },
     {
         "event.action": "user.settings_updated",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -136,6 +139,9 @@
     },
     {
         "event.action": "user.settings_updated",
+        "event.category": [
+            "configuration"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"

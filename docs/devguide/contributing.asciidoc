@@ -8,7 +8,9 @@ issues that you should know about before implementing the change.
 
 We enjoy working with contributors to get their code accepted. There are many
 approaches to fixing a problem and it is important to find the best approach
-before writing too much code.
+before writing too much code. After committing your code, check out the
+https://www.elastic.co/community/contributor[Elastic Contributor Program]
+where you can earn points and rewards for your contributions.
 
 The process for contributing to any of the Elastic repositories is similar.
 

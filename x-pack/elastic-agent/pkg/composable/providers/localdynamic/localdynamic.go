@@ -14,6 +14,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+// ItemPriority is the priority that item mappings are added to the provider.
+const ItemPriority = 0
+
 func init() {
 	composable.Providers.AddDynamicProvider("local_dynamic", DynamicProviderBuilder)
 }
@@ -30,7 +33,7 @@ type dynamicProvider struct {
 // Run runs the environment context provider.
 func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	for i, item := range c.Items {
-		if err := comm.AddOrUpdate(strconv.Itoa(i), item.Mapping, item.Processors); err != nil {
+		if err := comm.AddOrUpdate(strconv.Itoa(i), ItemPriority, item.Mapping, item.Processors); err != nil {
 			return errors.New(err, fmt.Sprintf("failed to add mapping for index %d", i), errors.TypeUnexpected)
 		}
 	}

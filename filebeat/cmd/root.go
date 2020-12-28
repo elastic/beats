@@ -35,17 +35,23 @@ import (
 // Name of this beat
 const Name = "filebeat"
 
-// Filebeat build the beat root command for executing filebeat and it's subcommands.
-func Filebeat(inputs beater.PluginFactory) *cmd.BeatsRootCmd {
+// RootCmd to handle beats cli
+var RootCmd *cmd.BeatsRootCmd
+
+// FilebeatSettings contains the default settings for filebeat
+func FilebeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
-	settings := instance.Settings{
+	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 	}
+}
 
+// Filebeat build the beat root command for executing filebeat and it's subcommands.
+func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.BeatsRootCmd {
 	command := cmd.GenRootCmdWithSettings(beater.New(inputs), settings)
 	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))

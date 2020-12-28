@@ -20,6 +20,12 @@ var ignoreFields = []string{
 	"message",
 	"winlog.opcode",
 	"winlog.task",
+
+	// Ignore these fields as under some circumstances they are not populated.
+	// (observed under Windows 7).
+	"winlog.user.type",
+	"winlog.user.name",
+	"winlog.user.domain",
 }
 
 func TestSysmon(t *testing.T) {

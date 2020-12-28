@@ -9,10 +9,10 @@ import (
 	"errors"
 	"runtime"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/dir"
-
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/atomic"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/dir"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/hooks"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/tar"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/zip"
@@ -28,7 +28,7 @@ type Installer interface {
 	// Install installs an artifact and returns
 	// location of the installed program
 	// error if something went wrong
-	Install(ctx context.Context, programName, version, installDir string) error
+	Install(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 // InstallerChecker is an interface that installs but also checks for valid installation.
@@ -36,7 +36,7 @@ type InstallerChecker interface {
 	Installer
 
 	// Check checks if the installation is good.
-	Check(ctx context.Context, programName, version, installDir string) error
+	Check(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 // NewInstaller returns a correct installer associated with a

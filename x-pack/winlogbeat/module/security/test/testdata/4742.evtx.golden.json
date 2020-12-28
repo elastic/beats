@@ -3,7 +3,9 @@
     "@timestamp": "2019-12-18T16:22:12.3425087Z",
     "event": {
       "action": "changed-computer-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4742,
       "kind": "event",
       "module": "security",

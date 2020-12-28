@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -31,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kibana/mtest"
 )
 
-func TestFetchUsage(t *testing.T) {
+func TestFetchExcludeUsage(t *testing.T) {
 	// Spin up mock Kibana server
 	numStatsRequests := 0
 	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -45,17 +44,15 @@ func TestFetchUsage(t *testing.T) {
 			// Make GET /api/stats return 503 for first call, 200 for subsequent calls
 			switch numStatsRequests {
 			case 0: // first call
-				require.Equal(t, "false", excludeUsage)
+				require.Equal(t, "true", excludeUsage) // exclude_usage is always true
 				w.WriteHeader(503)
 
 			case 1: // second call
-				// Make sure exclude_usage is true since first call failed and it should not try again until usageCollectionBackoff time has passed
-				require.Equal(t, "true", excludeUsage)
+				require.Equal(t, "true", excludeUsage) // exclude_usage is always true
 				w.WriteHeader(200)
 
 			case 2: // third call
-				// Make sure exclude_usage is still true
-				require.Equal(t, "true", excludeUsage)
+				require.Equal(t, "true", excludeUsage) // exclude_usage is always true
 				w.WriteHeader(200)
 			}
 
@@ -78,39 +75,25 @@ func TestFetchUsage(t *testing.T) {
 	mbtest.ReportingFetchV2Error(f)
 }
 
-func TestShouldCollectUsage(t *testing.T) {
-	now := time.Now()
+func TestFetchNoExcludeUsage(t *testing.T) {
+	// Spin up mock Kibana server
+	kib := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/status":
+			w.Write([]byte("{ \"version\": { \"number\": \"7.0.0\" }}")) // v7.0.0 does not support exclude_usage and should not be sent
 
-	cases := map[string]struct {
-		usageLastCollectedOn time.Time
-		usageNextCollectOn   time.Time
-		expectedResult       bool
-	}{
-		"within_usage_collection_period": {
-			usageLastCollectedOn: now.Add(-1 * usageCollectionPeriod),
-			expectedResult:       false,
-		},
-		"after_usage_collection_period_but_before_next_scheduled_collection": {
-			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
-			usageNextCollectOn:   now.Add(3 * time.Hour),
-			expectedResult:       false,
-		},
-		"after_usage_collection_period_and_after_next_scheduled_collection": {
-			usageLastCollectedOn: now.Add(-2 * usageCollectionPeriod),
-			usageNextCollectOn:   now.Add(-1 * time.Hour),
-			expectedResult:       true,
-		},
-	}
+		case "/api/stats":
+			excludeUsage := r.FormValue("exclude_usage")
+			require.Empty(t, excludeUsage) // exclude_usage should not be provided
+			w.WriteHeader(200)
+		}
+	}))
+	defer kib.Close()
 
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			m := MetricSet{
-				usageLastCollectedOn: test.usageLastCollectedOn,
-				usageNextCollectOn:   test.usageNextCollectOn,
-			}
+	config := mtest.GetConfig("stats", kib.URL, true)
 
-			actualResult := m.shouldCollectUsage(now)
-			require.Equal(t, test.expectedResult, actualResult)
-		})
-	}
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	// First fetch
+	mbtest.ReportingFetchV2Error(f)
 }

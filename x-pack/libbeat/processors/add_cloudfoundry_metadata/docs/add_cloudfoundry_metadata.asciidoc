@@ -25,6 +25,10 @@ metadata in all events from the firehose since version 2.8. In these cases the
 metadata in the events is used, and `add_cloudfoundry_metadata` processor
 doesn't modify these fields.
 
+For efficient annotation, application metadata retrieved by the Cloud Foundry
+client is stored in a persistent cache on the filesystem under the `path.data`
+directory. This is done so the metadata can persist across restarts of {beatname_uc}.
+For control over this cache, use the `cache_duration` and `cache_retry_delay` settings.
 
 [source,yaml]
 -------------------------------------------------------------------------------

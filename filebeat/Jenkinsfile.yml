@@ -11,7 +11,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "filebeat"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         make: |
@@ -83,5 +83,27 @@ stages:
                 - "/test filebeat for windows-8"
             labels:
                 - "windows-8"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    #windows-7:  See https://github.com/elastic/beats/issues/22317
+    #    mage: "mage build unitTest"
+    #    platforms:             ## override default labels in this specific stage.
+    #        - "windows-7"
+    #    when:                  ## Override the top-level when.
+    #        comments:
+    #            - "/test filebeat for windows-7"
+    #        labels:
+    #            - "windows-7"
+    #        branches: true     ## for all the branches
+    #        tags: true         ## for all the tags
+    windows-7-32:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7-32-bit"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test filebeat for windows-7-32"
+            labels:
+                - "windows-7-32"
             branches: true     ## for all the branches
             tags: true         ## for all the tags

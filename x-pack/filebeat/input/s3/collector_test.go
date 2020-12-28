@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -242,12 +241,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash, s3Context)
+			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, len([]byte(log)), s3Info, s3ObjectHash, s3Context)
+		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
 		events = append(events, event)
 	}
 
@@ -311,27 +310,29 @@ func TestConstructObjectURL(t *testing.T) {
 	}
 }
 
-func TestConvertOffsetToString(t *testing.T) {
-	cases := []struct {
-		offset         int
-		expectedString string
+func TestCreateObjectID(t *testing.T) {
+	cases := map[string]struct {
+		offset int64
+		want   string
 	}{
-		{
+		"object1": {
 			123,
-			"000000000123",
+			"object1-000000000123",
 		},
-		{
+		"object2": {
 			123456,
-			"000000123456",
+			"object2-000000123456",
 		},
-		{
+		"object3": {
 			123456789123,
-			"123456789123",
+			"object3-123456789123",
 		},
 	}
-	for _, c := range cases {
-		output := fmt.Sprintf("%012d", c.offset)
-		assert.Equal(t, c.expectedString, output)
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			id := objectID(name, c.offset)
+			assert.Equal(t, c.want, id)
+		})
 	}
 
 }

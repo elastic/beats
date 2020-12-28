@@ -17,13 +17,13 @@ type ModuleV1 struct {
 	log *logp.Logger
 
 	running  atomic.Bool
-	consumer *cfcommon.DopplerConsumer
+	consumer DopplerConsumer
 
 	events        chan cfcommon.Event
 	subscriptions chan subscription
 }
 
-func newModuleV1(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (*ModuleV1, error) {
+func newModuleV1(base mb.BaseModule, hub CloudfoundryHub, log *logp.Logger) (*ModuleV1, error) {
 	m := ModuleV1{
 		BaseModule: base,
 		log:        log,

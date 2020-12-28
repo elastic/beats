@@ -3,13 +3,17 @@
     "@timestamp": "2019-03-29T21:10:39.7868321Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -83,13 +87,17 @@
     "@timestamp": "2019-03-29T21:10:40.2555609Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -163,13 +171,17 @@
     "@timestamp": "2019-03-29T21:10:40.3805426Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -246,13 +258,17 @@
     "@timestamp": "2019-03-29T21:10:40.5055514Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -326,13 +342,17 @@
     "@timestamp": "2019-03-29T21:10:40.6305447Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -403,13 +423,17 @@
     "@timestamp": "2019-03-29T21:10:53.6617957Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -480,13 +504,17 @@
     "@timestamp": "2019-03-29T21:10:54.6618303Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -557,13 +585,17 @@
     "@timestamp": "2019-03-29T21:10:55.4587259Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -634,13 +666,17 @@
     "@timestamp": "2019-03-29T21:13:17.3025591Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -714,13 +750,17 @@
     "@timestamp": "2019-03-29T21:13:17.5213056Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -794,13 +834,17 @@
     "@timestamp": "2019-03-29T21:13:17.6149946Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -877,13 +921,17 @@
     "@timestamp": "2019-03-29T21:13:18.7869259Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -957,13 +1005,17 @@
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1037,13 +1089,17 @@
     "@timestamp": "2019-03-29T21:20:48.7402309Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1117,13 +1173,17 @@
     "@timestamp": "2019-03-29T21:20:50.5840151Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1197,13 +1257,17 @@
     "@timestamp": "2019-03-29T21:23:42.5201798Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1277,13 +1341,17 @@
     "@timestamp": "2019-03-29T21:26:24.1764267Z",
     "event": {
       "action": "logged-in",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4624,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -1357,13 +1425,17 @@
     "@timestamp": "2019-03-29T21:45:35.177054Z",
     "event": {
       "action": "logon-failed",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4625,
       "kind": "event",
       "module": "security",
       "outcome": "failure",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"

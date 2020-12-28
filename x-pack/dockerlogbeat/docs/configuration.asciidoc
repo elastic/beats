@@ -6,7 +6,6 @@
 <titleabbrev>Configuration options</titleabbrev>
 ++++
 
-experimental[]
 
 Use the following options to configure the {log-driver-long}. You can
 pass these options with the `--log-opt` flag when you start a container, or

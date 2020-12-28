@@ -3,6 +3,7 @@
   description: >
     couchdb module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: couchdb
       type: group
