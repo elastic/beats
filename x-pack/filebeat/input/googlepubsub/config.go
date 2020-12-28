@@ -11,6 +11,8 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type config struct {
@@ -32,7 +34,7 @@ type config struct {
 	CredentialsFile string `config:"credentials_file"`
 
 	// JSON blob containing authentication credentials and key.
-	CredentialsJSON []byte `config:"credentials_json"`
+	CredentialsJSON common.JSONBlob `config:"credentials_json"`
 }
 
 func (c *config) Validate() error {
