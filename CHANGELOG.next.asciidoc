@@ -163,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
 - Fix typo in config docs {pull}23185[23185]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
+- Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
 
 
 *Auditbeat*
