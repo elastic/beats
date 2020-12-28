@@ -139,9 +139,6 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
 	}
 
-	// These metricsets are exactly the ones required if xpack.enabled == true
-	raw["metricsets"] = xpackEnabledMetricsets
-
 	newConfig, err := common.NewConfigFrom(raw)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
