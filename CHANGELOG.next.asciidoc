@@ -262,6 +262,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
+- Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 
 *Filebeat*
 
@@ -357,6 +358,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
 - Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
+- Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
 
 *Heartbeat*
 
