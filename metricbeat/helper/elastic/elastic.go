@@ -149,7 +149,5 @@ func NewModule(base *mb.BaseModule, logger *logp.Logger) (*mb.BaseModule, error)
 		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
 	}
 
-	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)
-
 	return newModule, nil
 }
