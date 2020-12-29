@@ -110,6 +110,7 @@ func TestEmitEvent(t *testing.T) {
 				Name:          "job.task",
 				Namespace:     namespace,
 				DesiredStatus: api.AllocDesiredStatusRun,
+				ClientStatus:  api.AllocClientStatusRunning,
 				NodeName:      host,
 				NodeID:        "nomad1",
 				Job: &nomad.Job{
@@ -210,6 +211,7 @@ func TestEmitEvent(t *testing.T) {
 				Name:          "job.task",
 				Namespace:     "default",
 				DesiredStatus: api.AllocDesiredStatusRun,
+				ClientStatus:  api.AllocClientStatusRunning,
 				NodeName:      "",
 				NodeID:        "5456bd7a",
 				Job: &nomad.Job{
