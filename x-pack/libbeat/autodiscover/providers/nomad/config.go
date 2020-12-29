@@ -5,6 +5,7 @@
 package nomad
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -18,6 +19,7 @@ type Config struct {
 	Namespace      string        `config:"namespace"`
 	SecretID       string        `config:"secret_id"`
 	Node           string        `config:"node"`
+	Scope          string        `config:"scope"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`
@@ -37,6 +39,7 @@ func defaultConfig() *Config {
 		Region:         "",
 		Namespace:      "",
 		SecretID:       "",
+		Scope:          "local",
 		allowStale:     true,
 		waitTime:       15 * time.Second,
 		syncPeriod:     30 * time.Second,
@@ -46,9 +49,21 @@ func defaultConfig() *Config {
 }
 
 // Validate ensures correctness of config
-func (c *Config) Validate() {
+func (c *Config) Validate() error {
 	// Make sure that prefix doesn't ends with a '.'
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {
 		c.Prefix = c.Prefix[:len(c.Prefix)-2]
 	}
+
+	switch c.Scope {
+	case "local":
+		if c.Node == "" {
+			return fmt.Errorf("`node` needs to be specified when using `local` scope")
+		}
+	case "global":
+		c.Node = ""
+	default:
+		return fmt.Errorf("invalid value for `scope`, select `local` or `global`")
+	}
+	return nil
 }
