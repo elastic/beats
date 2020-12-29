@@ -18,6 +18,8 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/endpoints"
 	"golang.org/x/oauth2/google"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type authConfig struct {
@@ -86,10 +88,10 @@ type oAuth2Config struct {
 	TokenURL       string              `config:"token_url"`
 
 	// google specific
-	GoogleCredentialsFile  string `config:"google.credentials_file"`
-	GoogleCredentialsJSON  []byte `config:"google.credentials_json"`
-	GoogleJWTFile          string `config:"google.jwt_file"`
-	GoogleDelegatedAccount string `config:"google.delegated_account"`
+	GoogleCredentialsFile  string          `config:"google.credentials_file"`
+	GoogleCredentialsJSON  common.JSONBlob `config:"google.credentials_json"`
+	GoogleJWTFile          string          `config:"google.jwt_file"`
+	GoogleDelegatedAccount string          `config:"google.delegated_account"`
 
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
@@ -202,9 +204,6 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 	if len(o.GoogleCredentialsJSON) > 0 {
 		if o.GoogleDelegatedAccount != "" {
 			return errors.New("google.delegated_account can only be provided with a jwt_file")
-		}
-		if !json.Valid(o.GoogleCredentialsJSON) {
-			return errors.New("google.credentials_json must be valid JSON")
 		}
 		return nil
 	}
