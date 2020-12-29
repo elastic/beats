@@ -11,9 +11,11 @@ import (
 )
 
 type nomadAnnotatorConfig struct {
-	Host            string        `config:"host"`
+	Address         string        `config:"address"`
+	Region          string        `config:"region"`
 	Namespace       string        `config:"namespace"`
-	SyncPeriod      time.Duration `config:"sync_period"`
+	SecretID        string        `config:"secret_id"`
+	Node            string        `config:"node"`
 	RefreshInterval time.Duration `config:"refresh_interval"`
 	// Annotations are kept after the allocations is removed, until they haven't been accessed for a
 	// full `cleanup_timeout`:
@@ -22,6 +24,8 @@ type nomadAnnotatorConfig struct {
 	Matchers        PluginConfig  `config:"matchers"`
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
+
+	syncPeriod time.Duration
 }
 
 type Enabled struct {
@@ -32,7 +36,11 @@ type PluginConfig []map[string]common.Config
 
 func defaultNomadAnnotatorConfig() nomadAnnotatorConfig {
 	return nomadAnnotatorConfig{
-		SyncPeriod:      5 * time.Second,
+		Address:         "http://127.0.0.1:4646",
+		Region:          "",
+		Namespace:       "",
+		SecretID:        "",
+		syncPeriod:      5 * time.Second,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},

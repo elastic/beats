@@ -17,7 +17,7 @@ type Config struct {
 	Region         string        `config:"region"`
 	Namespace      string        `config:"namespace"`
 	SecretID       string        `config:"secret_id"`
-	Host           string        `config:"host" validate:"required"`
+	Node           string        `config:"node"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	Prefix    string                  `config:"prefix"`

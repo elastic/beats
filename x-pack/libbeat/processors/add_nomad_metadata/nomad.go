@@ -66,7 +66,13 @@ func New(cfg *common.Config) (processors.Processor, error) {
 		Indexing.RUnlock()
 	}
 
-	client, err := nomad.NewClient()
+	clientConfig := nomad.ClientConfig{
+		Address:   config.Address,
+		Namespace: config.Namespace,
+		Region:    config.Region,
+		SecretID:  config.SecretID,
+	}
+	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
 		logp.Err("nomad: Couldn't create client")
 		return nil, err
@@ -80,12 +86,12 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	indexers := NewIndexers(config.Indexers, metaGen)
 	matchers := NewMatchers(config.Matchers)
 
-	logp.Debug("nomad", "Using host: %s", config.Host)
+	logp.Debug("nomad", "Using node: %s", config.Node)
 	logp.Debug("nomad", "Initializing watcher")
 
 	watcher, err := nomad.NewWatcher(client, nomad.WatchOptions{
-		SyncTimeout:     config.SyncPeriod,
-		Node:            config.Host,
+		SyncTimeout:     config.syncPeriod,
+		Node:            config.Node,
 		Namespace:       config.Namespace,
 		RefreshInterval: config.RefreshInterval,
 	})

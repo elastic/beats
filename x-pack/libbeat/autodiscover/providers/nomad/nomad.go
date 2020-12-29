@@ -57,7 +57,13 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	client, err := nomad.NewClient()
+	clientConfig := nomad.ClientConfig{
+		Address:   config.Address,
+		Namespace: config.Namespace,
+		Region:    config.Region,
+		SecretID:  config.SecretID,
+	}
+	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
 		logp.Err("nomad: Couldn't create client")
 		return nil, err
@@ -86,7 +92,7 @@ func AutodiscoverBuilder(
 	options := nomad.WatchOptions{
 		SyncTimeout:     config.waitTime,
 		RefreshInterval: config.syncPeriod,
-		Node:            config.Host,
+		Node:            config.Node,
 	}
 
 	watcher, err := nomad.NewWatcher(client, options)

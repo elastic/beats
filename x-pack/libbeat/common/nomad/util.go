@@ -8,13 +8,30 @@ import (
 	api "github.com/hashicorp/nomad/api"
 )
 
-// Default Nomad configuration, reads configuration from environment variables.
-var defaultConfig = api.DefaultConfig()
+type ClientConfig struct {
+	Address   string
+	Region    string
+	SecretID  string
+	Namespace string
+}
 
 // NewClient returns a new Nomad client, using the default configuration or the configuration options
 // provided through environment variables.
-func NewClient() (*Client, error) {
-	return api.NewClient(defaultConfig)
+func NewClient(config ClientConfig) (*Client, error) {
+	apiConfig := api.DefaultConfig()
+	if config.Address != "" {
+		apiConfig.Address = config.Address
+	}
+	if config.Region != "" {
+		apiConfig.Region = config.Region
+	}
+	if config.SecretID != "" {
+		apiConfig.SecretID = config.SecretID
+	}
+	if config.Namespace != "" {
+		apiConfig.Namespace = config.Namespace
+	}
+	return api.NewClient(apiConfig)
 }
 
 // StringToPtr returns the pointer to a string
