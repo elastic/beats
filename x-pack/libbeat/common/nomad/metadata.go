@@ -69,7 +69,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 		"region":      *obj.Job.Region,
 		"type":        *obj.Job.Type,
 		"alloc_id":    obj.ID,
-		"status":      *obj.Job.Status,
+		"status":      obj.ClientStatus,
 	}
 
 	return meta
