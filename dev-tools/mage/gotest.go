@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -50,6 +49,7 @@ type GoTestArgs struct {
 	OutputFile          string            // File to write verbose test output to.
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
+	Output              io.Writer         // Write stderr and stdout to Output if set
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -230,8 +230,10 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
 	// Wire up the outputs.
-	bufferOutput := new(bytes.Buffer)
-	outputs := []io.Writer{bufferOutput}
+	var outputs []io.Writer
+	if params.Output != nil {
+		outputs = append(outputs, params.Output)
+	}
 
 	if params.OutputFile != "" {
 		fileOutput, err := os.Create(createDir(params.OutputFile))
@@ -242,8 +244,13 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		outputs = append(outputs, fileOutput)
 	}
 	output := io.MultiWriter(outputs...)
-	goTest.Stdout = io.MultiWriter(output, os.Stdout)
-	goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	if params.Output == nil {
+		goTest.Stdout = io.MultiWriter(output, os.Stdout)
+		goTest.Stderr = io.MultiWriter(output, os.Stderr)
+	} else {
+		goTest.Stdout = output
+		goTest.Stderr = output
+	}
 
 	err := goTest.Run()
 
