@@ -5,6 +5,7 @@
 package add_nomad_metadata
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -16,6 +17,7 @@ type nomadAnnotatorConfig struct {
 	Namespace       string        `config:"namespace"`
 	SecretID        string        `config:"secret_id"`
 	Node            string        `config:"node"`
+	Scope           string        `config:"scope"`
 	RefreshInterval time.Duration `config:"refresh_interval"`
 	// Annotations are kept after the allocations is removed, until they haven't been accessed for a
 	// full `cleanup_timeout`:
@@ -26,6 +28,20 @@ type nomadAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	syncPeriod time.Duration
+}
+
+func (c *nomadAnnotatorConfig) Validate() error {
+	switch c.Scope {
+	case "local":
+		if c.Node == "" {
+			return fmt.Errorf("`node` needs to be specified when using `local` scope")
+		}
+	case "global":
+		c.Node = ""
+	default:
+		return fmt.Errorf("invalid value for `scope`, select `local` or `global`")
+	}
+	return nil
 }
 
 type Enabled struct {
@@ -40,6 +56,7 @@ func defaultNomadAnnotatorConfig() nomadAnnotatorConfig {
 		Region:          "",
 		Namespace:       "",
 		SecretID:        "",
+		Scope:           "local",
 		syncPeriod:      5 * time.Second,
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
