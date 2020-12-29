@@ -14,7 +14,14 @@ The maximum size of the message received over the socket. The default is `20MiB`
 [id="{beatname_lc}-input-{type}-unix-path"]
 ==== `path`
 
-The path to the Unix socket that will receive event streams.
+The path to the Unix socket that will receive events.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-socket-type"]
+==== `socket_type`
+
+The type to of the Unix socket that will receive events. Valid values
+are `stream` and `datagram`. The default is `stream`.
 
 [float]
 [id="{beatname_lc}-input-{type}-unix-group"]

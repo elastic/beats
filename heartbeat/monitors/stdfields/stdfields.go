@@ -28,7 +28,7 @@ import (
 )
 
 // ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
-var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
+var ErrPluginDisabled = errors.New("monitor not loaded, plugin is disabled")
 
 type ServiceFields struct {
 	Name string `config:"name"`

@@ -13,7 +13,7 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "generator"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     metricbeat-test:
         make: "make -C generator/_templates/metricbeat test test-package"

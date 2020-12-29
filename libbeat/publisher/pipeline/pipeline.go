@@ -89,6 +89,8 @@ type Settings struct {
 	WaitCloseMode WaitCloseMode
 
 	Processors processing.Supporter
+
+	InputQueueSize int
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.

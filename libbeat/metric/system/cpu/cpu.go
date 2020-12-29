@@ -26,12 +26,6 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
-var (
-	// NumCores is the number of CPU cores in the system. Changes to operating
-	// system CPU allocation after process startup are not reflected.
-	NumCores = runtime.NumCPU()
-)
-
 // CPU Monitor
 
 // Monitor is used to monitor the overall CPU usage of the system.
@@ -83,16 +77,16 @@ type Metrics struct {
 }
 
 // NormalizedPercentages returns CPU percentage usage information that is
-// normalized by the number of CPU cores (NumCores). The values will range from
+// normalized by the number of CPU cores. The values will range from
 // 0 to 100%.
 func (m *Metrics) NormalizedPercentages() Percentages {
 	return cpuPercentages(m.previousSample, m.currentSample, 1)
 }
 
 // Percentages returns CPU percentage usage information. The values range from
-// 0 to 100% * NumCores.
+// 0 to 100% * NumCPU.
 func (m *Metrics) Percentages() Percentages {
-	return cpuPercentages(m.previousSample, m.currentSample, NumCores)
+	return cpuPercentages(m.previousSample, m.currentSample, runtime.NumCPU())
 }
 
 // cpuPercentages calculates the amount of CPU time used between the two given
@@ -215,7 +209,7 @@ type LoadAverages struct {
 }
 
 // Averages return the CPU load averages. These values should range from
-// 0 to NumCores.
+// 0 to NumCPU.
 func (m *LoadMetrics) Averages() LoadAverages {
 	return LoadAverages{
 		OneMinute:     common.Round(m.sample.One, common.DefaultDecimalPlacesCount),
@@ -224,12 +218,13 @@ func (m *LoadMetrics) Averages() LoadAverages {
 	}
 }
 
-// NormalizedAverages return the CPU load averages normalized by the NumCores.
+// NormalizedAverages return the CPU load averages normalized by the NumCPU.
 // These values should range from 0 to 1.
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
+	cpus := runtime.NumCPU()
 	return LoadAverages{
-		OneMinute:     common.Round(m.sample.One/float64(NumCores), common.DefaultDecimalPlacesCount),
-		FiveMinute:    common.Round(m.sample.Five/float64(NumCores), common.DefaultDecimalPlacesCount),
-		FifteenMinute: common.Round(m.sample.Fifteen/float64(NumCores), common.DefaultDecimalPlacesCount),
+		OneMinute:     common.Round(m.sample.One/float64(cpus), common.DefaultDecimalPlacesCount),
+		FiveMinute:    common.Round(m.sample.Five/float64(cpus), common.DefaultDecimalPlacesCount),
+		FifteenMinute: common.Round(m.sample.Fifteen/float64(cpus), common.DefaultDecimalPlacesCount),
 	}
 }

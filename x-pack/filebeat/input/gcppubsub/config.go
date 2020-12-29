@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"cloud.google.com/go/pubsub"
 	"golang.org/x/oauth2/google"
@@ -35,7 +36,10 @@ type config struct {
 	CredentialsFile string `config:"credentials_file"`
 
 	// JSON blob containing authentication credentials and key.
-	CredentialsJSON []byte `config:"credentials_json"`
+	CredentialsJSON common.JSONBlob `config:"credentials_json"`
+
+	// Overrides the default Pub/Sub service address and disables TLS. For testing.
+	AlternativeHost string `config:"alternative_host"`
 }
 
 func (c *config) Validate() error {

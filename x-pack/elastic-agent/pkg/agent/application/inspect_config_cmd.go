@@ -46,7 +46,7 @@ func (c *InspectConfigCmd) inspectConfig() error {
 		return err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		return printConfig(rawConfig)
 	}
 

@@ -69,6 +69,8 @@ type WatchOptions struct {
 	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
 	// vs what does not.
 	IsUpdated func(old, new interface{}) bool
+	// HonorReSyncs allows resync events to be requeued on the worker
+	HonorReSyncs bool
 }
 
 type item struct {
@@ -137,6 +139,15 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		UpdateFunc: func(o, n interface{}) {
 			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
+			} else if opts.HonorReSyncs {
+				// HonorReSyncs ensure that at the time when the kubernetes client does a "resync", i.e, a full list of all
+				// objects we make sure that autodiscover processes them. Why is this necessary? An effective control loop works
+				// based on two state changes, a list and a watch. A watch is triggered each time the state of the system changes.
+				// However, there is no guarantee that all events from a watch are processed by the receiver. To ensure that missed events
+				// are properly handled, a period re-list is done to ensure that every state within the system is effectively handled.
+				// In this case, we are making sure that we are enqueueing an "add" event because, an runner that is already in Running
+				// state should just be deduped by autodiscover and not stop/started periodically as would be the case with an update.
+				w.enqueue(n, add)
 			}
 		},
 	})

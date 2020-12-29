@@ -41,8 +41,11 @@ import (
 const pluginName = "filestream"
 
 type state struct {
+	Offset int64 `json:"offset" struct:"offset"`
+}
+
+type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
-	Offset         int64  `json:"offset" struct:"offset"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
@@ -84,14 +87,14 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	prospector, err := newFileProspector(
-		config.Paths,
-		config.IgnoreOlder,
-		config.FileWatcher,
-		config.FileIdentity,
-	)
+	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error while creating filewatcher %v", err)
+	}
+
+	identifier, err := newFileIdentifier(config.FileIdentity)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
 
 	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
@@ -99,7 +102,15 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
 	}
 
-	return prospector, &filestream{
+	prospector := &fileProspector{
+		filewatcher:       filewatcher,
+		identifier:        identifier,
+		ignoreOlder:       config.IgnoreOlder,
+		cleanRemoved:      config.CleanRemoved,
+		stateChangeCloser: config.Close.OnStateChange,
+	}
+
+	filestream := &filestream{
 		readerConfig:    config.readerConfig,
 		bufferSize:      config.BufferSize,
 		encodingFactory: encodingFactory,
@@ -108,13 +119,20 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		includeLines:    config.IncludeLines,
 		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
-	}, nil
+	}
+
+	return prospector, filestream, nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
 
 func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, state{})
+	fs, ok := src.(fileSource)
+	if !ok {
+		return fmt.Errorf("not file source")
+	}
+
+	reader, err := inp.open(ctx.Logger, ctx.Cancelation, fs.newPath, 0)
 	if err != nil {
 		return err
 	}
@@ -135,7 +153,7 @@ func (inp *filestream) Run(
 	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
 	state := initState(log, cursor, fs)
 
-	r, err := inp.open(log, ctx.Cancelation, state)
+	r, err := inp.open(log, ctx.Cancelation, fs.newPath, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
@@ -154,7 +172,7 @@ func (inp *filestream) Run(
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
-	state := state{Source: s.newPath, IdentifierName: s.identifierGenerator}
+	var state state
 	if c.IsNew() {
 		return state
 	}
@@ -167,8 +185,8 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, s state) (reader.Reader, error) {
-	f, err := inp.openFile(s.Source, s.Offset)
+func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
+	f, err := inp.openFile(path, offset)
 	if err != nil {
 		return nil, err
 	}

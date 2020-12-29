@@ -53,11 +53,11 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return newHTTPFromConfig(config, base.Name(), base.HostData())
+	return NewHTTPFromConfig(config, base.HostData())
 }
 
 // newHTTPWithConfig creates a new http helper from some configuration
-func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
