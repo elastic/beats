@@ -483,13 +483,6 @@ include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
 
 endif::autodiscoverNomad[]
 
-ifdef::autodiscoverHints[]
-[[configuration-autodiscover-hints]]
-=== Hints based autodiscover
-
-include::../../{beatname_lc}/docs/autodiscover-hints.asciidoc[]
-endif::autodiscoverHints[]
-
 ifdef::autodiscoverAWSEC2[]
 [float]
 ===== Amazon EC2s
