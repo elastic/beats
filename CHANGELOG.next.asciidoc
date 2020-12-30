@@ -474,6 +474,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 
 *Packetbeat*
 
