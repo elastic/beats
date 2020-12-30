@@ -69,12 +69,11 @@ func NewWatcher(client *api.Client, options WatchOptions) (Watcher, error) {
 		done:      make(chan struct{}),
 	}
 
-	if w.nodeID == "" {
+	if options.Node != "" {
 		nodeID, err := w.fetchNodeID()
 		if err != nil {
 			return nil, err
 		}
-
 		w.nodeID = nodeID
 	}
 
@@ -104,7 +103,7 @@ func (w *watcher) AddEventHandler(h ResourceEventHandlerFuncs) {
 
 // Sync the allocations on the given node and update the local metadata
 func (w *watcher) sync() error {
-	w.logger.Info("Nomad: Syncing allocations and metadata")
+	w.logger.Debugf("Syncing allocations and metadata")
 	w.logger.Debugf("Starting with WaitIndex=%v", w.waitIndex)
 
 	queryOpts := &api.QueryOptions{
@@ -113,16 +112,12 @@ func (w *watcher) sync() error {
 		WaitIndex:  w.waitIndex,
 	}
 
-	w.logger.Infof("Filtering allocations running in node: [%s, %s]", w.options.Node, w.nodeID)
-
-	// Do we need to keep direct access to the metadata as well?
-	allocations, meta, err := w.client.Nodes().Allocations(w.nodeID, queryOpts)
+	allocations, meta, err := w.getAllocations(queryOpts)
 	if err != nil {
-		w.logger.Errorf("Nomad: Fetching allocations err %s for %s,%s", err.Error(), w.options.Node, w.nodeID)
-		return err
+		return fmt.Errorf("listing allocations: %w", err)
 	}
 
-	w.logger.Infof("Found %d allocations", len(allocations))
+	w.logger.Debugf("Found %d allocations", len(allocations))
 
 	remoteWaitIndex := meta.LastIndex
 	localWaitIndex := queryOpts.WaitIndex
@@ -208,6 +203,29 @@ func (w *watcher) watch() {
 	}
 }
 
+func (w *watcher) getAllocations(queryOpts *api.QueryOptions) ([]*api.Allocation, *api.QueryMeta, error) {
+	if w.nodeID != "" {
+		return w.client.Nodes().Allocations(w.nodeID, queryOpts)
+	}
+
+	// This is making a query for each allocation in the cluster, this can be expensive,
+	// consider refactoring the watcher to don't need full allocations.
+	// In any case, the way to scale beats on big clusters, is to use one beat per node.
+	stubs, meta, err := w.client.Allocations().List(queryOpts)
+	if err != nil {
+		return nil, meta, err
+	}
+	var allocations []*api.Allocation
+	for _, stub := range stubs {
+		allocation, _, err := w.client.Allocations().Info(stub.ID, queryOpts)
+		if err != nil {
+			w.logger.Warnf("Failed to get details of allocation '%s'", stub.ID)
+		}
+		allocations = append(allocations, allocation)
+	}
+	return allocations, meta, nil
+}
+
 func (w *watcher) fetchNodeID() (string, error) {
 	queryOpts := &api.QueryOptions{
 		WaitTime:   w.options.SyncTimeout,
@@ -216,40 +234,39 @@ func (w *watcher) fetchNodeID() (string, error) {
 
 	// Fetch the nodeId from the node name, used to filter the allocations
 	// If for some reason the NodeID changes filebeat will have to be restarted
-	if w.options.Node != "" {
-		nodes, _, err := w.client.Nodes().List(queryOpts)
+	nodes, _, err := w.client.Nodes().List(queryOpts)
 
-		if err != nil {
-			w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
-			return "", err
-		}
+	if err != nil {
+		w.logger.Fatalf("Nomad: Fetching node list err %s", err.Error())
+		return "", err
+	}
 
-		for _, node := range nodes {
-			if node.Name == w.options.Node {
-				return node.ID, nil
-			}
+	for _, node := range nodes {
+		if node.Name == w.options.Node {
+			return node.ID, nil
 		}
 	}
 
+	// If there was no node with this name, check if the specified node is the local one.
 	agent, err := w.client.Agent().Self()
 	if err != nil {
-		w.logger.Fatalf("Nomad: Error connecting to the nomad agent: %s", err)
-		return "", err
+		return "", fmt.Errorf("connecting to the nomad agent: %w", err)
+	}
+	if agent.Member.Name == w.options.Node {
+		stats, ok := agent.Stats["client"]
+		if !ok {
+			return "", fmt.Errorf("getting node_id from the API client: %w", err)
+		}
+
+		nodeID, ok := stats["node_id"]
+		if !ok {
+			return "", fmt.Errorf("getting node_id from the API client: %w", err)
+		}
+
+		return nodeID, nil
 	}
 
-	stats, ok := agent.Stats["client"]
-	if !ok {
-		w.logger.Fatalf("Nomad: Error getting client from the nomad agent: %s", err)
-		return "", err
-	}
-
-	nodeID, ok := stats["node_id"]
-	if !ok {
-		w.logger.Fatalf("Nomad: Error getting node_id from the nomad agent: %s", err)
-		return "", err
-	}
-
-	return nodeID, nil
+	return "", fmt.Errorf("node ID for configured node '%s' couldn't be obtained or it doesn't exist", w.options.Node)
 }
 
 func backoff(failures uint) {

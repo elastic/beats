@@ -39,6 +39,7 @@ type Provider struct {
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 	watcher   nomad.Watcher
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -50,6 +51,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The nomad autodiscover is experimental")
+
 	config := defaultConfig()
 
 	err := c.Unpack(&config)
@@ -65,8 +67,7 @@ func AutodiscoverBuilder(
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		logp.Err("nomad: Couldn't create client")
-		return nil, err
+		return nil, fmt.Errorf("failed to intialize nomad API client: %w", err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
@@ -92,14 +93,29 @@ func AutodiscoverBuilder(
 	options := nomad.WatchOptions{
 		SyncTimeout:     config.waitTime,
 		RefreshInterval: config.syncPeriod,
-		Node:            config.Node,
+		Namespace:       config.Namespace,
+	}
+	if config.Scope == ScopeNode {
+		node := config.Node
+		if node == "" {
+			agent, err := client.Agent().Self()
+			if err != nil {
+				return nil, fmt.Errorf("`scope: %s` used without `node`: couldn't autoconfigure node name: %w", ScopeNode, err)
+			}
+			if agent.Member.Name == "" {
+				return nil, fmt.Errorf("`scope: %s` used without `node`: API returned empty name")
+			}
+			node = agent.Member.Name
+		}
+		options.Node = node
 	}
 
 	watcher, err := nomad.NewWatcher(client, options)
 	if err != nil {
-		logp.Err("ERROR creating Watcher %v", err.Error())
+		return nil, fmt.Errorf("failed to initialize nomad watcher: %w", err)
 	}
 
+	logger := logp.NewLogger("nomad")
 	p := &Provider{
 		config:    config,
 		bus:       bus,
@@ -109,22 +125,23 @@ func AutodiscoverBuilder(
 		builders:  builders,
 		appenders: appenders,
 		watcher:   watcher,
+		logger:    logger,
 	}
 
 	watcher.AddEventHandler(nomad.ResourceEventHandlerFuncs{
 		AddFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation add: %+v", obj.ID)
+			logger.Debugf("Watcher Allocation add: %+v", obj.ID)
 			p.emit(&obj, "start")
 		},
 		UpdateFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation update: %+v", obj.ID)
+			logger.Debugf("nomad", "Watcher Allocation update: %+v", obj.ID)
 			p.emit(&obj, "stop")
 			// We have a CleanupTimeout grace period (defaults to 15s) to wait for the stop event
 			// to be processed
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "start") })
 		},
 		DeleteFunc: func(obj nomad.Resource) {
-			logp.Debug("nomad", "Watcher Allocation delete: %+v", obj.ID)
+			logger.Debugf("Watcher Allocation delete: %+v", obj.ID)
 			p.emit(&obj, "stop")
 		},
 	})
@@ -135,7 +152,7 @@ func AutodiscoverBuilder(
 // Start for Runner interface.
 func (p *Provider) Start() {
 	if err := p.watcher.Start(); err != nil {
-		logp.Err("Error starting nomad autodiscover provider: %s", err)
+		p.logger.Errorf("Error starting nomad autodiscover provider: %s", err)
 	}
 }
 
@@ -158,7 +175,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 		// the NodeID
 		host, err := p.metagen.AllocationNodeName(obj.NodeID)
 		if err != nil {
-			logp.Err("Error fetching node information: %s", err)
+			p.logger.Errorf("Error fetching node information: %s", err)
 		}
 
 		// If we cannot get a host, we assume that the allocation was stopped
@@ -208,7 +225,7 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 
-	logp.Debug("nomad", "Publishing event: %+v", event)
+	p.logger.Debugf("nomad", "Publishing event: %+v", event)
 	p.bus.Publish(event)
 }
 
@@ -251,7 +268,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	if rawTasks, ok := meta["task"]; ok {
 		tasks, ok = rawTasks.(common.MapStr)
 		if !ok {
-			logp.Info("Could not get meta for the given task: %s", rawTasks)
+			p.logger.Warnf("Could not get meta for the given task: %s", rawTasks)
 			return e
 		}
 	}
@@ -259,11 +276,11 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
 
-	logp.Debug("nomad", "Generated hints from %+v %+v", tasks, hints)
+	p.logger.Debugf("Generated hints from %+v %+v", tasks, hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
 	}
-	logp.Debug("nomad", "Generated builder event %+v", e)
+	p.logger.Debugf("nomad", "Generated builder event %+v", e)
 
 	prefix := strings.Split(p.config.Prefix, ".")[0]
 	tasks.Delete(prefix)
