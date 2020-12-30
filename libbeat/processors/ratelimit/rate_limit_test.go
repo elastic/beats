@@ -18,6 +18,7 @@
 package ratelimit
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -61,32 +62,20 @@ func TestNew(t *testing.T) {
 }
 
 func TestRateLimit(t *testing.T) {
-	inEvents := []beat.Event{
-		{
+	var inEvents []beat.Event
+	for i := 1; i <= 6; i++ {
+		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"foo": "bar",
+				"event_number": i,
 			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"foo": "bar",
-				"baz": "mosquito",
-			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"baz": "qux",
-			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"foo": "seger",
-			},
-		},
+		}
+		inEvents = append(inEvents, event)
+	}
+
+	withField := func(in beat.Event, key string, value interface{}) beat.Event {
+		in.Fields.Put(key, value)
+		return in
 	}
 
 	cases := map[string]struct {
@@ -114,9 +103,9 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: inEvents[0:2],
 		},
-		"rate_5_per_min": {
+		"rate_6_per_min": {
 			config: common.MapStr{
-				"limit": "5/m",
+				"limit": "6/m",
 			},
 			inEvents:  inEvents,
 			outEvents: inEvents,
@@ -127,15 +116,20 @@ func TestRateLimit(t *testing.T) {
 			},
 			delay:     200 * time.Millisecond,
 			inEvents:  inEvents,
-			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3]},
+			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3], inEvents[5]},
 		},
 		"with_fields": {
 			config: common.MapStr{
 				"limit":  "1/s",
 				"fields": []string{"foo"},
 			},
-			delay:     400 * time.Millisecond,
-			inEvents:  inEvents,
+			delay: 400 * time.Millisecond,
+			inEvents: []beat.Event{
+				withField(inEvents[0], "foo", "bar"),
+				withField(inEvents[1], "foo", "bar"),
+				inEvents[2],
+				withField(inEvents[3], "foo", "seger"),
+			},
 			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
 		},
 		"with_burst": {
@@ -146,6 +140,20 @@ func TestRateLimit(t *testing.T) {
 			delay:     400 * time.Millisecond,
 			inEvents:  inEvents,
 			outEvents: inEvents,
+		},
+		"with_throttled": {
+			config: common.MapStr{
+				"limit":           "2/s",
+				"throttled_field": "num_throttled",
+			},
+			delay:    200 * time.Millisecond,
+			inEvents: inEvents,
+			outEvents: []beat.Event{
+				inEvents[0],
+				inEvents[1],
+				withField(inEvents[3], "num_throttled", uint64(1)),
+				withField(inEvents[5], "num_throttled", uint64(1)),
+			},
 		},
 	}
 
@@ -160,7 +168,10 @@ func TestRateLimit(t *testing.T) {
 
 			out := make([]beat.Event, 0)
 			for _, in := range test.inEvents {
-				o, err := p.Run(&in)
+				inCopy := in
+				inCopy.Fields = in.Fields.Clone()
+
+				o, err := p.Run(&inCopy)
 				require.NoError(t, err)
 				if o != nil {
 					out = append(out, *o)
@@ -168,6 +179,12 @@ func TestRateLimit(t *testing.T) {
 				fakeClock.Advance(test.delay)
 			}
 
+			require.Len(t, out, len(test.outEvents))
+			for idx, event := range out {
+				fmt.Println("actual: ", event)
+				fmt.Println("expected: ", test.outEvents[idx])
+				require.Equal(t, test.outEvents[idx], event)
+			}
 			require.Equal(t, test.outEvents, out)
 		})
 	}

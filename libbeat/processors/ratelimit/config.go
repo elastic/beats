@@ -25,9 +25,10 @@ import (
 
 // config for rate limit processor.
 type config struct {
-	Limit     rate                   `config:"limit" validate:"required"`
-	Fields    []string               `config:"fields"`
-	Algorithm common.ConfigNamespace `config:"algorithm"`
+	Limit          rate                   `config:"limit" validate:"required"`
+	Fields         []string               `config:"fields"`
+	ThrottledField string                 `config:"throttled_field"`
+	Algorithm      common.ConfigNamespace `config:"algorithm"`
 }
 
 func (c *config) setDefaults() error {

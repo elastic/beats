@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 )
@@ -40,7 +41,10 @@ const processorName = "rate_limit"
 type rateLimit struct {
 	config    config
 	algorithm algorithm
-	logger    *logp.Logger
+
+	numThrottled atomic.Uint64
+
+	logger *logp.Logger
 }
 
 // new constructs a new rate limit processor.
@@ -83,9 +87,12 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	if p.algorithm.IsAllowed(key) {
+		p.tagEvent(event)
+		fmt.Println("event:", event)
 		return event, nil
 	}
 
+	p.numThrottled.Inc()
 	p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
 	return nil, nil
 }
@@ -118,6 +125,14 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	}
 
 	return hashstructure.Hash(values, nil)
+}
+
+func (p *rateLimit) tagEvent(event *beat.Event) {
+	fmt.Println("throttled_field:", p.config.ThrottledField)
+	if p.config.ThrottledField != "" && p.numThrottled.Load() > 0 {
+		event.PutValue(p.config.ThrottledField, p.numThrottled.Load())
+		p.numThrottled.Store(0)
+	}
 }
 
 // setClock allows test code to inject a fake clock
