@@ -187,19 +187,31 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 func GoTest(ctx context.Context, params GoTestArgs) error {
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
-	toolsArgs := []string{"--no-color"}
+	// We use gotestsum to drive the tests and produce a junit report.
+	// The tool runs `go test -json` in order to produce a structured log which makes it easier
+	// to parse the actual test output.
+	// Of OutputFile is given the original JSON file will be written as well.
+	//
+	// The runner needs to set CLI flags for gotestsum and for "go test". We track the different
+	// CLI flags in the gotestsumArgs and testArgs variables, such that we can finally produce command like:
+	//   $ gotestsum <gotestsum args> -- <go test args>
+	//
+	// The additional arguments given via GoTestArgs are applied to `go test` only. Callers can not
+	// modify any of the gotestsum arguments.
+
+	gotestsumArgs := []string{"--no-color"}
 	if mg.Verbose() {
-		toolsArgs = append(toolsArgs, "-f", "standard-verbose")
+		gotestsumArgs = append(gotestsumArgs, "-f", "standard-verbose")
 	} else {
-		toolsArgs = append(toolsArgs, "-f", "standard-quiet")
+		gotestsumArgs = append(gotestsumArgs, "-f", "standard-quiet")
 	}
 	if params.JUnitReportFile != "" {
 		CreateDir(params.JUnitReportFile)
-		toolsArgs = append(toolsArgs, "--junitfile", params.JUnitReportFile)
+		gotestsumArgs = append(gotestsumArgs, "--junitfile", params.JUnitReportFile)
 	}
 	if params.OutputFile != "" {
 		CreateDir(params.OutputFile)
-		toolsArgs = append(toolsArgs, "--jsonfile", params.OutputFile+".json")
+		gotestsumArgs = append(gotestsumArgs, "--jsonfile", params.OutputFile+".json")
 	}
 
 	var testArgs []string
@@ -226,7 +238,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	testArgs = append(testArgs, params.ExtraFlags...)
 	testArgs = append(testArgs, params.Packages...)
 
-	args := append(toolsArgs, append([]string{"--"}, testArgs...)...)
+	args := append(gotestsumArgs, append([]string{"--"}, testArgs...)...)
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
 	// Wire up the outputs.
