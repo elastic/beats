@@ -18,7 +18,6 @@
 package ratelimit
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -74,8 +73,11 @@ func TestRateLimit(t *testing.T) {
 	}
 
 	withField := func(in beat.Event, key string, value interface{}) beat.Event {
-		in.Fields.Put(key, value)
-		return in
+		out := in
+		out.Fields = in.Fields.Clone()
+
+		out.Fields.Put(key, value)
+		return out
 	}
 
 	cases := map[string]struct {
@@ -130,7 +132,11 @@ func TestRateLimit(t *testing.T) {
 				inEvents[2],
 				withField(inEvents[3], "foo", "seger"),
 			},
-			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
+			outEvents: []beat.Event{
+				withField(inEvents[0], "foo", "bar"),
+				inEvents[2],
+				withField(inEvents[3], "foo", "seger"),
+			},
 		},
 		"with_burst": {
 			config: common.MapStr{
@@ -141,18 +147,18 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: inEvents,
 		},
-		"with_throttled": {
+		"with_metric": {
 			config: common.MapStr{
-				"limit":           "2/s",
-				"throttled_field": "num_throttled",
+				"limit":        "2/s",
+				"metric_field": "num_dropped",
 			},
 			delay:    200 * time.Millisecond,
 			inEvents: inEvents,
 			outEvents: []beat.Event{
 				inEvents[0],
 				inEvents[1],
-				withField(inEvents[3], "num_throttled", uint64(1)),
-				withField(inEvents[5], "num_throttled", uint64(1)),
+				withField(inEvents[3], "num_dropped", uint64(1)),
+				withField(inEvents[5], "num_dropped", uint64(1)),
 			},
 		},
 	}
@@ -179,12 +185,6 @@ func TestRateLimit(t *testing.T) {
 				fakeClock.Advance(test.delay)
 			}
 
-			require.Len(t, out, len(test.outEvents))
-			for idx, event := range out {
-				fmt.Println("actual: ", event)
-				fmt.Println("expected: ", test.outEvents[idx])
-				require.Equal(t, test.outEvents[idx], event)
-			}
 			require.Equal(t, test.outEvents, out)
 		})
 	}

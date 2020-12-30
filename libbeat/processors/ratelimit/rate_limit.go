@@ -42,7 +42,7 @@ type rateLimit struct {
 	config    config
 	algorithm algorithm
 
-	numThrottled atomic.Uint64
+	numRateLimited atomic.Uint64
 
 	logger *logp.Logger
 }
@@ -88,11 +88,10 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 
 	if p.algorithm.IsAllowed(key) {
 		p.tagEvent(event)
-		fmt.Println("event:", event)
 		return event, nil
 	}
 
-	p.numThrottled.Inc()
+	p.numRateLimited.Inc()
 	p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
 	return nil, nil
 }
@@ -128,10 +127,9 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 }
 
 func (p *rateLimit) tagEvent(event *beat.Event) {
-	fmt.Println("throttled_field:", p.config.ThrottledField)
-	if p.config.ThrottledField != "" && p.numThrottled.Load() > 0 {
-		event.PutValue(p.config.ThrottledField, p.numThrottled.Load())
-		p.numThrottled.Store(0)
+	if p.config.MetricField != "" && p.numRateLimited.Load() > 0 {
+		event.PutValue(p.config.MetricField, p.numRateLimited.Load())
+		p.numRateLimited.Store(0)
 	}
 }
 
