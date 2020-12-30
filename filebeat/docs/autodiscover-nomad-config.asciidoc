@@ -5,7 +5,8 @@ Filebeat supports templates for inputs and modules.
 filebeat.autodiscover:
   providers:
     - type: nomad
-      host: nomad1
+      node: nomad1
+      scope: local
       hints.enabled: true
       allow_stale: true
       templates:
