@@ -17,12 +17,15 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
+* <<exported-fields-aws.ec2>>
+* <<exported-fields-aws.elb>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
+* <<exported-fields-cloudfoundry-processor>>
 * <<exported-fields-cloudfoundry>>
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
@@ -4590,6 +4593,314 @@ type: double
 
 --
 
+[[exported-fields-aws.ec2]]
+== EC2 Listener fields
+
+AWS EC2 Listeners
+
+
+
+[float]
+=== aws.ec2
+
+Represents an AWS EC2 Listener, e.g. state of an EC2.
+
+
+
+*`aws.ec2.architecture`*::
++
+--
+The EC2 instance architecture (i386 | x86_64 | arm64 ).
+
+type: keyword
+
+--
+
+*`aws.ec2.image.id`*::
++
+--
+The ID of the image used to launch the instance.
+
+type: keyword
+
+--
+
+*`aws.ec2.kernel.id`*::
++
+--
+The kernel associated with this instance, if applicable.
+
+type: keyword
+
+--
+
+*`aws.ec2.monitoring.state`*::
++
+--
+Indicates whether detailed monitoring is enabled (disabled | enabled).
+
+type: keyword
+
+--
+
+*`aws.ec2.private.dns_name`*::
++
+--
+The private DNS name.
+
+type: keyword
+
+--
+
+*`aws.ec2.private.ip`*::
++
+--
+The IPv4 address of the network interface within the subnet.
+
+type: keyword
+
+--
+
+*`aws.ec2.public.dns_name`*::
++
+--
+The public DNS name.
+
+type: keyword
+
+--
+
+*`aws.ec2.public.ip`*::
++
+--
+The public IPv4 address assigned to the instance, if applicable.
+
+type: keyword
+
+--
+
+*`aws.ec2.root_device_name`*::
++
+--
+The device name of the root device volume (for example, /dev/sda1).
+
+type: keyword
+
+--
+
+*`aws.ec2.state.code`*::
++
+--
+The reason code for the state change.
+
+type: keyword
+
+--
+
+*`aws.ec2.state.name`*::
++
+--
+A message that describes the state change.
+
+type: keyword
+
+--
+
+*`aws.ec2.subnet.id`*::
++
+--
+The ID of the subnet in which the instance is running.
+
+type: keyword
+
+--
+
+*`aws.ec2.vpc.id`*::
++
+--
+The ID of the VPC that the instance is running in.
+
+type: keyword
+
+--
+
+*`aws.ec2.tags.*`*::
++
+--
+Tag key value pairs from aws resources.
+
+type: object
+
+--
+
+[[exported-fields-aws.elb]]
+== ELB Listener fields
+
+AWS ELB Listeners
+
+
+
+[float]
+=== aws.elb
+
+Represents an AWS ELB Listener, e.g. a port on an ELB.
+
+
+
+*`aws.elb.ip_address_type`*::
++
+--
+Whether this is an ipv4 or dual-stack IP
+
+type: keyword
+
+example: ipv4
+
+required: True
+
+--
+
+*`aws.elb.state`*::
++
+--
+Current state of the ELB
+
+type: keyword
+
+example: active
+
+--
+
+*`aws.elb.type`*::
++
+--
+Whether this is an application or network loadbalancer
+
+type: keyword
+
+example: application
+
+--
+
+*`aws.elb.protocol`*::
++
+--
+The application layer protocol
+
+type: keyword
+
+example: HTTP
+
+--
+
+*`aws.elb.vpc_id`*::
++
+--
+ID of the VPC
+
+type: keyword
+
+example: vpc-123456
+
+--
+
+*`aws.elb.ssl_policy`*::
++
+--
+The specific SSL policy
+
+type: keyword
+
+--
+
+*`aws.elb.load_balancer_arn`*::
++
+--
+ARN for the ELB itself
+
+type: keyword
+
+example: arn:aws:elasticloadbalancing:us-east-1:331574139922:loadbalancer/app/testytesty/a14c9934d2a6e438
+
+--
+
+*`aws.elb.security_groups`*::
++
+--
+List of security groups for this
+
+type: keyword
+
+example: sg-a1b555d4
+
+--
+
+*`aws.elb.created`*::
++
+--
+Date of creation
+
+type: date
+
+example: 2019-06-12 21:55:14.490000+00:00
+
+--
+
+*`aws.elb.availability_zones`*::
++
+--
+List of AZs this is active in
+
+type: keyword
+
+example: us-east-1e
+
+--
+
+*`aws.elb.host`*::
++
+--
+the hostname for this ELB
+
+type: keyword
+
+example: testytesty-141141146.us-east-1.elb.amazonaws.com
+
+--
+
+*`aws.elb.listener_arn`*::
++
+--
+ARN for this ELB listener
+
+type: keyword
+
+example: arn:aws:elasticloadbalancing:us-east-1:334575128422:listener/app/testytesty/b74b9934c5a6e438/0e8425ad18d4d529
+
+--
+
+*`aws.elb.scheme`*::
++
+--
+whether this ELB is internet facing or internal-only
+
+type: keyword
+
+example: internet-facing
+
+--
+
+*`aws.elb.port`*::
++
+--
+Port number for this listener
+
+type: integer
+
+example: 8080
+
+--
+
 [[exported-fields-awsfargate]]
 == AWS Fargate fields
 
@@ -7014,6 +7325,135 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+[[exported-fields-cloudfoundry-processor]]
+== Cloud Foundry fields
+
+Cloud Foundry information collected from Cloud Foundry.
+
+
+
+
+*`cloudfoundry.app.id`*::
++
+--
+Cloud Foundry application identifier.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.app.name`*::
++
+--
+Cloud Foundry application name.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.space.id`*::
++
+--
+Cloud Foundry space identifier.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.space.name`*::
++
+--
+Cloud Foundry space name.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.org.id`*::
++
+--
+Cloud Foundry organization identifier.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.org.name`*::
++
+--
+Cloud Foundry organization name.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.tags.*`*::
++
+--
+Cloud Foundry tags.
+
+
+type: object
+
+--
+
+
+*`cloudfoundry.envelope.deployment`*::
++
+--
+Identifier of the Cloud Foundry deployment where this event was created.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.envelope.index`*::
++
+--
+Envelope index.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.envelope.ip`*::
++
+--
+IP address of the node where the job that created this event is running.
+
+
+type: ip
+
+--
+
+*`cloudfoundry.envelope.job`*::
++
+--
+Job name.
+
+
+type: keyword
+
+--
+
+*`cloudfoundry.envelope.origin`*::
++
+--
+Name of the deployment that created this event.
+
+
+type: keyword
 
 --
 

@@ -30,5 +30,10 @@ func Build() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return devtools.GenerateFieldsYAML()
+	return devtools.GenerateFieldsYAML(
+		devtools.OSSBeatDir("processors"),
+		devtools.OSSBeatDir("autodiscover/providers"),
+		"processors",
+		"autodiscover/providers",
+	)
 }

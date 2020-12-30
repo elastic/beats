@@ -82,6 +82,9 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 		libbeatModulesPaths := []string{
 			filepath.Join(esBeatsPath, "libbeat/processors"),
 			filepath.Join(esBeatsPath, "libbeat/autodiscover/providers"),
+
+			filepath.Join(esBeatsPath, "x-pack/libbeat/processors"),
+			filepath.Join(esBeatsPath, "x-pack/libbeat/autodiscover/providers"),
 		}
 		for _, libbeatModulesPath := range libbeatModulesPaths {
 			libbeatFieldFiles, err := CollectModuleFiles(libbeatModulesPath)

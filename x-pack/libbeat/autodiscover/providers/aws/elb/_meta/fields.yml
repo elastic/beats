@@ -63,7 +63,7 @@
           example: internet-facing
           description: whether this ELB is internet facing or internal-only
         - name: port
-          type: number
+          type: integer
           example: 8080
           description: Port number for this listener
 

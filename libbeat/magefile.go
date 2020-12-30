@@ -44,7 +44,7 @@ func Build() error {
 
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
-	return devtools.GenerateFieldsYAML("processors")
+	return devtools.GenerateFieldsYAML("processors", "autodiscover/providers")
 }
 
 // Config generates example and reference configuration for libbeat.
