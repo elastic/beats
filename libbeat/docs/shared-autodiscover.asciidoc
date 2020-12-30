@@ -393,20 +393,18 @@ The Nomad autodiscover provider watches for Nomad jobs to start, update, and sto
 These are the available fields during config templating. The `nomad.*` fields will be available
 on each emitted event.
 
-* host
-* id
-* nomad.name
-* nomad.job
-* nomad.namespace
+* nomad.allocation.id
+* nomad.allocation.name
+* nomad.allocation.status
 * nomad.datacenter
+* nomad.job.name
+* nomad.job.type
+* nomad.namespace
 * nomad.region
-* nomad.type
-* nomad.alloc_id
-* nomad.status
 * nomad.task.name
+* nomad.task.service.canary_tags
 * nomad.task.service.name
 * nomad.task.service.tags
-* nomad.task.service.canary_tags
 
 If the `include_labels` config is added to the provider config, then the list of labels present in
 the config will be added to the event.
@@ -424,14 +422,19 @@ For example:
 {
   ...
   "region": "europe",
-  "type": "service",
-  "alloc_id": "35eba07f-e5e4-20ac-6def-85117bee6efb",
+  "allocation": {
+    "name": "coffeshop.api[0]",
+    "id": "35eba07f-e5e4-20ac-6def-85117bee6efb",
+    "status": "running"
+  },
   "datacenters": [
     "europe-west4"
   ],
   "namespace": "default",
-  "name": "coffeshop.api[0]",
-  "job": "coffeshop"
+  "job": {
+    "type": "service",
+    "name": "coffeshop"
+  },
   "task": {
     "service": {
       "name": [

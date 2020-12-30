@@ -83,7 +83,10 @@ func TestAllocationMetadata(t *testing.T) {
 	meta := metaGen.ResourceMetadata(alloc)
 	tasks := metaGen.GroupMeta(alloc.Job)
 
-	assert.Equal(t, "my-job", meta["job"])
+	assert.EqualValues(t, common.MapStr{
+		"name": "my-job",
+		"type": "service",
+	}, meta["job"])
 	assert.Equal(t, "task-value", tasks[0]["key1"])
 	assert.Equal(t, []string{"europe-west4"}, meta["datacenter"])
 }
@@ -163,8 +166,15 @@ func TestCronJob(t *testing.T) {
 	meta := metaGen.ResourceMetadata(alloc)
 	tasks := metaGen.GroupMeta(alloc.Job)
 
-	assert.Equal(t, meta["alloc_id"], allocID)
-	assert.Equal(t, meta["type"], JobTypeBatch)
+	assert.EqualValues(t, common.MapStr{
+		"name":   alloc.Name,
+		"id":     allocID,
+		"status": "",
+	}, meta["allocation"])
+	assert.EqualValues(t, common.MapStr{
+		"name": *cron.Name,
+		"type": JobTypeBatch,
+	}, meta["job"])
 	assert.Len(t, tasks, 2)
 }
 

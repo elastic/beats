@@ -40,13 +40,17 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"nomad": common.MapStr{
-					"alloc_id":   "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
+					"allocation": common.MapStr{
+						"id": "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
+					},
 					"datacenter": []string{"europe-west4"},
 				},
 				"meta": common.MapStr{
 					"nomad": common.MapStr{
 						"task": getNestedAnnotations(common.MapStr{
-							"alloc_id":                          "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+							"allocation": common.MapStr{
+								"id": "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+							},
 							"co.elastic.logs/multiline.pattern": "^test",
 							"co.elastic.metrics/module":         "prometheus",
 							"co.elastic.metrics/period":         "10s",
@@ -58,7 +62,9 @@ func TestGenerateHints(t *testing.T) {
 			result: bus.Event{
 				"nomad": common.MapStr{
 					"task": getNestedAnnotations(common.MapStr{
-						"alloc_id":       "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+						"allocation": common.MapStr{
+							"id": "f67d087a-fb67-48a8-b526-ac1316f4bc9a",
+						},
 						"not.to.include": "true",
 					}),
 				},
@@ -169,19 +175,26 @@ func TestEmitEvent(t *testing.T) {
 				"start":    true,
 				"host":     host,
 				"nomad": common.MapStr{
-					"alloc_id":   UUID.String(),
+					"allocation": common.MapStr{
+						"id":     UUID.String(),
+						"name":   "job.task",
+						"status": "running",
+					},
 					"datacenter": []string{"europe-west4"},
-					"job":        "my-job",
-					"name":       "job.task",
-					"namespace":  "default",
-					"region":     "global",
-					"status":     "running",
-					"type":       "service",
+					"job": common.MapStr{
+						"name": "my-job",
+						"type": "service",
+					},
+					"namespace": "default",
+					"region":    "global",
 				},
 				"meta": common.MapStr{
 					"nomad": common.MapStr{
 						"datacenter": []string{"europe-west4"},
-						"job":        "my-job",
+						"job": common.MapStr{
+							"name": "my-job",
+							"type": "service",
+						},
 						"task": common.MapStr{
 							"group-key": "group.value",
 							"job-key":   "job.value",
@@ -193,12 +206,13 @@ func TestEmitEvent(t *testing.T) {
 							},
 							"task-key": "task.value",
 						},
-						"name":      "job.task",
 						"namespace": "default",
 						"region":    "global",
-						"type":      "service",
-						"alloc_id":  UUID.String(),
-						"status":    nomad.AllocClientStatusRunning,
+						"allocation": common.MapStr{
+							"id":     UUID.String(),
+							"name":   "job.task",
+							"status": nomad.AllocClientStatusRunning,
+						},
 					},
 				},
 			},
