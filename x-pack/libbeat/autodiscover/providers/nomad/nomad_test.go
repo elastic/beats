@@ -40,8 +40,8 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"nomad": common.MapStr{
-					"alloc_id":    "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
-					"datacenters": []string{"europe-west4"},
+					"alloc_id":   "cf7db85d-c93c-873a-cb37-6d2ea071b0eb",
+					"datacenter": []string{"europe-west4"},
 				},
 				"meta": common.MapStr{
 					"nomad": common.MapStr{
@@ -169,19 +169,19 @@ func TestEmitEvent(t *testing.T) {
 				"start":    true,
 				"host":     host,
 				"nomad": common.MapStr{
-					"alloc_id":    UUID.String(),
-					"datacenters": []string{"europe-west4"},
-					"job":         "my-job",
-					"name":        "job.task",
-					"namespace":   "default",
-					"region":      "global",
-					"status":      "running",
-					"type":        "service",
+					"alloc_id":   UUID.String(),
+					"datacenter": []string{"europe-west4"},
+					"job":        "my-job",
+					"name":       "job.task",
+					"namespace":  "default",
+					"region":     "global",
+					"status":     "running",
+					"type":       "service",
 				},
 				"meta": common.MapStr{
 					"nomad": common.MapStr{
-						"datacenters": []string{"europe-west4"},
-						"job":         "my-job",
+						"datacenter": []string{"europe-west4"},
+						"job":        "my-job",
 						"task": common.MapStr{
 							"group-key": "group.value",
 							"job-key":   "job.value",

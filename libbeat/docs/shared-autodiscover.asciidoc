@@ -397,7 +397,7 @@ on each emitted event.
 * nomad.name
 * nomad.job
 * nomad.namespace
-* nomad.datacenters
+* nomad.datacenter
 * nomad.region
 * nomad.type
 * nomad.alloc_id
