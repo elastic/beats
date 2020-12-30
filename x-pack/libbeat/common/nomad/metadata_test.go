@@ -85,7 +85,7 @@ func TestAllocationMetadata(t *testing.T) {
 
 	assert.Equal(t, "my-job", meta["job"])
 	assert.Equal(t, "task-value", tasks[0]["key1"])
-	assert.Equal(t, []string{"europe-west4"}, meta["datacenters"])
+	assert.Equal(t, []string{"europe-west4"}, meta["datacenter"])
 }
 
 func TestExcludeMetadata(t *testing.T) {

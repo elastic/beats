@@ -62,14 +62,14 @@ func NewMetaGeneratorFromConfig(cfg *MetaGeneratorConfig) MetaGenerator {
 func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 	// default labels that we expose / filter with `IncludeLabels`
 	meta := common.MapStr{
-		"name":        obj.Name,
-		"job":         *obj.Job.Name,
-		"namespace":   obj.Namespace,
-		"datacenters": obj.Job.Datacenters,
-		"region":      *obj.Job.Region,
-		"type":        *obj.Job.Type,
-		"alloc_id":    obj.ID,
-		"status":      obj.ClientStatus,
+		"name":       obj.Name,
+		"job":        *obj.Job.Name,
+		"namespace":  obj.Namespace,
+		"datacenter": obj.Job.Datacenters,
+		"region":     *obj.Job.Region,
+		"type":       *obj.Job.Type,
+		"alloc_id":   obj.ID,
+		"status":     obj.ClientStatus,
 	}
 
 	return meta
