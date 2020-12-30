@@ -5,6 +5,7 @@
 package add_nomad_metadata
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,14 +17,26 @@ const allocID = "43205e0e-3d55-f561-83cb-bed15e23b862"
 
 func TestLogsPathMatcherEmpty(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
-	path := "/var/lib/nomad"
+	var path string
+	if runtime.GOOS == "windows" {
+		path = `C:\ProgramData\Nomad`
+	} else {
+		path = "/var/lib/nomad"
+	}
 	expectedResult := ""
 	executeTest(t, cfgLogsPath, path, expectedResult)
 }
 
 func TestLogsPathMatcherWithAllocation(t *testing.T) {
-	cfgLogsPath := "/appdata/nomad/alloc/"
-	path := "/appdata/nomad/alloc/43205e0e-3d55-f561-83cb-bed15e23b862/alloc/logs/teb-booking-gateway-prod.stdout.94"
+	var cfgLogsPath, path string
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = `C:\ProgramData\Nomad\alloc`
+		path = `C:\ProgramData\Nomad\alloc\43205e0e-3d55-f561-83cb-bed15e23b862\alloc\logs\teb-booking-gateway-prod.stdout.94`
+	} else {
+		cfgLogsPath = "/appdata/nomad/alloc/"
+		path = "/appdata/nomad/alloc/43205e0e-3d55-f561-83cb-bed15e23b862/alloc/logs/teb-booking-gateway-prod.stdout.94"
+	}
+
 	executeTest(t, cfgLogsPath, path, allocID)
 }
 
