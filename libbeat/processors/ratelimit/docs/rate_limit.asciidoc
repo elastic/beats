@@ -38,3 +38,4 @@ The following settings are supported:
 
 `limit`:: The rate limit. Supported time units for the rate are `s` (per second), `m` (per minute), and `h` (per hour).
 `fields`:: (Optional) List of fields. The rate limit will be applied to each distinct value derived by combining the values of these fields.
+`throttled_field`:: (Optional) When events are rate limited, the first event that is allowed to pass through after rate limiting will contain this field. The value of the field will be the number of events that were rate limited since the last time an event was allowed to pass through.
