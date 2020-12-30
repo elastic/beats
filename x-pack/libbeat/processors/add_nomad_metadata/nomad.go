@@ -102,7 +102,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 				return nil, fmt.Errorf("`scope: %s` used without `node`: couldn't autoconfigure node name: %w", ScopeNode, err)
 			}
 			if agent.Member.Name == "" {
-				return nil, fmt.Errorf("`scope: %s` used without `node`: API returned empty name")
+				return nil, fmt.Errorf("`scope: %s` used without `node`: API returned empty name", ScopeNode)
 			}
 			node = agent.Member.Name
 		}

@@ -81,6 +81,7 @@ func TestGenerateHints(t *testing.T) {
 
 	p := Provider{
 		config: cfg,
+		logger: logp.NewLogger("nomad"),
 	}
 	for _, test := range tests {
 		assert.Equal(t, test.result, p.generateHints(test.event))
@@ -187,9 +188,8 @@ func TestEmitEvent(t *testing.T) {
 							"key1":      "task-value",
 							"name":      "task1",
 							"service": common.MapStr{
-								"canary_tags": []string{},
-								"name":        []string{"web", "nginx"},
-								"tags":        []string{"tag-a", "tag-b", "tag-c", "tag-d"},
+								"name": []string{"web", "nginx"},
+								"tags": []string{"tag-a", "tag-b", "tag-c", "tag-d"},
 							},
 							"task-key": "task.value",
 						},
@@ -301,6 +301,7 @@ func TestEmitEvent(t *testing.T) {
 				metagen:   metaGen,
 				templates: mapper,
 				uuid:      UUID,
+				logger:    logp.NewLogger("nomad"),
 			}
 
 			listener := p.bus.Subscribe()

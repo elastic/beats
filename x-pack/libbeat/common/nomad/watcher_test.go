@@ -7,12 +7,12 @@ package nomad
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
-	"net/http"
-	"net/http/httptest"
-
+	"github.com/gofrs/uuid"
 	api "github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
@@ -77,7 +77,7 @@ func TestAllocationWatcher(t *testing.T) {
 	}{
 		{
 			name: "allocation added",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 20, CreateIndex: 20,
@@ -101,7 +101,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "ignore events due to unchanged WaitIndex",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 20, CreateIndex: 20,
@@ -119,7 +119,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "ignore old allocations",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ID: "9820bd24-6c67-013a-e0c3-6ce1129dc0d2", ModifyIndex: 0,
@@ -148,7 +148,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "on initial run all allocations are added",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 200, CreateIndex: 100,
@@ -172,7 +172,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "allocation updated",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 20, CreateIndex: 10,
@@ -196,7 +196,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "allocation created in the same index as the watcher check",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 97, CreateIndex: 85,
@@ -220,7 +220,7 @@ func TestAllocationWatcher(t *testing.T) {
 		},
 		{
 			name: "allocation updated in the same index as the watcher check",
-			node: api.Node{Name: "nomad1"},
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
 			allocs: []api.Allocation{
 				{
 					ModifyIndex: 509, CreateIndex: 479,
