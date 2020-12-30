@@ -411,7 +411,7 @@ func writeTmpFile(baseName string, perm os.FileMode, states []file.State) (strin
 	logp.Debug("registrar", "Write registry file: %s (%v)", baseName, len(states))
 
 	tempfile := baseName + ".new"
-	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, perm)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, perm)
 	if err != nil {
 		logp.Err("Failed to create tempfile (%s) for writing: %s", tempfile, err)
 		return "", err
