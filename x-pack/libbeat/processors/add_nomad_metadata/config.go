@@ -11,6 +11,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+const (
+	ScopeNode    = "node"
+	ScopeCluster = "cluster"
+)
+
 type nomadAnnotatorConfig struct {
 	Address         string        `config:"address"`
 	Region          string        `config:"region"`
@@ -32,12 +37,8 @@ type nomadAnnotatorConfig struct {
 
 func (c *nomadAnnotatorConfig) Validate() error {
 	switch c.Scope {
-	case "local":
-		if c.Node == "" {
-			return fmt.Errorf("`node` needs to be specified when using `local` scope")
-		}
-	case "global":
-		c.Node = ""
+	case ScopeNode:
+	case ScopeCluster:
 	default:
 		return fmt.Errorf("invalid value for `scope`, select `local` or `global`")
 	}

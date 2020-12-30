@@ -89,13 +89,26 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	logp.Debug("nomad", "Using node: %s", config.Node)
 	logp.Debug("nomad", "Initializing watcher")
 
-	watcher, err := nomad.NewWatcher(client, nomad.WatchOptions{
+	options := nomad.WatchOptions{
 		SyncTimeout:     config.syncPeriod,
-		Node:            config.Node,
-		Namespace:       config.Namespace,
 		RefreshInterval: config.RefreshInterval,
-	})
-
+		Namespace:       config.Namespace,
+	}
+	if config.Scope == ScopeNode {
+		node := config.Node
+		if node == "" {
+			agent, err := client.Agent().Self()
+			if err != nil {
+				return nil, fmt.Errorf("`scope: %s` used without `node`: couldn't autoconfigure node name: %w", ScopeNode, err)
+			}
+			if agent.Member.Name == "" {
+				return nil, fmt.Errorf("`scope: %s` used without `node`: API returned empty name")
+			}
+			node = agent.Member.Name
+		}
+		options.Node = node
+	}
+	watcher, err := nomad.NewWatcher(client, options)
 	if err != nil {
 		logp.Err("Error creating watcher %v", err.Error())
 		return nil, err

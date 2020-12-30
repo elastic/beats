@@ -12,6 +12,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+const (
+	ScopeNode    = "node"
+	ScopeCluster = "cluster"
+)
+
 // Config for nomad autodiscover provider
 type Config struct {
 	Address        string        `config:"address"`
@@ -39,7 +44,7 @@ func defaultConfig() *Config {
 		Region:         "",
 		Namespace:      "",
 		SecretID:       "",
-		Scope:          "local",
+		Scope:          ScopeNode,
 		allowStale:     true,
 		waitTime:       15 * time.Second,
 		syncPeriod:     30 * time.Second,
@@ -56,14 +61,10 @@ func (c *Config) Validate() error {
 	}
 
 	switch c.Scope {
-	case "local":
-		if c.Node == "" {
-			return fmt.Errorf("`node` needs to be specified when using `local` scope")
-		}
-	case "global":
-		c.Node = ""
+	case ScopeNode:
+	case ScopeCluster:
 	default:
-		return fmt.Errorf("invalid value for `scope`, select `local` or `global`")
+		return fmt.Errorf("invalid value for `scope`, select `%s` or `%s`", ScopeNode, ScopeCluster)
 	}
 	return nil
 }
