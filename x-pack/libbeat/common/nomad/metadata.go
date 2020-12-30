@@ -130,17 +130,22 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 	tasks := []common.MapStr{}
 
 	for _, task := range group.Tasks {
-		svcMeta := common.MapStr{
-			"name":        []string{},
-			"tags":        []string{},
-			"canary_tags": []string{},
+		var svcNames, svcTags, svcCanaryTags []string
+		for _, service := range task.Services {
+			svcNames = append(svcNames, service.Name)
+			svcTags = append(svcTags, service.Tags...)
+			svcCanaryTags = append(svcCanaryTags, service.CanaryTags...)
 		}
 
-		for _, service := range task.Services {
-			svcMeta["name"] = append(svcMeta["name"].([]string), service.Name)
-			svcMeta["tags"] = append(svcMeta["tags"].([]string), service.Tags...)
-			svcMeta["canary_tags"] = append(svcMeta["canary_tags"].([]string),
-				service.CanaryTags...)
+		svcMeta := common.MapStr{}
+		if len(svcNames) > 0 {
+			svcMeta["name"] = svcNames
+		}
+		if len(svcTags) > 0 {
+			svcMeta["tags"] = svcTags
+		}
+		if len(svcCanaryTags) > 0 {
+			svcMeta["canary_tags"] = svcCanaryTags
 		}
 
 		joinMeta := make(map[string]string, len(group.Meta))
@@ -154,8 +159,10 @@ func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
 		}
 
 		meta := common.MapStr{
-			"name":    task.Name,
-			"service": svcMeta,
+			"name": task.Name,
+		}
+		if len(svcMeta) > 0 {
+			meta["service"] = svcMeta
 		}
 
 		for k, v := range joinMeta {
