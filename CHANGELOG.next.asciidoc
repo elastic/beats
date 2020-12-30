@@ -530,6 +530,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added Kafka version 2.2 to the list of supported versions. {pull}22328[22328]
 - Add support for ephemeral containers in kubernetes autodiscover and `add_kubernetes_metadata`. {pull}22389[22389] {pull}22439[22439]
 - Added support for wildcard fields and keyword fallback in beats setup commands. {pull}22521[22521]
+- Fix polling node when it is not ready and monitor by hostname {pull}22666[22666]
+- Add `expand_keys` option to `decode_json_fields` processor and `json` input, to recusively de-dot and expand json keys into hierarchical object structures {pull}22849[22849]
+- Update k8s client and release k8s leader lock gracefully {pull}22919[22919]
+- Improve equals check. {pull}22778[22778]
+- Added "detect_mime_type" processor for detecting mime types {pull}22940[22940]
+- Improve event normalization performance {pull}22974[22974]
+- Add tini as init system in docker images {pull}22137[22137]
+- Added "add_network_direction" processor for determining perimeter-based network direction. {pull}23076[23076]
+- Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
+- Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
+- Honor kube event resysncs to handle missed watch events {pull}22668[22668]
+- Add support for customized monitoring API. {pull}22605[22605]
+- Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
 
 *Auditbeat*
 
