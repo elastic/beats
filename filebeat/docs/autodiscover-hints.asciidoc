@@ -278,7 +278,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: nomad
         paths:
-          - /var/lib/nomad/alloc/${data.nomad.alloc_id}/alloc/logs/${data.nomad.task.name}.*
+          - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
 
 You can also disable default settings entirely, so only Jobs annotated like `co.elastic.logs/enabled: true`

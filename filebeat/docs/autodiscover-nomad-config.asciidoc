@@ -16,7 +16,7 @@ filebeat.autodiscover:
           config:
             - type: log
               paths:
-                - /var/lib/nomad/alloc/${data.nomad.alloc_id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
+                - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ filebeat.autodiscover:
                 input:
                   type: log
                   paths:
-                    - /var/lib/nomad/alloc/${data.nomad.alloc_id}/alloc/logs/${data.nomad.task.name}.*
+                    - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -------------------------------------------------------------------------------------
 
 WARNING: The `docker` input is currently not supported. Nomad doesn't expose the container id

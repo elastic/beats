@@ -159,7 +159,7 @@ func (w *watcher) sync() error {
 			// don't trigger a new allocation
 			updated := (w.waitIndex != 0) && (alloc.CreateIndex < w.waitIndex) && (alloc.AllocModifyIndex >= w.waitIndex)
 
-			w.logger.Debugf("alloc_id=%s waitIndex=%v CreateIndex=%v ModifyIndex=%v AllocModifyIndex=%v updated=%v",
+			w.logger.Debugf("allocation.id=%s waitIndex=%v CreateIndex=%v ModifyIndex=%v AllocModifyIndex=%v updated=%v",
 				alloc.ID, w.waitIndex, alloc.CreateIndex, alloc.ModifyIndex,
 				alloc.AllocModifyIndex, updated,
 			)
