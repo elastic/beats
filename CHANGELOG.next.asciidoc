@@ -565,7 +565,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
-- Add support for customized monitoring API. {pull}22605[22605]
 - Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
 
 *Auditbeat*
