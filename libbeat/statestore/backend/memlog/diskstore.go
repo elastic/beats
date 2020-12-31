@@ -335,7 +335,7 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 }
 
 func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) (string, error) {
-	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, s.fileMode)
+	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, s.fileMode)
 	if err != nil {
 		return "", err
 	}
