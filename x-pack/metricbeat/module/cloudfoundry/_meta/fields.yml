@@ -1,0 +1,24 @@
+- key: cloudfoundry
+  title: "Cloudfoundry"
+  description: >
+    Cloud Foundry module
+  release: beta
+  fields:
+    - name: cloudfoundry
+      type: group
+      description: >
+      fields:
+        - name: type
+          type: keyword
+          description: >
+            The type of event from Cloud Foundry.
+            Possible values include 'container', 'counter' and 'value'.
+        - name: app
+          type: group
+          description: >
+            The application the metric is associated with.
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                The ID of the application.

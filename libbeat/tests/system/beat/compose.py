@@ -1,9 +1,11 @@
-from __future__ import absolute_import
+import io
+import logging
 import os
 import sys
 import tarfile
 import time
-import StringIO
+
+from contextlib import contextmanager
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
@@ -55,9 +57,12 @@ class ComposeMixin(object):
             return container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
-        project.pull(
-            ignore_pull_failures=True,
-            service_names=cls.COMPOSE_SERVICES)
+
+        with disabled_logger('compose.service'):
+            project.pull(
+                ignore_pull_failures=True,
+                service_names=cls.COMPOSE_SERVICES)
+
         project.up(
             strategy=ConvergenceStrategy.always,
             service_names=cls.COMPOSE_SERVICES,
@@ -111,12 +116,12 @@ class ComposeMixin(object):
 
         content = "SERVICE_HOST=%s" % host
         info = tarfile.TarInfo(name="/run/compose_env")
-        info.mode = 0100644
+        info.mode = 0o100644
         info.size = len(content)
 
-        data = StringIO.StringIO()
+        data = io.BytesIO()
         tar = tarfile.TarFile(fileobj=data, mode='w')
-        tar.addfile(info, StringIO.StringIO(content))
+        tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
         tar.close()
 
         containers = project.containers(service_names=[service])
@@ -150,7 +155,7 @@ class ComposeMixin(object):
         run from another container in the same network. It also works when
         running from the host network if the docker daemon runs natively.
         """
-        networks = info['NetworkSettings']['Networks'].values()
+        networks = list(info['NetworkSettings']['Networks'].values())
         port = port.split("/")[0]
         for network in networks:
             ip = network['IPAddress']
@@ -184,7 +189,7 @@ class ComposeMixin(object):
         if len(portsConfig) == 0:
             raise Exception("No exposed ports for service %s" % service)
         if port is None:
-            port = portsConfig.keys()[0]
+            port = list(portsConfig.keys())[0]
 
         # We can use _exposed_host for all platforms when we can use host network
         # in the metricbeat container
@@ -197,7 +202,7 @@ class ComposeMixin(object):
         basename = os.path.basename(cls.find_compose_path())
 
         def positivehash(x):
-            return hash(x) % ((sys.maxsize+1) * 2)
+            return hash(x) % ((sys.maxsize + 1) * 2)
 
         return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
 
@@ -229,6 +234,17 @@ class ComposeMixin(object):
         log = cls.get_service_log(service)
         counter = 0
         for line in log.splitlines():
-            if line.find(msg) >= 0:
+            if line.find(msg.encode("utf-8")) >= 0:
                 counter += 1
         return counter > 0
+
+
+@contextmanager
+def disabled_logger(name):
+    logger = logging.getLogger(name)
+    old_level = logger.getEffectiveLevel()
+    logger.setLevel(logging.CRITICAL)
+    try:
+        yield logger
+    finally:
+        logger.setLevel(old_level)

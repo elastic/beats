@@ -4,15 +4,27 @@
         "destination.address": "192.168.1.10",
         "destination.ip": "192.168.1.10",
         "destination.port": 5900,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.rfb",
         "event.id": "CXoIzM3wH3fUwXtKN1",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info"
+        ],
         "fileset.name": "rfb",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:AtPVA5phuztnwqMfO/2142WXVdY=",
         "network.protocol": "rfb",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.123",
+            "192.168.1.10"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.123",
         "source.ip": "192.168.1.123",

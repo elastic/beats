@@ -18,6 +18,8 @@
 package logp
 
 import (
+	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -46,6 +48,12 @@ func newLogger(rootLogger *zap.Logger, selector string, options ...LogOption) *L
 // log from a static context then you may use logp.L().Infow(), for example.
 func NewLogger(selector string, options ...LogOption) *Logger {
 	return newLogger(loadLogger().rootLogger, selector, options...)
+}
+
+// WithOptions returns a clone of l with options applied.
+func (l *Logger) WithOptions(options ...LogOption) *Logger {
+	cloned := l.logger.WithOptions(options...)
+	return &Logger{cloned, cloned.Sugar()}
 }
 
 // With creates a child logger and adds structured context to it. Fields added
@@ -201,6 +209,19 @@ func (l *Logger) Panicw(msg string, keysAndValues ...interface{}) {
 // Field such as logp.Stringer.
 func (l *Logger) DPanicw(msg string, keysAndValues ...interface{}) {
 	l.sugar.DPanicw(msg, keysAndValues...)
+}
+
+// Recover stops a panicking goroutine and logs an Error.
+func (l *Logger) Recover(msg string) {
+	if r := recover(); r != nil {
+		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
+		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
+	}
+}
+
+// Sync syncs the logger.
+func (l *Logger) Sync() error {
+	return l.logger.Sync()
 }
 
 // L returns an unnamed global logger.

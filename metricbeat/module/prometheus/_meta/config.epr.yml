@@ -1,0 +1,60 @@
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
+  username: "user"
+  password: "secret"
+
+  # This can be used for service account based authorization:
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  rate_counters: true
+
+# Metrics sent by a Prometheus server using remote_write option
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  ssl.enabled: false
+  ssl.certificate: "/etc/pki/server/cert.pem"
+  ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+- module: prometheus
+  metricsets: ["query"]
+  hosts: ["localhost:9090"]
+  period: 10s
+  queries:
+  - name: "instant_vector"
+    path: "/api/v1/query"
+    params:
+      query: "sum(rate(prometheus_http_requests_total[1m]))"
+  - name: "range_vector"
+    path: "/api/v1/query_range"
+    params:
+      query: "up"
+      start: "2019-12-20T00:00:00.000Z"
+      end:  "2019-12-21T00:00:00.000Z"
+      step: 1h
+  - name: "scalar"
+    path: "/api/v1/query"
+    params:
+      query: "100"
+  - name: "string"
+    path: "/api/v1/query"
+    params:
+      query: "some_value"

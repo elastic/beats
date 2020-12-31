@@ -12,12 +12,11 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	"github.com/elastic/beats/x-pack/filebeat/processors/decode_cef/cef"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
 const (
@@ -45,8 +44,6 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newDecodeCEF(c config) (*processor, error) {
-	cfgwarn.Beta("The " + procName + " processor is a beta feature.")
-
 	log := logp.NewLogger(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
@@ -89,7 +86,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// If the version < 0 after parsing then none of the data is valid so return here.
 	var ce cef.Event
-	if err = ce.Unpack([]byte(cefData), cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
+	if err = ce.Unpack(cefData, cef.WithFullExtensionNames()); ce.Version < 0 && err != nil {
 		if p.IgnoreFailure {
 			return event, nil
 		}

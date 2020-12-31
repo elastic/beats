@@ -20,12 +20,16 @@
 package memory
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	mem "github.com/elastic/beats/libbeat/metric/system/memory"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
+	"fmt"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	mem "github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	linux "github.com/elastic/beats/v7/metricbeat/module/linux/memory"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func init() {
@@ -38,11 +42,18 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	IsAgent bool
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{base}, nil
+
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
+	}
+
+	return &MetricSet{BaseMetricSet: base, IsAgent: systemModule.IsAgent}, nil
 }
 
 // Fetch fetches memory metrics from the OS.
@@ -103,38 +114,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"pages":  vmstat.SwapRa,
 			"cached": vmstat.SwapRaHit,
 		}
+	}
 
+	// for backwards compatibility, only report if we're not in fleet mode
+	if !m.IsAgent {
+		err := linux.FetchLinuxMemStats(memory)
+		if err != nil {
+			return errors.Wrap(err, "error getting page stats")
+		}
 	}
 
 	memory["swap"] = swap
-
-	hugePagesStat, err := mem.GetHugeTLBPages()
-	if err != nil {
-		return errors.Wrap(err, "hugepages")
-	}
-	if hugePagesStat != nil {
-		mem.AddHugeTLBPagesPercentage(hugePagesStat)
-		thp := common.MapStr{
-			"total": hugePagesStat.Total,
-			"used": common.MapStr{
-				"bytes": hugePagesStat.TotalAllocatedSize,
-				"pct":   hugePagesStat.UsedPercent,
-			},
-			"free":         hugePagesStat.Free,
-			"reserved":     hugePagesStat.Reserved,
-			"surplus":      hugePagesStat.Surplus,
-			"default_size": hugePagesStat.DefaultSize,
-		}
-		if vmstat != nil {
-			thp["swap"] = common.MapStr{
-				"out": common.MapStr{
-					"pages":    vmstat.ThpSwpout,
-					"fallback": vmstat.ThpSwpoutFallback,
-				},
-			}
-		}
-		memory["hugepages"] = thp
-	}
 
 	r.Event(mb.Event{
 		MetricSetFields: memory,

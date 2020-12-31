@@ -44,6 +44,9 @@ This file is generated! See scripts/docs_collector.py
         os.mkdir(os.path.join(module_docs_path(module_dir), "modules", module))
 
         module_file = generated_note
+
+        module_file += ":modulename: " + module + "\n\n"
+
         module_file += "[id=\"{beatname_lc}-module-" + module + "\"]\n"
 
         with open(module_doc) as f:
@@ -53,7 +56,7 @@ This file is generated! See scripts/docs_collector.py
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:
-            fields = yaml.load(f.read())
+            fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
 
         modules_list[module] = title
@@ -83,6 +86,9 @@ is an example configuration:
                     module_file += line
 
             module_file += "----\n\n"
+
+        # Close modulename variable
+        module_file += "\n:modulename!:\n\n"
 
         module_links = ""
         module_includes = ""

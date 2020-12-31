@@ -20,33 +20,18 @@
 package perfmon
 
 import (
-	"strings"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-// CounterConfig for perfmon counters.
-type CounterConfig struct {
-	InstanceLabel    string `config:"instance_label"    validate:"required"`
-	InstanceName     string `config:"instance_name"`
-	MeasurementLabel string `config:"measurement_label" validate:"required"`
-	Query            string `config:"query"             validate:"required"`
-	Format           string `config:"format"`
-}
-
-// Config for the windows perfmon metricset.
-type Config struct {
-	IgnoreNECounters  bool            `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements bool            `config:"perfmon.group_measurements_by_instance"`
-	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
-}
+const metricsetName = "perfmon"
 
 func init() {
-	mb.Registry.MustAddMetricSet("windows", "perfmon", New)
+	mb.Registry.MustAddMetricSet("windows", metricsetName, New, mb.WithHostParser(parse.EmptyHostParser))
 }
 
 type MetricSet struct {
@@ -57,24 +42,9 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The perfmon metricset is beta")
-
 	var config Config
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-	for _, value := range config.CounterConfig {
-		form := strings.ToLower(value.Format)
-		switch form {
-		case "", "float":
-			value.Format = "float"
-		case "long", "large":
-		default:
-			return nil, errors.Errorf("initialization failed: format '%s' "+
-				"for counter '%s' is invalid (must be float, large or long)",
-				value.Format, value.InstanceLabel)
-		}
-
 	}
 	reader, err := NewReader(config)
 	if err != nil {
@@ -83,15 +53,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		reader:        reader,
-		log:           logp.NewLogger("perfmon"),
+		log:           logp.NewLogger(metricsetName),
 	}, nil
 }
 
 // Fetch fetches events and reports them upstream
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// if the ignore_non_existent_counters flag is set and no valid counter paths are found the Read func will still execute, a check is done before
-	if len(m.reader.query.counters) == 0 {
-		return errors.New("no counters to read")
+	if len(m.reader.query.Counters) == 0 {
+		m.log.Error("no counter paths were found")
 	}
 
 	// refresh performance counter list
@@ -115,6 +85,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
+
 	return nil
 }
 

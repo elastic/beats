@@ -22,15 +22,16 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/auditbeat/datastore"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
@@ -62,6 +63,10 @@ func TestData(t *testing.T) {
 
 func TestActions(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
+
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/22518")
+	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
@@ -253,15 +258,13 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	config["recursive"] = true
 	ms := mbtest.NewPushMetricSetV2(t, config)
 
-	go func() {
-		for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
-			file := filepath.Join(dir, f)
-			err := ioutil.WriteFile(file, []byte("hello world"), 0600)
-			if err != nil {
-				t.Fatal(err)
-			}
+	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
+		file := filepath.Join(dir, f)
+		err := ioutil.WriteFile(file, []byte("hello world"), 0600)
+		if err != nil {
+			t.Fatal(err)
 		}
-	}()
+	}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
 	for _, e := range events {
@@ -278,14 +281,16 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	if !assert.Len(t, events, len(wanted)) {
 		return
 	}
+
+	got := map[string]bool{}
 	for _, e := range events {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
-		if assert.NoError(t, err) {
-			_, ok := wanted[path.(string)]
-			assert.True(t, ok)
+		if assert.NoError(t, err, "Failed to read file.path field") {
+			got[path.(string)] = true
 		}
 	}
+	assert.Equal(t, wanted, got)
 }
 
 func getConfig(path ...string) map[string]interface{} {

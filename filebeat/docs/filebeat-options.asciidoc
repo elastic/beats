@@ -2,14 +2,12 @@
 == Configure inputs
 
 ++++
-<titleabbrev>Configure inputs</titleabbrev>
+<titleabbrev>Inputs</titleabbrev>
 ++++
 
 TIP: <<{beatname_lc}-modules-overview,{beatname_uc} modules>> provide the
 fastest getting started experience for common log formats. See
-<<{beatname_lc}-modules-quickstart>> to learn how to get started with modules.
-Also see <<configuration-{beatname_lc}-modules>> for information about enabling
-and configuring modules.
+<<{beatname_lc}-installation-configuration>> to learn how to get started.
 
 To configure {beatname_uc} manually (instead of using
 <<{beatname_lc}-modules-overview,modules>>), you specify a list of inputs in the
@@ -35,6 +33,28 @@ input type more than once. For example:
   fields_under_root: true
 ----
 
+For the most basic configuration, define a single input with a single path. For
+example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/*.log
+-------------------------------------------------------------------------------------
+
+The input in this example harvests all files in the path `/var/log/*.log`, which
+means that {beatname_uc} will harvest all files in the directory `/var/log/`
+that end with `.log`. All patterns supported by
+https://golang.org/pkg/path/filepath/#Glob[Go Glob] are also supported here.
+
+To fetch all files from a predefined level of subdirectories, use this pattern:
+`/var/log/*/*.log`. This fetches all `.log` files from the subfolders of
+`/var/log`. It does not fetch log files from the `/var/log` folder itself.
+Currently it is not possible to recursively fetch all files in all
+subdirectories of a directory.
 
 [float]
 [id="{beatname_lc}-input-types"]
@@ -42,40 +62,67 @@ input type more than once. For example:
 
 You can configure {beatname_uc} to use the following inputs:
 
-* <<{beatname_lc}-input-log>>
-* <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-aws-cloudwatch>>
+* <<{beatname_lc}-input-azure-eventhub>>
+* <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
-* <<{beatname_lc}-input-kafka>>
-* <<{beatname_lc}-input-redis>>
-* <<{beatname_lc}-input-udp>>
 * <<{beatname_lc}-input-docker>>
-* <<{beatname_lc}-input-tcp>>
-* <<{beatname_lc}-input-syslog>>
-* <<{beatname_lc}-input-s3>>
+* <<{beatname_lc}-input-gcp-pubsub>>
+* <<{beatname_lc}-input-http_endpoint>>
+* <<{beatname_lc}-input-httpjson>>
+* <<{beatname_lc}-input-kafka>>
+* <<{beatname_lc}-input-log>>
+* <<{beatname_lc}-input-mqtt>>
 * <<{beatname_lc}-input-netflow>>
-* <<{beatname_lc}-input-google-pubsub>>
+* <<{beatname_lc}-input-o365audit>>
+* <<{beatname_lc}-input-redis>>
+* <<{beatname_lc}-input-s3>>
+* <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-syslog>>
+* <<{beatname_lc}-input-tcp>>
+* <<{beatname_lc}-input-udp>>
 
 
-include::inputs/input-log.asciidoc[]
+include::multiline.asciidoc[]
 
-include::inputs/input-stdin.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
 
 include::inputs/input-container.asciidoc[]
 
-include::inputs/input-kafka.asciidoc[]
-
-include::inputs/input-redis.asciidoc[]
-
-include::inputs/input-udp.asciidoc[]
-
 include::inputs/input-docker.asciidoc[]
 
-include::inputs/input-tcp.asciidoc[]
+include::inputs/input-filestream.asciidoc[]
 
-include::inputs/input-syslog.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-gcp-pubsub.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-httpjson.asciidoc[]
+
+include::inputs/input-kafka.asciidoc[]
+
+include::inputs/input-log.asciidoc[]
+
+include::inputs/input-mqtt.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-google-pubsub.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
+
+include::inputs/input-redis.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
+
+include::inputs/input-stdin.asciidoc[]
+
+include::inputs/input-syslog.asciidoc[]
+
+include::inputs/input-tcp.asciidoc[]
+
+include::inputs/input-udp.asciidoc[]
+
+include::inputs/input-unix.asciidoc[]

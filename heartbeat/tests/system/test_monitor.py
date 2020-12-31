@@ -1,8 +1,8 @@
+import os
+import unittest
+
 from heartbeat import BaseTest
 from parameterized import parameterized
-import os
-from nose.plugins.skip import SkipTest
-import nose.tools
 
 
 class Test(BaseTest):
@@ -34,7 +34,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
             # Currently skipped on Windows as fields.yml not generated
-            raise SkipTest
+            raise unittest.SkipTest
         self.assert_fields_are_documented(output[0])
 
     @parameterized.expand([
@@ -64,7 +64,7 @@ class Test(BaseTest):
 
         if os.name == "nt":
             # Currently skipped on Windows as fields.yml not generated
-            raise SkipTest
+            raise unittest.SkipTest
         self.assert_fields_are_documented(output[0])
 
     def test_http_delayed(self):
@@ -83,7 +83,7 @@ class Test(BaseTest):
             try:
                 proc = self.start_beat()
                 self.wait_until(lambda: self.output_has(lines=1))
-                nose.tools.assert_greater_equal(
+                self.assertGreaterEqual(
                     self.last_output_line()['http.rtt.total.us'], delay)
             finally:
                 proc.check_kill_and_wait()
@@ -125,9 +125,13 @@ class Test(BaseTest):
 
             self.assert_last_status(expected_status)
             if expected_status == "down":
-                nose.tools.eq_(self.last_output_line()["http.response.body.content"], body)
+                self.assertEqual(self.last_output_line()["http.response.body.content"], body)
+                if body == "notjson":
+                    self.assertEqual(self.last_output_line()["http.response.mime_type"], "text/plain; charset=utf-8")
+                else:
+                    self.assertEqual(self.last_output_line()["http.response.mime_type"], "application/json")
             else:
-                assert not self.last_output_line().has_key("http.response.body.content")
+                assert "http.response.body.content" not in self.last_output_line()
         finally:
             server.shutdown()
 
@@ -201,7 +205,7 @@ class Test(BaseTest):
             self.assert_last_status(status)
             if os.name == "nt":
                 # Currently skipped on Windows as fields.yml not generated
-                raise SkipTest
+                raise unittest.SkipTest
             self.assert_fields_are_documented(output[0])
         finally:
             server.shutdown()

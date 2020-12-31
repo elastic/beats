@@ -1,5 +1,5 @@
 [[running-on-docker]]
-=== Running {beatname_uc} on Docker
+=== Run {beatname_uc} on Docker
 
 Docker images for {beatname_uc} are available from the Elastic Docker
 registry. The base image is https://hub.docker.com/_/centos/[centos:7].
@@ -9,12 +9,12 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 
 These images are free to use under the Elastic license. They contain open source 
 and free commercial features and access to paid commercial features.  
-{xpack-ref}/license-management.html[Start a 30-day trial] to try out all of the 
+{kibana-ref}/managing-licenses.html[Start a 30-day trial] to try out all of the 
 paid commercial features. See the 
 https://www.elastic.co/subscriptions[Subscriptions] page for information about 
 Elastic license levels.
 
-==== Pulling the image
+==== Pull the image
 
 Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ command
 against the Elastic Docker registry.

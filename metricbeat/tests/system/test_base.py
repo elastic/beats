@@ -1,14 +1,18 @@
+import os
+import pytest
 import re
+import shutil
 import sys
 import unittest
-import os
-import shutil
+
 from metricbeat import BaseTest
-from elasticsearch import Elasticsearch
+
 from beat.beat import INTEGRATION_TESTS
+from beat import common_tests
+from elasticsearch import Elasticsearch
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
@@ -53,6 +57,7 @@ class Test(BaseTest):
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.timeout(180, func_only=True)
     def test_dashboards(self):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
@@ -71,7 +76,7 @@ class Test(BaseTest):
         )
         exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
 
-        assert exit_code == 0
+        assert exit_code == 0, 'Error output: ' + self.get_log()
         assert self.log_contains("Kibana dashboards successfully loaded.")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -106,4 +111,4 @@ class Test(BaseTest):
         return "http://" + self.compose_host("kibana")
 
     def kibana_dir(self):
-        return os.path.join(self.beat_path, "_meta", "kibana.generated")
+        return os.path.join(self.beat_path, "build", "kibana")

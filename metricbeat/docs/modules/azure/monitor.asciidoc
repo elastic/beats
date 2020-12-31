@@ -3,9 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-monitor]]
-=== azure monitor metricset
-
-beta[]
+[role="xpack"]
+=== Azure monitor metricset
 
 include::../../../../x-pack/metricbeat/module/azure/monitor/_meta/docs.asciidoc[]
 

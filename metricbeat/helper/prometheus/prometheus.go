@@ -18,18 +18,24 @@
 package prometheus
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+const acceptHeader = `application/openmetrics-text; version=0.0.1,text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
@@ -43,6 +49,7 @@ type Prometheus interface {
 
 type prometheus struct {
 	httpfetcher
+	logger *logp.Logger
 }
 
 type httpfetcher interface {
@@ -55,23 +62,47 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &prometheus{http}, nil
+
+	http.SetHeaderDefault("Accept", acceptHeader)
+	http.SetHeaderDefault("Accept-Encoding", "gzip")
+	return &prometheus{http, base.Logger()}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
 func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
+	var reader io.Reader
+
 	resp, err := p.FetchResponse()
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		greader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer greader.Close()
+		reader = greader
+	} else {
+		reader = resp.Body
+	}
+
+	if resp.StatusCode > 399 {
+		bodyBytes, err := ioutil.ReadAll(reader)
+		if err == nil {
+			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
+		}
+		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
+	}
+
 	format := expfmt.ResponseFormat(resp.Header)
 	if format == "" {
 		return nil, fmt.Errorf("Invalid format for response of response")
 	}
 
-	decoder := expfmt.NewDecoder(resp.Body, format)
+	decoder := expfmt.NewDecoder(reader, format)
 	if decoder == nil {
 		return nil, fmt.Errorf("Unable to create decoder to decode response")
 	}
@@ -268,4 +299,32 @@ func getLabels(metric *dto.Metric) common.MapStr {
 		}
 	}
 	return labels
+}
+
+// CompilePatternList compiles a pattern list and returns the list of the compiled patterns
+func CompilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
+	var compiledPatterns []*regexp.Regexp
+	compiledPatterns = []*regexp.Regexp{}
+	if patterns != nil {
+		for _, pattern := range *patterns {
+			r, err := regexp.Compile(pattern)
+			if err != nil {
+				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
+			}
+			compiledPatterns = append(compiledPatterns, r)
+		}
+		return compiledPatterns, nil
+	}
+	return []*regexp.Regexp{}, nil
+}
+
+// MatchMetricFamily checks if the given family/metric name matches any of the given patterns
+func MatchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
+	for _, checkMetric := range matchMetrics {
+		matched := checkMetric.MatchString(family)
+		if matched {
+			return true
+		}
+	}
+	return false
 }

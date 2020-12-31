@@ -1,8 +1,15 @@
 [
     {
         "@timestamp": "2017-10-09T16:13:19.578Z",
+        "event.category": [
+            "file"
+        ],
         "event.dataset": "zeek.pe",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "pe",
         "input.type": "log",
         "log.offset": 0,

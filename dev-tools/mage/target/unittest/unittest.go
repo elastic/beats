@@ -22,8 +22,8 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/test"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -61,5 +61,5 @@ func GoUnitTest(ctx context.Context) error {
 func PythonUnitTest() error {
 	mg.SerialDeps(pythonTestDeps...)
 	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
 }

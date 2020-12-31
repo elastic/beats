@@ -1,13 +1,18 @@
-FROM golang:1.13.5
-MAINTAINER Pier-Hugues Pellerin <ph@elastic.co>
+FROM golang:1.14.12
 
-RUN set -x && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-         netcat python-pip rsync virtualenv && \
-    apt-get clean
+RUN \
+    apt-get update \
+      && apt-get install -y --no-install-recommends \
+         netcat \
+         rsync \
+         python3 \
+         python3-pip \
+         python3-venv \
+      && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade setuptools
+RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade setuptools==47.3.2
+RUN pip3 install --upgrade docker-compose==1.23.2
 
 # Setup work environment
 ENV FUNCTIONBEAT_PATH /go/src/github.com/elastic/beats/x-pack/functionbeat

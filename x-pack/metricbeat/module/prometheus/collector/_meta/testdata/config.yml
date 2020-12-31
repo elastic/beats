@@ -1,0 +1,7 @@
+type: http
+url: "/metrics"
+suffix: plain
+remove_fields_from_comparison: ["prometheus.labels.instance"]
+module:
+  use_types: true
+  rate_counters: true

@@ -31,16 +31,17 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/cespare/xxhash"
+	"github.com/cespare/xxhash/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Source identifies the source of an event (i.e. what triggered it).
@@ -214,6 +215,24 @@ func NewEvent(
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 
+func isASCIILetter(letter byte) bool {
+	// It appears that Windows only allows ascii characters for drive letters
+	// and that's what go checks for: https://golang.org/src/path/filepath/path_windows.go#L63
+	// **If** Windows/go ever return multibyte utf16 characters we'll need to change
+	// the drive letter mapping logic.
+	return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z')
+}
+
+func getDriveLetter(path string) string {
+	volume := filepath.VolumeName(path)
+	if len(volume) == 2 && volume[1] == ':' {
+		if isASCIILetter(volume[0]) {
+			return strings.ToUpper(volume[:1])
+		}
+	}
+	return ""
+}
+
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	file := common.MapStr{
 		"path": e.Path,
@@ -237,6 +256,12 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file["ctime"] = info.CTime
 
 		if e.Info.Type == FileType {
+			if extension := filepath.Ext(e.Path); extension != "" {
+				file["extension"] = strings.TrimLeft(extension, ".")
+			}
+			if mimeType := getMimeType(e.Path); mimeType != "" {
+				file["mime_type"] = mimeType
+			}
 			file["size"] = info.Size
 		}
 
@@ -245,6 +270,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 
 		if runtime.GOOS == "windows" {
+			if drive := getDriveLetter(e.Path); drive != "" {
+				file["drive_letter"] = drive
+			}
 			if info.SID != "" {
 				file["uid"] = info.SID
 			}
@@ -276,12 +304,19 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}
+		file["hash"] = hashes
+		// Remove this for 8.x
 		out.MetricSetFields.Put("hash", hashes)
 	}
 
+	out.MetricSetFields.Put("event.kind", "event")
+	out.MetricSetFields.Put("event.category", []string{"file"})
 	if e.Action > 0 {
-		actions := e.Action.InOrder(existedBefore, e.Info != nil).StringArray()
-		out.MetricSetFields.Put("event.action", actions)
+		actions := e.Action.InOrder(existedBefore, e.Info != nil)
+		out.MetricSetFields.Put("event.type", actions.ECSTypes())
+		out.MetricSetFields.Put("event.action", actions.StringArray())
+	} else {
+		out.MetricSetFields.Put("event.type", None.ECSTypes())
 	}
 
 	return out

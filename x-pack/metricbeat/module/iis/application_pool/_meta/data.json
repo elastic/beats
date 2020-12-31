@@ -1,0 +1,33 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "iis.application_pool",
+        "duration": 115000,
+        "module": "iis"
+    },
+    "iis": {
+        "application_pool": {
+            "name": "test.local",
+            "net_clr": {
+                "total_exceptions_thrown": 0
+            },
+            "process": {
+                "handle_count": 532,
+                "private_byte": 35258368,
+                "thread_count": 29,
+                "virtual_bytes": 667226112,
+                "working_set": 36044800
+            }
+        }
+    },
+    "metricset": {
+        "name": "application_pool",
+        "period": 10000
+    },
+    "process": {
+        "pid": 748
+    },
+    "service": {
+        "type": "iis"
+    }
+}

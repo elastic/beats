@@ -18,23 +18,36 @@
       ],
       "question": {
         "name": "go.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "go",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.223.14.67"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -62,10 +75,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 66,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -89,23 +99,36 @@
       ],
       "question": {
         "name": "www.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -133,10 +156,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 67,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -160,7 +180,9 @@
       ],
       "question": {
         "name": "static-global-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-global-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.192",
@@ -168,16 +190,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -205,10 +238,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 68,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -236,7 +266,9 @@
       ],
       "question": {
         "name": "www.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -244,16 +276,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -281,10 +324,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 69,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -308,23 +348,36 @@
       ],
       "question": {
         "name": "linkmaker.itunes.apple.com",
-        "registered_domain": "apple.com"
+        "registered_domain": "apple.com",
+        "subdomain": "linkmaker.itunes",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.64.104.249"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -352,10 +405,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 70,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -383,7 +433,8 @@
       ],
       "question": {
         "name": "confiant-integrations.global.ssl.fastly.net",
-        "registered_domain": "confiant-integrations.global.ssl.fastly.net"
+        "registered_domain": "confiant-integrations.global.ssl.fastly.net",
+        "top_level_domain": "global.ssl.fastly.net"
       },
       "resolved_ip": [
         "151.101.1.194",
@@ -393,16 +444,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -430,10 +492,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 71,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -453,23 +512,36 @@
       ],
       "question": {
         "name": "c.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.253.92"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -497,10 +569,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 72,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -528,7 +597,9 @@
       ],
       "question": {
         "name": "c.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "13.107.21.200",
@@ -536,16 +607,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -573,10 +655,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 73,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -592,23 +671,36 @@
       ],
       "question": {
         "name": "contextual.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "contextual",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -636,10 +728,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 74,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -671,23 +760,36 @@
       ],
       "question": {
         "name": "at.atwola.com",
-        "registered_domain": "atwola.com"
+        "registered_domain": "atwola.com",
+        "subdomain": "at",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.120"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -715,10 +817,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 75,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -774,7 +873,9 @@
       ],
       "question": {
         "name": "m.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "m",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.13.192.56",
@@ -789,16 +890,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -826,10 +938,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 76,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -849,23 +958,36 @@
       ],
       "question": {
         "name": "cms.analytics.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "cms.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.6.137.78"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -893,10 +1015,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 77,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -920,23 +1039,36 @@
       ],
       "question": {
         "name": "cvision.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "cvision",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -964,10 +1096,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 78,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -995,7 +1124,9 @@
       ],
       "question": {
         "name": "g.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "g",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -1003,16 +1134,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1040,10 +1182,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 79,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1059,23 +1198,36 @@
       ],
       "question": {
         "name": "lg3.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "lg3",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1103,10 +1255,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 80,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1134,7 +1283,9 @@
       ],
       "question": {
         "name": "service.sp.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "service.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.88.96.255",
@@ -1143,16 +1294,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1180,10 +1342,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 81,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1207,23 +1366,36 @@
       ],
       "question": {
         "name": "sb.scorecardresearch.com",
-        "registered_domain": "scorecardresearch.com"
+        "registered_domain": "scorecardresearch.com",
+        "subdomain": "sb",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "184.25.176.117"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1251,10 +1423,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 82,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1278,23 +1447,36 @@
       ],
       "question": {
         "name": "otf.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "otf",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.114.54.223"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1322,10 +1504,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 83,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1369,7 +1548,9 @@
       ],
       "question": {
         "name": "ping.chartbeat.net",
-        "registered_domain": "chartbeat.net"
+        "registered_domain": "chartbeat.net",
+        "subdomain": "ping",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.171.101.225",
@@ -1383,16 +1564,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1420,10 +1612,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 84,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1451,7 +1640,8 @@
       ],
       "question": {
         "name": "clarium.freetls.fastly.net",
-        "registered_domain": "clarium.freetls.fastly.net"
+        "registered_domain": "clarium.freetls.fastly.net",
+        "top_level_domain": "freetls.fastly.net"
       },
       "resolved_ip": [
         "151.101.194.79",
@@ -1461,16 +1651,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1498,10 +1699,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 85,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1565,7 +1763,9 @@
       ],
       "question": {
         "name": "nym1-ib.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "nym1-ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.178.252",
@@ -1584,16 +1784,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1621,10 +1832,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 86,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1680,7 +1888,9 @@
       ],
       "question": {
         "name": "eb2.3lift.com",
-        "registered_domain": "3lift.com"
+        "registered_domain": "3lift.com",
+        "subdomain": "eb2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.196.86.129",
@@ -1695,16 +1905,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1732,10 +1953,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 87,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1795,7 +2013,9 @@
       ],
       "question": {
         "name": "px.ads.linkedin.com",
-        "registered_domain": "linkedin.com"
+        "registered_domain": "linkedin.com",
+        "subdomain": "px.ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "108.174.10.14",
@@ -1811,16 +2031,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1848,10 +2079,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 88,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1883,7 +2111,9 @@
       ],
       "question": {
         "name": "login.live.com",
-        "registered_domain": "live.com"
+        "registered_domain": "live.com",
+        "subdomain": "login",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.90.23.239",
@@ -1892,16 +2122,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -1929,10 +2170,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 89,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1992,7 +2230,9 @@
       ],
       "question": {
         "name": "dis.criteo.com",
-        "registered_domain": "criteo.com"
+        "registered_domain": "criteo.com",
+        "subdomain": "dis",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.119.119.150",
@@ -2010,16 +2250,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2047,10 +2298,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 90,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2114,7 +2362,9 @@
       ],
       "question": {
         "name": "ib.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.180.12",
@@ -2131,16 +2381,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2168,10 +2429,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 91,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2191,23 +2449,36 @@
       ],
       "question": {
         "name": "cm.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "cm.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2235,10 +2506,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 92,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2294,7 +2562,9 @@
       ],
       "question": {
         "name": "match.adsrvr.org",
-        "registered_domain": "adsrvr.org"
+        "registered_domain": "adsrvr.org",
+        "subdomain": "match",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "54.208.129.24",
@@ -2310,16 +2580,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2347,10 +2628,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 93,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2374,23 +2652,36 @@
       ],
       "question": {
         "name": "ssum-sec.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "ssum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2418,10 +2709,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 94,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2477,7 +2765,9 @@
       ],
       "question": {
         "name": "protected-by.clarium.io",
-        "registered_domain": "clarium.io"
+        "registered_domain": "clarium.io",
+        "subdomain": "protected-by",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "18.204.130.216",
@@ -2493,16 +2783,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2530,10 +2831,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 95,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2553,23 +2851,36 @@
       ],
       "question": {
         "name": "pagead2.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "pagead2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2597,10 +2908,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 96,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2620,23 +2928,36 @@
       ],
       "question": {
         "name": "googleads.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.66"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2664,10 +2985,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 97,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2719,7 +3037,9 @@
       ],
       "question": {
         "name": "pixel.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.22.184.73",
@@ -2733,16 +3053,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2770,10 +3101,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 98,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2817,7 +3145,9 @@
       ],
       "question": {
         "name": "onevideosync.uplynk.com",
-        "registered_domain": "uplynk.com"
+        "registered_domain": "uplynk.com",
+        "subdomain": "onevideosync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.210.214.197",
@@ -2828,16 +3158,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2865,10 +3206,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 99,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2888,23 +3226,36 @@
       ],
       "question": {
         "name": "ad.turn.com",
-        "registered_domain": "turn.com"
+        "registered_domain": "turn.com",
+        "subdomain": "ad",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "50.116.194.21"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -2932,10 +3283,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 100,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -2983,7 +3331,9 @@
       ],
       "question": {
         "name": "ups.analytics.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "ups.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.225.20.218",
@@ -2997,16 +3347,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3034,10 +3395,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 101,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3097,7 +3455,9 @@
       ],
       "question": {
         "name": "pm.w55c.net",
-        "registered_domain": "w55c.net"
+        "registered_domain": "w55c.net",
+        "subdomain": "pm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "34.237.248.89",
@@ -3114,16 +3474,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3151,10 +3522,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 102,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3214,7 +3582,9 @@
       ],
       "question": {
         "name": "cm.eyereturn.com",
-        "registered_domain": "eyereturn.com"
+        "registered_domain": "eyereturn.com",
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.239.238",
@@ -3232,16 +3602,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3269,10 +3650,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 103,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3292,23 +3670,36 @@
       ],
       "question": {
         "name": "www.googletagservices.com",
-        "registered_domain": "googletagservices.com"
+        "registered_domain": "googletagservices.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3336,10 +3727,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 104,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3399,7 +3787,9 @@
       ],
       "question": {
         "name": "cm.adgrx.com",
-        "registered_domain": "adgrx.com"
+        "registered_domain": "adgrx.com",
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "173.231.178.117",
@@ -3416,16 +3806,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3453,10 +3854,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 105,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3512,7 +3910,9 @@
       ],
       "question": {
         "name": "csm2waycm-atl.netmng.com",
-        "registered_domain": "netmng.com"
+        "registered_domain": "netmng.com",
+        "subdomain": "csm2waycm-atl",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.193.83.156",
@@ -3527,16 +3927,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3564,10 +3975,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 106,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3587,23 +3995,36 @@
       ],
       "question": {
         "name": "pr-bh.ybp.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "pr-bh.ybp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.30.2.182"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3631,10 +4052,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 107,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3650,23 +4068,36 @@
       ],
       "question": {
         "name": "ps.eyeota.net",
-        "registered_domain": "eyeota.net"
+        "registered_domain": "eyeota.net",
+        "subdomain": "ps",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "3.83.220.223"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3694,10 +4125,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 108,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3729,7 +4157,9 @@
       ],
       "question": {
         "name": "idpix.media6degrees.com",
-        "registered_domain": "media6degrees.com"
+        "registered_domain": "media6degrees.com",
+        "subdomain": "idpix",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.2.197.201",
@@ -3737,16 +4167,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3774,10 +4215,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 109,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3829,7 +4267,9 @@
       ],
       "question": {
         "name": "tpc.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.1",
@@ -3844,16 +4284,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3881,10 +4332,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 110,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -3940,7 +4388,9 @@
       ],
       "question": {
         "name": "image2.pubmatic.com",
-        "registered_domain": "pubmatic.com"
+        "registered_domain": "pubmatic.com",
+        "subdomain": "image2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "162.248.19.147",
@@ -3955,16 +4405,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -3992,10 +4453,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 111,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4023,23 +4481,36 @@
       ],
       "question": {
         "name": "sam.msn.com",
-        "registered_domain": "msn.com"
+        "registered_domain": "msn.com",
+        "subdomain": "sam",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4067,10 +4538,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 112,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4130,7 +4598,9 @@
       ],
       "question": {
         "name": "ocsp.sca1b.amazontrust.com",
-        "registered_domain": "amazontrust.com"
+        "registered_domain": "amazontrust.com",
+        "subdomain": "ocsp.sca1b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.85.89.250",
@@ -4148,16 +4618,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4185,10 +4666,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 113,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4216,7 +4694,9 @@
       ],
       "question": {
         "name": "c1.adform.net",
-        "registered_domain": "adform.net"
+        "registered_domain": "adform.net",
+        "subdomain": "c1",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "185.167.164.43",
@@ -4224,16 +4704,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4261,10 +4752,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 114,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4308,7 +4796,9 @@
       ],
       "question": {
         "name": "urs.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.84.140.84",
@@ -4320,16 +4810,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4357,10 +4858,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 115,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4384,23 +4882,36 @@
       ],
       "question": {
         "name": "dsum-sec.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "dsum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4428,10 +4939,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 116,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4451,23 +4959,36 @@
       ],
       "question": {
         "name": "ocsp.godaddy.com",
-        "registered_domain": "godaddy.com"
+        "registered_domain": "godaddy.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.167.239.239"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4495,10 +5016,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 117,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4508,20 +5026,33 @@
     "dns": {
       "question": {
         "name": "googleads.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4549,10 +5080,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 118,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4562,20 +5090,33 @@
     "dns": {
       "question": {
         "name": "tpc.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4603,10 +5144,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 119,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4662,7 +5200,9 @@
       ],
       "question": {
         "name": "ocsp.usertrust.com",
-        "registered_domain": "usertrust.com"
+        "registered_domain": "usertrust.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -4678,16 +5218,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4715,10 +5266,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 120,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4746,7 +5294,9 @@
       ],
       "question": {
         "name": "isrg.trustid.ocsp.identrust.com",
-        "registered_domain": "identrust.com"
+        "registered_domain": "identrust.com",
+        "subdomain": "isrg.trustid.ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -4754,16 +5304,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4791,10 +5352,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 121,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4814,23 +5372,36 @@
       ],
       "question": {
         "name": "ad.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "ad",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.6.198"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4858,10 +5429,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 122,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -4917,7 +5485,9 @@
       ],
       "question": {
         "name": "ocsp.sectigo.com",
-        "registered_domain": "sectigo.com"
+        "registered_domain": "sectigo.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -4933,16 +5503,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -4970,10 +5551,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 123,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5001,7 +5579,9 @@
       ],
       "question": {
         "name": "ocsp.int-x3.letsencrypt.org",
-        "registered_domain": "letsencrypt.org"
+        "registered_domain": "letsencrypt.org",
+        "subdomain": "ocsp.int-x3",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -5009,16 +5589,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5046,10 +5637,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 124,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5105,7 +5693,9 @@
       ],
       "question": {
         "name": "ocsp.pki.goog",
-        "registered_domain": "pki.goog"
+        "registered_domain": "pki.goog",
+        "subdomain": "ocsp",
+        "top_level_domain": "goog"
       },
       "resolved_ip": [
         "172.217.12.195",
@@ -5121,16 +5711,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5158,10 +5759,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 125,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5181,23 +5779,36 @@
       ],
       "question": {
         "name": "googleads4.g.doubleclick.net",
-        "registered_domain": "doubleclick.net"
+        "registered_domain": "doubleclick.net",
+        "subdomain": "googleads4.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5225,10 +5836,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 126,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5260,7 +5868,9 @@
       ],
       "question": {
         "name": "images.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "images",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.2.2",
@@ -5270,16 +5880,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5307,10 +5928,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 127,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5342,7 +5960,9 @@
       ],
       "question": {
         "name": "api-s2s.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "api-s2s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.66.2",
@@ -5352,16 +5972,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5389,10 +6020,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 128,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5412,7 +6040,9 @@
       ],
       "question": {
         "name": "x.bidswitch.net",
-        "registered_domain": "bidswitch.net"
+        "registered_domain": "bidswitch.net",
+        "subdomain": "x",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.231.30.22",
@@ -5420,16 +6050,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5457,10 +6098,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 129,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5516,7 +6154,9 @@
       ],
       "question": {
         "name": "pixel.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.26",
@@ -5532,16 +6172,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5569,10 +6220,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 130,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5632,7 +6280,8 @@
       ],
       "question": {
         "name": "ml314.com",
-        "registered_domain": "ml314.com"
+        "registered_domain": "ml314.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.171.48.231",
@@ -5650,16 +6299,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5687,10 +6347,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 131,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5750,7 +6407,9 @@
       ],
       "question": {
         "name": "aa.agkn.com",
-        "registered_domain": "agkn.com"
+        "registered_domain": "agkn.com",
+        "subdomain": "aa",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "156.154.200.36",
@@ -5768,16 +6427,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5805,10 +6475,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 132,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5864,7 +6531,9 @@
       ],
       "question": {
         "name": "s0.2mdn.net",
-        "registered_domain": "2mdn.net"
+        "registered_domain": "2mdn.net",
+        "subdomain": "s0",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.134",
@@ -5880,16 +6549,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5917,10 +6597,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 133,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -5948,7 +6625,9 @@
       ],
       "question": {
         "name": "b.scorecardresearch.com",
-        "registered_domain": "scorecardresearch.com"
+        "registered_domain": "scorecardresearch.com",
+        "subdomain": "b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.195",
@@ -5956,16 +6635,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -5993,10 +6683,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 134,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6028,7 +6715,9 @@
       ],
       "question": {
         "name": "edw.edmunds.com",
-        "registered_domain": "edmunds.com"
+        "registered_domain": "edmunds.com",
+        "subdomain": "edw",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -6038,16 +6727,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6075,10 +6775,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 135,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6098,23 +6795,36 @@
       ],
       "question": {
         "name": "ocsp.digicert.com",
-        "registered_domain": "digicert.com"
+        "registered_domain": "digicert.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6142,10 +6852,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 136,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6201,7 +6908,9 @@
       ],
       "question": {
         "name": "pre-usermatch.targeting.unrulymedia.com",
-        "registered_domain": "unrulymedia.com"
+        "registered_domain": "unrulymedia.com",
+        "subdomain": "pre-usermatch.targeting",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.167.55.0",
@@ -6217,16 +6926,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6254,10 +6974,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 137,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6321,7 +7038,9 @@
       ],
       "question": {
         "name": "farm.plista.com",
-        "registered_domain": "plista.com"
+        "registered_domain": "plista.com",
+        "subdomain": "farm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "144.76.67.119",
@@ -6339,16 +7058,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6376,10 +7106,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 138,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6435,7 +7162,9 @@
       ],
       "question": {
         "name": "beacon.krxd.net",
-        "registered_domain": "krxd.net"
+        "registered_domain": "krxd.net",
+        "subdomain": "beacon",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "50.17.180.35",
@@ -6450,16 +7179,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6487,10 +7227,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 139,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6514,23 +7251,36 @@
       ],
       "question": {
         "name": "dsum.casalemedia.com",
-        "registered_domain": "casalemedia.com"
+        "registered_domain": "casalemedia.com",
+        "subdomain": "dsum",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6558,10 +7308,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 140,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6621,7 +7368,9 @@
       ],
       "question": {
         "name": "sync.mathtag.com",
-        "registered_domain": "mathtag.com"
+        "registered_domain": "mathtag.com",
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "216.200.232.235",
@@ -6638,16 +7387,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6675,10 +7435,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 141,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6702,23 +7459,36 @@
       ],
       "question": {
         "name": "status.rapidssl.com",
-        "registered_domain": "rapidssl.com"
+        "registered_domain": "rapidssl.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6746,10 +7516,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 142,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6809,7 +7576,9 @@
       ],
       "question": {
         "name": "sync.extend.tv",
-        "registered_domain": "extend.tv"
+        "registered_domain": "extend.tv",
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "34.197.195.131",
@@ -6826,16 +7595,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6863,10 +7643,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 143,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -6922,7 +7699,9 @@
       ],
       "question": {
         "name": "ocsp.comodoca.com",
-        "registered_domain": "comodoca.com"
+        "registered_domain": "comodoca.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -6938,16 +7717,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -6975,10 +7765,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 144,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7018,7 +7805,9 @@
       ],
       "question": {
         "name": "sync-tm.everesttech.net",
-        "registered_domain": "everesttech.net"
+        "registered_domain": "everesttech.net",
+        "subdomain": "sync-tm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "151.101.2.49",
@@ -7028,16 +7817,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7065,10 +7865,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 145,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7128,7 +7925,9 @@
       ],
       "question": {
         "name": "idsync.rlcdn.com",
-        "registered_domain": "rlcdn.com"
+        "registered_domain": "rlcdn.com",
+        "subdomain": "idsync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.95.92.78",
@@ -7146,16 +7945,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7183,10 +7993,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 146,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7226,7 +8033,9 @@
       ],
       "question": {
         "name": "cm.adform.net",
-        "registered_domain": "adform.net"
+        "registered_domain": "adform.net",
+        "subdomain": "cm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "37.157.2.239",
@@ -7238,16 +8047,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7275,10 +8095,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 147,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7294,23 +8111,36 @@
       ],
       "question": {
         "name": "dm.hybrid.ai",
-        "registered_domain": "hybrid.ai"
+        "registered_domain": "hybrid.ai",
+        "subdomain": "dm",
+        "top_level_domain": "ai"
       },
       "resolved_ip": [
         "37.18.16.16"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7338,10 +8168,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 148,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7397,7 +8224,9 @@
       ],
       "question": {
         "name": "static.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "static",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.32",
@@ -7413,16 +8242,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7450,10 +8290,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 149,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7485,7 +8322,9 @@
       ],
       "question": {
         "name": "trc.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "trc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -7495,16 +8334,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7532,10 +8382,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 150,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7551,23 +8398,35 @@
       ],
       "question": {
         "name": "pippio.com",
-        "registered_domain": "pippio.com"
+        "registered_domain": "pippio.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.178.254.65"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7595,10 +8454,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 151,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7654,7 +8510,9 @@
       ],
       "question": {
         "name": "pixel-sync.sitescout.com",
-        "registered_domain": "sitescout.com"
+        "registered_domain": "sitescout.com",
+        "subdomain": "pixel-sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "209.15.36.34",
@@ -7670,16 +8528,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7707,10 +8576,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 152,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7766,7 +8632,9 @@
       ],
       "question": {
         "name": "prod.y-medialink.com",
-        "registered_domain": "y-medialink.com"
+        "registered_domain": "y-medialink.com",
+        "subdomain": "prod",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.202.217",
@@ -7783,16 +8651,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7820,10 +8699,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 153,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7863,7 +8739,9 @@
       ],
       "question": {
         "name": "jadserve.postrelease.com",
-        "registered_domain": "postrelease.com"
+        "registered_domain": "postrelease.com",
+        "subdomain": "jadserve",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.80.117.178",
@@ -7875,16 +8753,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -7912,10 +8801,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 154,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -7971,7 +8857,9 @@
       ],
       "question": {
         "name": "appnexus-partners.tremorhub.com",
-        "registered_domain": "tremorhub.com"
+        "registered_domain": "tremorhub.com",
+        "subdomain": "appnexus-partners",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.43.184",
@@ -7987,16 +8875,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8024,10 +8923,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 155,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8075,7 +8971,9 @@
       ],
       "question": {
         "name": "x.dlx.addthis.com",
-        "registered_domain": "addthis.com"
+        "registered_domain": "addthis.com",
+        "subdomain": "x.dlx",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.14.70",
@@ -8088,16 +8986,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8125,10 +9034,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 156,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8176,7 +9082,9 @@
       ],
       "question": {
         "name": "dh.serving-sys.com",
-        "registered_domain": "serving-sys.com"
+        "registered_domain": "serving-sys.com",
+        "subdomain": "dh",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "18.205.112.71",
@@ -8189,16 +9097,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8226,10 +9145,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 157,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8293,7 +9209,9 @@
       ],
       "question": {
         "name": "match.sharethrough.com",
-        "registered_domain": "sharethrough.com"
+        "registered_domain": "sharethrough.com",
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.55.160.246",
@@ -8311,16 +9229,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8348,10 +9277,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 158,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8407,7 +9333,9 @@
       ],
       "question": {
         "name": "tags.rd.linksynergy.com",
-        "registered_domain": "linksynergy.com"
+        "registered_domain": "linksynergy.com",
+        "subdomain": "tags.rd",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.241.16.233",
@@ -8424,16 +9352,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8461,10 +9400,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 159,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8516,7 +9452,9 @@
       ],
       "question": {
         "name": "rtb-csync.smartadserver.com",
-        "registered_domain": "smartadserver.com"
+        "registered_domain": "smartadserver.com",
+        "subdomain": "rtb-csync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.187.193.166",
@@ -8530,16 +9468,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8567,10 +9516,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 160,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8626,7 +9572,9 @@
       ],
       "question": {
         "name": "sc.iasds01.com",
-        "registered_domain": "iasds01.com"
+        "registered_domain": "iasds01.com",
+        "subdomain": "sc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.200",
@@ -8642,16 +9590,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8679,10 +9638,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 161,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8738,7 +9694,9 @@
       ],
       "question": {
         "name": "dt.adsafeprotected.com",
-        "registered_domain": "adsafeprotected.com"
+        "registered_domain": "adsafeprotected.com",
+        "subdomain": "dt",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.38.20",
@@ -8754,16 +9712,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8791,10 +9760,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 162,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8818,23 +9784,36 @@
       ],
       "question": {
         "name": "status.thawte.com",
-        "registered_domain": "thawte.com"
+        "registered_domain": "thawte.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8862,10 +9841,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 163,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8921,7 +9897,9 @@
       ],
       "question": {
         "name": "ads.stickyadstv.com",
-        "registered_domain": "stickyadstv.com"
+        "registered_domain": "stickyadstv.com",
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "38.134.110.101",
@@ -8935,16 +9913,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -8972,10 +9961,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 164,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -8999,23 +9985,36 @@
       ],
       "question": {
         "name": "hbx.media.net",
-        "registered_domain": "media.net"
+        "registered_domain": "media.net",
+        "subdomain": "hbx",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9043,10 +10042,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 165,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9078,7 +10074,9 @@
       ],
       "question": {
         "name": "match.taboola.com",
-        "registered_domain": "taboola.com"
+        "registered_domain": "taboola.com",
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.194.49",
@@ -9088,16 +10086,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9125,10 +10134,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 166,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9152,7 +10158,9 @@
       ],
       "question": {
         "name": "img-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "img-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.185",
@@ -9160,16 +10168,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9197,10 +10216,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 167,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9224,7 +10240,9 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -9232,16 +10250,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9269,10 +10298,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 168,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9296,23 +10322,36 @@
       ],
       "question": {
         "name": "radarmaps.weather.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "radarmaps.weather",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.217.149.91"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9340,10 +10379,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 169,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9367,7 +10403,9 @@
       ],
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
-        "registered_domain": "akamaized.net"
+        "registered_domain": "akamaized.net",
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -9375,16 +10413,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -9412,10 +10461,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 170,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9435,23 +10481,36 @@
       ],
       "question": {
         "name": "tag.sp.advertising.com",
-        "registered_domain": "advertising.com"
+        "registered_domain": "advertising.com",
+        "subdomain": "tag.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.163"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9479,10 +10538,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 171,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9510,7 +10566,9 @@
       ],
       "question": {
         "name": "www.bing.com",
-        "registered_domain": "bing.com"
+        "registered_domain": "bing.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -9518,16 +10576,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9555,10 +10624,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 172,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9582,23 +10648,36 @@
       ],
       "question": {
         "name": "cdn.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "cdn",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9626,10 +10705,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 173,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9657,23 +10733,36 @@
       ],
       "question": {
         "name": "cdn3.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "cdn3",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9701,10 +10790,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 174,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9728,23 +10814,36 @@
       ],
       "question": {
         "name": "rtb0.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "rtb0",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9772,10 +10871,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 175,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9799,23 +10895,36 @@
       ],
       "question": {
         "name": "dev.virtualearth.net",
-        "registered_domain": "virtualearth.net"
+        "registered_domain": "virtualearth.net",
+        "subdomain": "dev",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "20.36.236.157"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9843,10 +10952,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 176,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9870,23 +10976,36 @@
       ],
       "question": {
         "name": "t.ssl.ak.dynamic.tiles.virtualearth.net",
-        "registered_domain": "virtualearth.net"
+        "registered_domain": "virtualearth.net",
+        "subdomain": "t.ssl.ak.dynamic.tiles",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.161.238"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -9914,10 +11033,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 177,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -9977,7 +11093,9 @@
       ],
       "question": {
         "name": "rp.gwallet.com",
-        "registered_domain": "gwallet.com"
+        "registered_domain": "gwallet.com",
+        "subdomain": "rp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.217.253.61",
@@ -9995,16 +11113,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10032,10 +11161,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 178,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10067,7 +11193,9 @@
       ],
       "question": {
         "name": "ads.yahoo.com",
-        "registered_domain": "yahoo.com"
+        "registered_domain": "yahoo.com",
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "98.139.225.43",
@@ -10077,16 +11205,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10114,10 +11253,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 179,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10141,7 +11277,9 @@
       ],
       "question": {
         "name": "um.simpli.fi",
-        "registered_domain": "simpli.fi"
+        "registered_domain": "simpli.fi",
+        "subdomain": "um",
+        "top_level_domain": "fi"
       },
       "resolved_ip": [
         "169.55.104.49",
@@ -10150,16 +11288,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10187,10 +11336,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 180,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10246,7 +11392,9 @@
       ],
       "question": {
         "name": "mpp.vindicosuite.com",
-        "registered_domain": "vindicosuite.com"
+        "registered_domain": "vindicosuite.com",
+        "subdomain": "mpp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.236.204",
@@ -10263,16 +11411,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10300,10 +11459,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 181,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10319,23 +11475,36 @@
       ],
       "question": {
         "name": "sync.1rx.io",
-        "registered_domain": "1rx.io"
+        "registered_domain": "1rx.io",
+        "subdomain": "sync",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "8.41.222.152"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10363,10 +11532,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 182,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10390,23 +11556,36 @@
       ],
       "question": {
         "name": "sync.teads.tv",
-        "registered_domain": "teads.tv"
+        "registered_domain": "teads.tv",
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "23.52.160.7"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10434,10 +11613,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 183,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10497,7 +11673,9 @@
       ],
       "question": {
         "name": "s.thebrighttag.com",
-        "registered_domain": "thebrighttag.com"
+        "registered_domain": "thebrighttag.com",
+        "subdomain": "s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "3.15.109.176",
@@ -10514,16 +11692,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10551,10 +11740,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 184,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10574,23 +11760,36 @@
       ],
       "question": {
         "name": "t.a3cloud.net",
-        "registered_domain": "a3cloud.net"
+        "registered_domain": "a3cloud.net",
+        "subdomain": "t",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.192.55.189"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10618,10 +11817,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 186,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10645,23 +11841,36 @@
       ],
       "question": {
         "name": "tps618.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps618",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10689,10 +11898,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 187,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10752,7 +11958,9 @@
       ],
       "question": {
         "name": "dpm.demdex.net",
-        "registered_domain": "demdex.net"
+        "registered_domain": "demdex.net",
+        "subdomain": "dpm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.157.69.185",
@@ -10767,16 +11975,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10804,10 +12023,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 188,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10871,7 +12087,9 @@
       ],
       "question": {
         "name": "secure.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "secure",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.179.228",
@@ -10888,16 +12106,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10925,10 +12154,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 189,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -10952,23 +12178,36 @@
       ],
       "question": {
         "name": "tps.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -10996,10 +12235,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 190,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11059,7 +12295,9 @@
       ],
       "question": {
         "name": "i.liadm.com",
-        "registered_domain": "liadm.com"
+        "registered_domain": "liadm.com",
+        "subdomain": "i",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.71.175.22",
@@ -11076,16 +12314,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11113,10 +12362,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 191,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11176,7 +12422,9 @@
       ],
       "question": {
         "name": "pixel.s3xified.com",
-        "registered_domain": "s3xified.com"
+        "registered_domain": "s3xified.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "67.231.251.189",
@@ -11194,16 +12442,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11231,10 +12490,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 192,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11290,7 +12546,9 @@
       ],
       "question": {
         "name": "router.infolinks.com",
-        "registered_domain": "infolinks.com"
+        "registered_domain": "infolinks.com",
+        "subdomain": "router",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.20.252.85",
@@ -11307,16 +12565,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11344,10 +12613,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 193,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11399,7 +12665,9 @@
       ],
       "question": {
         "name": "grey.erne.co",
-        "registered_domain": "erne.co"
+        "registered_domain": "erne.co",
+        "subdomain": "grey",
+        "top_level_domain": "co"
       },
       "resolved_ip": [
         "94.23.171.206",
@@ -11415,16 +12683,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11452,10 +12731,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 194,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11515,7 +12791,9 @@
       ],
       "question": {
         "name": "sync.jivox.com",
-        "registered_domain": "jivox.com"
+        "registered_domain": "jivox.com",
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.243.145.203",
@@ -11533,16 +12811,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11570,10 +12859,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 195,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11793,15 +13079,13 @@
         {
           "data": "2001:502:7094::30",
           "type": "AAAA"
-        },
-        {
-          "data": "192.5",
-          "type": "A"
         }
       ],
       "question": {
         "name": "b1sync.zemanta.com",
-        "registered_domain": "zemanta.com"
+        "registered_domain": "zemanta.com",
+        "subdomain": "b1sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "207.244.121.25",
@@ -11855,21 +13139,31 @@
         "192.43.172.30",
         "2001:503:39c1::30",
         "192.48.79.30",
-        "2001:502:7094::30",
-        "192.5"
+        "2001:502:7094::30"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -11897,10 +13191,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 196,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -11972,7 +13263,9 @@
       ],
       "question": {
         "name": "tg.socdm.com",
-        "registered_domain": "socdm.com"
+        "registered_domain": "socdm.com",
+        "subdomain": "tg",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "124.146.215.43",
@@ -11992,16 +13285,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12029,10 +13333,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 197,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12052,23 +13353,36 @@
       ],
       "question": {
         "name": "prebid.adnxs.com",
-        "registered_domain": "adnxs.com"
+        "registered_domain": "adnxs.com",
+        "subdomain": "prebid",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.153.75"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12096,10 +13410,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 198,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12127,23 +13438,36 @@
       ],
       "question": {
         "name": "ul1.dvtps.com",
-        "registered_domain": "dvtps.com"
+        "registered_domain": "dvtps.com",
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12171,10 +13495,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 199,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12184,20 +13505,33 @@
     "dns": {
       "question": {
         "name": "ul1.dvtps.com",
-        "registered_domain": "dvtps.com"
+        "registered_domain": "dvtps.com",
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12225,10 +13559,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 200,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12252,23 +13583,36 @@
       ],
       "question": {
         "name": "tags.bluekai.com",
-        "registered_domain": "bluekai.com"
+        "registered_domain": "bluekai.com",
+        "subdomain": "tags",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.3.125.199"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12296,10 +13640,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 201,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12359,7 +13700,9 @@
       ],
       "question": {
         "name": "cdnjs.cloudflare.com",
-        "registered_domain": "cloudflare.com"
+        "registered_domain": "cloudflare.com",
+        "subdomain": "cdnjs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.19.195.151",
@@ -12377,16 +13720,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12414,10 +13768,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 202,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12477,7 +13828,9 @@
       ],
       "question": {
         "name": "pixel.onaudience.com",
-        "registered_domain": "onaudience.com"
+        "registered_domain": "onaudience.com",
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "85.194.243.23",
@@ -12495,16 +13848,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12532,10 +13896,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 203,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12559,23 +13920,36 @@
       ],
       "question": {
         "name": "status.geotrust.com",
-        "registered_domain": "geotrust.com"
+        "registered_domain": "geotrust.com",
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12603,10 +13977,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 204,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12662,7 +14033,9 @@
       ],
       "question": {
         "name": "ocsp.trust-provider.com",
-        "registered_domain": "trust-provider.com"
+        "registered_domain": "trust-provider.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -12678,16 +14051,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12715,10 +14099,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 205,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12774,7 +14155,9 @@
       ],
       "question": {
         "name": "ocsp.comodoca4.com",
-        "registered_domain": "comodoca4.com"
+        "registered_domain": "comodoca4.com",
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -12790,16 +14173,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12827,10 +14221,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 206,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12886,7 +14277,9 @@
       ],
       "question": {
         "name": "sync.crwdcntrl.net",
-        "registered_domain": "crwdcntrl.net"
+        "registered_domain": "crwdcntrl.net",
+        "subdomain": "sync",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "52.4.111.14",
@@ -12901,16 +14294,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -12938,10 +14342,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 207,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -12989,7 +14390,9 @@
       ],
       "question": {
         "name": "match.sync.ad.cpe.dotomi.com",
-        "registered_domain": "dotomi.com"
+        "registered_domain": "dotomi.com",
+        "subdomain": "match.sync.ad.cpe",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "159.127.42.114",
@@ -13001,16 +14404,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13038,10 +14452,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 208,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13065,23 +14476,36 @@
       ],
       "question": {
         "name": "tps10230.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps10230",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13109,10 +14533,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 209,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13136,23 +14557,36 @@
       ],
       "question": {
         "name": "tps10221.doubleverify.com",
-        "registered_domain": "doubleverify.com"
+        "registered_domain": "doubleverify.com",
+        "subdomain": "tps10221",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13180,10 +14614,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 210,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13239,7 +14670,9 @@
       ],
       "question": {
         "name": "www.facebook.com",
-        "registered_domain": "facebook.com"
+        "registered_domain": "facebook.com",
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "31.13.71.36",
@@ -13255,16 +14688,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13292,10 +14736,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 212,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13331,23 +14772,36 @@
       ],
       "question": {
         "name": "platform.twitter.com",
-        "registered_domain": "twitter.com"
+        "registered_domain": "twitter.com",
+        "subdomain": "platform",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "192.229.163.25"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13375,10 +14829,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 213,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13438,7 +14889,9 @@
       ],
       "question": {
         "name": "syndication.twitter.com",
-        "registered_domain": "twitter.com"
+        "registered_domain": "twitter.com",
+        "subdomain": "syndication",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.42.8",
@@ -13456,16 +14909,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13493,10 +14957,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 214,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13516,23 +14977,36 @@
       ],
       "question": {
         "name": "ade.googlesyndication.com",
-        "registered_domain": "googlesyndication.com"
+        "registered_domain": "googlesyndication.com",
+        "subdomain": "ade",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.34"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a9-5d2f-0000-001053699900}",
@@ -13560,10 +15034,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 215,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13587,23 +15058,36 @@
       ],
       "question": {
         "name": "iecvlist.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "iecvlist",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.81.200"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -13631,10 +15115,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 216,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13654,23 +15135,36 @@
       ],
       "question": {
         "name": "tsfe.trafficshaping.dsp.mp.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "tsfe.trafficshaping.dsp.mp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.77.232.95"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
@@ -13698,10 +15192,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 220,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13711,20 +15202,33 @@
     "dns": {
       "question": {
         "name": "isatap.local.crowbird.com",
-        "registered_domain": "crowbird.com"
+        "registered_domain": "crowbird.com",
+        "subdomain": "isatap.local",
+        "top_level_domain": "com"
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-00106aca0000}",
@@ -13752,10 +15256,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 221,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13768,16 +15269,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e9f7-5d2f-0000-001031039c00}",
@@ -13805,10 +15317,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 230,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13821,16 +15330,27 @@
       }
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a2-5d2f-0000-001016f70000}",
@@ -13858,10 +15378,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 231,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13889,23 +15406,36 @@
       ],
       "question": {
         "name": "v10.vortex-win.data.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "v10.vortex-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "65.55.44.109"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
@@ -13933,10 +15463,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 232,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -13956,23 +15483,36 @@
       ],
       "question": {
         "name": "settings-win.data.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "settings-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.218.63"
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-b1a3-5d2f-0000-00102f440100}",
@@ -14000,10 +15540,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 233,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -14051,7 +15588,9 @@
       ],
       "question": {
         "name": "c.urs.microsoft.com",
-        "registered_domain": "microsoft.com"
+        "registered_domain": "microsoft.com",
+        "subdomain": "c.urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.121.17.79",
@@ -14064,16 +15603,27 @@
       ]
     },
     "event": {
+      "category": [
+        "network"
+      ],
       "code": 22,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
     },
     "process": {
       "entity_id": "{fa4a0de6-e8a8-5d2f-0000-001094619900}",
@@ -14101,10 +15651,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 234,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }

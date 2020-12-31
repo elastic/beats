@@ -151,8 +151,7 @@ var ciscoIOS = (function() {
                 normalizeEventOutcome(evt);
                 setNetworkType(evt);
                 setRelatedIP(evt);
-                evt.Put("event.category", "network_traffic");
-                evt.Put("event.type", "firewall");
+                setECSCategorization(evt);
                 return;
             }
         })
@@ -202,6 +201,14 @@ var ciscoIOS = (function() {
     var setRelatedIP = function(event) {
         event.AppendTo("related.ip", event.Get("source.ip"));
         event.AppendTo("related.ip", event.Get("destination.ip"));
+    };
+
+    var setECSCategorization = function(event) {
+        event.Put("event.kind", "event");
+        event.AppendTo("event.category", "network");
+        event.AppendTo("event.category", "network_traffic");
+        event.AppendTo("event.type", "connection");
+        event.AppendTo("event.type", "firewall");
     };
 
     return {

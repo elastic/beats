@@ -8,7 +8,7 @@
 # https://www.elastic.co/guide/en/beats/functionbeat/index.html
 #
 
-#============================  Provider ===============================
+# ================================== Provider ==================================
 # Configure functions to run on AWS Lambda, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #
@@ -170,7 +170,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -179,6 +179,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
 
   # Create a function that accepts Cloudwatch logs from Kinesis streams.
   - name: cloudwatch-logs-kinesis
@@ -233,7 +237,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -243,6 +247,105 @@ functionbeat.provider.aws.functions:
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
 
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
+
+# Configure functions to run on Google Cloud Platform, currently we assume that the credentials
+# are present in the environment to correctly create the function when using the CLI.
+#
+# Configure which region your project is located in.
+functionbeat.provider.gcp.location_id: "europe-west2"
+# Configure which Google Cloud project to deploy your functions.
+functionbeat.provider.gcp.project_id: "my-project-123456"
+# Configure the Google Cloud Storage we should upload the function artifact.
+functionbeat.provider.gcp.storage_name: "functionbeat-deploy"
+
+functionbeat.provider.gcp.functions:
+  # Define the list of function availables, each function required to have a unique name.
+  # Create a function that accepts events coming from Google Pub/Sub.
+  - name: pubsub
+    enabled: false
+    type: pubsub
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Pub/Sub"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    trigger:
+      resource: "projects/_/pubsub/myPubSub"
+      #service: "pubsub.googleapis.com"
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
+
+  # Create a function that accepts events coming from Google Cloud Storage.
+  - name: storage
+    enabled: false
+    type: storage
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "Google Cloud Function for Cloud Storage"
+
+    # The maximum memory allocated for this function.
+    # Default is 256MB.
+    #memory_size: 256MB
+
+    # Execution timeout in seconds. If the function does not finish in time,
+    # it is considered failed and terminated. Default is 60s.
+    #timeout: 60s
+
+    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
+    #service_account_email: {projectid}@appspot.gserviceaccount.com
+
+    trigger:
+      resource: "projects/my-project/buckets/my-storage"
+      #event_type: "google.storage.object.finalize"
+
+    # Labels of the function.
+    #labels:
+    # mylabel: label
+
+    # VPC Connector this function can connect to.
+    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
+    #vpc_connector: ""
+
+    # Number of maximum instances running at the same time. Default is unlimited.
+    #maximum_instances: 0
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - dissect:
+    #      tokenizer: "%{key1} %{key2}"
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
@@ -250,7 +353,7 @@ setup.template.settings:
   #index.codec: best_compression
   #_source.enabled: false
 
-#================================ General =====================================
+# ================================== General ===================================
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
@@ -265,8 +368,7 @@ setup.template.settings:
 #fields:
 #  env: staging
 
-
-#============================== Dashboards =====================================
+# ================================= Dashboards =================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
 # options here or by using the `setup` command.
@@ -278,7 +380,7 @@ setup.template.settings:
 # website.
 #setup.dashboards.url:
 
-#============================== Kibana =====================================
+# =================================== Kibana ===================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
 # This requires a Kibana endpoint configuration.
@@ -295,7 +397,7 @@ setup.kibana:
   # the Default Space will be used.
   #space.id:
 
-#============================= Elastic Cloud ==================================
+# =============================== Elastic Cloud ================================
 
 # These settings simplify using Functionbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
@@ -308,11 +410,11 @@ setup.kibana:
 # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
 #cloud.auth:
 
-#================================ Outputs =====================================
+# ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
 
-#-------------------------- Elasticsearch output ------------------------------
+# ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
@@ -325,7 +427,7 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-#----------------------------- Logstash output --------------------------------
+# ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
@@ -340,7 +442,7 @@ output.elasticsearch:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
-#================================ Processors =====================================
+# ================================= Processors =================================
 
 # Configure processors to enhance or manipulate events generated by the beat.
 
@@ -348,7 +450,8 @@ processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
 
-#================================ Logging =====================================
+
+# ================================== Logging ===================================
 
 # Sets log level. The default log level is info.
 # Available log levels are: error, warning, info, debug
@@ -356,11 +459,11 @@ processors:
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
+# "publisher", "service".
 #logging.selectors: ["*"]
 
-#============================== X-Pack Monitoring ===============================
-# functionbeat can export internal metrics to a central Elasticsearch monitoring
+# ============================= X-Pack Monitoring ==============================
+# Functionbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
@@ -381,7 +484,30 @@ processors:
 # uncomment the following line.
 #monitoring.elasticsearch:
 
-#================================= Migration ==================================
+# ============================== Instrumentation ===============================
+
+# Instrumentation support for the functionbeat.
+#instrumentation:
+    # Set to true to enable instrumentation of functionbeat.
+    #enabled: false
+
+    # Environment in which functionbeat is running on (eg: staging, production, etc.)
+    #environment: ""
+
+    # APM Server hosts to report instrumentation results to.
+    #hosts:
+    #  - http://localhost:8200
+
+    # API Key for the APM Server(s).
+    # If api_key is set then secret_token will be ignored.
+    #api_key:
+
+    # Secret token for the APM Server(s).
+    #secret_token:
+
+
+# ================================= Migration ==================================
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+

@@ -1,6 +1,10 @@
 [[add-docker-metadata]]
 === Add Docker metadata
 
+++++
+<titleabbrev>add_docker_metadata</titleabbrev>
+++++
+
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers. At startup it detects a docker environment and caches the metadata.
 The events are annotated with Docker metadata, only if a valid configuration
@@ -25,25 +29,31 @@ To avoid privilege issues, you may also need to add `--user=root` to the
 `docker run` flags. Because the user must be part of the docker group in order
 to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
 running as non-root inside the container.
+
+If Docker daemon is restarted the mounted socket will become invalid and metadata
+will stop working, in these situations there are two options:
+
+ - Restart {beatname_uc} every time Docker is restarted
+ - Mount the entire `/var/run` directory (instead of just the socket)
 =====
 
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
-- add_docker_metadata:
-    host: "unix:///var/run/docker.sock"
-    #match_fields: ["system.process.cgroup.id"]
-    #match_pids: ["process.pid", "process.ppid"]
-    #match_source: true
-    #match_source_index: 4
-    #match_short_id: true
-    #cleanup_timeout: 60
-    #labels.dedot: false
-    # To connect to Docker over TLS you must specify a client and CA certificate.
-    #ssl:
-    #  certificate_authority: "/etc/pki/root/ca.pem"
-    #  certificate:           "/etc/pki/client/cert.pem"
-    #  key:                   "/etc/pki/client/cert.key"
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+      #match_fields: ["system.process.cgroup.id"]
+      #match_pids: ["process.pid", "process.ppid"]
+      #match_source: true
+      #match_source_index: 4
+      #match_short_id: true
+      #cleanup_timeout: 60
+      #labels.dedot: false
+      # To connect to Docker over TLS you must specify a client and CA certificate.
+      #ssl:
+      #  certificate_authority: "/etc/pki/root/ca.pem"
+      #  certificate:           "/etc/pki/client/cert.pem"
+      #  key:                   "/etc/pki/client/cert.key"
 -------------------------------------------------------------------------------
 
 It has the following settings:

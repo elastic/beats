@@ -20,10 +20,10 @@ package cassandra
 import (
 	"fmt"
 
-	"github.com/elastic/beats/packetbeat/config"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 
-	gocql "github.com/elastic/beats/packetbeat/protos/cassandra/internal/gocql"
+	gocql "github.com/elastic/beats/v7/packetbeat/protos/cassandra/internal/gocql"
 )
 
 type cassandraConfig struct {

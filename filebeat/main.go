@@ -20,7 +20,8 @@ package main
 import (
 	"os"
 
-	"github.com/elastic/beats/filebeat/cmd"
+	"github.com/elastic/beats/v7/filebeat/cmd"
+	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
 )
 
 // The basic model of execution:
@@ -32,7 +33,7 @@ import (
 // Finally, input uses the registrar information, on restart, to
 // determine where in each file to restart a harvester.
 func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
+	if err := cmd.Filebeat(inputs.Init, cmd.FilebeatSettings()).Execute(); err != nil {
 		os.Exit(1)
 	}
 }

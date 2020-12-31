@@ -12,13 +12,13 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(
             modules=[{
                 "name": "system",
-                "metricsets": ["cpu"],
+                "metricsets": ["network"],
                 "period": "1s"
             }],
             processors=[{
                 "drop_fields": {
                     "when": "range.system.cpu.system.pct.lt: 0.1",
-                    "fields": ["system.cpu.load"],
+                    "fields": ["system.network.in"],
                 },
             }]
         )
@@ -27,22 +27,19 @@ class Test(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertGreater(len(output), 1)
         evt = output[0]
         self.assert_fields_are_documented(evt)
 
         print(evt)
-        print(evt.keys())
-        self.assertItemsEqual(self.de_dot([
+        print(list(evt.keys()))
+        self.assertCountEqual(self.de_dot([
             'agent', '@timestamp', 'system', 'metricset.module',
             'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
-        cpu = evt["system"]["cpu"]
-        print(cpu.keys())
-        self.assertItemsEqual(self.de_dot([
-            "system", "cores", "user", "softirq", "iowait",
-            "idle", "irq", "steal", "nice", "total"
-        ]), cpu.keys())
+        network = evt["system"]["network"]
+        print(list(network.keys()))
+        self.assertCountEqual(self.de_dot(["name", "out", "in"]), network.keys())
 
     def test_dropfields_with_condition(self):
         """
@@ -119,7 +116,7 @@ class Test(metricbeat.BaseTest):
             }],
             processors=[{
                 "drop_event": {
-                    "when.not": "contains.system.process.cmdline: metricbeat.test",
+                    "when.not": "contains.process.command_line: metricbeat.test",
                 },
             }]
         )
@@ -283,7 +280,7 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         print(evt)
-        print(evt.keys())
+        print(list(evt.keys()))
 
         assert "dataset" not in output[0]["event"]
         assert "cpu" in output[0]["hello"]["world"]

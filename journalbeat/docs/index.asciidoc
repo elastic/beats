@@ -14,6 +14,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
+:beat_kib_app: {kib} Logs
 :deb_os:
 :rpm_os:
 :linux_os:
@@ -27,11 +28,11 @@ include::./overview.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
-include::{libbeat-dir}/repositories.asciidoc[]
-
 include::./setting-up-running.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
+
+include::{docdir}/howto/howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
@@ -42,4 +43,5 @@ include::{libbeat-dir}/shared-securing-beat.asciidoc[]
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
+
 

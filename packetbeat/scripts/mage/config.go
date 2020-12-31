@@ -18,7 +18,9 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/magefile/mage/mg"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
@@ -43,24 +45,35 @@ func device(goos string) string {
 // ConfigFileParams returns the default ConfigFileParams for generating
 // packetbeat*.yml files.
 func ConfigFileParams() devtools.ConfigFileParams {
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/beat.yml"),
-			configTemplateGlob,
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/beat.reference.yml"),
-			configTemplateGlob,
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		DockerParts: []string{
-			devtools.OSSBeatDir("_meta/beat.docker.yml"),
-			configTemplateGlob,
-			devtools.LibbeatDir("_meta/config.docker.yml"),
-		},
-		ExtraVars: map[string]interface{}{
-			"device": device,
-		},
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	p.ExtraVars = map[string]interface{}{
+		"device": device,
 	}
+	return p
+}
+
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndPacketbeatCommonFieldsGo, protosFieldsGo)
+	mg.Deps(FieldsYML)
+}
+
+// libbeatAndPacketbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and packetbeat's common fields.
+func libbeatAndPacketbeatCommonFieldsGo() error {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return devtools.GenerateAllInOneFieldsGo()
+}
+
+// protosFieldsGo generates a fields.go for each protocol.
+func protosFieldsGo() error {
+	return devtools.GenerateModuleFieldsGo(devtools.OSSBeatDir("protos"))
+}
+
+// FieldsYML generates the fields.yml file containing all fields.
+func FieldsYML() error {
+	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("protos"))
 }

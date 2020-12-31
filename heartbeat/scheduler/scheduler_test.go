@@ -25,10 +25,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/monitoring"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 // The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
@@ -172,6 +173,71 @@ func TestScheduler_Stop(t *testing.T) {
 	}))
 
 	assert.Equal(t, ErrAlreadyStopped, err)
+}
+
+func TestScheduler_runRecursiveTask(t *testing.T) {
+	cancelledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	testCases := []struct {
+		name          string
+		jobCtx        context.Context
+		overLimit     bool
+		shouldRunTask bool
+	}{
+		{
+			"context not cancelled",
+			context.Background(),
+			false,
+			true,
+		},
+		{
+			"context cancelled",
+			cancelledCtx,
+			false,
+			false,
+		},
+		{
+			"context cancelled over limit",
+			cancelledCtx,
+			true,
+			false,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			limit := int64(100)
+			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime())
+
+			if testCase.overLimit {
+				s.limitSem.Acquire(context.Background(), limit)
+			}
+
+			wg := &sync.WaitGroup{}
+			wg.Add(1)
+			executed := batomic.MakeBool(false)
+
+			tf := func(ctx context.Context) []TaskFunc {
+				executed.Store(true)
+				return nil
+			}
+
+			beforeStart := time.Now()
+			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg)
+
+			// This will panic in the case where we don't check s.limitSem.Acquire
+			// for an error value and released an unacquired resource in scheduler.go.
+			// In that case this will release one more resource than allowed causing
+			// the panic.
+			if testCase.overLimit {
+				s.limitSem.Release(limit)
+			}
+
+			require.Equal(t, testCase.shouldRunTask, executed.Load())
+			require.True(t, startedAt.Equal(beforeStart) || startedAt.After(beforeStart))
+		})
+	}
 }
 
 func BenchmarkScheduler(b *testing.B) {

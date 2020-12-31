@@ -4,7 +4,8 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
@@ -94,9 +95,29 @@ processors:
           fields:
             port: 67
 
-{{ if .community_id }}
-  - community_id:
+  - convert:
       fields:
-        source.address: zeek.dhcp.address.client
-        destination.address: zeek.dhcp.address.server
-{{ end }}
+        - {from: "zeek.dhcp.address.client", to: "source.address"}
+        - {from: "zeek.dhcp.address.client", to: "source.ip", type: "ip"}
+        - {from: "zeek.dhcp.address.client", to: "client.address"}
+        - {from: "zeek.dhcp.address.server", to: "destination.address"}
+        - {from: "zeek.dhcp.address.server", to: "destination.ip", type: "ip"}
+        - {from: "zeek.dhcp.address.server", to: "server.address"}
+        - {from: "zeek.dhcp.domain", to: "network.name"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - connection
+          - protocol
+          - info
+  - community_id:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

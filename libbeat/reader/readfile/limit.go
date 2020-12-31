@@ -20,7 +20,7 @@ package readfile
 import (
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 // Reader sets an upper limited on line length. Lines longer
@@ -48,4 +48,8 @@ func (r *LimitReader) Next() (reader.Message, error) {
 		message.AddFlagsWithKey("log.flags", "truncated")
 	}
 	return message, err
+}
+
+func (r *LimitReader) Close() error {
+	return r.reader.Close()
 }

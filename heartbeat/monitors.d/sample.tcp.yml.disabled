@@ -6,8 +6,14 @@
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
   # by sending/receiving a custom payload
 
-  # Monitor name used for job name and document type
-  #name: tcp
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-tcp-monitor
+
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My TCP monitor
+
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service.name: my-apm-service-name
 
   # Enable/Disable monitor
   #enabled: true

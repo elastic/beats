@@ -23,7 +23,7 @@ package mysql
 import (
 	"database/sql"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
@@ -39,7 +39,7 @@ func init() {
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
-		Hosts []string `config:"hosts"    validate:"nonzero,required"`
+		Hosts []string `config:"hosts"    validate:"required"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
 		return nil, err

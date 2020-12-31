@@ -4,20 +4,42 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.x509"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
           to: "zeek.files"
-
         - from: "zeek.files.conn_uids"
           to: "zeek.files.session_ids"
-              
       ignore_missing: true
       fail_on_error: false
+  - convert:
+      fields:
+        - {from: "zeek.files.mime_type", to: "file.mime_type"}
+        - {from: "zeek.files.filename", to: "file.name"}
+        - {from: "zeek.files.total_bytes", to: "file.size"}
+        - {from: "zeek.files.md5", to: "file.hash.md5"}
+        - {from: "zeek.files.sha1", to: "file.hash.sha1"}
+        - {from: "zeek.files.sha256", to: "file.hash.sha256"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - file
+        type:
+          - info
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

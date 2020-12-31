@@ -22,8 +22,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Command line flags.
@@ -203,6 +203,10 @@ func LoadList(file string) ([]*common.Config, error) {
 	}
 
 	return c, nil
+}
+
+func SetConfigPath(path string) {
+	*configPath = path
 }
 
 // GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.

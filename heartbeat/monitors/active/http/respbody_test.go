@@ -30,20 +30,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
 
 func Test_handleRespBody(t *testing.T) {
-	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")})
-	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")})
+	matchingBodyValidator := checkBody([]match.Matcher{match.MustCompile("hello")}, nil)
+	failingBodyValidator := checkBody([]match.Matcher{match.MustCompile("goodbye")}, nil)
 
 	matchingComboValidator := multiValidator{bodyValidators: []bodyValidator{matchingBodyValidator}}
 	failingComboValidator := multiValidator{bodyValidators: []bodyValidator{failingBodyValidator}}
 
 	type args struct {
 		resp           *http.Response
+		mimeType       string
 		responseConfig responseConfig
 		validator      multiValidator
 	}
@@ -57,6 +58,7 @@ func Test_handleRespBody(t *testing.T) {
 			"on_error with error",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
@@ -67,6 +69,7 @@ func Test_handleRespBody(t *testing.T) {
 			"on_error with success",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
 			},
@@ -77,6 +80,7 @@ func Test_handleRespBody(t *testing.T) {
 			"always with error",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
@@ -87,6 +91,7 @@ func Test_handleRespBody(t *testing.T) {
 			"always with success",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
 			},
@@ -97,6 +102,7 @@ func Test_handleRespBody(t *testing.T) {
 			"never with error",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
 			},
@@ -107,6 +113,7 @@ func Test_handleRespBody(t *testing.T) {
 			"never with success",
 			args{
 				simpleHTTPResponse("hello"),
+				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
 			},
@@ -117,9 +124,12 @@ func Test_handleRespBody(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fields, err := processBody(tt.args.resp, tt.args.responseConfig, tt.args.validator)
+			fields, mimeType, err := processBody(tt.args.resp, tt.args.responseConfig, tt.args.validator)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("handleRespBody() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if mimeType != tt.args.mimeType {
+				t.Errorf("invalid mime type - got: '%v' - want: '%v'", mimeType, tt.args.mimeType)
 			}
 
 			bodyMatch := map[string]interface{}{
@@ -246,7 +256,7 @@ func Test_readPrefixAndHash(t *testing.T) {
 			expectedHash := sha256.Sum256([]byte(tt.body))
 			assert.Equal(t, hex.EncodeToString(expectedHash[:]), gotHashStr)
 
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 		})
 	}
 }

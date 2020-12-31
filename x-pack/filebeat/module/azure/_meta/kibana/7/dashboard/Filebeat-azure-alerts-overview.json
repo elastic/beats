@@ -245,7 +245,7 @@
             "default_timefield": "@timestamp",
             "filter": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alert\""
+              "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category : \"Alert\""
             },
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "filebeat-*",
@@ -259,7 +259,7 @@
                 "fill": 0.5,
                 "filter": {
                   "language": "kuery",
-                  "query": "event.outcome: \"Activated\""
+                  "query": "azure.activitylogs.result_type: \"Activated\""
                 },
                 "formatter": "number",
                 "hide_in_legend": 0,
@@ -283,7 +283,7 @@
                 "fill": 0.5,
                 "filter": {
                   "language": "kuery",
-                  "query": "event.outcome: \"Resolved\" or event.outcome: \"Succeeded\""
+                  "query": "azure.activitylogs.result_type: \"Resolved\" or azure.activitylogs.result_type: \"Succeeded\""
                 },
                 "formatter": "number",
                 "hide_in_legend": 0,
@@ -328,7 +328,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alert\" "
+              "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category : \"Alert\" "
             }
           }
         },
@@ -354,21 +354,21 @@
                   {
                     "input": {
                       "language": "kuery",
-                      "query": "event.outcome : \"Activated\""
+                      "query": "azure.activitylogs.result_type : \"Activated\""
                     },
                     "label": "Activated"
                   },
                   {
                     "input": {
                       "language": "kuery",
-                      "query": "event.outcome : \"Resolved\""
+                      "query": "azure.activitylogs.result_type : \"Resolved\""
                     },
                     "label": "Resolved"
                   },
                   {
                     "input": {
                       "language": "kuery",
-                      "query": "event.outcome : \"Succeeded\""
+                      "query": "azure.activitylogs.result_type : \"Succeeded\""
                     },
                     "label": "Succeeded"
                   }
@@ -455,7 +455,7 @@
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
-              "query": "event.dataset :\"azure.activitylogs\" and event.category : \"Alert\" "
+              "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category : \"Alert\" "
             }
           }
         },

@@ -1,6 +1,7 @@
 import jinja2
 import os
 import platform
+import pytest
 import sys
 import time
 import unittest
@@ -24,7 +25,7 @@ class Test(AuditbeatXPackTest):
 
         self.check_metricset("system", "host", COMMON_FIELDS + fields)
 
-    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
+    @unittest.skipUnless(sys.platform.startswith('linux'), "Only implemented for Linux")
     @unittest.skipIf(sys.byteorder != "little", "Test only implemented for little-endian systems")
     def test_metricset_login(self):
         """
@@ -42,8 +43,10 @@ class Test(AuditbeatXPackTest):
         # Metricset is beta and that generates a warning, TODO: remove later
         self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
 
+    # 1/20 build fails https://github.com/elastic/beats/issues/21308
+    @pytest.mark.flaky(reruns=1, reruns_delay=10)
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
-    @unittest.skipIf(sys.platform == "linux2" and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
+    @unittest.skipIf(sys.platform.startswith('linux') and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
                      "Only implemented for dpkg and rpm")
     def test_metricset_package(self):
         """
@@ -74,7 +77,7 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "process", COMMON_FIELDS + fields, {"process.hash.max_file_size": 1},
                              errors_allowed=True, warnings_allowed=True)
 
-    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
+    @unittest.skipUnless(sys.platform.startswith('linux'), "Only implemented for Linux")
     def test_metricset_user(self):
         """
         user metricset collects information about users on a server.

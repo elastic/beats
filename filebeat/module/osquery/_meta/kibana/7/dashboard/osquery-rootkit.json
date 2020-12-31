@@ -113,7 +113,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "agent.hostname"
+                                "field": "agent.name"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
@@ -185,7 +185,7 @@
                 "columns": [
                     "osquery.result.name", 
                     "osquery.result.columns.path", 
-                    "agent.hostname"
+                    "agent.name"
                 ], 
                 "description": "", 
                 "hits": 0, 

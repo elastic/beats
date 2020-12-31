@@ -13,20 +13,12 @@ Internet Information Services (IIS) HTTP server.
 
 include::../include/what-happens.asciidoc[]
 
+include::../include/gs-link.asciidoc[]
+
 [float]
 === Compatibility
 
 The IIS module was tested with logs from version 7.5 and version 10.
-
-include::../include/running-modules.asciidoc[]
-
-[float]
-=== Example dashboard
-
-This module comes with a sample dashboard. For example:
-
-[role="screenshot"]
-image::./images/kibana-iis.png[]
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -66,6 +58,14 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-iis.png[]
 
 :has-dashboards!:
 

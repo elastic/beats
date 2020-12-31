@@ -1,6 +1,10 @@
 [[add-labels]]
 === Add labels
 
+++++
+<titleabbrev>add_labels</titleabbrev>
+++++
+
 The `add_labels` processors adds a set of key-value pairs to an event.
 The processor will flatten nested configuration objects like arrays or
 dictionaries into a fully qualified name by merging nested names with a `.`.
@@ -14,16 +18,16 @@ For example, this configuration:
 [source,yaml]
 ------------------------------------------------------------------------------
 processors:
-- add_labels:
-    labels:
-      number: 1
-      with.dots: test
-      nested:
-        with.dots: nested
-      array:
-        - do
-        - re
-        - with.field: mi
+  - add_labels:
+      labels:
+        number: 1
+        with.dots: test
+        nested:
+          with.dots: nested
+        array:
+          - do
+          - re
+          - with.field: mi
 ------------------------------------------------------------------------------
 
 Adds these fields to every event:

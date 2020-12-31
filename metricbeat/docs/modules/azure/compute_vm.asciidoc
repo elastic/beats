@@ -3,9 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-azure-compute_vm]]
-=== azure compute_vm metricset
-
-beta[]
+[role="xpack"]
+=== Azure compute_vm metricset
 
 include::../../../../x-pack/metricbeat/module/azure/compute_vm/_meta/docs.asciidoc[]
 

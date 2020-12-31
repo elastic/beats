@@ -23,9 +23,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
@@ -53,8 +52,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere virtualmachine metricset is beta")
-
 	config := struct {
 		Username        string `config:"username"`
 		Password        string `config:"password"`
@@ -167,20 +164,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			},
 		}
 
-		if vm.Summary.Runtime.Host != nil {
-			event["host.id"] = vm.Summary.Runtime.Host.Value
+		if host := vm.Summary.Runtime.Host; host != nil {
+			event["host.id"] = host.Value
+			hostSystem, err := getHostSystem(ctx, c, host.Reference())
+			if err == nil {
+				event["host.hostname"] = hostSystem.Summary.Config.Name
+			} else {
+				m.Logger().Debug(err.Error())
+			}
 		} else {
 			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
 				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
 				"from host/guest")
 		}
 
-		hostSystem, err := getHostSystem(ctx, c, vm.Summary.Runtime.Host.Reference())
-		if err != nil {
-			m.Logger().Debug(err.Error())
-		} else {
-			event["host.hostname"] = hostSystem.Summary.Config.Name
-		}
 		// Get custom fields (attributes) values if get_custom_fields is true.
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
 			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)

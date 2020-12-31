@@ -22,9 +22,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Test metadata updates don't replace existing pod metrics
@@ -38,6 +40,7 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 	}
 
 	processor := kubernetesAnnotator{
+		log:   logp.NewLogger(selector),
 		cache: newCache(10 * time.Second),
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
@@ -125,4 +128,104 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, intialEventMap, event.Fields)
+}
+
+// TestNewProcessorConfigDefaultIndexers validates the behaviour of default indexers and
+// matchers settings
+func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
+	emptyRegister := NewRegister()
+	registerWithDefaults := NewRegister()
+	registerWithDefaults.AddDefaultIndexerConfig("ip_port", *common.NewConfig())
+	registerWithDefaults.AddDefaultMatcherConfig("field_format", *common.MustNewConfigFrom(map[string]interface{}{
+		"format": "%{[destination.ip]}:%{[destination.port]}",
+	}))
+
+	configWithIndexersAndMatchers := common.MustNewConfigFrom(map[string]interface{}{
+		"indexers": []map[string]interface{}{
+			{
+				"container": map[string]interface{}{},
+			},
+		},
+		"matchers": []map[string]interface{}{
+			{
+				"fields": map[string]interface{}{
+					"lookup_fields": []string{"container.id"},
+				},
+			},
+		},
+	})
+	configOverrideDefaults := common.MustNewConfigFrom(map[string]interface{}{
+		"default_indexers.enabled": "false",
+		"default_matchers.enabled": "false",
+	})
+	require.NoError(t, configOverrideDefaults.Merge(configWithIndexersAndMatchers))
+
+	cases := map[string]struct {
+		register         *Register
+		config           *common.Config
+		expectedMatchers []string
+		expectedIndexers []string
+	}{
+		"no matchers": {
+			register: emptyRegister,
+			config:   common.NewConfig(),
+		},
+		"one configured indexer and matcher": {
+			register:         emptyRegister,
+			config:           configWithIndexersAndMatchers,
+			expectedIndexers: []string{"container"},
+			expectedMatchers: []string{"fields"},
+		},
+		"default indexers and matchers": {
+			register:         registerWithDefaults,
+			config:           common.NewConfig(),
+			expectedIndexers: []string{"ip_port"},
+			expectedMatchers: []string{"field_format"},
+		},
+		"default indexers and matchers, don't use indexers": {
+			register: registerWithDefaults,
+			config: common.MustNewConfigFrom(map[string]interface{}{
+				"default_indexers.enabled": "false",
+			}),
+			expectedMatchers: []string{"field_format"},
+		},
+		"default indexers and matchers, don't use matchers": {
+			register: registerWithDefaults,
+			config: common.MustNewConfigFrom(map[string]interface{}{
+				"default_matchers.enabled": "false",
+			}),
+			expectedIndexers: []string{"ip_port"},
+		},
+		"one configured indexer and matcher and defaults, configured should come first": {
+			register:         registerWithDefaults,
+			config:           configWithIndexersAndMatchers,
+			expectedIndexers: []string{"container", "ip_port"},
+			expectedMatchers: []string{"fields", "field_format"},
+		},
+		"override defaults": {
+			register:         registerWithDefaults,
+			config:           configOverrideDefaults,
+			expectedIndexers: []string{"container"},
+			expectedMatchers: []string{"fields"},
+		},
+	}
+
+	names := func(plugins PluginConfig) []string {
+		var ns []string
+		for _, plugin := range plugins {
+			for name := range plugin {
+				ns = append(ns, name)
+			}
+		}
+		return ns
+	}
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			config, err := newProcessorConfig(c.config, c.register)
+			require.NoError(t, err)
+			assert.Equal(t, c.expectedMatchers, names(config.Matchers), "expected matchers")
+			assert.Equal(t, c.expectedIndexers, names(config.Indexers), "expected indexers")
+		})
+	}
 }

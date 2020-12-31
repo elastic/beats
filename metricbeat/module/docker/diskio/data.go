@@ -18,8 +18,8 @@
 package diskio
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
@@ -34,19 +34,28 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 		"writes": stats.writes,
 		"total":  stats.totals,
 		"read": common.MapStr{
-			"ops":   stats.serviced.reads,
-			"bytes": stats.servicedBytes.reads,
-			"rate":  stats.reads,
+			"ops":          stats.serviced.reads,
+			"bytes":        stats.servicedBytes.reads,
+			"rate":         stats.reads,
+			"service_time": stats.servicedTime.reads,
+			"wait_time":    stats.waitTime.reads,
+			"queued":       stats.queued.reads,
 		},
 		"write": common.MapStr{
-			"ops":   stats.serviced.writes,
-			"bytes": stats.servicedBytes.writes,
-			"rate":  stats.writes,
+			"ops":          stats.serviced.writes,
+			"bytes":        stats.servicedBytes.writes,
+			"rate":         stats.writes,
+			"service_time": stats.servicedTime.writes,
+			"wait_time":    stats.waitTime.writes,
+			"queued":       stats.queued.writes,
 		},
 		"summary": common.MapStr{
-			"ops":   stats.serviced.totals,
-			"bytes": stats.servicedBytes.totals,
-			"rate":  stats.totals,
+			"ops":          stats.serviced.totals,
+			"bytes":        stats.servicedBytes.totals,
+			"rate":         stats.totals,
+			"service_time": stats.servicedTime.totals,
+			"wait_time":    stats.waitTime.totals,
+			"queued":       stats.queued.totals,
 		},
 	}
 

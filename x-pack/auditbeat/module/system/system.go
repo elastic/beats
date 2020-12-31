@@ -5,8 +5,8 @@
 package system
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -55,19 +55,20 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	log := logp.NewLogger(moduleName)
 
 	var hostID string
-	hostInfo, err := sysinfo.Host()
-	if hostInfo != nil {
+	if hostInfo, err := sysinfo.Host(); err != nil {
+		log.Errorf("Could not get host info. err=%+v", err)
+	} else {
 		hostID = hostInfo.Info().UniqueID
 	}
 
 	if hostID == "" {
-		log.Warnf("Could not get host ID, will not fill entity_id fields. Error: %+v", err)
+		log.Warnf("Could not get host ID, will not fill entity_id fields.")
 	}
 
 	return &SystemModule{
 		BaseModule: base,
 		config:     config,
-		hostID:     hostInfo.Info().UniqueID,
+		hostID:     hostID,
 	}, nil
 }
 

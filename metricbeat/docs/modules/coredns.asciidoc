@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-coredns]]
 [role="xpack"]
-== coredns module
+== Coredns module
 
 This is the CoreDNS module. The CoreDNS module collects metrics from the
 CoreDNS https://github.com/coredns/coredns/tree/master/plugin/metrics[prometheus exporter endpoint].
@@ -28,7 +28,7 @@ image::./images/metricbeat_coredns_dashboard.png[]
 [float]
 === Example configuration
 
-The coredns module supports the standard configuration options that are described
+The Coredns module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]

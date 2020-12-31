@@ -23,13 +23,14 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover/meta"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
@@ -37,26 +38,26 @@ const (
 	retryPeriod = 10 * time.Second
 )
 
-// TODO autodiscover providers config reload
-
-// Adapter must be implemented by the beat in order to provide Autodiscover
-type Adapter interface {
-	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-	CreateConfig(bus.Event) ([]*common.Config, error)
-
-	// RunnerFactory provides runner creation by feeding valid configs
-	cfgfile.CheckableRunnerFactory
-
-	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
+// EventConfigurer is used to configure the creation of configuration objects
+// from the autodiscover event bus.
+type EventConfigurer interface {
+	// EventFilter returns the bus filter to retrieve runner start/stop triggering
+	// events. The bus will filter events to the ones, that contain *all* the
+	// the required top-level keys.
 	EventFilter() []string
+
+	// CreateConfig creates a list of configurations from a bus.Event. The
+	// received event will have all keys defined in `EventFilter`.
+	CreateConfig(bus.Event) ([]*common.Config, error)
 }
 
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
 // new modules when any configured providers does a match
 type Autodiscover struct {
 	bus             bus.Bus
-	defaultPipeline beat.Pipeline
-	adapter         Adapter
+	defaultPipeline beat.PipelineConnector
+	factory         cfgfile.RunnerFactory
+	configurer      EventConfigurer
 	providers       []Provider
 	configs         map[string]map[uint64]*reload.ConfigWithMeta
 	runners         *cfgfile.RunnerList
@@ -66,16 +67,23 @@ type Autodiscover struct {
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, config *Config) (*Autodiscover, error) {
-	// Init Event bus
-	bus := bus.New(name)
-
+func NewAutodiscover(
+	name string,
+	pipeline beat.PipelineConnector,
+	factory cfgfile.RunnerFactory,
+	configurer EventConfigurer,
+	config *Config,
+	keystore keystore.Keystore,
+) (*Autodiscover, error) {
 	logger := logp.NewLogger("autodiscover")
+
+	// Init Event bus
+	bus := bus.New(logger, name)
 
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := Registry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
 			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
@@ -86,9 +94,10 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 	return &Autodiscover{
 		bus:             bus,
 		defaultPipeline: pipeline,
-		adapter:         adapter,
+		factory:         factory,
+		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover", factory, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
@@ -102,7 +111,7 @@ func (a *Autodiscover) Start() {
 	}
 
 	a.logger.Info("Starting autodiscover manager")
-	a.listener = a.bus.Subscribe(a.adapter.EventFilter()...)
+	a.listener = a.bus.Subscribe(a.configurer.EventFilter()...)
 
 	// It is important to start the worker first before starting the producer.
 	// In hosts that have large number of workloads, it is easy to have an initial
@@ -160,8 +169,6 @@ func (a *Autodiscover) worker() {
 }
 
 func (a *Autodiscover) handleStart(event bus.Event) bool {
-	var updated bool
-
 	a.logger.Debugf("Got a start event: %v", event)
 
 	eventID := getID(event)
@@ -172,52 +179,69 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 	// Ensure configs list exists for this instance
 	if _, ok := a.configs[eventID]; !ok {
-		a.configs[eventID] = map[uint64]*reload.ConfigWithMeta{}
+		a.configs[eventID] = make(map[uint64]*reload.ConfigWithMeta)
 	}
 
-	configs, err := a.adapter.CreateConfig(event)
+	configs, err := a.configurer.CreateConfig(event)
 	if err != nil {
 		a.logger.Debugf("Could not generate config from event %v: %v", event, err)
 		return false
 	}
 
 	if a.logger.IsDebug() {
-
 		for _, c := range configs {
-			rc := map[string]interface{}{}
-			c.Unpack(&rc)
-
-			a.logger.Debugf("Generated config: %+v", rc)
+			a.logger.Debugf("Generated config: %+v", common.DebugString(c, true))
 		}
 	}
+
+	var (
+		updated bool
+		newCfg  = make(map[uint64]*reload.ConfigWithMeta)
+	)
 
 	meta := a.getMeta(event)
 	for _, config := range configs {
 		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
-			a.logger.Debugf("Could not hash config %v: %v", config, err)
+			a.logger.Debugf("Could not hash config %v: %v", common.DebugString(config, true), err)
 			continue
 		}
 
-		err = a.adapter.CheckConfig(config)
+		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config '%s', won't start runner", common.DebugString(config, true))))
+			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+				"Auto discover config check failed for config '%s', won't start runner",
+				common.DebugString(config, true))))
 			continue
 		}
 
 		// Update meta no matter what
 		dynFields := a.meta.Store(hash, meta)
 
-		if a.configs[eventID][hash] != nil {
-			a.logger.Debugf("Config %v is already running", config)
+		if cfg, ok := a.configs[eventID][hash]; ok {
+			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
+			newCfg[hash] = cfg
 			continue
+		} else {
+			newCfg[hash] = &reload.ConfigWithMeta{
+				Config: config,
+				Meta:   &dynFields,
+			}
 		}
 
-		a.configs[eventID][hash] = &reload.ConfigWithMeta{
-			Config: config,
-			Meta:   &dynFields,
-		}
 		updated = true
+	}
+
+	// If the new add event has lesser configs than the previous stable configuration then it means that there were
+	// configs that were removed in something like a resync event.
+	if len(newCfg) < len(a.configs[eventID]) {
+		updated = true
+	}
+
+	// By replacing the config's for eventID we make sure that all old configs that are no longer in use
+	// are stopped correctly. This will ensure that a resync event is handled correctly.
+	if updated {
+		a.configs[eventID] = newCfg
 	}
 
 	return updated

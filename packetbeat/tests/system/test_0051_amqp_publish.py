@@ -17,6 +17,7 @@ class Test(BaseTest):
         assert all([o["server.port"] == 5672 for o in objs])
 
         assert objs[0]["method"] == "queue.declare"
+        assert objs[0]["event.action"] == "amqp.queue.declare"
         assert objs[0]["status"] == "OK"
         assert objs[0]["amqp.queue"] == "hello"
         assert objs[0]["amqp.durable"] == False
@@ -25,6 +26,7 @@ class Test(BaseTest):
         assert objs[0]["amqp.no-wait"] == False
 
         assert objs[1]["method"] == "basic.publish"
+        assert objs[1]["event.action"] == "amqp.basic.publish"
         assert objs[1]["status"] == "OK"
         assert objs[1]["request"] == "hello"
         assert objs[1]["amqp.routing-key"] == "hello"

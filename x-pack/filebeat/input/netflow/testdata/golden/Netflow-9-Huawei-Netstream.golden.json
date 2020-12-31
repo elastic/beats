@@ -6,18 +6,25 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "bytes": 0,
           "ip": "10.111.112.204",
           "locality": "private",
           "port": 2598
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-01-29T03:02:20Z",
           "duration": 327060000000,
           "end": "2018-01-29T03:02:19Z",
           "kind": "event",
-          "start": "2018-01-29T02:56:51.94Z"
+          "start": "2018-01-29T02:56:51.94Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "d-FUjj8eKi8",
@@ -68,6 +75,12 @@
         },
         "observer": {
           "ip": "192.0.2.1"
+        },
+        "related": {
+          "ip": [
+            "10.108.219.53",
+            "10.111.112.204"
+          ]
         },
         "source": {
           "bytes": 200,

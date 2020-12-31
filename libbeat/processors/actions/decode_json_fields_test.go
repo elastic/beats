@@ -22,10 +22,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var fields = [1]string{"msg"}
@@ -92,6 +93,38 @@ func TestInvalidJSONMultiple(t *testing.T) {
 		"pipeline": "us1",
 	}
 	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestDocumentID(t *testing.T) {
+	log := logp.NewLogger("decode_json_fields_test")
+
+	input := common.MapStr{
+		"msg": `{"log": "message", "myid": "myDocumentID"}`,
+	}
+
+	config := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":      []string{"msg"},
+		"document_id": "myid",
+	})
+
+	p, err := NewDecodeJSONFields(config)
+	if err != nil {
+		log.Error("Error initializing decode_json_fields")
+		t.Fatal(err)
+	}
+
+	actual, err := p.Run(&beat.Event{Fields: input})
+	require.NoError(t, err)
+
+	wantFields := common.MapStr{
+		"msg": map[string]interface{}{"log": "message"},
+	}
+	wantMeta := common.MapStr{
+		"_id": "myDocumentID",
+	}
+
+	assert.Equal(t, wantFields, actual.Fields)
+	assert.Equal(t, wantMeta, actual.Meta)
 }
 
 func TestValidJSONDepthOne(t *testing.T) {
@@ -367,12 +400,60 @@ func TestAddErrKeyOption(t *testing.T) {
 	}
 }
 
+func TestExpandKeys(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":      fields,
+		"expand_keys": true,
+		"target":      "",
+	})
+	input := common.MapStr{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
+	expected := common.MapStr{
+		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
+		"a": common.MapStr{
+			"b": map[string]interface{}{
+				"c": "c",
+				"d": "d",
+			},
+		},
+	}
+	actual := getActualValue(t, testConfig, input)
+	assert.Equal(t, expected, actual)
+}
+
+func TestExpandKeysError(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"expand_keys":   true,
+		"add_error_key": true,
+		"target":        "",
+	})
+	input := common.MapStr{"msg": `{"a.b": "c", "a.b.c": "d"}`}
+	expected := common.MapStr{
+		"msg": `{"a.b": "c", "a.b.c": "d"}`,
+		"error": common.MapStr{
+			"message": "cannot expand ...",
+			"type":    "json",
+		},
+	}
+
+	actual := getActualValue(t, testConfig, input)
+	assert.Contains(t, actual, "error")
+	errorField := actual["error"].(common.MapStr)
+	assert.Contains(t, errorField, "message")
+
+	// The order in which keys are processed is not defined, so the error
+	// message is not defined. Apart from that, the outcome is the same.
+	assert.Regexp(t, `cannot expand ".*": .*`, errorField["message"])
+	errorField["message"] = "cannot expand ..."
+	assert.Equal(t, expected, actual)
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
-	logp.TestingSetup()
+	log := logp.NewLogger("decode_json_fields_test")
 
 	p, err := NewDecodeJSONFields(config)
 	if err != nil {
-		logp.Err("Error initializing decode_json_fields")
+		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
 	}
 

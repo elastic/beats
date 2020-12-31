@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 func TestGenerateAppender(t *testing.T) {
@@ -92,11 +92,11 @@ condition.equals:
 			}
 
 			appender, err := NewConfigAppender(config)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 			assert.NotNil(t, appender)
 
 			eveConfig, err := common.NewConfigFrom(&test.eventConfig)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 
 			test.event["config"] = []*common.Config{eveConfig}
 			appender.Append(test.event)

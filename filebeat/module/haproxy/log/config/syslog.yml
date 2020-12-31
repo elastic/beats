@@ -2,4 +2,8 @@ type: syslog
 protocol.udp:
   host: "{{.syslog_host}}:{{.syslog_port}}"
 processors:
-- add_locale: ~
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

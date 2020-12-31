@@ -1,0 +1,59 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.memory",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "memory": {
+            "hugepages": {
+                "default_size": 2097152,
+                "free": 0,
+                "reserved": 0,
+                "surplus": 0,
+                "swap": {
+                    "out": {
+                        "fallback": 0,
+                        "pages": 0
+                    }
+                },
+                "total": 0,
+                "used": {
+                    "bytes": 0,
+                    "pct": 0
+                }
+            },
+            "page_stats": {
+                "direct_efficiency": {
+                    "pct": 0.9228
+                },
+                "kswapd_efficiency": {
+                    "pct": 0.7523
+                },
+                "pgfree": {
+                    "pages": 16061818710
+                },
+                "pgscan_direct": {
+                    "pages": 1198580
+                },
+                "pgscan_kswapd": {
+                    "pages": 50222460
+                },
+                "pgsteal_direct": {
+                    "pages": 1106083
+                },
+                "pgsteal_kswapd": {
+                    "pages": 37782783
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "memory",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
+}

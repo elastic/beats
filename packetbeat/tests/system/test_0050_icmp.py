@@ -7,7 +7,6 @@ class Test(BaseTest):
         self.render_config_template()
         self.run_packetbeat(pcap="icmp/icmp_2_pings.pcap", debug_selectors=["*"])
         objs = self.read_output()
-
         assert len(objs) == 2
         assert all([o["icmp.version"] == 4 for o in objs])
         assert objs[0]["@timestamp"] == "2015-10-19T21:47:49.900Z"
@@ -69,6 +68,8 @@ class Test(BaseTest):
     def assert_common_fields(self, objs):
         assert all([o["type"] == "icmp" for o in objs])
         assert all([o["event.dataset"] == "icmp" for o in objs])
+        assert all([o["event.category"] == ['network'] for o in objs])
+        assert all([o["event.type"] == ["connection"] for o in objs])
         assert all([o["source.bytes"] == 4 for o in objs])
         assert all([o["destination.bytes"] == 4 for o in objs])
         assert all([("server.port" in o) == False for o in objs])
@@ -78,6 +79,7 @@ class Test(BaseTest):
         assert obj["network.transport"] == "icmp"
         assert obj["server.ip"] == "10.0.0.2"
         assert obj["client.ip"] == "10.0.0.1"
+        assert obj["related.ip"] == ["10.0.0.1", "10.0.0.2"]
         assert obj["path"] == "10.0.0.2"
         assert obj["status"] == "OK"
         assert obj["icmp.request.message"] == "EchoRequest(0)"

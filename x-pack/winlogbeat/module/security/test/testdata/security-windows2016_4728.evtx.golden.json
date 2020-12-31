@@ -2,11 +2,19 @@
   {
     "@timestamp": "2019-10-22T11:33:26.8613751Z",
     "event": {
-      "action": "added-group-account-to",
+      "action": "added-member-to-group",
+      "category": [
+        "iam"
+      ],
       "code": 4728,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "group",
+        "change"
+      ]
     },
     "group": {
       "domain": "WLBEAT",
@@ -18,8 +26,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

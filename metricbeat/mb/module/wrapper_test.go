@@ -23,11 +23,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/module"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 )
 
 const (
@@ -107,24 +108,18 @@ func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func newTestRegistry(t testing.TB) *mb.Register {
 	r := mb.NewRegister()
 
-	if err := r.AddMetricSet(moduleName, eventFetcherName, newFakeEventFetcher); err != nil {
-		t.Fatal(err)
-	}
-	if err := r.AddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher); err != nil {
-		t.Fatal(err)
-	}
-	if err := r.AddMetricSet(moduleName, pushMetricSetName, newFakePushMetricSet); err != nil {
-		t.Fatal(err)
-	}
-
+	err := r.AddMetricSet(moduleName, eventFetcherName, newFakeEventFetcher)
+	require.NoError(t, err)
+	err = r.AddMetricSet(moduleName, reportingFetcherName, newFakeReportingFetcher)
+	require.NoError(t, err)
+	err = r.AddMetricSet(moduleName, pushMetricSetName, newFakePushMetricSet)
+	require.NoError(t, err)
 	return r
 }
 
 func newConfig(t testing.TB, moduleConfig interface{}) *common.Config {
 	config, err := common.NewConfigFrom(moduleConfig)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	return config
 }
 
@@ -139,9 +134,7 @@ func TestWrapperOfEventFetcher(t *testing.T) {
 	})
 
 	m, err := module.NewWrapper(c, newTestRegistry(t))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	done := make(chan struct{})
 	output := m.Start(done)
@@ -172,9 +165,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 	})
 
 	m, err := module.NewWrapper(c, newTestRegistry(t))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	done := make(chan struct{})
 	output := m.Start(done)
@@ -205,9 +196,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 	})
 
 	m, err := module.NewWrapper(c, newTestRegistry(t))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	done := make(chan struct{})
 	output := m.Start(done)
@@ -254,9 +243,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 			})
 
 			m, err := module.NewWrapper(config, registry, module.WithMetricSetInfo())
-			if err != nil {
-				t.Fatal(err)
-			}
+			require.NoError(t, err)
 
 			done := make(chan struct{})
 			defer close(done)
@@ -268,5 +255,35 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 			hasPeriod, _ := event.Fields.HasKey("metricset.period")
 			assert.Equal(t, c.hasPeriod, hasPeriod, "has metricset.period in event %+v", event)
 		})
+	}
+}
+
+func TestNewWrapperForMetricSet(t *testing.T) {
+	hosts := []string{"alpha"}
+	c := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{eventFetcherName},
+		"hosts":      hosts,
+	})
+
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t))
+	require.NoError(t, err)
+
+	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], module.WithMetricSetInfo())
+	require.NoError(t, err)
+
+	done := make(chan struct{})
+	output := m.Start(done)
+
+	<-output
+	close(done)
+
+	// Validate that the channel is closed after receiving the event.
+	select {
+	case _, ok := <-output:
+		if !ok {
+			return // Channel is closed.
+		}
+		assert.Fail(t, "received unexpected event")
 	}
 }

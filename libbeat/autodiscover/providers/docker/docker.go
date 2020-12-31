@@ -26,15 +26,15 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/autodiscover"
-	"github.com/elastic/beats/libbeat/autodiscover/builder"
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/docker"
-	"github.com/elastic/beats/libbeat/common/safemapstr"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -59,8 +59,14 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Beta("The docker autodiscover is beta")
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
+	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
 		return errors.Wrap(err, "error setting up docker autodiscover provider")
@@ -72,20 +78,20 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		return nil, errWrap(err)
 	}
 
-	watcher, err := docker.NewWatcher(config.Host, config.TLS, false)
+	watcher, err := docker.NewWatcher(logger, config.Host, config.TLS, false)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
-	if len(mapper) == 0 && !config.Hints.Enabled() {
+	if len(mapper.ConditionMaps) == 0 && !config.Hints.Enabled() {
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -115,7 +121,7 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		stopListener:  stop,
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
-		logger:        logp.NewLogger("docker"),
+		logger:        logger,
 	}, nil
 }
 
@@ -271,6 +277,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 		host = container.IPAddresses[0]
 	}
 
+	var events []bus.Event
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -283,7 +290,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			"meta":      meta.Metadata,
 		}
 
-		d.publish(event)
+		events = append(events, event)
 	}
 
 	// Emit container container and port information
@@ -298,25 +305,38 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			"container": meta.Container,
 			"meta":      meta.Metadata,
 		}
-
-		d.publish(event)
+		events = append(events, event)
 	}
+	d.publish(events)
 }
 
-func (d *Provider) publish(event bus.Event) {
-	// Try to match a config
-	if config := d.templates.GetConfig(event); config != nil {
-		event["config"] = config
-	} else {
-		// If no template matches, try builders:
-		if config := d.builders.GetConfig(d.generateHints(event)); config != nil {
-			event["config"] = config
+func (d *Provider) publish(events []bus.Event) {
+	if len(events) == 0 {
+		return
+	}
+
+	configs := make([]*common.Config, 0)
+	for _, event := range events {
+		// Try to match a config
+		if config := d.templates.GetConfig(event); config != nil {
+			configs = append(configs, config...)
+		} else {
+			// If there isn't a default template then attempt to use builders
+			e := d.generateHints(event)
+			if config := d.builders.GetConfig(e); config != nil {
+				configs = append(configs, config...)
+			}
 		}
 	}
 
+	// Since all the events belong to the same event ID pick on and add in all the configs
+	event := bus.Event(common.MapStr(events[0]).Clone())
+	// Remove the port to avoid ambiguity during debugging
+	delete(event, "port")
+	event["config"] = configs
+
 	// Call all appenders to append any extra configuration
 	d.appenders.Append(event)
-
 	d.bus.Publish(event)
 }
 

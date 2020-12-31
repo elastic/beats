@@ -24,11 +24,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -36,8 +37,6 @@ const (
 	// use for their metadata service.
 	metadataHost = "169.254.169.254"
 )
-
-var debugf = logp.MakeDebug("filters")
 
 // init registers the add_cloud_metadata processor.
 func init() {
@@ -49,11 +48,13 @@ type addCloudMetadata struct {
 	initOnce sync.Once
 	initData *initData
 	metadata common.MapStr
+	logger   *logp.Logger
 }
 
 type initData struct {
 	fetchers  []metadataFetcher
 	timeout   time.Duration
+	tlsConfig *tlscommon.TLSConfig
 	overwrite bool
 }
 
@@ -64,13 +65,24 @@ func New(c *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
 	}
 
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, errors.Wrap(err, "TLS configuration load")
+	}
+
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
 	fetchers, err := setupFetchers(initProviders, c)
 	if err != nil {
 		return nil, err
 	}
 	p := &addCloudMetadata{
-		initData: &initData{fetchers, config.Timeout, config.Overwrite},
+		initData: &initData{
+			fetchers:  fetchers,
+			timeout:   config.Timeout,
+			tlsConfig: tlsConfig,
+			overwrite: config.Overwrite,
+		},
+		logger: logp.NewLogger("add_cloud_metadata"),
 	}
 
 	go p.init()
@@ -84,20 +96,20 @@ func (r result) String() string {
 
 func (p *addCloudMetadata) init() {
 	p.initOnce.Do(func() {
-		result := fetchMetadata(p.initData.fetchers, p.initData.timeout)
+		result := p.fetchMetadata()
 		if result == nil {
-			logp.Info("add_cloud_metadata: hosting provider type not detected.")
+			p.logger.Info("add_cloud_metadata: hosting provider type not detected.")
 			return
 		}
 		p.metadata = result.metadata
-		logp.Info("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
+		p.logger.Infof("add_cloud_metadata: hosting provider type detected as %v, metadata=%v",
 			result.provider, result.metadata.String())
 	})
 }
 
 func (p *addCloudMetadata) getMeta() common.MapStr {
 	p.init()
-	return p.metadata
+	return p.metadata.Clone()
 }
 
 func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {

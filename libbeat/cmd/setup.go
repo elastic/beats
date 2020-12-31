@@ -23,8 +23,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
 const (
@@ -54,12 +54,11 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 
  * Index mapping template in Elasticsearch to ensure fields are mapped.
  * Kibana dashboards (where available).
- * ML jobs (where available).
  * Ingest pipelines (where available).
  * ILM policy (for Elasticsearch 6.5 and newer).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+			beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

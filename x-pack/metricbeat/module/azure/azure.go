@@ -5,49 +5,12 @@
 package azure
 
 import (
-	"time"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"fmt"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-// Config options
-type Config struct {
-	ClientID            string           `config:"client_id"    validate:"required"`
-	ClientSecret        string           `config:"client_secret" validate:"required"`
-	TenantID            string           `config:"tenant_id" validate:"required"`
-	SubscriptionID      string           `config:"subscription_id" validate:"required"`
-	Period              time.Duration    `config:"period" validate:"nonzero,required"`
-	Resources           []ResourceConfig `config:"resources"`
-	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
-}
-
-// ResourceConfig contains resource and metric list specific configuration.
-type ResourceConfig struct {
-	ID      []string       `config:"resource_id"`
-	Group   []string       `config:"resource_group"`
-	Metrics []MetricConfig `config:"metrics"`
-	Type    string         `config:"resource_type"`
-	Query   string         `config:"resource_query"`
-}
-
-// MetricConfig contains metric specific configuration.
-type MetricConfig struct {
-	Name         []string          `config:"name"`
-	Namespace    string            `config:"namespace"`
-	Aggregations []string          `config:"aggregations"`
-	Dimensions   []DimensionConfig `config:"dimensions"`
-	Timegrain    string            `config:"timegrain"`
-}
-
-// DimensionConfig contains dimensions specific configuration.
-type DimensionConfig struct {
-	Name  string `config:"name"`
-	Value string `config:"value"`
-}
 
 func init() {
 	// Register the ModuleFactory function for the "azure" module.
@@ -59,10 +22,6 @@ func init() {
 // newModule adds validation that hosts is non-empty, a requirement to use the
 // azure module.
 func newModule(base mb.BaseModule) (mb.Module, error) {
-	var config Config
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
-	}
 	return &base, nil
 }
 
@@ -72,14 +31,13 @@ func newModule(base mb.BaseModule) (mb.Module, error) {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client    *Client
-	MapMetric mapMetric
+	Client     *Client
+	MapMetrics mapResourceMetrics
 }
 
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	cfgwarn.Beta("The azure %s metricset is beta.", metricsetName)
 	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
@@ -100,7 +58,21 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 				return nil, errors.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
 			}
 		}
-
+		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
+		var resources []ResourceConfig
+		for _, resource := range config.Resources {
+			if hasConfigOptions(resource.Group) || hasConfigOptions(resource.Id) {
+				resources = append(resources, resource)
+			}
+		}
+		// check if this is a light metricset or not and no resources have been configured
+		if len(resources) == 0 && len(config.Resources) != 0 {
+			resources = append(resources, ResourceConfig{
+				Query:   fmt.Sprintf("resourceType eq '%s'", config.DefaultResourceType),
+				Metrics: config.Resources[0].Metrics,
+			})
+		}
+		config.Resources = resources
 	}
 	// instantiate monitor client
 	monitorClient, err := NewClient(config)
@@ -117,18 +89,36 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.Client.InitResources(m.MapMetric, report)
+	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
-	if len(m.Client.Resources.Metrics) == 0 {
+	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
 		// error message is previously logged in the InitResources, no error event should be created
 		return nil
 	}
 	// retrieve metrics
-	err = m.Client.GetMetricValues(report)
-	if err != nil {
-		return err
+	groupedMetrics := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
+
+	for _, metrics := range groupedMetrics {
+		results := m.Client.GetMetricValues(metrics, report)
+		err := EventsMapping(results, m.Client, report)
+		if err != nil {
+			return errors.Wrap(err, "error running EventsMapping")
+		}
 	}
-	return EventsMapping(report, m.Client.Resources.Metrics, m.BaseMetricSet.Name())
+	return nil
+}
+
+// hasConfigOptions func will check if any resource id or resource group options have been entered in the light metricsets
+func hasConfigOptions(config []string) bool {
+	if config == nil {
+		return false
+	}
+	for _, group := range config {
+		if group == "" {
+			return false
+		}
+	}
+	return true
 }

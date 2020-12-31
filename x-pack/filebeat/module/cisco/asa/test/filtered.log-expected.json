@@ -1,41 +1,62 @@
 [
     {
-        "@timestamp": "2019-01-01T01:00:27.000-02:00",
         "cisco.asa.message_id": "999999",
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 999999,
         "event.dataset": "cisco.asa",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-999999: This message is not filtered.",
         "event.severity": 7,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "asa",
         "host.hostname": "beats",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 0,
+        "observer.hostname": "beats",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-01-01T01:02:12.000-02:00",
         "cisco.asa.message_id": "106001",
         "cisco.asa.source_interface": "eth0",
         "destination.address": "192.168.33.12",
         "destination.ip": "192.168.33.12",
         "destination.port": 443,
         "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
         "event.code": 106001,
         "event.dataset": "cisco.asa",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106001: Inbound TCP connection denied from 10.13.12.11/45321 to 192.168.33.12/443 flags URG+SYN+RST on interface eth0",
         "event.outcome": "deny",
         "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "denied"
+        ],
         "fileset.name": "asa",
         "host.hostname": "beats",
         "input.type": "log",
@@ -44,14 +65,27 @@
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "eth0",
+        "observer.hostname": "beats",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "process.name": "asa",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
+        "related.ip": [
+            "10.13.12.11",
+            "192.168.33.12"
+        ],
         "service.type": "cisco",
         "source.address": "10.13.12.11",
         "source.ip": "10.13.12.11",
         "source.port": 45321,
         "tags": [
-            "cisco-asa"
+            "cisco-asa",
+            "forwarded"
         ]
     }
 ]

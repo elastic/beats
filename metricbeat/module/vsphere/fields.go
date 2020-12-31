@@ -20,7 +20,7 @@
 package vsphere
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetVsphere returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/vsphere.
+// This is the base64 encoded gzipped contents of module/vsphere.
 func AssetVsphere() string {
-	return "eJzMlsFunDAQhu/7FKPcsw/AoZdUaS/bVkrT68oLw+IuxpY9JKJPX9mGFRjTpMG08WGlteH/PzDzj2/hgl0GT0ZVqHEHQJxqzODm6cHN3OwACjS55oq4bDL4sAMA6FdByKKt7W0aa2QGMzghsR1AybEuTOYuvoWGCRyb2EGdwgzOWraqn4n4TIXGYgUjZkhe5eKSi7L9UkQkfJJhhCBjGPs7WRhYLtg9S10Ea38gsuPjQDXXHQxLY/XTWd7zGk1nCAXMhAfPnCmWc+r2JInV+1NHaKIEtWzOf2f/3SqCUwRZAlUY3Ro7SqkFowzm9jPOUiMmxbzXiMkpW4NFUspHg8U2lCqnlIwKdY4NvZayv/y6OouEShpakwbB/f8/CD5LQ8sZkKvWb4uofqXclrtvj8AbOASqY1ufAOl8ff2/wtiVdDpfV9Av2AoUUm9Vpgcnbu1j0i/XZw+3VSInwtsmiNfCNUjPUl+O9l8c7E1F+8XLwlT2egbimlpWC5ZXvFl1dllUektu2ejb8/BJ10ZXIDgxsz8bpeXQUII83yqlf/iNgIPfieXAlgm/stD0q0LNiDdnePDHuPfWNsYxem7R0GZhKkv4ZA1Wx5ZjdR/rhqi+UJLkf/rXOukCyd6rawfpYcdNYT1r3hqS4uhDM0ooTz9xdiD2k8cVlX3njCFi/E8b1+8AAAD//7eBEp0="
+	return "eJzMlsFymzAQhu9+ip3c4wfg0Es6aS9uO5OmV48Ci61asIy0JEOfviMJPCDkximijQ6eMRL//4HYf3ULJ+wyeDbNETVuAFiywgxunh/clZsNQIEm17JhSXUGHzYAAP0sVFS0yt6mUaEwmMFBbABKiaowmVt6C7WocGxhB3eNXaypbforEZep0FisECwM01kuLnlRtp+KiEyfYxghxhjF/k4mBpITdi+ki2DuDzx2fByY5rqDYWmsfjrLe6nQdIaxgpnw4JmLRuSSuy0TC7V96hhNlEBRfXib/XerCE4RqAQ+YnRj7ChJV4IzmNvPOEuNmBTzXiMmp2wNFkkpHw0W61A2OUcZTS4UFvtSkQgXXMPaoM6x5mtp++Xn2VkwHMnwkkwI7v/fcfCZDF9Ogrxp/eZUx18pP6C7b48ga9gFqmNbnwPpfH0KXGHsCjudryvrV2wrrEivVaw7J27tY9KvV2kPt1YuJ8JbJ46XwtXIL6RPe/svDvZXRfvFy8JU9nwOkppboSqRH2W96PxyUentqWVjbyvD51waXIHgxMz+rJSVQzMJsnytjP7htwF2fh8uxzUl/MZC068NasGyPsCDP8q9t6YxDtFDi4ZXi1Iq4ZM1WBxajtV9rCui+kJJkv7pX+ukByR7r64ZpIcdt4TlrHlrmKq9D80oIT39xNmh2F/cL6jsO2cMEeN/2rZ+BwAA//8rvBJ+"
 }

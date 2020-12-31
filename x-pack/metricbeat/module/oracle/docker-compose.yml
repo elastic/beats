@@ -1,0 +1,12 @@
+version: '2.3'
+
+services:
+  oracle:
+    image: docker.elastic.co/observability-ci/database-enterprise:${ORACLE_VERSION:-12.2.0.1}-1
+    build:
+      context: ./_meta
+      args:
+        ORACLE_VERSION: ${ORACLE_VERSION:-12.2.0.1}
+    ports:
+      - 1521
+      - 5500

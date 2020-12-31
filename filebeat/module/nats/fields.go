@@ -20,7 +20,7 @@
 package nats
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -32,5 +32,5 @@ func init() {
 // AssetNats returns asset data.
 // This is the base64 encoded gzipped contents of module/nats.
 func AssetNats() string {
-	return "eJy0lEFP3DAQhe/5FU/c4QfkUAkJVeqhXOCOnGSSDDieYI+7pL++coi3y5LAVmXntutk3jfvTXyJJ5pKOKOhAJTVUomL9POiABoKtedRWVyJbwUA/JQmWkIrHqPxgV2H2+v7O1jp0LKlcFUAniyZQCUqUlMALZNtQjk3uIQzA+0lU+k0UonOSxyXf1aEU32f+6D1MuxVZ8FUhyKHQla6/X9rWh/opbo1Gv5Od3B0PGSuY45DltoyOX1ztIX0CdamHYvG1dHTa1SHZNy8O8pk7JQ68ivnn/Cluu8J3EBaaE9r82eAIXTn9WWgEExH/2pMNemb2N/SWXHH2HNT8YPR7ZdPMO6Of1O2bTSTFdOA3UbHDJugNlmfaNqJX8v5xBxHLyq12GzlulxmCbF6pPp42b8I5+61+SwF7XkfL3YmwFNN/IsaiNvGO+fGR8fPkWDs2BsXB/JcJz/27+LHTc52y6bM6Wm004PK+WJlV8lL5oA47Hqu+9fFi5Xl0JMHB1gOSi7d+On29xRGceGDZRzMy8OSyvYH9F9WXzvI/ICxcHGoyCdXsyZUsDOsM25FrXiCiSqDUa6NtROiW0KpeOUzznOQ9+Kvlq6bgyi9rO36CVPckBq2AaaSqLPtsyKkrqP39D7ZDPYcKdLD2gX5FVhpNWaF1yt42YpsGHns2Fo8CrviTwAAAP//7bga1A=="
+	return "eJy0lEFP3DAQhe/5FU/c4QfkUAkJVeqhXOCOnGSSDDieYI+7pL++coi3y5LAVmXnGCfzvnlv4ks80VTCGQ0FoKyWSlzcXt/fXRRAQ6H2PCqLK/GtAICf0kRLaMVjND6w65DehpUOLVsKVwXgyZIJVKIiNQXQMtkmlHODSzgz0F4ylU4jlei8xHF5siKc6vvcB62XYa86C6Y6FDkUstLtn61pfaCX6tZo+DvdwdHxkLmOOQ5Zasvk9M3RFtInWJt2LBpXR2+vUR2ScfPuKJOxU+rIr5x/wpfqvidwA2mhPa3NnwGG0J3Xl4FCMB39qzHVpG9if0tnxR1jz03FD0a3Pz7BuDv+Tdm20UxWTAN2Gx0zbILaZH2iaSd+LecTcxy9qNRis5XrcpklxOqR6uNl/yKcu9fmsxS053282JkATzXxL2ogbhvvnBsfHT9HgrFjb1wcyHOd/Nh/ix83OdstmzKnp9FODyrni5VdJS+ZA+Kw67nuXxcvVpZDTx4cYDkouXTjp9vfUxjFhQ+WcTAvD0sq2z/Qf1l97SDzC8bCxaEin1zNmlDBzrDOuBW14gkmqgxGuTbWTohuCaXild84z0Hei79aum4OovSytusnTHFDatgGmEqizrbPipC6jt7T+2Qz2HOkSA9rF+RXYKXVmBVer+BlK7Jh5LFja/Eo7Io/AQAA///WPBpU"
 }

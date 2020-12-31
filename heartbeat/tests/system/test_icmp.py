@@ -1,15 +1,14 @@
+import logging
 import os
-import unittest
 import platform
 import socket
-import sys
-from heartbeat import BaseTest
-from elasticsearch import Elasticsearch
-from beat.beat import INTEGRATION_TESTS
-import nose.tools
-import logging
 import subprocess
+import sys
 import time
+import unittest
+from beat.beat import INTEGRATION_TESTS
+from elasticsearch import Elasticsearch
+from heartbeat import BaseTest
 
 
 class Test(BaseTest):

@@ -20,9 +20,9 @@ package add_cloud_metadata
 import (
 	"path"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
 
 // Google GCE Metadata Service
@@ -67,6 +67,9 @@ var gceMetadataFetcher = provider{
 			if project, ok := m["project"].(map[string]interface{}); ok {
 				s.Schema{
 					"project": s.Object{
+						"id": c.Str("projectId"),
+					},
+					"account": s.Object{
 						"id": c.Str("projectId"),
 					},
 				}.ApplyTo(out, project)

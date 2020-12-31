@@ -26,11 +26,12 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 var _ protos.UDPPlugin = &dhcpv4Plugin{}
@@ -81,7 +82,7 @@ var (
 
 func TestParseDHCPRequest(t *testing.T) {
 	logp.TestingSetup()
-	p, err := newPlugin(true, nil, nil)
+	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,17 +118,22 @@ func TestParseDHCPRequest(t *testing.T) {
 				"port": 67,
 			},
 			"event": common.MapStr{
-				"category": "network_traffic",
+				"category": []string{"network"},
+				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
+				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
 				"bytes":        272,
 				"community_id": "1:t9O1j0qj71O4wJM7gnaHtgmfev8=",
+			},
+			"related": common.MapStr{
+				"ip": []string{"0.0.0.0", "255.255.255.255"},
 			},
 			"dhcpv4": common.MapStr{
 				"client_mac":     "00:0b:82:01:fc:42",
@@ -154,14 +160,14 @@ func TestParseDHCPRequest(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil)
+		publish.MarshalPacketbeatFields(actual, nil, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}
 }
 
 func TestParseDHCPACK(t *testing.T) {
-	p, err := newPlugin(true, nil, nil)
+	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,19 +203,23 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes": 300,
 			},
 			"event": common.MapStr{
-				"category": "network_traffic",
+				"category": []string{"network"},
+				"type":     []string{"connection", "protocol"},
 				"dataset":  "dhcpv4",
 				"kind":     "event",
 				"start":    pkt.Ts,
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
+				"direction":    "unknown",
 				"transport":    "udp",
 				"protocol":     "dhcpv4",
 				"bytes":        300,
 				"community_id": "1:VbRSZnvQqvLiQRhYHLrdVI17sLQ=",
 			},
-
+			"related": common.MapStr{
+				"ip": []string{"192.168.0.1", "192.168.0.10"},
+			},
 			"dhcpv4": common.MapStr{
 				"assigned_ip":    "192.168.0.10",
 				"client_mac":     "00:0b:82:01:fc:42",
@@ -233,7 +243,7 @@ func TestParseDHCPACK(t *testing.T) {
 
 	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
-		publish.MarshalPacketbeatFields(actual, nil)
+		publish.MarshalPacketbeatFields(actual, nil, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}

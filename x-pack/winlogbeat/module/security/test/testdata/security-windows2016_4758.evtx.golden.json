@@ -3,10 +3,18 @@
     "@timestamp": "2019-10-22T11:35:13.5502867Z",
     "event": {
       "action": "deleted-group-account",
+      "category": [
+        "iam"
+      ],
       "code": 4758,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "group",
+        "deletion"
+      ]
     },
     "group": {
       "domain": "WLBEAT",
@@ -18,8 +26,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

@@ -14,8 +14,34 @@ data:
       # Reload module configs as they change:
       reload.enabled: false
 
+    # When using containerd as runtime, a configuration like the following one
+    # can be used to monitor files in containers using autodiscover.
+    #auditbeat.autodiscover:
+    #  providers:
+    #  - type: kubernetes
+    #    host: ${NODE_NAME}
+    #    templates:
+    #      - config:
+    #        - module: 'file_integrity'
+    #          paths:
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/bin'
+    #            - '/run/containerd/io.containerd.runtime.v1.linux/k8s.io/${data.kubernetes.container.id}/rootfs/etc'
+    #          scan_at_start: false
+    #          recursive: true
+
     processors:
       - add_cloud_metadata:
+      - add_process_metadata:
+          match_pids: ['process.pid']
+          include_fields: ['container.id']
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          default_indexers.enabled: false
+          default_matchers.enabled: false
+          indexers:
+            - container:
+          matchers:
+            - fields.lookup_fields: ['container.id']
 
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
@@ -50,6 +76,14 @@ data:
       max_file_size: 100 MiB
       hash_types: [sha1]
       recursive: true
+    - module: auditd
+      audit_rules: |
+        # Executions
+        -a always,exit -F arch=b64 -S execve,execveat -k exec
+
+        # Unauthorized access attempts
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
+        -a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 ---
 # Deploy a auditbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
@@ -71,12 +105,14 @@ spec:
       serviceAccountName: auditbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
+      hostPID: true  # Required by auditd module
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
         image: docker.elastic.co/beats/auditbeat:8.0.0
         args: [
-          "-c", "/etc/auditbeat.yml"
+          "-c", "/etc/auditbeat.yml",
+          "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
@@ -91,8 +127,20 @@ spec:
           value:
         - name: ELASTIC_CLOUD_AUTH
           value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
+          capabilities:
+            add:
+              # Capabilities needed for auditd module
+              - 'AUDIT_READ'
+              - 'AUDIT_WRITE'
+              - 'AUDIT_CONTROL'
         resources:
           limits:
             memory: 200Mi
@@ -107,6 +155,8 @@ spec:
         - name: modules
           mountPath: /usr/share/auditbeat/modules.d
           readOnly: true
+        - name: data
+          mountPath: /usr/share/auditbeat/data
         - name: bin
           mountPath: /hostfs/bin
           readOnly: true
@@ -121,6 +171,12 @@ spec:
           readOnly: true
         - name: etc
           mountPath: /hostfs/etc
+          readOnly: true
+        # Directory with root filesystems of containers executed with containerd, this can be
+        # different with other runtimes. This volume is needed to monitor the file integrity
+        # of files in containers.
+        - name: run-containerd
+          mountPath: /run/containerd
           readOnly: true
       volumes:
       - name: bin
@@ -140,15 +196,20 @@ spec:
           path: /etc
       - name: config
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: auditbeat-config
       - name: modules
         configMap:
-          defaultMode: 0600
+          defaultMode: 0640
           name: auditbeat-daemonset-modules
       - name: data
         hostPath:
+          # When auditbeat runs as non-root user, this directory needs to be writable by group (g+w).
           path: /var/lib/auditbeat-data
+          type: DirectoryOrCreate
+      - name: run-containerd
+        hostPath:
+          path: /run/containerd
           type: DirectoryOrCreate
 ---
 apiVersion: rbac.authorization.k8s.io/v1

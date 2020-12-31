@@ -21,7 +21,7 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
 var systemTest *bool
@@ -42,5 +42,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, "mockbeat")
+	template.TestTemplate(t, "mockbeat", false)
 }

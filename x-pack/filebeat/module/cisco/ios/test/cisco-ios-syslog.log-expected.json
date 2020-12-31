@@ -1,19 +1,25 @@
 [
     {
-        "@timestamp": "2019-02-08T06:00:47.272Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.22",
         "destination.ip": "224.0.0.22",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGRP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 585917,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -34,24 +40,31 @@
         "source.ip": "198.51.100.197",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-02-09T06:00:47.272Z",
         "cisco.ios.access_list": "INBOUND-ON-F11",
         "cisco.ios.facility": "SEC",
         "destination.address": "224.0.0.2",
         "destination.ip": "224.0.0.2",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGSP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 585918,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "igmp.type": 20,
         "input.type": "log",
@@ -73,24 +86,31 @@
         "source.ip": "198.51.100.2",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-02-10T06:00:47.272Z",
         "cisco.ios.access_list": "171",
         "cisco.ios.facility": "SEC",
         "destination.address": "255.255.255.255",
         "destination.ip": "255.255.255.255",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGNP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 585919,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -111,25 +131,32 @@
         "source.ip": "198.51.100.1",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-05-03T21:11:32.619Z",
         "cisco.ios.access_list": "ACL-IPv6-E0/0-IN/10",
         "cisco.ios.facility": "IPV6",
         "destination.address": "2001:DB8:1000::1",
         "destination.ip": "2001:DB8:1000::1",
         "destination.port": 22,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "ACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "allow",
         "event.sequence": 585920,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -151,25 +178,32 @@
         "source.packets": 9,
         "source.port": 1027,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:39.326Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663303,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -191,24 +225,31 @@
         "source.packets": 1,
         "source.port": 55250,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:44.921Z",
         "cisco.ios.access_list": "151",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.2",
         "destination.ip": "198.51.100.2",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGDP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663304,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "icmp.code": 4,
         "icmp.type": 3,
@@ -231,25 +272,32 @@
         "source.ip": "198.51.100.1",
         "source.packets": 1,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:51.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663305,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -271,11 +319,11 @@
         "source.packets": 1,
         "source.port": 60677,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:55.222Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -283,19 +331,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663306,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -317,25 +373,32 @@
         "source.packets": 1,
         "source.port": 59825,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:41:57.328Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663307,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -357,25 +420,32 @@
         "source.packets": 1,
         "source.port": 56723,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:03.334Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663308,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -397,25 +467,32 @@
         "source.packets": 1,
         "source.port": 54473,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:09.332Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663309,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -437,25 +514,32 @@
         "source.packets": 1,
         "source.port": 33568,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:15.330Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663310,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -477,25 +561,32 @@
         "source.packets": 1,
         "source.port": 35207,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:21.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663311,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -517,25 +608,32 @@
         "source.packets": 1,
         "source.port": 37063,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:27.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663312,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -557,11 +655,11 @@
         "source.packets": 1,
         "source.port": 54309,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:28.374Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
@@ -578,25 +676,32 @@
         "message": "access-list logging rate-limited or missed 18 packets",
         "service.type": "cisco",
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:33.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663314,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -618,25 +723,32 @@
         "source.packets": 1,
         "source.port": 43989,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:39.338Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663315,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -658,25 +770,32 @@
         "source.packets": 1,
         "source.port": 53432,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:45.336Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663316,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -698,11 +817,11 @@
         "source.packets": 1,
         "source.port": 58674,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:47.466Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -710,19 +829,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663317,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -744,25 +871,32 @@
         "source.packets": 1,
         "source.port": 59830,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:51.342Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663318,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -784,25 +918,32 @@
         "source.packets": 1,
         "source.port": 52377,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:42:57.340Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663319,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -824,25 +965,32 @@
         "source.packets": 1,
         "source.port": 42695,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:03.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663320,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -864,11 +1012,11 @@
         "source.packets": 1,
         "source.port": 58393,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:08.454Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -876,19 +1024,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663321,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -910,25 +1066,32 @@
         "source.packets": 1,
         "source.port": 59832,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:15.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663322,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -950,11 +1113,11 @@
         "source.packets": 1,
         "source.port": 60908,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:20.346Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "8.8.8.8",
@@ -962,19 +1125,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
         "destination.port": 53,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663323,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -996,25 +1167,32 @@
         "source.packets": 1,
         "source.port": 59415,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:21.348Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.195",
         "destination.ip": "198.51.100.195",
         "destination.port": 59415,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663324,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1036,17 +1214,18 @@
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "8.8.8.8",
         "source.packets": 1,
         "source.port": 53,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:28.403Z",
         "cisco.ios.facility": "SEC",
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
@@ -1063,24 +1242,31 @@
         "message": "access-list logging rate-limited or missed 23 packets",
         "service.type": "cisco",
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:28.403Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.1",
         "destination.ip": "198.51.100.1",
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGDP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663326,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "icmp.code": 3,
         "icmp.type": 3,
@@ -1103,11 +1289,11 @@
         "source.ip": "198.51.100.12",
         "source.packets": 32,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:29.451Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -1115,19 +1301,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663327,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1149,25 +1343,32 @@
         "source.packets": 1,
         "source.port": 59834,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:33.352Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663328,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1189,25 +1390,32 @@
         "source.packets": 1,
         "source.port": 54532,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:39.350Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663329,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1229,25 +1437,32 @@
         "source.packets": 1,
         "source.port": 57831,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:44.173Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 138,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663330,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1269,25 +1484,32 @@
         "source.packets": 1,
         "source.port": 138,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:45.356Z",
         "cisco.ios.access_list": "177",
         "cisco.ios.facility": "SEC",
         "destination.address": "198.51.100.255",
         "destination.ip": "198.51.100.255",
         "destination.port": 15600,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663331,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1309,11 +1531,11 @@
         "source.packets": 1,
         "source.port": 42988,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-06-20T04:43:50.473Z",
         "cisco.ios.access_list": "150",
         "cisco.ios.facility": "SEC",
         "destination.address": "172.217.10.46",
@@ -1321,19 +1543,27 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.10.46",
         "destination.port": 80,
-        "event.category": "network_traffic",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGP",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.outcome": "deny",
         "event.sequence": 1663332,
         "event.severity": 6,
         "event.timezone": "-02:00",
-        "event.type": "firewall",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
@@ -1355,7 +1585,8 @@
         "source.packets": 1,
         "source.port": 59836,
         "tags": [
-            "cisco-ios"
+            "cisco-ios",
+            "forwarded"
         ]
     }
 ]

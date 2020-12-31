@@ -1,0 +1,28 @@
+- name: mgr_osd_pool_stats
+  type: group
+  description: >
+    OSD pool stats of Ceph cluster
+  release: beta
+  fields:
+    - name: pool_name
+      type: keyword
+      description: Pool name
+    - name: pool_id
+      type: long
+      description: Pool ID
+    - name: client_io_rate
+      type: object
+      description: Client I/O rates
+      fields:
+        - name: read_bytes_sec
+          type: long
+          keyword: Bytes read per second
+        - name: write_bytes_sec
+          type: long
+          keyword: Bytes written per second
+        - name: read_op_per_sec
+          type: long
+          keyword: Read operations per second
+        - name: write_op_per_sec
+          type: long
+          keyword: Write operations per second

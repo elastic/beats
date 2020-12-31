@@ -22,7 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
@@ -61,27 +61,15 @@ func configFileParams(dirs ...string) (devtools.ConfigFileParams, error) {
 	if len(configFiles) == 0 {
 		return devtools.ConfigFileParams{}, errors.Errorf("no config files found in %v", globs)
 	}
+	devtools.MustFileConcat("build/config.modules.yml.tmpl", 0644, configFiles...)
 
-	return devtools.ConfigFileParams{
-		ShortParts: join(
-			devtools.OSSBeatDir("_meta/common.p1.yml"),
-			configFiles,
-			devtools.OSSBeatDir("_meta/common.p2.yml"),
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		),
-		ReferenceParts: join(
-			devtools.OSSBeatDir("_meta/common.reference.yml"),
-			configFiles,
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		),
-		DockerParts: []string{
-			devtools.OSSBeatDir("_meta/beat.docker.yml"),
-			devtools.LibbeatDir("_meta/config.docker.yml"),
-		},
-		ExtraVars: map[string]interface{}{
-			"ArchBits": archBits,
-		},
-	}, nil
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	p.Templates = append(p.Templates, "build/config.modules.yml.tmpl")
+	p.ExtraVars = map[string]interface{}{
+		"ArchBits": archBits,
+	}
+	return p, nil
 }
 
 // archBits returns the number of bit width of the GOARCH architecture value.
@@ -94,17 +82,4 @@ func archBits(goarch string) int {
 	default:
 		return 64
 	}
-}
-
-func join(items ...interface{}) []string {
-	var out []string
-	for _, item := range items {
-		switch v := item.(type) {
-		case string:
-			out = append(out, v)
-		case []string:
-			out = append(out, v...)
-		}
-	}
-	return out
 }

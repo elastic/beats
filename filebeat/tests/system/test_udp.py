@@ -1,9 +1,12 @@
 from filebeat import BaseTest
+import os
 import socket
+import unittest
 
 
 class Test(BaseTest):
 
+    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/22809')
     def test_udp(self):
 
         host = "127.0.0.1"
@@ -28,7 +31,7 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
         for n in range(0, 2):
-            sock.sendto("Hello World: " + str(n), (host, port))
+            sock.sendto(b"Hello World: " + n.to_bytes(2, "big"), (host, port))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 

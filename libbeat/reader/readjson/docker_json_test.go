@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 func TestDockerJSON(t *testing.T) {
@@ -365,3 +365,5 @@ func (m *mockReader) Next() (reader.Message, error) {
 		Bytes:   len(message),
 	}, nil
 }
+
+func (m *mockReader) Close() error { return nil }

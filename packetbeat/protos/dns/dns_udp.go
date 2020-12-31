@@ -18,10 +18,9 @@
 package dns
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
 // Only EDNS packets should have their size beyond this value
@@ -47,7 +46,7 @@ func (dns *dnsPlugin) ParseUDP(pkt *protos.Packet) {
 	dnsMsg := &dnsMessage{
 		ts:           pkt.Ts,
 		tuple:        pkt.Tuple,
-		cmdlineTuple: procs.ProcWatcher.FindProcessesTupleUDP(&pkt.Tuple),
+		cmdlineTuple: dns.watcher.FindProcessesTupleUDP(&pkt.Tuple),
 		data:         dnsPkt,
 		length:       packetSize,
 	}

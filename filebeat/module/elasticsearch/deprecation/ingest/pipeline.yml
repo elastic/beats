@@ -1,0 +1,49 @@
+description: Pipeline for parsing elasticsearch deprecation logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- rename:
+    field: '@timestamp'
+    target_field: event.created
+- grok:
+    field: message
+    patterns:
+    - ^%{CHAR:first_char}
+    pattern_definitions:
+      CHAR: .
+- pipeline:
+    if: ctx.first_char != '{'
+    name: '{< IngestPipeline "pipeline-plaintext" >}'
+- pipeline:
+    if: ctx.first_char == '{'
+    name: '{< IngestPipeline "pipeline-json" >}'
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value: database
+- set:
+    field: event.type
+    value: info
+- set:
+    field: host.id
+    value: "{{elasticsearch.node.id}}"
+    ignore_empty_value: true
+- set:
+    field: host.name
+    value: "{{elasticsearch.node.name}}"
+    ignore_empty_value: true
+- remove:
+    field:
+    - elasticsearch.deprecation.timestamp
+    - elasticsearch.deprecation.@timestamp
+    ignore_missing: true
+- remove:
+    field:
+    - first_char
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

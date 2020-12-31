@@ -31,10 +31,10 @@ import (
 
 func TestGetOSFileState(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := file.Stat()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 
@@ -50,10 +50,10 @@ func TestGetOSFileState(t *testing.T) {
 
 func TestGetOSFileStateStat(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := os.Stat(file.Name())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 

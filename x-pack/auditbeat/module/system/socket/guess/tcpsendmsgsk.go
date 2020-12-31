@@ -11,9 +11,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // Guess how to get a struct sock* from tcp_sendmsg parameters. It can be:
@@ -28,7 +28,7 @@ import (
 //  TCP_SENDMSG_SOCK  : %di
 
 func init() {
-	if err := Registry.AddGuess(&guessTcpSendmsgSock{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessTcpSendmsgSock{} }); err != nil {
 		panic(err)
 	}
 }

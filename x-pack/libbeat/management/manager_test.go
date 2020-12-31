@@ -18,10 +18,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/paths"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 type reloadable struct {
@@ -73,6 +73,7 @@ func TestConfigManager(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -87,7 +88,7 @@ func TestConfigManager(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -148,6 +149,7 @@ func TestRemoveItems(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -162,7 +164,7 @@ func TestRemoveItems(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -225,6 +227,7 @@ func TestUnEnroll(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -239,7 +242,7 @@ func TestUnEnroll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded
@@ -299,6 +302,7 @@ func TestBadConfig(t *testing.T) {
 
 	config := &Config{
 		Enabled:     true,
+		Mode:        ModeCentralManagement,
 		Period:      100 * time.Millisecond,
 		Kibana:      c,
 		AccessToken: accessToken,
@@ -318,7 +322,7 @@ func TestBadConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	manager.Start()
+	manager.Start(func() {})
 
 	// On first reload we will get apache2 module
 	config1 := <-reloadable.reloaded

@@ -26,6 +26,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -71,7 +72,13 @@ func (b *dockerBuilder) Build() error {
 
 	tag, err := b.dockerBuild()
 	if err != nil {
-		return errors.Wrap(err, "failed to build docker")
+		fmt.Println(">> Building docker images again (after 10 seconds)")
+		// This sleep is to avoid hitting the docker build issues when resources are not available.
+		time.Sleep(10)
+		tag, err = b.dockerBuild()
+		if err != nil {
+			return errors.Wrap(err, "failed to build docker")
+		}
 	}
 
 	if err := b.dockerSave(tag); err != nil {
@@ -102,6 +109,9 @@ func (b *dockerBuilder) copyFiles() error {
 	for _, f := range b.Files {
 		target := filepath.Join(b.beatDir, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return errors.Wrapf(err, "failed to copy from %s to %s", f.Source, target)
 		}
 	}
@@ -120,8 +130,8 @@ func (b *dockerBuilder) prepareBuild() error {
 		"ModulesDirs": b.modulesDirs(),
 	}
 
-	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
-		if !info.IsDir() {
+	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
+		if !info.IsDir() && !isDockerFile(path) {
 			target := strings.TrimSuffix(
 				filepath.Join(b.buildDir, filepath.Base(path)),
 				".tmpl",
@@ -134,6 +144,47 @@ func (b *dockerBuilder) prepareBuild() error {
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return b.expandDockerfile(templatesDir, data)
+}
+
+func isDockerFile(path string) bool {
+	path = filepath.Base(path)
+	return strings.HasPrefix(path, "Dockerfile") || strings.HasPrefix(path, "docker-entrypoint")
+}
+
+func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
+	dockerfile := "Dockerfile.tmpl"
+	if f, found := b.ExtraVars["dockerfile"]; found {
+		dockerfile = f
+	}
+
+	entrypoint := "docker-entrypoint.tmpl"
+	if e, found := b.ExtraVars["docker_entrypoint"]; found {
+		entrypoint = e
+	}
+
+	type fileExpansion struct {
+		source string
+		target string
+	}
+	for _, file := range []fileExpansion{{dockerfile, "Dockerfile.tmpl"}, {entrypoint, "docker-entrypoint.tmpl"}} {
+		target := strings.TrimSuffix(
+			filepath.Join(b.buildDir, file.target),
+			".tmpl",
+		)
+		path := filepath.Join(templatesDir, file.source)
+		err := b.ExpandFile(path, target, data)
+		if err != nil {
+			return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
+		}
+	}
+
+	return nil
 }
 
 func (b *dockerBuilder) dockerBuild() (string, error) {

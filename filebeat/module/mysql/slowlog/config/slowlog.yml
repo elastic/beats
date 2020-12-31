@@ -9,3 +9,8 @@ multiline:
   negate: true
   match: after
 exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*', '^# Time:.*']   # Exclude the header and time
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

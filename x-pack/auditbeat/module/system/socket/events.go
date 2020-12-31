@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 const (
@@ -135,7 +135,7 @@ func (e *tcpConnectResult) Update(s *state) error {
 			pid:      e.Meta.PID,
 			inetType: inetTypeIPv4,
 			proto:    protoTCP,
-			dir:      directionOutbound,
+			dir:      directionEgress,
 			complete: true,
 			lastSeen: kernelTime(call.Meta.Timestamp),
 			local:    newEndpointIPv4(call.LAddr, call.LPort, 0, 0),
@@ -147,7 +147,7 @@ func (e *tcpConnectResult) Update(s *state) error {
 			pid:      e.Meta.PID,
 			inetType: inetTypeIPv6,
 			proto:    protoTCP,
-			dir:      directionOutbound,
+			dir:      directionEgress,
 			complete: true,
 			lastSeen: kernelTime(call.Meta.Timestamp),
 			local:    newEndpointIPv6(call.LAddrA, call.LAddrB, call.LPort, 0, 0),
@@ -193,7 +193,7 @@ func (e *tcpAcceptResult) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetType(e.Af),
 		proto:    protoTCP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		complete: true,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 	}
@@ -237,7 +237,7 @@ func (e *tcpAcceptResult4) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetType(e.Af),
 		proto:    protoTCP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		complete: true,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 	}
@@ -534,14 +534,16 @@ type udpSendMsgCall struct {
 	LPort    uint16           `kprobe:"lport"`
 	RPort    uint16           `kprobe:"rport"`
 	AltRPort uint16           `kprobe:"altrport"`
+	// SIPtr is the struct sockaddr_in pointer.
+	SIPtr uintptr `kprobe:"siptr"`
+	// SIAF is the address family in (struct sockaddr_in*)->sin_family.
+	SIAF uint16 `kprobe:"siaf"`
 }
 
 func (e *udpSendMsgCall) asFlow() flow {
 	raddr, rport := e.RAddr, e.RPort
-	if raddr == 0 {
+	if e.SIPtr == 0 || e.SIAF != unix.AF_INET {
 		raddr = e.AltRAddr
-	}
-	if rport == 0 {
 		rport = e.AltRPort
 	}
 	return flow{
@@ -549,7 +551,7 @@ func (e *udpSendMsgCall) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv4,
 		proto:    protoUDP,
-		dir:      directionOutbound,
+		dir:      directionEgress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minIPv4UdpPacketSize),
 		remote:   newEndpointIPv4(raddr, rport, 0, 0),
@@ -586,14 +588,16 @@ type udpv6SendMsgCall struct {
 	LPort     uint16           `kprobe:"lport"`
 	RPort     uint16           `kprobe:"rport"`
 	AltRPort  uint16           `kprobe:"altrport"`
+	// SI6Ptr is the struct sockaddr_in6 pointer.
+	SI6Ptr uintptr `kprobe:"si6ptr"`
+	// Si6AF is the address family field ((struct sockaddr_in6*)->sin6_family)
+	SI6AF uint16 `kprobe:"si6af"`
 }
 
 func (e *udpv6SendMsgCall) asFlow() flow {
 	raddra, raddrb, rport := e.RAddrA, e.RAddrB, e.RPort
-	if raddra == 0 && raddrb == 0 {
+	if e.SI6Ptr == 0 || e.SI6AF != unix.AF_INET6 {
 		raddra, raddrb = e.AltRAddrA, e.AltRAddrB
-	}
-	if rport == 0 {
 		rport = e.AltRPort
 	}
 	return flow{
@@ -601,7 +605,7 @@ func (e *udpv6SendMsgCall) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv6,
 		proto:    protoUDP,
-		dir:      directionOutbound,
+		dir:      directionEgress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		// In IPv6, udpv6_sendmsg increments local counters as there is no
 		// corresponding ip6_local_out call.
@@ -661,7 +665,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv4,
 		proto:    protoUDP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 	}
@@ -735,7 +739,7 @@ func (e *udpv6QueueRcvSkb) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv6,
 		proto:    protoUDP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
 	}
@@ -868,8 +872,8 @@ type execveCall struct {
 	creds *commitCreds
 }
 
-func (e *execveCall) getProcess() process {
-	p := process{
+func (e *execveCall) getProcess() *process {
+	p := &process{
 		pid:     e.Meta.PID,
 		path:    readCString(e.Path[:]),
 		created: kernelTime(e.Meta.Timestamp),

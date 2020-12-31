@@ -1,7 +1,14 @@
 [
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
@@ -10,8 +17,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "warning",
@@ -20,8 +34,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
@@ -30,8 +51,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -40,8 +68,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -50,8 +85,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -60,8 +102,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -70,8 +119,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -80,8 +136,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -90,8 +153,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -100,8 +170,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -110,8 +187,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -120,8 +204,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -130,8 +221,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -140,8 +238,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -150,8 +255,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -160,8 +272,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -170,8 +289,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -180,8 +306,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -190,8 +323,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -200,8 +340,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -210,8 +357,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -220,8 +374,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -230,8 +391,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -240,8 +408,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -250,8 +425,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -260,8 +442,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -270,8 +459,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -280,8 +476,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -290,8 +493,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -300,8 +510,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -310,8 +527,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -320,8 +544,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",
@@ -330,8 +561,15 @@
         "service.type": "redis"
     },
     {
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "redis.log",
+        "event.kind": "event",
         "event.module": "redis",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "verbose",

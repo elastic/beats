@@ -1,21 +1,34 @@
 [
     {
-        "@timestamp": 1547687130000,
+        "@timestamp": "2019-01-17T01:05:30.172Z",
         "destination.address": "17.253.5.203",
         "destination.as.number": 6185,
         "destination.as.organization.name": "Apple Inc.",
         "destination.geo.city_name": "San Jose",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.3388,
         "destination.geo.location.lon": -121.8914,
         "destination.geo.region_iso_code": "US-CA",
         "destination.geo.region_name": "California",
         "destination.ip": "17.253.5.203",
         "destination.port": 80,
+        "event.action": "get",
+        "event.category": [
+            "network",
+            "web"
+        ],
         "event.dataset": "zeek.http",
         "event.id": "CCNp8v1SNzY7v9d1Ih",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "info",
+            "protocol"
+        ],
         "fileset.name": "http",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
@@ -26,6 +39,10 @@
         "log.offset": 0,
         "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
         "network.transport": "tcp",
+        "related.ip": [
+            "10.178.98.102",
+            "17.253.5.203"
+        ],
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
@@ -35,7 +52,7 @@
         ],
         "url.domain": "ocsp.apple.com",
         "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",
-        "url.port": "80",
+        "url.port": 80,
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "com.apple.trustd/2.0",

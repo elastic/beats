@@ -18,9 +18,12 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"errors"
+	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
@@ -29,13 +32,12 @@ import (
 // is receiving cancelled batches from outputs to be closed on output reloading.
 type eventConsumer struct {
 	logger *logp.Logger
-	done   chan struct{}
-
-	ctx *batchContext
+	ctx    *batchContext
 
 	pause atomic.Bool
 	wait  atomic.Bool
 	sig   chan consumerSignal
+	wg    sync.WaitGroup
 
 	queue    queue.Queue
 	consumer queue.Consumer
@@ -55,32 +57,41 @@ const (
 	sigConsumerCheck consumerEventTag = iota
 	sigConsumerUpdateOutput
 	sigConsumerUpdateInput
+	sigStop
 )
+
+var errStopped = errors.New("stopped")
 
 func newEventConsumer(
 	log *logp.Logger,
 	queue queue.Queue,
 	ctx *batchContext,
 ) *eventConsumer {
+	consumer := queue.Consumer()
 	c := &eventConsumer{
 		logger: log,
-		done:   make(chan struct{}),
 		sig:    make(chan consumerSignal, 3),
 		out:    nil,
 
 		queue:    queue,
-		consumer: queue.Consumer(),
+		consumer: consumer,
 		ctx:      ctx,
 	}
 
 	c.pause.Store(true)
-	go c.loop(c.consumer)
+
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		c.loop(consumer)
+	}()
 	return c
 }
 
 func (c *eventConsumer) close() {
 	c.consumer.Close()
-	close(c.done)
+	c.sig <- consumerSignal{tag: sigStop}
+	c.wg.Wait()
 }
 
 func (c *eventConsumer) sigWait() {
@@ -138,12 +149,15 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 	var (
 		out    workQueue
-		batch  *Batch
+		batch  Batch
 		paused = true
 	)
 
-	handleSignal := func(sig consumerSignal) {
+	handleSignal := func(sig consumerSignal) error {
 		switch sig.tag {
+		case sigStop:
+			return errStopped
+
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
@@ -154,11 +168,12 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 		}
 
 		paused = c.paused()
-		if !paused && c.out != nil && batch != nil {
+		if c.out != nil && batch != nil {
 			out = c.out.workQueue
 		} else {
 			out = nil
 		}
+		return nil
 	}
 
 	for {
@@ -182,19 +197,23 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 
 		select {
 		case sig := <-c.sig:
-			handleSignal(sig)
+			if err := handleSignal(sig); err != nil {
+				return
+			}
 			continue
 		default:
 		}
 
 		select {
-		case <-c.done:
-			log.Debug("stop pipeline event consumer")
-			return
 		case sig := <-c.sig:
-			handleSignal(sig)
+			if err := handleSignal(sig); err != nil {
+				return
+			}
 		case out <- batch:
 			batch = nil
+			if paused {
+				out = nil
+			}
 		}
 	}
 }

@@ -34,8 +34,8 @@ import (
 
 	"golang.org/x/crypto/pbkdf2"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -51,6 +51,12 @@ const (
 // Version of the keystore format, will be added at the beginning of the file.
 var version = []byte("v1")
 
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
+type Packager interface {
+	Package() ([]byte, error)
+	ConfiguredPath() string
+}
+
 // FileKeystore Allows to store key / secrets pair securely into an encrypted local file.
 type FileKeystore struct {
 	sync.RWMutex
@@ -64,6 +70,27 @@ type FileKeystore struct {
 type serializableSecureString struct {
 	*SecureString
 	Value []byte `json:"value"`
+}
+
+// Factory Create the right keystore with the configured options.
+func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
+	config := defaultConfig
+
+	if cfg == nil {
+		cfg = common.NewConfig()
+	}
+	err := cfg.Unpack(&config)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not read keystore configuration, err: %v", err)
+	}
+
+	if config.Path == "" {
+		config.Path = defaultPath
+	}
+
+	keystore, err := NewFileKeystore(config.Path)
+	return keystore, err
 }
 
 // NewFileKeystore returns an new File based keystore or an error, currently users cannot set their

@@ -20,15 +20,17 @@ package idxmgmt
 import (
 	"errors"
 	"fmt"
+	"strings"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/outil"
-	"github.com/elastic/beats/libbeat/template"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/template"
 )
 
 type indexSupport struct {
@@ -197,6 +199,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		MultiKey:         "indices",
 		EnableSingleOnly: true,
 		FailEmpty:        mode != ilm.ModeEnabled,
+		Case:             outil.SelectorLowerCase,
 	}
 
 	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
@@ -238,7 +241,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 	if !ilmComponent.load {
 		warn += "ILM policy and write alias loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
-		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite:true` for enabling.\n"
+		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.\n"
 	}
 	if !templateComponent.load {
 		warn += "Template loading not enabled.\n"
@@ -352,28 +355,22 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 		return ""
 	}
 
-	if tmp := evt.Meta["alias"]; tmp != nil {
-		if alias, ok := tmp.(string); ok {
-			return alias
-		}
+	if alias, err := events.GetMetaStringValue(*evt, events.FieldMetaAlias); err == nil {
+		return strings.ToLower(alias)
 	}
 
-	if tmp := evt.Meta["index"]; tmp != nil {
-		if idx, ok := tmp.(string); ok {
-			ts := evt.Timestamp.UTC()
-			return fmt.Sprintf("%s-%d.%02d.%02d",
-				idx, ts.Year(), ts.Month(), ts.Day())
-		}
+	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaIndex); err == nil {
+		ts := evt.Timestamp.UTC()
+		return fmt.Sprintf("%s-%d.%02d.%02d",
+			strings.ToLower(idx), ts.Year(), ts.Month(), ts.Day())
 	}
 
 	// This is functionally identical to Meta["alias"], returning the overriding
 	// metadata as the index name if present. It is currently used by Filebeat
 	// to send the index for particular inputs to formatted string templates,
 	// which are then expanded by a processor to the "raw_index" field.
-	if tmp := evt.Meta["raw_index"]; tmp != nil {
-		if idx, ok := tmp.(string); ok {
-			return idx
-		}
+	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaRawIndex); err == nil {
+		return strings.ToLower(idx)
 	}
 
 	return ""

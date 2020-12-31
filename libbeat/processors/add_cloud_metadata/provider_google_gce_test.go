@@ -24,9 +24,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const gceMetadataV1 = `{
@@ -152,6 +152,9 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 
 	expected := common.MapStr{
 		"cloud": common.MapStr{
+			"account": common.MapStr{
+				"id": "test-dev",
+			},
 			"provider": "gcp",
 			"instance": common.MapStr{
 				"id":   "3910564293633576924",

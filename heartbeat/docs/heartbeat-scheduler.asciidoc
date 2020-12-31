@@ -1,0 +1,41 @@
+[[monitors-scheduler]]
+== Configure the task scheduler
+
+++++
+<titleabbrev>Task scheduler</titleabbrev>
+++++
+
+You specify options under `heartbeat.scheduler` to control the behavior of the task
+scheduler.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+heartbeat.scheduler:
+  limit: 10
+  location: 'UTC-08:00'
+-------------------------------------------------------------------------------
+
+In the example, setting `limit` to 10 guarantees that only 10 concurrent
+I/O tasks will be active. An I/O task can be the actual check or resolving an
+address via DNS.
+
+[float]
+[[heartbeat-scheduler-limit]]
+==== `limit`
+
+The number of concurrent I/O tasks that {beatname_uc} is allowed to execute. If set
+to 0, there is no limit. The default is 0.
+
+Most operating systems set a file descriptor limit of 1024. For {beatname_uc} to
+operate correctly and not accidentally block libbeat output, the value that you
+specify for `limit` should be below the configured ulimit.
+
+
+[float]
+[[heartbeat-scheduler-location]]
+==== `location`
+
+The time zone for the scheduler. By default the scheduler uses localtime.
+

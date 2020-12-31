@@ -24,10 +24,11 @@ import (
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
 // RunnerList implements a reloadable.List of Runners
@@ -35,12 +36,12 @@ type RunnerList struct {
 	runners  map[uint64]Runner
 	mutex    sync.RWMutex
 	factory  RunnerFactory
-	pipeline beat.Pipeline
+	pipeline beat.PipelineConnector
 	logger   *logp.Logger
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
@@ -70,7 +71,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			continue
 		}
 
-		if _, ok := stopList[hash]; ok {
+		if _, ok := r.runners[hash]; ok {
 			delete(stopList, hash)
 		} else {
 			startList[hash] = config
@@ -84,16 +85,19 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
 		go runner.Stop()
+		moduleStops.Add(1)
 	}
 
 	// Start new runners
 	for hash, config := range startList {
-		// Pass a copy of the config to the factory, this way if the factory modifies it,
-		// that doesn't affect the hash of the original one.
-		c, _ := common.NewConfigFrom(config.Config)
-		runner, err := r.factory.Create(r.pipeline, c, config.Meta)
+		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			r.logger.Errorf("Error creating runner from config: %s", err)
+			if _, ok := err.(*common.ErrInputNotFinished); ok {
+				// error is related to state, we should not log at error level
+				r.logger.Debugf("Error creating runner from config: %s", err)
+			} else {
+				r.logger.Errorf("Error creating runner from config: %s", err)
+			}
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
 			continue
 		}
@@ -101,7 +105,14 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
 		runner.Start()
+		moduleStarts.Add(1)
 	}
+
+	// NOTE: This metric tracks the number of modules in the list. The true
+	// number of modules in the running state may differ because modules can
+	// stop on their own (i.e. on errors) and also when this stops a module
+	// above it is done asynchronously.
+	moduleRunning.Set(int64(len(r.runners)))
 
 	return errs.Err()
 }
@@ -146,7 +157,9 @@ func (r *RunnerList) Has(hash uint64) bool {
 // HashConfig hashes a given common.Config
 func HashConfig(c *common.Config) (uint64, error) {
 	var config map[string]interface{}
-	c.Unpack(&config)
+	if err := c.Unpack(&config); err != nil {
+		return 0, err
+	}
 	return hashstructure.Hash(config, nil)
 }
 
@@ -156,4 +169,11 @@ func (r *RunnerList) copyRunnerList() map[uint64]Runner {
 		list[k] = v
 	}
 	return list
+}
+
+func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, config *reload.ConfigWithMeta) (Runner, error) {
+	// Pass a copy of the config to the factory, this way if the factory modifies it,
+	// that doesn't affect the hash of the original one.
+	c, _ := common.NewConfigFrom(config.Config)
+	return factory.Create(pipetool.WithDynamicFields(pipeline, config.Meta), c)
 }

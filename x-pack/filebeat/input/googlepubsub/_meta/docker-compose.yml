@@ -1,7 +1,0 @@
-version: '2.3'
-
-services:
-  googlepubsub:
-    build: .
-    ports:
-      - 127.0.0.1:8432:8432

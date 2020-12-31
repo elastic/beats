@@ -19,6 +19,7 @@ package prometheus
 
 import (
 	"bytes"
+	"compress/gzip"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -26,8 +27,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 const (
@@ -184,15 +186,23 @@ var _ = httpfetcher(&mockFetcher{})
 // FetchResponse returns an HTTP response but for the Body, which
 // returns the mockFetcher.Response contents
 func (m mockFetcher) FetchResponse() (*http.Response, error) {
+	body := bytes.NewBuffer(nil)
+	writer := gzip.NewWriter(body)
+	writer.Write([]byte(m.response))
+	writer.Close()
+
 	return &http.Response{
-		Header: make(http.Header),
-		Body:   ioutil.NopCloser(bytes.NewReader([]byte(m.response))),
+		StatusCode: 200,
+		Header: http.Header{
+			"Content-Encoding": []string{"gzip"},
+		},
+		Body: ioutil.NopCloser(body),
 	}, nil
 }
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}}
+	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -933,7 +943,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
 		p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

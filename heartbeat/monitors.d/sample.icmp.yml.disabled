@@ -4,16 +4,20 @@
 # be loaded.
 
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
-  # configured hosts
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-icmp-monitor
 
-  # Monitor name used for job name and document type.
-  #name: icmp
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My ICMP Monitor
+
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service.name: my-apm-service-name
 
   # Enable/Disable monitor
   #enabled: true
 
   # Configure task schedule using cron-like syntax
-  schedule: '*/5 * * * * * *' # exactly every 5 seconds like 10:00:00, 10:00:05, ...
+  schedule: '@every 5s' # every 5 seconds from start of beat
 
   # List of hosts to ping
   hosts: ["localhost"]

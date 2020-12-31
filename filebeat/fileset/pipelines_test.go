@@ -23,11 +23,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
@@ -87,9 +88,10 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			}))
 			defer testESServer.Close()
 
-			testESClient, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-				URL: testESServer.URL,
-			}, nil)
+			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
+				URL:     testESServer.URL,
+				Timeout: 90 * time.Second,
+			})
 			assert.NoError(t, err)
 
 			err = testESClient.Connect()
@@ -209,6 +211,385 @@ func TestSetEcsProcessors(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, test.expected, test.content)
+			}
+		})
+	}
+}
+
+func TestModifySetProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.9.0",
+			esVersion: common.MustNewVersion("7.8.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+							"if":    "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.9.0",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.9.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "existing if",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": true,
+							"if":                 "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+							"if":    "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ignore_empty_value is false",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"value":              "{{panw.panos.ruleset}}",
+							"ignore_empty_value": false,
+							"if":                 "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+							"if":    "ctx?.panw?.panos?.ruleset != null",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "no value",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":              "rule.name",
+							"ignore_empty_value": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := modifySetProcessor(*test.esVersion, "foo-pipeline", test.content)
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
+func TestModifyAppendProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.10.0: set to true",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": true,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES < 7.10.0: set to false",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.10.0",
+			esVersion: common.MustNewVersion("7.10.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.10.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES < 7.10.0: existing if",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+							"if":               "ctx?.host?.hostname != null",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES < 7.10.0: existing if with contains",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+							"if":               "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+							"if":    "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES < 7.10.0: no value",
+			esVersion: common.MustNewVersion("7.7.7"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"allow_duplicates": false,
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := modifyAppendProcessor(*test.esVersion, "foo-pipeline", test.content)
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
 	}

@@ -18,6 +18,7 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -166,7 +167,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
 	}
 	var err error
-	r.intervalRotator, err = newIntervalRotator(r.interval)
+	r.intervalRotator, err = newIntervalRotator(r.log, r.interval, r.rotateOnStartup, r.filename)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +302,7 @@ func (r *Rotator) openFile() error {
 
 	r.file, err = os.OpenFile(r.filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, r.permissions)
 	if err != nil {
-		return errors.Wrap(err, "failed to open new file")
+		return errors.Wrap(err, fmt.Sprintf("failed to open new file '%s'", r.filename))
 	}
 	if r.redirectStderr {
 		RedirectStandardError(r.file)

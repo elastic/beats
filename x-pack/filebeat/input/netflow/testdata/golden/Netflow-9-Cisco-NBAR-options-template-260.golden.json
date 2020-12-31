@@ -7,7 +7,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -42,7 +45,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -77,7 +83,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -112,7 +121,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -147,7 +159,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -182,7 +197,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -217,7 +235,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -252,7 +273,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -287,7 +311,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -322,7 +349,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -357,7 +387,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -392,7 +425,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -427,7 +463,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -462,7 +501,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
@@ -497,7 +539,10 @@
       "Fields": {
         "event": {
           "action": "netflow_options",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },

@@ -19,16 +19,18 @@ package template
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/mapping"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
 // Processor struct to process fields to template
 type Processor struct {
-	EsVersion common.Version
-	Migration bool
+	EsVersion       common.Version
+	Migration       bool
+	ElasticLicensed bool
 }
 
 var (
@@ -72,6 +74,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.integer(&field)
 		case "text":
 			indexMapping = p.text(&field)
+		case "wildcard":
+			noWildcards := p.EsVersion.LessThan(common.MustNewVersion("7.9.0"))
+			if !p.ElasticLicensed || noWildcards {
+				indexMapping = p.keyword(&field)
+			} else {
+				indexMapping = p.wildcard(&field)
+			}
 		case "", "keyword":
 			indexMapping = p.keyword(&field)
 		case "object":
@@ -80,33 +89,20 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.array(&field)
 		case "alias":
 			indexMapping = p.alias(&field)
-		case "group":
-			indexMapping = common.MapStr{}
-			if field.Dynamic.Value != nil {
-				indexMapping["dynamic"] = field.Dynamic.Value
-			}
-
-			// Combine properties with previous field definitions (if any)
-			properties := common.MapStr{}
-			key := mapping.GenerateKey(field.Name) + ".properties"
-			currentProperties, err := output.GetValue(key)
-			if err == nil {
-				var ok bool
-				properties, ok = currentProperties.(common.MapStr)
-				if !ok {
-					// This should never happen
-					return errors.New(key + " is expected to be a MapStr")
-				}
-			}
-
-			groupState := &fieldState{Path: field.Name, DefaultField: *field.DefaultField}
-			if state.Path != "" {
-				groupState.Path = state.Path + "." + field.Name
-			}
-			if err := p.Process(field.Fields, groupState, properties); err != nil {
+		case "histogram":
+			indexMapping = p.histogram(&field)
+		case "nested":
+			mapping, err := p.nested(&field, output)
+			if err != nil {
 				return err
 			}
-			indexMapping["properties"] = properties
+			indexMapping = mapping
+		case "group":
+			mapping, err := p.group(&field, output)
+			if err != nil {
+				return err
+			}
+			indexMapping = mapping
 		default:
 			indexMapping = p.other(&field)
 		}
@@ -176,6 +172,47 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 	return property
 }
 
+func (p *Processor) nested(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	mapping, err := p.group(f, output)
+	if err != nil {
+		return nil, err
+	}
+	mapping["type"] = "nested"
+	return mapping, nil
+}
+
+func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	indexMapping := common.MapStr{}
+	if f.Dynamic.Value != nil {
+		indexMapping["dynamic"] = f.Dynamic.Value
+	}
+
+	// Combine properties with previous field definitions (if any)
+	properties := common.MapStr{}
+	key := mapping.GenerateKey(f.Name) + ".properties"
+	currentProperties, err := output.GetValue(key)
+	if err == nil {
+		var ok bool
+		properties, ok = currentProperties.(common.MapStr)
+		if !ok {
+			// This should never happen
+			return nil, errors.New(key + " is expected to be a MapStr")
+		}
+	}
+
+	groupState := &fieldState{Path: f.Name, DefaultField: *f.DefaultField}
+	if f.Path != "" {
+		groupState.Path = f.Path + "." + f.Name
+	}
+	if err := p.Process(f.Fields, groupState, properties); err != nil {
+		return nil, err
+	}
+	if len(properties) != 0 {
+		indexMapping["properties"] = properties
+	}
+	return indexMapping, nil
+}
+
 func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "half_float"
@@ -215,6 +252,28 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "string"
 		property["index"] = "not_analyzed"
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, nil, fields)
+		property["fields"] = fields
+	}
+
+	return property
+}
+
+func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
+	property := getDefaultProperties(f)
+
+	property["type"] = "wildcard"
+
+	switch f.IgnoreAbove {
+	case 0: // Use libbeat default
+		property["ignore_above"] = defaultIgnoreAbove
+	case -1: // Use ES default
+	default: // Use user value
+		property["ignore_above"] = f.IgnoreAbove
 	}
 
 	if len(f.MultiFields) > 0 {
@@ -287,6 +346,18 @@ func (p *Processor) alias(f *mapping.Field) common.MapStr {
 	return properties
 }
 
+func (p *Processor) histogram(f *mapping.Field) common.MapStr {
+	// Histograms were introduced in Elasticsearch 7.6, ignore if unsupported
+	if p.EsVersion.LessThan(common.MustNewVersion("7.6.0")) {
+		return nil
+	}
+
+	properties := getDefaultProperties(f)
+	properties["type"] = "histogram"
+
+	return properties
+}
+
 func (p *Processor) object(f *mapping.Field) common.MapStr {
 	matchType := func(onlyType string, mt string) string {
 		if mt != "" {
@@ -305,11 +376,12 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 
 	for _, otp := range otParams {
 		dynProperties := getDefaultProperties(f)
+		var matchingType string
 
 		switch otp.ObjectType {
 		case "scaled_float":
 			dynProperties = p.scaledFloat(f, common.MapStr{scalingFactorKey: otp.ScalingFactor})
-			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
+			matchingType = matchType("*", otp.ObjectTypeMappingType)
 		case "text":
 			dynProperties["type"] = "text"
 
@@ -317,14 +389,38 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 				dynProperties["type"] = "string"
 				dynProperties["index"] = "analyzed"
 			}
-			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+			matchingType = matchType("string", otp.ObjectTypeMappingType)
 		case "keyword":
 			dynProperties["type"] = otp.ObjectType
-			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+			matchingType = matchType("string", otp.ObjectTypeMappingType)
 		case "byte", "double", "float", "long", "short", "boolean":
 			dynProperties["type"] = otp.ObjectType
-			addDynamicTemplate(f, dynProperties, matchType(otp.ObjectType, otp.ObjectTypeMappingType))
+			matchingType = matchType(otp.ObjectType, otp.ObjectTypeMappingType)
+		case "histogram":
+			dynProperties["type"] = otp.ObjectType
+			matchingType = matchType("*", otp.ObjectTypeMappingType)
+		default:
+			continue
 		}
+
+		path := f.Path
+		if len(path) > 0 {
+			path += "."
+		}
+		path += f.Name
+		pathMatch := path
+		// ensure the `path_match` string ends with a `*`
+		if !strings.ContainsRune(path, '*') {
+			pathMatch += ".*"
+		}
+		// When multiple object type parameters are detected for a field,
+		// add a unique part to the name of the dynamic template.
+		// Duplicated dynamic template names can lead to errors when template
+		// inheritance is applied, and will not be supported in future versions
+		if len(otParams) > 1 {
+			path = fmt.Sprintf("%s_%s", path, matchingType)
+		}
+		addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
 	}
 
 	properties := getDefaultProperties(f)
@@ -340,18 +436,10 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func addDynamicTemplate(f *mapping.Field, properties common.MapStr, matchType string) {
-	path := ""
-	if len(f.Path) > 0 {
-		path = f.Path + "."
-	}
-	pathMatch := path + f.Name
-	if !strings.ContainsRune(pathMatch, '*') {
-		pathMatch += ".*"
-	}
+func addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
 	template := common.MapStr{
 		// Set the path of the field as name
-		path + f.Name: common.MapStr{
+		path: common.MapStr{
 			"mapping":            properties,
 			"match_mapping_type": matchType,
 			"path_match":         pathMatch,

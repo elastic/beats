@@ -22,18 +22,15 @@ package connections
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "nats")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	err := mbtest.WriteEventsReporterV2Error(metricSet, t, "./test_data.json")
-	if err != nil {
-		t.Fatal("write", err)
-	}
+	m := mbtest.NewFetcher(t, getConfig(service.Host()))
+	m.WriteEvents(t, "")
 }
 
 func TestFetch(t *testing.T) {

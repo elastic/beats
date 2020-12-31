@@ -30,8 +30,8 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
 )
 
 // Version returns a kafka version from its string representation
@@ -119,7 +119,7 @@ func (b *Broker) Connect() error {
 	c, err := getClusterWideClient(b.Addr(), b.cfg)
 	if err != nil {
 		closeBroker(b.broker)
-		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
+		return fmt.Errorf("getting cluster client for advertised broker with address %v: %w", b.Addr(), err)
 	}
 	b.client = c
 

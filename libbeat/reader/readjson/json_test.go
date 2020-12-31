@@ -21,9 +21,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestUnmarshal(t *testing.T) {
@@ -185,13 +187,14 @@ func TestDecodeJSON(t *testing.T) {
 
 		var p JSONReader
 		p.cfg = &test.Config
+		p.logger = logp.NewLogger("json_test")
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
 		assert.Equal(t, test.ExpectedMap, M)
 	}
 }
 
-func TestAddJSONFields(t *testing.T) {
+func TestMergeJSONFields(t *testing.T) {
 	type io struct {
 	}
 
@@ -340,6 +343,11 @@ func TestAddJSONFields(t *testing.T) {
 			Data:       common.MapStr{"@timestamp": common.Time(now), "json": common.MapStr{"id": 42}},
 			JSONConfig: Config{DocumentID: "id"},
 			ExpectedID: "",
+		},
+		"expand dotted fields": {
+			Data:          common.MapStr{"json": common.MapStr{"a.b": common.MapStr{"c": "c"}, "a.b.d": "d"}},
+			JSONConfig:    Config{ExpandKeys: true, KeysUnderRoot: true},
+			ExpectedItems: common.MapStr{"a": common.MapStr{"b": common.MapStr{"c": "c", "d": "d"}}},
 		},
 	}
 

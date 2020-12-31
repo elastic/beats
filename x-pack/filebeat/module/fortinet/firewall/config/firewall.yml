@@ -1,0 +1,44 @@
+{{ if eq .input "tcp" }}
+
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "udp" }}
+
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0
+
+{{ if .external_interfaces }}
+  - add_fields:
+      target: _temp
+      fields:
+        external_interfaces: {{ .external_interfaces | tojson }}
+{{ end }}
+
+{{ if .internal_interfaces }}
+  - add_fields:
+      target: _temp
+      fields:
+        internal_interfaces: {{ .internal_interfaces | tojson }}
+{{ end }}

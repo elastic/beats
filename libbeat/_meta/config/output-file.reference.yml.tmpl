@@ -1,0 +1,33 @@
+{{subheader "File Output"}}
+#output.file:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
+  # Configure JSON encoding
+  #codec.json:
+    # Pretty-print JSON event
+    #pretty: false
+
+    # Configure escaping HTML symbols in strings.
+    #escape_html: false
+
+  # Path to the directory where to save the generated files. The option is
+  # mandatory.
+  #path: "/tmp/{{.BeatName}}"
+
+  # Name of the generated files. The default is `{{.BeatName}}` and it generates
+  # files: `{{.BeatName}}`, `{{.BeatName}}.1`, `{{.BeatName}}.2`, etc.
+  #filename: {{.BeatName}}
+
+  # Maximum size in kilobytes of each file. When this size is reached, and on
+  # every {{.BeatName | title}} restart, the files are rotated. The default value is 10240
+  # kB.
+  #rotate_every_kb: 10000
+
+  # Maximum number of files under path. When this number of files is reached,
+  # the oldest file is deleted and the rest are shifted from last to first. The
+  # default is 7 files.
+  #number_of_files: 7
+
+  # Permissions to use for file creation. The default is 0600.
+  #permissions: 0600

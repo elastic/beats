@@ -25,7 +25,7 @@ export PATH
 [ -f /etc/sysconfig/{{.ServiceName}} ] && . /etc/sysconfig/{{.ServiceName}}
 pidfile=${PIDFILE-/var/run/{{.ServiceName}}.pid}
 agent=${BEATS_AGENT-/usr/share/{{.BeatName}}/bin/{{.BeatName}}}
-args="-c /etc/{{.BeatName}}/{{.BeatName}}.yml -path.home /usr/share/{{.BeatName}} -path.config /etc/{{.BeatName}} -path.data /var/lib/{{.BeatName}} -path.logs /var/log/{{.BeatName}}"
+args="-c /etc/{{.BeatName}}/{{.BeatName}}.yml --path.home /usr/share/{{.BeatName}} --path.config /etc/{{.BeatName}} --path.data /var/lib/{{.BeatName}} --path.logs /var/log/{{.BeatName}}"
 test_args="-e test config"
 beat_user="${BEAT_USER:-{{.BeatUser}}}"
 wrapper="/usr/share/{{.BeatName}}/bin/{{.BeatName}}-god"
@@ -33,6 +33,8 @@ wrapperopts="-r / -n -p $pidfile"
 user_wrapper="su"
 user_wrapperopts="$beat_user -c"
 RETVAL=0
+DEFAULT_GODEBUG="madvdontneed=1"
+export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 # Source function library.
 . /etc/rc.d/init.d/functions

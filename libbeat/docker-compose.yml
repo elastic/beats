@@ -5,6 +5,7 @@ services:
     depends_on:
       - proxy_dep
     environment:
+      - BEAT_STRICT_PERMS=false
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SREDIS_HOST=sredis
@@ -12,16 +13,24 @@ services:
       - LS_HOST=logstash
       - LS_TCP_PORT=5044
       - LS_TLS_PORT=5055
-      # Setup work environment
-      - LIBBEAT_PATH=/go/src/github.com/elastic/beats/libbeat
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9092
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
+      - KIBANA_USER=beats
+      - KIBANA_PASS=testing
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USER=beats
+      - ES_PASS=testing
       - ES_MONITORING_HOST=elasticsearch_monitoring
       - ES_MONITORING_PORT=9200
-    env_file:
-      - ${PWD}/build/test.env
+      - ES_HOST_SSL=elasticsearchssl
+      # See https://github.com/elastic/beats/issues/21838
+      # - ES_KERBEROS_HOST=elasticsearch_kerberos.elastic
+      - ES_PORT_SSL=9200
+      - ES_SUPERUSER_USER=admin
+      - ES_SUPERUSER_PASS=changeme
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       # Used for docker integration tests:
@@ -34,13 +43,16 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
-      elasticsearch:            { condition: service_healthy }
-      elasticsearch_monitoring: { condition: service_healthy }
-      logstash:                 { condition: service_healthy }
-      kafka:                    { condition: service_healthy }
-      redis:                    { condition: service_healthy }
-      sredis:                   { condition: service_healthy }
-      kibana:                   { condition: service_healthy }
+      elasticsearch:                  { condition: service_healthy }
+      # See https://github.com/elastic/beats/issues/21838
+      # elasticsearch_kerberos.elastic: { condition: service_healthy }
+      elasticsearch_monitoring:       { condition: service_healthy }
+      elasticsearchssl:               { condition: service_healthy }
+      logstash:                       { condition: service_healthy }
+      kafka:                          { condition: service_healthy }
+      redis:                          { condition: service_healthy }
+      sredis:                         { condition: service_healthy }
+      kibana:                         { condition: service_healthy }
     healthcheck:
       interval: 1s
       retries: 1200
@@ -55,15 +67,42 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+  elasticsearchssl:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-u", "admin:changeme", "-f", "https://localhost:9200", "--insecure"]
+      retries: 1200
+      interval: 5s
+      start_period: 60s
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=true"
+      - "indices.id_field_data.enabled=true"
+      - "xpack.license.self_generated.type=trial"
+      - "xpack.security.http.ssl.enabled=true"
+      - "xpack.security.http.ssl.key=/usr/share/elasticsearch/config/pki/elasticsearchssl/elasticsearchssl.key"
+      - "xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/pki/elasticsearchssl/elasticsearchssl.crt"
+      - "xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/pki/ca/ca.crt"
+      # Do no used indices as the storage for credentials, using file based allow Elasticsearch
+      # to be online and green much quicker.
+      - "xpack.security.authc.realms.file.file1.order=0"
+    volumes:
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/pki:/usr/share/elasticsearch/config/pki:ro
+    expose:
+      - 9200
+    command: bash -c "bin/elasticsearch-users useradd admin -r superuser -p changeme | /usr/local/bin/docker-entrypoint.sh eswrapper"
 
   # This host name is static because of the certificate.
   logstash:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: logstash
-    env_file:
-      - ${PWD}/build/test.env
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -82,8 +121,6 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    env_file:
-      - ${PWD}/build/test.env
 
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka
@@ -92,6 +129,35 @@ services:
       - 2181
     environment:
       - ADVERTISED_HOST=kafka
+
+  # elasticsearch_kerberos.elastic:
+  #   build: ${ES_BEATS}/testing/environments/docker/elasticsearch_kerberos
+  #   healthcheck:
+  #     test: bash -c "/healthcheck.sh"
+  #     retries: 1200
+  #     interval: 5s
+  #     start_period: 60s
+  #   environment:
+  #     - "TERM=linux"
+  #     - "ELASTIC_PASSWORD=changeme"
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.security.krb5.conf=/etc/krb5.conf"
+  #     - "network.host="
+  #     - "transport.host=127.0.0.1"
+  #     - "http.host=0.0.0.0"
+  #     - "xpack.security.enabled=true"
+  #     - "indices.id_field_data.enabled=true"
+  #     - "xpack.license.self_generated.type=trial"
+  #     - "xpack.security.authc.realms.kerberos.ELASTIC.order=1"
+  #     - "xpack.security.authc.realms.kerberos.ELASTIC.keytab.path=/usr/share/elasticsearch/config/HTTP_elasticsearch_kerberos.elastic.keytab"
+  #   hostname: elasticsearch_kerberos.elastic
+  #   volumes:
+  #     # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
+  #     - /dev/urandom:/dev/random
+  #   ports:
+  #     - 1088
+  #     - 1749
+  #     - 9200
+  #   command: bash -c "/start.sh"
 
   kibana:
     extends:

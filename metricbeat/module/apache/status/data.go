@@ -22,9 +22,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
-	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/v7/libbeat/common"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 )
 
 var (
@@ -129,7 +129,7 @@ func eventMapping(scanner *bufio.Scanner, hostname string) (common.MapStr, error
 	for scanner.Scan() {
 		if match := matchNumber.FindStringSubmatch(scanner.Text()); len(match) == 3 {
 			// Total Accesses: 16147
-			//Total kBytes: 12988
+			// Total kBytes: 12988
 			// Uptime: 3229728
 			// CPULoad: .000408393
 			// CPUUser: 0

@@ -1,9 +1,17 @@
 [
     {
         "@timestamp": "2017-10-02T20:22:07.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 2000000,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://example.com/login",
@@ -12,6 +20,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
+        "related.ip": [
+            "192.168.33.1"
+        ],
         "service.type": "traefik",
         "source.address": "192.168.33.1",
         "source.ip": "192.168.33.1",
@@ -29,9 +40,17 @@
     },
     {
         "@timestamp": "2017-10-02T20:22:08.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 3000000,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "http://example.com/login",
@@ -40,6 +59,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 280,
+        "related.ip": [
+            "85.181.35.98"
+        ],
         "service.type": "traefik",
         "source.address": "85.181.35.98",
         "source.as.number": 6805,
@@ -47,6 +69,7 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 52.4473,
         "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
@@ -66,9 +89,17 @@
     },
     {
         "@timestamp": "2018-02-28T17:30:33.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 247000000,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.response.body.bytes": 2814,
@@ -76,6 +107,9 @@
         "http.version": "2.0",
         "input.type": "log",
         "log.offset": 553,
+        "related.ip": [
+            "70.29.80.15"
+        ],
         "service.type": "traefik",
         "source.address": "70.29.80.15",
         "source.as.number": 577,
@@ -83,6 +117,7 @@
         "source.geo.city_name": "Ottawa",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "CA",
+        "source.geo.country_name": "Canada",
         "source.geo.location.lat": 45.2691,
         "source.geo.location.lon": -75.7518,
         "source.geo.region_iso_code": "CA-ON",
@@ -104,9 +139,17 @@
     },
     {
         "@timestamp": "2018-11-29T15:03:51.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 0,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "failure",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
@@ -115,6 +158,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 821,
+        "related.ip": [
+            "::1"
+        ],
         "service.type": "traefik",
         "source.address": "::1",
         "source.ip": "::1",
@@ -131,9 +177,17 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 13000000,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.response.body.bytes": 85,
@@ -141,6 +195,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 931,
+        "related.ip": [
+            "94.254.131.115"
+        ],
         "service.type": "traefik",
         "source.address": "94.254.131.115",
         "source.as.number": 39603,
@@ -148,6 +205,7 @@
         "source.geo.city_name": "Warsaw",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
+        "source.geo.country_name": "Poland",
         "source.geo.location.lat": 52.25,
         "source.geo.location.lon": 21.0,
         "source.geo.region_iso_code": "PL-14",
@@ -166,9 +224,17 @@
     },
     {
         "@timestamp": "2018-01-19T10:01:02.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
         "event.duration": 8000000,
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.response.body.bytes": 150,
@@ -176,6 +242,9 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 1267,
+        "related.ip": [
+            "89.64.35.193"
+        ],
         "service.type": "traefik",
         "source.address": "89.64.35.193",
         "source.as.number": 6830,
@@ -183,6 +252,7 @@
         "source.geo.city_name": "Gda\u0144sk",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
+        "source.geo.country_name": "Poland",
         "source.geo.location.lat": 54.3605,
         "source.geo.location.lon": 18.649,
         "source.geo.region_iso_code": "PL-22",
@@ -201,8 +271,16 @@
     },
     {
         "@timestamp": "2000-10-10T20:55:36.000Z",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "traefik.access",
+        "event.kind": "event",
         "event.module": "traefik",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.response.body.bytes": 2326,
@@ -210,6 +288,12 @@
         "http.version": "1.0",
         "input.type": "log",
         "log.offset": 1581,
+        "related.ip": [
+            "127.0.0.1"
+        ],
+        "related.user": [
+            "frank"
+        ],
         "service.type": "traefik",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

@@ -1,10 +1,8 @@
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 CONSUL_FIELDS = metricbeat.COMMON_FIELDS + ["consul"]
@@ -27,7 +25,7 @@ class ConsulAgentTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['consul']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Consul agent module outputs an event.
@@ -47,14 +45,14 @@ class ConsulAgentTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(CONSUL_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(CONSUL_FIELDS), evt.keys())
         consul_agent = evt["consul"]["agent"]
 
         consul_agent.pop("raft", None)
         consul_agent.pop("autopilot", None)
 
         print(consul_agent)
-        self.assertItemsEqual(self.de_dot(AGENT_FIELDS), consul_agent.keys())
+        self.assertCountEqual(self.de_dot(AGENT_FIELDS), consul_agent.keys())
 
         assert(consul_agent["runtime"]["heap_objects"] > 0)
 

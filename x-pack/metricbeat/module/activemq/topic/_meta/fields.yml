@@ -1,7 +1,7 @@
 - name: topic
   type: group
   description: Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
-  release: beta
+  release: ga
   fields:
   - name: mbean
     description: Mbean that this event is related to

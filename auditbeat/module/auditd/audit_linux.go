@@ -30,15 +30,15 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/go-libaudit"
-	"github.com/elastic/go-libaudit/aucoalesce"
-	"github.com/elastic/go-libaudit/auparse"
-	"github.com/elastic/go-libaudit/rule"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/go-libaudit/v2"
+	"github.com/elastic/go-libaudit/v2/aucoalesce"
+	"github.com/elastic/go-libaudit/v2/auparse"
+	"github.com/elastic/go-libaudit/v2/rule"
 )
 
 const (
@@ -163,7 +163,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
 		go func() {
-			defer client.Close()
+			defer func() { // Close the most recently allocated "client" instance.
+				if client != nil {
+					client.Close()
+				}
+			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
 			defer timer.Stop()
 			for {
@@ -175,6 +179,15 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
+						if err = client.Close(); err != nil {
+							ms.log.Errorw("Error closing audit monitoring client", "error", err)
+						}
+						client, err = libaudit.NewAuditClient(nil)
+						if err != nil {
+							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
+							reporter.Error(err)
+							return
+						}
 					}
 				}
 			}
@@ -539,10 +552,10 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		m.Put("paths", auditEvent.Paths)
 	}
 
+	normalizeEventFields(auditEvent, out.RootFields)
+
 	switch auditEvent.Category {
 	case aucoalesce.EventTypeUserLogin:
-		// Customize event.type / event.category to match unified values.
-		normalizeEventFields(out.RootFields)
 		// Set ECS user fields from the attempted login account.
 		if usernameOrID := auditEvent.Summary.Actor.Secondary; usernameOrID != "" {
 			if usr, err := resolveUsernameOrID(usernameOrID); err == nil {
@@ -572,25 +585,39 @@ func resolveUsernameOrID(userOrID string) (usr *user.User, err error) {
 	return user.LookupId(userOrID)
 }
 
-func normalizeEventFields(m common.MapStr) {
-	getFieldAsStr := func(key string) (s string, found bool) {
-		iface, err := m.GetValue(key)
-		if err != nil {
+func normalizeEventFields(event *aucoalesce.Event, m common.MapStr) {
+	// we need to merge types for backwards compatibility
+	types := event.ECS.Event.Type
+
+	// Remove this block in 8.x
+	{
+		getFieldAsStr := func(key string) (s string, found bool) {
+			iface, err := m.GetValue(key)
+			if err != nil {
+				return
+			}
+			s, found = iface.(string)
 			return
 		}
-		s, found = iface.(string)
-		return
+		oldCategory, ok1 := getFieldAsStr("event.category")
+		oldAction, ok2 := getFieldAsStr("event.action")
+		oldOutcome, ok3 := getFieldAsStr("event.outcome")
+		if ok1 && ok2 && ok3 {
+			if oldCategory == "user-login" && oldAction == "logged-in" { // USER_LOGIN
+				types = append(types, fmt.Sprintf("authentication_%s", oldOutcome))
+			}
+		}
 	}
 
-	category, ok1 := getFieldAsStr("event.category")
-	action, ok2 := getFieldAsStr("event.action")
-	outcome, ok3 := getFieldAsStr("event.outcome")
-	if !ok1 || !ok2 || !ok3 {
-		return
+	m.Put("event.kind", "event")
+	if len(event.ECS.Event.Category) > 0 {
+		m.Put("event.category", event.ECS.Event.Category)
 	}
-	if category == "user-login" && action == "logged-in" { // USER_LOGIN
-		m.Put("event.category", "authentication")
-		m.Put("event.type", fmt.Sprintf("authentication_%s", outcome))
+	if len(types) > 0 {
+		m.Put("event.type", types)
+	}
+	if event.ECS.Event.Outcome != "" {
+		m.Put("event.outcome", event.ECS.Event.Outcome)
 	}
 }
 

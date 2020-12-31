@@ -23,10 +23,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Config for kubernetes autodiscover provider
@@ -42,12 +44,17 @@ type Config struct {
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
+	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
+	Unique      bool   `config:"unique"`
+	LeaderLease string `config:"leader_lease"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *common.Config          `config:"hints"`
 	Builders  []*common.Config        `config:"builders"`
 	Appenders []*common.Config        `config:"appenders"`
 	Templates template.MapperSettings `config:"templates"`
+
+	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
 func defaultConfig() *Config {
@@ -56,6 +63,7 @@ func defaultConfig() *Config {
 		Resource:       "pod",
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
+		Unique:         false,
 	}
 }
 
@@ -93,6 +101,9 @@ func (c *Config) Validate() error {
 
 	if c.Scope != "node" && c.Scope != "cluster" {
 		return fmt.Errorf("invalid `scope` configured. supported values are `node` and `cluster`")
+	}
+	if c.Unique && c.Scope != "cluster" {
+		logp.L().Warnf("can only set `unique` when scope is `cluster`")
 	}
 
 	return nil

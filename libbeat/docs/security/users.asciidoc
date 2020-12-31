@@ -1,6 +1,6 @@
 [role="xpack"]
 [[feature-roles]]
-=== Grant users access to secured resources
+== Grant users access to secured resources
 
 You can use role-based access control to grant users access to secured
 resources. The roles that you set up depend on your organization's security
@@ -18,22 +18,29 @@ by {beatname_uc}
 create visualizations that access {beatname_uc} data
 
 
-{security} provides {ref}/built-in-roles.html[built-in roles] that grant a
+{es-security-features} provides {ref}/built-in-roles.html[built-in roles] that grant a
 subset of the privileges needed by {beatname_uc} users. When possible, use the
 built-in roles to minimize the affect of future changes on your security
 strategy.
 
+Instead of using usernames and passwords, roles and privileges can be assigned to
+API keys to grant access to Elasticsearch resources. See <<beats-api-keys>> for
+more information.
 
 [[privileges-to-setup-beats]]
-==== Grant privileges and roles needed for setup
+=== Grant privileges and roles needed for setup
+
+++++
+<titleabbrev>Create a _setup_ user</titleabbrev>
+++++
 
 IMPORTANT: Setting up {beatname_uc} is an admin-level task that requires extra
 privileges. As a best practice, grant the setup role to administrators only, and
-use a less restrictive role for event publishing.  
+use a more restrictive role for event publishing.
 
 Administrators who set up {beatname_uc} typically need to load mappings,
 dashboards, and other objects used to index data into {es} and visualize it in
-{kib}. 
+{kib}.
 
 To grant users the required privileges:
 
@@ -63,7 +70,7 @@ endif::has_ml_jobs[]
 |Index
 |`manage` on +{beat_default_index_prefix}-*+ indices
 |Set up aliases used by ILM
- 
+
 ifdef::has_ml_jobs[]
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
@@ -74,17 +81,17 @@ endif::has_ml_jobs[]
 Omit any privileges that aren't relevant in your environment.
 +
 NOTE: These instructions assume that you are using the default name for
-{beatname_uc} indices. If you are using a custom name, modify the privileges to
+{beatname_uc} indices. If +{beat_default_index_prefix}-*+ is not listed, or you are using a custom name, enter it manually and modify the privileges to
 match your index naming pattern.
 
 . Assign the *setup role*, along with the following built-in roles, to users who
-need to set up {beatname_uc}: 
+need to set up {beatname_uc}:
 +
 [options="header"]
 |====
 |Role | Purpose
 
-|`kibana_user`
+|`kibana_admin`
 |Load dependencies, such as example dashboards, if available, into {kib}
 
 |`ingest_admin`
@@ -104,14 +111,18 @@ endif::has_central_config[]
 Omit any roles that aren't relevant in your environment.
 
 [[privileges-to-publish-monitoring]]
-==== Grant privileges and roles needed for monitoring
+=== Grant privileges and roles needed for monitoring
 
-{security} provides built-in users and roles for monitoring. The privileges and
+++++
+<titleabbrev>Create a _monitoring_ user</titleabbrev>
+++++
+
+{es-security-features} provides built-in users and roles for monitoring. The privileges and
 roles needed depend on the method used to collect monitoring data.
 
-[IMPORTANT] 
+[IMPORTANT]
 .Important note for {ecloud} users
-==== 
+====
 Built-in users are not available when running our
 https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]
 on {ecloud}. To send monitoring data securely, create a monitoring user and
@@ -119,7 +130,7 @@ grant it the roles described in the following sections.
 ====
 
 * If you're using <<monitoring-internal-collection,internal collection>> to
-collect metrics about {beatname_uc}, {security} provides
+collect metrics about {beatname_uc}, {es-security-features} provides
 the +{beat_monitoring_user}+ {ref}/built-in-users.html[built-in user] and
 +{beat_monitoring_user}+ {ref}/built-in-roles.html[built-in role] to send
 monitoring information. You can use the built-in user, if it's available in your
@@ -152,13 +163,13 @@ If you don't use the +{beat_monitoring_user}+ user:
 |====
 
 . Assign the *monitoring role*, along with the following built-in roles, to
-users who need to monitor {beatname_uc}: 
+users who need to monitor {beatname_uc}:
 +
 [options="header"]
 |====
 |Role | Purpose
 
-|`kibana_user`
+|`kibana_admin`
 |Use {kib}
 
 |`monitoring_user`
@@ -169,7 +180,7 @@ users who need to monitor {beatname_uc}:
 ifndef::serverless[]
 
 * If you're <<monitoring-metricbeat-collection,using {metricbeat}>> to collect
-metrics about {beatname_uc}, {security} provides the `remote_monitoring_user`
+metrics about {beatname_uc}, {es-security-features} provides the `remote_monitoring_user`
 {ref}/built-in-users.html[built-in user], and the `remote_monitoring_collector`
 and `remote_monitoring_agent` {ref}/built-in-roles.html[built-in roles] for
 collecting and sending monitoring information. You can use the built-in user, if
@@ -184,7 +195,7 @@ If you don't use the `remote_monitoring_user` user:
 . Create a user on the production cluster who will collect and send monitoring
 information.
 
-. Assign the following roles to the user: 
+. Assign the following roles to the user:
 +
 [options="header"]
 |====
@@ -211,11 +222,16 @@ information.
 endif::serverless[]
 
 [[privileges-to-publish-events]]
-==== Grant privileges and roles needed for publishing
+=== Grant privileges and roles needed for publishing
+
+++++
+<titleabbrev>Create a _publishing_ user</titleabbrev>
+++++
 
 Users who publish events to {es} need to create and write to {beatname_uc}
-indices. To minimize the privileges required by the writer role, you can use the
-<<privileges-to-setup-beats,setup role>> to pre-load dependencies.
+indices. To minimize the privileges required by the writer role, use the
+<<privileges-to-setup-beats,setup role>> to pre-load dependencies. This section
+assumes that you've run the setup.
 
 ifndef::no_ilm[]
 When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
@@ -242,7 +258,7 @@ NOTE: The `monitor` cluster privilege and the `create_doc` privilege on
 ifndef::apm-server[]
 |Cluster
 |`monitor`
-|Retrieve cluster details (e.g. version) 
+|Retrieve cluster details (e.g. version)
 endif::apm-server[]
 
 ifndef::no_ilm[]
@@ -282,7 +298,11 @@ endif::apm-server[]
 . Assign the *writer role* to users who will index events into {es}.
 
 [[kibana-user-privileges]]
-==== Grant privileges and roles needed to read {beatname_uc} data
+=== Grant privileges and roles needed to read {beatname_uc} data from {kib}
+
+++++
+<titleabbrev>Create a _reader_ user</titleabbrev>
+++++
 
 {kib} users typically need to view dashboards and visualizations that contain
 {beatname_uc} data. These users might also need to create and edit dashboards
@@ -305,6 +325,16 @@ the following privilege:
 |Index
 |`read` on +{beat_default_index_prefix}-*+ indices
 |Read data indexed by {beatname_uc}
+
+| Spaces
+| `Read` or `All` on Dashboards, Visualize, and Discover
+| Allow the user to view, edit, and create dashboards, as well as browse data.
+
+ifdef::beat_kib_app[]
+| Spaces
+| `Read` or `All` on {beat_kib_app}
+| Allow the use of {beat_kib_app}
+endif::[]
 |====
 
 . Assign the *reader role*, along with the following built-in roles, to
@@ -314,17 +344,16 @@ users who need to read {beatname_uc} data:
 |====
 |Role | Purpose
 
-|`kibana_user` or `kibana_dashboard_only_user`
-|Use {kib}. `kibana_dashboard_only_user` grants read-only access to dashboards.
+| `monitoring_user`
+| Allow users to monitor the health of {beatname_uc} itself. Only assign this role to users who manage {beatname_uc}.
 
 ifdef::has_central_config[]
 |`beats_admin`
 |Create and manage configurations in Beats central management. Only assign this
 role to users who need to use Beats central management.
++
 endif::[]
 |====
-+
-Omit any roles that aren't relevant in your environment.
 endif::apm-server[]
 
 ifdef::apm-server[]
@@ -339,13 +368,13 @@ data:
 |Use the APM UI
 
 |`admin`
-|Read and update APM Agent configuration via Kibana
+|Read and update APM Agent configuration via {kib}
 |====
 endif::apm-server[]
 
-
+// to do: THIS SHOULD GO IN ITS OWN FILE
 [[learn-more-security]]
-==== Learn more about users and roles
+=== Learn more about privileges, roles, and users
 
 Want to learn more about creating users and roles? See
 {ref}/secure-cluster.html[Secure a cluster]. Also see:

@@ -18,14 +18,19 @@
 package hints
 
 import (
+	"os"
+	"path/filepath"
 	"sort"
 	"testing"
 
+	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -33,7 +38,7 @@ func TestGenerateHints(t *testing.T) {
 		message string
 		event   bus.Event
 		len     int
-		result  common.MapStr
+		result  []common.MapStr
 	}{
 		{
 			message: "Empty event hints should return empty config",
@@ -53,7 +58,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: common.MapStr{},
+			result: []common.MapStr{},
 		},
 		{
 			message: "Hints without host should return nothing",
@@ -65,7 +70,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: common.MapStr{},
+			result: []common.MapStr{},
 		},
 		{
 			message: "Hints without matching port should return nothing",
@@ -80,7 +85,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: common.MapStr{},
+			result: []common.MapStr{},
 		},
 		{
 			message: "Hints with multiple hosts return only the matching one",
@@ -95,13 +100,15 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
-				"hosts":      []interface{}{"1.2.3.4:9090"},
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
 			},
 		},
 		{
@@ -117,13 +124,15 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
-				"hosts":      []interface{}{"1.2.3.4:9090"},
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
 			},
 		},
 		{
@@ -137,12 +146,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmodule",
-				"metricsets": []string{"one", "two"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
+			result: []common.MapStr{
+				{
+					"module":     "mockmodule",
+					"metricsets": []string{"one", "two"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
 			},
 		},
 		{
@@ -157,12 +168,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmodule",
-				"metricsets": []string{"one"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
+			result: []common.MapStr{
+				{
+					"module":     "mockmodule",
+					"metricsets": []string{"one"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
 			},
 		},
 		{
@@ -176,12 +189,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
 			},
 		},
 		{
@@ -195,12 +210,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
 			},
 		},
 		{
@@ -217,14 +234,16 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"namespace":  "test",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
-				"hosts":      []interface{}{"1.2.3.4:9090"},
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
 			},
 		},
 		{
@@ -245,22 +264,39 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"namespace":  "test",
-				"metricsets": []string{"default"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
-				"hosts":      []interface{}{"1.2.3.4:9090"},
-				"processors": []interface{}{
-					map[string]interface{}{
-						"add_locale": map[string]interface{}{
-							"abbrevation": "MST",
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{
+						map[string]interface{}{
+							"add_locale": map[string]interface{}{
+								"abbrevation": "MST",
+							},
 						},
 					},
 				},
 			},
+		},
+		{
+			message: "Module with data.host defined and a zero port should not return a config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 0,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+					},
+				},
+			},
+			len: 0,
 		},
 		{
 			message: "Module, namespace, host hint should return valid config",
@@ -276,14 +312,240 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: common.MapStr{
-				"module":     "mockmoduledefaults",
-				"namespace":  "test",
-				"metricsets": []string{"default"},
-				"hosts":      []interface{}{"1.2.3.4:9090"},
-				"timeout":    "3s",
-				"period":     "1m",
-				"enabled":    true,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Module, namespace, host hint shouldn't return when port isn't the same has hint",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 80,
+				"hints": []common.MapStr{
+					{
+						"metrics": common.MapStr{
+							"module":    "mockmoduledefaults",
+							"namespace": "test",
+							"hosts":     "${data.host}:8080",
+						},
+					},
+				},
+			},
+			len:    0,
+			result: []common.MapStr{},
+		},
+		{
+			message: "Non http URLs with valid host port combination should return a valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 3306,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "tcp(${data.host}:3306)/",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"tcp(1.2.3.4:3306)/"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Named port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"some": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.ports.some}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Named port in the hints should return the corresponding container port for complex hosts",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "http://${data.host}:${data.ports.prometheus}/metrics",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"http://1.2.3.4:3306/metrics"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "data.port in the hints should return the corresponding container port",
+			event: bus.Event{
+				"host":  "1.2.3.4",
+				"port":  3306,
+				"ports": common.MapStr{"prometheus": 3306},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:${data.port}",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"hosts":      []interface{}{"1.2.3.4:3306"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+				},
+			},
+		},
+		{
+			message: "Module with mutliple sets of hints must return the right configs",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"1": common.MapStr{
+							"module":    "mockmoduledefaults",
+							"namespace": "test",
+							"hosts":     "${data.host}:9090",
+						},
+						"2": common.MapStr{
+							"module":    "mockmoduledefaults",
+							"namespace": "test1",
+							"hosts":     "${data.host}:9090/fake",
+						},
+					},
+				},
+			},
+			len: 2,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test1",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090/fake"},
+				},
+			},
+		},
+		{
+			message: "Module with multiple hosts returns the right number of hints. Pod level hints need to be one per host",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090, ${data.host}:9091",
+					},
+				},
+			},
+			len: 2,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+				},
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9091"},
+				},
+			},
+		},
+		{
+			message: "Module with multiple hosts and an exposed port creates a config for just the exposed port",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9091,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "mockmoduledefaults",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090, ${data.host}:9091",
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "mockmoduledefaults",
+					"namespace":  "test",
+					"metricsets": []string{"default"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9091"},
+				},
 			},
 		},
 	}
@@ -297,10 +559,91 @@ func TestGenerateHints(t *testing.T) {
 		m := metricHints{
 			Key:      defaultConfig().Key,
 			Registry: mockRegister,
+			logger:   logp.NewLogger("hints.builder"),
+		}
+		cfgs := m.CreateConfig(test.event)
+		assert.Equal(t, len(cfgs), test.len, test.message)
+
+		// The check below helps skipping config validation if there is no config supposed to be emitted.
+		if len(cfgs) == 0 {
+			continue
+		}
+		configs := make([]common.MapStr, 0)
+		for _, cfg := range cfgs {
+			config := common.MapStr{}
+			err := cfg.Unpack(&config)
+			ok := assert.Nil(t, err, test.message)
+			if !ok {
+				break
+			}
+			// metricsets order is random, order it for tests
+			if v, err := config.GetValue("metricsets"); err == nil {
+				if msets, ok := v.([]interface{}); ok {
+					metricsets := make([]string, len(msets))
+					for i, v := range msets {
+						metricsets[i] = v.(string)
+					}
+					sort.Strings(metricsets)
+					config["metricsets"] = metricsets
+				}
+			}
+			configs = append(configs, config)
+		}
+		assert.Equal(t, test.result, configs, test.message)
+
+	}
+}
+
+func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
+	path := getTemporaryKeystoreFile()
+	defer os.Remove(path)
+	// store the secret
+	keystore := createAnExistingKeystore(path, "stored_secret")
+	os.Setenv("PASSWORD", "env_secret")
+
+	tests := []struct {
+		message string
+		event   bus.Event
+		len     int
+		result  common.MapStr
+	}{
+		{
+			message: "Module, namespace, host hint should return valid config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":   "mockmoduledefaults",
+						"hosts":    "${data.host}:9090",
+						"password": "${PASSWORD}",
+					},
+				},
+				"keystore": keystore,
+			},
+			len: 1,
+			result: common.MapStr{
+				"module":     "mockmoduledefaults",
+				"metricsets": []string{"default"},
+				"hosts":      []interface{}{"1.2.3.4:9090"},
+				"timeout":    "3s",
+				"period":     "1m",
+				"enabled":    true,
+				"password":   "env_secret",
+			},
+		},
+	}
+	for _, test := range tests {
+		mockRegister := mb.NewRegister()
+		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
+
+		m := metricHints{
+			Key:      defaultConfig().Key,
+			Registry: mockRegister,
+			logger:   logp.NewLogger("hints.builder"),
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
-
 		if len(cfgs) != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)
@@ -334,4 +677,32 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func (ms *MockMetricSet) Fetch(report mb.Reporter) {
 
+}
+
+// create a keystore with an existing key
+/// `PASSWORD` with the value of `secret` variable.
+func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+	keyStore, err := keystore.NewFileKeystore(path)
+	// Fail fast in the test suite
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		panic(err)
+	}
+
+	writableKeystore.Store("PASSWORD", []byte(secret))
+	writableKeystore.Save()
+	return keyStore
+}
+
+// create a temporary file on disk to save the keystore.
+func getTemporaryKeystoreFile() string {
+	path, err := ioutils.TempDir("", "testing")
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(path, "keystore")
 }

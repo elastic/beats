@@ -4,15 +4,29 @@
         "destination.address": "192.168.1.164",
         "destination.ip": "192.168.1.164",
         "destination.port": 502,
+        "event.action": "READ_COILS",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.modbus",
         "event.id": "CpIIXl4DFGswmjH2bl",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.outcome": "success",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "modbus",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:jEXbR2FqHyMgLJgyYyFQN3yxbpc=",
         "network.protocol": "modbus",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.10",
+            "192.168.1.164"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.10",
         "source.ip": "192.168.1.10",

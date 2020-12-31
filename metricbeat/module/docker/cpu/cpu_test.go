@@ -23,14 +23,14 @@ import (
 
 	"github.com/docker/docker/api/types"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/module/docker"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
 var cpuService CPUService
 
-func cpuUsageFor(stats types.StatsJSON) *cpuUsage {
-	u := cpuUsage{
+func cpuUsageFor(stats types.StatsJSON) *CPUUsage {
+	u := CPUUsage{
 		Stat:        &docker.Stat{Stats: stats},
 		systemDelta: 1000000000, // Nanoseconds in a second
 	}

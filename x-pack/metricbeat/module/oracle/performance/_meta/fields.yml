@@ -1,7 +1,7 @@
 - name: performance
   type: group
   description: Performance related metrics on a single database instance
-  release: beta
+  release: ga
   fields:
     - name: machine
       type: keyword

@@ -18,16 +18,15 @@
 package queue
 
 import (
-	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/feature"
 )
 
 // Namespace is the feature namespace for queue definition.
-var Namespace = "libbeat.queue"
+const Namespace = "libbeat.queue"
 
-// RegisterType registers a new queue type.
-func RegisterType(name string, fn Factory) {
-	f := Feature(name, fn, feature.NewDetails(name, "", feature.Undefined))
-	feature.MustRegister(f)
+// RegisterQueueType registers a new queue type.
+func RegisterQueueType(name string, factory Factory, details feature.Details) {
+	feature.MustRegister(feature.New(Namespace, name, factory, details))
 }
 
 // FindFactory retrieves a queue types constructor. Returns nil if queue type is unknown
@@ -42,9 +41,4 @@ func FindFactory(name string) Factory {
 	}
 
 	return factory
-}
-
-// Feature creates a new type of queue.
-func Feature(name string, factory Factory, description feature.Describer) *feature.Feature {
-	return feature.New(Namespace, name, factory, description)
 }

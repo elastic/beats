@@ -23,9 +23,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common/cli"
-	"github.com/elastic/beats/libbeat/version"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 // GenVersionCmd generates the command version for a Beat.
@@ -35,7 +35,7 @@ func GenVersionCmd(settings instance.Settings) *cobra.Command {
 		Short: "Show current version info",
 		Run: cli.RunWith(
 			func(_ *cobra.Command, args []string) error {
-				beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
+				beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 				if err != nil {
 					return fmt.Errorf("error initializing beat: %s", err)
 				}

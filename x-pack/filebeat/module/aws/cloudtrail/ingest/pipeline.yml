@@ -1,0 +1,695 @@
+---
+description: Pipeline for AWS CloudTrail Logs
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - set:
+      field: event.created
+      value: '{{@timestamp}}'
+  - rename:
+      field: "message"
+      target_field: "event.original"
+  - json:
+      field: "event.original"
+      target_field: "json"
+  - date:
+      field: "json.eventTime"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.eventVersion"
+      target_field: "aws.cloudtrail.event_version"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.type"
+      target_field: "aws.cloudtrail.user_identity.type"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.userName"
+      target_field: "user.name"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.principalId"
+      target_field: "user.id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.arn"
+      target_field: "aws.cloudtrail.user_identity.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.accountId"
+      target_field: "cloud.account.id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.accessKeyId"
+      target_field: "aws.cloudtrail.user_identity.access_key_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionContext.attributes.mfaAuthenticated"
+      target_field: "aws.cloudtrail.user_identity.session_context.mfa_authenticated"
+      ignore_failure: true
+  - date:
+      field: "json.userIdentity.sessionContext.attributes.creationDate"
+      target_field: "aws.cloudtrail.user_identity.session_context.creation_date"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.userIdentity.sessionContext.sessionIssuer.type"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.type"
+      ignore_failure: true
+  # userIdentity.sessionIssuer.userName is only set with assumed roles.
+  - rename:
+      field: "json.userIdentity.sessionContext.sessionIssuer.userName"
+      target_field: "user.name"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionContext.sessionIssuer.principalId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.principal_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionContext.sessionIssuer.arn"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.sessionContext.sessionIssuer.accountId"
+      target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.userIdentity.invokedBy"
+      target_field: "aws.cloudtrail.user_identity.invoked_by"
+      ignore_failure: true
+  - rename:
+      field: "json.eventSource"
+      target_field: "event.provider"
+      ignore_failure: true
+  - set:
+      field: "event.action"
+      value: "{{json.eventName}}"
+      ignore_failure: true
+      ignore_empty_value: true
+  - rename:
+      field: "json.eventCategory"
+      target_field: "aws.cloudtrail.event_category"
+      ignore_failure: true
+  - rename:
+      field: "json.awsRegion"
+      target_field: "cloud.region"
+      ignore_failure: true
+  - rename:
+      field: "json.sourceIPAddress"
+      target_field: "source.address"
+      ignore_failure: true
+  - grok:
+      field: source.address
+      ignore_failure: true
+      patterns:
+        - ^%{IP:source.ip}$
+  - geoip:
+      field: "source.ip"
+      target_field: "source.geo"
+      ignore_failure: true
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - user_agent:
+      field: "json.userAgent"
+      target_field: "user_agent"
+      on_failure:
+        - rename:
+            field: "json.userAgent"
+            target_field: "user_agent.original"
+            ignore_failure: true
+  - rename:
+      field: "json.errorCode"
+      target_field: "aws.cloudtrail.error_code"
+      ignore_failure: true
+  - rename:
+      field: "json.errorMessage"
+      target_field: "aws.cloudtrail.error_message"
+      ignore_failure: true
+  - script:
+      lang: painless
+      source: |
+        if (ctx.aws.cloudtrail?.flattened == null) {
+            Map map = new HashMap();
+            ctx.aws.cloudtrail.put("flattened", map);
+          }
+        if (ctx.json.requestParameters != null) {
+          ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
+          if (ctx.aws.cloudtrail.request_parameters.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("request_parameters", ctx.json.requestParameters);
+          }
+        }
+        if (ctx.json.responseElements != null) {
+          ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
+          if (ctx.aws.cloudtrail.response_elements.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("response_elements", ctx.json.responseElements);
+          }
+        }
+        if (ctx.json.additionalEventData != null) {
+          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
+          if (ctx.aws.cloudtrail.additional_eventdata.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("additional_eventdata", ctx.json.additionalEventData);
+          }
+        }
+        if (ctx.json.serviceEventDetails != null) {
+          ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
+          if (ctx.aws.cloudtrail.service_event_details.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("service_event_details", ctx.json.serviceEventDetails);
+          }
+        }
+      ignore_failure: true
+  - rename:
+      field: "json.requestId"
+      target_field: "aws.cloudtrail.request_id"
+      ignore_failure: true
+  - rename:
+      field: "json.eventID"
+      target_field: event.id
+      ignore_failure: true
+  - rename:
+      field: "json.eventType"
+      target_field: "aws.cloudtrail.event_type"
+      ignore_failure: true
+  - rename:
+      field: "json.apiVersion"
+      target_field: "aws.cloudtrail.api_version"
+      ignore_failure: true
+  - rename:
+      field: "json.managementEvent"
+      target_field: "aws.cloudtrail.management_event"
+      ignore_failure: true
+  - rename:
+      field: "json.readOnly"
+      target_field: "aws.cloudtrail.read_only"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.ARN"
+      target_field: "aws.cloudtrail.resources.arn"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.accountId"
+      target_field: "aws.cloudtrail.resources.account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.resources.type"
+      target_field: "aws.cloudtrail.resources.type"
+      ignore_failure: true
+  - rename:
+      field: "json.recipientAccountId"
+      target_field: "aws.cloudtrail.recipient_account_id"
+      ignore_failure: true
+  - rename:
+      field: "json.sharedEventId"
+      target_field: "aws.cloudtrail.shared_event_id"
+      ignore_failure: true
+  - rename:
+      field: "json.vpcEndpointId"
+      target_field: "aws.cloudtrail.vpc_endpoint_id"
+      ignore_failure: true
+  - script:
+      lang: painless
+      ignore_failure: true
+      source: >-
+        void addRelatedUser(def ctx, String userName) {
+          if (ctx.related == null) {
+            Map map = new HashMap();
+            ctx.put("related", map);
+          }
+          if (ctx.related.user == null) {
+            ArrayList al = new ArrayList();
+            ctx.related.put("user", al);
+          }
+          ctx.related.user.add(userName);
+        }
+        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.userName != null) {
+          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.userName);
+        }
+        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.newUserName != null) {
+          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.newUserName);
+        }
+
+  - script:
+      lang: painless
+      ignore_failure: true
+      source: >-
+        if (ctx.json?.eventName != 'ConsoleLogin') {
+          return;
+        }
+        Map aed_map = new HashMap();
+        if (ctx?.aws?.cloudtrail?.flattened?.additional_eventdata?.MobileVersion != null) {
+          if (ctx.aws.cloudtrail.flattened.additional_eventdata.MobileVersion == 'No') {
+            aed_map.put("mobile_version", false);
+          } else {
+            aed_map.put("mobile_version", true);
+          }
+        }
+        if (ctx?.aws?.cloudtrail?.flattened?.additional_eventdata?.LoginTo != null) {
+          aed_map.put("login_to", ctx.aws.cloudtrail.flattened.additional_eventdata.LoginTo);
+        }
+        if (ctx?.aws?.cloudtrail?.flattened?.additional_eventdata?.MFAUsed != null) {
+          if (ctx.aws.cloudtrail.flattened.additional_eventdata.MFAUsed == 'No') {
+            aed_map.put("mfa_used", false);
+          } else {
+            aed_map.put("mfa_used", true);
+          }
+        }
+        if (aed_map.size() > 0) {
+          Map cl_map = new HashMap();
+          cl_map.put("additional_eventdata", aed_map);
+          ctx.aws.cloudtrail.put("console_login", cl_map);
+        }
+  - script:
+      lang: painless
+      ignore_failure: true
+      params:
+        AddUserToGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        AssumeRole:
+          category:
+            - authentication
+          type:
+            - info
+        AttachGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        AttachUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        ChangePassword:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        ConsoleLogin:
+          category:
+            - authentication
+          type:
+            - info
+        CreateAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        CreateBucket:
+          category:
+            - file
+          type:
+            - creation
+        CreateGroup:
+          category:
+            - iam
+          type:
+            - group
+            - creation
+        CreateKeyPair:
+          category:
+            - iam
+          type:
+            - admin
+            - creation
+        CreateUser:
+          category:
+            - iam
+          type:
+            - user
+            - creation
+        CreateVirtualMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeactivateMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteBucket:
+          category:
+            - file
+          type:
+            - deletion
+        DeleteGroup:
+          category:
+            - iam
+          type:
+            - group
+            - deletion
+        DeleteGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        DeleteSSHPublicKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteUser:
+          category:
+            - iam
+          type:
+            - user
+            - deletion
+        DeleteUserPermissionsBoundary:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DeleteVirtualMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        DetachGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        DetachUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        EnableMFADevice:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        GetGroup:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        GetGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        GetUser:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        GetUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListAttachedGroupPolicies:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListAttachedUserPolicies:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListGroupPolicies:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListGroups:
+          category:
+            - iam
+          type:
+            - group
+            - info
+        ListGroupsForUser:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUserPolicies:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUsers:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        ListUserTags:
+          category:
+            - iam
+          type:
+            - user
+            - info
+        PutGroupPolicy:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        PutUserPermissionsBoundary:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        PutUserPolicy:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        RemoveUserFromGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        SetDefaultPolicyVersion:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        SetSecurityTokenServicePreferences:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        TagUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UntagUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateAccessKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateAccountPasswordPolicy:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        UpdateGroup:
+          category:
+            - iam
+          type:
+            - group
+            - change
+        UpdateLoginProfile:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateRole:
+          category:
+            - iam
+          type:
+            - admin
+            - change
+        UpdateSSHPublicKey:
+          category:
+            - iam
+          type:
+            - user
+            - change
+        UpdateUser:
+          category:
+            - iam
+          type:
+            - user
+            - change
+      source: >-
+        ctx.event.kind = 'event';
+        ctx.event.type = 'info';
+
+        if (ctx.aws.cloudtrail.error_code != null || ctx.aws.cloudtrail.error_message != null) {
+            ctx.event.outcome = 'failure'
+        } else {
+            ctx.event.outcome = 'success'
+        }
+
+        if (ctx?.event?.action == null) {
+            return;
+        }
+
+        if (ctx.event.action == 'ConsoleLogin' && ctx?.aws?.cloudtrail?.flattened?.response_elements.ConsoleLogin != null) {
+            ctx.event.outcome = Processors.lowercase(ctx.aws.cloudtrail.flattened.response_elements.ConsoleLogin);
+        }
+
+        def hm = new HashMap(params.get(ctx.event.action));
+        hm.forEach((k, v) -> ctx.event[k] = v);
+
+  - rename:
+      field: "json.awsAccountId"
+      target_field: "cloud.account.id"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestS3Object"
+      target_field: "file.path"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestSignature"
+      target_field: "file.hash.sha256"
+      if: >-
+        ctx?.json?.previousDigestHashAlgorithm != null && ctx.json.previousDigestHashAlgorithm == 'SHA-256'
+  - append:
+      field: "related.hash"
+      value: "{{json.previousDigestSignature}}"
+      if: "ctx?.json?.previousDigestSignature != null"
+  - rename:
+      field: "json.logFiles"
+      target_field: "aws.cloudtrail.digest.log_files"
+      ignore_failure: true
+  - date:
+      field: "json.digestStartTime"
+      target_field: "aws.cloudtrail.digest.start_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.digestEndTime"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.digestEndTime"
+      target_field: "aws.cloudtrail.digest.end_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.digestS3Bucket"
+      target_field: "aws.cloudtrail.digest.s3_bucket"
+      ignore_failure: true
+  - date:
+      field: "json.newestEventTime"
+      target_field: "aws.cloudtrail.digest.newest_event_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.oldestEventTime"
+      target_field: "aws.cloudtrail.digest.oldest_event_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.previousDigestS3Bucket"
+      target_field: "aws.cloudtrail.digest.previous_s3_bucket"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestHashAlgorithm"
+      target_field: "aws.cloudtrail.digest.previous_hash_algorithm"
+      ignore_failure: true
+  - rename:
+      field: "json.publicKeyFingerprint"
+      target_field: "aws.cloudtrail.digest.public_key_fingerprint"
+      ignore_failure: true
+  - rename:
+      field: "json.digestSignatureAlgorithm"
+      target_field: "aws.cloudtrail.digest.signature_algorithm"
+      ignore_failure: true
+  - rename:
+      field: "json.insightDetails"
+      target_field: "aws.cloudtrail.insight_details"
+      ignore_failure: true
+  - remove:
+      field:
+        - "json"
+      ignore_missing: true
+on_failure:
+  - set:
+      field: "error.message"
+      value: "{{ _ingest.on_failure_message }}"

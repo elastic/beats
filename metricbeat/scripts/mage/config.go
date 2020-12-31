@@ -18,36 +18,25 @@
 package mage
 
 import (
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	"github.com/magefile/mage/mg"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-const modulesConfigYml = "build/config.modules.yml"
+const modulesConfigYml = "build/config.modules.yml.tmpl"
 
 func configFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 	collectModuleConfig := func() error {
 		return devtools.GenerateModuleReferenceConfig(modulesConfigYml, moduleDirs...)
 	}
+	mg.Deps(collectModuleConfig)
 
-	return devtools.ConfigFileParams{
-		ShortParts: []string{
-			devtools.OSSBeatDir("_meta/common.yml"),
-			devtools.OSSBeatDir("_meta/setup.yml"),
-			devtools.LibbeatDir("_meta/config.yml.tmpl"),
-		},
-		ReferenceDeps: []interface{}{collectModuleConfig},
-		ReferenceParts: []string{
-			devtools.OSSBeatDir("_meta/common.reference.yml"),
-			modulesConfigYml,
-			devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-		},
-		DockerParts: []string{
-			devtools.OSSBeatDir("_meta/beat.docker.yml"),
-			devtools.LibbeatDir("_meta/config.docker.yml"),
-		},
-		ExtraVars: map[string]interface{}{
-			"UseKubernetesMetadataProcessor": true,
-		},
+	p := devtools.DefaultConfigFileParams()
+	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"), modulesConfigYml)
+	p.ExtraVars = map[string]interface{}{
+		"UseKubernetesMetadataProcessor": true,
 	}
+	return p
 }
 
 // OSSConfigFileParams returns the default ConfigFileParams for generating
@@ -59,11 +48,5 @@ func OSSConfigFileParams(moduleDirs ...string) devtools.ConfigFileParams {
 // XPackConfigFileParams returns the default ConfigFileParams for generating
 // metricbeat*.yml files.
 func XPackConfigFileParams() devtools.ConfigFileParams {
-	args := configFileParams(devtools.OSSBeatDir("module"), "module")
-	args.ReferenceParts = []string{
-		devtools.OSSBeatDir("_meta/common.reference.yml"),
-		modulesConfigYml,
-		devtools.LibbeatDir("_meta/config.reference.yml.tmpl"),
-	}
-	return args
+	return configFileParams(devtools.OSSBeatDir("module"), "module")
 }

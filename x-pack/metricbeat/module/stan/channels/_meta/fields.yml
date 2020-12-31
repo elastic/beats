@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains stan / nats streaming/serverz endpoint metrics
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword

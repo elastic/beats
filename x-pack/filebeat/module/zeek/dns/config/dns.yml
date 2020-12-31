@@ -4,7 +4,8 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - rename:
@@ -13,6 +14,13 @@ processors:
   - decode_json_fields:
       fields: [event.original]
       target: zeek.dns
+  - registered_domain:
+      ignore_missing: true
+      ignore_failure: true
+      field: zeek.dns.query
+      target_field: dns.question.registered_domain
+      target_subdomain_field: dns.question.subdomain
+      target_etld_field: dns.question.top_level_domain
   - script:
       lang: javascript
       id: zeek_dns_flags
@@ -105,12 +113,54 @@ processors:
             evt.Put("event.duration", rttSec * 1000000000);
         }
 
+        function addTopLevelDomain(evt) {
+            var rd = evt.Get("dns.question.registered_domain");
+            if (!rd) {
+                return;
+            }
+            var firstPeriod = rd.indexOf(".");
+            if (firstPeriod == -1) {
+                return;
+            }
+            evt.Put("dns.question.top_level_domain", rd.substr(firstPeriod + 1));
+        }
+
+        function addEventOutcome(evt) {
+            var rcode = evt.Get("zeek.dns.rcode");
+            if (rcode == null) {
+                return;
+            }
+            if (rcode == 0) {
+                evt.Put("event.outcome", "success");
+            } else {
+                evt.Put("event.outcome", "failure");
+            }
+        }
+
+        function addRelatedIP(evt) {
+            var related = [];
+            var src = evt.Get("zeek.dns.id.orig_h");
+            if (src != null) {
+                related.push(src);
+            }
+            var dst = evt.Get("zeek.dns.id.resp_h");
+            if (dst != null) {
+                related.push(dst);
+            }
+            if (related.length > 0) {
+                evt.Put("related.ip", related);
+            }
+        }
+
         function process(evt) {
             addDnsHeaderFlags(evt);
             addDnsQuestionClass(evt);
             addDnsAnswers(evt);
             setDnsType(evt);
             addEventDuration(evt);
+            addTopLevelDomain(evt);
+            addEventOutcome(evt);
+            addRelatedIP(evt);
         }
   - convert:
       ignore_missing: true
@@ -131,28 +181,28 @@ processors:
         - {from: source.address, to: source.ip, type: ip}
         - {from: destination.address, to: destination.ip, type: ip}
         - {from: zeek.session_id, to: event.id}
-        - {from: '@timestamp', to: event.created}
         - {from: zeek.dns.trans_id, to: dns.id}
         - {from: zeek.dns.query, to: dns.question.name}
         - {from: zeek.dns.qtype_name, to: dns.question.type}
         - {from: zeek.dns.rcode_name, to: dns.response_code}
-  - registered_domain:
-      ignore_missing: true
-      ignore_failure: true
-      field: dns.question.name
-      target_field: dns.question.registered_domain
-{{ if .community_id }}
-  - community_id: ~
-{{ end }}
-  - timestamp:
-      ignore_missing: true
-      field: zeek.dns.ts
-      layouts:
-        - UNIX
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - connection
+          - info
+          - protocol
+  - community_id:
   - drop_fields:
       ignore_missing: true
       fields:
         - zeek.dns.Z
         - zeek.dns.auth
         - zeek.dns.addl
-        - zeek.dns.ts
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

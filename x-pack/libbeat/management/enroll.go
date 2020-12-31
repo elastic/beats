@@ -11,12 +11,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/common/file"
-	"github.com/elastic/beats/libbeat/kibana"
-	"github.com/elastic/beats/x-pack/libbeat/management/api"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/api"
 )
 
 const accessTokenKey = "management.accesstoken"
@@ -87,16 +88,22 @@ func Enroll(
 }
 
 func storeAccessToken(beat *instance.Beat, accessToken string) error {
-	keystore := beat.Keystore()
-	if !keystore.IsPersisted() {
-		if err := keystore.Create(false); err != nil {
+	keyStore := beat.Keystore()
+
+	wKeystore, err := keystore.AsWritableKeystore(keyStore)
+	if err != nil {
+		return err
+	}
+
+	if !keyStore.IsPersisted() {
+
+		if err := wKeystore.Create(false); err != nil {
 			return errors.Wrap(err, "error creating keystore")
 		}
 	}
-
-	if err := keystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
+	if err := wKeystore.Store(accessTokenKey, []byte(accessToken)); err != nil {
 		return errors.Wrap(err, "error storing the access token")
 	}
 
-	return keystore.Save()
+	return wKeystore.Save()
 }

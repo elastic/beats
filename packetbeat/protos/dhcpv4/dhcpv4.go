@@ -23,12 +23,13 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -45,12 +46,13 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
-	return newPlugin(testMode, results, cfg)
+	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, cfg *common.Config) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -62,14 +64,16 @@ func newPlugin(testMode bool, results protos.Reporter, cfg *common.Config) (*dhc
 	return &dhcpv4Plugin{
 		dhcpv4Config: config,
 		report:       results,
+		watcher:      watcher,
 		log:          logp.NewLogger("dhcpv4"),
 	}, nil
 }
 
 type dhcpv4Plugin struct {
 	dhcpv4Config
-	report protos.Reporter
-	log    *logp.Logger
+	report  protos.Reporter
+	watcher procs.ProcessesWatcher
+	log     *logp.Logger
 }
 
 func (p *dhcpv4Plugin) GetPorts() []int {
@@ -133,12 +137,15 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 
 	if !v4.ClientIPAddr().IsUnspecified() {
 		dhcpData.Put("client_ip", v4.ClientIPAddr().String())
+		pbf.AddIP(v4.ClientIPAddr().String())
 	}
 	if !v4.YourIPAddr().IsUnspecified() {
 		dhcpData.Put("assigned_ip", v4.YourIPAddr().String())
+		pbf.AddIP(v4.YourIPAddr().String())
 	}
 	if !v4.GatewayIPAddr().IsUnspecified() {
 		dhcpData.Put("relay_ip", v4.GatewayIPAddr().String())
+		pbf.AddIP(v4.GatewayIPAddr().String())
 	}
 	if serverName := v4.ServerHostNameToString(); serverName != "" {
 		dhcpData.Put("server_name", serverName)

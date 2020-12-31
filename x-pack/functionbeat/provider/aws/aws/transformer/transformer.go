@@ -14,8 +14,8 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Centralize anything related to ECS into a common file.
@@ -31,6 +31,12 @@ func CloudwatchLogs(request events.CloudwatchLogsData) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Unix(0, logEvent.Timestamp*1000000),
 			Fields: common.MapStr{
+				"event": common.MapStr{
+					"kind": "event",
+				},
+				"cloud": common.MapStr{
+					"provider": "aws",
+				},
 				"message":              logEvent.Message,
 				"id":                   logEvent.ID,
 				"owner":                request.Owner,
@@ -50,6 +56,19 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
 		Fields: common.MapStr{
+			"event": common.MapStr{
+				"kind":     "event",
+				"category": []string{"network"},
+				"type":     []string{"connection", "protocol"},
+			},
+			"cloud": common.MapStr{
+				"provider":   "aws",
+				"account.id": request.RequestContext.AccountID,
+			},
+			"network": common.MapStr{
+				"transport": "tcp",
+				"protocol":  "http",
+			},
 			"resource":          request.Resource,
 			"path":              request.Path,
 			"method":            request.HTTPMethod,
@@ -70,6 +89,13 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
+				"event": common.MapStr{
+					"kind": "event",
+				},
+				"cloud": common.MapStr{
+					"provider": "aws",
+					"region":   record.AwsRegion,
+				},
 				"event_id":                record.EventID,
 				"event_name":              record.EventName,
 				"event_source":            record.EventSource,
@@ -93,6 +119,13 @@ func CloudwatchKinesisEvent(request events.KinesisEvent, base64Encoded, compress
 	var evts []beat.Event
 	for _, record := range request.Records {
 		envelopeFields := common.MapStr{
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   record.AwsRegion,
+			},
 			"event_id":                record.EventID,
 			"event_name":              record.EventName,
 			"event_source":            record.EventSource,
@@ -157,6 +190,13 @@ func SQS(request events.SQSEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
+				"event": common.MapStr{
+					"kind": "event",
+				},
+				"cloud": common.MapStr{
+					"provider": "aws",
+					"region":   record.AWSRegion,
+				},
 				"message_id":       record.MessageId,
 				"receipt_handle":   record.ReceiptHandle,
 				"message":          record.Body,

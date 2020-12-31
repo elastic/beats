@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package s3_daily_storage
 
@@ -11,15 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_daily_storage", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "s3_daily_storage", "86400s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -30,25 +29,17 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 
 	for _, event := range events {
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
 		mtest.CheckEventField("cloud.region", "string", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("bucket.name", "string", event, t)
-		mtest.CheckEventField("bucket.size.bytes", "float", event, t)
-		mtest.CheckEventField("number_of_objects", "float", event, t)
+		mtest.CheckEventField("aws.dimensions.BucketName", "string", event, t)
+		mtest.CheckEventField("aws.dimensions.StorageType", "string", event, t)
+		mtest.CheckEventField("aws.s3.metrics.BucketSizeBytes.avg", "float", event, t)
+		mtest.CheckEventField("aws.s3.metrics.NumberOfObjects.avg", "float", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_daily_storage", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "s3_daily_storage", "86400s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

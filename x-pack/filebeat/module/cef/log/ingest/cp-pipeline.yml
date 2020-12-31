@@ -1,0 +1,400 @@
+---
+description: Pipeline for Check Point CEF
+
+processors:
+  # This script is mapping CEF extensions to ECS when possible. Otherwise
+  # it maps them to fields under the `checkpoint` group using Check Point log
+  # field names.
+  #
+  # [1] Description of Check Point CEF extensions:
+  # https://community.checkpoint.com/t5/Logging-and-Reporting/Log-Exporter-CEF-Field-Mappings/td-p/41060
+  # [2] Description of Check Point log field names (sk144192):
+  # https://supportcenter.checkpoint.com/supportcenter/portal?eventSubmit_doGoviewsolutiondetails=&solutionid=sk144192
+  #
+  # Note that in some cases the CEF extension name doesn't accurately describe
+  # its contents. For example sntdom/sourceNtDomain, which is used to store
+  # Check Point's domain_name, documented as "Domain name sent to DNS request".
+  #
+  # This script processes the `params.extensions` list below. This list consists
+  # of two different kinds of mappings, the simpler has a source ext `name`
+  # and a `to` field. It copies the given extension field to the target `to`.
+  #
+  # When the `labels` dict is defined, the target field depends on the value of
+  # the accompanying label field. For example, the field deviceCustomIPv6Address2
+  # is mapped to `source.ip` only when the extension deviceCustomIPv6Address2Label
+  # exists and its value is "Source IPv6 Address".
+  #
+  # Also it can convert the destination value by simple mapping when the
+  # convert key exists. Values without an entry in the convert dict are not
+  # copied and the target field remains unset.
+  #
+  # The output of this processor is a single field, `_tmp_copy`, that contains
+  # a list of actions `{"to": "target_field", "value":"field value"}` that is
+  # later executed using a foreach processor. This is done to avoid complex
+  # de-dotting and other gotchas of setting arbitrary fields in Painless.
+  - script:
+      lang: painless
+      params:
+        extensions:
+          - name: cp_app_risk
+            to: checkpoint.app_risk
+
+          - name: cp_app_risk
+            to: event.risk_score
+            # This mapping is a mix of [1] and [2] above.
+            convert:
+              unknown: 0
+              informational: 0
+              very-low: 1
+              low: 2
+              medium: 3
+              high: 4
+              very-high: 5
+              critical: 5
+
+          - name: cp_severity
+            to: checkpoint.severity
+
+          - name: cp_severity
+            to: event.severity
+            convert:
+              # This mapping is a mix of [1] and [2] above.
+              unknown: 0
+              informational: 0
+              very-low: 1
+              low: 1
+              medium: 2
+              high: 3
+              very-high: 4
+              critical: 4
+
+            # Number of events associated with the log
+          - name: baseEventCount
+            to: checkpoint.event_count
+
+            # Log type
+          - name: deviceExternalId
+            to: observer.type
+
+            # Product Family (override deviceExternalId if present).
+          - name: deviceFacility
+            to: observer.type
+            convert:
+              '0': Network
+              '1': Endpoint
+              '2': Access
+              '3': Threat
+              '4': Mobile
+
+          # Gateway interface, where the connection is received from in case of an outbound connection
+          - name: deviceInboundInterface
+            to: observer.ingress.interface.name
+
+          # Gateway interface, where the connection is sent from, in case of an inbound connection
+          - name: deviceOutboundInterface
+            to: observer.egress.interface.name
+
+          - name: externalId
+            to: checkpoint.uuid
+
+          - name: fileHash
+            to: checkpoint.file_hash
+
+          - name: reason
+            to: checkpoint.termination_reason
+
+          # Possibly an IKE cookie
+          - name: requestCookies
+            to: checkpoint.cookie
+
+          # Probably a typo in CP's CEF docs
+          - name: checkrequestCookies
+            to: checkpoint.cookie
+
+          # Domain name sent to DNS request
+          - name: sourceNtDomain
+            to: dns.question.name
+
+          # CVE registry entry
+          - name: Signature
+            to: vulnerability.id
+
+          - name: Recipient
+            to: destination.user.email
+
+          - name: Sender
+            to: source.user.email
+
+          - name: deviceCustomFloatingPoint1
+            labels:
+              update version: observer.version
+
+          - name: deviceCustomIPv6Address2
+            labels:
+              source ipv6 address: source.ip
+
+          - name: deviceCustomIPv6Address3
+            labels:
+              destination ipv6 address: destination.ip
+
+          - name: deviceCustomNumber1
+            labels:
+              payload: network.bytes
+              elapsed time in seconds: event.duration
+              email recipients number: checkpoint.email_recipients_num
+
+          - name: deviceCustomNumber2
+            labels:
+              duration in seconds: event.duration
+              icmp type: checkpoint.icmp_type
+
+          - name: deviceCustomNumber3
+            labels:
+              icmp code: checkpoint.icmp_code
+
+          - name: deviceCustomString1
+            labels:
+              application rule name: rule.name
+              dlp rule name: rule.name
+              threat prevention rule name: rule.name
+              connectivity state: checkpoint.connectivity_state
+              email id: checkpoint.email_id
+              voip log type: checkpoint.voip_log_type
+
+          - name: deviceCustomString2
+            labels:
+              # Protection malware id
+              protection id: checkpoint.protection_id
+              update status: checkpoint.update_status
+              email subject: checkpoint.email_subject
+              sensor mode: checkpoint.sensor_mode
+              scan invoke type: checkpoint.integrity_av_invoke_type
+              category: checkpoint.category
+              # Matched categories
+              categories: rule.category
+              peer gateway: checkpoint.peer_gateway
+
+          - name: deviceCustomString6
+            labels:
+              application name: network.application
+              virus name: checkpoint.virus_name
+              malware name: checkpoint.spyware_name
+              malware family: checkpoint.malware_family
+
+          - name: deviceCustomString3
+            labels:
+              user group: group.name
+              # Format of original data.
+              incident extension: checkpoint.incident_extension
+              identity type: checkpoint.identity_type
+              email spool id: checkpoint.email_spool_id
+              # Type of protection used to detect the attack
+              protection type: checkpoint.protection_type
+
+          - name: deviceCustomString4
+            labels:
+              malware status: checkpoint.spyware_status
+              destination os: os.name
+              scan result: checkpoint.scan_result
+              frequency: checkpoint.frequency
+              protection name: checkpoint.protection_name
+              user response: checkpoint.user_status
+              email control: checkpoint.email_control
+              tcp flags: checkpoint.tcp_flags
+              threat prevention rule id: rule.id
+
+          - name: deviceCustomString5
+            labels:
+              matched category: rule.category
+              authentication method: checkpoint.auth_method
+              email session id: checkpoint.email_session_id
+              vlan id: network.vlan.id
+
+          - name: deviceCustomDate2
+            labels:
+              subscription expiration: checkpoint.subs_exp
+
+          - name: deviceFlexNumber1
+            labels:
+              confidence: checkpoint.confidence_level
+
+          - name: deviceFlexNumber2
+            labels:
+              destination phone number: checkpoint.dst_phone_number
+              performance impact: checkpoint.performance_impact
+
+          - name: flexString1
+            labels:
+              application signature id: checkpoint.app_sig_id
+
+          - name: flexString2
+            labels:
+              malware action: rule.description
+              attack information: event.action
+
+          - name: rule_uid
+            to: rule.uuid
+
+          - name: ifname
+            to: observer.ingress.interface.name
+
+          - name: inzone
+            to: observer.ingress.zone
+
+          - name: outzone
+            to: observer.egress.zone
+
+          - name: product
+            to: observer.product
+
+      source: |
+        def actions = new ArrayList();
+        def exts = ctx.cef?.extensions;
+        if (exts == null) return;
+        for (entry in params.extensions) {
+          def value = exts[entry.name];
+          if (value == null ||
+            (entry.convert != null &&
+              (value=entry.convert[value.toLowerCase()]) == null))
+            continue;
+          if (entry.to != null) {
+            actions.add([
+              "value": value,
+              "to": entry.to
+            ]);
+            continue;
+          }
+          def label = exts[entry.name + "Label"];
+          if (label == null) continue;
+          def dest = entry.labels[label.toLowerCase()];
+          if (dest == null) continue;
+          actions.add([
+            "value": value,
+            "to": dest
+          ]);
+        }
+        ctx["_tmp_copy"] = actions;
+
+  - foreach:
+      field: _tmp_copy
+      processor:
+        set:
+          field: "{{_ingest._value.to}}"
+          value: "{{_ingest._value.value}}"
+
+  - remove:
+      field: _tmp_copy
+
+  # event.duration is a string and contains seconds. Convert to long nanos.
+  - script:
+      params:
+        second_to_nanos: 1000000000
+      lang: painless
+      source: |
+        def duration = ctx.event?.duration;
+        if (duration == null) return;
+        ctx.event.duration = Long.parseLong(duration) * params.second_to_nanos;
+      on_failure:
+        - remove:
+            field: event.duration
+            ignore_missing: true
+
+  # checkpoint.file_hash can be either MD5, SHA1 or SHA256.
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.md5
+      if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==32'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha1
+      if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==40'
+  - rename:
+      field: checkpoint.file_hash
+      target_field: file.hash.sha256
+      if: 'ctx.checkpoint?.file_hash != null && ctx.checkpoint.file_hash.length()==64'
+
+  # Event kind is 'event' by default. 'alert' when a risk score and rule info
+  # is present.
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: event.kind
+      value: alert
+      if: 'ctx.cef?.extensions?.cp_app_risk != null && ctx.rule != null'
+
+  # Set event.category to network/malware/intrusion_detection depending on which
+  # fields have been populated.
+  - set:
+      field: event.category
+      value: network
+      if: 'ctx.source?.ip != null && ctx.destination?.ip != null'
+  - set:
+      field: event.category
+      value: malware
+      if: 'ctx.checkpoint?.protection_id != null || ctx.checkpoint?.spyware_name != null || ctx.checkpoint?.malware_family != null || ctx.checkpoint?.spyware_status != null'
+  - set:
+      field: event.category
+      value: intrusion_detection
+      if: 'ctx.event?.category != "malware" && (ctx.checkpoint?.protection_type != null || ctx.cef.extensions?.flexString2Label == "Attack Information")'
+
+  # Handle zone-based network directionality
+  - set:
+      field: network.direction
+      value: inbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+  - set:
+      field: network.direction
+      value: outbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: internal
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: external
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: unknown
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        (
+          (
+            !ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+          ) ||
+          (
+            !ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+          )
+        )
+

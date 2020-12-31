@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   munin:
-    image: docker.elastic.co/observability-ci/beats-integration-munin:1
+    image: docker.elastic.co/integrations-ci/beats-munin:1
     build:
       context: ./_meta
     ports:

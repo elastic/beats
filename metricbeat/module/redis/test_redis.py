@@ -1,11 +1,9 @@
+import metricbeat
 import os
+import pytest
 import redis
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]
@@ -29,11 +27,12 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['redis']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_info(self):
         """
         Test redis info metricset
         """
+
         self.render_config_template(modules=[{
             "name": "redis",
             "metricsets": ["info"],
@@ -50,15 +49,15 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         fields = REDIS_FIELDS + ["process", "os"]
-        self.assertItemsEqual(self.de_dot(fields), evt.keys())
+        self.assertCountEqual(self.de_dot(fields), evt.keys())
         redis_info = evt["redis"]["info"]
-        self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+        self.assertCountEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
+        self.assertCountEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertCountEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_keyspace(self):
         """
         Test redis keyspace metricset
@@ -88,13 +87,13 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["keyspace"]
-        self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
+        self.assertCountEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_key(self):
         """
         Test redis key metricset
@@ -128,15 +127,16 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_module_processors(self):
         """
         Test local processors for Redis info event.
         """
+
         fields = ["clients", "cpu"]
         eventFields = ['beat', 'metricset', 'service', 'event']
         eventFields += ['redis.info.' + f for f in fields]
@@ -158,9 +158,9 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["info"]
         print(redis_info)
-        self.assertItemsEqual(fields, redis_info.keys())
-        self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
-        self.assertItemsEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())
+        self.assertCountEqual(fields, redis_info.keys())
+        self.assertCountEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
+        self.assertCountEqual(self.de_dot(CPU_FIELDS), redis_info["cpu"].keys())

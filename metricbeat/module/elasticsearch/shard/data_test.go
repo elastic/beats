@@ -22,23 +22,23 @@ import (
 	"path/filepath"
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/stretchr/testify/require"
 
-	"github.com/stretchr/testify/assert"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestStats(t *testing.T) {
 	files, err := filepath.Glob("./_meta/test/routing_table.*.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
 		eventsMapping(reporter, input)
 
-		assert.True(t, len(reporter.GetEvents()) >= 1)
-		assert.Equal(t, 0, len(reporter.GetErrors()))
+		require.True(t, len(reporter.GetEvents()) >= 1)
+		require.Equal(t, 0, len(reporter.GetErrors()))
 	}
 }

@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "sql.query",
+        "duration": 115000,
+        "module": "sql"
+    },
+    "metricset": {
+        "name": "query",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.21.0.3:5432",
+        "type": "sql"
+    },
+    "sql": {
+        "driver": "postgres",
+        "metrics": {
+            "numeric": {
+                "blk_read_time": 0,
+                "blk_write_time": 0,
+                "blks_hit": 105648,
+                "blks_read": 240,
+                "conflicts": 0,
+                "datid": 12379,
+                "deadlocks": 0,
+                "numbackends": 1,
+                "temp_bytes": 0,
+                "temp_files": 0,
+                "tup_deleted": 0,
+                "tup_fetched": 71845,
+                "tup_inserted": 0,
+                "tup_returned": 150847,
+                "tup_updated": 0,
+                "xact_commit": 1157,
+                "xact_rollback": 0
+            },
+            "string": {
+                "datname": "postgres",
+                "stats_reset": "2020-01-27T02:45:53.51247Z"
+            }
+        },
+        "query": "select * from pg_stat_database where datname='postgres'"
+    }
+}

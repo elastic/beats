@@ -20,7 +20,7 @@
 package prometheus
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetPrometheus returns asset data.
-// This is the base64 encoded gzipped contents of ../metricbeat/module/prometheus.
+// This is the base64 encoded gzipped contents of module/prometheus.
 func AssetPrometheus() string {
-	return "eJyUkc1qwzAQhO9+ikG9hSQPoENfoYUeSwmKtba30R+7G0LeviQ2aQIttLppv9FoNNrgQGePJjWTTXTUDjC2RB7u9TZ0HRBJe+FmXIvHcwcAbxZMob2ERhGD1IyA71OgElvlYtsO0KmK7fpaBh49hpCUOkAoUVDyGMNFQ2ZcRvV4d6rJreEms+Y+OmBgSlH99d4nvEgkASs4tyoWimEioTVS2FNSnDgl5GD9hIFFbQ2bCEJqCEKI9bhPdPXaoIRM9w1sZ4/t6soBOzfyqPtP6m0ZzZvdTA50PlWJC/qhpsu6ayWTCfdL0t8yzKK/h7h70QPZ5dAal3GRuZX7Z84b2Tx81lcAAAD//3hXtDU="
+	return "eJzMkk1u20AMhfc6xYO6C5wcQIueoEBbdFkUxlh6sqaZv5JUDN++kGU5im2gf5tyyTckP77hI555bFAkR9rAUSvAvAU2qD9dknUFdNRWfDGfU4P3FQB8MWcKbcUVduglRzi8VoGpK9kne6oAHbLYts2p9/sGvQvKChAGOmWDvZve0MynvTb4WquGeoN6MCv1twroPUOnzWnuI5KLvKKewo5l6iV5LOfMumyKd/goHQVe4WPJYi4ZBgo3CG7HoDj4EBCdtQN6L2ob2EAI1eCE6PK4C7z0W1Dm4qeHi7DA5N13trZKz4ntrD7zeMjSreQ7Ni+xcjbSxLfnqTcws/rnNFe7vVG30ZXi0/78tH6o/xL6hvbHSDn+b6wvLoynXx+DLbc9yZ8/rPjfXu+drW52Wp/mL2BODZav5NqHe2NvL30BEcZs3B7EG/+FZ+6DU58F69WXs21KeaH8NuvPAAAA///rUkpn"
 }

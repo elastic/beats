@@ -1,6 +1,6 @@
-[![Travis](https://travis-ci.org/elastic/beats.svg?branch=master)](https://travis-ci.org/elastic/beats)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
-[![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 # Beats - The Lightweight Shippers of the Elastic Stack
 
@@ -49,6 +49,10 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
 * [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)
 
+## Documentation and Getting Started information for the Elastic Agent
+
+You can find the documentation and getting started guides for the Elastic Agent
+on the [elastic.co site](https://www.elastic.co/downloads/elastic-agent)
 
 ## Getting Help
 
@@ -84,4 +88,35 @@ your dev environment to build Beats from the source.
 
 ## Snapshots
 
-For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/elastic+beats+master+multijob-package-linux/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/Beats/job/packaging/job/master/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.
+
+## CI
+
+### PR Comments
+
+It is possible to trigger some jobs by putting a comment on a GitHub PR.
+(This service is only available for users affiliated with Elastic and not for open-source contributors.)
+
+* [beats][]
+  * `jenkins run the tests please` or `jenkins run tests` or `/test` will kick off a default build.
+  * `/test macos` will kick off a default build with also the `macos` stages.
+  * `/test <beat-name>` will kick off the default build for the given PR in addition to the `<beat-name>` build itself.
+  * `/test <beat-name> for macos` will kick off a default build with also the `macos` stage for the `<beat-name>`.
+* [apm-beats-update][]
+  * `/run apm-beats-update`
+* [apm-beats-packaging][]
+  * `/package` or `/packaging` will kick of a build to generate the packages for beats.
+* [apm-beats-tester][]
+  * `/beats-tester` will kick of a build to validate the generated packages.
+
+### PR Labels
+
+It's possible to configure the build on a GitHub PR by labelling the PR with the below labels
+
+* `<beat-name>` to force the following builds to run the stages for the `<beat-name>`
+* `macOS` to force the following builds to run the `macos` stages.
+
+[beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
+[apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
+[apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/
+[apm-beats-tester]: https://beats-ci.elastic.co/job/Beats/job/beats-tester/

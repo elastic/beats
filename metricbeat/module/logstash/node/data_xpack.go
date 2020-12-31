@@ -20,15 +20,15 @@ package node
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/module/logstash"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 )
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.PipelineState, overrideClusterUUID string) error {
 	pipelines = getUserDefinedPipelines(pipelines)
-	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
 			removeClusterUUIDsFromPipeline(pipeline)
@@ -62,32 +62,30 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, pipelines []logstash.Pipel
 	return nil
 }
 
-func makeClusterToPipelinesMap(pipelines []logstash.PipelineState) map[string][]logstash.PipelineState {
+func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClusterUUID string) map[string][]logstash.PipelineState {
 	var clusterToPipelinesMap map[string][]logstash.PipelineState
 	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
 
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
+
 	for _, pipeline := range pipelines {
-		var clusterUUIDs []string
+		clusterUUIDs := common.StringSet{}
 		for _, vertex := range pipeline.Graph.Graph.Vertices {
-			c, ok := vertex["cluster_uuid"]
-			if !ok {
-				continue
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs.Add(clusterUUID)
 			}
-
-			clusterUUID, ok := c.(string)
-			if !ok {
-				continue
-			}
-
-			clusterUUIDs = append(clusterUUIDs, clusterUUID)
 		}
 
 		// If no cluster UUID was found in this pipeline, assign it a blank one
 		if len(clusterUUIDs) == 0 {
-			clusterUUIDs = []string{""}
+			clusterUUIDs.Add("")
 		}
 
-		for _, clusterUUID := range clusterUUIDs {
+		for clusterUUID := range clusterUUIDs {
 			clusterPipelines := clusterToPipelinesMap[clusterUUID]
 			if clusterPipelines == nil {
 				clusterToPipelinesMap[clusterUUID] = []logstash.PipelineState{}

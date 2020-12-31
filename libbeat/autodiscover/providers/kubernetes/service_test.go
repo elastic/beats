@@ -27,11 +27,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGenerateHints_Service(t *testing.T) {
@@ -96,6 +97,127 @@ func TestGenerateHints_Service(t *testing.T) {
 				},
 			},
 		},
+		// Scenarios tested:
+		// Have one set of annotations come from service and the other from namespace defaults
+		// The resultant should have both
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"not.to.include":            "true",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have the same set of annotations come from both namespace and service.
+		// The resultant should have the ones from service alone
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+						"not.to.include":            "true",
+					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
+		// Scenarios tested:
+		// Have no annotations on the service and only have namespace level defaults
+		// The resultant should have honored the namespace defaults
+		{
+			event: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
+				},
+			},
+			result: bus.Event{
+				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
+					"service": common.MapStr{
+						"name": "foobar",
+					},
+					"namespace": "ns",
+				},
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module": "prometheus",
+						"period": "10s",
+					},
+				},
+			},
+		},
 	}
 
 	cfg := defaultConfig()
@@ -119,6 +241,11 @@ func TestEmitEvent_Service(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Service",
+		APIVersion: "v1",
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -136,6 +263,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -151,7 +279,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"port":     8080,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
 						"name": "metricbeat",
@@ -183,6 +310,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -205,6 +333,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					ClusterIP: clusterIP,
 				},
@@ -222,6 +351,7 @@ func TestEmitEvent_Service(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Spec: v1.ServiceSpec{
 					Ports: []v1.ServicePort{
 						{
@@ -235,7 +365,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"stop":     true,
 				"host":     "",
 				"id":       uid,
-				"port":     8080,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
@@ -261,19 +390,16 @@ func TestEmitEvent_Service(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
+			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil)
 
 			p := &Provider{
 				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}
@@ -286,8 +412,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.service"),
 			}
 
-			p.eventer = service
-
+			p.eventManager = NewMockServiceEventerManager(service)
 			listener := p.bus.Subscribe()
 
 			service.emit(test.Service, test.Flag)
@@ -302,4 +427,10 @@ func TestEmitEvent_Service(t *testing.T) {
 			}
 		})
 	}
+}
+
+func NewMockServiceEventerManager(svc *service) EventManager {
+	em := &eventerManager{}
+	em.eventer = svc
+	return em
 }

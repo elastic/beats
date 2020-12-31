@@ -5,8 +5,8 @@
 package azure
 
 import (
-	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -15,6 +15,8 @@ import (
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
 const DefaultTimeGrain = "PT5M"
+
+var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
 func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
@@ -87,15 +89,15 @@ func metricIsEmpty(metric insights.MetricValue) bool {
 
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
-	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.Resource.ID == met.Resource.ID &&
+	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
 		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
 		return true
 	}
 	return false
 }
 
-// getResourceGroupFormID maps resource group from resource ID
-func getResourceGroupFromID(path string) string {
+// getResourceGroupFromId maps resource group from resource ID
+func getResourceGroupFromId(path string) string {
 	params := strings.Split(path, "/")
 	for i, param := range params {
 		if param == "resourceGroups" {
@@ -103,27 +105,6 @@ func getResourceGroupFromID(path string) string {
 		}
 	}
 	return ""
-}
-
-// getResourceNameFormID maps resource group from resource ID
-func getResourceTypeFromID(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "providers" {
-			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
-		}
-	}
-	return ""
-}
-
-// getResourceNameFormID maps resource group from resource ID
-func getResourceNameFromID(path string) string {
-	params := strings.Split(path, "/")
-	if strings.HasSuffix(path, "/") {
-		return params[len(params)-2]
-	}
-	return params[len(params)-1]
-
 }
 
 // mapTags maps resource tags
@@ -150,4 +131,80 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 		return true
 	}
 	return false
+}
+
+// convertTimegrainToDuration will convert azure timegrain options to actual duration values
+func convertTimegrainToDuration(timegrain string) time.Duration {
+	var duration time.Duration
+	switch timegrain {
+	case "PT1M":
+		duration = time.Duration(time.Minute)
+	default:
+	case "PT5M":
+		duration = time.Duration(5 * time.Minute)
+	case "PT15M":
+		duration = time.Duration(15 * time.Minute)
+	case "PT30M":
+		duration = time.Duration(30 * time.Minute)
+	case "PT1H":
+		duration = time.Duration(time.Hour)
+	case "PT6H":
+		duration = time.Duration(6 * time.Hour)
+	case "PT12H":
+		duration = time.Duration(12 * time.Hour)
+	case "PT1D":
+		duration = time.Duration(24 * time.Hour)
+	}
+	return duration
+}
+
+// groupMetricsByResource is used in order to group metrics by resource and return data faster
+func groupMetricsByResource(metrics []Metric) map[string][]Metric {
+	grouped := make(map[string][]Metric)
+	for _, metric := range metrics {
+		if _, ok := grouped[metric.ResourceId]; !ok {
+			grouped[metric.ResourceId] = make([]Metric, 0)
+		}
+		grouped[metric.ResourceId] = append(grouped[metric.ResourceId], metric)
+	}
+	return grouped
+}
+
+// getDimension will check if the dimension value is found in the list
+func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
+	for _, dim := range dimensions {
+		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
+			return dim, true
+		}
+	}
+	return Dimension{}, false
+}
+
+func containsResource(resourceId string, resources []Resource) bool {
+	for _, res := range resources {
+		if res.Id == resourceId {
+			return true
+		}
+	}
+	return false
+}
+
+func getInstanceId(dimensionValue string) string {
+	matches := instanceIdRegex.FindStringSubmatch(dimensionValue)
+	if len(matches) == 2 {
+		return matches[1]
+	}
+	return ""
+}
+
+func getVM(vmName string, vms []VmResource) (VmResource, bool) {
+	if len(vms) == 0 {
+		return VmResource{}, false
+	}
+	for _, vm := range vms {
+		if vm.Name == vmName {
+			return vm, true
+		}
+	}
+	return VmResource{}, false
 }

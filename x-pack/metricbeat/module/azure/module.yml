@@ -1,0 +1,9 @@
+name: azure
+metricsets:
+ - container_registry
+ - container_instance
+ - container_service
+ - database_account
+ - app_state
+ - compute_vm
+ - compute_vm_scaleset

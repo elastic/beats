@@ -112,9 +112,15 @@
       - name: e2e.duration.us.count
         type: long
         description: End to end scheduling count
-      - name: pod.preemption.victims.count
+      - name: pod.preemption.victims.bucket.*
         type: long
         description: Pod preemption victims
+      - name: pod.preemption.victims.sum
+        type: long
+        description: Pod preemption victims sum
+      - name: pod.preemption.victims.count
+        type: long
+        description: Pod preemption victims count
       - name: pod.attempts.count
         type: long
         description: Pod attempts count

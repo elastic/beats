@@ -25,10 +25,18 @@ import (
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/debug"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type beatService struct{}
+type beatService struct {
+	stopCallback func()
+	done         chan struct{}
+}
+
+var serviceInstance = &beatService{
+	stopCallback: nil,
+	done:         make(chan struct{}, 0),
+}
 
 // Execute runs the beat service with the arguments and manages changes that
 // occur in the environment or runtime that may affect the beat.
@@ -52,7 +60,20 @@ loop:
 		}
 	}
 	changes <- svc.Status{State: svc.StopPending}
+	m.stopCallback()
+	// Block until notifyWindowsServiceStopped below is called. This is required
+	// as the windows/svc package will transition the service to STOPPED state
+	// once this function returns.
+	<-m.done
 	return
+}
+
+func (m *beatService) stop() {
+	close(m.done)
+}
+
+func notifyWindowsServiceStopped() {
+	serviceInstance.stop()
 }
 
 // couldNotConnect is the errno for ERROR_FAILED_SERVICE_CONTROLLER_CONNECT.
@@ -76,10 +97,10 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 		run = debug.Run
 	}
 
-	err = run(os.Args[0], &beatService{})
+	serviceInstance.stopCallback = stopCallback
+	err = run(os.Args[0], serviceInstance)
 
 	if err == nil {
-		stopCallback()
 		return
 	}
 

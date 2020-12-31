@@ -1,10 +1,8 @@
+import metricbeat
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 class Test(metricbeat.BaseTest):
@@ -17,7 +15,7 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             top_level_fields = metricbeat.COMMON_FIELDS + ["postgresql"]
-            self.assertItemsEqual(self.de_dot(top_level_fields), evt.keys())
+            self.assertCountEqual(self.de_dot(top_level_fields), evt.keys())
 
             self.assert_fields_are_documented(evt)
 
@@ -32,7 +30,7 @@ class Test(metricbeat.BaseTest):
         )
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_activity(self):
         """
         PostgreSQL module outputs an event.
@@ -59,7 +57,7 @@ class Test(metricbeat.BaseTest):
             assert "state" in evt["postgresql"]["activity"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_database(self):
         """
         PostgreSQL module outputs an event.
@@ -89,7 +87,7 @@ class Test(metricbeat.BaseTest):
             assert "deadlocks" in evt["postgresql"]["database"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_bgwriter(self):
         """
         PostgreSQL module outputs an event.

@@ -23,11 +23,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coreos/go-systemd/dbus"
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
+
+var exampleUnits = []dbus.UnitStatus{
+	dbus.UnitStatus{
+		Name:      "sshd.service",
+		LoadState: "active",
+	},
+	dbus.UnitStatus{
+		Name:      "metricbeat.service",
+		LoadState: "active",
+	},
+	dbus.UnitStatus{
+		Name: "filebeat.service",
+	},
+}
 
 func TestFormProps(t *testing.T) {
 	testUnit := dbus.UnitStatus{
@@ -71,4 +85,44 @@ func TestFormProps(t *testing.T) {
 	assert.NotEmpty(t, event.MetricSetFields["resources"])
 	assert.Equal(t, event.MetricSetFields["state_since"], testEvent["state_since"])
 	assert.NotEmpty(t, event.RootFields)
+}
+
+func TestFilterEmpty(t *testing.T) {
+
+	filtersBad := []string{
+		"asdf",
+	}
+	shouldNotMatch, err := matchUnitPatterns(filtersBad, exampleUnits)
+	assert.NoError(t, err)
+	assert.Empty(t, shouldNotMatch)
+}
+
+func TestFilterMatches(t *testing.T) {
+	filtersMatch := []string{
+		"ssh*",
+	}
+
+	shouldMatch, err := matchUnitPatterns(filtersMatch, exampleUnits)
+	assert.NoError(t, err)
+	assert.Len(t, shouldMatch, 1)
+}
+
+func TestNoFilter(t *testing.T) {
+	shouldReturnResults, err := matchUnitPatterns([]string{}, exampleUnits)
+	assert.NoError(t, err)
+	assert.Len(t, shouldReturnResults, 3)
+}
+
+func TestUnitStateFilter(t *testing.T) {
+	stateFilter := []string{
+		"active",
+	}
+	shouldReturnResults := matchUnitState(stateFilter, exampleUnits)
+	assert.Len(t, shouldReturnResults, 2)
+
+}
+
+func TestUnitStateNoFilter(t *testing.T) {
+	shouldReturnResults := matchUnitState([]string{}, exampleUnits)
+	assert.Len(t, shouldReturnResults, 3)
 }

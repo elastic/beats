@@ -5,307 +5,196 @@
 package httpjson
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"net"
 	"net/http"
-	"sync"
+	"net/url"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/common/useragent"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	v2 "github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson/internal/v2"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
 	inputName = "httpjson"
 )
 
-var userAgent = useragent.UserAgent("Filebeat")
+var (
+	userAgent = useragent.UserAgent("Filebeat")
 
-func init() {
-	err := input.Register(inputName, NewInput)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
+	// for testing
+	timeNow = time.Now
+)
+
+type retryLogger struct {
+	log *logp.Logger
+}
+
+func newRetryLogger() *retryLogger {
+	return &retryLogger{
+		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
 	}
 }
 
-type httpjsonInput struct {
-	config
-	log      *logp.Logger
-	outlet   channel.Outleter // Output of received messages.
-	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
-
-	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc // Used to signal that the worker should stop.
-	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup     // Waits on worker goroutine.
+func (log *retryLogger) Error(format string, args ...interface{}) {
+	log.log.Errorf(format, args...)
 }
 
-type requestInfo struct {
-	URL        string
-	ContentMap common.MapStr
-	Headers    common.MapStr
+func (log *retryLogger) Info(format string, args ...interface{}) {
+	log.log.Infof(format, args...)
 }
 
-// NewInput creates a new httpjson input
-func NewInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	inputContext input.Context,
-) (input.Input, error) {
-	// Extract and validate the input's configuration.
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
-	// Build outlet for events.
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			DynamicFields: inputContext.DynamicFields,
+func (log *retryLogger) Debug(format string, args ...interface{}) {
+	log.log.Debugf(format, args...)
+}
+
+func (log *retryLogger) Warn(format string, args ...interface{}) {
+	log.log.Warnf(format, args...)
+}
+
+func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
+	sim := stateless.NewInputManager(statelessConfigure)
+	return inputv2.Plugin{
+		Name:       inputName,
+		Stability:  feature.Stable,
+		Deprecated: false,
+		Manager: inputManager{
+			v2inputManager: v2.NewInputManager(log, store),
+			stateless:      &sim,
+			cursor: &cursor.InputManager{
+				Logger:     log,
+				StateStore: store,
+				Type:       inputName,
+				Configure:  cursorConfigure,
+			},
 		},
-	})
+	}
+}
+
+func newTLSConfig(config config) (*tlscommon.TLSConfig, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return nil, err
 	}
 
-	// Wrap input.Context's Done channel with a context.Context. This goroutine
-	// stops with the parent closes the Done channel.
-	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Done:
-		case <-inputCtx.Done():
+	return tlsConfig, nil
+}
+
+func test(url *url.URL) error {
+	port := func() string {
+		if url.Port() != "" {
+			return url.Port()
 		}
+		switch url.Scheme {
+		case "https":
+			return "443"
+		}
+		return "80"
 	}()
 
-	// If the input ever needs to be made restartable, then context would need
-	// to be recreated with each restart.
-	workerCtx, workerCancel := context.WithCancel(inputCtx)
-
-	in := &httpjsonInput{
-		config: conf,
-		log: logp.NewLogger("httpjson").With(
-			"url", conf.URL),
-		outlet:       out,
-		inputCtx:     inputCtx,
-		workerCtx:    workerCtx,
-		workerCancel: workerCancel,
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	if err != nil {
+		return fmt.Errorf("url %q is unreachable", url)
 	}
 
-	in.log.Info("Initialized httpjson input.")
-	return in, nil
+	return nil
 }
 
-// Run starts the input worker then returns. Only the first invocation
-// will ever start the worker.
-func (in *httpjsonInput) Run() {
-	in.workerOnce.Do(func() {
-		in.workerWg.Add(1)
-		go func() {
-			in.log.Info("httpjson input worker has started.")
-			defer in.log.Info("httpjson input worker has stopped.")
-			defer in.workerWg.Done()
-			defer in.workerCancel()
-			if err := in.run(); err != nil {
-				in.log.Error(err)
-				return
-			}
-		}()
+func run(
+	ctx inputv2.Context,
+	config config,
+	tlsConfig *tlscommon.TLSConfig,
+	publisher cursor.Publisher,
+	cursor *cursor.Cursor,
+) error {
+	log := ctx.Logger.With("url", config.URL)
+
+	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
+
+	httpClient, err := newHTTPClient(stdCtx, config, tlsConfig)
+	if err != nil {
+		return err
+	}
+
+	dateCursor := newDateCursorFromConfig(config, log)
+
+	rateLimiter := newRateLimiterFromConfig(config, log)
+
+	pagination := newPaginationFromConfig(config)
+
+	requester := newRequester(
+		config,
+		rateLimiter,
+		dateCursor,
+		pagination,
+		httpClient,
+		log,
+	)
+
+	requester.loadCursor(cursor, log)
+
+	// TODO: disallow passing interval = 0 as a mean to run once.
+	if config.Interval == 0 {
+		return requester.processHTTPRequest(stdCtx, publisher)
+	}
+
+	err = timed.Periodic(stdCtx, config.Interval, func() error {
+		log.Info("Process another repeated request.")
+		if err := requester.processHTTPRequest(stdCtx, publisher); err != nil {
+			log.Error(err)
+		}
+		return nil
 	})
+
+	log.Infof("Context done: %v", err)
+
+	return nil
 }
 
-// createHTTPRequest creates an HTTP/HTTPs request for the input
-func (in *httpjsonInput) createHTTPRequest(ctx context.Context, ri *requestInfo) (*http.Request, error) {
-	b, _ := json.Marshal(ri.ContentMap)
-	body := bytes.NewReader(b)
-	req, err := http.NewRequest(in.config.HTTPMethod, ri.URL, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", userAgent)
-	if in.config.APIKey != "" {
-		req.Header.Set("Authorization", in.config.APIKey)
-	}
-	for k, v := range ri.Headers {
-		switch vv := v.(type) {
-		case string:
-			req.Header.Set(k, vv)
-		default:
-		}
-	}
-	return req, nil
-}
-
-// processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (in *httpjsonInput) processHTTPRequest(ctx context.Context, client *http.Client, req *http.Request, ri *requestInfo) error {
-	for {
-		msg, err := client.Do(req)
-		if err != nil {
-			return errors.New("failed to do http request. Stopping input worker - ")
-		}
-		if msg.StatusCode != http.StatusOK {
-			return errors.Errorf("return HTTP status is %s - ", msg.Status)
-		}
-		responseData, err := ioutil.ReadAll(msg.Body)
-		defer msg.Body.Close()
-		if err != nil {
-			return err
-		}
-		var m, v interface{}
-		err = json.Unmarshal(responseData, &m)
-		if err != nil {
-			return err
-		}
-		switch mmap := m.(type) {
-		case map[string]interface{}:
-			if in.config.JSONObjects == "" {
-				ok := in.outlet.OnEvent(makeEvent(string(responseData)))
-				if !ok {
-					return errors.New("function OnEvent returned false - ")
-				}
-			} else {
-				v, err = common.MapStr(mmap).GetValue(in.config.JSONObjects)
-				if err != nil {
-					return err
-				}
-				switch ts := v.(type) {
-				case []interface{}:
-					for _, t := range ts {
-						switch tv := t.(type) {
-						case map[string]interface{}:
-							d, err := json.Marshal(tv)
-							if err != nil {
-								return errors.New("failed to process http response data - ")
-							}
-							ok := in.outlet.OnEvent(makeEvent(string(d)))
-							if !ok {
-								return errors.New("OnEvent returned false - ")
-							}
-						default:
-							return errors.New("invalid json_objects_array configuration")
-						}
-					}
-				default:
-					return errors.New("invalid json_objects_array configuration")
-				}
-			}
-			if in.config.Pagination != nil && in.config.Pagination.IsEnabled {
-				v, err = common.MapStr(mmap).GetValue(in.config.Pagination.IDField)
-				if err != nil {
-					in.log.Info("Successfully processed HTTP request. Pagination finished.")
-					return nil
-				}
-				if in.config.Pagination.RequestField != "" {
-					ri.ContentMap.Put(in.config.Pagination.RequestField, v)
-					if in.config.Pagination.URL != "" {
-						ri.URL = in.config.Pagination.URL
-					}
-				} else {
-					switch v.(type) {
-					case string:
-						ri.URL = v.(string)
-					default:
-						return errors.New("pagination ID is not string, which is required for URL - ")
-					}
-				}
-				if in.config.Pagination.ExtraBodyContent != nil {
-					ri.ContentMap.Update(common.MapStr(in.config.Pagination.ExtraBodyContent))
-				}
-				req, err = in.createHTTPRequest(ctx, ri)
-				if err != nil {
-					return err
-				}
-				continue
-			}
-			return nil
-		default:
-			return errors.New("response is not valid JSON - ")
-		}
-	}
-}
-
-func (in *httpjsonInput) run() error {
-	ctx, cancel := context.WithCancel(in.workerCtx)
-	defer cancel()
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(in.config.TLS)
-	if err != nil {
-		return err
-	}
-
-	var dialer, tlsDialer transport.Dialer
-
-	dialer = transport.NetDialer(in.config.HTTPClientTimeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, in.config.HTTPClientTimeout)
-	if err != nil {
-		return err
-	}
-
-	// Make transport client
-	var client *http.Client
-	client = &http.Client{
-		Transport: &http.Transport{
-			Dial:              dialer.Dial,
-			DialTLS:           tlsDialer.Dial,
-			DisableKeepAlives: true,
+func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig) (*http.Client, error) {
+	// Make retryable HTTP client
+	client := &retryablehttp.Client{
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout: config.HTTPClientTimeout,
+				}).DialContext,
+				TLSClientConfig:   tlsConfig.ToConfig(),
+				DisableKeepAlives: true,
+			},
+			Timeout: config.HTTPClientTimeout,
 		},
-		Timeout: in.config.HTTPClientTimeout,
+		Logger:       newRetryLogger(),
+		RetryWaitMin: config.RetryWaitMin,
+		RetryWaitMax: config.RetryWaitMax,
+		RetryMax:     config.RetryMax,
+		CheckRetry:   retryablehttp.DefaultRetryPolicy,
+		Backoff:      retryablehttp.DefaultBackoff,
 	}
 
-	ri := &requestInfo{
-		URL:        in.URL,
-		ContentMap: common.MapStr{},
-		Headers:    in.HTTPHeaders,
+	if config.OAuth2.isEnabled() {
+		return config.OAuth2.client(ctx, client.StandardClient())
 	}
-	if in.config.HTTPMethod == "POST" && in.config.HTTPRequestBody != nil {
-		ri.ContentMap.Update(common.MapStr(in.config.HTTPRequestBody))
-	}
-	req, err := in.createHTTPRequest(ctx, ri)
-	if err != nil {
-		return err
-	}
-	err = in.processHTTPRequest(ctx, client, req, ri)
-	if err == nil && in.Interval > 0 {
-		ticker := time.NewTicker(in.Interval)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				in.log.Info("Context done.")
-				return nil
-			case <-ticker.C:
-				err = in.processHTTPRequest(ctx, client, req, ri)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-	return err
-}
 
-// Stop stops the misp input and waits for it to fully stop.
-func (in *httpjsonInput) Stop() {
-	in.workerCancel()
-	in.workerWg.Wait()
-}
-
-// Wait is an alias for Stop.
-func (in *httpjsonInput) Wait() {
-	in.Stop()
+	return client.StandardClient(), nil
 }
 
 func makeEvent(body string) beat.Event {

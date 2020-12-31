@@ -1,0 +1,56 @@
+default: true
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.ContainerService/managedClusters"
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.ContainerService/managedClusters"
+      metrics:
+      - name: ["kube_node_status_condition"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "node"
+          value: "*"
+        - name: "status"
+          value: "*"
+        - name: "condition"
+          value: "*"
+      - name: ["kube_node_status_allocatable_cpu_cores", "kube_node_status_allocatable_memory_bytes"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+      - name: ["kube_pod_status_ready", "kube_pod_status_phase"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "pod"
+          value: "*"
+    - resource_id: ""
+      metrics:
+      - name: ["kube_node_status_condition"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "node"
+          value: "*"
+        - name: "status"
+          value: "*"
+        - name: "condition"
+          value: "*"
+      - name: ["kube_node_status_allocatable_cpu_cores", "kube_node_status_allocatable_memory_bytes"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+      - name: ["kube_pod_status_ready", "kube_pod_status_phase"]
+        namespace: "Microsoft.ContainerService/managedClusters"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "pod"
+          value: "*"

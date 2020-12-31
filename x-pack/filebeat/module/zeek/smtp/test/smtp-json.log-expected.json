@@ -4,15 +4,27 @@
         "destination.address": "192.168.1.9",
         "destination.ip": "192.168.1.9",
         "destination.port": 25,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.smtp",
         "event.id": "CWWzPB3RjqhFf528c",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "protocol"
+        ],
         "fileset.name": "smtp",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:38H0puTqOoHT/5r2bKFUVSXifQw=",
         "network.protocol": "smtp",
         "network.transport": "tcp",
+        "related.ip": [
+            "192.168.1.10",
+            "192.168.1.9"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.1.10",
         "source.ip": "192.168.1.10",
@@ -20,6 +32,7 @@
         "tags": [
             "zeek.smtp"
         ],
+        "tls.established": true,
         "zeek.session_id": "CWWzPB3RjqhFf528c",
         "zeek.smtp.fuids": [],
         "zeek.smtp.helo": "EXAMPLE.COM",

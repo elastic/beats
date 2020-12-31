@@ -9,4 +9,8 @@ multiline:
   negate: true
   match: after
 processors:
-- add_locale: ~
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

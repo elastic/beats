@@ -4,7 +4,8 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
@@ -60,10 +61,29 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
-
-{{ if .community_id }}
-  - community_id:
+  - convert:
       fields:
-        source_ip: source.address
-        destination_ip: destination.address
-{{ end }}
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "zeek.ftp.user", to: "user.name"}
+        - {from: "zeek.ftp.command", to: "event.action"}
+        - {from: "zeek.ftp.mime.type", to: "file.mime_type"}
+        - {from: "zeek.ftp.file.size", to: "file.size"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - connection
+          - info
+          - protocol
+  - community_id:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

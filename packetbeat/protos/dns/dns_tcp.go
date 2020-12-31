@@ -20,12 +20,11 @@ package dns
 import (
 	"encoding/binary"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 
 	mkdns "github.com/miekg/dns"
 )
@@ -150,7 +149,7 @@ func (dns *dnsPlugin) handleDNS(conn *dnsConnectionData, tcpTuple *common.TCPTup
 	message := conn.data[dir].message
 	dnsTuple := dnsTupleFromIPPort(&message.tuple, transportTCP, decodedData.Id)
 
-	message.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcpTuple.IPPort())
+	message.cmdlineTuple = dns.watcher.FindProcessesTupleTCP(tcpTuple.IPPort())
 	message.data = decodedData
 	message.length += decodeOffset
 

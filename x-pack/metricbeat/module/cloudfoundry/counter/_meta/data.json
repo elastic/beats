@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloudfoundry": {
+        "counter": {
+            "delta": 0,
+            "name": "dropped",
+            "total": 0
+        },
+        "envelope": {
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "995eb273-f871-4fea-a834-dbc0a4a72efc",
+            "ip": "192.168.16.37",
+            "job": "syslog_adapter",
+            "origin": "loggregator.metron"
+        },
+        "tags": {
+            "direction": "ingress",
+            "metric_version": "2.0",
+            "product": "Pivotal Application Service",
+            "source_id": "metron"
+        },
+        "type": "counter"
+    },
+    "service": {
+        "type": "cloudfoundry"
+    }
+}

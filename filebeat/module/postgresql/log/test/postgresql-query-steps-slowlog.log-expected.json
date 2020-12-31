@@ -1,10 +1,17 @@
 [
     {
         "@timestamp": "2019-09-04T13:52:38.004Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 12437000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.level": "LOG",
@@ -15,15 +22,25 @@
         "postgresql.log.query_step": "parse",
         "postgresql.log.timestamp": "2019-09-04 15:52:38.004 CEST",
         "process.pid": 31136,
+        "related.user": [
+            "user"
+        ],
         "service.type": "postgresql",
         "user.name": "user"
     },
     {
         "@timestamp": "2019-09-04T13:52:38.004Z",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "postgresql.log",
         "event.duration": 12437000,
+        "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "CEST",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -38,6 +55,9 @@
         "postgresql.log.query_step": "execute",
         "postgresql.log.timestamp": "2019-09-04 15:52:38.004 CEST",
         "process.pid": 31136,
+        "related.user": [
+            "user"
+        ],
         "service.type": "postgresql",
         "user.name": "user"
     }

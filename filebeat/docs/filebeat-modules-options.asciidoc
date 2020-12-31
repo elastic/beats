@@ -1,121 +1,75 @@
-:modulename: apache mysql
+:modulename: system nginx mysql
 
 [id="configuration-{beatname_lc}-modules"]
-== Specify which modules to run
+== Configure modules
+
+++++
+<titleabbrev>Modules</titleabbrev>
+++++
 
 NOTE: Using {beatname_uc} modules is optional. You may decide to
-<<configuration-{beatname_lc}-options,configure inputs manually>> if you are using
+<<configuration-{beatname_lc}-options,configure inputs manually>> if you're using
 a log type that isn't supported, or you want to use a different setup.
 
-{beatname_uc} <<{beatname_lc}-modules,modules>> provide a quick way for you to get started
-processing common log formats. They contain default configurations,
-Elasticsearch ingest node pipeline definitions, and Kibana dashboards to help you
+{beatname_uc} <<{beatname_lc}-modules,modules>> provide a quick way to
+get started processing common log formats. They contain default configurations,
+{es} ingest node pipeline definitions, and {kib} dashboards to help you
 implement and deploy a log monitoring solution.
 
-{beatname_uc} provides a few different ways to enable modules. You can:
+You can configure modules in the `modules.d` directory (recommended), or in the
+{beatname_uc} configuration file.
 
-* <<enable-modules-d-configs>>
-* <<enable-modules-cli>>
-* <<enable-modules-config-file>>
+Before running {beatname_uc} with modules enabled, make sure you also set up the
+environment to use {kib} dashboards. See
+<<{beatname_lc}-installation-configuration>> for more information.
 
 include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
 
-When you enable modules, you can also
-<<specify-variable-settings,specify variable settings>> to change the default
-behavior of the modules, and you can specify
-<<advanced-settings,advanced settings>> to override input settings.
-
-Before running {beatname_uc} with modules enabled, make sure you also set up the
-environment to use Kibana dashboards. See <<{beatname_lc}-modules-quickstart>> for
-more information.
-
 [float]
-[[enable-modules-d-configs]]
-=== Enable module configs in the `modules.d` directory
+[[configure-modules-d-configs]]
+===  Configure modules in the `modules.d` directory
 
 The `modules.d` directory contains default configurations for all the modules
-available in {beatname_uc}. You can enable or disable specific module configurations
-under `modules.d` by running the
-<<modules-command,`modules enable` or `modules disable`>> commands.
+available in {beatname_uc}. To enable or disable specific module configurations
+under `modules.d`, run the
+<<modules-command,`modules enable` or `modules disable`>> command. For example:
 
-For example, to enable the `apache` and `mysql` configs in the `modules.d`
-directory, you use:
+include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 
-include::./include/enable-modules-command.asciidoc[]
+The default configurations assume that your data is in the location expected for
+your OS and that the behavior of the module is appropriate for your environment.
+To change the default behavior, configure variable settings. For a list of
+available settings, see the documentation under <<{beatname_lc}-modules>>.
 
-Then when you run {beatname_uc}, it loads the corresponding module configurations
-specified in the `modules.d` directory (for example, `modules.d/apache.yml` and
-`modules.d/mysql.yml`).
+For advanced use cases, you can also
+<<advanced-settings,override input settings>>.
 
-To see a list of enabled and disabled modules, run:
-
-include::./include/list-modules-command.asciidoc[]
-
-The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the behavior of the module is
-appropriate for your environment. To change the default configurations, you need
-to <<specify-variable-settings,specify variable settings>>.
-
-[float]
-[[enable-modules-cli]]
-=== Enable modules when you run {beatname_uc}
-
-To enable specific <<{beatname_lc}-modules,modules>> when you run {beatname_uc} at the
-command line, you can use the `--modules` flag. This approach works well when
-you're getting started and want to specify different modules and settings each
-time you run {beatname_uc}. Any modules specified at the command line will be loaded
+TIP: You can enable modules at runtime by using the
+<<{beatname_lc}-modules,--modules flag>>. This is useful if you're getting started
+and want to try things out. Any modules specified at the command line are loaded
 along with any modules that are enabled in the configuration file or `modules.d`
 directory. If there's a conflict, the configuration specified at the command
 line is used.
 
-The following command enables and runs the `nginx`,`mysql`, and `system`
-modules.
-
-*deb and rpm:*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} --modules nginx,mysql,system
-----
-
-*mac:*
-
-["source","sh",subs="attributes"]
-----
-./{beatname_lc} --modules nginx,mysql,system
-----
-
-*win:*
-
-["source","sh",subs="attributes"]
-----
-PS > .{backslash}{beatname_lc}.exe --modules nginx,mysql,system
-----
-
-The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the behavior of the module is
-appropriate for your environment. To change the default configurations, you need
-to <<specify-variable-settings,specify variable settings>>.
-
 [float]
-[[enable-modules-config-file]]
-=== Enable module configs in the +{beatname_lc}.yml+ file
+[[configure-modules-config-file]]
+=== Configure modules in the +{beatname_lc}.yml+ file
 
 When possible, you should use the config files in the `modules.d` directory.
 
-However, enabling <<{beatname_lc}-modules,modules>> directly in the config file is a
-practical approach if you have upgraded from a previous version of {beatname_uc}
-and don't want to move your module configs to the `modules.d` directory. You can
-continue to configure modules in the +{beatname_lc}.yml+ file, but you won't be
-able to use the `modules` command to enable and disable configurations because
-the command requires the `modules.d` layout.
+However, configuring <<{beatname_lc}-modules,modules>> directly in the config
+file is a practical approach if you have upgraded from a previous version of
+{beatname_uc} and don't want to move your module configs to the `modules.d`
+directory. You can continue to configure modules in the +{beatname_lc}.yml+
+file, but you won't be able to use the `modules` command to enable and disable
+configurations because the command requires the `modules.d` layout.
 
-To enable specific modules in the +{beatname_lc}.yml+ config file, you can add
+To enable specific modules in the +{beatname_lc}.yml+ config file, add
 entries to the +{beatname_lc}.modules+ list. Each entry in the list begins with
 a dash (-) and is followed by settings for that module.
 
 The following example shows a configuration that runs the `nginx`,`mysql`, and
-`system` modules.
+`system` modules:
 
 ["source","yaml",subs="attributes"]
 ----
@@ -125,15 +79,8 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 - module: system
 ----
 
-The default module configurations assume that the logs you’re harvesting are
-in the location expected for your OS and that the behavior of the module is
-appropriate for your environment. To change the default configurations, you need
-to <<specify-variable-settings,specify variable settings>>.
-
-[[specify-variable-settings]]
-=== Specify variable settings
-
-include::./include/set-paths.asciidoc[]
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]
 
 [[advanced-settings]]
 === Override input settings
@@ -175,4 +122,3 @@ You can also enable `close_eof` for all inputs created by any of the modules:
 ----------------------------------------------------------------------
 
 :modulename!:
-

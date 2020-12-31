@@ -20,6 +20,8 @@ package testing
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,4 +41,47 @@ func TestOmitDocumentedField(t *testing.T) {
 		result := omitDocumentedField(tt.a, tt.b)
 		assert.Equal(t, tt.result, result)
 	}
+}
+
+func TestDocumentedFieldCheck(t *testing.T) {
+	foundKeys := common.MapStr{
+		"hello":               "hello",
+		"elasticsearch.stats": "stats1",
+	}
+	omitfields := []string{
+		"hello",
+	}
+	knownKeys := map[string]interface{}{
+		"elasticsearch.stats": "key1",
+	}
+	err := documentedFieldCheck(foundKeys, knownKeys, omitfields)
+	//error should be nil, as `hello` field is ignored and `elasticsearch.stats` field is defined
+	assert.NoError(t, err)
+
+	foundKeys = common.MapStr{
+		"elasticsearch.stats.cpu":              "stats2",
+		"elasticsearch.metrics.requests.count": "requests2",
+	}
+
+	knownKeys = map[string]interface{}{
+		"elasticsearch.stats.*":     "key1",
+		"elasticsearch.metrics.*.*": "hello1",
+	}
+	// error should be nil as the foundKeys are covered by the `prefix` cases
+	err = documentedFieldCheck(foundKeys, knownKeys, omitfields)
+	assert.NoError(t, err)
+
+	foundKeys = common.MapStr{
+		"elasticsearch.stats.cpu":              "stats2",
+		"elasticsearch.metrics.requests.count": "requests2",
+	}
+
+	knownKeys = map[string]interface{}{
+		"elasticsearch.*":         "key1",
+		"elasticsearch.metrics.*": "hello1",
+	}
+	// error should not be nil as the foundKeys are not covered by the `prefix` cases
+	err = documentedFieldCheck(foundKeys, knownKeys, omitfields)
+	assert.Error(t, err, "field missing 'elasticsearch.stats.cpu'")
+
 }

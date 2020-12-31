@@ -1,0 +1,260 @@
+description: Pipeline for parsing sophosxg firewall logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '%{SYSLOG5424PRI}%{GREEDYDATA:log.original}$'
+
+# optimize fields / strings in log.original for KV processor
+- gsub:
+    field: log.original
+    pattern: "clients_conn_SSID"
+    replacement: 'clients_conn_ssid'
+
+# split Sophos-XG fields
+- kv:
+    field: log.original
+    field_split: " (?=[a-z0-9\\_\\-]+=)"
+    value_split: "="
+    prefix: "sophos.xg."
+    ignore_missing: true
+    ignore_failure: false
+    trim_value: "\""
+
+# Parse the date
+- set:
+    field: _temp_.time
+    value: "{{sophos.xg.date}} {{sophos.xg.time}}"
+- date:
+    if: "ctx.event.timezone == null"
+    field: _temp_.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+- date:
+    if: "ctx.event.timezone != null"
+    timezone: "{{ event.timezone }}"
+    field: _temp_.time
+    target_field: "@timestamp"
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss Z
+    - yyyy-MM-dd HH:mm:ss z
+    - ISO8601
+
+# Sets starts, end and duration when start and duration is known
+- script:
+    lang: painless
+    if: ctx?.sophos?.xg?.duration != null
+    source: >-
+      ctx.event.duration = Integer.parseInt(ctx.sophos.xg.duration) * 1000000000L;
+      ctx.event.start = ctx['@timestamp'];
+      ZonedDateTime start = ZonedDateTime.parse(ctx.event.start);
+      ctx.event.end = start.plus(ctx.event.duration, ChronoUnit.NANOS);
+
+# Removes all empty fields
+- script:
+    lang: painless
+    params:
+      values:
+        - ""
+        - "-"
+        - "N/A"
+    source: >-
+      ctx?.sophos?.xg.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.module
+    value: sophos
+- set:
+    field: event.dataset
+    value: sophos.xg
+- set:
+    field: event.severity
+    value: "{{sophos.xg.log_id}}"
+- rename:
+    field: log.original
+    target_field: event.original
+    ignore_missing: true
+
+# extract from event_severity from log_id, example: 010101600001"
+- gsub:
+    field: event.severity
+    pattern: "(^.{1,6})"
+    replacement: ""
+- gsub:
+    field: event.severity
+    pattern: "(.{1,5}$)"
+    replacement: ""
+
+#####################
+## ECS Log Mapping ##
+#####################
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '0' "
+    value: unknown
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '1' "
+    value: alert
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '2' "
+    value: critical
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '3' "
+    value: error
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '4' "
+    value: warning
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '5' "
+    value: notification
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '6' "
+    value: informational
+- set:
+    field: "log.level"
+    if: "ctx.event.severity == '7' "
+    value: debug
+
+##########################
+## ECS Observer Mapping ##
+##########################
+- set:
+    field: observer.vendor
+    value: Sophos
+- set:
+    field: observer.product
+    value: XG
+- set:
+    field: observer.type
+    value: firewall
+- rename:
+    field: sophos.xg.device_id
+    target_field: observer.serial_number
+    ignore_missing: true
+- rename:
+    field: sophos.xg.out_interface
+    target_field: observer.egress.interface.name
+    ignore_missing: true
+- rename:
+    field: sophos.xg.in_interface
+    target_field: observer.ingress.interface.name
+    ignore_missing: true
+- rename:
+    field: sophos.xg.srczonetype
+    target_field: observer.ingress.zone
+    ignore_missing: true
+- rename:
+    field: sophos.xg.dstzonetype
+    target_field: observer.egress.zone
+    ignore_missing: true
+
+# extract from log_id the new field "sophos.xg.message_id"
+- set:
+    field: sophos.xg.message_id
+    value: "{{sophos.xg.log_id}}"
+    ignore_empty_value: true
+- gsub:
+    field: sophos.xg.message_id
+    pattern: "(^.{1,7})"
+    replacement: ""
+    ignore_failure: true
+- rename:
+    field: sophos.xg.log_id
+    target_field: event.code
+    ignore_missing: true
+
+###################
+## Set host.name ##
+###################
+- script:
+    lang: painless
+    if: ctx?.observer?.serial_number != null
+    source: >-
+        def conf = ctx['_conf'];
+        if (conf == null) return;
+        def serial = ctx.observer.serial_number;
+        def name = conf['default'];
+        for (def item : conf.mappings) {
+            if (item.serial == serial) {
+                name = item.hostname;
+                break;
+            }
+        }
+        ctx["host"]["name"] = name;
+
+#############
+## Cleanup ##
+#############
+- remove:
+    field:
+    - message
+    - _temp_
+    - _conf
+    - sophos.xg.date
+    - sophos.xg.time
+    - sophos.xg.duration
+    - sophos.xg.timezone
+    - sophos.xg.dir_disp
+    - sophos.xg.srczone
+    - sophos.xg.dstzone
+    - syslog5424_pri
+    ignore_missing: true
+
+###############################
+## Product Speific Pipelines ##
+###############################
+- pipeline:
+    name: '{< IngestPipeline "firewall" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Firewall'"
+- pipeline:
+    name: '{< IngestPipeline "idp" >}'
+    if: "ctx.sophos?.xg?.log_type == 'IDP'"
+- pipeline:
+    name: '{< IngestPipeline "atp" >}'
+    if: "ctx.sophos?.xg?.log_type == 'ATP'"
+- pipeline:
+    name: '{< IngestPipeline "antivirus" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Anti-Virus'"
+- pipeline:
+    name: '{< IngestPipeline "sandstorm" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Sandbox'"
+- pipeline:
+    name: '{< IngestPipeline "cfilter" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Content Filtering'"
+- pipeline:
+    name: '{< IngestPipeline "event" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Event'"
+- pipeline:
+    name: '{< IngestPipeline "waf" >}'
+    if: "ctx.sophos?.xg?.log_type == 'WAF'"
+- pipeline:
+    name: '{< IngestPipeline "antispam" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Anti-Spam'"
+- pipeline:
+    name: '{< IngestPipeline "systemhealth" >}'
+    if: "ctx.sophos?.xg?.log_type == 'System Health'"
+- pipeline:
+    name: '{< IngestPipeline "wifi" >}'
+    if: "ctx.sophos?.xg?.log_type == 'Wireless Protection'"
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

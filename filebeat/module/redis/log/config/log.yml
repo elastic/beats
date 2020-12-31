@@ -5,3 +5,8 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines\n
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

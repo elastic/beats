@@ -10,5 +10,9 @@ multiline:
   match: after
 
 processors:
-# Locale for timezone is only needed in non-json logs
-- add_locale.when.not.regexp.message: "^{" 
+# Locale for time zone is only needed in non-json logs
+- add_locale.when.not.regexp.message: "^{"
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.7.0

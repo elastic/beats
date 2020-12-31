@@ -13,12 +13,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 8996000000,
           "end": "2018-02-18T05:46:53.996Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:45Z"
+          "start": "2018-02-18T05:46:45Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "XLC-7u3wi0U",
@@ -65,6 +71,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "37.122.1.226",
+            "193.151.198.166"
+          ]
+        },
         "source": {
           "bytes": 156,
           "ip": "37.122.1.226",
@@ -89,12 +101,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 0,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.992Z"
+          "start": "2018-02-18T05:46:53.992Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "2mdiEm9z6pA",
@@ -141,6 +159,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "5.141.231.166",
+            "193.151.199.69"
+          ]
+        },
         "source": {
           "bytes": 48,
           "ip": "5.141.231.166",
@@ -165,12 +189,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 7652000000,
           "end": "2018-02-18T05:46:53.988Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:46.336Z"
+          "start": "2018-02-18T05:46:46.336Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "IKsDJxZK5UA",
@@ -217,6 +247,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.233.128.4",
+            "212.224.113.74"
+          ]
+        },
         "source": {
           "bytes": 584,
           "ip": "10.233.128.4",
@@ -241,12 +277,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 16000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.976Z"
+          "start": "2018-02-18T05:46:53.976Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "lfpS1KL7LwI",
@@ -293,6 +335,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "193.151.192.46",
+            "10.236.8.4"
+          ]
+        },
         "source": {
           "bytes": 577,
           "ip": "193.151.192.46",
@@ -317,12 +365,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 1168000000,
           "end": "2018-02-18T05:46:53.988Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:52.82Z"
+          "start": "2018-02-18T05:46:52.82Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "HRyho8QOr5M",
@@ -369,6 +423,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.235.197.6",
+            "62.221.115.205"
+          ]
+        },
         "source": {
           "bytes": 152,
           "ip": "10.235.197.6",
@@ -393,12 +453,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 8992000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:45Z"
+          "start": "2018-02-18T05:46:45Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "jbL3H_oK7ok",
@@ -445,6 +511,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.236.31.7",
+            "37.146.125.64"
+          ]
+        },
         "source": {
           "bytes": 152,
           "ip": "10.236.31.7",
@@ -469,12 +541,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 4432000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:49.56Z"
+          "start": "2018-02-18T05:46:49.56Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "ayKjfr1z0QU",
@@ -521,6 +599,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.233.151.8",
+            "52.198.214.72"
+          ]
+        },
         "source": {
           "bytes": 1809,
           "ip": "10.233.151.8",
@@ -545,12 +629,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 80000000,
           "end": "2018-02-18T05:46:53.996Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.916Z"
+          "start": "2018-02-18T05:46:53.916Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "B15R8wv_tVI",
@@ -597,6 +687,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.234.22.4",
+            "64.233.161.188"
+          ]
+        },
         "source": {
           "bytes": 234,
           "ip": "10.234.22.4",
@@ -621,12 +717,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 400000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.592Z"
+          "start": "2018-02-18T05:46:53.592Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "oYN-uwp504w",
@@ -673,6 +775,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.233.36.7",
+            "185.209.20.240"
+          ]
+        },
         "source": {
           "bytes": 1681,
           "ip": "10.233.36.7",
@@ -697,12 +805,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 9024000000,
           "end": "2018-02-18T05:46:53.988Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:44.964Z"
+          "start": "2018-02-18T05:46:44.964Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "MUPum_LUoxk",
@@ -749,6 +863,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "10.233.200.7",
+            "84.39.245.175"
+          ]
+        },
         "source": {
           "bytes": 152,
           "ip": "10.233.200.7",
@@ -773,12 +893,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 60000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.932Z"
+          "start": "2018-02-18T05:46:53.932Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "YStkNP0pV1E",
@@ -825,6 +951,12 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "23.43.139.27",
+            "10.232.8.45"
+          ]
+        },
         "source": {
           "bytes": 1866,
           "ip": "23.43.139.27",
@@ -849,12 +981,18 @@
         },
         "event": {
           "action": "netflow_flow",
-          "category": "network_traffic",
+          "category": [
+            "network_traffic",
+            "network"
+          ],
           "created": "2018-02-18T05:47:09Z",
           "duration": 192000000,
           "end": "2018-02-18T05:46:53.992Z",
           "kind": "event",
-          "start": "2018-02-18T05:46:53.8Z"
+          "start": "2018-02-18T05:46:53.8Z",
+          "type": [
+            "connection"
+          ]
         },
         "flow": {
           "id": "nkastJ_vPI4",
@@ -900,6 +1038,12 @@
         },
         "observer": {
           "ip": "192.0.2.1"
+        },
+        "related": {
+          "ip": [
+            "2.17.140.47",
+            "10.233.150.21"
+          ]
         },
         "source": {
           "bytes": 187,

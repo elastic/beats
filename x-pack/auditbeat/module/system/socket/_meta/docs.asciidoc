@@ -127,6 +127,12 @@ Determines how long to wait after a socket has been closed for out of order
 packets. With TCP, some packets can be received shortly after a socket is
 closed. If set too low, additional flows will be generated for those packets.
 
+- `socket.socket_inactive_timeout` (default: 1m)
+
+How long a socket can be inactive to be evicted from the internal cache.
+A lower value reduces memory usage at the expense of some flows being
+reported as multiple partial flows.
+
 - `socket.perf_queue_size` (default: 4096)
 
 The number of tracing samples that can be queued for processing. A larger value

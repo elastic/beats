@@ -22,9 +22,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Log contains all log related data
@@ -208,7 +208,8 @@ func (f *Log) wait() {
 }
 
 // Close closes the done channel but no th the file handler
-func (f *Log) Close() {
+func (f *Log) Close() error {
 	close(f.done)
 	// Note: File reader is not closed here because that leads to race conditions
+	return nil
 }

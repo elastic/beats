@@ -1,9 +1,6 @@
 import os
 import sys
 import unittest
-from xpack_metricbeat import XPackTest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
@@ -35,4 +32,4 @@ class Test(XPackTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            self.assertItemsEqual(self.de_dot(COREDNS_FIELDS), evt.keys(), evt)
+            self.assertCountEqual(self.de_dot(COREDNS_FIELDS), evt.keys(), evt)

@@ -23,22 +23,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/jsontransform"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 // JSONReader parses JSON inputs
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
+	logger *logp.Logger
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
 func NewJSONReader(r reader.Reader, cfg *Config) *JSONReader {
-	return &JSONReader{reader: r, cfg: cfg}
+	return &JSONReader{
+		reader: r,
+		cfg:    cfg,
+		logger: logp.NewLogger("reader_json"),
+	}
 }
 
 // decodeJSON unmarshals the text parameter into a MapStr and
@@ -49,7 +54,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, common.MapStr) {
 	err := unmarshal(text, &jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
-			logp.Err("Error decoding JSON: %v", err)
+			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
 			jsonFields = common.MapStr{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
@@ -106,12 +111,16 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	return message, nil
 }
 
+func (r *JSONReader) Close() error {
+	return r.reader.Close()
+}
+
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }
 
 // MergeJSONFields writes the JSON fields in the event map,
-// respecting the KeysUnderRoot and OverwriteKeys configuration options.
+// respecting the KeysUnderRoot, ExpandKeys, and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
 func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (string, time.Time) {
@@ -155,7 +164,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 			Timestamp: ts,
 			Fields:    data,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys, config.AddErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, config.ExpandKeys, config.OverwriteKeys, config.AddErrorKey)
 
 		return id, event.Timestamp
 	}

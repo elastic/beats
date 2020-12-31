@@ -35,20 +35,20 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage/gotool"
-	"github.com/elastic/beats/libbeat/processors/dissect"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/libbeat/processors/dissect"
 )
 
 // Check looks for created/modified/deleted/renamed files and returns an error
 // if it finds any modifications. If executed in in verbose mode it will write
 // the results of 'git diff' to stdout to indicate what changes have been made.
 //
-// It checks the file permissions of nosetests test cases and YAML files.
+// It checks the file permissions of python test cases and YAML files.
 // It checks .go source files using 'go vet'.
 func Check() error {
 	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
+	mg.Deps(GoVet, CheckPythonTestNotExecutable, CheckYAMLNotExecutable, CheckDashboardsFormat)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -61,7 +61,7 @@ func Check() error {
 		}
 
 		return errors.Errorf("some files are not up-to-date. "+
-			"Run 'mage fmt update' then review and commit the changes. "+
+			"Run 'make update' then review and commit the changes. "+
 			"Modified: %v", changes)
 	}
 	return nil
@@ -124,16 +124,15 @@ func GitDiff() error {
 	return err
 }
 
-// CheckNosetestsNotExecutable checks that none of the nosetests files are
-// executable. Nosetests silently skips executable .py files and we don't want
-// this to happen.
-func CheckNosetestsNotExecutable() error {
+// CheckPythonTestNotExecutable checks that none of the python test files are
+// executable. They are silently skipped and we don't want this to happen.
+func CheckPythonTestNotExecutable() error {
 	if runtime.GOOS == "windows" {
 		// Skip windows because it doesn't have POSIX permissions.
 		return nil
 	}
 
-	tests, err := FindFiles(nosetestsTestFiles...)
+	tests, err := FindFiles(pythonTestFiles...)
 	if err != nil {
 		return err
 	}
@@ -151,7 +150,7 @@ func CheckNosetestsNotExecutable() error {
 	}
 
 	if len(executableTestFiles) > 0 {
-		return errors.Errorf("nosetests files cannot be executable because "+
+		return errors.Errorf("python test files cannot be executable because "+
 			"they will be skipped. Fix permissions of %v", executableTestFiles)
 	}
 	return nil
@@ -270,13 +269,14 @@ type dashboardObject struct {
 		Title                 string `json:"title"`
 		KibanaSavedObjectMeta *struct {
 			SearchSourceJSON struct {
-				Index string `json:"index"`
+				Index *string `json:"index"`
 			} `json:"searchSourceJSON,omitempty"`
 		} `json:"kibanaSavedObjectMeta"`
 		VisState *struct {
-			Params struct {
-				Controls []struct {
-					IndexPattern string
+			Params *struct {
+				IndexPattern *string `json:"index_pattern"`
+				Controls     []struct {
+					IndexPattern *string
 				} `json:"controls"`
 			} `json:"params"`
 		} `json:"visState,omitempty"`
@@ -346,20 +346,23 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 
 func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error {
 	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
-		if index := objectMeta.SearchSourceJSON.Index; index != "" && index != expectedIndex {
-			return errors.Errorf("unexpected index pattern reference found in object meta: %s", index)
+		if index := objectMeta.SearchSourceJSON.Index; index != nil && *index != expectedIndex {
+			return errors.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	if visState := o.Attributes.VisState; visState != nil {
 		for _, control := range visState.Params.Controls {
-			if index := control.IndexPattern; index != "" && index != expectedIndex {
-				return errors.Errorf("unexpected index pattern reference found in visualization state: %s", index)
+			if index := control.IndexPattern; index != nil && *index != expectedIndex {
+				return errors.Errorf("unexpected index pattern reference found in visualization state: `%s` in visualization `%s`", *index, o.Attributes.Title)
 			}
+		}
+		if index := visState.Params.IndexPattern; index != nil && *index != expectedIndex {
+			return errors.Errorf("unexpected index pattern reference found in visualization state params: `%s` in visualization `%s`", *index, o.Attributes.Title)
 		}
 	}
 	for _, reference := range o.References {
 		if reference.Type == "index-pattern" && reference.ID != expectedIndex {
-			return errors.Errorf("unexpected reference to index pattern %s", reference.ID)
+			return errors.Errorf("unexpected reference to index pattern `%s`", reference.ID)
 		}
 	}
 	return nil

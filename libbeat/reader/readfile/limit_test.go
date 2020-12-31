@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 type mockReader struct {
@@ -36,6 +36,8 @@ func (m *mockReader) Next() (reader.Message, error) {
 		Content: m.line,
 	}, nil
 }
+
+func (m *mockReader) Close() error { return nil }
 
 var limitTests = []struct {
 	line      string

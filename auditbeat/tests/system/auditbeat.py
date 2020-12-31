@@ -3,8 +3,6 @@ import shutil
 import sys
 import tempfile
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../metricbeat/tests/system'))
-
 if os.name == "nt":
     import win32file
 
@@ -24,7 +22,7 @@ class BaseTest(MetricbeatTest):
 
     def create_file(self, path, contents):
         f = open(path, 'wb')
-        f.write(contents)
+        f.write(bytes(contents, "utf-8"))
         f.close()
 
     def check_event(self, event, expected):

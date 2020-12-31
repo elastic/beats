@@ -16,6 +16,7 @@
 // under the License.
 
 // +build linux darwin windows
+// +build !integration
 
 package add_docker_metadata
 
@@ -27,10 +28,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func init() {
@@ -58,7 +60,7 @@ func TestInitializationNoDocker(t *testing.T) {
 	var testConfig = common.NewConfig()
 	testConfig.SetString("host", -1, "unix:///var/run42/docker.sock")
 
-	p, err := buildDockerMetadataProcessor(testConfig, docker.NewWatcher)
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, docker.NewWatcher)
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{}
@@ -71,7 +73,7 @@ func TestInitializationNoDocker(t *testing.T) {
 func TestInitialization(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{}
@@ -87,7 +89,7 @@ func TestNoMatch(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{
@@ -105,7 +107,7 @@ func TestMatchNoContainer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(nil))
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(nil))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{
@@ -124,7 +126,7 @@ func TestMatchContainer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
 			"container_id": &docker.Container{
 				ID:    "container_id",
@@ -172,7 +174,7 @@ func TestMatchContainerWithDedot(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
 			"container_id": &docker.Container{
 				ID:    "container_id",
@@ -215,7 +217,7 @@ func TestMatchSource(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
 			"FABADA": &docker.Container{
 				ID:    "FABADA",
@@ -274,7 +276,7 @@ func TestDisableSource(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
 			"FABADA": &docker.Container{
 				ID:    "FABADA",
@@ -299,7 +301,7 @@ func TestDisableSource(t *testing.T) {
 }
 
 func TestMatchPIDs(t *testing.T) {
-	p, err := buildDockerMetadataProcessor(common.NewConfig(), MockWatcherFactory(
+	p, err := buildDockerMetadataProcessor(logp.L(), common.NewConfig(), MockWatcherFactory(
 		map[string]*docker.Container{
 			"FABADA": &docker.Container{
 				ID:    "FABADA",
@@ -399,7 +401,7 @@ func MockWatcherFactory(containers map[string]*docker.Container) docker.WatcherC
 	if containers == nil {
 		containers = make(map[string]*docker.Container)
 	}
-	return func(host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+	return func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		return &mockWatcher{containers: containers}, nil
 	}
 }

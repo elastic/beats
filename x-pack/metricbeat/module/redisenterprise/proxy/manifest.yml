@@ -1,0 +1,9 @@
+default: true
+input:
+  module: prometheus
+  metricset: collector
+  defaults:
+    metrics_path: /
+    metrics_filters:
+      include: ["listener_*"]
+      exclude: ["^up$"]

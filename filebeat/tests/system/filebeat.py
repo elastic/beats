@@ -3,12 +3,9 @@ import os
 import stat
 import sys
 
-curdir = os.path.dirname(__file__)
-sys.path.append(os.path.join(curdir, '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase, TimeoutError, REGEXP_TYPE
 
-default_registry_file = 'registry/filebeat/data.json'
+default_registry_path = 'registry/filebeat'
 
 
 class BaseTest(TestCase):
@@ -18,7 +15,7 @@ class BaseTest(TestCase):
         if not hasattr(self, "beat_name"):
             self.beat_name = "filebeat"
         if not hasattr(self, "beat_path"):
-            self.beat_path = os.path.abspath(os.path.join(curdir, "../../"))
+            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 
         super(BaseTest, self).setUpClass()
 
@@ -48,7 +45,15 @@ class BaseTest(TestCase):
     def get_registry(self, name=None, data_path=None, filter=None):
         reg = self.access_registry(name, data_path)
         self.wait_until(reg.exists)
-        return reg.load(filter=filter)
+
+        def parse_entry(entry):
+            extra, sec = entry["timestamp"]
+            nsec = extra & 0xFFFFFFFF
+            entry["timestamp"] = sec + (nsec / 1000000000)
+            return entry
+
+        entries = [parse_entry(entry) for entry in reg.load(filter=filter)]
+        return entries
 
     def get_registry_entry_by_path(self, path):
         """
@@ -105,16 +110,17 @@ class Registry:
 
     def __init__(self, home, name=None):
         if not name:
-            name = default_registry_file
+            name = default_registry_path
         self.path = os.path.join(home, name)
+        self._meta_path = os.path.join(self.path, "meta.json")
+        self._log_path = os.path.join(self.path, "log.json")
+        self._active_path = os.path.join(self.path, "active.dat")
 
     def exists(self):
-        return os.path.isfile(self.path)
+        return os.path.isfile(self._log_path)
 
     def load(self, filter=None):
-        with open(self.path) as f:
-            entries = json.load(f)
-
+        entries = self._read_registry()
         if filter:
             entries = [x for x in entries if filter(x)]
         return entries
@@ -123,6 +129,32 @@ class Registry:
         if not self.exists():
             return 0
         return len(self.load(filter=filter))
+
+    def _read_registry(self):
+        data = {}
+        data_file_path = None
+        if os.path.isfile(self._active_path):
+            with open(self._active_path) as f:
+                data_file_path = f.read().strip()
+        if data_file_path and os.path.isfile(data_file_path):
+            with open(data_file_path) as f:
+                data = dict((x['_key'], x) for x in json.load(f))
+
+        with open(self._log_path) as f:
+            try:
+                iter_objs = (json.loads(line) for line in f)
+                for action, entry in zip(iter_objs, iter_objs):
+                    if action['op'] == 'remove':
+                        if entry['k'] in data:
+                            del data[entry['k']]
+                    elif action['op'] == 'set':
+                        v = entry['v']
+                        v['_key'] = entry['k']
+                        data[entry['k']] = v
+            except ValueError:  # log file was incomplete, ignore mid writes
+                pass
+
+        return list(data.values())
 
 
 class LogState:
@@ -144,7 +176,7 @@ class LogState:
         if ignore_case:
             msg = msg.lower()
 
-        if type(msg) == REGEXP_TYPE:
+        if isinstance(msg, REGEXP_TYPE):
             def match(x): return msg.search(x) is not None
         else:
             def match(x): return x.find(msg) >= 0

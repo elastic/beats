@@ -1,0 +1,10 @@
+2020-04-16 11:45:11.844 CEST [26953] LOG:  starting PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc (Arch Linux 9.3.0-1) 9.3.0, 64-bit
+2020-04-16 11:45:11.844 CEST [26953] LOG:  listening on IPv6 address "::1", port 5432
+2020-04-16 11:45:11.844 CEST [26953] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-04-16 11:45:11.846 CEST [26953] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2020-04-16 11:45:11.861 CEST [26954] LOG:  database system was shut down at 2020-04-16 11:45:01 CEST
+2020-04-16 11:45:11.864 CEST [26953] LOG:  database system is ready to accept connections
+2020-04-16 12:22:22.579 CEST [26953] LOG:  received smart shutdown request
+2020-04-16 12:22:22.582 CEST [26953] LOG:  background worker "logical replication launcher" (PID 26960) exited with exit code 1
+2020-04-16 12:22:22.582 CEST [26955] LOG:  shutting down
+2020-04-16 12:22:22.596 CEST [26953] LOG:  database system is shut down

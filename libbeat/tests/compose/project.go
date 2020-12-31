@@ -27,7 +27,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // CreateOptions are the options when containers are created
@@ -92,6 +92,7 @@ type Driver interface {
 	Kill(ctx context.Context, signal string, service string) error
 	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
+	Inspect(ctx context.Context, serviceName string) (string, error)
 
 	LockFile() string
 
@@ -225,6 +226,14 @@ func (c *Project) KillOld(except []string) error {
 	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes", "kafka")
 
 	return c.Driver.KillOld(context.TODO(), except)
+}
+
+// Inspect a container
+func (c *Project) Inspect(service string) (string, error) {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Driver.Inspect(context.Background(), service)
 }
 
 // Lock acquires the lock (300s) timeout

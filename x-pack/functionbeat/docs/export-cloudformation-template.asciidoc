@@ -1,6 +1,6 @@
 [[export-cloudformation-template]]
 [role="xpack"]
-=== Export AWS CloudFormation template
+=== Export AWS CloudFormation template  
 
 You can use {beatname_uc} to export an {cloudformation-ref} template then use
 the template with automation software to deploy {beatname_uc} code to your cloud

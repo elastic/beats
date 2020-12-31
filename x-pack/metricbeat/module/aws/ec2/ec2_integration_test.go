@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package ec2
 
@@ -11,15 +12,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2", "300s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/20951")
+	config := mtest.GetConfigForTest(t, "ec2", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -66,10 +65,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2", "300s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "ec2", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {

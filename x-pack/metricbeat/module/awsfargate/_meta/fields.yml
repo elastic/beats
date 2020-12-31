@@ -1,0 +1,6 @@
+- key: awsfargate
+  title: "AWS Fargate"
+  description: >
+    `awsfargate` module collects AWS fargate metrics from task metadata endpoint.
+  release: beta
+  fields:

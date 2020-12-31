@@ -19,10 +19,11 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type config struct {
@@ -43,6 +44,19 @@ type config struct {
 
 	// Fields is the list of fields to add to target.
 	Fields []string `config:"include_fields"`
+
+	// HostPath is the path where /proc reside
+	HostPath string `config:"host_path"`
+
+	// CgroupPrefix is the prefix where the container id is inside cgroup
+	CgroupPrefixes []string `config:"cgroup_prefixes"`
+
+	// CgroupRegex is the regular expression that captures the container id from cgroup path
+	CgroupRegex string `config:"cgroup_regex"`
+
+	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
+	// set to 0 to disable the cgroup cache
+	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`
 }
 
 // available fields by default
@@ -55,6 +69,9 @@ var defaultFields = common.MapStr{
 		"pid":        nil,
 		"ppid":       nil,
 		"start_time": nil,
+	},
+	"container": common.MapStr{
+		"id": nil,
 	},
 }
 
@@ -72,9 +89,13 @@ func init() {
 
 func defaultConfig() config {
 	return config{
-		IgnoreMissing:    true,
-		OverwriteKeys:    false,
-		RestrictedFields: false,
+		IgnoreMissing:         true,
+		OverwriteKeys:         false,
+		RestrictedFields:      false,
+		MatchPIDs:             []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
+		HostPath:              "/",
+		CgroupPrefixes:        []string{"/kubepods", "/docker"},
+		CgroupCacheExpireTime: cacheExpiration,
 	}
 }
 
@@ -90,7 +111,7 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 	}
 	wantedFields := pf.Fields
 	if len(wantedFields) == 0 {
-		wantedFields = []string{"process"}
+		wantedFields = []string{"process", "container"}
 	}
 	for _, docSrc := range wantedFields {
 		dstField := fieldPrefix + docSrc
@@ -99,9 +120,6 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 			return nil, fmt.Errorf("field '%v' not found", docSrc)
 		}
 		if reqField != nil {
-			if len(wantedFields) != 1 {
-				return nil, fmt.Errorf("'%s' field cannot be used in conjunction with other fields", docSrc)
-			}
 			for subField := range reqField.(common.MapStr) {
 				key := dstField + "." + subField
 				val := docSrc + "." + subField

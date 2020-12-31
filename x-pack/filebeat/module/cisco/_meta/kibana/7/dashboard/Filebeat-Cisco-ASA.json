@@ -764,7 +764,7 @@
               "id": "2",
               "params": {
                 "customLabel": "ACL ID",
-                "field": "cisco.asa.list_id",
+                "field": "cisco.asa.rule_name",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -878,7 +878,7 @@
               "params": {
                 "aggregate": "concat",
                 "customLabel": "Sample message",
-                "field": "log.original",
+                "field": "event.original",
                 "size": 1,
                 "sortField": "@timestamp",
                 "sortOrder": "desc"

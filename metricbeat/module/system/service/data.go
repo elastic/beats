@@ -22,11 +22,11 @@ package service
 import (
 	"time"
 
-	"github.com/coreos/go-systemd/dbus"
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // Properties is a struct representation of the dbus returns from GetAllProperties
@@ -54,6 +54,9 @@ type Properties struct {
 	ActiveExitTimestamp    uint64
 	// Meta
 	FragmentPath string
+	// UnitFileState
+	UnitFileState  string
+	UnitFilePreset string
 }
 
 // formProperties gets properties for the systemd service and returns a MapStr with useful data
@@ -71,6 +74,10 @@ func formProperties(unit dbus.UnitStatus, props Properties) (mb.Event, error) {
 		"load_state": unit.LoadState,
 		"state":      unit.ActiveState,
 		"sub_state":  unit.SubState,
+		"unit_file": common.MapStr{
+			"state":         props.UnitFileState,
+			"vendor_preset": props.UnitFilePreset,
+		},
 	}
 
 	//most of the properties values are context-dependent.

@@ -5,15 +5,21 @@ var:
     default:
       - /var/log/cef.log
   - name: tags
-    default: [cef]
+    default: [cef, forwarded]
   - name: syslog_host
     default: localhost
   - name: syslog_port
     default: 9003
   - name: input
     default: syslog
+  - name: internal_zones
+  - name: external_zones
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/fp-pipeline.yml
+  - ingest/cp-pipeline.yml
+
 input: config/input.yml
 
 requires.processors:

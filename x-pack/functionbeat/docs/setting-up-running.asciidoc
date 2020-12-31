@@ -6,18 +6,20 @@
 
 [[setting-up-and-running]]
 [role="xpack"]
-== Setting up and deploying {beatname_uc}
+== Set up and deploy {beatname_uc}
 
-Before reading this section, see the
-<<{beatname_lc}-getting-started,getting started documentation>> for basic
+++++
+<titleabbrev>Set up and deploy</titleabbrev>
+++++
+
+Before reading this section, see
+<<{beatname_lc}-installation-configuration>> for basic
 installation instructions to get you started.
 
-This section includes additional information on how to set up and run
+This section includes additional information on how to install, set up, and run
 {beatname_uc}, including:
 
 * <<directory-layout>>
-
-* <<keystore>>
 
 * <<iam-permissions>>
 
@@ -32,9 +34,6 @@ This section includes additional information on how to set up and run
 
 [role="xpack"]
 include::{libbeat-dir}/shared-directory-layout.asciidoc[]
-
-[role="xpack"]
-include::{libbeat-dir}/keystore.asciidoc[]
 
 include::iam-permissions.asciidoc[]
 

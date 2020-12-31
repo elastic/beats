@@ -4,13 +4,15 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.actions"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
@@ -56,7 +58,7 @@ processors:
           to: "zeek.notice.file.id"
 
         - from: "zeek.notice.f.parent_id"
-          to: "dzeek.notice.file.parent_id"
+          to: "zeek.notice.file.parent_id"
 
         - from: "zeek.notice.f.source"
           to: "zeek.notice.file.source"
@@ -70,7 +72,7 @@ processors:
         - from: "zeek.notice.f.total_bytes"
           to: "zeek.notice.file.total_bytes"
 
-        - from: "zzeek.notice.file_mime_type"
+        - from: "zeek.notice.file_mime_type"
           to: "zeek.notice.file.mime_type"
 
       ignore_missing: true
@@ -78,9 +80,28 @@ processors:
 
   - drop_fields:
       fields: ["zeek.notice.remote_location", "zeek.notice.f"]
-{{ if .community_id }}
-  - community_id:
+      ignore_missing: true
+  - convert:
       fields:
-        source_ip: source.address
-        destination_ip: destination.address
-{{ end }}
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+        - {from: "zeek.notice.file.total_bytes", to: "file.size"}
+        - {from: "zeek.notice.file.mime_type", to: "file.mime_type"}
+        - {from: "zeek.notice.note", to: "rule.name"}
+        - {from: "zeek.notice.msg", to: "rule.description"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: alert
+        category:
+          - intrusion_detection
+        type:
+          - info
+  - community_id:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

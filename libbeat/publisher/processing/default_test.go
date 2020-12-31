@@ -26,10 +26,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -183,7 +184,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				},
 				"agent": common.MapStr{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
-					"hostname":     "test.host.name",
+					"name":         "test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
 					"type":         "test",
 					"version":      "0.1",
@@ -209,7 +210,6 @@ func TestProcessorsConfigs(t *testing.T) {
 				},
 				"agent": common.MapStr{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
-					"hostname":     "test.host.name",
 					"name":         "other.test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
 					"type":         "test",
@@ -318,7 +318,24 @@ func TestNormalization(t *testing.T) {
 
 			fields.DeepUpdate(test.mod)
 			assert.Equal(t, test.want, actual.Fields)
+
+			err = s.Close()
+			require.NoError(t, err)
 		})
+	}
+}
+
+func BenchmarkNormalization(b *testing.B) {
+	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	require.NoError(b, err)
+
+	prog, err := s.Create(beat.ProcessingConfig{}, false)
+	require.NoError(b, err)
+
+	fields := common.MapStr{"a": "b"}
+	for i := 0; i < b.N; i++ {
+		f := fields.Clone()
+		_, _ = prog.Run(&beat.Event{Fields: f})
 	}
 }
 
@@ -332,6 +349,9 @@ func TestAlwaysDrop(t *testing.T) {
 	actual, err := prog.Run(&beat.Event{})
 	require.NoError(t, err)
 	assert.Nil(t, actual)
+
+	err = s.Close()
+	require.NoError(t, err)
 }
 
 func TestDynamicFields(t *testing.T) {
@@ -352,6 +372,52 @@ func TestDynamicFields(t *testing.T) {
 	actual, err = prog.Run(&beat.Event{Fields: common.MapStr{"hello": "world"}})
 	require.NoError(t, err)
 	assert.Equal(t, common.MapStr{"hello": "world", "dyn": "field"}, actual.Fields)
+
+	err = factory.Close()
+	require.NoError(t, err)
+}
+
+func TestProcessingClose(t *testing.T) {
+	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	require.NoError(t, err)
+
+	// Inject a processor in the builder that we can check if has been closed.
+	factoryProcessor := &processorWithClose{}
+	b := factory.(*builder)
+	if b.processors == nil {
+		b.processors = newGroup("global", logp.L())
+	}
+	b.processors.add(factoryProcessor)
+
+	clientProcessor := &processorWithClose{}
+	g := newGroup("test", logp.L())
+	g.add(clientProcessor)
+
+	prog, err := factory.Create(beat.ProcessingConfig{
+		Processor: g,
+	}, false)
+	require.NoError(t, err)
+
+	// Check that both processors are called
+	assert.False(t, factoryProcessor.called)
+	assert.False(t, clientProcessor.called)
+	_, err = prog.Run(&beat.Event{Fields: common.MapStr{"hello": "world"}})
+	require.NoError(t, err)
+	assert.True(t, factoryProcessor.called)
+	assert.True(t, clientProcessor.called)
+
+	// Check that closing the client processing pipeline doesn't close the global pipeline
+	assert.False(t, factoryProcessor.closed)
+	assert.False(t, clientProcessor.closed)
+	err = processors.Close(prog)
+	require.NoError(t, err)
+	assert.False(t, factoryProcessor.closed)
+	assert.True(t, clientProcessor.closed)
+
+	// Check that closing the factory closes the processor in the global pipeline
+	err = factory.Close()
+	require.NoError(t, err)
+	assert.True(t, factoryProcessor.closed)
 }
 
 func fromJSON(in string) common.MapStr {
@@ -361,4 +427,23 @@ func fromJSON(in string) common.MapStr {
 		panic(err)
 	}
 	return tmp
+}
+
+type processorWithClose struct {
+	closed bool
+	called bool
+}
+
+func (p *processorWithClose) Run(e *beat.Event) (*beat.Event, error) {
+	p.called = true
+	return e, nil
+}
+
+func (p *processorWithClose) Close() error {
+	p.closed = true
+	return nil
+}
+
+func (p *processorWithClose) String() string {
+	return "processorWithClose"
 }

@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   etcd:
-    image: docker.elastic.co/observability-ci/beats-integration-etcd:${ETCD_VERSION:-3.3.10}-1
+    image: docker.elastic.co/integrations-ci/beats-etcd:${ETCD_VERSION:-3.3.10}-1
     build:
       context: ./_meta
       args:

@@ -22,8 +22,8 @@ import (
 
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type NodeSystemStats struct {
@@ -35,20 +35,20 @@ type NodeSystemStats struct {
 }
 
 type NodeInterestingStats struct {
-	CmdGet                   int64 `json:"cmd_get"`
-	CouchDocsActualDiskSize  int64 `json:"couch_docs_actual_disk_size"`
-	CouchDocsDataSize        int64 `json:"couch_docs_data_size"`
-	CouchSpatialDataSize     int64 `json:"couch_spatial_data_size"`
-	CouchSpatialDiskSize     int64 `json:"couch_spatial_disk_size"`
-	CouchViewsActualDiskSize int64 `json:"couch_views_actual_disk_size"`
-	CouchViewsDataSize       int64 `json:"couch_views_data_size"`
-	CurrItems                int64 `json:"curr_items"`
-	CurrItemsTot             int64 `json:"curr_items_tot"`
-	EpBgFetched              int64 `json:"ep_bg_fetched"`
-	GetHits                  int64 `json:"get_hits"`
-	MemUsed                  int64 `json:"mem_used"`
-	Ops                      int64 `json:"ops"`
-	VbReplicaCurrItems       int64 `json:"vb_replica_curr_items"`
+	CmdGet                   float64 `json:"cmd_get"`
+	CouchDocsActualDiskSize  int64   `json:"couch_docs_actual_disk_size"`
+	CouchDocsDataSize        int64   `json:"couch_docs_data_size"`
+	CouchSpatialDataSize     int64   `json:"couch_spatial_data_size"`
+	CouchSpatialDiskSize     int64   `json:"couch_spatial_disk_size"`
+	CouchViewsActualDiskSize int64   `json:"couch_views_actual_disk_size"`
+	CouchViewsDataSize       int64   `json:"couch_views_data_size"`
+	CurrItems                int64   `json:"curr_items"`
+	CurrItemsTot             int64   `json:"curr_items_tot"`
+	EpBgFetched              int64   `json:"ep_bg_fetched"`
+	GetHits                  int64   `json:"get_hits"`
+	MemUsed                  int64   `json:"mem_used"`
+	Ops                      int64   `json:"ops"`
+	VbReplicaCurrItems       int64   `json:"vb_replica_curr_items"`
 }
 
 type Node struct {

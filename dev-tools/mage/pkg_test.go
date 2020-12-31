@@ -88,7 +88,7 @@ func TestRepoRoot(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.Equal(t, "github.com/elastic/beats", repo.RootImportPath)
+	assert.Equal(t, "github.com/elastic/beats/v7", repo.RootImportPath)
 	assert.True(t, filepath.IsAbs(repo.RootDir))
 	cwd := filepath.Join(repo.RootDir, repo.SubDir)
 	assert.Equal(t, CWD(), cwd)
@@ -103,7 +103,7 @@ func TestDumpVariables(t *testing.T) {
 }
 
 func TestLoadSpecs(t *testing.T) {
-	pkgs, err := LoadSpecs("files/packages.yml")
+	pkgs, err := LoadSpecs("../packaging/packages.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

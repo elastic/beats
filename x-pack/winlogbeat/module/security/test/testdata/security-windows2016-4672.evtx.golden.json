@@ -3,16 +3,26 @@
     "@timestamp": "2018-05-18T23:09:03.2086661Z",
     "event": {
       "action": "logged-in-special",
+      "category": [
+        "iam"
+      ],
       "code": 4672,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin"
+      ]
     },
     "host": {
       "name": "vagrant-2016"
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
     },
     "user": {
       "domain": "VAGRANT-2016",

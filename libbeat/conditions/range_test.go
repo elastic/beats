@@ -23,8 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestRangeCreateNumeric(t *testing.T) {
@@ -34,7 +34,7 @@ func TestRangeCreateNumeric(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestRangeCreateLexicographic(t *testing.T) {
@@ -44,7 +44,7 @@ func TestRangeCreateLexicographic(t *testing.T) {
 		}},
 	}
 	_, err := NewCondition(&config)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestRangeSingleFieldNegativeMatch(t *testing.T) {

@@ -1,0 +1,20 @@
+- name: app_insights
+  type: group
+  release: beta
+  description: >
+    application insights
+  fields:
+    - name: start_date
+      type: date
+      description: >
+        The start date
+    - name: end_date
+      type: date
+      description: >
+        The end date
+    - name: metrics.*.*
+      type: object
+      object_type: float
+      object_type_mapping_type: "*"
+      description: >
+       The metrics

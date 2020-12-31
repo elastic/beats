@@ -3,6 +3,14 @@
 # Select the network interfaces to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
+packetbeat.interfaces.internal_networks:
+  - private
+
+{% if af_packet %}
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
+packetbeat.interfaces.auto_promisc_mode: true
+{% endif %}
 
 {% if bpf_filter %}
 packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
@@ -130,6 +138,10 @@ packetbeat.protocols:
 
 - type: tls
   ports: [{{ tls_ports|default([443])|join(", ") }}]
+{% if tls_send_certificates is defined %}  send_certificates: {{tls_send_certificates}}{%- endif %}
+{% if tls_include_raw_certificates is defined  %}  include_raw_certificates: {{tls_include_raw_certificates}}{%- endif %}
+{% if tls_include_detailed_fields is defined %}  include_detailed_fields: {{tls_include_detailed_fields}}{%- endif %}
+{% if tls_fingerprints is defined %}  fingerprints: {{tls_fingerprints}}{%- endif %}
 
 - type: mongodb
   ports: [{{ mongodb_ports|default([27017])|join(", ") }}]
@@ -137,6 +149,9 @@ packetbeat.protocols:
 {% if mongodb_send_response %}  send_response: true{% endif %}
 {% if mongodb_max_docs is not none %}  max_docs: {{mongodb_max_docs}}{% endif %}
 {% if mongodb_max_doc_length is not none %}  max_doc_length: {{mongodb_max_doc_length}}{% endif %}
+
+- type: sip
+  ports: [{{ sip_ports|default([5060])|join(", ") }}]
 
 
 {% if procs_enabled %}
@@ -181,7 +196,16 @@ tags: [
 
 packetbeat.shutdown_timeout: {{ shutdown_timeout|default('400ms') }}
 
-{%- if processors %}
+{%- if include_mime %}
+processors:
+  - detect_mime_type:
+      field: http.request.body.content
+      target: http.request.mime_type
+  - detect_mime_type:
+      field: http.response.body.content
+      target: http.response.mime_type
+
+{%- elif processors %}
 
 #================================ Filters =====================================
 

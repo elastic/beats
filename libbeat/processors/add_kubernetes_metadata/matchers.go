@@ -19,14 +19,13 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
-	"sync"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/codec"
-	"github.com/elastic/beats/libbeat/outputs/codec/format"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 )
 
 const (
@@ -43,7 +42,6 @@ type Matcher interface {
 }
 
 type Matchers struct {
-	sync.RWMutex
 	matchers []Matcher
 }
 
@@ -76,8 +74,6 @@ func NewMatchers(configs PluginConfig) *Matchers {
 
 // MetadataIndex returns the index string for the first matcher from the Registry returning one
 func (m *Matchers) MetadataIndex(event common.MapStr) string {
-	m.RLock()
-	defer m.RUnlock()
 	for _, matcher := range m.matchers {
 		index := matcher.MetadataIndex(event)
 		if index != "" {
@@ -90,8 +86,6 @@ func (m *Matchers) MetadataIndex(event common.MapStr) string {
 }
 
 func (m *Matchers) Empty() bool {
-	m.RLock()
-	defer m.RUnlock()
 	if len(m.matchers) == 0 {
 		return true
 	}

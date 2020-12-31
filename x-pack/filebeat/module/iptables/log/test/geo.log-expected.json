@@ -1,23 +1,34 @@
 [
     {
-        "@timestamp": "2019-10-10T07:25:12.000-02:00",
         "destination.ip": "10.4.0.5",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
+        "event.action": "drop",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "deny",
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 0,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "ACK",
+        "iptables.tcp.flags": [
+            "ACK"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 2853,
         "iptables.tos": 0,
@@ -31,18 +42,28 @@
         "network.community_id": "1:RGJPRWtru8Lg2itNyFREDvoRkNA=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.egress.zone": "lan",
+        "observer.ingress.zone": "wan",
+        "related.ip": [
+            "158.109.0.1",
+            "10.4.0.5"
+        ],
+        "rule.id": "default",
+        "rule.name": "wan-lan",
         "service.type": "iptables",
         "source.as.number": 13041,
         "source.as.organization.name": "Consorci de Serveis Universitaris de Catalunya",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.4172,
         "source.geo.location.lon": -3.684,
         "source.ip": "158.109.0.1",
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 38842,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

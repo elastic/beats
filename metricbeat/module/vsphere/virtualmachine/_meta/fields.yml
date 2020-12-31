@@ -2,7 +2,7 @@
   type: group
   description: >
     virtualmachine
-  release: beta
+  release: ga
   fields:
     - name: host.id
       type: keyword

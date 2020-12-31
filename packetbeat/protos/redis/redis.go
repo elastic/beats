@@ -19,18 +19,19 @@ package redis
 
 import (
 	"bytes"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
 type stream struct {
@@ -54,6 +55,7 @@ type redisPlugin struct {
 	transactionTimeout time.Duration
 	queueConfig        MessageQueueConfig
 
+	watcher procs.ProcessesWatcher
 	results protos.Reporter
 }
 
@@ -74,6 +76,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
@@ -84,16 +87,17 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (redis *redisPlugin) init(results protos.Reporter, config *redisConfig) error {
+func (redis *redisPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
+	redis.watcher = watcher
 	isDebug = logp.IsDebug("redis")
 
 	return nil
@@ -246,7 +250,7 @@ func (redis *redisPlugin) handleRedis(
 ) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = redis.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
 		// wait for response
@@ -324,6 +328,11 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 	}
 	if redis.sendResponse {
 		fields["response"] = resp.message
+	}
+
+	pbf.Event.Action = "redis." + strings.ToLower(string(requ.method))
+	if resp.isError {
+		pbf.Event.Outcome = "failure"
 	}
 
 	return evt

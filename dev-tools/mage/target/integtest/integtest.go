@@ -22,8 +22,8 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/test"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -53,8 +53,6 @@ func WhitelistEnvVar(key ...string) {
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
@@ -62,16 +60,32 @@ func IntegTest() {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(goTestDeps...)
+	}
+	runner, err := devtools.NewDockerIntegrationRunner(whitelistedEnvVars...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("goIntegTest", func() error {
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	})
 }
 
-// PythonIntegTest executes the python system tests in the integration environment (Docker).
+// PythonIntegTest executes the python system tests in the integration
+// environment (Docker).
+// Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
+// Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(pythonTestDeps...)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(append(whitelistedEnvVars, devtools.ListMatchingEnvVars("PYTEST_")...)...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonNoseTest(devtools.DefaultPythonTestIntegrationArgs())
-	}, whitelistedEnvVars...)
+		return devtools.PythonTest(devtools.DefaultPythonTestIntegrationArgs())
+	})
 }

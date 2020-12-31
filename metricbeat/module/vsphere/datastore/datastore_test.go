@@ -20,7 +20,7 @@ package datastore
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/simulator"
@@ -52,7 +52,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	// Values are based on the result 'df -k'.
 	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes", "capacity.used.pct"}
+		"capacity.used.bytes"}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {

@@ -3,16 +3,26 @@
     "@timestamp": "2019-05-17T11:06:58.210768Z",
     "event": {
       "action": "logged-out",
+      "category": [
+        "authentication"
+      ],
       "code": 4634,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": "audittest"
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",
@@ -55,16 +65,26 @@
     "@timestamp": "2019-05-19T16:15:38.542273Z",
     "event": {
       "action": "logged-out",
+      "category": [
+        "authentication"
+      ],
       "code": 4634,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "WIN-41OB2LO92CR"
     },
     "log": {
       "level": "information"
+    },
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WIN-41OB2LO92CR",

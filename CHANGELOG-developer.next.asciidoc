@@ -27,13 +27,42 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - The custom beat generator now uses mage instead of python, `mage GenerateCustomBeat` can be used to create a new beat, and `mage vendorUpdate` to update the vendored libbeat in a custom beat. {pull}13610[13610]
 - Altered all remaining uses of mapval to use the renamed and enhanced version: https://github.com/elastic/go-lookslike[go-lookslike] instead, which is a separate project. The mapval tree is now gone. {pull}14165[14165]
 - Move light modules to OSS. {pull}14369[14369]
+- Deprecate test flags, `generate` and `update_expected`, in favor of `data`. {pull}15292[15292]
+- Python 3 is required now to run python tests and tools. {pull}14798[14798]
+- The type `memqueue.Broker` is no longer exported; instead of `memqueue.NewBroker`, call `memqueue.NewQueue` (which provides the same public interface). {pull}16667[16667]
+- The disk spool types `spool.Spool` and `spool.Settings` have been renamed to the internal types `spool.diskSpool` and `spool.settings`. {pull}16693[16693]
+- `queue.Eventer` has been renamed to `queue.ACKListener` {pull}16691[16691]
+- Require logger as first parameter for `outputs.transport.transport#ProxyDialer` and `outputs.elasticsearch.client#BulkReadItemStatus`. {pull}16761[16761]
+- The `libbeat/outputs/transport` package has been moved to `libbeat/common/transport`. {pull}16734[16734]
+- The `libbeat/outputs/tls.go` file has been removed. All exported symbols in that file (`libbeat/outputs.*`) are now available as `libbeat/common/tlscommon.*`. {pull}16734[16734]
+- The newly generated Beats are using go modules to manage dependencies. {pull}16288[16288]
+- Extract Elasticsearch client logic from `outputs/elasticsearch` package into new `esclientleg` package. {pull}16150[16150]
+- Rename `queue.BufferConfig.Events` to `queue.BufferConfig.MaxEvents`. {pull}17622[17622]
+- Remove `queue.Feature` and replace `queue.RegisterType` with `queue.RegisterQueueType`. {pull}17666[17666]
+- Introduce APM libbeat instrumentation. `Publish` method on `Client` interface now takes a Context as first argument. {pull}17938[17938]
+- The way configuration files are generated has changed to make it easier to customize parts
+  of the config without requiring changes to libbeat config templates. Generation is now
+  fully based on Go text/template and no longer uses file concatenation to generate the config.
+  Your magefile.go will require a change to adapt the devtool API. See the pull request for
+  more details. {pull}18148[18148]
+- The Elasticsearch client settings expect the API key to be raw (not base64-encoded). {issue}18939[18939] {pull}18945[18945]
+- `management.ConfigManager` has been renamed to `management.Manager`. {pull}19114[19114]
+- `UpdateStatus` has been added to the `management.Manager` interface. {pull}19114[19114]
+- Remove `common.MapStrPointer` parameter from `cfgfile.Runnerfactory` interface. {pull}19135[19135]
+- Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
+- Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
+- Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
+- Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 
 ==== Bugfixes
 
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
+- Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
+- Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
 
 ==== Added
 
+- Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
 - The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
@@ -62,3 +91,18 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Compare event by event in `testadata` framework to avoid sorting problems {pull}13747[13747]
 - Added a `default_field` option to fields in fields.yml to offer a way to exclude fields from the default_field list. {issue}14262[14262] {pull}14341[14341]
 - `supported-versions.yml` can be used in metricbeat python system tests to obtain the build args for docker compose builds. {pull}14520[14520]
+- Fix dropped errors in the tests for the metricbeat Azure module. {pull}13773[13773]
+- New mage target for Functionbeat: generate pkg folder to make manager easier. {pull}15580[15880]
+- Add support for MODULE environment variable in `mage goIntegTest` in metricbeat to run integration tests for a single module. {pull}17147[17147]
+- Add support for a `TEST_TAGS` environment variable to add tags for tests selection following go build tags semantics, this environment variable is used by mage test targets to add build tags. Python tests can also be tagged with a decorator (`@beat.tag('sometag')`). {pull}16937[16937] {pull}17075[17075]
+- Add fields validation for histogram subfields. {pull}17759[17759]
+- Add IP* fields to `fields.yml` generator script in Filebeat. {issue}17998[17998] {pull}18256[18256]
+- Events intended for the Elasticsearch output can now take an `op_type` metadata field of type events.OpType or string to indicate the `op_type` to use for bulk indexing. {pull}12606[12606]
+- Remove vendor folder from repository. {pull}18655[18655]
+- Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
+- Update Go version to 1.14.4. {pull}19753[19753]
+- Update Go version to 1.14.7. {pull}20508[20508]
+- Add packaging for docker image based on UBI minimal 8. {pull}20576[20576]
+- Make the mage binary used by the build process in the docker container to be statically compiled. {pull}20827[20827]
+- Update ecszap to v0.3.0 for using ECS 1.6.0 in logs {pull}22267[22267]
+- Add support for customized monitoring API. {pull}22605[22605]

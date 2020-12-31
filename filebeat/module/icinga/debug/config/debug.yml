@@ -8,3 +8,8 @@ multiline:
   pattern: '^\['
   negate: true
   match: after
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

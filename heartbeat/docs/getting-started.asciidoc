@@ -1,190 +1,89 @@
-[[heartbeat-getting-started]]
-== Getting Started With Heartbeat
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+++++
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
+++++
 
-* <<heartbeat-installation>>
-* <<heartbeat-configuration>>
-* <<heartbeat-template>>
-* <<load-kibana-dashboards>>
-* <<heartbeat-starting>>
-* <<view-kibana-dashboards>>
-* <<setup-repositories>>
+This guide describes how to get started quickly collecting uptime data about
+your hosts. You'll learn how to:
 
+* install {beatname_uc}
+* specify the protocols to monitor
+* send uptime data to {es}
+* visualize the uptime data in {kib}
 
-[[heartbeat-installation]]
+[role="screenshot"]
+image::./images/heartbeat-statistics.png[{beatname_uc} HTTP monitoring dashboard]
+
+[float]
+=== Before you begin
+
+You need {es} for storing and searching your data, and {kib} for visualizing and
+managing it.
+
+include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
+
+[float]
+[[installation]]
 === Step 1: Install Heartbeat
 
 Unlike most Beats, which you install on edge nodes, you typically install
-Heartbeat as part of monitoring service that runs on a separate machine
+Heartbeat as part of a monitoring service that runs on a separate machine
 and possibly even outside of the network where the services that you want to
 monitor are running.
 
-//TODO: Add a separate topic that explores deployment scenarios in more detail (like installing on a sub-network where there's a firewall etc.
+To download and install {beatname_uc}, use the commands that work with your
+system:
 
-include::{libbeat-dir}/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 
-[[deb]]
-*deb:*
+[float]
+[[other-installation-options]]
+==== Other installation options
 
-ifeval::["{release-state}"=="unreleased"]
+* <<setup-repositories,APT or YUM>>
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page]
+* <<running-on-docker,Docker>>
 
-Version {version} of {beatname_uc} has not yet been released.
+[float]
+[[set-connection]]
+=== Step 2: Connect to the {stack}
 
-endif::[]
+include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-curl -L -O {downloads}/heartbeat/heartbeat-{version}-amd64.deb
-sudo dpkg -i heartbeat-{version}-amd64.deb
-----------------------------------------------------------------------
-
-endif::[]
-
-[[rpm]]
-*rpm:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-curl -L -O {downloads}/heartbeat/heartbeat-{version}-x86_64.rpm
-sudo rpm -vi heartbeat-{version}-x86_64.rpm
-----------------------------------------------------------------------
-
-endif::[]
-
-[[mac]]
-*mac:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O {downloads}/heartbeat/heartbeat-{version}-darwin-x86_64.tar.gz
-tar xzvf heartbeat-{version}-darwin-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-include::{libbeat-dir}/shared-brew-install.asciidoc[]
-
-[[linux]]
-*linux:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O {downloads}/heartbeat/heartbeat-{version}-linux-x86_64.tar.gz
-tar xzvf heartbeat-{version}-linux-x86_64.tar.gz
-------------------------------------------------
-endif::[]
-
-[[docker]]
-*docker:*
-
-See <<running-on-docker, Running on Docker>> for deploying Docker containers.
-
-[[win]]
-*win:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-. Download the Heartbeat Windows zip file from the
-https://www.elastic.co/downloads/beats/heartbeat[downloads page].
-
-. Extract the contents of the zip file into `C:\Program Files`.
-
-. Rename the +heartbeat-<version>-windows+ directory to +Heartbeat+.
-
-. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon
-and select *Run As Administrator*).
-
-. From the PowerShell prompt, run the following commands to install Heartbeat as
-a Windows service:
-+
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-PS > cd 'C:\Program Files\Heartbeat'
-PS C:\Program Files\Heartbeat> .\install-service-heartbeat.ps1
-----------------------------------------------------------------------
-
-NOTE: If script execution is disabled on your system, you need to set the
-execution policy for the current session to allow the script to run. For
-example:
-+PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1+.
-
-endif::[]
-
-Before starting Heartbeat, you should look at the configuration options in
-the configuration file, for example +C:\Program Files\Heartbeat\heartbeat.yml+
-or +/etc/heartbeat/heartbeat.yml+. For more information about these
-options, see <<configuring-howto-heartbeat>>.
-
-[[heartbeat-configuration]]
-=== Step 2: Configure Heartbeat
-
-include::{libbeat-dir}/shared-configuring.asciidoc[]
+[float]
+[[configuration]]
+=== Step 3: Configure Heartbeat monitors
 
 Heartbeat provides monitors to check the status of hosts at set intervals.
-You configure each monitor individually. Heartbeat currently provides monitors
-for ICMP, TCP, and HTTP (see <<heartbeat-overview>> for more about these
-monitors). Here is an example that configures Heartbeat to use an `icmp`
-monitor:
+Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see
+<<heartbeat-overview>> for more about these monitors).
 
-[source,yaml]
-----------------------------------------------------------------------
-heartbeat.monitors:
-- type: icmp
-  schedule: '*/5 * * * * * *'
-  hosts: ["myhost"]
-output.elasticsearch:
-  hosts: ["myEShost:9200"]
-----------------------------------------------------------------------
+You configure each monitor individually. In +{beatname_lc}.yml+, specify the
+list of monitors that you want to enable. Each item in the list begins with a
+dash (-). The following example configures Heartbeat to use two monitors, an
+`icmp` monitor and a `tcp` monitor:
 
-To configure Heartbeat:
-
-. Specify the list of monitors that you want to enable. Each item in the list
-begins with a dash (-). The following example configures Heartbeat to use two
-monitors, an `icmp` monitor and a `tcp` monitor:
-+
 [source,yaml]
 ----------------------------------------------------------------------
 heartbeat.monitors:
 - type: icmp
   schedule: '*/5 * * * * * *' <1>
   hosts: ["myhost"]
+  id: my-icmp-service
+  name: My ICMP Service
 - type: tcp
   schedule: '@every 5s' <2>
   hosts: ["myhost:12345"]
   mode: any <3>
+  id: my-tcp-service
+- type: http
+  schedule: '@every 5s'
+  urls: ["http://example.net"]
+  service.name: apm-service-name <4>
+  id: my-http-service
+  name: My HTTP Service
 ----------------------------------------------------------------------
 <1> The `icmp` monitor is scheduled to run exactly every 5 seconds (10:00:00,
 10:00:05, and so on). The `schedule` option uses a cron-like syntax based on
@@ -193,89 +92,110 @@ https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementatio
 was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 `cronexpr` package.
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
-(`all`).
+<4> The `service.name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
+
+include::{libbeat-dir}/shared/config-check.asciidoc[]
+
+[float]
+[[configurelocation]]
+=== Step 4: Configure the Heartbeat location
+
+Heartbeat can be deployed in multiple locations so that you can detect 
+differences in availability and response times across those locations.
+Configure the Heartbeat location to allow {kib} to display location-specific
+information on Uptime maps and perform Uptime anomaly detection based
+on location.
+
+To configure the location of a Heartbeat instance, modify the 
+`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
+example specifies the `geo.name` of the `add_observer_metadata` processor as
+`us-east-1a`:
+
+[source,yaml]
+----------------------------------------------------------------------
+# ============================ Processors ============================
+
+processors:
+  - add_observer_metadata:
+      # Optional, but recommended geo settings for the location Heartbeat is running in
+      geo: <1>
+        # Token describing this location
+        name: us-east-1a <2>
+        # Lat, Lon "
+        #location: "37.926868, -78.024902" <3>
+----------------------------------------------------------------------
+<1> Uncomment the `geo` setting.
+<2> Uncomment `name` and assign the name of the location of the Heartbeat server.
+<3> Optionally uncomment `location` and assign the latitude and longitude.
+
+include::{libbeat-dir}/shared/config-check.asciidoc[]
+
+[float]
+[[setup-assets]]
+=== Step 5: Set up assets
+
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
+
+. Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
+
+. From the installation directory, run:
 +
-See <<configuring-howto-heartbeat>> for a full description of each
-configuration option.
+--
+include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
+--
++
+`-e` is optional and sends output to standard error instead of the configured log output.
 
-include::{libbeat-dir}/step-configure-output.asciidoc[]
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
+It does not install {beatname_uc} dashboards.  Heartbeat dashboards and
+installation steps are available in the
+https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
 
-include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>>.
+=====
 
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+[float]
+[[start]]
+=== Step 6: Start Heartbeat
 
-include::{libbeat-dir}/step-test-config.asciidoc[]
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who is
+<<privileges-to-publish-events,authorized to publish events>>.
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
-
-[[heartbeat-template]]
-=== Step 3: Load the index template in Elasticsearch
-
-include::{libbeat-dir}/shared-template-load.asciidoc[]
-
-[[load-kibana-dashboards]]
-=== Step 4: Set up the Kibana dashboards
-
-Dashboards for Heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
-
-[[heartbeat-starting]]
-=== Step 5: Start Heartbeat
-
-Start Heartbeat by issuing the appropriate command for your platform. If you
-are accessing a secured Elasticsearch cluster, make sure you've configured
-credentials as described in <<{beatname_lc}-configuration>>.
-
-NOTE: If you use an init.d script to start Heartbeat on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
-start Heartbeat in the foreground.
-
-*deb and rpm:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc}-elastic start
-----------------------------------------------------------------------
-
-*mac and linux:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo chown root heartbeat.yml <1>
-sudo ./heartbeat -e
-----------------------------------------------------------------------
-<1> You'll be running Heartbeat as root, so you need to change ownership of the
-configuration file, or run Heartbeat with `--strict.perms=false` specified. See
-{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_.
+To start {beatname_uc}, run:
 
 :requires-sudo:
-include::{libbeat-dir}/shared-brew-run.asciidoc[]
+include::{libbeat-dir}/tab-widgets/start-widget.asciidoc[]
 :requires-sudo!:
-
-*win:*
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-PS C:\Program Files\Heartbeat> Start-Service heartbeat
-----------------------------------------------------------------------
-
-By default, Windows log files are stored in +C:\ProgramData\heartbeat\Logs+.
 
 Heartbeat is now ready to check the status of your services and send
 events to your defined output.
 
-[[view-kibana-dashboards]]
-=== Step 6: View the sample Kibana dashboards
+[float]
+[[view-data]]
+=== Step 7: View your data in {kib}
 
-To make it easier for you to visualize the status of your services, we have
-created example {beatname_uc} dashboards in the
-https://github.com/elastic/uptime-contrib[uptime-contrib] github repository. If
-you loaded them earlier, open them now.
+{beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing the
+status of your services. The dashboards are available in the
+https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.
 
-include::{libbeat-dir}/opendashboards.asciidoc[]
+If you loaded the dashboards earlier, open them now.
 
-The dashboards are provided as examples. We recommend that you
-{kibana-ref}/dashboard.html[customize] them to meet your needs.
+include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
 
-[role="screenshot"]
-image::./images/heartbeat-statistics.png[Heartbeat statistics]
+[float]
+=== What's next?
+
+Now that you have your uptime data streaming into {es}, learn how to unify your
+logs, metrics, uptime, and application performance data.
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[]
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

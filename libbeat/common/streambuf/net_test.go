@@ -44,7 +44,7 @@ func Test_ReadNetUint8Data(t *testing.T) {
 	b := New([]byte{10})
 	v, err := b.ReadNetUint8()
 	b.checkInvariants(t)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(10), v)
 }
 
@@ -59,7 +59,7 @@ func Test_ReadNetUint8AtFailed(t *testing.T) {
 func Test_ReadNetUint8AtInRange(t *testing.T) {
 	b := New([]byte{1, 2, 3})
 	v, err := b.ReadNetUint8At(2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(3), v)
 }
 
@@ -73,11 +73,11 @@ func Test_ReadNetUint8AtOutOfRange(t *testing.T) {
 func Test_WriteNetUint8At(t *testing.T) {
 	b := New(nil)
 	err := b.WriteNetUint8At(10, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	b.Advance(1)
 	tmp, err := b.ReadNetUint8()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint8(10), tmp)
 }
 
@@ -100,7 +100,7 @@ func Test_ReadNetUint16Data(t *testing.T) {
 	b := New([]byte{0xf1, 0xf2})
 	v, err := b.ReadNetUint16()
 	b.checkInvariants(t)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(0xf1f2), v)
 }
 
@@ -115,7 +115,7 @@ func Test_ReadNetUint16AtFailed(t *testing.T) {
 func Test_ReadNetUint16AtInRange(t *testing.T) {
 	b := New([]byte{0xf1, 0xf2, 0xf3})
 	v, err := b.ReadNetUint16At(1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(0xf2f3), v)
 }
 
@@ -129,11 +129,11 @@ func Test_ReadNetUint16AtOutOfRange(t *testing.T) {
 func Test_WriteNetUint16At(t *testing.T) {
 	b := New(nil)
 	err := b.WriteNetUint16At(0x1f2f, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	b.Advance(1)
 	tmp, err := b.ReadNetUint16()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint16(0x1f2f), tmp)
 }
 
@@ -156,7 +156,7 @@ func Test_ReadNetUint32Data(t *testing.T) {
 	b := New([]byte{0xf1, 0xf2, 0xf3, 0xf4})
 	v, err := b.ReadNetUint32()
 	b.checkInvariants(t)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint32(0xf1f2f3f4), v)
 }
 
@@ -171,7 +171,7 @@ func Test_ReadNetUint32AtFailed(t *testing.T) {
 func Test_ReadNetUint32AtInRange(t *testing.T) {
 	b := New([]byte{0xf1, 0xf2, 0xf3, 0xf4, 0xf5})
 	v, err := b.ReadNetUint32At(1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint32(0xf2f3f4f5), v)
 }
 
@@ -185,11 +185,11 @@ func Test_ReadNetUint32AtOutOfRange(t *testing.T) {
 func Test_WriteNetUint32At(t *testing.T) {
 	b := New(nil)
 	err := b.WriteNetUint32At(0x1f2f3f4f, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	b.Advance(1)
 	tmp, err := b.ReadNetUint32()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint32(0x1f2f3f4f), tmp)
 }
 
@@ -216,7 +216,7 @@ func Test_ReadNetUint64Data(t *testing.T) {
 	})
 	v, err := b.ReadNetUint64()
 	b.checkInvariants(t)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint64(0xf0f1f2f3f4f5f6f7), v)
 }
 
@@ -235,7 +235,7 @@ func Test_ReadNetUint64AtInRange(t *testing.T) {
 		0xfa, 0xfb, 0xfc, 0xfd, 0xfe,
 	})
 	v, err := b.ReadNetUint64At(1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint64(0xf1f2f3f4f5f6f7f8), v)
 }
 
@@ -249,10 +249,10 @@ func Test_ReadNetUint64AtOutOfRange(t *testing.T) {
 func Test_WriteNetUint64At(t *testing.T) {
 	b := New(nil)
 	err := b.WriteNetUint64At(0x1f2f3f4f5f6f7f8f, 1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	b.Advance(1)
 	tmp, err := b.ReadNetUint64()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, uint64(0x1f2f3f4f5f6f7f8f), tmp)
 }

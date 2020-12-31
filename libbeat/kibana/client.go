@@ -19,6 +19,7 @@ package kibana
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,16 +31,17 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type Connection struct {
 	URL      string
 	Username string
 	Password string
+	Headers  http.Header
 
 	HTTP    *http.Client
 	Version common.Version
@@ -47,6 +49,7 @@ type Connection struct {
 
 type Client struct {
 	Connection
+	log *logp.Logger
 }
 
 func addToURL(_url, _path string, params url.Values) string {
@@ -78,7 +81,7 @@ func extractError(result []byte) error {
 
 // NewKibanaClient builds and returns a new Kibana client
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
-	config := defaultClientConfig
+	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
@@ -114,7 +117,8 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		kibanaURL = u.String()
 	}
 
-	logp.Info("Kibana url: %s", kibanaURL)
+	log := logp.NewLogger("kibana")
+	log.Info("Kibana url: %s", kibanaURL)
 
 	var dialer, tlsDialer transport.Dialer
 
@@ -129,19 +133,27 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 		return nil, err
 	}
 
+	headers := make(http.Header)
+	for k, v := range config.Headers {
+		headers.Set(k, v)
+	}
+
 	client := &Client{
 		Connection: Connection{
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
+			Headers:  headers,
 			HTTP: &http.Client{
 				Transport: &http.Transport{
-					Dial:    dialer.Dial,
-					DialTLS: tlsDialer.Dial,
+					Dial:            dialer.Dial,
+					DialTLS:         tlsDialer.Dial,
+					TLSClientConfig: tlsConfig.ToConfig(),
 				},
 				Timeout: config.Timeout,
 			},
 		},
+		log: log,
 	}
 
 	if !config.IgnoreVersion {
@@ -180,9 +192,16 @@ func (conn *Connection) Request(method, extraPath string,
 func (conn *Connection) Send(method, extraPath string,
 	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
 
+	return conn.SendWithContext(context.Background(), method, extraPath, params, headers, body)
+}
+
+// SendWithContext sends an application/json request to Kibana with appropriate kbn headers and the given context.
+func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath string,
+	params url.Values, headers http.Header, body io.Reader) (*http.Response, error) {
+
 	reqURL := addToURL(conn.URL, extraPath, params)
 
-	req, err := http.NewRequest(method, reqURL, body)
+	req, err := http.NewRequestWithContext(ctx, method, reqURL, body)
 	if err != nil {
 		return nil, fmt.Errorf("fail to create the HTTP %s request: %+v", method, err)
 	}
@@ -191,17 +210,21 @@ func (conn *Connection) Send(method, extraPath string,
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 
+	addHeaders(req.Header, conn.Headers)
+	addHeaders(req.Header, headers)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Add("Accept", "application/json")
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
-	for header, values := range headers {
-		for _, value := range values {
-			req.Header.Add(header, value)
+	return conn.RoundTrip(req)
+}
+
+func addHeaders(out, in http.Header) {
+	for k, vs := range in {
+		for _, v := range vs {
+			out.Add(k, v)
 		}
 	}
-
-	return conn.RoundTrip(req)
 }
 
 // Implements RoundTrip interface
@@ -262,7 +285,7 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 
 	body, err := json.Marshal(jsonBody)
 	if err != nil {
-		logp.Err("Failed to json encode body (%v): %#v", err, jsonBody)
+		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
 		return fmt.Errorf("fail to marshal the json content: %v", err)
 	}
 

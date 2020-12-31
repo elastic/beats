@@ -1,10 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
-
 
 PHPFPM_FIELDS = metricbeat.COMMON_FIELDS + ["php_fpm"]
 
@@ -33,6 +30,6 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(PHPFPM_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(PHPFPM_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)

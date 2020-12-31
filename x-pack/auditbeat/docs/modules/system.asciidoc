@@ -2,9 +2,10 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:modulename: system
+
 [id="{beatname_lc}-module-system"]
 [role="xpack"]
-
 == System Module
 
 beta[]
@@ -35,6 +36,26 @@ Event information is sent as the events occur (e.g. a process starts or stops).
 All datasets are currently using a poll model to retrieve their data.
 The frequency of these polls is controlled by the `period` configuration
 parameter.
+
+[float]
+==== Entity IDs
+
+This module populates `entity_id` fields to uniquely identify entities (users,
+packages, processes...) within a host. This requires {beatname_uc}
+to obtain a unique identifier for the host:
+
+- Windows: Uses the `HKLM\Software\Microsoft\Cryptography\MachineGuid` registry
+key.
+- macOS: Uses the value returned by `gethostuuid(2)` system call.
+- Linux: Uses the content of one of the following files, created by either
+`systemd` or `dbus`:
+ * /etc/machine-id
+ * /var/lib/dbus/machine-id
+ * /var/db/dbus/machine-id
+
+NOTE: Under CentOS 6.x, it's possible that none of the files above exist.
+In that case, running `dbus-uuidgen --ensure` (provided by the `dbus` package)
+will generate one for you.
 
 [float]
 ==== Example dashboard
@@ -72,10 +93,11 @@ sample suggested configuration.
   user.detect_password_changes: true
 ----
 
-*`period`*:: The frequency at which the datasets check for changes. For most
-datasets - esp. `process` and `socket` - a shorter period is recommended.
+This module also supports the
+<<module-standard-options-{modulename},standard configuration options>>
+described later.
 
-*`state.period`*:: The frequency at which the datasets send full state information.
+*`state.period`*:: The interval at which the datasets send full state information.
 This option can be overridden per dataset using `{dataset}.state.period`.
 
 *`user.detect_password_changes`*:: If the `user` dataset is configured and
@@ -85,8 +107,7 @@ the `beat.db` file to detect changes between Auditbeat restarts. The `beat.db` f
 should be readable only by the root user and be treated similar to the shadow file
 itself.
 
-*`keep_null`*:: If this option is set to true, fields with `null` values will be
-published in the output document. By default, `keep_null` is set to `false`.
+include::{docdir}/auditbeat-options.asciidoc[]
 
 [float]
 === Suggested configuration
@@ -129,9 +150,14 @@ is an example configuration:
 auditbeat.modules:
 - module: system
   datasets:
+    - package # Installed, updated, and removed packages
+
+  period: 2m # The frequency at which the datasets check for changes
+
+- module: system
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - login   # User logins, logouts, and system boots.
-    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -150,6 +176,9 @@ auditbeat.modules:
   login.wtmp_file_pattern: /var/log/wtmp*
   login.btmp_file_pattern: /var/log/btmp*
 ----
+
+
+:modulename!:
 
 [float]
 === Datasets

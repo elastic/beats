@@ -1,0 +1,16 @@
+{{header "Filebeat autodiscover"}}
+
+# Autodiscover allows you to detect changes in the system and spawn new modules
+# or inputs as they happen.
+
+#filebeat.autodiscover:
+  # List of enabled autodiscover providers
+#  providers:
+#    - type: docker
+#      templates:
+#        - condition:
+#            equals.docker.container.image: busybox
+#          config:
+#            - type: container
+#              paths:
+#                - /var/lib/docker/containers/${data.docker.container.id}/*.log

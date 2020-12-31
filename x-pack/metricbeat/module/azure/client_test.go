@@ -17,7 +17,7 @@ import (
 var (
 	resourceIDConfig = Config{
 		Resources: []ResourceConfig{
-			{ID: []string{"123"},
+			{Id: []string{"123"},
 				Metrics: []MetricConfig{
 					{
 						Name: []string{"hello", "test"},
@@ -36,28 +36,27 @@ var (
 	}
 )
 
-func mockMapMetric(client *Client, metric MetricConfig, resource resources.GenericResource) ([]Metric, error) {
+func mockMapResourceMetrics(client *Client, resources []resources.GenericResource, resourceConfig ResourceConfig) ([]Metric, error) {
 	return nil, nil
 }
 
 func TestInitResources(t *testing.T) {
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
 		client := NewMockClient()
-		mr := MockReporterV2{}
-		err := client.InitResources(mockMapMetric, &mr)
+		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
 		client := NewMockClient()
 		client.Config = resourceQueryConfig
 		m := &MockService{}
-		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(resources.ListResultPage{}, errors.New("invalid resource query"))
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResource{}, errors.New("invalid resource query"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		err := client.InitResources(mockMapMetric, &mr)
+		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resources were found based on all the configurations options entered")
-		assert.Equal(t, len(client.Resources.Metrics), 0)
+		assert.Equal(t, len(client.ResourceConfigurations.Metrics), 0)
 		m.AssertExpectations(t)
 	})
 }
@@ -65,8 +64,9 @@ func TestInitResources(t *testing.T) {
 func TestGetMetricValues(t *testing.T) {
 	client := NewMockClient()
 	client.Config = resourceIDConfig
+
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
-		client.Resources = ResourceConfiguration{
+		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
 				{
 					Namespace:    "namespace",
@@ -77,18 +77,18 @@ func TestGetMetricValues(t *testing.T) {
 			},
 		}
 		m := &MockService{}
-		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
+		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Once().
+			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		err := client.GetMetricValues(&mr)
-		assert.Nil(t, err)
-		assert.Equal(t, len(client.Resources.Metrics[0].Values), 0)
+		metrics := client.GetMetricValues(client.ResourceConfigurations.Metrics, &mr)
+		assert.Equal(t, len(metrics), 0)
+		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
 		m.AssertExpectations(t)
 	})
 	t.Run("return metric values", func(t *testing.T) {
-		client.Resources = ResourceConfiguration{
+		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
 				{
 					Namespace:    "namespace",
@@ -99,14 +99,14 @@ func TestGetMetricValues(t *testing.T) {
 			},
 		}
 		m := &MockService{}
-		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return([]insights.Metric{}, errors.New("invalid parameters or no metrics found"))
+		m.On("GetMetricValues", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return([]insights.Metric{}, "", errors.New("invalid parameters or no metrics found"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		err := client.GetMetricValues(&mr)
-		assert.Nil(t, err)
-		assert.Equal(t, len(client.Resources.Metrics[0].Values), 0)
+		metricValues := client.GetMetricValues(client.ResourceConfigurations.Metrics, &mr)
+		assert.Equal(t, len(metricValues), 0)
+		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
 		m.AssertExpectations(t)
 	})
 }

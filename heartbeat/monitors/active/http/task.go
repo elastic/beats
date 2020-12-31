@@ -20,26 +20,29 @@ package http
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common/useragent"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/transport"
+	"github.com/elastic/beats/v7/heartbeat/eventext"
+	"github.com/elastic/beats/v7/heartbeat/look"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
 
 var userAgent = useragent.UserAgent("Heartbeat")
@@ -53,14 +56,6 @@ func newHTTPMonitorHostJob(
 	validator multiValidator,
 ) (jobs.Job, error) {
 
-	// Trace visited URLs when redirects occur
-	var redirects []string
-	client := &http.Client{
-		CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
-		Transport:     transport,
-		Timeout:       config.Timeout,
-	}
-
 	request, err := buildRequest(addr, config, enc)
 	if err != nil {
 		return nil, err
@@ -69,7 +64,17 @@ func newHTTPMonitorHostJob(
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response, &redirects)
+		var redirects []string
+		client := &http.Client{
+			// Trace visited URLs when redirects occur
+			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
+			Transport:     transport,
+			Timeout:       config.Timeout,
+		}
+		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		if len(redirects) > 0 {
+			event.PutValue("http.response.redirects", redirects)
+		}
 		return err
 	}), nil
 }
@@ -77,7 +82,7 @@ func newHTTPMonitorHostJob(
 func newHTTPMonitorIPsJob(
 	config *Config,
 	addr string,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -93,10 +98,8 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
-
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
-	job, err := monitors.MakeByHostJob(settings, pingFactory)
+	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
 }
@@ -104,14 +107,13 @@ func newHTTPMonitorIPsJob(
 func createPingFactory(
 	config *Config,
 	port uint16,
-	tls *transport.TLSConfig,
+	tls *tlscommon.TLSConfig,
 	request *http.Request,
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
-	checkRedirect := makeCheckRedirect(config.MaxRedirects, nil)
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
@@ -137,6 +139,10 @@ func createPingFactory(
 		// It seems they can be invoked still sometime after the request is done
 		cbMutex := sync.Mutex{}
 
+		// We don't support redirects for IP jobs, so this effectively just
+		// prevents following redirects in this case, we know that
+		// config.MaxRedirects must be zero to even be here
+		checkRedirect := makeCheckRedirect(0, nil)
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
@@ -160,7 +166,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response, nil)
+		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -221,7 +227,6 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-	redirects *[]string,
 ) (start, end time.Time, err reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -231,30 +236,56 @@ func execPing(
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
 	start, resp, errReason := execRequest(client, req)
-
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
 	// in other ways
 	if resp == nil || errReason != nil {
+		if urlErr, ok := errReason.Unwrap().(*url.Error); ok {
+			if certErr, ok := urlErr.Err.(x509.CertificateInvalidError); ok {
+				tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
+			}
+		}
+
 		return start, time.Now(), errReason
 	}
 
-	bodyFields, errReason := processBody(resp, responseConfig, validator)
+	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
 	}
 
+	if mimeType != "" {
+		responseFields["mime_type"] = mimeType
+	}
+
+	if responseConfig.IncludeHeaders {
+		headerFields := common.MapStr{}
+		for canonicalHeaderKey, vals := range resp.Header {
+			if len(vals) > 1 {
+				headerFields[canonicalHeaderKey] = vals
+			} else {
+				headerFields[canonicalHeaderKey] = vals[0]
+			}
+		}
+		responseFields["headers"] = headerFields
+	}
+
 	httpFields := common.MapStr{"response": responseFields}
 
-	if redirects != nil && len(*redirects) > 0 {
-		httpFields["redirects"] = redirects
-	}
 	eventext.MergeEventFields(event, common.MapStr{"http": httpFields})
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
+
+	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
+	// a proxy.
+	if resp.TLS != nil {
+		tlsFields := common.MapStr{}
+		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
+		eventext.MergeEventFields(event, tlsFields)
+	}
 
 	// Add total HTTP RTT
 	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{

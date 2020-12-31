@@ -1246,7 +1246,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Handshake completed",
-                "field": "tls.handshake_completed",
+                "field": "tls.established",
                 "json": "",
                 "order": "desc",
                 "orderBy": "1",
@@ -1665,13 +1665,13 @@
                   "store": "appState"
                 },
                 "exists": {
-                  "field": "tls.handshake_completed"
+                  "field": "tls.established"
                 },
                 "meta": {
                   "alias": "TLS sessions",
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "tls.handshake_completed",
+                  "key": "tls.established",
                   "negate": false,
                   "type": "exists",
                   "value": "exists"

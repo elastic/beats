@@ -14,9 +14,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 const (
@@ -137,7 +137,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 func ReadTemplateFlowSet(d Decoder, buf *bytes.Buffer) (templates []*template.Template, err error) {
 	var row [4]byte
 	for {
-		if buf.Len() < 4 {
+		if buf.Len() < 8 {
 			return templates, nil
 		}
 		if n, err := buf.Read(row[:]); err != nil || n != len(row) {
@@ -184,7 +184,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		if buf.Len() < int(length) {
 			return nil, io.EOF
 		}
-		if scopeLen == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
+		if (scopeLen+optsLen) == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
 			return nil, fmt.Errorf("bad length for options template. scope=%d options=%d", scopeLen, optsLen)
 		}
 		template, err := ReadFields(d, buf, (scopeLen+optsLen)/4)
@@ -193,6 +193,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		}
 		template.ID = tID
 		template.ScopeFields = scopeLen / 4
+		template.IsOptions = true
 		templates = append(templates, &template)
 	}
 	return templates, nil

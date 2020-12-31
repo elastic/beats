@@ -5,8 +5,10 @@
     Contains common beat fields available in all event types.
   fields:
     - name: agent.hostname
-      type: keyword
-      description: Hostname of the agent.
+      type: alias
+      path: agent.name
+      description: >
+        Deprecated - use agent.name or agent.id to identify an agent.
 
     - name: beat.timezone
       type: alias
@@ -26,7 +28,7 @@
 
     - name: beat.hostname
       type: alias
-      path: agent.hostname
+      path: agent.name
       migration: true
 
     - name: timeseries.instance

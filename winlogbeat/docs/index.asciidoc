@@ -20,6 +20,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :win_only:
 :no_decode_cef_processor:
 :no_decode_csv_fields_processor:
+:include_translate_sid_processor:
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
@@ -32,6 +33,8 @@ include::./setting-up-running.asciidoc[]
 include::./upgrading.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
+
+include::{docdir}/howto/howto.asciidoc[]
 
 include::./modules.asciidoc[]
 
@@ -46,4 +49,5 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+
 

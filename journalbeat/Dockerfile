@@ -1,13 +1,19 @@
-FROM golang:1.13.5
-MAINTAINER Noémi Ványi <noemi.vanyi@elastic.co>
+FROM golang:1.14.12
 
-RUN set -x && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-      python-pip virtualenv libsystemd-dev libc6-dev-i386 gcc-arm-linux-gnueabi && \
-    apt-get clean
+RUN \
+    apt-get update \
+      && apt-get install -y --no-install-recommends \
+         libsystemd-dev \
+         libc6-dev-i386 \
+         gcc-arm-linux-gnueabi \
+         python3 \
+         python3-pip \
+         python3-venv \
+      && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade setuptools
+RUN pip3 install --upgrade pip==20.1.1
+RUN pip3 install --upgrade setuptools==47.3.2
+RUN pip3 install --upgrade docker-compose==1.23.2
 
 # Setup work environment
 ENV JOURNALBEAT_PATH /go/src/github.com/elastic/beats/journalbeat

@@ -1,0 +1,319 @@
+[
+    {
+        "@timestamp": "2017-01-31T14:52:11.000-02:00",
+        "event.action": "Allowed",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "138301618041",
+        "event.dataset": "sophos.xg",
+        "event.kind": "event",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138301618041 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip= filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
+        "event.outcome": "success",
+        "event.severity": "6",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "end",
+            "connection"
+        ],
+        "file.size": 0,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 0,
+        "observer.product": "XG",
+        "observer.serial_number": "C44310050024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.log_component": "Mail",
+        "sophos.xg.log_subtype": "Allowed",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18041",
+        "sophos.xg.priority": "Information",
+        "sophos.xg.reason": "eligible",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-31T14:52:11.000-02:00",
+        "client.ip": "10.198.47.112",
+        "event.action": "Denied",
+        "event.category": [
+            "malware",
+            "network"
+        ],
+        "event.code": "138302218042",
+        "event.dataset": "sophos.xg",
+        "event.kind": "alert",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=14:52:11 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=138302218042 log_type=\"Sandbox\" log_component=\"Mail\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith@iview.com\" src_ip=10.198.47.112 filename=\"1.exe\" filetype=\"application/octet-stream\" filesize=153006 sha1sum=\"83cd339302bf5e8ed5240ca6383418089c337a81\" source=\"jsmith@iview.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
+        "event.outcome": "success",
+        "event.severity": "2",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
+        "file.hash.sha1": "83cd339302bf5e8ed5240ca6383418089c337a81",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153006,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "critical",
+        "log.offset": 343,
+        "observer.product": "XG",
+        "observer.serial_number": "C44310050024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "related.hash": [
+            "83cd339302bf5e8ed5240ca6383418089c337a81"
+        ],
+        "related.ip": [
+            "10.198.47.112"
+        ],
+        "related.user": [
+            "jsmith@iview.com"
+        ],
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.filename": "1.exe",
+        "sophos.xg.log_component": "Mail",
+        "sophos.xg.log_subtype": "Denied",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18042",
+        "sophos.xg.priority": "Critical",
+        "sophos.xg.reason": "cached malicious",
+        "sophos.xg.source": "jsmith@iview.com",
+        "source.ip": "10.198.47.112",
+        "source.user.name": "jsmith@iview.com",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
+        "event.action": "Allowed",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "136501618041",
+        "event.dataset": "sophos.xg",
+        "event.kind": "event",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44313350024-P29PUA log_id=136501618041 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Allowed\" priority=Information user_name=\"\" src_ip= filename=\"\" filetype=\"\" filesize=0 sha1sum=\"\" source=\"\" reason=\"eligible\" destination=\"\" subject=\"\"",
+        "event.outcome": "success",
+        "event.severity": "6",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "end",
+            "connection"
+        ],
+        "file.size": 0,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 809,
+        "observer.product": "XG",
+        "observer.serial_number": "C44313350024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.log_component": "Web",
+        "sophos.xg.log_subtype": "Allowed",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18041",
+        "sophos.xg.priority": "Information",
+        "sophos.xg.reason": "eligible",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
+        "client.ip": "10.198.47.112",
+        "event.action": "Pending",
+        "event.category": [
+            "network"
+        ],
+        "event.code": "136528618043",
+        "event.dataset": "sophos.xg",
+        "event.kind": "event",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136528618043 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Pending\" priority=Information user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"pending\" destination=\"\" subject=\"\"",
+        "event.outcome": "success",
+        "event.severity": "6",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "start",
+            "connection"
+        ],
+        "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153010,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 1151,
+        "observer.product": "XG",
+        "observer.serial_number": "C44310050024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "related.hash": [
+            "3ce799580908df9ca0dc649aa8c2d06ab267e8c8"
+        ],
+        "related.ip": [
+            "10.198.47.112"
+        ],
+        "related.user": [
+            "jsmith"
+        ],
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.filename": "19.exe",
+        "sophos.xg.log_component": "Web",
+        "sophos.xg.log_subtype": "Pending",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18043",
+        "sophos.xg.priority": "Information",
+        "sophos.xg.reason": "pending",
+        "sophos.xg.source": "10.198.241.50",
+        "source.ip": "10.198.47.112",
+        "source.user.name": "jsmith",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
+        "client.ip": "10.198.47.112",
+        "event.action": "Denied",
+        "event.category": [
+            "malware",
+            "network"
+        ],
+        "event.code": "136502218042",
+        "event.dataset": "sophos.xg",
+        "event.kind": "alert",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2017-01-31 time=15:28:25 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"jsmith\" src_ip=10.198.47.112 filename=\"19.exe\" filetype=\"application/octet-stream\" filesize=153010 sha1sum=\"3ce799580908df9ca0dc649aa8c2d06ab267e8c8\" source=\"10.198.241.50\" reason=\"cloud malicious\" destination=\"\" subject=\"",
+        "event.outcome": "success",
+        "event.severity": "2",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
+        "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
+        "file.mime_type": "application/octet-stream",
+        "file.size": 153010,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "critical",
+        "log.offset": 1599,
+        "observer.product": "XG",
+        "observer.serial_number": "C44310050024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "related.hash": [
+            "3ce799580908df9ca0dc649aa8c2d06ab267e8c8"
+        ],
+        "related.ip": [
+            "10.198.47.112"
+        ],
+        "related.user": [
+            "jsmith"
+        ],
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.filename": "19.exe",
+        "sophos.xg.log_component": "Web",
+        "sophos.xg.log_subtype": "Denied",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18042",
+        "sophos.xg.priority": "Critical",
+        "sophos.xg.reason": "cloud malicious",
+        "sophos.xg.source": "10.198.241.50",
+        "source.ip": "10.198.47.112",
+        "source.user.name": "jsmith",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-05-18T14:38:36.000-02:00",
+        "client.ip": "172.16.34.24",
+        "event.action": "Denied",
+        "event.category": [
+            "malware",
+            "network"
+        ],
+        "event.code": "136502218042",
+        "event.dataset": "sophos.xg",
+        "event.kind": "alert",
+        "event.module": "sophos",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:36 timezone=\"IST\" device_name=\"CR750iNG-XP\" device_id=C44310050024-P29PUA log_id=136502218042 log_type=\"Sandbox\" log_component=\"Web\" log_subtype=\"Denied\" priority=Critical user_name=\"\" src_ip=172.16.34.24 filename=\"SBTestFile1.pdf\" filetype=\"application/pdf\" filesize=1124 sha1sum=\"d910c4a81122c360fe57f67a04999425a65249db\" source=\"sophostest.com\" reason=\"cached malicious\" destination=\"\" subject=\"\"",
+        "event.outcome": "success",
+        "event.severity": "2",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
+        "file.hash.sha1": "d910c4a81122c360fe57f67a04999425a65249db",
+        "file.mime_type": "application/pdf",
+        "file.size": 1124,
+        "fileset.name": "xg",
+        "host.name": "firewall.localgroup.local",
+        "input.type": "log",
+        "log.level": "critical",
+        "log.offset": 2050,
+        "observer.product": "XG",
+        "observer.serial_number": "C44310050024-P29PUA",
+        "observer.type": "firewall",
+        "observer.vendor": "Sophos",
+        "related.hash": [
+            "d910c4a81122c360fe57f67a04999425a65249db"
+        ],
+        "related.ip": [
+            "172.16.34.24"
+        ],
+        "service.type": "sophos",
+        "sophos.xg.device": "SFW",
+        "sophos.xg.device_name": "CR750iNG-XP",
+        "sophos.xg.filename": "SBTestFile1.pdf",
+        "sophos.xg.log_component": "Web",
+        "sophos.xg.log_subtype": "Denied",
+        "sophos.xg.log_type": "Sandbox",
+        "sophos.xg.message_id": "18042",
+        "sophos.xg.priority": "Critical",
+        "sophos.xg.reason": "cached malicious",
+        "sophos.xg.source": "sophostest.com",
+        "source.ip": "172.16.34.24",
+        "tags": [
+            "sophos-xg",
+            "forwarded"
+        ]
+    }
+]

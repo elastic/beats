@@ -21,19 +21,28 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
-func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys bool, addErrKey bool) {
-	if !overwriteKeys {
-		for k, v := range keys {
-			if _, exists := event.Fields[k]; !exists && k != "@timestamp" && k != "@metadata" {
-				event.Fields[k] = v
-			}
+func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, overwriteKeys, addErrKey bool) {
+	logger := logp.NewLogger("jsonhelper")
+	if expandKeys {
+		if err := expandFields(keys); err != nil {
+			logger.Errorf("JSON: failed to expand fields: %s", err)
+			event.SetErrorWithOption(createJSONError(err.Error()), addErrKey)
+			return
 		}
+	}
+	if !overwriteKeys {
+		// @timestamp and @metadata fields are root-level fields. We remove them so they
+		// don't become part of event.Fields.
+		removeKeys(keys, "@timestamp", "@metadata")
+
+		// Then, perform deep update without overwriting
+		event.Fields.DeepUpdateNoOverwrite(keys)
 		return
 	}
 
@@ -42,7 +51,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys
 		case "@timestamp":
 			vstr, ok := v.(string)
 			if !ok {
-				logp.Err("JSON: Won't overwrite @timestamp because value is not string")
+				logger.Error("JSON: Won't overwrite @timestamp because value is not string")
 				event.SetErrorWithOption(createJSONError("@timestamp not overwritten (not string)"), addErrKey)
 				continue
 			}
@@ -50,7 +59,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys
 			// @timestamp must be of format RFC3339
 			ts, err := time.Parse(time.RFC3339, vstr)
 			if err != nil {
-				logp.Err("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
+				logger.Errorf("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
 				event.SetErrorWithOption(createJSONError(fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)), addErrKey)
 				continue
 			}
@@ -64,7 +73,7 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys
 				}
 
 			case map[string]interface{}:
-				event.Meta.Update(common.MapStr(m))
+				event.Meta.DeepUpdate(common.MapStr(m))
 
 			default:
 				event.SetErrorWithOption(createJSONError("failed to update @metadata"), addErrKey)
@@ -73,23 +82,31 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, overwriteKeys
 		case "type":
 			vstr, ok := v.(string)
 			if !ok {
-				logp.Err("JSON: Won't overwrite type because value is not string")
+				logger.Error("JSON: Won't overwrite type because value is not string")
 				event.SetErrorWithOption(createJSONError("type not overwritten (not string)"), addErrKey)
 				continue
 			}
 			if len(vstr) == 0 || vstr[0] == '_' {
-				logp.Err("JSON: Won't overwrite type because value is empty or starts with an underscore")
+				logger.Error("JSON: Won't overwrite type because value is empty or starts with an underscore")
 				event.SetErrorWithOption(createJSONError(fmt.Sprintf("type not overwritten (invalid value [%s])", vstr)), addErrKey)
 				continue
 			}
 			event.Fields[k] = vstr
-
-		default:
-			event.Fields[k] = v
 		}
 	}
+
+	// We have accounted for @timestamp, @metadata, type above. So let's remove these keys and
+	// deep update the event with the rest of the keys.
+	removeKeys(keys, "@timestamp", "@metadata", "type")
+	event.Fields.DeepUpdate(keys)
 }
 
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
+}
+
+func removeKeys(keys map[string]interface{}, names ...string) {
+	for _, name := range names {
+		delete(keys, name)
+	}
 }

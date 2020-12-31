@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
 )
 
 const maxMessageSize = 20
@@ -75,7 +75,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			conn, err := net.Dial("udp", s.Listener.LocalAddr().String())
+			conn, err := net.Dial("udp", s.localaddress)
 			if !assert.NoError(t, err) {
 				return
 			}

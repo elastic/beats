@@ -20,7 +20,7 @@ package readfile
 import (
 	"bytes"
 
-	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 // StripNewline reader removes the last trailing newline characters from
@@ -80,4 +80,8 @@ func (p *StripNewline) autoLineEndingChars(l []byte) int {
 		return 2
 	}
 	return 1
+}
+
+func (p *StripNewline) Close() error {
+	return p.reader.Close()
 }

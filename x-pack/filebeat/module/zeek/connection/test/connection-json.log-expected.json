@@ -6,10 +6,19 @@
         "destination.ip": "192.168.86.1",
         "destination.packets": 1,
         "destination.port": 53,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.connection",
         "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH3",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "start",
+            "end"
+        ],
         "fileset.name": "connection",
         "input.type": "log",
         "log.offset": 0,
@@ -19,6 +28,10 @@
         "network.packets": 2,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "192.168.86.167",
+            "192.168.86.1"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.86.167",
         "source.bytes": 103,
@@ -46,15 +59,25 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
         "destination.packets": 1,
         "destination.port": 53,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.connection",
         "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH4",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "start",
+            "end"
+        ],
         "fileset.name": "connection",
         "input.type": "log",
         "log.offset": 398,
@@ -64,6 +87,10 @@
         "network.packets": 2,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "192.168.86.167",
+            "8.8.8.8"
+        ],
         "service.type": "zeek",
         "source.address": "192.168.86.167",
         "source.bytes": 103,
@@ -90,15 +117,25 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
         "destination.packets": 1,
         "destination.port": 53,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.connection",
         "event.duration": 76967000,
         "event.id": "CAcJw21BbVedgFnYH5",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "start",
+            "end"
+        ],
         "fileset.name": "connection",
         "input.type": "log",
         "log.offset": 792,
@@ -108,6 +145,10 @@
         "network.packets": 2,
         "network.protocol": "dns",
         "network.transport": "udp",
+        "related.ip": [
+            "4.4.2.2",
+            "8.8.8.8"
+        ],
         "service.type": "zeek",
         "source.address": "4.4.2.2",
         "source.as.number": 3356,
@@ -115,6 +156,7 @@
         "source.bytes": 103,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.4.2.2",
@@ -137,9 +179,17 @@
         "destination.bytes": 0,
         "destination.ip": "198.51.100.249",
         "destination.packets": 0,
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "zeek.connection",
         "event.id": "Cc6NJ3GRlfjE44I3h",
+        "event.kind": "event",
         "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info"
+        ],
         "fileset.name": "connection",
         "input.type": "log",
         "log.offset": 1181,
@@ -148,6 +198,10 @@
         "network.direction": "external",
         "network.packets": 1,
         "network.transport": "icmp",
+        "related.ip": [
+            "192.0.2.205",
+            "198.51.100.249"
+        ],
         "service.type": "zeek",
         "source.address": "192.0.2.205",
         "source.bytes": 107,

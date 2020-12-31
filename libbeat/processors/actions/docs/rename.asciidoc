@@ -1,6 +1,10 @@
 [[rename-fields]]
 === Rename fields from events
 
+++++
+<titleabbrev>rename</titleabbrev>
+++++
+
 The `rename` processor specifies a list of fields to rename. Under the `fields`
 key, each entry contains a `from: old-key` and a `to: new-key` pair, where:
 
@@ -21,12 +25,12 @@ before assigning values.
 [source,yaml]
 -------
 processors:
-- rename:
-    fields:
-     - from: "a.g"
-       to: "e.d"
-    ignore_missing: false
-    fail_on_error: true
+  - rename:
+      fields:
+        - from: "a.g"
+          to: "e.d"
+      ignore_missing: false
+      fail_on_error: true
 -------
 
 The `rename` processor has the following configuration settings:
@@ -40,5 +44,5 @@ continues also if an error happened during renaming. Default is `true`.
 
 See <<conditions>> for a list of supported conditions.
 
-You can specify multiple `ignore_missing` processors under the `processors`
+You can specify multiple `rename` processors under the `processors`
 section.

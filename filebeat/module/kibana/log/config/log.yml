@@ -7,3 +7,8 @@ exclude_files: [".gz$"]
 
 json.keys_under_root: false
 json.add_error_key: true
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

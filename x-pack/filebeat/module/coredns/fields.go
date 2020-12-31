@@ -7,7 +7,7 @@
 package coredns
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetCoredns returns asset data.
 // This is the base64 encoded gzipped contents of module/coredns.
 func AssetCoredns() string {
-	return "eJy00kFugzAQheE9p3gXSA7Aopt22256gMqxB2LF8dAZo4qcvsIEApIVqYm6S0ae78eIHU401LAs5KJWQPIpUI3XZeBIrfgueY41XioAeGfXB0LDgqOJLvjYInCr6IRdb8nhMKzIxlNwWlfADtGcaZ0D0tBRjVa47/L/Qg/zwpWCaRIJIsvZBH8x49l88Fa6tby7GlPoRMMPyzwrxgDvwA3SkfD28YkkJqqxubKhv3uSYa/+QpuEj4lakuusGZ8y1TgMifR+dpTW4eyXkjYY1b9fazExAQV5/P0MnPcL7og94+b9jSukHUelvWX3ID0TyERZb4JpH3zVCz8ZZf//vp45kQ9s4i6qkv3i0yZ8YA5k4v3ItJpvtMyq3wAAAP//8MJAFA=="
+	return "eJy00kFugzAQheE9p3gXSA7Aopt22256gMqxB2LF8VCPUeWcvrIhBCFQpKKyikb4/8YKB1wo1dAcyHipgGijoxqv08CQ6GC7aNnXeKkA4J1N7wgNB5yVN876Fo5bQRfY9JoMTmmWbCw5I3U5eoBXV5qD+Ympoxpt4L4bJytqfsZjYxKqiRTgOVyVszeV3x5fnZsP1ZqpNJAXSj8cHtMNFrAG3CCeCW8fn4hBeVG6eAviu6eQjmJvtKCsj9RSmKZN3jrWOKVI8nyBXJyvUJx1XDsl8teLTm0MmVUh/94PlMpqPyf390tl0Q8kHXuho2azi7iHUEJbSuNUu+uvmJihtOX8//d2p5YrGC9C+osvC/7E7Ej559AQKPerqt8AAAD//23BSVQ="
 }

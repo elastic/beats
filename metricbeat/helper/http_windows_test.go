@@ -29,9 +29,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/api/npipe"
-	"github.com/elastic/beats/metricbeat/helper/dialer"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/api/npipe"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func TestOverNamedpipe(t *testing.T) {
@@ -62,7 +62,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/",
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
@@ -95,7 +95,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/ok",
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()

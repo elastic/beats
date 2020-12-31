@@ -29,10 +29,10 @@ import (
 
 func TestGetOSState(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := file.Stat()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 
@@ -43,10 +43,10 @@ func TestGetOSState(t *testing.T) {
 
 func TestGetOSStateStat(t *testing.T) {
 	file, err := ioutil.TempFile("", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	fileinfo, err := os.Stat(file.Name())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	state := GetOSState(fileinfo)
 

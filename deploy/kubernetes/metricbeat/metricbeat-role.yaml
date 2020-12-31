@@ -11,6 +11,8 @@ rules:
   - namespaces
   - events
   - pods
+  - secrets
+  - services
   verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
@@ -20,6 +22,7 @@ rules:
   resources:
   - statefulsets
   - deployments
+  - replicasets
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""
@@ -27,3 +30,13 @@ rules:
   - nodes/stats
   verbs:
   - get
+- nonResourceURLs:
+  - "/metrics"
+  verbs:
+  - get
+- apiGroups:
+    - coordination.k8s.io
+  resources:
+    - leases
+  verbs:
+    - '*'

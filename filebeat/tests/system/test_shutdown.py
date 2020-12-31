@@ -1,5 +1,6 @@
 import gzip
 import os
+import platform
 import time
 import unittest
 from filebeat import BaseTest
@@ -11,6 +12,8 @@ Tests that Filebeat shuts down cleanly.
 
 class Test(BaseTest):
 
+    @unittest.skipIf(platform.platform().startswith("Windows-7"),
+                     "Flaky test: https://github.com/elastic/beats/issues/22795")
     def test_shutdown(self):
         """
         Test starting and stopping Filebeat under load.
@@ -81,8 +84,9 @@ class Test(BaseTest):
 
         self.nasa_logs()
 
+        # Use 'localhost' so connection is refused instantly
         self.render_config_template(
-            logstash={"host": "does.not.exist:12345"},
+            logstash={"host": "localhost:12345", "timeout": 1},
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="1s",
@@ -155,7 +159,7 @@ class Test(BaseTest):
             with gzip.open(nasa_log + ".gz", 'rb') as infile:
                 with open(nasa_log, 'w') as outfile:
                     for line in infile:
-                        outfile.write(line)
+                        outfile.write(line.decode("utf-8"))
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/nasa-50k.log"],
                         target_dir="log")

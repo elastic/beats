@@ -1,0 +1,41 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "container_instance": {
+            "cpu_usage": {
+                "avg": 0
+            },
+            "memory_usage": {
+                "avg": 2666496
+            }
+        },
+        "dimensions": {
+            "container_name": "anothercontainer"
+        },
+        "namespace": "Microsoft.ContainerInstance/containerGroups",
+        "resource": {
+            "group": "obs-infrastructure",
+            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerInstance/containerGroups/anothercontainer",
+            "name": "anothercontainer",
+            "type": "Microsoft.ContainerInstance/containerGroups"
+        },
+        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
+        "timegrain": "PT5M"
+    },
+    "cloud": {
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.container_instance",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "container_instance",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}

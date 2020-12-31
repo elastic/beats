@@ -11,8 +11,6 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 
 PROVIDER = "WinlogbeatTestPython"
@@ -43,7 +41,7 @@ class WriteReadTest(BaseTest):
 
         # Every test will use its own event log and application names to ensure
         # isolation.
-        self.testSuffix = "_" + hashlib.sha256(self.api + self._testMethodName).hexdigest()[:5]
+        self.testSuffix = "_" + hashlib.sha256(str(self.api + self._testMethodName).encode('utf_8')).hexdigest()[:5]
         self.providerName = PROVIDER + self.testSuffix
         self.applicationName = APP_NAME + self.testSuffix
         self.otherAppName = OTHER_APP_NAME + self.testSuffix
@@ -70,18 +68,18 @@ class WriteReadTest(BaseTest):
 
     def write_event_log(self, message, eventID=10, sid=None,
                         level=None, source=None):
-        if sid == None:
+        if sid is None:
             sid = self.get_sid()
-        if source == None:
+        if source is None:
             source = self.applicationName
-        if level == None:
+        if level is None:
             level = win32evtlog.EVENTLOG_INFORMATION_TYPE
 
         win32evtlogutil.ReportEvent(source, eventID,
                                     eventType=level, strings=[message], sid=sid)
 
     def get_sid(self):
-        if self.sid == None:
+        if self.sid is None:
             ph = win32api.GetCurrentProcess()
             th = win32security.OpenProcessToken(ph, win32con.TOKEN_READ)
             self.sid = win32security.GetTokenInformation(
@@ -90,13 +88,13 @@ class WriteReadTest(BaseTest):
         return self.sid
 
     def get_sid_string(self):
-        if self.sidString == None:
+        if self.sidString is None:
             self.sidString = win32security.ConvertSidToStringSid(self.get_sid())
 
         return self.sidString
 
     def read_events(self, config=None, expected_events=1):
-        if config == None:
+        if config is None:
             config = {
                 "event_logs": [
                     {"name": self.providerName, "api": self.api}
@@ -111,7 +109,7 @@ class WriteReadTest(BaseTest):
 
     def read_registry(self, requireBookmark=False):
         f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "r")
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.FullLoader)
         self.assertIn("update_time", data)
         self.assertIn("event_logs", data)
 
@@ -132,34 +130,35 @@ class WriteReadTest(BaseTest):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
         assert "winlog.record_id" in evt
-        self.assertDictContainsSubset({
+        expected = {
             "winlog.event_id": eventID,
             "event.code": eventID,
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,
             "winlog.api": self.api,
-        }, evt)
+        }
+        assert expected.items() <= evt.items()
 
-        if msg == None:
+        if msg is None:
             assert "message" not in evt
         else:
-            self.assertEquals(evt["message"], msg)
-            self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
+            self.assertEqual(evt["message"], msg)
+            self.assertEqual(msg, evt.get("winlog.event_data.param1"))
 
-        if sid == None:
-            self.assertEquals(evt["winlog.user.identifier"], self.get_sid_string())
-            self.assertEquals(evt["winlog.user.name"].lower(),
-                              win32api.GetUserName().lower())
-            self.assertEquals(evt["winlog.user.type"], "User")
+        if sid is None:
+            self.assertEqual(evt["winlog.user.identifier"], self.get_sid_string())
+            self.assertEqual(evt["winlog.user.name"].lower(),
+                             win32api.GetUserName().lower())
+            self.assertEqual(evt["winlog.user.type"], "User")
             assert "winlog.user.domain" in evt
         else:
-            self.assertEquals(evt["winlog.user.identifier"], sid)
+            self.assertEqual(evt["winlog.user.identifier"], sid)
             assert "winlog.user.name" not in evt
             assert "winlog.user.type" not in evt
 
-        if extra != None:
-            self.assertDictContainsSubset(extra, evt)
+        if extra is not None:
+            assert extra.items() <= evt.items()
 
 
 def host_name(fqdn):

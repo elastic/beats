@@ -6,8 +6,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 == Stan module
 
-beta[]
-
 This is the STAN module. The STAN module uses https://github.com/nats-io/nats-streaming-server/blob/master/server/monitor.go[STAN monitoring server APIs] to collect metrics.
 
 The default metricsets are `channels`, `stats` and `subscriptions`.
@@ -16,6 +14,12 @@ The default metricsets are `channels`, `stats` and `subscriptions`.
 === Compatibility
 
 The STAN module is tested with STAN 0.15.1.
+
+[float]
+== Dashboard
+Dashboards for topic message count and queue depth are included:
+
+image::./images/metricbeat-stan-overview.png[]
 
 
 [float]
@@ -35,6 +39,9 @@ metricbeat.modules:
   #channels.metrics_path: "/streaming/channelsz"
   #subscriptions.metrics_path: "/streaming/channelsz" # we retrieve streaming subscriptions with a detailed query param to the channelsz endpoint
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

@@ -27,11 +27,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 type eventStore struct {
@@ -39,8 +40,8 @@ type eventStore struct {
 }
 
 const (
-	expectedClientHello = `{"client":{"ip":"192.168.0.1","port":6512},"destination":{"domain":"example.org","ip":"192.168.0.2","port":27017},"event":{"category":"network_traffic","dataset":"tls","kind":"event"},"network":{"community_id":"1:jKfewJN/czjTuEpVvsKdYXXiMzs=","protocol":"tls","transport":"tcp","type":"ipv4"},"server":{"domain":"example.org","ip":"192.168.0.2","port":27017},"source":{"ip":"192.168.0.1","port":6512},"status":"Error","tls":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"],"supported_compression_methods":["NULL"],"version":"3.3"},"fingerprints":{"ja3":{"hash":"94c485bca29d5392be53f2b8cf7f4304","str":"771,49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53-10,65281-0-23-35-13-5-18-16-30032-11-10,29-23-24,0"}},"handshake_completed":false,"resumed":false},"type":"tls"}`
-	expectedServerHello = `{"extensions":{"_unparsed_":["renegotiation_info","status_request"],"application_layer_protocol_negotiation":["h2"],"ec_points_formats":["uncompressed","ansiX962_compressed_prime","ansiX962_compressed_char2"],"session_ticket":""},"selected_cipher":"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","selected_compression_method":"NULL","version":"3.3"}`
+	expectedClientHello = `{"client":{"ip":"192.168.0.1","port":6512},"destination":{"domain":"example.org","ip":"192.168.0.2","port":27017},"event":{"category":["network"],"dataset":"tls","kind":"event","type":["connection","protocol"]},"network":{"community_id":"1:jKfewJN/czjTuEpVvsKdYXXiMzs=","direction":"unknown","protocol":"tls","transport":"tcp","type":"ipv4"},"related":{"ip":["192.168.0.1","192.168.0.2"]},"server":{"domain":"example.org","ip":"192.168.0.2","port":27017},"source":{"ip":"192.168.0.1","port":6512},"status":"Error","tls":{"client":{"ja3":"94c485bca29d5392be53f2b8cf7f4304","server_name":"example.org","supported_ciphers":["TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256","TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384","TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256","TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA","TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_GCM_SHA256","TLS_RSA_WITH_AES_256_GCM_SHA384","TLS_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_3DES_EDE_CBC_SHA"]},"detailed":{"client_certificate_requested":false,"client_hello":{"extensions":{"_unparsed_":["renegotiation_info","23","status_request","18","30032"],"application_layer_protocol_negotiation":["h2","http/1.1"],"ec_points_formats":["uncompressed"],"server_name_indication":["example.org"],"session_ticket":"","signature_algorithms":["ecdsa_secp256r1_sha256","rsa_pss_sha256","rsa_pkcs1_sha256","ecdsa_secp384r1_sha384","rsa_pss_sha384","rsa_pkcs1_sha384","rsa_pss_sha512","rsa_pkcs1_sha512","rsa_pkcs1_sha1"],"supported_groups":["x25519","secp256r1","secp384r1"]},"supported_compression_methods":["NULL"],"version":"3.3"},"version":"TLS 1.2"},"established":false,"resumed":false,"version":"1.2","version_protocol":"tls"},"type":"tls"}`
+	expectedServerHello = `{"extensions":{"_unparsed_":["renegotiation_info","status_request"],"application_layer_protocol_negotiation":["h2"],"ec_points_formats":["uncompressed","ansiX962_compressed_prime","ansiX962_compressed_char2"],"session_ticket":""},"selected_compression_method":"NULL","version":"3.3"}`
 	rawClientHello      = "16030100c2010000be03033367dfae0d46ec0651e49cca2ae47317e8989df710" +
 		"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 		"009c009d002f0035000a01000079dada0000ff0100010000000010000e00000b" +
@@ -56,7 +57,7 @@ const (
 )
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil)
+	publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -66,7 +67,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, nil)
+	tls, err := New(true, results.publish, procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		return nil, nil
 	}
@@ -116,7 +117,7 @@ func TestAlert(t *testing.T) {
 
 	reqData, err := hex.DecodeString(
 		"1503010002022d")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -128,10 +129,11 @@ func TestAlert(t *testing.T) {
 	event := results.events[0]
 	_, ok := event.Fields["tls"]
 	assert.True(t, ok)
-	tlsMap, ok := event.Fields["tls"].(common.MapStr)
-	assert.True(t, ok)
-
-	alerts, ok := tlsMap["alerts"].([]common.MapStr)
+	alertsIf, err := event.GetValue("tls.detailed.alerts")
+	if !assert.NoError(t, err) {
+		t.Fatal(err)
+	}
+	alerts := alertsIf.([]common.MapStr)
 	assert.True(t, ok)
 	assert.Len(t, alerts, 1)
 	severity, ok := alerts[0]["severity"]
@@ -150,7 +152,7 @@ func TestInvalidAlert(t *testing.T) {
 
 	reqData, err := hex.DecodeString(
 		"1503010003010203")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -166,7 +168,7 @@ func TestClientHello(t *testing.T) {
 
 	reqData, err := hex.DecodeString(rawClientHello)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -178,7 +180,7 @@ func TestClientHello(t *testing.T) {
 	event := results.events[0]
 
 	b, err := json.Marshal(event.Fields)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
 }
 
@@ -187,7 +189,7 @@ func TestServerHello(t *testing.T) {
 
 	reqData, err := hex.DecodeString(rawServerHello)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -198,10 +200,10 @@ func TestServerHello(t *testing.T) {
 	assert.Len(t, results.events, 1)
 	event := results.events[0]
 
-	hello, err := event.GetValue("tls.server_hello")
-	assert.Nil(t, err)
+	hello, err := event.GetValue("tls.detailed.server_hello")
+	assert.NoError(t, err)
 	b, err := json.Marshal(hello)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedServerHello, string(b))
 }
 
@@ -214,7 +216,7 @@ func TestFragmentedHandshake(t *testing.T) {
 			"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 			"009c009d")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -226,7 +228,7 @@ func TestFragmentedHandshake(t *testing.T) {
 		"1603010083002f0035000a01000079dada0000ff0100010000000010000e00000b" +
 			"6578616d706c652e6f72670017000000230000000d0014001204030804040105" +
 			"0308050501080606010201000500050100000000001200000010000e000c0268")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -234,7 +236,7 @@ func TestFragmentedHandshake(t *testing.T) {
 	reqData, err = hex.DecodeString(
 		"3208687474702f312e3175500000000b00020100000a000a00086a6a001d0017" +
 			"0018aaaa000100")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -244,7 +246,7 @@ func TestFragmentedHandshake(t *testing.T) {
 	event := results.events[0]
 
 	b, err := json.Marshal(event.Fields)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expectedClientHello, string(b))
 }
 
@@ -257,7 +259,7 @@ func TestInterleavedRecords(t *testing.T) {
 			"ee7570a88b9a7d5d56b3af00001c3a3ac02bc02fc02cc030cca9cca8c013c014" +
 			"009c009d")
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -267,14 +269,14 @@ func TestInterleavedRecords(t *testing.T) {
 	// Then two records containing one alert each, merged in a single packet
 	reqData, err = hex.DecodeString(
 		"1503010002FFFF15030100020101")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
 	// And an application data record
 	reqData, err = hex.DecodeString(
 		"17030100080123456789abcdef")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -285,7 +287,7 @@ func TestInterleavedRecords(t *testing.T) {
 			"0308050501080606010201000500050100000000001200000010000e000c0268" +
 			"3208687474702f312e3175500000000b00020100000a000a00086a6a001d0017" +
 			"0018aaaa000100")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 
@@ -295,12 +297,12 @@ func TestInterleavedRecords(t *testing.T) {
 	event := results.events[0]
 
 	// Event contains the client hello
-	_, err = event.GetValue("tls.client_hello")
-	assert.Nil(t, err)
+	_, err = event.GetValue("tls.detailed.client_hello")
+	assert.NoError(t, err)
 
 	// and the alert
-	alerts, err := event.GetValue("tls.alerts")
-	assert.Nil(t, err)
+	alerts, err := event.GetValue("tls.detailed.alerts")
+	assert.NoError(t, err)
 
 	assert.Len(t, alerts.([]common.MapStr), 2)
 }
@@ -311,7 +313,7 @@ func TestCompletedHandshake(t *testing.T) {
 	// First, a certificates record
 	reqData, err := hex.DecodeString(certsMsg)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -356,7 +358,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 			"d809edfcd417861a3ca83e40cf631616e0791efbcc79a0fdfe0d57c6ede4dd4f" +
 			"8dc54cdb7904a8924f10c55f97e5fcc1f813e6002120720c822a09c99a10b09e" +
 			"de25dded2e4c62eff486bf7827f89613f3038d5a200a")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -384,12 +386,15 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
 
-	iVersion, err := results.events[0].Fields.GetValue("tls.version")
-	assert.Nil(t, err)
-
-	version, ok := iVersion.(string)
-	assert.True(t, ok)
-	assert.Equal(t, "TLS 1.3", version)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.3",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.3",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, version)
+	}
 }
 
 func TestLegacyVersionNegotiation(t *testing.T) {
@@ -397,7 +402,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// First, a client hello
 	reqData, err := hex.DecodeString(rawClientHello)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	tcpTuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
 	var private protos.ProtocolData
@@ -420,10 +425,13 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
 
-	iVersion, err := results.events[0].Fields.GetValue("tls.version")
-	assert.Nil(t, err)
-
-	version, ok := iVersion.(string)
-	assert.True(t, ok)
-	assert.Equal(t, "TLS 1.2", version)
+	for key, expected := range map[string]string{
+		"tls.version":          "1.2",
+		"tls.version_protocol": "tls",
+		"tls.detailed.version": "TLS 1.2",
+	} {
+		version, err := results.events[0].Fields.GetValue(key)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, version)
+	}
 }

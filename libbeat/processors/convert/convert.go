@@ -26,14 +26,16 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const logName = "processor.convert"
+
+var ignoredFailure = struct{}{}
 
 func init() {
 	processors.RegisterPlugin("convert", New)
@@ -43,8 +45,6 @@ func init() {
 type processor struct {
 	config
 	log *logp.Logger
-
-	converted []interface{} // Temporary storage for converted values.
 }
 
 // New constructs a new convert processor.
@@ -63,7 +63,7 @@ func newConvert(c config) (*processor, error) {
 		log = log.With("instance_id", c.Tag)
 	}
 
-	return &processor{config: c, log: log, converted: make([]interface{}, len(c.Fields))}, nil
+	return &processor{config: c, log: log}, nil
 }
 
 func (p *processor) String() string {
@@ -71,19 +71,11 @@ func (p *processor) String() string {
 	return "convert=" + string(json)
 }
 
-var ignoredFailure = struct{}{}
-
-func resetValues(s []interface{}) {
-	for i := range s {
-		s[i] = nil
-	}
-}
-
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	defer resetValues(p.converted)
+	converted := make([]interface{}, len(p.Fields))
 
 	// Convert the fields and write the results to temporary storage.
-	if err := p.convertFields(event); err != nil {
+	if err := p.convertFields(event, converted); err != nil {
 		return event, err
 	}
 
@@ -99,14 +91,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	// Update the event with the converted values.
-	if err := p.writeToEvent(event); err != nil {
+	if err := p.writeToEvent(event, converted); err != nil {
 		return &saved, err
 	}
 
 	return event, nil
 }
 
-func (p *processor) convertFields(event *beat.Event) error {
+func (p *processor) convertFields(event *beat.Event, converted []interface{}) error {
 	// Write conversion results to temporary storage.
 	for i, conv := range p.Fields {
 		v, err := p.convertField(event, conv)
@@ -116,7 +108,7 @@ func (p *processor) convertFields(event *beat.Event) error {
 			}
 			v = ignoredFailure
 		}
-		p.converted[i] = v
+		converted[i] = v
 	}
 
 	return nil
@@ -142,9 +134,9 @@ func (p *processor) convertField(event *beat.Event, conversion field) (interface
 	return v, nil
 }
 
-func (p *processor) writeToEvent(event *beat.Event) error {
+func (p *processor) writeToEvent(event *beat.Event, converted []interface{}) error {
 	for i, conversion := range p.Fields {
-		v := p.converted[i]
+		v := converted[i]
 		if v == ignoredFailure {
 			continue
 		}
@@ -205,7 +197,7 @@ func toString(value interface{}) (string, error) {
 func toLong(value interface{}) (int64, error) {
 	switch v := value.(type) {
 	case string:
-		return strconv.ParseInt(v, 0, 64)
+		return strToInt(v, 64)
 	case int:
 		return int64(v), nil
 	case int8:
@@ -238,7 +230,7 @@ func toLong(value interface{}) (int64, error) {
 func toInteger(value interface{}) (int32, error) {
 	switch v := value.(type) {
 	case string:
-		i, err := strconv.ParseInt(v, 0, 32)
+		i, err := strToInt(v, 32)
 		return int32(i), err
 	case int:
 		return int32(v), nil
@@ -402,4 +394,25 @@ func cloneValue(value interface{}) interface{} {
 	default:
 		return value
 	}
+}
+
+// strToInt is a helper to interpret a string as either base 10 or base 16.
+func strToInt(s string, bitSize int) (int64, error) {
+	base := 10
+	if hasHexPrefix(s) {
+		// strconv.ParseInt will accept the '0x' or '0X` prefix only when base is 0.
+		base = 0
+	}
+	return strconv.ParseInt(s, base, bitSize)
+}
+
+func hasHexPrefix(s string) bool {
+	if len(s) < 3 {
+		return false
+	}
+	a, b := s[0], s[1]
+	if a == '+' || a == '-' {
+		a, b = b, s[2]
+	}
+	return a == '0' && (b == 'x' || b == 'X')
 }

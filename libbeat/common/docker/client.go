@@ -25,7 +25,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // NewClient builds and returns a new Docker client. On the first request the

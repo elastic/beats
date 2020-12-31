@@ -9,9 +9,9 @@ package guess
 import (
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // guess udp_sendmsg arguments:
@@ -28,7 +28,7 @@ import (
 //  UDP_SENDMSG_MSG: $stack3
 
 func init() {
-	if err := Registry.AddGuess(&guessUDPSendMsg{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessUDPSendMsg{} }); err != nil {
 		panic(err)
 	}
 }

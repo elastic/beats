@@ -1,11 +1,12 @@
+import json
+import logging
+import os
+import pytest
+import shutil
+import unittest
+
 from base import BaseTest
 from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
-import shutil
-import logging
-import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -83,7 +84,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_json_template(self):
         """
         Test loading of json based template
@@ -93,7 +94,7 @@ class Test(BaseTest):
         es = self.es_client()
         self.copy_files(["template.json"])
         path = os.path.join(self.working_dir, "template.json")
-        print path
+        print(path)
 
         self.render_config_template(
             elasticsearch={"hosts": self.get_host()},
@@ -140,7 +141,7 @@ class TestRunTemplate(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_default(self):
         """
         Test run cmd with default settings for template
@@ -157,7 +158,7 @@ class TestRunTemplate(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_disabled(self):
         """
         Test run cmd does not load template when disabled in config
@@ -201,7 +202,7 @@ class TestCommandSetupTemplate(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup(self):
         """
         Test setup cmd with template and ilm-policy subcommands
@@ -216,7 +217,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_default(self):
         """
         Test template setup with default config
@@ -235,7 +236,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_disabled(self):
         """
         Test template setup when ilm disabled
@@ -254,7 +255,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_with_opts(self):
         """
         Test template setup with config options
@@ -266,7 +267,7 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
 
         # check that settings are overwritten
         resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
@@ -275,7 +276,7 @@ class TestCommandSetupTemplate(BaseTest):
         assert index["number_of_shards"] == "2", index["number_of_shards"]
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_template_with_ilm_changed_pattern(self):
         """
         Test template setup with changed ilm.rollover_alias config
@@ -290,7 +291,7 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_template_created_on_ilm_policy_created(self):
         """
         Test template setup overwrites template when new ilm policy is created
@@ -304,7 +305,7 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.name=" + self.custom_alias,
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.custom_alias)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_alias)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
@@ -320,6 +321,34 @@ class TestCommandSetupTemplate(BaseTest):
         assert self.custom_alias in resp
         index = resp[self.custom_alias]["settings"]["index"]
         assert index["number_of_shards"] == "2", index["number_of_shards"]
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_setup_template_index(self):
+        """
+        Test template setup of new index templates
+        """
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.template.type=index"])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_setup_template_component(self):
+        """
+        Test template setup of component index templates
+        """
+        self.render_config()
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.template.type=component"])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_component_template_loaded(self.index_name)
 
 
 class TestCommandExportTemplate(BaseTest):

@@ -26,10 +26,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/config"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
 type flowsChan struct {
@@ -50,7 +51,7 @@ func TestFlowsCounting(t *testing.T) {
 	port1 := []byte{0, 1}
 	port2 := []byte{0, 2}
 
-	module, err := NewFlows(nil, &config.Flows{})
+	module, err := NewFlows(nil, procs.ProcessesWatcher{}, &config.Flows{})
 	assert.NoError(t, err)
 
 	uint1, err := module.NewUint("uint1")

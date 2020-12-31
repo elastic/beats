@@ -1,0 +1,170 @@
+[
+    {
+        "crowdstrike.event.CommandLine": "C:\\Windows\\Explorer.EXE",
+        "crowdstrike.event.ComputerName": "alice-laptop",
+        "crowdstrike.event.DetectDescription": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
+        "crowdstrike.event.DetectId": "ldt:ec86abd353824e96765ecbe18eb4f0b4:38655257584",
+        "crowdstrike.event.DetectName": "Process Terminated",
+        "crowdstrike.event.FalconHostLink": "https://falcon.crowdstrike.com/ec86abd353824e96765ecbe18eb4f0b4",
+        "crowdstrike.event.FileName": "explorer.exe",
+        "crowdstrike.event.FilePath": "\\Device\\HarddiskVolume1\\Windows",
+        "crowdstrike.event.LocalIP": "192.168.12.51",
+        "crowdstrike.event.MACAddress": "00-00-00-11-22-33",
+        "crowdstrike.event.MD5String": "ac4c51eb24aa95b77f705ab159189e24",
+        "crowdstrike.event.MachineDomain": "CORP-DOMAIN",
+        "crowdstrike.event.Objective": "Falcon Detection Method",
+        "crowdstrike.event.ParentProcessId": 38682494050,
+        "crowdstrike.event.PatternDispositionDescription": "Prevention, process killed.",
+        "crowdstrike.event.PatternDispositionFlags.Detect": false,
+        "crowdstrike.event.PatternDispositionFlags.InddetMask": false,
+        "crowdstrike.event.PatternDispositionFlags.Indicator": false,
+        "crowdstrike.event.PatternDispositionFlags.KillParent": false,
+        "crowdstrike.event.PatternDispositionFlags.KillProcess": true,
+        "crowdstrike.event.PatternDispositionFlags.KillSubProcess": false,
+        "crowdstrike.event.PatternDispositionFlags.OperationBlocked": false,
+        "crowdstrike.event.PatternDispositionFlags.PolicyDisabled": false,
+        "crowdstrike.event.PatternDispositionFlags.ProcessBlocked": false,
+        "crowdstrike.event.PatternDispositionFlags.QuarantineFile": false,
+        "crowdstrike.event.PatternDispositionFlags.QuarantineMachine": false,
+        "crowdstrike.event.PatternDispositionFlags.Rooting": false,
+        "crowdstrike.event.PatternDispositionFlags.SensorOnly": false,
+        "crowdstrike.event.PatternDispositionValue": 16,
+        "crowdstrike.event.ProcessEndTime": 0,
+        "crowdstrike.event.ProcessId": 38684386611,
+        "crowdstrike.event.ProcessStartTime": "2018-09-13T13:45:39.000Z",
+        "crowdstrike.event.SHA256String": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
+        "crowdstrike.event.SensorId": "7c808b4c8878433287eea53d4a8c3268",
+        "crowdstrike.event.Severity": 4,
+        "crowdstrike.event.SeverityName": "High",
+        "crowdstrike.event.Tactic": "Malware",
+        "crowdstrike.event.Technique": "Ransomware",
+        "crowdstrike.event.UserName": "alice",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-02-19T08:30:00.000Z",
+        "crowdstrike.metadata.eventType": "DetectionSummaryEvent",
+        "crowdstrike.metadata.offset": 294564,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "Prevention, process killed.",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.kind": "alert",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.severity": 4,
+        "event.type": [
+            "info"
+        ],
+        "event.url": "https://falcon.crowdstrike.com/ec86abd353824e96765ecbe18eb4f0b4",
+        "file.hash.md5": "ac4c51eb24aa95b77f705ab159189e24",
+        "file.hash.sha256": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
+        "fileset.name": "falcon",
+        "host.name": "alice-laptop",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 0,
+        "message": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
+        "process.args": [
+            "C:\\Windows\\Explorer.EXE"
+        ],
+        "process.command_line": "C:\\Windows\\Explorer.EXE",
+        "process.executable": "C:\\Windows\\Explorer.EXE",
+        "process.name": "explorer.exe",
+        "process.pid": 38684386611,
+        "related.ip": "192.168.12.51",
+        "rule.description": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
+        "rule.name": "Process Terminated",
+        "service.type": "crowdstrike",
+        "source.ip": "192.168.12.51",
+        "tags": [
+            "forwarded"
+        ],
+        "threat.tactic.name": "malware",
+        "threat.technique.name": "ransomware",
+        "user.domain": "CORP-DOMAIN",
+        "user.name": "alice"
+    },
+    {
+        "crowdstrike.event.FalconHostLink": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.event.FineScore": 1.2,
+        "crowdstrike.event.IncidentEndTime": "2020-03-04T04:17:50.000Z",
+        "crowdstrike.event.IncidentStartTime": "2020-03-04T04:13:48.000Z",
+        "crowdstrike.event.State": "open",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-03-04T04:17:56.766Z",
+        "crowdstrike.metadata.eventType": "IncidentSummaryEvent",
+        "crowdstrike.metadata.offset": 1824,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "incident",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "crowdstrike.falcon_endpoint",
+        "event.kind": "alert",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "info"
+        ],
+        "event.url": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2063,
+        "message": "Incident score 1.2",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "crowdstrike.event.AuditKeyValues": [
+            {
+                "Key": "quarantined_file_id",
+                "ValueString": "35b35a53da374816a6b471cf09e12019_a076d3121743755f2d4f8d4d5807f0bc013177f7847d09b48e76de88ace08c78"
+            },
+            {
+                "Key": "action_taken",
+                "ValueString": "quarantined"
+            }
+        ],
+        "crowdstrike.event.OperationName": "quarantined_file_update",
+        "crowdstrike.event.ServiceName": "quarantined_files",
+        "crowdstrike.event.UTCTimestamp": "2020-06-26T15:55:52.000Z",
+        "crowdstrike.event.UserId": "Crowdstrike",
+        "crowdstrike.metadata.customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "crowdstrike.metadata.eventCreationTime": "2020-06-26T15:55:52.000Z",
+        "crowdstrike.metadata.eventType": "UserActivityAuditEvent",
+        "crowdstrike.metadata.offset": 22865,
+        "crowdstrike.metadata.version": "1.0",
+        "event.action": "user_activity_audit_event",
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "crowdstrike.falcon_audit",
+        "event.kind": "event",
+        "event.module": "crowdstrike",
+        "event.outcome": "unknown",
+        "event.type": [
+            "change"
+        ],
+        "fileset.name": "falcon",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 2579,
+        "message": "quarantined_file_update",
+        "related.user": "Crowdstrike",
+        "service.type": "crowdstrike",
+        "tags": [
+            "forwarded"
+        ],
+        "user.name": "Crowdstrike"
+    }
+]

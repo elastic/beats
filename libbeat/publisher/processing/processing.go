@@ -18,9 +18,9 @@
 package processing
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // SupportFactory creates a new processing Supporter that can be used with
@@ -33,6 +33,8 @@ type SupportFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (
 // will merge the global and local configurations into a common event
 // processor.
 // If `drop` is set, then the processor generated must always drop all events.
+// A Supporter needs to be closed with `Close()` to release its global resources.
 type Supporter interface {
 	Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
+	Close() error
 }

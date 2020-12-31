@@ -1,9 +1,7 @@
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
@@ -18,7 +16,7 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['mssql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MSSQL module outputs an event.
@@ -40,14 +38,14 @@ class Test(XPackTest):
         self.assertEqual(len(output), 4)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
         self.assertTrue(evt["mssql"]["transaction_log"]["space_usage"]["used"]["pct"] > 0)
         self.assertTrue(evt["mssql"]["transaction_log"]["stats"]["active_size"]["bytes"] > 0)
 
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_performance(self):
         """
         MSSQL module outputs an event.
@@ -69,7 +67,7 @@ class Test(XPackTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
         self.assertTrue(evt["mssql"]["performance"]["buffer"]["page_life_expectancy"]["sec"] > 0)
         self.assertTrue(evt["mssql"]["performance"]["user_connections"] > 0)
 

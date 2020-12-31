@@ -1,0 +1,153 @@
+- key: powershell
+  title: PowerShell module
+  description: >
+    These are the event fields specific to the module for the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
+  release: beta
+  fields:
+
+    - name: powershell.id
+      type: keyword
+      description: Shell Id.
+      example: Microsoft Powershell
+
+    - name: powershell.pipeline_id
+      type: keyword
+      description: Pipeline id.
+      example: "1"
+
+    - name: powershell.runspace_id
+      type: keyword
+      description: Runspace id.
+      example: "4fa9074d-45ab-4e53-9195-e91981ac2bbb"
+
+    - name: powershell.sequence
+      type: long
+      description: Sequence number of the powershell execution.
+      example: 1
+
+    - name: powershell.total
+      type: long
+      description: Total number of messages in the sequence.
+      example: 10
+
+    - name: powershell.command
+      type: group
+      description: Data related to the executed command.
+      fields:
+        - name: path
+          type: keyword
+          description: Path of the executed command.
+          example: "C:\\Windows\\system32\\cmd.exe"
+
+        - name: name
+          type: keyword
+          description: Name of the executed command.
+          example: "cmd.exe"
+
+        - name: type
+          type: keyword
+          description: Type of the executed command.
+          example: Application
+
+        - name: value
+          type: text
+          description: The invoked command.
+          example: Import-LocalizedData  LocalizedData -filename ArchiveResources
+
+        - name: invocation_details
+          type: array
+          description: >
+            An array of objects containing detailed information of the executed command.
+
+        - name: invocation_details.type
+          type: keyword
+          description: The type of detail.
+          example: CommandInvocation
+
+        - name: invocation_details.related_command
+          type: keyword
+          description: The command to which the detail is related to.
+          example: Add-Type
+
+        - name: invocation_details.name
+          type: keyword
+          description: >
+            Only used for ParameterBinding detail type. Indicates the parameter name.
+          example: AssemblyName
+
+        - name: invocation_details.value
+          type: text
+          description: >
+            The value of the detail. The meaning of it will depend on the detail type.
+          example: System.IO.Compression.FileSystem
+
+    - name: powershell.connected_user
+      type: group
+      description: Data related to the connected user executing the command.
+      fields:
+        - name: domain
+          type: keyword
+          description: User domain.
+          example: VAGRANT
+
+        - name: name
+          type: keyword
+          description: User name.
+          example: vagrant
+
+    - name: powershell.engine
+      type: group
+      description: Data related to the PowerShell engine.
+      fields:
+        - name: version
+          type: keyword
+          description: Version of the PowerShell engine version used to execute the command.
+          example: "5.1.17763.1007"
+
+        - name: previous_state
+          type: keyword
+          description: >
+            Previous state of the PowerShell engine.
+          example: Available
+
+        - name: new_state
+          type: keyword
+          description: >
+            New state of the PowerShell engine.
+          example: Stopped
+
+    - name: powershell.file
+      type: group
+      description: Data related to the executed script file.
+      fields:
+        - name: script_block_id
+          type: keyword
+          description: Id of the executed script block.
+          example: "50d2dbda-7361-4926-a94d-d9eadfdb43fa"
+
+        - name: script_block_text
+          type: text
+          description: >
+            Text of the executed script block.
+          example: ".\\a_script.ps1"
+
+    - name: powershell.process.executable_version
+      type: keyword
+      description: Version of the engine hosting process executable.
+      example: "5.1.17763.1007"
+
+    - name: powershell.provider
+      type: group
+      description: Data related to the PowerShell engine host.
+      fields:
+        - name: new_state
+          type: keyword
+          description: >
+            New state of the PowerShell provider.
+          example: Active
+
+        - name: name
+          type: keyword
+          description: >
+            Provider name.
+          example: Variable

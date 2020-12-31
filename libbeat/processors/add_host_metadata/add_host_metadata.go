@@ -24,13 +24,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/metric/system/host"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/libbeat/processors/util"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/host"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -47,6 +47,7 @@ type addHostMetadata struct {
 	data    common.MapStrPointer
 	geoData common.MapStr
 	config  Config
+	logger  *logp.Logger
 }
 
 const (
@@ -63,6 +64,7 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	p := &addHostMetadata{
 		config: config,
 		data:   common.NewMapStrPointer(nil),
+		logger: logp.NewLogger("add_host_metadata"),
 	}
 	p.loadData()
 
@@ -79,6 +81,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 
 // Run enriches the given event with the host meta data
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
+	// check replace_host_fields field
+	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {
+		return event, nil
+	}
+
 	err := p.loadData()
 	if err != nil {
 		return nil, err
@@ -122,7 +129,7 @@ func (p *addHostMetadata) loadData() error {
 		// IP-address and MAC-address
 		var ipList, hwList, err = util.GetNetInfo()
 		if err != nil {
-			logp.Info("Error when getting network information %v", err)
+			p.logger.Infof("Error when getting network information %v", err)
 		}
 
 		if len(ipList) > 0 {
@@ -143,4 +150,40 @@ func (p *addHostMetadata) loadData() error {
 func (p *addHostMetadata) String() string {
 	return fmt.Sprintf("%v=[netinfo.enabled=[%v], cache.ttl=[%v]]",
 		processorName, p.config.NetInfoEnabled, p.config.CacheTTL)
+}
+
+func skipAddingHostMetadata(event *beat.Event) bool {
+	// If host fields exist(besides host.name added by libbeat) in event, skip add_host_metadata.
+	hostFields, err := event.Fields.GetValue("host")
+
+	// Don't skip if there are no fields
+	if err != nil || hostFields == nil {
+		return false
+	}
+
+	switch m := hostFields.(type) {
+	case common.MapStr:
+		// if "name" is the only field, don't skip
+		hasName, _ := m.HasKey("name")
+		if hasName && len(m) == 1 {
+			return false
+		}
+		return true
+	case map[string]interface{}:
+		hostMapStr := common.MapStr(m)
+		// if "name" is the only field, don't skip
+		hasName, _ := hostMapStr.HasKey("name")
+		if hasName && len(m) == 1 {
+			return false
+		}
+		return true
+	case map[string]string:
+		// if "name" is the only field, don't skip
+		if m["name"] != "" && len(m) == 1 {
+			return false
+		}
+		return true
+	default:
+		return false
+	}
 }

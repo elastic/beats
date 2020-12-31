@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloudfoundry": {
+        "envelope": {
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "dffd1799-d03a-405a-9309-3fcce23f536f",
+            "ip": "192.168.16.15",
+            "job": "diego_database",
+            "origin": "silk-controller"
+        },
+        "tags": {
+            "source_id": "silk-controller"
+        },
+        "type": "value",
+        "value": {
+            "name": "LeasesIndexRequestTime",
+            "unit": "ms",
+            "value": 0.681265
+        }
+    },
+    "service": {
+        "type": "cloudfoundry"
+    }
+}

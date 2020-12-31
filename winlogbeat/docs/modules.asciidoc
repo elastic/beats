@@ -35,16 +35,16 @@ winlogbeat.event_logs:
 - name: ForwardedEvents
   tags: [forwarded]
   processors:
-  - script:
-      when.equals.winlog.channel: Security
-      lang: javascript
-      id: security
-      file: ${path.home}/module/security/config/winlogbeat-security.js
-  - script:
-      when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
-      lang: javascript
-      id: sysmon
-      file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+    - script:
+        when.equals.winlog.channel: Security
+        lang: javascript
+        id: security
+        file: ${path.home}/module/security/config/winlogbeat-security.js
+    - script:
+        when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
+        lang: javascript
+        id: sysmon
+        file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
 ----
 
 [float]

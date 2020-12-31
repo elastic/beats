@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-module-couchdb]]
-== couchdb module
+== CouchDB module
 
 This is the couchdb module.
 
@@ -12,7 +12,10 @@ The default metricset is `server`.
 [float]
 === Compatibility
 
-The Couchdb module is tested with Couchdb 1.7.
+The Couchdb module is tested in CI with Couchdb 1.7 and 2.3. Because of the differences between v1 and v2 for exposing metrics, the path to request metrics for each version is different:
+
+* v1.* uses `[host]:5984/_stats` so the hosts of your config should just be `[host]:5984`
+* v2.* exposes metrics in various places. Local in `[host]:5986/_stats` and cluster wide in `[host]:5984/_node/[node-name]/_stats` or `[host]:5984/_node/_local/_stats`. Recommended config is `[host]:5986` to use the local path (double check that you are using port `5986`) or to use the full path on `5984`  `[host]:5984/_node/[node name or _local]/_stats`
 
 
 [float]
@@ -26,7 +29,7 @@ image::./images/metricbeat-couchdb-overview.png[]
 [float]
 === Example configuration
 
-The couchdb module supports the standard configuration options that are described
+The CouchDB module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
@@ -37,6 +40,9 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5984"]
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

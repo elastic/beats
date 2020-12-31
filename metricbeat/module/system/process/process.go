@@ -25,12 +25,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/metric/system/process"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
-	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/gosigar/cgroup"
 )
 
@@ -46,9 +46,10 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *process.Stats
-	cgroup *cgroup.Reader
-	perCPU bool
+	stats   *process.Stats
+	cgroup  *cgroup.Reader
+	perCPU  bool
+	IsAgent bool
 }
 
 // New creates and returns a new MetricSet.
@@ -56,6 +57,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
 	}
 
 	m := &MetricSet{
@@ -67,7 +73,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			CacheCmdLine: config.CacheCmdLine,
 			IncludeTop:   config.IncludeTop,
 		},
-		perCPU: config.IncludePerCPU,
+		perCPU:  config.IncludePerCPU,
+		IsAgent: systemModule.IsAgent,
 	}
 	err := m.stats.Init()
 	if err != nil {
@@ -75,11 +82,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if runtime.GOOS == "linux" {
-		systemModule, ok := base.Module().(*system.Module)
-		if !ok {
-			return nil, fmt.Errorf("unexpected module type")
-		}
-
 		if config.Cgroups == nil || *config.Cgroups {
 			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
 			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
@@ -136,6 +138,21 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 
+		// Duplicate system.process.cmdline with ECS name process.command_line
+		rootFields = getAndCopy(proc, "cmdline", rootFields, "process.command_line")
+
+		// Duplicate system.process.state with process.state
+		rootFields = getAndCopy(proc, "state", rootFields, "process.state")
+
+		// Duplicate system.process.cpu.start_time with process.cpu.start_time
+		rootFields = getAndCopy(proc, "cpu.start_time", rootFields, "process.cpu.start_time")
+
+		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
+		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.pct")
+
+		// Duplicate system.process.memory.rss.pct with process.memory.pct
+		rootFields = getAndCopy(proc, "memory.rss.pct", rootFields, "process.memory.pct")
+
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
 			rootFields.Put("process.working_directory", cwd)
 		}
@@ -146,6 +163,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		if args := getAndRemove(proc, "args"); args != nil {
 			rootFields.Put("process.args", args)
+		}
+
+		// "share" is unavailable on Windows.
+		if runtime.GOOS == "windows" {
+			proc.Delete("memory.share")
 		}
 
 		e := mb.Event{
@@ -167,4 +189,14 @@ func getAndRemove(from common.MapStr, field string) interface{} {
 		return v
 	}
 	return nil
+}
+
+func getAndCopy(from common.MapStr, field string, to common.MapStr, toField string) common.MapStr {
+	v, err := from.GetValue(field)
+	if err != nil {
+		return to
+	}
+
+	_, err = to.Put(toField, v)
+	return to
 }

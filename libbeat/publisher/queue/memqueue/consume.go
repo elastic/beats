@@ -21,13 +21,13 @@ import (
 	"errors"
 	"io"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/publisher"
-	"github.com/elastic/beats/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type consumer struct {
-	broker *Broker
+	broker *broker
 	resp   chan getResponse
 
 	done   chan struct{}
@@ -49,7 +49,7 @@ const (
 	batchACK
 )
 
-func newConsumer(b *Broker) *consumer {
+func newConsumer(b *broker) *consumer {
 	return &consumer{
 		broker: b,
 		resp:   make(chan getResponse),
@@ -58,8 +58,6 @@ func newConsumer(b *Broker) *consumer {
 }
 
 func (c *consumer) Get(sz int) (queue.Batch, error) {
-	// log := c.broker.logger
-
 	if c.closed.Load() {
 		return nil, io.EOF
 	}

@@ -11,10 +11,17 @@ To create your own Beat, you must have Go {go-version} or later installed, and t
 must be set up correctly. In addition, the following tools are required:
 
 * https://www.python.org/downloads/[python]
-* https://virtualenv.pypa.io/en/stable/[virtualenv]
+* https://docs.python.org/3/library/venv.html[python venv module]
 * https://github.com/magefile/mage[mage]
 
-Virtualenv is easiest installed with your package manager or https://pip.pypa.io/en/stable/[pip].
+Python venv module is already included in the standard library. In Ubuntu/Debian
+it requires additional support scripts that can be installed with the
+`python3-venv` package:
+
+[source,bash]
+----
+sudo apt-get install python3-venv
+----
 
 [float]
 ==== Step 1 - Get the metricbeat source code

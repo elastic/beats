@@ -294,7 +294,7 @@
             "drop_last_bucket": 1,
             "filter": "_exists_:\"kubernetes.scheduler.process.started.sec\"",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "30s",
             "markdown": "|  |   |\n|---|---|\n|**Days running**|{{ math.started.last.raw }}|\n|**File descriptors open**|{{ max_of_kubernetes_scheduler_process_fds_open_count.fds.last.raw }}|\n|**Resident Memory**|{{ max_of_kubernetes_scheduler_process_memory_resident_bytes.resident_memory.last.formatted }}|\n|**Virtual Memory**|{{ max_of_kubernetes_scheduler_process_memory_virtual_bytes.virtual_memory.last.formatted }}|\n",
             "markdown_css": "#markdown-61ca57f0-469d-11e7-af02-69e470af7417 table,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 tr,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 td,#markdown-61ca57f0-469d-11e7-af02-69e470af7417 th{border:none}",
@@ -443,7 +443,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {
@@ -553,7 +553,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {
@@ -796,7 +796,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {
@@ -873,7 +873,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {
@@ -947,7 +947,7 @@
             "default_index_pattern": "metricbeat-*",
             "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
+            "index_pattern": "metricbeat-*",
             "interval": "",
             "series": [
               {

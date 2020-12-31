@@ -9,10 +9,10 @@ var:
     default: [envoyproxy]
 
 ingest_pipeline: 
-  - ingest/pipeline-entry.json
-  - ingest/pipeline-json.json
-  - ingest/pipeline-plaintext.json
-  - ingest/pipeline-http.json
-  - ingest/pipeline-tcp.json
+  - ingest/pipeline-entry.yml
+  - ingest/pipeline-json.yml
+  - ingest/pipeline-plaintext.yml
+  - ingest/pipeline-http.yml
+  - ingest/pipeline-tcp.yml
   - ingest/pipeline-geo-as.yml
 input: config/envoyproxy.yml

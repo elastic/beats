@@ -5,16 +5,23 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/winlogbeat/cmd"
-	xpackcmd "github.com/elastic/beats/x-pack/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	winlogbeatCmd "github.com/elastic/beats/v7/winlogbeat/cmd"
+	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	// Register fields.
+	_ "github.com/elastic/beats/v7/x-pack/winlogbeat/include"
 )
 
 // Name of this beat.
-var Name = cmd.Name
+var Name = winlogbeatCmd.Name
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.RootCmd
+var RootCmd *cmd.BeatsRootCmd
 
 func init() {
-	xpackcmd.AddXPack(RootCmd, cmd.Name)
+	settings := winlogbeatCmd.WinlogbeatSettings()
+	settings.ElasticLicensed = true
+	RootCmd = winlogbeatCmd.Initialize(settings)
+	xpackcmd.AddXPack(RootCmd, winlogbeatCmd.Name)
 }

@@ -1,13 +1,15 @@
 # coding=utf-8
 
-from filebeat import BaseTest
-import os
-import codecs
-import time
 import base64
+import codecs
 import io
+import os
+import platform
 import re
+import time
 import unittest
+
+from filebeat import BaseTest
 from parameterized import parameterized
 
 """
@@ -17,6 +19,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skipIf(platform.system() == 'Windows', 'Flaky test: https://github.com/elastic/beats/issues/22613')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
@@ -49,9 +52,8 @@ class Test(BaseTest):
 
         os.rename(testfile1, testfile2)
 
-        file = open(testfile1, 'w', 0)
-        file.write("Hello World\n")
-        file.close()
+        with open(testfile1, 'w') as f:
+            f.write("Hello World\n")
 
         # Wait until error shows up
         self.wait_until(
@@ -80,7 +82,7 @@ class Test(BaseTest):
 
     def test_close_removed(self):
         """
-        Checks that a file is closed if removed
+        Checks that a file is closed if removed with native file identifier
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
@@ -110,8 +112,7 @@ class Test(BaseTest):
 
         # Make sure state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Wait until error shows up on windows
@@ -596,10 +597,9 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        # Make sure state is written
+        # Make sure some state is written
         self.wait_until(
-            lambda: self.log_contains_count(
-                "Write registry file") > 1,
+            lambda: len(self.get_registry()) > 0,
             max_timeout=10)
 
         # Make sure symlink is skipped
@@ -792,14 +792,14 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with io.open(logfile, 'w', encoding="utf-16le") as file:
-            file.write(u'hello world1')
-            file.write(u"\n")
+            file.write(str(u'hello world1'))
+            file.write(str(u"\n"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write(u"\U00012345=Ra")
+            file.write(str(u"\U00012345=Ra"))
         with io.open(logfile, 'a', encoding="utf-16le") as file:
-            file.write(u"\n")
-            file.write(u"hello world2")
-            file.write(u"\n")
+            file.write(str(u"\n"))
+            file.write(str(u"hello world2"))
+            file.write(str(u"\n"))
 
         filebeat = self.start_beat()
 
@@ -834,19 +834,23 @@ class Test(BaseTest):
 
         logfile = self.working_dir + "/log/test.log"
 
-        file = open(logfile, 'w', 0)
-        file.write("hello world1")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("\n")
-        file.write("hello world2")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("Hello World\n")
-        # Write some more data to hit the 16k min buffer size.
-        # Make it web safe.
-        file.write(base64.b64encode(os.urandom(16 * 1024)))
-        file.close()
+        lines = [
+            b"hello world1",
+            b"\n",
+            b"\x00\x00\x00\x00",
+            b"\n",
+            b"hello world2",
+            b"\n",
+            b"\x00\x00\x00\x00",
+            b"Hello World\n",
+        ]
+        with open(logfile, 'wb') as f:
+            for line in lines:
+                f.write(line)
+
+            # Write some more data to hit the 16k min buffer size.
+            # Make it web safe.
+            f.write(base64.b64encode(os.urandom(16 * 1024)))
 
         filebeat = self.start_beat()
 

@@ -15,6 +15,12 @@ This module periodically fetches JMX metrics from Apache Tomcat.
 The module has been tested with Tomcat 7.0.24 and 9.0.24. Other versions are expected to work.
 
 [float]
+== Dashboard
+An overview dashboard for Kibana is already included:
+
+image::./images/metricbeat-tomcat-overview.png[]
+
+[float]
 === Usage
 The Tomcat module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 

@@ -11,11 +11,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(metricSetName string, period string) (map[string]interface{}, string) {
+func GetConfigForTest(t *testing.T, metricSetName string, period string) map[string]interface{} {
+	t.Helper()
+
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
@@ -24,12 +26,11 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 		defaultRegion = "us-west-1"
 	}
 
-	info := ""
 	config := map[string]interface{}{}
 	if !okAccessKeyID || accessKeyID == "" {
-		info = "Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty"
+		t.Fatal("$AWS_ACCESS_KEY_ID not set or set to empty")
 	} else if !okSecretAccessKey || secretAccessKey == "" {
-		info = "Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty"
+		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
 	} else {
 		config = map[string]interface{}{
 			"module":            "aws",
@@ -38,18 +39,22 @@ func GetConfigForTest(metricSetName string, period string) (map[string]interface
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
 			"default_region":    defaultRegion,
-			"regions":           []string{"us-east-1"},
+			"latency":           "5m",
+			// You can specify which region to run test on by using regions variable
+			// "regions":           []string{"us-east-1"},
 		}
 
 		if okSessionToken && sessionToken != "" {
 			config["session_token"] = sessionToken
 		}
 	}
-	return config, info
+	return config
 }
 
 // CheckEventField function checks a given field type and compares it with the expected type for integration tests.
 func CheckEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
+	t.Helper()
+
 	ok1, err1 := event.MetricSetFields.HasKey(metricName)
 	ok2, err2 := event.RootFields.HasKey(metricName)
 	if ok1 || ok2 {

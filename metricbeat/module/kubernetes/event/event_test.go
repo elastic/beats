@@ -21,10 +21,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
@@ -73,6 +73,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus_io/scrape": "false",
 	}
 
+	source := v1.EventSource{
+		Component: "kubelet",
+		Host:      "prod_1",
+	}
+
 	testCases := map[string]struct {
 		mockEvent        v1.Event
 		expectedMetadata common.MapStr
@@ -84,6 +89,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDot,
@@ -100,6 +106,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDeDot,
@@ -116,6 +123,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDot,
@@ -132,6 +140,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 					Labels:      labels,
 					Annotations: annotations,
 				},
+				Source: source,
 			},
 			expectedMetadata: common.MapStr{
 				"labels":      expectedLabelsMapStrWithDeDot,
@@ -149,6 +158,8 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
 			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
 			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
+			assert.Equal(t, source.Host, mapStrOutput["source"].(common.MapStr)["host"])
+			assert.Equal(t, source.Component, mapStrOutput["source"].(common.MapStr)["component"])
 		})
 	}
 }

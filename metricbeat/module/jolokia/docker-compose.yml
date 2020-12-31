@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   jolokia:
-    image: docker.elastic.co/observability-ci/beats-integration-jolokia:${JOLOKIA_VERSION:-1.5.0}-1
+    image: docker.elastic.co/integrations-ci/beats-jolokia:${JOLOKIA_VERSION:-1.5.0}-1
     build:
       context: ./_meta
       args:

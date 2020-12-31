@@ -1,6 +1,9 @@
 description: "Pipeline for ELB logs"
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - grok:
       field: message
       # Classic ELB patterns documented in https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html
@@ -28,7 +31,7 @@ processors:
           %{TIMESTAMP_ISO8601:event.start}
           \"(?:-|%{DATA:_tmp.actions_executed})\"
           \"(?:-|%{DATA:aws.elb.redirect_url})\"
-          \"(?:-|%{DATA:aws.elb.error.reason})\"
+          \"(?:-|%{DATA:aws.elb.error.reason})\"( \"(?:-|%{DATA:_tmp.target_port})\")?( \"(?:-|%{DATA:_tmp.target_status_code})\")?( \"(?:-|%{DATA:aws.elb.classification})\")?( \"(?:-|%{DATA:aws.elb.classification_reason})\")?
 
         # TCP from Network Load Balancers (v2 Load Balancers)
         - >-
@@ -70,8 +73,8 @@ processors:
           %{ELBPROCESSINGTIME}
         ELBHTTPLOG: >-
           %{ELBCOMMON}
-          %{NUMBER:http.response.status_code}
-          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code})
+          %{NUMBER:http.response.status_code:long}
+          (?:-|%{NUMBER:aws.elb.backend.http.response.status_code:long})
           %{NUMBER:http.request.body.bytes:long}
           %{NUMBER:http.response.body.bytes:long}
           \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|HTTP/%{NOTSPACE:http.version})\"
@@ -89,6 +92,13 @@ processors:
         ELBV2TYPE: '%{WORD:aws.elb.type}'
         ELBV2LOGVERSION: '%{NOTSPACE}'  # Could be used to support different log versions, only 1.0 exists now
 
+  - set:
+      field: event.kind
+      value: event
+
+  - set:
+      field: cloud.provider
+      value: aws
 
   - set:
       if: 'ctx.http != null'
@@ -96,14 +106,51 @@ processors:
       value: 'http'
 
   - set:
+      if: 'ctx.http != null'
+      field: event.category
+      value: web
+
+  - set:
       if: 'ctx.http == null'
       field: 'aws.elb.protocol'
       value: 'tcp'
+
+  - set:
+      if: 'ctx.http == null'
+      field: event.category
+      value: network
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+      field: event.outcome
+      value: success
+
+  - set:
+      if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+      field: event.outcome
+      value: failure
+
+  - set:
+      field: trace.id
+      value: "{{aws.elb.trace_id}}"
+      ignore_empty_value: true
 
   - split:
       field: '_tmp.actions_executed'
       target_field: 'aws.elb.action_executed'
       separator: ','
+      ignore_missing: true
+
+  - split:
+      field: '_tmp.target_port'
+      target_field: 'aws.elb.target_port'
+      separator: ' '
+      ignore_missing: true
+
+  - split:
+      field: '_tmp.target_status_code'
+      target_field: 'aws.elb.target_status_code'
+      separator: ' '
       ignore_missing: true
 
   - date:
@@ -114,6 +161,7 @@ processors:
   - set:
       field: 'event.end'
       value: '{{ @timestamp }}'
+      ignore_empty_value: true
 
   - geoip:
       field: 'source.ip'
@@ -138,6 +186,26 @@ processors:
       field: source.as.organization_name
       target_field: source.as.organization.name
       ignore_missing: true
+
+  - set:
+      field: tls.cipher
+      value: '{{aws.elb.ssl_cipher}}'
+      ignore_empty_value: true
+
+  - script:
+      lang: painless
+      if: ctx.aws?.elb?.ssl_protocol != null
+      source: >-
+        def parts = ctx.aws.elb.ssl_protocol.splitOnToken("v");
+        if (parts.length != 2) {
+          return;
+        }
+        if (parts[1].contains(".")) {
+          ctx.tls.version = parts[1];
+        } else {
+          ctx.tls.version = parts[1].substring(0,1) + "." + parts[1].substring(1);
+        }
+        ctx.tls.version_protocol = parts[0].toLowerCase();
 
   - remove:
       field:

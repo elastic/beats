@@ -22,14 +22,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
 
 var debugf = logp.MakeDebug("mongodb")
@@ -47,6 +47,7 @@ type mongodbPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 type transactionKey struct {
@@ -65,6 +66,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
@@ -75,13 +77,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (mongodb *mongodbPlugin) init(results protos.Reporter, config *mongodbConfig) error {
+func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mongodbConfig) error {
 	debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
@@ -94,6 +96,7 @@ func (mongodb *mongodbPlugin) init(results protos.Reporter, config *mongodbConfi
 		protos.DefaultTransactionHashSize)
 	mongodb.responses.StartJanitor(mongodb.transactionTimeout)
 	mongodb.results = results
+	mongodb.watcher = watcher
 
 	return nil
 }
@@ -218,7 +221,7 @@ func (mongodb *mongodbPlugin) handleMongodb(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = mongodb.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isResponse {
 		debugf("MongoDB response message")

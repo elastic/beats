@@ -13,9 +13,9 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 /*
@@ -34,7 +34,7 @@ import (
 */
 
 func init() {
-	if err := Registry.AddGuess(&guessInet6CskXmit{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInet6CskXmit{} }); err != nil {
 		panic(err)
 	}
 }

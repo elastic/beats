@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-nats-connections]]
-=== Nats connections metricset
+=== NATS connections metricset
 
 include::../../../module/nats/connections/_meta/docs.asciidoc[]
 

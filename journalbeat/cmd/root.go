@@ -18,18 +18,50 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/journalbeat/beater"
+	"github.com/elastic/beats/v7/journalbeat/beater"
 
-	cmd "github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
 	// Import processors.
-	_ "github.com/elastic/beats/libbeat/processors/script"
-	_ "github.com/elastic/beats/libbeat/processors/timestamp"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
+	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
-// Name of this beat
-var Name = "journalbeat"
+const (
+	// Name of this beat.
+	Name = "journalbeat"
+
+	// ecsVersion specifies the version of ECS that Winlogbeat is implementing.
+	ecsVersion = "1.7.0"
+)
+
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: Name})
+var RootCmd *cmd.BeatsRootCmd
+
+// JournalbeatSettings contains the default settings for journalbeat
+func JournalbeatSettings() instance.Settings {
+	return instance.Settings{
+		Name:          Name,
+		HasDashboards: false,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+	}
+}
+
+// Initialize initializes the entrypoint commands for journalbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
+	return cmd.GenRootCmdWithSettings(beater.New, settings)
+}
+
+func init() {
+	RootCmd = Initialize(JournalbeatSettings())
+}

@@ -1,116 +1,63 @@
-[id="{beatname_lc}-getting-started"]
-== Getting started with {beatname_uc}
+[id="{beatname_lc}-installation-configuration"]
+== {beatname_uc} quick start: installation and configuration
 
-include::{libbeat-dir}/shared-getting-started-intro.asciidoc[]
+++++
+<titleabbrev>Quick start: installation and configuration</titleabbrev>
+++++
 
-* <<{beatname_lc}-installation>>
-* <<{beatname_lc}-configuration>>
-* <<{beatname_lc}-template>>
-* <<{beatname_lc}-starting>>
-* <<view-kibana-dashboards>>
-* <<setup-repositories>>
+This guide describes how to get started quickly with log data collection from
+systemd journals. You'll learn how to:
 
-[id="{beatname_lc}-installation"]
+* install {beatname_uc} on each system you want to monitor
+* specify the location of your log files
+* parse log data into fields and send it to {es}
+* visualize the log data in {kib}
+
+[float]
+=== Before you begin
+
+You need {es} for storing and searching your data, and {kib} for visualizing and
+managing it.
+
+include::{libbeat-dir}/tab-widgets/spinup-stack-widget.asciidoc[]
+
+[float]
+[[install]]
 === Step 1: Install {beatname_uc}
 
-include::{libbeat-dir}/shared-download-and-install.asciidoc[]
+Install {beatname_uc} on all the servers you want to monitor.
 
-[[deb]]
-*deb:*
+To download and install {beatname_uc}, use the commands that work with your
+system:
 
-ifeval::["{release-state}"=="unreleased"]
+include::{libbeat-dir}/tab-widgets/install-deb-rpm-linux-widget.asciidoc[]
 
-Version {version} of {beatname_uc} has not yet been released.
+[float]
+[[other-installation-options]]
+==== Other installation options
 
-endif::[]
+* <<setup-repositories,APT or YUM>>
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* <<running-on-docker,Docker>>
 
-ifeval::["{release-state}"!="unreleased"]
+[float]
+[[set-connection]]
+=== Step 2: Connect to the {stack}
 
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-amd64.deb
-sudo dpkg -i {beatname_lc}-{version}-amd64.deb
-------------------------------------------------
+include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
-endif::[]
 
-[[rpm]]
-*rpm:*
+[float]
+[[configuration]]
+=== Step 3: Configure {beatname_uc}
 
-ifeval::["{release-state}"=="unreleased"]
+Before running {beatname_uc}, specify the location of the systemd journal files
+and configure how you want the files to be read. If you accept the default
+configuration, {beatname_uc} reads from the local journal.
 
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-x86_64.rpm
-sudo rpm -vi {beatname_lc}-{version}-x86_64.rpm
-------------------------------------------------
-
-endif::[]
-
-[[linux]]
-*linux:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-["source","sh",subs="attributes"]
-------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
-tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
-------------------------------------------------
-
-endif::[]
-
-[[docker]]
-*docker:*
-
-ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been released.
-
-endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
-
-See <<running-on-docker, Running on Docker>> for deploying Docker containers.
-
-endif::[]
-
-[id="{beatname_lc}-configuration"]
-=== Step 2: Configure {beatname_uc}
-
-Before running {beatname_uc}, you can specify the location of the systemd
-journal files and configure how you want the files to be read. If you accept the
-default configuration, {beatname_uc} reads from the local journal.
-
-include::{libbeat-dir}/shared-configuring.asciidoc[]
-
-Here is a sample of the +{beatname_lc}+ section of the +{beatname_lc}.yml+ file.
-{beatname_uc} uses predefined default values for most configuration options.
-
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-journalbeat.inputs:
-- paths: ["/path/to/journal/directory"]
-  seek: head
-----------------------------------------------------------------------
-
-To configure {beatname_uc}:
-
-. Specify a list of paths to your systemd journal files. Each path can be a
-directory path (to collect events from all journals in a directory), or a file
-path. For example:
+. In +{beatname_lc}.yml+, specify a list of paths to your systemd journal files.
+Each path can be a directory path (to collect events from all journals in a
+directory), or a file path. For example:
 +
 ["source","sh",subs="attributes"]
 ----
@@ -118,6 +65,7 @@ path. For example:
 - paths:
   - "/dev/log"
   - "/var/log/messages/my-journal-file.journal"
+  seek: head
 ----
 +
 If no paths are specified, {beatname_uc} reads from the default journal.
@@ -144,75 +92,78 @@ Redis events from a Docker container tagged as `redis`, use:
     - "_COMM=redis"
 ----
 
-include::{libbeat-dir}/step-configure-output.asciidoc[]
+include::{libbeat-dir}/shared/config-check.asciidoc[]
 
-include::{libbeat-dir}/step-configure-kibana-endpoint.asciidoc[]
+[float]
+[[setup-assets]]
+=== Step 4: Set up assets
 
-include::{libbeat-dir}/step-configure-credentials.asciidoc[]
+{beatname_uc} comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
 
-include::{libbeat-dir}/step-test-config.asciidoc[]
+. Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
 
-include::{libbeat-dir}/step-look-at-config.asciidoc[]
+. From the installation directory, run:
++
+--
+include::{libbeat-dir}/tab-widgets/setup-deb-rpm-linux-widget.asciidoc[]
+--
++
+`-e` is optional and sends output to standard error instead of the configured log output.
 
+This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
 
-[id="{beatname_lc}-template"]
-=== Step 3: Load the index template in {es}
+[TIP]
+=====
+A connection to {es} (or {ess}) is required to set up the initial
+environment. If you're using a different output, such as {ls}, see
+<<load-template-manually>>.
+=====
 
-include::{libbeat-dir}/shared-template-load.asciidoc[]
-
-[id="{beatname_lc}-starting"]
+[float]
+[[start]]
 === Step 5: Start {beatname_uc}
 
-Start {beatname_uc} by issuing the appropriate command for your platform. If you
-are accessing a secured {es} cluster, make sure you've configured
-credentials as described in <<{beatname_lc}-configuration>>.
+Before starting {beatname_uc}, modify the user credentials in
++{beatname_lc}.yml+ and specify a user who is
+<<privileges-to-publish-events,authorized to publish events>>.
 
-NOTE: If you use an init.d script to start {beatname_uc} on deb or rpm, you can't
-specify command line flags (see <<command-line-options>>). To specify flags,
-start {beatname_uc} in the foreground.
+To start {beatname_uc}, run:
 
-*deb and rpm:*
+// tag::start-step[]
+include::{libbeat-dir}/tab-widgets/start-deb-rpm-linux-widget.asciidoc[]
+// end::start-step[]
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo service {beatname_lc} start
-----------------------------------------------------------------------
+{beatname_uc} is now ready to send journal events to the {es}.
 
-*linux:*
+[float]
+[[view-data]]
+=== Step 6: View your data in {kib}
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-sudo chown root {beatname_lc}.yml <1>
-sudo ./{beatname_lc} -e
-----------------------------------------------------------------------
-<1> You'll be running {beatname_uc} as root, so you need to change ownership
-of the configuration file, or run {beatname_uc} with `--strict.perms=false`
-specified. See
-{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
-in the _Beats Platform Reference_.
-
-{beatname_uc} is now ready to send journal events to the defined output.
-
-[[view-kibana-dashboards]]
-=== Step 6: Explore your data in {kib}
-
-To start exploring your data, go to the Discover application in {kib}. From
-there, you can submit search queries, filter the search results, and view
-document data.
+There is currently no dashboard available for {beatname_uc}. To start exploring
+your data, go to the Discover app in {kib}. From there, you can submit search
+queries, filter the search results, and view document data.
 
 To learn how to build visualizations and dashboards to view your data, see the
 _{kibana-ref}/index.html[{kib} User Guide]_.
 
-[role="xpack"]
-==== Want to tail logs in real time?
 
-Use the Logs app in {kib}.
-For more details, see the {logs-guide}[Logs Monitoring Guide].
+[float]
+=== What's next?
 
-The Logs app shows logs
-from `filebeat-*` indices by default. To show {beatname_uc} indices, configure
-the source to include `journalbeat-*`. You can do this in the Logs app when you
-configure the source, or you can modify the {kib} configuration. For example:
+Now that you have your logs streaming into {es}, learn how to unify your logs,
+metrics, uptime, and application performance data.
+
+include::{libbeat-dir}/shared/obs-apps.asciidoc[]
+
+[TIP]
+====
+The {logs-app} shows logs from `filebeat-*` indices by default. To show
+{beatname_uc} indices, configure the source to include `journalbeat-*`. You can
+do this in the {logs-app} when you configure the source, or you can modify the {kib}
+configuration. For
+example:
 
 [source,yaml]
 ----
@@ -221,3 +172,7 @@ xpack.infra:
    default:
      logAlias: "filebeat-*,journalbeat-*"
 ----
+====
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

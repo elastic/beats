@@ -4,3 +4,9 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

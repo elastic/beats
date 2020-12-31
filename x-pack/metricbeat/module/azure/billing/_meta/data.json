@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2020-07-08T08:05:34.853Z",
+    "azure": {
+        "billing" : {
+            "product" : "Tables - LRS Data Stored",
+            "usage_start" : "2020-07-08T00:00:00.000Z",
+            "usage_end" : "2020-07-08T23:59:59.000Z",
+            "currency" : "USD",
+            "billing_period_id" : "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/providers/Microsoft.Billing/billingPeriods/20200701",
+            "account_name" : "Eng1",
+            "pretax_cost" : "0.000004175936293",
+            "department_name" : "Eng"
+        },
+        "resource": {
+            "group": "obs-infrastructure"
+        },
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6"
+    },
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.DocumentDb/databaseAccounts/obsaccount",
+            "name": "obsaccount"
+        },
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.monitor",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "monitor",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}

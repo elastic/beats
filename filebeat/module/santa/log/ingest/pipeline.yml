@@ -1,0 +1,99 @@
+description: Pipeline for parsing Google Santa logs.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- grok:
+    field: message
+    patterns:
+    - '\[%{TIMESTAMP_ISO8601:process.start}\] %{NOT_SEPARATOR:log.level} santad: action=%{NOT_SEPARATOR:santa.action}\|decision=%{NOT_SEPARATOR:santa.decision}\|reason=%{NOT_SEPARATOR:santa.reason}\|sha256=%{NOT_SEPARATOR:process.hash.sha256}\|path=%{NOT_SEPARATOR:process.executable}(\|args=%{NOT_SEPARATOR:santa.args})?(\|cert_sha256=%{NOT_SEPARATOR:santa.certificate.sha256})?(\|cert_cn=%{NOT_SEPARATOR:santa.certificate.common_name})?\|pid=%{NUMBER:process.pid:long}\|ppid=%{NUMBER:process.ppid:long}\|uid=%{NUMBER:user.id}\|user=%{NOT_SEPARATOR:user.name}\|gid=%{NUMBER:group.id}\|group=%{NOT_SEPARATOR:group.name}\|mode=%{WORD:santa.mode}'
+    - '\[%{TIMESTAMP_ISO8601:timestamp}\] %{NOT_SEPARATOR:log.level} santad: action=%{NOT_SEPARATOR:santa.action}\|mount=%{NOT_SEPARATOR:santa.disk.mount}\|volume=%{NOT_SEPARATOR:santa.disk.volume}\|bsdname=%{NOT_SEPARATOR:santa.disk.bsdname}\|fs=%{NOT_SEPARATOR:santa.disk.fs}\|model=%{NOT_SEPARATOR:santa.disk.model}\|serial=%{NOT_SEPARATOR:santa.disk.serial}\|bus=%{NOT_SEPARATOR:santa.disk.bus}\|dmgpath=%{NOT_SEPARATOR:santa.disk.dmgpath}?'
+    pattern_definitions:
+      NOT_SEPARATOR: '[^\|]+'
+- rename:
+    field: message
+    target_field: log.original
+- date:
+    field: process.start
+    target_field: process.start
+    formats:
+    - ISO8601
+    ignore_failure: true
+- set:
+    field: '@timestamp'
+    value: '{{ process.start }}'
+    ignore_failure: true
+    ignore_empty_value: true
+- split:
+    field: santa.args
+    separator: ' '
+    ignore_failure: true
+- date:
+    field: timestamp
+    target_field: '@timestamp'
+    formats:
+    - ISO8601
+    ignore_failure: true
+- remove:
+    field: timestamp
+    ignore_missing: true
+- append:
+    field: process.args
+    value: "{{process.executable}}"
+    if: "ctx?.process?.executable != null"
+- foreach:
+    field: santa.args
+    processor:
+      append:
+        field: process.args
+        value: "{{_ingest._value}}"
+    ignore_missing: true
+- remove:
+    field: santa.args
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: process
+    if: "ctx?.santa?.action == 'EXEC'"
+- append:
+    field: event.type
+    value: start
+    if: "ctx?.santa?.action == 'EXEC'"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.santa?.decision == 'ALLOW'"
+- set:
+    field: event.outcome
+    value: failure
+    if: "ctx?.santa?.decision == 'DENY'"
+- set:
+    field: event.action
+    value: "{{santa.action}}"
+    ignore_empty_value: true
+- lowercase:
+    field: event.action
+    ignore_missing: true
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: "ctx?.user?.name != null"
+- append:
+    field: related.hash
+    value: "{{santa.certificate.sha256}}"
+    if: "ctx?.santa?.certificate?.sha256 != null"
+- append:
+    field: related.hash
+    value: "{{process.hash.sha256}}"
+    if: "ctx?.process?.hash != null"
+- set:
+    field: file.x509.issuer.common_name
+    value: "{{santa.certificate.common_name}}"
+    ignore_empty_value: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

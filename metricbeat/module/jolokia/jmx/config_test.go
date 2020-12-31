@@ -75,32 +75,32 @@ func TestBuildJolokiaGETUri(t *testing.T) {
 
 func TestParseMBean(t *testing.T) {
 
-	cases := []struct {
+	cases := map[string]struct {
 		mbean    string
 		expected *MBeanName
 		ok       bool
 	}{
-		{
+		"empty": {
 			mbean: ``,
 			ok:    false,
 		},
-		{
+		"no domain": {
 			mbean: `type=Runtime`,
 			ok:    false,
 		},
-		{
+		"no properties": {
 			mbean: `java.lang`,
 			ok:    false,
 		},
-		{
+		"no properties, with colon": {
 			mbean: `java.lang:`,
 			ok:    false,
 		},
-		{
+		"property without value": {
 			mbean: `java.lang:type=Runtime,name`,
 			ok:    false,
 		},
-		{
+		"single property": {
 			mbean: `java.lang:type=Runtime`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -110,7 +110,17 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
-		{
+		"other single property": {
+			mbean: `java.lang:type=Memory`,
+			expected: &MBeanName{
+				Domain: `java.lang`,
+				Properties: map[string]string{
+					"type": "Memory",
+				},
+			},
+			ok: true,
+		},
+		"multiple properties": {
 			mbean: `java.lang:name=Foo,type=Runtime`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -121,18 +131,7 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
-		{
-			mbean: `java.lang:name=Foo,type=Runtime`,
-			expected: &MBeanName{
-				Domain: `java.lang`,
-				Properties: map[string]string{
-					"name": "Foo",
-					"type": "Runtime",
-				},
-			},
-			ok: true,
-		},
-		{
+		"property with wildcard": {
 			mbean: `java.lang:type=Runtime,name=Foo*`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -143,7 +142,7 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
-		{
+		"property with wildcard as value": {
 			mbean: `java.lang:type=Runtime,name=*`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -154,7 +153,7 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
-		{
+		"quoted property": {
 			mbean: `java.lang:name="foo,bar",type=Runtime`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
@@ -165,17 +164,41 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
-		{
-			mbean: `java.lang:type=Memory`,
+		"multiple quoted properties": {
+			mbean: `java.lang:name="foo",othername="bar",type=Runtime`,
 			expected: &MBeanName{
 				Domain: `java.lang`,
 				Properties: map[string]string{
-					"type": "Memory",
+					"name":      `"foo"`,
+					"othername": `"bar"`,
+					"type":      "Runtime",
 				},
 			},
 			ok: true,
 		},
-		{
+		"escaped quote in quoted property": {
+			mbean: `java.lang:name="foo,\"bar\"",type=Runtime`,
+			expected: &MBeanName{
+				Domain: `java.lang`,
+				Properties: map[string]string{
+					"name": `"foo,\"bar\""`,
+					"type": "Runtime",
+				},
+			},
+			ok: true,
+		},
+		"newline in quoted property": {
+			mbean: `java.lang:name="foo\nbar",type=Runtime`,
+			expected: &MBeanName{
+				Domain: `java.lang`,
+				Properties: map[string]string{
+					"name": `"foo\nbar"`,
+					"type": "Runtime",
+				},
+			},
+			ok: true,
+		},
+		"real catalina mbean": {
 			mbean: `Catalina:name=HttpRequest1,type=RequestProcessor,worker="http-nio-8080"`,
 			expected: &MBeanName{
 				Domain: `Catalina`,
@@ -187,17 +210,36 @@ func TestParseMBean(t *testing.T) {
 			},
 			ok: true,
 		},
+		"real activemq artemis mbean": {
+			mbean: `org.apache.activemq.artemis:broker="0.0.0.0",component=addresses,address="helloworld",subcomponent=queues,routing-type="anycast",queue="helloworld"`,
+			expected: &MBeanName{
+				Domain: `org.apache.activemq.artemis`,
+				Properties: map[string]string{
+					"broker":       `"0.0.0.0"`,
+					"component":    `addresses`,
+					"address":      `"helloworld"`,
+					"subcomponent": `queues`,
+					"routing-type": `"anycast"`,
+					"queue":        `"helloworld"`,
+				},
+			},
+			ok: true,
+		},
 	}
 
-	for _, c := range cases {
-		beanObj, err := ParseMBeanName(c.mbean)
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			beanObj, err := ParseMBeanName(c.mbean)
 
-		if c.ok {
-			assert.NoError(t, err, "failed parsing for: "+c.mbean)
-			assert.Equal(t, c.expected, beanObj, "mbean: "+c.mbean)
-		} else {
-			assert.Error(t, err, "should have failed for: "+c.mbean)
-		}
+			if c.ok {
+				if assert.NoError(t, err, "failed parsing for: "+c.mbean) {
+					t.Log("Canonicalized mbean: ", beanObj.Canonicalize(true))
+				}
+				assert.Equal(t, c.expected, beanObj, "mbean: "+c.mbean)
+			} else {
+				assert.Error(t, err, "should have failed for: "+c.mbean)
+			}
+		})
 	}
 
 }

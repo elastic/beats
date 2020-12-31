@@ -9,9 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -19,7 +18,8 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("oracle", "tablespace", New)
+	mb.Registry.MustAddMetricSet("oracle", "tablespace", New,
+		mb.WithHostParser(oracle.HostParser))
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -35,8 +35,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The oracle 'tablespace' metricset is beta.")
-
 	config := oracle.ConnectionDetails{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrap(err, "error parsing config file")

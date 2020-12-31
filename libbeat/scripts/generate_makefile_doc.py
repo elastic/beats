@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script generates and output a documentation from a list of Makefile files
@@ -7,7 +7,6 @@ Example usage:
 
    python generate_makefile_doc.py Makefile1 Makefile2 ...
 """
-
 import argparse
 import re
 
@@ -64,11 +63,11 @@ def parse_line(line, regexp, categories, categories_set):
         try:
             name = matches.group("varname")
             is_variable = True
-        except:
+        except BaseException:
             pass
         try:
             default = matches.group("default").strip()
-        except:
+        except BaseException:
             default = ""
 
         if not name:

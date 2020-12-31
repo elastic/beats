@@ -14,7 +14,26 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0
+
+{{ if .external_zones }}
+  - add_fields:
+      target: _temp_
+      fields:
+        external_zones: {{ .external_zones | tojson }}
+{{ end }}
+
+{{ if .internal_zones }}
+  - add_fields:
+      target: _temp_
+      fields:
+        internal_zones: {{ .internal_zones | tojson }}
+{{ end }}

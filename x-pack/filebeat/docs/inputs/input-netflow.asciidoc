@@ -29,6 +29,7 @@ Example configuration:
   queue_size: 8192
   custom_definitions:
   - path/to/fields.yml
+  detect_sequence_reset: true
 ----
 
 
@@ -106,6 +107,18 @@ IPFIX PEN zero are equivalent to changes to NetFlow fields.
 [WARNING]
 Overriding the names and/or types of standard fields can prevent
 mapping of ECS fields to function properly.
+
+[float]
+[[detect_sequence_reset]]
+==== `detect_sequence_reset`
+
+Flag controlling whether {beatname_uc} should monitor sequence numbers in the
+Netflow packets to detect an Exporting Process reset. When this condition is
+detected, record templates for the given exporter will be dropped. This will
+cause flow loss until the exporter provides new templates. If set to `false`,
+{beatname_uc} will ignore sequence numbers, which can cause some invalid flows
+if the exporter process is reset. This option is only applicable to Netflow V9
+and IPFIX. Default is `true`.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

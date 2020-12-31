@@ -1,0 +1,54 @@
+#!/bin/sh
+
+set -e
+set -x
+
+SRCPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+outfile=dependencies.csv
+
+while :; do
+	case $1 in
+		--csv)
+			if [ "$2" ]; then
+				outfile=$2
+			else
+				echo "ERROR: --csv needs a non-empty argument"
+				exit 1
+			fi
+			shift
+			;;
+		--csv=?*)
+			outfile=${1#*=}
+			;;
+		--csv=)
+			echo "ERROR: --csv needs a non-empty argument"
+			exit 1
+			;;
+		*)
+			break
+			;;
+	esac
+
+	shift
+done
+
+go mod tidy
+go mod download
+go list -m -json all $@ | go run go.elastic.co/go-licence-detector \
+		-includeIndirect \
+		-rules "$SRCPATH/notice/rules.json" \
+		-overrides "$SRCPATH/notice/overrides.json" \
+		-noticeTemplate "$SRCPATH/notice/dependencies.csv.tmpl" \
+		-noticeOut "$outfile" \
+		-depsOut ""
+
+
+# Fill-in required values for UBI images
+# Check headers in $SRCPATH/notice/dependencies.csv.tmpl:
+# name,url,version,revision,license
+ubi8url='https://catalog.redhat.com/software/containers/ubi8/ubi-minimal/5c359a62bed8bd75a2c3fba8'
+ubi8source='https://oss-dependencies.elastic.co/redhat/ubi/ubi-minimal-8-source.tar.gz'
+ubilicense='Custom;https://www.redhat.com/licenses/EULA_Red_Hat_Universal_Base_Image_English_20190422.pdf'
+cat <<EOF >> $outfile
+Red Hat Universal Base Image,$ubi8url,8,,$ubilicense,$ubi8source
+EOF

@@ -2,21 +2,17 @@ version: '2.3'
 
 services:
   uwsgi_tcp:
-    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
+    image: docker.elastic.co/integrations-ci/beats-uwsgi:${UWSGI_VERSION:-2.0.18}-py${UWSGI_PYTHON_VERSION:-3.8}-1
     build:
       context: ./_meta
       args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
-    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
+        UWSGI_VERSION: ${UWSGI_VERSION:-2.0.18}
+        UWSGI_PYTHON_VERSION: ${UWSGI_PYTHON_VERSION:-3.8}
     ports:
       - 9191
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --wsgi-file app.py
 
   uwsgi_http:
-    image: docker.elastic.co/observability-ci/beats-integration-uwsgi:py${PYTHON_VERSION:-3.6}-1
-    build:
-      context: ./_meta
-      args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.6}
-    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9192 --memory-report --stats-http --wsgi-file app.py
-    ports:
-      - 9192
+    extends:
+      service: uwsgi_tcp
+    command: uwsgi --http :8080 --master --processes 1 --threads 2 --stats 0.0.0.0:9191 --memory-report --stats-http --wsgi-file app.py

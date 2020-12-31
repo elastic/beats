@@ -13,10 +13,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/auditbeat/core"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	"github.com/elastic/beats/libbeat/beat"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestHomebrew(t *testing.T) {
@@ -51,19 +51,29 @@ func TestHomebrew(t *testing.T) {
 
 		if assert.Len(t, events, 1) {
 			event := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
+			checkFieldValue(t, event, "event.kind", "state")
+			checkFieldValue(t, event, "event.category", []string{"package"})
+			checkFieldValue(t, event, "event.type", []string{"info"})
 			checkFieldValue(t, event, "system.audit.package.name", "test-package")
 			checkFieldValue(t, event, "system.audit.package.summary", "Test package")
 			checkFieldValue(t, event, "system.audit.package.url", "https://www.elastic.co/")
 			checkFieldValue(t, event, "system.audit.package.version", "1.0.0")
-			checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
+			// FIXME: The value of this field changes on each execution in CI - https://github.com/elastic/beats/issues/18855
+			// checkFieldValue(t, event, "system.audit.package.entity_id", "Krm421rtYM4wgq1S")
+			checkFieldValue(t, event, "package.name", "test-package")
+			checkFieldValue(t, event, "package.description", "Test package")
+			checkFieldValue(t, event, "package.reference", "https://www.elastic.co/")
+			checkFieldValue(t, event, "package.version", "1.0.0")
+			checkFieldValue(t, event, "package.type", "brew")
 		}
 	}
 }
 
 func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValue interface{}) {
+	t.Helper()
 	value, err := event.GetValue(fieldName)
-	if assert.NoError(t, err) {
-		assert.Equal(t, fieldValue, value)
+	if assert.NoError(t, err, "checking field %s", fieldName) {
+		assert.Equal(t, fieldValue, value, "checking field %v", fieldName)
 	}
 }
 

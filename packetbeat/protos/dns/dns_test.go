@@ -31,11 +31,12 @@ import (
 	mkdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 // Test Constants
@@ -81,7 +82,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil)
+	publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -111,7 +112,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 		"send_request":        true,
 		"send_response":       true,
 	})
-	dns, err := New(false, callback, cfg)
+	dns, err := New(false, callback, procs.ProcessesWatcher{}, cfg)
 	if err != nil {
 		panic(err)
 	}

@@ -16,6 +16,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :github_repo_name: beats
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
+:beat_kib_app: {kib} Metrics
 :has_central_config:
 :has_solutions:
 :has_docker_label_ex:
@@ -30,13 +31,13 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_decode_csv_fields_processor:
 :no_timestamp_processor:
 
+:kubernetes_default_indexers: {docdir}/kubernetes-default-indexers-matchers.asciidoc
+
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
 
-include::./gettingstarted.asciidoc[]
-
-include::{libbeat-dir}/repositories.asciidoc[]
+include::./getting-started.asciidoc[]
 
 include::./setting-up-running.asciidoc[]
 
@@ -45,6 +46,8 @@ include::./upgrading.asciidoc[]
 include::./how-metricbeat-works.asciidoc[]
 
 include::./configuring-howto.asciidoc[]
+
+include::{docdir}/howto/howto.asciidoc[]
 
 include::{libbeat-dir}/shared-central-management.asciidoc[]
 
@@ -61,3 +64,5 @@ include::./troubleshooting.asciidoc[]
 include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
+
+

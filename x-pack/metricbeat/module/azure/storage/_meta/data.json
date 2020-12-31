@@ -1,0 +1,43 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "namespace": "Microsoft.Storage/storageAccounts/queueServices",
+        "resource": {
+            "group": "obs-infrastructure",
+            "type": "Microsoft.Storage/storageAccounts"
+        },
+        "storage": {
+            "queue_capacity": {
+                "avg": 0
+            },
+            "queue_count": {
+                "avg": 0
+            },
+            "queue_message_count": {
+                "avg": 0
+            }
+        },
+        "subscription_id": "fd675b6f-b5e5-426e-ac45-d1f876d0ffa6",
+        "timegrain": "PT1H"
+    },
+    "cloud": {
+        "instance": {
+            "id": "/subscriptions/fd675b6f-b5e5-426e-ac45-d1f876d0ffa6/resourceGroups/obs-infrastructure/providers/Microsoft.Storage/storageAccounts/urcbyscmrkbygsawinvm/queueServices/default",
+            "name": "urcbyscmrkbygsawinvm"
+        },
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.storage",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "storage",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}

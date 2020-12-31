@@ -18,13 +18,16 @@
 package module
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -89,6 +92,44 @@ func TestProcessorsForConfig(t *testing.T) {
 			}
 		}
 	}
+}
+
+type fakeMetricSetRegister struct {
+	success bool
+}
+
+func (fmsr *fakeMetricSetRegister) ProcessorsForMetricSet(moduleName, metricSetName string) (*processors.Processors, error) {
+	if !fmsr.success {
+		return nil, errors.New("failure")
+	}
+
+	procs := new(processors.Processors)
+	procs.List = []processors.Processor{nil, nil}
+	return procs, nil
+}
+
+func TestUseMetricSetProcessors_ReadingProcessorsFailed(t *testing.T) {
+	r := new(fakeMetricSetRegister)
+
+	var connector Connector
+	err := connector.UseMetricSetProcessors(r, "module", "metricset")
+	require.Error(t, err)
+	require.Nil(t, connector.processors)
+}
+
+func TestUseMetricSetProcessors_ReadingProcessorsSucceeded(t *testing.T) {
+	r := &fakeMetricSetRegister{
+		success: true,
+	}
+
+	connector := Connector{
+		processors: &processors.Processors{
+			List: []processors.Processor{},
+		},
+	}
+	err := connector.UseMetricSetProcessors(r, "module", "metricset")
+	require.NoError(t, err)
+	require.Len(t, connector.processors.List, 2)
 }
 
 // Helper function to convert from YML input string to an unpacked

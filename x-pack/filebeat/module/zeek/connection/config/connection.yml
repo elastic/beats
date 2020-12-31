@@ -4,13 +4,15 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-tags: {{.tags}}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 json.keys_under_root: false
 
 processors:
   - drop_fields:
       fields: ["json.orig_bytes","json.resp_bytes","json.tunnel_parents"]
+      ignore_missing: true
   - rename:
       fields:
         - from: "json"
@@ -75,20 +77,29 @@ processors:
 
       ignore_missing: true
       fail_on_error: false
-
-{{ if .community_id }}
+  - convert:
+      fields:
+        - {from: "zeek.session_id", to: "event.id"}
+        - {from: "source.address", to: "source.ip", type: "ip"}
+        - {from: "destination.address", to: "destination.ip", type: "ip"}
+      ignore_missing: true
+      fail_on_error: false
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
   - if:
       equals.network.transport: icmp
     then:
       community_id:
         fields:
-          source_ip: source.address
-          destination_ip: destination.address
           icmp_type: zeek.connection.icmp.type
           icmp_code: zeek.connection.icmp.code
     else:
       community_id:
-        fields:
-          source_ip: source.address
-          destination_ip: destination.address
-{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

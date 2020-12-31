@@ -17,7 +17,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="{{.Description}}"
 NAME="{{.BeatName}}"
 DAEMON=/usr/share/${NAME}/bin/${NAME}
-DAEMON_ARGS="-c /etc/${NAME}/${NAME}.yml -path.home /usr/share/${NAME} -path.config /etc/${NAME} -path.data /var/lib/${NAME} -path.logs /var/log/${NAME}"
+DAEMON_ARGS="-c /etc/${NAME}/${NAME}.yml --path.home /usr/share/${NAME} --path.config /etc/${NAME} --path.data /var/lib/${NAME} --path.logs /var/log/${NAME}"
 TEST_ARGS="-e test config"
 PIDFILE=/var/run/{{.ServiceName}}.pid
 WRAPPER="/usr/share/${NAME}/bin/${NAME}-god"
@@ -25,11 +25,15 @@ BEAT_USER="{{.BeatUser}}"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/{{.ServiceName}}
 
+
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/{{.ServiceName}} ] && . /etc/default/{{.ServiceName}}
+
+DEFAULT_GODEBUG="madvdontneed=1"
+export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 [ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
 USER_WRAPPER="su"

@@ -26,7 +26,7 @@ import (
 
 	rd "github.com/garyburd/redigo/redis"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Redis types

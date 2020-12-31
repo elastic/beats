@@ -1,0 +1,24 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: o365audit
+  - name: certificate
+  - name: key
+  - name: key_passphrase
+  - name: application_id
+  - name: client_secret
+  - name: tenants
+  - name: content_type
+  - name: api
+  - name: tags
+    default: [forwarded]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml
+
+requires.processors:
+  - name: geoip
+    plugin: ingest-geoip
+  - name: user_agent
+    plugin: ingest-user_agent

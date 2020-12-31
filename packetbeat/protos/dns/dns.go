@@ -34,11 +34,12 @@ import (
 	mkdns "github.com/miekg/dns"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
-	"github.com/elastic/beats/packetbeat/pb"
-	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
 type dnsPlugin struct {
@@ -55,6 +56,7 @@ type dnsPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter // Channel where results are pushed.
+	watcher procs.ProcessesWatcher
 }
 
 var (
@@ -220,6 +222,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &dnsPlugin{}
@@ -230,13 +233,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (dns *dnsPlugin) init(results protos.Reporter, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
@@ -252,6 +255,7 @@ func (dns *dnsPlugin) init(results protos.Reporter, config *dnsConfig) error {
 	dns.transactions.StartJanitor(dns.transactionTimeout)
 
 	dns.results = results
+	dns.watcher = watcher
 
 	return nil
 }
@@ -391,7 +395,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if t.response.data.Rcode == 0 {
@@ -414,7 +418,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.request.data.Question[0])
 			fields["resource"] = t.request.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.request.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.request.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 
 		if dns.sendRequest {
@@ -430,7 +434,7 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 			fields["query"] = dnsQuestionToString(t.response.data.Question[0])
 			fields["resource"] = t.response.data.Question[0].Name
 		}
-		addDNSToMapStr(dnsEvent, t.response.data, dns.includeAuthorities,
+		addDNSToMapStr(dnsEvent, pbf, t.response.data, dns.includeAuthorities,
 			dns.includeAdditionals)
 		if dns.sendResponse {
 			fields["response"] = dnsToString(t.response.data)
@@ -448,7 +452,7 @@ func (dns *dnsPlugin) expireTransaction(t *dnsTransaction) {
 }
 
 // Adds the DNS message data to the supplied MapStr.
-func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional bool) {
+func addDNSToMapStr(m common.MapStr, pbf *pb.Fields, dns *mkdns.Msg, authority bool, additional bool) {
 	m["id"] = dns.Id
 	m["op_code"] = dnsOpCodeToString(dns.Opcode)
 
@@ -533,6 +537,7 @@ func addDNSToMapStr(m common.MapStr, dns *mkdns.Msg, authority bool, additional 
 		m["answers"], resolvedIPs = rrsToMapStrs(dns.Answer, true)
 		if len(resolvedIPs) > 0 {
 			m["resolved_ip"] = resolvedIPs
+			pbf.AddIP(resolvedIPs...)
 		}
 	}
 

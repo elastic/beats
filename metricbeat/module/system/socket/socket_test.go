@@ -31,9 +31,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/libbeat/common"
-	sock "github.com/elastic/beats/metricbeat/helper/socket"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
@@ -49,8 +49,8 @@ func TestData(t *testing.T) {
 		path      string
 	}{
 		{sock.ListeningName, "."},
-		{sock.InboundName, "./_meta/data_inbound.json"},
-		{sock.OutboundName, "./_meta/data_outbound.json"},
+		{sock.IngressName, "./_meta/data_ingress.json"},
+		{sock.EgressName, "./_meta/data_egress.json"},
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())

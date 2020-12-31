@@ -7,9 +7,11 @@
 package pkg
 
 import (
+	"debug/elf"
 	"errors"
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -204,27 +206,57 @@ func (lib *librpm) close() error {
 	return nil
 }
 
-func openLibrpm() (*librpm, error) {
-	var librpmNames = []string{
-		"librpm.so",   // with rpm-devel installed
-		"librpm.so.8", // Fedora 29
-		"librpm.so.3", // CentOS 7
-		"librpm.so.1", // CentOS 6
-
-		// Following for completeness, but not explicitly tested
-		"librpm.so.7",
-		"librpm.so.6",
-		"librpm.so.5",
-		"librpm.so.4",
-		"librpm.so.2",
+// getLibrpmNames determines the versions of librpm.so that are
+// installed on a system.  rpm-devel rpm installs the librpm.so
+// symbolic link to the correct version of librpm, but that isn't a
+// required package.  rpm will install librpm.so.X, where X is the
+// version number.  getLibrpmNames looks at the elf header for the rpm
+// binary to determine what version of librpm.so it is linked against.
+func getLibrpmNames() []string {
+	var rpmPaths = []string{
+		"/usr/bin/rpm",
+		"/bin/rpm",
 	}
+	var libNames = []string{
+		"librpm.so",
+	}
+	var rpmElf *elf.File
+	var err error
+
+	for _, path := range rpmPaths {
+		rpmElf, err = elf.Open(path)
+		if err == nil {
+			break
+		}
+	}
+	if err != nil {
+		return libNames
+	}
+
+	impLibs, err := rpmElf.ImportedLibraries()
+	if err != nil {
+		return libNames
+	}
+
+	for _, lib := range impLibs {
+		if strings.Contains(lib, "librpm.so") {
+			libNames = append(libNames, lib)
+		}
+	}
+
+	return libNames
+}
+
+func openLibrpm() (*librpm, error) {
 
 	var librpm librpm
 	var err error
 
+	librpmNames := getLibrpmNames()
+
 	librpm.handle, err = dlopen.GetHandle(librpmNames)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't open %v: %v", librpmNames, err)
 	}
 
 	librpm.rpmtsCreate, err = librpm.handle.GetSymbolPointer("rpmtsCreate")
@@ -357,7 +389,9 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	}
 	defer C.my_headerFree(openedLibrpm.headerFree, header)
 
-	pkg := Package{}
+	pkg := Package{
+		Type: "rpm",
+	}
 
 	name := C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_NAME)
 	if name != nil {
@@ -370,7 +404,7 @@ func packageFromHeader(header C.Header, openedLibrpm *librpm) (*Package, error) 
 	if version != nil {
 		pkg.Version = C.GoString(version)
 	} else {
-		pkg.Error = errors.New("Failed to get package version")
+		pkg.error = errors.New("failed to get package version")
 	}
 
 	pkg.Release = C.GoString(C.my_headerGetString(openedLibrpm.headerGetString, header, RPMTAG_RELEASE))

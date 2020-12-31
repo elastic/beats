@@ -1,8 +1,13 @@
 [
     {
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "haproxy.log",
         "event.duration": 2000000,
+        "event.kind": "event",
         "event.module": "haproxy",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "haproxy.backend_name": "docs_microservice",
@@ -34,11 +39,15 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 32450,
+        "related.ip": [
+            "1.2.3.4"
+        ],
         "service.type": "haproxy",
         "source.address": "1.2.3.4",
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",

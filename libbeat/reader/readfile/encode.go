@@ -22,8 +22,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 // Reader produces lines by reading lines from an io.Reader
@@ -38,11 +38,12 @@ type Config struct {
 	Codec      encoding.Encoding
 	BufferSize int
 	Terminator LineTerminator
+	MaxBytes   int
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncodeReader(r io.Reader, config Config) (EncoderReader, error) {
+func NewEncodeReader(r io.ReadCloser, config Config) (EncoderReader, error) {
 	eReader, err := NewLineReader(r, config)
 	return EncoderReader{eReader}, err
 }
@@ -57,4 +58,8 @@ func (r EncoderReader) Next() (reader.Message, error) {
 		Content: bytes.Trim(c, "\xef\xbb\xbf"),
 		Bytes:   sz,
 	}, err
+}
+
+func (r EncoderReader) Close() error {
+	return r.reader.Close()
 }

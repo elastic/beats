@@ -2,13 +2,13 @@
   type: group
   description: >
     kubernetes service metrics
-  release: experimental
+  release: ga
   fields:
     - name: name
       type: keyword
       description: Service name.
     - name: cluster_ip
-      type: ip
+      type: keyword
       description: Internal IP for the service.
     - name: external_name
       type: keyword
@@ -26,16 +26,8 @@
       type: keyword
       description: Ingress IP
     - name: ingress_hostname
-      type: ip
+      type: keyword
       description: Ingress Hostname
-    - name: labels.*
-      type: object
-      object_type: keyword
-      description: Labels for service
     - name: created
       type: date
       description: Service creation date
-      
-      
-
-

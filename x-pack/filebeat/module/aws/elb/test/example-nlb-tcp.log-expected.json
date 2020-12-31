@@ -12,10 +12,13 @@
         "aws.elb.ssl_protocol": "tlsv12",
         "aws.elb.tls_handshake_time.ms": 2.0,
         "aws.elb.type": "tls",
+        "cloud.provider": "aws",
         "destination.bytes": 246,
         "destination.domain": "my-network-loadbalancer-c6e77e28c25b2234.elb.us-east-2.amazonaws.com",
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2018-12-20T02:59:40.000Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -27,11 +30,18 @@
         "source.geo.city_name": "Ashburn",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 39.0481,
         "source.geo.location.lon": -77.4728,
         "source.geo.region_iso_code": "US-VA",
         "source.geo.region_name": "Virginia",
         "source.ip": "72.21.218.154",
-        "source.port": "51341"
+        "source.port": "51341",
+        "tags": [
+            "forwarded"
+        ],
+        "tls.cipher": "ECDHE-RSA-AES128-SHA",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
     }
 ]

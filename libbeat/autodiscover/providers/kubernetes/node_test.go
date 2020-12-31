@@ -27,11 +27,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/elastic/beats/libbeat/autodiscover/template"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/bus"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestGenerateHints_Node(t *testing.T) {
@@ -114,6 +115,11 @@ func TestEmitEvent_Node(t *testing.T) {
 	nodeIP := "192.168.0.1"
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	UUID, err := uuid.NewV4()
+
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Node",
+		APIVersion: "v1",
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,6 +140,7 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
 					Addresses: []v1.NodeAddress{
 						{
@@ -143,6 +150,16 @@ func TestEmitEvent_Node(t *testing.T) {
 						{
 							Type:    v1.NodeInternalIP,
 							Address: "1.2.3.4",
+						},
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
+					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
 						},
 					},
 				},
@@ -154,16 +171,69 @@ func TestEmitEvent_Node(t *testing.T) {
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
-						"name": "metricbeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
 						"node": common.MapStr{
-							"name": "metricbeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test node start with just node name",
+			Flag:    "start",
+			Node: &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
+					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"start":    true,
+				"host":     "node1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"node": common.MapStr{
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
+					},
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"node": common.MapStr{
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},
@@ -180,7 +250,8 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
-				Status: v1.NodeStatus{},
+				TypeMeta: typeMeta,
+				Status:   v1.NodeStatus{},
 			},
 			Expected: nil,
 		},
@@ -194,8 +265,9 @@ func TestEmitEvent_Node(t *testing.T) {
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
 				},
+				TypeMeta: typeMeta,
 				Status: v1.NodeStatus{
-					Addresses: []v1.NodeAddress{},
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
 					Conditions: []v1.NodeCondition{
 						{
 							Type:   v1.NodeReady,
@@ -206,21 +278,23 @@ func TestEmitEvent_Node(t *testing.T) {
 			},
 			Expected: bus.Event{
 				"stop":     true,
-				"host":     "",
+				"host":     "node1",
 				"id":       uid,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"node": common.MapStr{
-						"name": "metricbeat",
-						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
 					},
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
 						"node": common.MapStr{
-							"name": "metricbeat",
-							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
 						},
 					},
 				},
@@ -231,19 +305,16 @@ func TestEmitEvent_Node(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
-			mapper, err := template.NewConfigMapper(nil)
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
+			config := defaultConfig()
 			p := &Provider{
-				config:    defaultConfig(),
-				bus:       bus.New("test"),
+				config:    config,
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
 				templates: mapper,
 				logger:    logp.NewLogger("kubernetes"),
 			}
@@ -256,7 +327,7 @@ func TestEmitEvent_Node(t *testing.T) {
 				logger:  logp.NewLogger("kubernetes.no"),
 			}
 
-			p.eventer = no
+			p.eventManager = NewMockNodeEventerManager(no)
 
 			listener := p.bus.Subscribe()
 
@@ -270,6 +341,187 @@ func TestEmitEvent_Node(t *testing.T) {
 					t.Fatal("Timeout while waiting for event")
 				}
 			}
+		})
+	}
+}
+
+func NewMockNodeEventerManager(no *node) EventManager {
+	em := &eventerManager{}
+	em.eventer = no
+	return em
+}
+
+func TestNode_isUpdated(t *testing.T) {
+	tests := []struct {
+		old     *kubernetes.Node
+		new     *kubernetes.Node
+		updated bool
+		test    string
+	}{
+		{
+			test:    "one of the objects is nil then its updated",
+			old:     nil,
+			new:     &kubernetes.Node{},
+			updated: true,
+		},
+		{
+			test:    "both empty nodes should return not updated",
+			old:     &kubernetes.Node{},
+			new:     &kubernetes.Node{},
+			updated: false,
+		},
+		{
+			test: "resource version is the same should return not updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+				},
+			},
+		},
+		{
+			test: "if meta changes then it should return updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations:     map[string]string{},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+			},
+			updated: true,
+		},
+		{
+			test: "if spec changes then it should return updated",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: false,
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+			},
+			updated: true,
+		},
+		{
+			test: "if overall status doesn't change then its not an update",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			updated: false,
+		},
+		{
+			test: "if node status changes then its an update",
+			old: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "1",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionFalse,
+						},
+					},
+				},
+			},
+			new: &kubernetes.Node{
+				ObjectMeta: kubernetes.ObjectMeta{
+					ResourceVersion: "2",
+					Annotations: map[string]string{
+						"a": "b",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID:    "1",
+					Unschedulable: true,
+				},
+				Status: v1.NodeStatus{
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			updated: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.test, func(t *testing.T) {
+			assert.Equal(t, test.updated, isUpdated(test.old, test.new))
 		})
 	}
 }

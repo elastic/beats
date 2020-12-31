@@ -5,11 +5,9 @@ import semver
 import sys
 import time
 import unittest
-import urllib2
-from nose.plugins.skip import SkipTest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
+import urllib.error
+import urllib.parse
+import urllib.request
 
 
 class Test(metricbeat.BaseTest):
@@ -40,7 +38,7 @@ class Test(metricbeat.BaseTest):
         version = self.get_version()
         if semver.compare(version, "7.3.0") == -1:
             # Skip for Logstash versions < 7.3.0 as necessary APIs not available
-            raise SkipTest
+            raise unittest.SkipTest
 
         self.render_config_template(modules=[{
             "name": "logstash",
@@ -59,7 +57,7 @@ class Test(metricbeat.BaseTest):
 
     def get_version(self):
         host = self.get_hosts()[0]
-        res = urllib2.urlopen("http://" + host + "/").read()
+        res = urllib.request.urlopen("http://" + host + "/").read()
 
         body = json.loads(res)
         version = body["version"]

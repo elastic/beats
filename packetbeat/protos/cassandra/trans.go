@@ -20,10 +20,10 @@ package cassandra
 import (
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/procs"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
 type transactions struct {
@@ -33,6 +33,8 @@ type transactions struct {
 	responses messageList
 
 	onTransaction transactionHandler
+
+	watcher procs.ProcessesWatcher
 }
 
 type transactionConfig struct {
@@ -46,8 +48,9 @@ type messageList struct {
 	head, tail *message
 }
 
-func (trans *transactions) init(c *transactionConfig, cb transactionHandler) {
+func (trans *transactions) init(c *transactionConfig, watcher procs.ProcessesWatcher, cb transactionHandler) {
 	trans.config = c
+	trans.watcher = watcher
 	trans.onTransaction = cb
 }
 
@@ -59,7 +62,7 @@ func (trans *transactions) onMessage(
 	var err error
 	msg.Tuple = *tuple
 	msg.Transport = applayer.TransportTCP
-	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(&msg.Tuple)
+	msg.CmdlineTuple = trans.watcher.FindProcessesTupleTCP(&msg.Tuple)
 
 	if msg.IsRequest {
 		if isDebug {

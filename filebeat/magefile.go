@@ -26,23 +26,39 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
-	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
+	// mage:import generate
+	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+)
+
+// declare journald dependencies for cross build target
+var (
+	journaldPlatforms = []devtools.PlatformDescription{
+		devtools.Linux386, devtools.LinuxAMD64,
+		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
+		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
+		devtools.LinuxPPC64LE,
+		devtools.LinuxS390x,
+	}
+
+	journaldDeps = devtools.NewPackageInstaller().
+			AddEach(journaldPlatforms, "libsystemd-dev").
+			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -53,6 +69,9 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	// XXX: enable once we have systemd available in the cross build image
+	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
+
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
@@ -175,34 +194,20 @@ func ExportDashboard() error {
 
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
-	devtools.AddIntegTestUsage()
-	defer devtools.StopIntegTestEnv()
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
-}
-
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // GoIntegTest executes the Go integration tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoIntegTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.Deps(devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
+	runner, err := devtools.NewDockerIntegrationRunner()
+	if err != nil {
+		return err
+	}
+	return runner.Test("goIntegTest", func() error {
+		return devtools.GoTest(ctx, devtools.DefaultGoTestIntegrationArgs())
+	})
 }
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
@@ -213,10 +218,14 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields)
 	}
-	return devtools.RunIntegTest("pythonIntegTest", func() error {
+	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
+	if err != nil {
+		return err
+	}
+	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		return devtools.PythonNoseTest(args)
-	}, "GENERATE", "TESTING_FILEBEAT_MODULES", "TESTING_FILEBEAT_FILESETS")
+		return devtools.PythonTest(args)
+	})
 }

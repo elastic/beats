@@ -29,12 +29,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/reader"
-	"github.com/elastic/beats/libbeat/reader/multiline"
-	"github.com/elastic/beats/libbeat/reader/readfile"
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/multiline"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 type logReaderConfig struct {
@@ -108,6 +108,11 @@ func main() {
 	}
 
 	for _, path := range paths {
+		// TODO: Add support for testing YAML pipelines.
+		if filepath.Ext(path) == ".yml" {
+			fmt.Fprintf(os.Stderr, "YAML pipelines are not supported by this tool. Cannot process %q.", path)
+			os.Exit(3)
+		}
 		err = testPipeline(*esURL, path, logs, *verbose, *simulateVerbose)
 		if err != nil {
 			os.Stderr.WriteString(err.Error())
@@ -185,8 +190,14 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 		module := parts[0]
 		fileset := parts[1]
 
-		pathToPipeline := filepath.Join(modulesPath, module, fileset, "ingest", "pipeline.json")
-		_, err := os.Stat(pathToPipeline)
+		var pathToPipeline string
+		for _, ext := range []string{".json", ".yml"} {
+			pathToPipeline = filepath.Join(modulesPath, module, fileset, "ingest", "pipeline"+ext)
+			_, err = os.Stat(pathToPipeline)
+			if err == nil {
+				break
+			}
+		}
 		if err != nil {
 			return nil, fmt.Errorf("Cannot find pipeline in %s: %v %v\n", path, err, pathToPipeline)
 		}
@@ -199,8 +210,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 			return nil, err
 		}
 		for _, f := range files {
-			isPipelineFile := strings.HasSuffix(f.Name(), ".json")
-			if isPipelineFile {
+			if isPipelineFileExtension(f.Name()) {
 				fullPath := filepath.Join(path, f.Name())
 				paths = append(paths, fullPath)
 			}
@@ -211,13 +221,21 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 		return paths, nil
 	}
 
-	isPipelineFile := strings.HasSuffix(path, ".json")
-	if isPipelineFile {
+	if isPipelineFileExtension(path) {
 		return []string{path}, nil
 	}
 
 	return paths, nil
 
+}
+
+func isPipelineFileExtension(path string) bool {
+	ext := filepath.Ext(path)
+	switch strings.ToLower(ext) {
+	case ".yml", ".json":
+		return true
+	}
+	return false
 }
 
 func testPipeline(esURL, path string, logs []string, verbose, simulateVerbose bool) error {

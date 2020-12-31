@@ -1,13 +1,13 @@
+import metricbeat
 import os
-import unittest
-from nose.plugins.attrib import attr
-import urllib2
-import time
+import pytest
 import semver
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
+import time
+import unittest
+import urllib.error
+import urllib.parse
+import urllib.request
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 
@@ -37,7 +37,7 @@ class ApacheStatusTest(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['apache']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_output(self):
         """
         Apache module outputs an event.
@@ -54,8 +54,8 @@ class ApacheStatusTest(metricbeat.BaseTest):
         found = False
         # Waits until CPULoad is part of the status
         while not found:
-            res = urllib2.urlopen(hosts[0] + "/server-status?auto").read()
-            if "CPULoad" in res:
+            res = urllib.request.urlopen(hosts[0] + "/server-status?auto").read()
+            if b"CPULoad" in res:
                 found = True
             time.sleep(0.5)
 
@@ -74,15 +74,15 @@ class ApacheStatusTest(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def verify_fields(self, evt):
-        self.assertItemsEqual(self.de_dot(APACHE_FIELDS), evt.keys())
+        self.assertCountEqual(self.de_dot(APACHE_FIELDS), evt.keys())
         apache_status = evt["apache"]["status"]
         if self.old_apache_version():
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(APACHE_OLD_STATUS_FIELDS), apache_status.keys())
         else:
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(APACHE_STATUS_FIELDS), apache_status.keys())
-            self.assertItemsEqual(
+            self.assertCountEqual(
                 self.de_dot(CPU_FIELDS), apache_status["cpu"].keys())
             # There are more fields that could be checked.
 

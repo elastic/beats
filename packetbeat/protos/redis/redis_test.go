@@ -67,7 +67,29 @@ func TestRedisParser_ArrayRequest(t *testing.T) {
 	assert.True(t, complete)
 	assert.True(t, msg.isRequest)
 	assert.Equal(t, "SET key1 Hello", string(msg.message))
+	assert.Equal(t, "SET", string(msg.method))
+	assert.Equal(t, "key1", string(msg.path))
 	assert.Equal(t, len(arrayRequest), msg.size)
+}
+
+var arrayRequest2 = []byte("*3\r\n" +
+	"$6\r\n" +
+	"CONFIG\r\n" +
+	"$3\r\n" +
+	"GET\r\n" +
+	"$1\r\n" +
+	"*\r\n")
+
+func TestRedisParser_ArrayRequest2(t *testing.T) {
+	msg, ok, complete := parse(arrayRequest2)
+
+	assert.True(t, ok)
+	assert.True(t, complete)
+	assert.True(t, msg.isRequest)
+	assert.Equal(t, "CONFIG GET *", string(msg.message))
+	assert.Equal(t, "CONFIG GET", string(msg.method))
+	assert.Equal(t, "*", string(msg.path))
+	assert.Equal(t, len(arrayRequest2), msg.size)
 }
 
 var arrayResponse = []byte("*4\r\n" +

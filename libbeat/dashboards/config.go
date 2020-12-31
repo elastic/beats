@@ -19,6 +19,7 @@ package dashboards
 
 import "time"
 
+// Config represents the config values for dashboards
 type Config struct {
 	Enabled        bool   `config:"enabled"`
 	KibanaIndex    string `config:"kibana_index"`
@@ -33,6 +34,7 @@ type Config struct {
 	Retry          *Retry `config:"retry"`
 }
 
+// Retry handles query retries
 type Retry struct {
 	Enabled  bool          `config:"enabled"`
 	Interval time.Duration `config:"interval"`

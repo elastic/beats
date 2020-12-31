@@ -27,13 +27,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
-	"github.com/elastic/beats/packetbeat/publish"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+	"github.com/elastic/beats/v7/packetbeat/publish"
 )
 
 const serverPort = 3306
@@ -43,7 +44,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil)
+	publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -60,7 +61,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	var mysql mysqlPlugin
 	config := defaultConfig
 	config.Ports = []int{serverPort}
-	mysql.init(callback, &config)
+	mysql.init(callback, procs.ProcessesWatcher{}, &config)
 	return &mysql
 }
 
@@ -519,7 +520,7 @@ func Test_gap_in_response(t *testing.T) {
 	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d2074657374")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	respData, err := hex.DecodeString(
 		"0100000103240000020364656604" +
 			"74657374047465737404746573740161" +
@@ -537,7 +538,7 @@ func Test_gap_in_response(t *testing.T) {
 			"6f6620746865207072696e74696e6720" +
 			"616e64207479706573657474696e6720" +
 			"696e6475737472792e204c6f72656d20")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: reqData}
@@ -571,7 +572,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 	reqData, err := hex.DecodeString(
 		"130000000373656c656374202a20" +
 			"66726f6d20746573")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
 	ok, complete := mysqlMessageParser(stream)
@@ -589,13 +590,13 @@ func Test_read_length(t *testing.T) {
 	var length int
 
 	_, err = readLength([]byte{}, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	_, err = readLength([]byte{0x00, 0x00}, 0)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	length, err = readLength([]byte{0x01, 0x00, 0x00}, 0)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, length, 1)
 }
 
@@ -662,7 +663,7 @@ func Test_PreparedStatement(t *testing.T) {
 
 	send := func(dir uint8, data string) {
 		rawData, err := hex.DecodeString(data)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		packet := protos.Packet{Payload: rawData}
 
 		var private protos.ProtocolData

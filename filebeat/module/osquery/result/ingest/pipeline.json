@@ -2,6 +2,11 @@
   "description": "Pipeline for parsing osquery result logs",
   "processors": [
     {
+      "set":{
+        "field": "event.ingested",
+        "value": "{{_ingest.timestamp}}"
+      }
+    }, {
       "rename": {
         "field": "@timestamp",
         "target_field": "event.created"
@@ -41,6 +46,173 @@
             "field": "osquery.result.calendarTime",
             "target_field": "osquery.result.calendar_time",
             "ignore_missing": true
+        }
+    },
+    {
+        "set": {
+            "field": "event.kind",
+            "value": "event"
+        }
+    },
+    {
+        "set": {
+            "field": "event.type",
+            "value": "info"
+        }
+    },
+    {
+        "set": {
+            "field": "event.action",
+            "value": "{{osquery.result.action}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.atime",
+            "target_field": "file.accessed",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.atime != null"
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.ctime",
+            "target_field": "file.created",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.ctime != null"
+        }
+    },
+    {
+        "date": {
+            "field": "osquery.result.columns.mtime",
+            "target_field": "file.mtime",
+            "formats": ["UNIX"],
+            "ignore_failure": true,
+            "if": "ctx?.osquery?.result?.columns?.mtime != null"
+        }
+    },
+    {
+        "set": {
+            "field": "file.directory",
+            "value": "{{osquery.result.columns.directory}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.name",
+            "value": "{{osquery.result.columns.filename}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.gid",
+            "value": "{{osquery.result.columns.gid}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.inode",
+            "value": "{{osquery.result.columns.inode}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.mode",
+            "value": "{{osquery.result.columns.mode}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.path",
+            "value": "{{osquery.result.columns.path}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.size",
+            "value": "{{osquery.result.columns.size}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.type",
+            "value": "{{osquery.result.columns.type}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "file.uid",
+            "value": "{{osquery.result.columns.uid}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "user.name",
+            "value": "{{osquery.result.decorations.username}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "append": {
+            "field": "related.user",
+            "value": "{{user.name}}",
+            "if": "ctx?.user?.name != null"
+        }
+    },
+    {
+        "set": {
+            "field": "host.hostname",
+            "value": "{{osquery.result.host_identifier}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "host.id",
+            "value": "{{osquery.result.decorations.host_uuid}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "process.name",
+            "value": "{{osquery.result.columns.process}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "url.full",
+            "value": "{{osquery.result.columns.source_url}}",
+            "if": "ctx?.osquery?.result?.columns?.source_url != 'null'",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "set": {
+            "field": "rule.name",
+            "value": "{{osquery.result.name}}",
+            "ignore_empty_value": true
+        }
+    },
+    {
+        "append": {
+            "field": "related.hosts",
+            "value": "{{host.hostname}}",
+            "if": "ctx?.host?.hostname != null && ctx.host?.hostname != ''",
+            "allow_duplicates": false
         }
     }
   ],

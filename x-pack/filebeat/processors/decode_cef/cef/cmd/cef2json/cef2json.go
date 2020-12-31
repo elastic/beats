@@ -13,7 +13,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/elastic/beats/x-pack/filebeat/processors/decode_cef/cef"
+	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
 var (
@@ -49,7 +49,7 @@ func main() {
 		line = line[begin:]
 
 		var e cef.Event
-		if err := e.Unpack(line, opts...); err != nil {
+		if err := e.Unpack(string(line), opts...); err != nil {
 			log.Println("ERROR:", err, "in:", string(line))
 		}
 

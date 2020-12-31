@@ -1,9 +1,7 @@
+import metricbeat
 import os
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 GOLANG_FIELDS = metricbeat.COMMON_FIELDS + ["golang"]
@@ -31,7 +29,7 @@ class Test(metricbeat.BaseTest):
         output = self.read_output_json()
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(GOLANG_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(GOLANG_FIELDS), evt.keys(), evt)
         assert evt["golang"]["heap"]["allocations"]["total"] > 0
 
         self.assert_fields_are_documented(evt)

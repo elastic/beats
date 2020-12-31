@@ -1,6 +1,10 @@
 [[extract-array]]
 === Extract array
 
+++++
+<titleabbrev>extract_array</titleabbrev>
+++++
+
 experimental[]
 
 The `extract_array` processor populates fields with values read from an array
@@ -11,9 +15,9 @@ the `my_array` field, `destination.ip` with the second element, and
 [source,yaml]
 -----------------------------------------------------
 processors:
- - extract_array:
-     field: my_array
-     mappings:
+  - extract_array:
+      field: my_array
+      mappings:
         source.ip: 0
         destination.ip: 1
         network.transport: 2

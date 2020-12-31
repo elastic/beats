@@ -1,0 +1,34 @@
+default: true
+input:
+  module: azure
+  metricset: monitor
+  defaults:
+    default_resource_type: "Microsoft.ContainerInstance/containerGroups"
+    resources:
+    - resource_group: ""
+      resource_type: "Microsoft.ContainerInstance/containerGroups"
+      metrics:
+      - name: ["CpuUsage", "MemoryUsage"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "containerName"
+          value: "*"
+      - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+    - resource_id: ""
+      metrics:
+      - name: ["CpuUsage", "MemoryUsage"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
+        timegrain: "PT5M"
+        dimensions:
+        - name: "containerName"
+          value: "*"
+      - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
+        namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
+        timegrain: "PT5M"

@@ -1,6 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
+
 package main
 
 // This file is mandatory as otherwise the heartbeat.test binary is not generated correctly.
@@ -8,8 +9,8 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/heartbeat/cmd"
-	"github.com/elastic/beats/libbeat/tests/system/template"
+	"github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
 var systemTest *bool
@@ -29,5 +30,5 @@ func TestSystem(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name)
+	template.TestTemplate(t, cmd.Name, true)
 }

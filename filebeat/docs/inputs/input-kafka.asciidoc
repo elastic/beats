@@ -48,6 +48,12 @@ For more details on the mapping between Kafka and Event Hubs configuration
 parameters, see the
 link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecosystem-overview[Azure documentation].
 
+[[kafka-input-compatibility]]
+==== Compatibility
+
+This input works with all Kafka versions in between 0.11 and 2.1.0. Older versions
+might work as well, but are not supported.
+
 [id="{beatname_lc}-input-{type}-options"]
 ==== Configuration options
 
@@ -131,11 +137,14 @@ Kafka fetch settings:
 
 If the fileset using this input expects to receive multiple messages bundled under a specific field then the config option `expand_event_list_from_field` value can be assigned the name of the field.
 For example in the case of azure filesets the events are found under the json object "records".
-```
+
+["source","json"]
+----
 {
 "records": [ {event1}, {event2}]
 }
-```
+----
+
 This setting will be able to split the messages under the group value ('records') into separate events.
 
 ===== `rebalance`
@@ -150,6 +159,14 @@ Kafka rebalance settings:
 
 *`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
 Defaults to 2s.
+
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

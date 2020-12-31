@@ -1,0 +1,11 @@
+- key: iis
+  title: "IIS"
+  description: >
+    iis module
+  release: ga
+
+  fields:
+    - name: iis
+      type: group
+      description: >
+      fields:

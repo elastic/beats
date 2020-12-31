@@ -22,21 +22,24 @@ package memcache
 import (
 	"encoding/json"
 	"math"
+	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
 
 // memcache types
 type memcache struct {
 	ports   protos.PortsConfig
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 	config  parserConfig
 
 	udpMemcache
@@ -130,6 +133,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &memcache{}
@@ -140,14 +144,14 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
 // Called to initialize the Plugin
-func (mc *memcache) init(results protos.Reporter, config *memcacheConfig) error {
+func (mc *memcache) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *memcacheConfig) error {
 	debug("init memcache plugin")
 
 	mc.handler = mc
@@ -157,6 +161,7 @@ func (mc *memcache) init(results protos.Reporter, config *memcacheConfig) error 
 
 	mc.udpConnections = make(map[common.HashableIPPortTuple]*udpConnection)
 	mc.results = results
+	mc.watcher = watcher
 	return nil
 }
 
@@ -388,12 +393,18 @@ func (t *transaction) Event(event *beat.Event) error {
 	mc := common.MapStr{}
 	event.Fields["memcache"] = mc
 
+	msg := t.request
+	if msg == nil {
+		msg = t.response
+	}
+
 	if t.request != nil {
 		_, err := t.request.SubEvent("request", mc)
 		if err != nil {
 			logp.Warn("error filling transaction request: %v", err)
 			return err
 		}
+		event.Fields["event.action"] = "memcache." + strings.ToLower(t.request.command.typ.String())
 	}
 	if t.response != nil {
 		_, err := t.response.SubEvent("response", mc)
@@ -401,12 +412,12 @@ func (t *transaction) Event(event *beat.Event) error {
 			logp.Warn("error filling transaction response: %v", err)
 			return err
 		}
+		normalized := normalizeEventOutcome(memcacheStatusCode(t.response.status).String())
+		if normalized != "" {
+			event.Fields["event.outcome"] = normalized
+		}
 	}
 
-	msg := t.request
-	if msg == nil {
-		msg = t.response
-	}
 	if msg == nil {
 		mc["protocol_type"] = "unknown"
 	} else {
@@ -418,6 +429,19 @@ func (t *transaction) Event(event *beat.Event) error {
 	}
 
 	return nil
+}
+
+func normalizeEventOutcome(outcome string) string {
+	switch outcome {
+	case "Fail":
+		return "failure"
+	case "UNKNOWN":
+		return "unknown"
+	case "Success":
+		return "success"
+	default:
+		return ""
+	}
 }
 
 func computeTransactionStatus(requ, resp *message) string {

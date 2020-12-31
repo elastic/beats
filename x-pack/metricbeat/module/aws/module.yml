@@ -3,5 +3,11 @@ metricsets:
   - elb
   - ebs
   - usage
-  - billing
   - sns
+  - s3_daily_storage
+  - s3_request
+  - lambda
+  - dynamodb
+  - vpn
+  - transitgateway
+  - natgateway

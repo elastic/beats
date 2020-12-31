@@ -1,0 +1,81 @@
+:type: mqtt
+
+[id="{beatname_lc}-input-{type}"]
+=== MQTT input
+
+++++
+<titleabbrev>MQTT</titleabbrev>
+++++
+
+Use the `MQTT` input to read data transmitted using lightweight messaging protocol
+for small and mobile devices, optimized for high-latency or unreliable networks.
+
+This input connects to the MQTT broker, subscribes to selected topics and parses data
+into common message lines. Everything happens before line filtering, multiline, and JSON decoding,
+so this input can be used in combination with those settings.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: mqtt
+  hosts: <1>
+    - tcp://broker:1883
+    - ssl://secure_broker:8883
+  topics: <2>
+    - sample_topic
+----
+
+<1> `hosts` are required.
+
+<2> `paths` are required.
+
+All other settings are optional.
+
+==== Configuration options
+
+The `mqtt` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+===== `hosts`
+
+A list of MQTT brokers to connect to.
+
+===== `topics`
+
+A list of topics to subscribe to and read from.
+
+===== `qos`
+
+An agreement level between the sender of a message and the receiver of a message that defines the guarantee of delivery.
+
+There are 3 QoS levels in MQTT:
+
+* At most once (`0`),
+* At least once (`1`),
+* Exactly once (`2`).
+
+===== `client_id`
+
+A unique identifier of each MQTT client connecting to a MQTT broker.
+
+===== `username`
+
+A client username used for authentication provided on the application level by the MQTT protocol.
+
+===== `password`
+
+A client password used for authentication provided on the application level by the MQTT protocol.
+
+===== `ssl`
+
+Configuration options for SSL parameters like the certificate, key and the certificate authorities
+to use.
+
+See <<configuration-ssl>> for more information.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

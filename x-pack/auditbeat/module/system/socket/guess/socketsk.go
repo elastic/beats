@@ -11,9 +11,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // Guess the offset of (struct socket*)->sk (type struct sock*)
@@ -29,7 +29,7 @@ import (
 //  "SOCKET_SOCK": 32
 
 func init() {
-	if err := Registry.AddGuess(&guessSocketSock{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSocketSock{} }); err != nil {
 		panic(err)
 	}
 }

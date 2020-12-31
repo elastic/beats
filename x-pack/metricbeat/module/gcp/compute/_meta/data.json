@@ -1,0 +1,73 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "8358623250631840944",
+            "name": "rhodes-spacetime-1"
+        },
+        "machine": {
+            "type": "e2-micro"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "instance": {
+                "network": {
+                    "received_bytes_count": {
+                        "value": 49837
+                    },
+                    "received_packets_count": {
+                        "value": 229
+                    },
+                    "sent_bytes_count": {
+                        "value": 1018967
+                    },
+                    "sent_packets_count": {
+                        "value": 752
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "loadbalanced": "false"
+            },
+            "user": {
+                "created-by": "ks"
+            }
+        }
+    },
+    "host": {
+        "id": "8358623250631840944",
+        "name": "rhodes-spacetime-1",
+        "network": {
+            "in": {
+                "bytes": 1018967,
+                "packets": 752
+            },
+            "out": {
+                "bytes": 49837,
+                "packets": 229
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

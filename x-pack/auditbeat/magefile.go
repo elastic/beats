@@ -7,7 +7,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -15,27 +14,26 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	auditbeat "github.com/elastic/beats/auditbeat/scripts/mage"
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
 	// mage:import
-	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
+	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(fieldsYML)
 
 	devtools.BeatDescription = "Audit the activities of users and processes on your system."
 	devtools.BeatLicense = "Elastic License"
 	devtools.Platforms = devtools.Platforms.Filter("!linux/ppc64 !linux/mips64")
-}
-
-// Aliases provides compatibility with CI while we transition all Beats
-// to having common testing targets.
-var Aliases = map[string]interface{}{
-	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -86,7 +84,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithRootUserContainer())
+	return devtools.TestPackages()
 }
 
 // Update is an alias for running fields, dashboards, config.
@@ -127,24 +125,6 @@ func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
 }
 
-// UnitTest executes the unit tests.
-func UnitTest() {
-	mg.SerialDeps(GoUnitTest, PythonUnitTest)
-}
-
-// GoUnitTest executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoUnitTest(ctx context.Context) error {
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
-}
-
-// PythonUnitTest executes the python system tests.
-func PythonUnitTest() error {
-	mg.SerialDeps(Fields, devtools.BuildSystemTestBinary)
-	return devtools.PythonNoseTest(devtools.DefaultPythonTestUnitArgs())
-}
-
 // -----------------------------------------------------------------------------
 // - Install the librpm-dev package
 var (
@@ -152,13 +132,13 @@ var (
 		"linux/386":      installLinux386,
 		"linux/amd64":    installLinuxAMD64,
 		"linux/arm64":    installLinuxARM64,
-		"linux/armv5":    installLinuxARMLE,
-		"linux/armv6":    installLinuxARMLE,
+		"linux/armv5":    installLinuxARMEL,
+		"linux/armv6":    installLinuxARMEL,
 		"linux/armv7":    installLinuxARMHF,
 		"linux/mips":     installLinuxMIPS,
-		"linux/mipsle":   installLinuxMIPSLE,
-		"linux/mips64le": installLinuxMIPS64LE,
-		"linux/ppc64le":  installLinuxPPC64LE,
+		"linux/mipsle":   installLinuxMIPSEL,
+		"linux/mips64le": installLinuxMIPS64EL,
+		"linux/ppc64le":  installLinuxPPC64EL,
 		"linux/s390x":    installLinuxS390X,
 
 		//"linux/ppc64":  installLinuxPpc64,
@@ -168,49 +148,56 @@ var (
 
 const (
 	librpmDevPkgName = "librpm-dev"
+
+	// Dependency of librpm-dev in ARM architectures, that needs to be explicitly
+	// installed to replace other conflicting packages pre-installed in the image.
+	libicuDevPkgName = "libicu-dev"
 )
 
 func installLinuxAMD64() error {
-	return installDependencies(librpmDevPkgName, "")
+	return installDependencies("", librpmDevPkgName)
 }
 
 func installLinuxARM64() error {
-	return installDependencies(librpmDevPkgName+":arm64", "arm64")
+	return installDependencies("arm64", librpmDevPkgName+":arm64")
 }
 
 func installLinuxARMHF() error {
-	return installDependencies(librpmDevPkgName+":armhf", "armhf")
+	return installDependencies("armhf", librpmDevPkgName+":armhf", libicuDevPkgName+":armhf")
 }
 
-func installLinuxARMLE() error {
-	return installDependencies(librpmDevPkgName+":armel", "armel")
+func installLinuxARMEL() error {
+	return installDependencies("armel", librpmDevPkgName+":armel", libicuDevPkgName+":armel")
 }
 
 func installLinux386() error {
-	return installDependencies(librpmDevPkgName+":i386", "i386")
+	return installDependencies("i386", librpmDevPkgName+":i386")
 }
 
 func installLinuxMIPS() error {
-	return installDependencies(librpmDevPkgName+":mips", "mips")
+	return installDependencies("mips", librpmDevPkgName+":mips")
 }
 
-func installLinuxMIPS64LE() error {
-	return installDependencies(librpmDevPkgName+":mips64el", "mips64el")
+func installLinuxMIPS64EL() error {
+	return installDependencies("mips64el", librpmDevPkgName+":mips64el")
 }
 
-func installLinuxMIPSLE() error {
-	return installDependencies(librpmDevPkgName+":mipsel", "mipsel")
+func installLinuxMIPSEL() error {
+	return installDependencies("mispel", librpmDevPkgName+":mipsel")
 }
 
-func installLinuxPPC64LE() error {
-	return installDependencies(librpmDevPkgName+":ppc64el", "ppc64el")
+func installLinuxPPC64EL() error {
+	return installDependencies("ppc64el", librpmDevPkgName+":ppc64el")
 }
 
 func installLinuxS390X() error {
-	return installDependencies(librpmDevPkgName+":s390x", "s390x")
+	return installDependencies("s390x", librpmDevPkgName+":s390x")
 }
 
-func installDependencies(pkg, arch string) error {
+func installDependencies(arch string, pkgs ...string) error {
+	if len(pkgs) == 0 {
+		return nil
+	}
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
@@ -221,10 +208,11 @@ func installDependencies(pkg, arch string) error {
 	// TODO: This is only for debian 7 and should be removed when move to a newer OS. This flag is
 	// going to be used unnecessary when building using non-debian7 images
 	// (like when making the linux/arm binaries) and we should remove it soonish.
-	// See https://github.com/elastic/beats/issues/11750 for more details.
+	// See https://github.com/elastic/beats/v7/issues/11750 for more details.
 	if err := sh.Run("apt-get", "update", "-o", "Acquire::Check-Valid-Until=false"); err != nil {
 		return err
 	}
 
-	return sh.Run("apt-get", "install", "-y", "--no-install-recommends", pkg)
+	args := append([]string{"install", "-y", "--no-install-recommends"}, pkgs...)
+	return sh.Run("apt-get", args...)
 }

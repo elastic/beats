@@ -21,15 +21,22 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/cmd"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/metricbeat/beater"
-	"github.com/elastic/beats/metricbeat/mb/module"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/metricbeat/beater"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 )
 
-// Name of the beat (auditbeat).
-const Name = "auditbeat"
+const (
+	// Name of the beat (auditbeat).
+	Name = "auditbeat"
+
+	// ecsVersion specifies the version of ECS that Auditbeat is implementing.
+	ecsVersion = "1.7.0"
+)
 
 // RootCmd for running auditbeat.
 var RootCmd *cmd.BeatsRootCmd
@@ -40,13 +47,36 @@ var ShowCmd = &cobra.Command{
 	Short: "Show modules information",
 }
 
-func init() {
+// withECSVersion is a modifier that adds ecs.version to events.
+var withECSVersion = processing.WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
+
+// AuditbeatSettings contains the default settings for auditbeat
+func AuditbeatSettings() instance.Settings {
+	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	return instance.Settings{
+		RunFlags:      runFlags,
+		Name:          Name,
+		HasDashboards: true,
+		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+	}
+}
+
+// Initialize initializes the entrypoint commands for journalbeat
+func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	create := beater.Creator(
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
 	)
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	RootCmd = cmd.GenRootCmdWithSettings(create, instance.Settings{RunFlags: runFlags, Name: Name})
-	RootCmd.AddCommand(ShowCmd)
+	rootCmd := cmd.GenRootCmdWithSettings(create, settings)
+	rootCmd.AddCommand(ShowCmd)
+	return rootCmd
+}
+
+func init() {
+	RootCmd = Initialize(AuditbeatSettings())
 }

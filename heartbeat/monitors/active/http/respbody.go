@@ -22,18 +22,26 @@ import (
 	"encoding/hex"
 	"io"
 	"net/http"
-	"unicode/utf8"
+	"strings"
 
-	"github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/docker/go-units"
+
+	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mime"
 )
 
-// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
-// since we must buffer the whole body for body validators this is effectively a cap on that.
-// 100MiB out to be enough for everybody.
-const maxBufferBodyBytes = 100 * 1024 * 1024
+const (
+	// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
+	// since we must buffer the whole body for body validators this is effectively a cap on that.
+	// 100MiB out to be enough for everybody.
+	maxBufferBodyBytes = 100 * units.MiB
+	// minBufferBytes is the lower bound on how much of the body content we actually read. In order to do
+	// do mime type detection of the response body, we always need a small read buffer.
+	minBufferBodyBytes = 128
+)
 
-func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, reason.Reason) {
+func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, string, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
@@ -41,15 +49,16 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	} else if config.IncludeBody == "always" || config.IncludeBody == "on_error" {
 		// If the user has asked for bodies to be recorded we only need to buffer that much
 		bufferBodyBytes = config.IncludeBodyMaxBytes
-	} else {
-		// Otherwise, we buffer nothing
-		bufferBodyBytes = 0
+	}
+
+	if bufferBodyBytes < minBufferBodyBytes {
+		bufferBodyBytes = minBufferBodyBytes
 	}
 
 	respBody, bodyLenBytes, bodyHash, respErr := readBody(resp, bufferBodyBytes)
 	// If we encounter an error while reading the body just fail early
 	if respErr != nil {
-		return nil, reason.IOFailed(respErr)
+		return nil, "", reason.IOFailed(respErr)
 	}
 
 	// Run any validations
@@ -75,7 +84,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 		bodyFields["content"] = respBody[0:sampleNumBytes]
 	}
 
-	return bodyFields, errReason
+	return bodyFields, mime.Detect(respBody), errReason
 }
 
 // readBody reads the first sampleSize bytes from the httpResponse,
@@ -94,43 +103,20 @@ func readBody(resp *http.Response, maxSampleBytes int) (bodySample string, bodyS
 
 func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, prefix string, hashStr string, err error) {
 	hash := sha256.New()
-	// Function to lazily get the body of the response
-	rawBuf := make([]byte, 1024)
 
-	// Buffer to hold the prefix output along with tracking info
-	prefixBuf := make([]byte, maxPrefixSize)
-	prefixRemainingBytes := maxPrefixSize
-	prefixWriteOffset := 0
-	for {
-		readSize, readErr := body.Read(rawBuf)
+	var prefixBuf strings.Builder
 
-		respSize += readSize
-		hash.Write(rawBuf[:readSize])
-
-		if prefixRemainingBytes > 0 {
-			if readSize >= prefixRemainingBytes {
-				copy(prefixBuf[prefixWriteOffset:maxPrefixSize], rawBuf[:prefixRemainingBytes])
-				prefixWriteOffset += prefixRemainingBytes
-				prefixRemainingBytes = 0
-			} else {
-				copy(prefixBuf[prefixWriteOffset:prefixWriteOffset+readSize], rawBuf[:readSize])
-				prefixWriteOffset += readSize
-				prefixRemainingBytes -= readSize
-			}
-		}
-
-		if readErr == io.EOF {
-			break
-		}
-
-		if readErr != nil {
-			return 0, "", "", readErr
-		}
+	n, err := io.Copy(&prefixBuf, io.TeeReader(io.LimitReader(body, int64(maxPrefixSize)), hash))
+	if err == nil {
+		// finish streaming into hash if the body has not been fully consumed yet
+		var m int64
+		m, err = io.Copy(hash, body)
+		n += m
 	}
 
-	// We discard the body if it is not valid UTF-8
-	if utf8.Valid(prefixBuf[:prefixWriteOffset]) {
-		prefix = string(prefixBuf[:prefixWriteOffset])
+	if err != nil && err != io.EOF {
+		return 0, "", "", err
 	}
-	return respSize, prefix, hex.EncodeToString(hash.Sum(nil)), nil
+
+	return int(n), prefixBuf.String(), hex.EncodeToString(hash.Sum(nil)), nil
 }

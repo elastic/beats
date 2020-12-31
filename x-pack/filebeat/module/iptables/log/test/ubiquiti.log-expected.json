@@ -1,13 +1,20 @@
 [
     {
-        "@timestamp": "2019-01-05T20:17:05.000-02:00",
         "destination.ip": "255.55.174.225",
         "destination.mac": "90:10:92:6e:ea:a7",
         "destination.port": 48689,
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
@@ -26,33 +33,52 @@
         "network.community_id": "1:3qoibVBmc9hsnHpP4Ms5HO6ls7Q=",
         "network.transport": "udp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.48.137",
+            "255.55.174.225"
+        ],
+        "rule.id": "default",
+        "rule.name": "LAN_LOCAL",
         "service.type": "iptables",
         "source.ip": "192.168.48.137",
         "source.mac": "90:10:73:ba:d6:77",
         "source.port": 48689,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 443,
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 51768,
         "iptables.input_device": "eth0",
         "iptables.length": 265,
         "iptables.output_device": "eth2",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "ACK",
+        "iptables.tcp.flags": [
+            "ACK",
+            "PSH"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 159,
         "iptables.tos": 0,
@@ -64,33 +90,51 @@
         "network.community_id": "1:7bPQdYPL4yePwQJZt0I1dvVXLHc=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.134.158",
+            "192.0.2.25"
+        ],
+        "rule.id": "2000",
+        "rule.name": "WAN_OUT",
         "service.type": "iptables",
         "source.ip": "192.168.134.158",
         "source.mac": "90:10:24:67:f4:89",
         "source.port": 43189,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.action": "drop",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "deny",
         "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 0,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "eth2",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "ACK",
+        "iptables.tcp.flags": [
+            "ACK"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 2857,
         "iptables.tos": 0,
@@ -104,33 +148,53 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "observer.egress.zone": "dest",
+        "observer.ingress.zone": "source",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
+        "rule.id": "default",
+        "rule.name": "source-dest",
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 0,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "eth2",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "ACK",
+        "iptables.tcp.flags": [
+            "ACK"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 2853,
         "iptables.tos": 0,
@@ -142,33 +206,51 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
+        "rule.id": "2000",
+        "rule.name": "WAN_OUT",
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     },
     {
-        "@timestamp": "2019-01-05T20:17:01.000-02:00",
         "destination.ip": "192.0.2.25",
         "destination.mac": "90:10:20:76:8d:20",
         "destination.port": 1443,
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "iptables.log",
+        "event.kind": "event",
         "event.module": "iptables",
-        "event.outcome": "allow",
         "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 2048,
-        "iptables.fragment_flags": "DF",
+        "iptables.fragment_flags": [
+            "DF"
+        ],
         "iptables.id": 0,
         "iptables.input_device": "eth0",
         "iptables.length": 52,
         "iptables.output_device": "eth2",
         "iptables.precedence_bits": 0,
-        "iptables.tcp.flags": "ACK",
+        "iptables.tcp.flags": [
+            "ACK"
+        ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 2850,
         "iptables.tos": 0,
@@ -180,12 +262,19 @@
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
+        "related.ip": [
+            "192.168.110.116",
+            "192.0.2.25"
+        ],
+        "rule.id": "2000",
+        "rule.name": "WAN_OUT",
         "service.type": "iptables",
         "source.ip": "192.168.110.116",
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 50093,
         "tags": [
-            "iptables"
+            "iptables",
+            "forwarded"
         ]
     }
 ]

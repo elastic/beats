@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -527,7 +527,7 @@ func TestFieldsCanConcat(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			err := test.fields.canConcat(test.key, strings.Split(test.key, "."))
 			if test.err == "" {
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 				return
 			}
 			if assert.Error(t, err) {

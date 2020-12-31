@@ -23,10 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/libbeat/common/match"
-	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/libbeat/conditions"
+	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
 type Config struct {
@@ -53,6 +52,7 @@ type Config struct {
 type responseConfig struct {
 	IncludeBody         string `config:"include_body"`
 	IncludeBodyMaxBytes int    `config:"include_body_max_bytes"`
+	IncludeHeaders      bool   `config:"include_headers"`
 }
 
 type checkConfig struct {
@@ -74,9 +74,9 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status      uint16               `config:"status" verify:"min=0, max=699"`
+	Status      []uint16             `config:"status"`
 	RecvHeaders map[string]string    `config:"headers"`
-	RecvBody    []match.Matcher      `config:"body"`
+	RecvBody    interface{}          `config:"body"`
 	RecvJSON    []*jsonResponseCheck `config:"json"`
 }
 
@@ -96,6 +96,7 @@ var defaultConfig = Config{
 	Response: responseConfig{
 		IncludeBody:         "on_error",
 		IncludeBodyMaxBytes: 2048,
+		IncludeHeaders:      true,
 	},
 	Mode: monitors.DefaultIPSettings,
 	Check: checkConfig{
@@ -105,9 +106,8 @@ var defaultConfig = Config{
 			SendBody:    "",
 		},
 		Response: responseParameters{
-			Status:      0,
 			RecvHeaders: nil,
-			RecvBody:    []match.Matcher{},
+			RecvBody:    nil,
 			RecvJSON:    nil,
 		},
 	},

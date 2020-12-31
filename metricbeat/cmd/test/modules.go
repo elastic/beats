@@ -23,10 +23,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/testing"
-	"github.com/elastic/beats/metricbeat/beater"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/metricbeat/beater"
 )
 
 func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Command {
@@ -49,6 +50,8 @@ func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Com
 				os.Exit(1)
 			}
 
+			// A publisher is needed for modules that add their own pipelines
+			b.Beat.Publisher = newPublisher()
 			mb, err := create(&b.Beat, b.Beat.BeatConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing metricbeat: %s\n", err)
@@ -77,4 +80,13 @@ func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Com
 			}
 		},
 	}
+}
+
+type publisher struct {
+	beat.PipelineConnector
+}
+
+// newPublisher returns a functional publisher that does nothing.
+func newPublisher() *publisher {
+	return &publisher{pipeline.NewNilPipeline()}
 }

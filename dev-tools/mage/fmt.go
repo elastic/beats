@@ -27,12 +27,12 @@ import (
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 var (
 	// GoImportsImportPath controls the import path used to install goimports.
-	GoImportsImportPath = "github.com/elastic/beats/vendor/golang.org/x/tools/cmd/goimports"
+	GoImportsImportPath = "golang.org/x/tools/cmd/goimports"
 
 	// GoImportsLocalPrefix is a string prefix matching imports that should be
 	// grouped after third-party packages.
@@ -51,10 +51,12 @@ func Format() {
 }
 
 // GoImports executes goimports against all .go files in and below the CWD. It
-// ignores vendor/ directories.
+// ignores vendor/ and generator/_templates/ directories.
 func GoImports() error {
 	goFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return filepath.Ext(path) == ".go" && !strings.Contains(path, "vendor/")
+		return filepath.Ext(path) == ".go" &&
+			!strings.Contains(path, "vendor/") &&
+			!strings.Contains(path, "generator/_templates/")
 	})
 	if err != nil {
 		return err
@@ -64,7 +66,9 @@ func GoImports() error {
 	}
 
 	fmt.Println(">> fmt - goimports: Formatting Go code")
-	if err := sh.Run("go", "get", GoImportsImportPath); err != nil {
+	if err := gotool.Install(
+		gotool.Install.Package(filepath.Join(GoImportsImportPath)),
+	); err != nil {
 		return err
 	}
 

@@ -1,0 +1,59 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+=== Elastic Agent version HEAD
+
+==== Breaking changes
+
+- Docker container is not run as root by default. {pull}21213[21213]
+
+==== Bugfixes
+- Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
+- Thread safe sorted set {pull}21290[21290]
+- Copy Action store on upgrade {pull}21298[21298]
+- Include inputs in action store actions {pull}21298[21298]
+- Fix issue where inputs without processors defined would panic {pull}21628[21628]
+- Prevent reporting ecs version twice {pull}21616[21616]
+- Partial extracted beat result in failure to spawn beat {issue}21718[21718]
+- Use symlink path for reexecutions {pull}21835[21835]
+- Use ML_SYSTEM to detect if agent is running as a service {pull}21884[21884]
+- Use local temp instead of system one {pull}21883[21883]
+- Rename monitoring index from `elastic.agent` to `elastic_agent` {pull}21932[21932]
+- Fix issue with named pipes on Windows 7 {pull}21931[21931]
+- Fix missing elastic_agent event data {pull}21994[21994]
+- Ensure shell wrapper path exists before writing wrapper on install {pull}22144[22144]
+- Fix deb/rpm packaging for Elastic Agent {pull}22153[22153]
+- Fix composable input processor promotion to fix duplicates {pull}22344[22344]
+- Fix sysv init files for deb/rpm installation {pull}22543[22543]
+- Fix shell wrapper for deb/rpm packaging {pull}23038[23038]
+- Fixed parsing of npipe URI {pull}22978[22978]
+- Remove artifacts on transient download errors {pull}23235[23235]
+
+==== New features
+
+- Prepare packaging for endpoint and asc files {pull}20186[20186]
+- Improved version CLI {pull}20359[20359]
+- Enroll CLI now restarts running daemon {pull}20359[20359]
+- Add restart CLI cmd {pull}20359[20359]
+- Users of the Docker image can now pass `FLEET_ENROLL_INSECURE=1` to include the `--insecure` flag with the `elastic-agent enroll` command {issue}20312[20312] {pull}20713[20713]
+- Add `docker` composable dynamic provider. {pull}20842[20842]
+- Add support for dynamic inputs with providers and `{{variable|"default"}}` substitution. {pull}20839[20839]
+- Add support for EQL based condition on inputs {pull}20994[20994]
+- Send `fleet.host.id` to Endpoint Security {pull}21042[21042]
+- Add `install` and `uninstall` subcommands {pull}21206[21206]
+- Use new form of fleet API paths {pull}21478[21478]
+- Add `kubernetes` composable dynamic provider. {pull}21480[21480]
+- Send updating state {pull}21461[21461]
+- Add `elastic.agent.id` and `elastic.agent.version` to published events from filebeat and metricbeat {pull}21543[21543]
+- Add `upgrade` subcommand to perform upgrade of installed Elastic Agent {pull}21425[21425]
+- Update `fleet.yml` and Kibana hosts when a policy change updates the Kibana hosts {pull}21599[21599]
+- Update `install` command to perform enroll before starting Elastic Agent {pull}21772[21772]
+- Update `fleet.kibana.path` from a POLICY_CHANGE {pull}21804[21804]
+- Removed `install-service.ps1` and `uninstall-service.ps1` from Windows .zip packaging {pull}21694[21694]
+- Add `priority` to `AddOrUpdate` on dynamic composable input providers communication channel {pull}22352[22352]
+- Ship `endpoint-security` logs to elasticsearch {pull}22526[22526]
+- Log level reloadable from fleet {pull}22690[22690]
+- Push log level downstream {pull}22815[22815]
+- Add metrics collection for Agent {pull}22793[22793]

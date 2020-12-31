@@ -1,12 +1,7 @@
 import os
 import sys
-import BaseHTTPServer
+import http.server
 import threading
-import nose.tools
-
-sys.path.append(os.path.join(os.path.dirname(
-    __file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 from time import sleep
 
@@ -21,7 +16,7 @@ class BaseTest(TestCase):
         super(BaseTest, self).setUpClass()
 
     def start_server(self, content, status_code, **kwargs):
-        class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+        class HTTPHandler(http.server.BaseHTTPRequestHandler):
             def do_GET(self):
                 self.send_response(status_code)
                 self.send_header('Content-Type', 'application/json')
@@ -29,9 +24,9 @@ class BaseTest(TestCase):
                 if "write_delay" in kwargs:
                     sleep(float(kwargs["write_delay"]))
 
-                self.wfile.write(content)
+                self.wfile.write(bytes(content, "utf-8"))
 
-        server = BaseHTTPServer.HTTPServer(('localhost', 0), HTTPHandler)
+        server = http.server.HTTPServer(('localhost', 0), HTTPHandler)
 
         thread = threading.Thread(target=server.serve_forever)
         thread.start()
@@ -69,7 +64,7 @@ class BaseTest(TestCase):
         return self.working_dir + "/monitors.d/"
 
     def assert_last_status(self, status):
-        nose.tools.eq_(self.last_output_line()["monitor.status"], status)
+        self.assertEqual(self.last_output_line()["monitor.status"], status)
 
     def setup_dynamic(self, extra_beat_args=[]):
         os.mkdir(self.monitors_dir())

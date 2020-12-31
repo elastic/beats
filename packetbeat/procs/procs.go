@@ -23,9 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/protos/applayer"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -82,8 +82,6 @@ type ProcessesWatcher struct {
 
 	impl processWatcherImpl
 }
-
-var ProcWatcher ProcessesWatcher
 
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	return proc.initWithImpl(config, proc)

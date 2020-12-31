@@ -20,8 +20,9 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"time"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
@@ -64,6 +65,48 @@ type TLSConfig struct {
 	// ClientAuth controls how we want to verify certificate from a client, `none`, `optional` and
 	// `required`, default to required. Do not affect TCP client.
 	ClientAuth tls.ClientAuthType
+
+	// CASha256 is the CA certificate pin, this is used to validate the CA that will be used to trust
+	// the server certificate.
+	CASha256 []string
+
+	// time returns the current time as the number of seconds since the epoch.
+	// If time is nil, TLS uses time.Now.
+	time func() time.Time
+}
+
+// ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
+// ServerName set, use that method for servers with SNI.
+func (c *TLSConfig) ToConfig() *tls.Config {
+	if c == nil {
+		return &tls.Config{}
+	}
+
+	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
+
+	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
+	// or when we are using 'certificate' TLS verification mode, we add a custom callback
+	verifyPeerCertFn := makeVerifyPeerCertificate(c)
+
+	insecure := c.Verification != VerifyFull
+	if c.Verification == VerifyNone {
+		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
+	}
+
+	return &tls.Config{
+		MinVersion:            minVersion,
+		MaxVersion:            maxVersion,
+		Certificates:          c.Certificates,
+		RootCAs:               c.RootCAs,
+		ClientCAs:             c.ClientCAs,
+		InsecureSkipVerify:    insecure,
+		CipherSuites:          c.CipherSuites,
+		CurvePreferences:      c.CurvePreferences,
+		Renegotiation:         c.Renegotiation,
+		ClientAuth:            c.ClientAuth,
+		VerifyPeerCertificate: verifyPeerCertFn,
+		Time:                  c.time,
+	}
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
@@ -73,23 +116,38 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		return &tls.Config{ServerName: host}
 	}
 
-	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
-	insecure := c.Verification != VerifyFull
-	if insecure {
-		logp.Warn("SSL/TLS verifications disabled.")
+	config := c.ToConfig()
+	config.ServerName = host
+	return config
+}
+
+// makeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
+func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
+	pin := len(cfg.CASha256) > 0
+	skipHostName := cfg.Verification == VerifyCertificate
+
+	if pin && !skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			return verifyCAPin(cfg.CASha256, verifiedChains)
+		}
 	}
 
-	return &tls.Config{
-		ServerName:         host,
-		MinVersion:         minVersion,
-		MaxVersion:         maxVersion,
-		Certificates:       c.Certificates,
-		RootCAs:            c.RootCAs,
-		ClientCAs:          c.ClientCAs,
-		InsecureSkipVerify: insecure,
-		CipherSuites:       c.CipherSuites,
-		CurvePreferences:   c.CurvePreferences,
-		Renegotiation:      c.Renegotiation,
-		ClientAuth:         c.ClientAuth,
+	if pin && skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
+			if err != nil {
+				return err
+			}
+			return verifyCAPin(cfg.CASha256, verifiedChains)
+		}
 	}
+
+	if !pin && skipHostName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
+			return err
+		}
+	}
+
+	return nil
 }

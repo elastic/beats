@@ -1,29 +1,31 @@
+:modulename: apache mysql
+
 [[configuration-metricbeat]]
-== Specify which modules to run
+== Configure modules
 
-Metricbeat provides a couple different ways to enable modules and metricsets:
+++++
+<titleabbrev>Modules</titleabbrev>
+++++
 
-* <<enable-modules-d-configs>>
-* <<enable-modules-config-file>>
+You can configure modules in the `modules.d` directory (recommended), or in the
+{beatname_uc} configuration file.
+
+Before running {beatname_uc} with modules enabled, make sure you also set up the
+environment to use {kib} dashboards. See
+<<{beatname_lc}-installation-configuration>> for more information.
 
 include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
 
 [float]
-[[enable-modules-d-configs]]
-=== Enable module configs in the `modules.d` directory
+[[configure-modules-d-configs]]
+=== Configure modules in the `modules.d` directory
 
 The `modules.d` directory contains default configurations for all the modules
-available in Metricbeat. You can enable or disable specific module
-configurations  under `modules.d` by running the <<modules-command,`modules
-enable` or `modules disable`>> commands.
+available in {beatname_uc}. To enable or disable specific module configurations
+under `modules.d`, run the
+<<modules-command,`modules enable` or `modules disable`>> command. For example:
 
-For example, to enable the `apache` and `mysql` configs in the `modules.d`
-directory, you use:
-
-[source,shell]
-----
-./metricbeat modules enable apache mysql
-----
+include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 
 Then when you run Metricbeat, it loads the corresponding module configurations
 specified in the `modules.d` directory (for example, `modules.d/apache.yml` and
@@ -31,12 +33,9 @@ specified in the `modules.d` directory (for example, `modules.d/apache.yml` and
 
 To see a list of enabled and disabled modules, run:
 
-[source,shell]
-----
-./metricbeat modules list
-----
+include::{libbeat-dir}/tab-widgets/list-modules-widget.asciidoc[]
 
-You can change the default module configurations by modifying the `.yml` files
+To change the default module configurations, modify the `.yml` files
 in the `modules.d` directory.
 
 The following example shows a basic configuration for the Apache module:
@@ -58,25 +57,25 @@ The following example shows a basic configuration for the Apache module:
 See <<config-combos>> for additional configuration examples.
 
 [float]
-[[enable-modules-config-file]]
-=== Enable module configs in the +{beatname_lc}.yml+ file
+[[configure-modules-config-file]]
+=== Configure modules in the +{beatname_lc}.yml+ file
 
 
 When possible, you should use the config files in the `modules.d` directory.
 
-However, enabling modules directly in the config file is a practical approach if
-you have upgraded from a previous version of {beatname_uc} and don't want to
-move your module configs to the `modules.d` directory. You can continue to
-configure modules in the +{beatname_lc}.yml+ file, but you won't be able to use
-the `modules` command to enable and disable configurations because the command
-requires the `modules.d` layout.
+However, configuring <<{beatname_lc}-modules,modules>> directly in the config
+file is a practical approach if you have upgraded from a previous version
+of {beatname_uc} and don't want to move your module configs to the `modules.d`
+directory. You can continue to configure modules in the +{beatname_lc}.yml+
+file, but you won't be able to use the `modules` command to enable and disable
+configurations because the command requires the `modules.d` layout.
 
 To enable specific modules and metricsets in the +{beatname_lc}.yml+ config
-file, you can add entries to the +{beatname_lc}.modules+ list. Each entry in the
+file, add entries to the +{beatname_lc}.modules+ list. Each entry in the
 list begins with a dash (-) and is followed by settings for that module.
 
-The following example shows a configuration where the apache and mysql modules
-are enabled:
+The following example shows a configuration where the `apache` and `mysql`
+modules are enabled:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -243,6 +242,13 @@ clusters with the same `service.type`.
 [[module-http-config-options]]
 === Standard HTTP config options
 
+Modules and metricsets that define the host as an HTTP URL can use the standard
+schemes for HTTP (`http://` and `https://`) and the following schemes to connect
+to local pipes:
+
+* `http+unix://` to connect to UNIX sockets.
+* `http+npipe://` to connect to Windows named pipes.
+
 The following options are available for modules and metricsets that define the
 host as an HTTP URL:
 
@@ -314,3 +320,7 @@ query:
   - 2.95
   - -15
 ----
+:modulename!:
+
+// Add Javascript and CSS for tabbed panels
+include::{libbeat-dir}/tab-widgets/code.asciidoc[]

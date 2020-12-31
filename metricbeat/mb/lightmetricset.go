@@ -20,7 +20,8 @@ package mb
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 // LightMetricSet contains the definition of a non-registered metric set
@@ -33,6 +34,7 @@ type LightMetricSet struct {
 		MetricSet string      `config:"metricset" validate:"required"`
 		Defaults  interface{} `config:"defaults"`
 	} `config:"input" validate:"required"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 // Registration obtains a metric set registration for this light metric set, this registration
@@ -50,13 +52,17 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	originalFactory := registration.Factory
 	registration.IsDefault = m.Default
 
+	// Disable the host parser, we will call it as part of the factory so the original
+	// host in the base module is not modified.
+	originalHostParser := registration.HostParser
+	registration.HostParser = nil
+
 	// Light modules factory has to override defaults and reproduce builder
 	// functionality with the resulting configuration, it does:
 	// - Override defaults
 	// - Call module factory if registered (it wouldn't have been called
 	//   if light module is really a registered mixed module)
-	// - Call host parser if defined (it would have already been called
-	//   without the light module defaults)
+	// - Call host parser if there was one defined
 	// - Finally, call the original factory for the registered metricset
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		// Override default config on base module and metricset
@@ -78,10 +84,9 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 			base.module = module
 		}
 
-		// At this point host parser was already run, we need to run this again
-		// with the overriden defaults
-		if registration.HostParser != nil {
-			base.hostData, err = registration.HostParser(base.module, base.host)
+		// Run the host parser if there was anyone defined
+		if originalHostParser != nil {
+			base.hostData, err = originalHostParser(base.module, base.host)
 			if err != nil {
 				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
 			}

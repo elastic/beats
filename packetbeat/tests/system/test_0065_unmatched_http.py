@@ -54,7 +54,7 @@ class Test(BaseTest):
                             debug_selectors=["http", "httpdetailed"],
                             real_time=True)
         objs = self.read_output()
-        print objs
+        print(objs)
         assert len(objs) == 1
         check_event(objs[0], {
             "type": "http",

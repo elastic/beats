@@ -8,15 +8,3 @@
       type: keyword
       description: >
         The namespace specified when query cloudwatch api.
-    - name: metrics.*.*
-      type: object
-      object_type: double
-      object_type_mapping_type: "*"
-      description: >
-        Metrics that returned from Cloudwatch api query.
-    - name: dimensions.*
-      type: object
-      object_type: keyword
-      object_type_mapping_type: "*"
-      description: >
-        Cloudwatch metric dimensions.

@@ -1,0 +1,40 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "azure": {
+        "container_service": {
+            "kube_node_status_condition": {
+                "avg": 1
+            }
+        },
+        "dimensions": {
+            "condition": "PIDPressure",
+            "node": "aks-agentpool-38582116-vmss000000",
+            "status": "false"
+        },
+        "namespace": "Microsoft.ContainerService/managedClusters",
+        "resource": {
+            "group": "obs-infrastructure",
+            "id": "/subscriptions/70bd6e64-4b1e-4835-8896-db77b8eef364/resourceGroups/obs-infrastructure/providers/Microsoft.ContainerService/managedClusters/obskube",
+            "name": "obskube",
+            "type": "Microsoft.ContainerService/managedClusters"
+        },
+        "subscription_id": "70bd6e64-4b1e-4835-8896-db77b8eef364",
+        "timegrain": "PT5M"
+    },
+    "cloud": {
+        "provider": "azure",
+        "region": "westeurope"
+    },
+    "event": {
+        "dataset": "azure.container_service",
+        "duration": 115000,
+        "module": "azure"
+    },
+    "metricset": {
+        "name": "container_service",
+        "period": 10000
+    },
+    "service": {
+        "type": "azure"
+    }
+}

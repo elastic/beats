@@ -188,7 +188,7 @@ class Test(BaseTest):
 
     def test_stats(self):
         objs = self._run('memcache/memcache_bin_tcp_stats.pcap')
-
+        print(objs)
         # all transactions succeed
         assert all(o['status'] == 'OK' for o in objs)
 

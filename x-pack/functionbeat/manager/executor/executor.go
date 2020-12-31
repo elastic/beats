@@ -7,7 +7,7 @@ package executor
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (

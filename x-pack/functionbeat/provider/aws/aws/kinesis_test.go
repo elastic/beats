@@ -12,8 +12,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/functionbeat/function/provider"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 )
 
 func TestKinesis(t *testing.T) {
@@ -39,7 +39,7 @@ func TestKinesis(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("when publish is not succesful", func(t *testing.T) {
+	t.Run("when publish is not successful", func(t *testing.T) {
 		e := errors.New("something bad")
 		client := &arrayBackedClient{err: e}
 
@@ -141,6 +141,32 @@ func testKinesisConfig(t *testing.T) {
 				},
 			},
 		},
+		"test upper bound parallelization factor limit": {
+			valid: false,
+			rawConfig: map[string]interface{}{
+				"name":        "mysuperfunctionname",
+				"description": "mylong description",
+				"triggers": []map[string]interface{}{
+					map[string]interface{}{
+						"event_source_arn":       "abc123",
+						"parallelization_factor": 13,
+					},
+				},
+			},
+		},
+		"test lower bound parallelization factor limit": {
+			valid: false,
+			rawConfig: map[string]interface{}{
+				"name":        "mysuperfunctionname",
+				"description": "mylong description",
+				"triggers": []map[string]interface{}{
+					map[string]interface{}{
+						"event_source_arn":       "abc123",
+						"parallelization_factor": 0,
+					},
+				},
+			},
+		},
 		"test default values": {
 			valid: true,
 			rawConfig: map[string]interface{}{
@@ -158,9 +184,10 @@ func testKinesisConfig(t *testing.T) {
 				LambdaConfig: DefaultLambdaConfig,
 				Triggers: []*KinesisTriggerConfig{
 					&KinesisTriggerConfig{
-						EventSourceArn:   "abc123",
-						BatchSize:        100,
-						StartingPosition: trimHorizonPos,
+						EventSourceArn:        "abc123",
+						BatchSize:             100,
+						StartingPosition:      trimHorizonPos,
+						ParallelizationFactor: 1,
 					},
 				},
 			},

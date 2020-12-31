@@ -1,0 +1,94 @@
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 294564,
+        "eventType": "DetectionSummaryEvent",
+        "eventCreationTime": 1582101000000,
+        "version": "1.0"
+    },
+    "event": {
+        "ProcessStartTime": 1536846339,
+        "ProcessEndTime": 0,
+        "ProcessId": 38684386611,
+        "ParentProcessId": 38682494050,
+        "ComputerName": "alice-laptop",
+        "UserName": "alice",
+        "DetectName": "Process Terminated",
+        "DetectDescription": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
+        "Severity": 4,
+        "SeverityName": "High",
+        "FileName": "explorer.exe",
+        "FilePath": "\\Device\\HarddiskVolume1\\Windows",
+        "CommandLine": "C:\\Windows\\Explorer.EXE",
+        "SHA256String": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
+        "MD5String": "ac4c51eb24aa95b77f705ab159189e24",
+        "MachineDomain": "CORP-DOMAIN",
+        "FalconHostLink": "https://falcon.crowdstrike.com/ec86abd353824e96765ecbe18eb4f0b4",
+        "SensorId": "7c808b4c8878433287eea53d4a8c3268",
+        "DetectId": "ldt:ec86abd353824e96765ecbe18eb4f0b4:38655257584",
+        "LocalIP": "192.168.12.51",
+        "MACAddress": "00-00-00-11-22-33",
+        "Tactic": "Malware",
+        "Technique": "Ransomware",
+        "Objective": "Falcon Detection Method",
+        "PatternDispositionDescription": "Prevention, process killed.",
+        "PatternDispositionValue": 16,
+        "PatternDispositionFlags": {
+            "Indicator": false,
+            "Detect": false,
+            "InddetMask": false,
+            "SensorOnly": false,
+            "Rooting": false,
+            "KillProcess": true,
+            "KillSubProcess": false,
+            "QuarantineMachine": false,
+            "QuarantineFile": false,
+            "PolicyDisabled": false,
+            "KillParent": false,
+            "OperationBlocked": false,
+            "ProcessBlocked": false
+        }
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 1824,
+        "eventType": "IncidentSummaryEvent",
+        "eventCreationTime": 1583295476766,
+        "version": "1.0"
+    },
+    "event": {
+        "IncidentStartTime": 1583295228,
+        "IncidentEndTime": 1583295470,
+        "FalconHostLink": "https://falcon.crowdstrike.com/crowdscore/incidents/details/inc:8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "State": "open",
+        "FineScore": 1.2
+    }
+}
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 22865,
+        "eventType": "UserActivityAuditEvent",
+        "eventCreationTime": 1593186952000,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "Crowdstrike",
+        "UserIp": "",
+        "OperationName": "quarantined_file_update",
+        "ServiceName": "quarantined_files",
+        "AuditKeyValues": [
+            {
+                "Key": "quarantined_file_id",
+                "ValueString": "35b35a53da374816a6b471cf09e12019_a076d3121743755f2d4f8d4d5807f0bc013177f7847d09b48e76de88ace08c78"
+            },
+            {
+                "Key": "action_taken",
+                "ValueString": "quarantined"
+            }
+        ],
+        "UTCTimestamp": 1593186952
+    }
+}

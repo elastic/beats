@@ -60,7 +60,7 @@ func TestMetricExists(t *testing.T) {
 
 func TestMatchMetrics(t *testing.T) {
 	prev := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", ID: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -69,7 +69,7 @@ func TestMatchMetrics(t *testing.T) {
 		TimeGrain:    "1PM",
 	}
 	current := Metric{
-		Resource:     Resource{Name: "vm", Group: "group", ID: "id"},
+		ResourceId:   "id",
 		Namespace:    "namespace",
 		Names:        []string{"TotalRequests,Capacity"},
 		Aggregations: "Average,Total",
@@ -79,7 +79,7 @@ func TestMatchMetrics(t *testing.T) {
 	}
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
-	current.Resource.ID = "id1"
+	current.ResourceId = "id1"
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
@@ -107,20 +107,8 @@ func TestMetricIsEmpty(t *testing.T) {
 
 func TestGetResourceGroupFromID(t *testing.T) {
 	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	group := getResourceGroupFromID(path)
+	group := getResourceGroupFromId(path)
 	assert.Equal(t, group, "obs-infrastructure")
-}
-
-func TestGetResourceTypeFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	rType := getResourceTypeFromID(path)
-	assert.Equal(t, rType, "Microsoft.Compute/virtualMachines")
-}
-
-func TestGetResourceNameFromID(t *testing.T) {
-	path := "subscriptions/qw3e45r6t-23ws-1234-6587-1234ed4532/resourceGroups/obs-infrastructure/providers/Microsoft.Compute/virtualMachines/obstestmemleak"
-	name := getResourceNameFromID(path)
-	assert.Equal(t, name, "obstestmemleak")
 }
 
 func TestExpired(t *testing.T) {
@@ -141,4 +129,96 @@ func TestCompareMetricValues(t *testing.T) {
 	val2 = &float1
 	result = compareMetricValues(val1, val2)
 	assert.True(t, result)
+}
+
+func TestGetDimension(t *testing.T) {
+	dimension := "VMName"
+	dim1 := "SlotID"
+	dim2 := "VNU"
+	dim3 := "VMName"
+	dimensionList := []Dimension{
+		{
+			Name:  dim1,
+			Value: dim1,
+		},
+		{
+			Name:  dim2,
+			Value: dim2,
+		},
+		{
+			Name:  dim3,
+			Value: dim3,
+		},
+	}
+	result, ok := getDimension(dimension, dimensionList)
+	assert.True(t, ok)
+	assert.Equal(t, result.Name, dim3)
+	assert.Equal(t, result.Value, dim3)
+	dimension = "VirtualMachine"
+	result, ok = getDimension(dimension, dimensionList)
+	assert.False(t, ok)
+	assert.Equal(t, result.Name, "")
+	assert.Equal(t, result.Value, "")
+}
+
+func TestContainsResource(t *testing.T) {
+	resourceId := "resId"
+	resourceList := []Resource{
+		{
+			Name: "resource name",
+			Id:   "resId",
+		},
+		{
+			Name: "resource name1",
+			Id:   "resId1",
+		},
+		{
+			Name: "resource name2",
+			Id:   "resId2",
+		},
+	}
+	ok := containsResource(resourceId, resourceList)
+	assert.True(t, ok)
+	resourceId = "ressId"
+	ok = containsResource(resourceId, resourceList)
+	assert.False(t, ok)
+}
+
+func TestGetVM(t *testing.T) {
+	vmName := "resource name1"
+	vmResourceList := []VmResource{
+		{
+			Name: "resource name",
+			Id:   "resId",
+		},
+		{
+			Name: "resource name1",
+			Id:   "resId1",
+		},
+		{
+			Name: "resource name2",
+			Id:   "resId2",
+		},
+	}
+	vm, ok := getVM(vmName, vmResourceList)
+	assert.True(t, ok)
+	assert.Equal(t, vm.Name, vmName)
+	assert.Equal(t, vm.Id, "resId1")
+	vmName = "resource name3"
+	vm, ok = getVM(vmName, vmResourceList)
+	assert.False(t, ok)
+	assert.Equal(t, vm.Name, "")
+	assert.Equal(t, vm.Id, "")
+}
+
+func TestGetInstanceId(t *testing.T) {
+	dimensionValue := "sfjsfjghhbsjsjskjkf"
+	result := getInstanceId(dimensionValue)
+	assert.Empty(t, result)
+	dimensionValue = "fjsfhfhsjhjsfs_34"
+	result = getInstanceId(dimensionValue)
+	assert.Equal(t, result, "34")
+	dimensionValue = "fjsfhfhsjhjsfs_34sjsjfhsfsjjsjf_242"
+	result = getInstanceId(dimensionValue)
+	assert.Equal(t, result, "242")
 }

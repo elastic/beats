@@ -3,10 +3,18 @@
     "@timestamp": "2019-10-22T11:26:12.4955445Z",
     "event": {
       "action": "added-group-account",
+      "category": [
+        "iam"
+      ],
       "code": 4727,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "group",
+        "creation"
+      ]
     },
     "group": {
       "domain": "WLBEAT",
@@ -18,8 +26,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "WIN-41OB2LO92CR$"
     },
     "user": {
       "domain": "WLBEAT",

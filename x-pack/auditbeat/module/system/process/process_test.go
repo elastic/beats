@@ -11,11 +11,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/auditbeat/helper/hasher"
-	abtest "github.com/elastic/beats/auditbeat/testing"
-	"github.com/elastic/beats/libbeat/common"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	abtest "github.com/elastic/beats/v7/auditbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/go-sysinfo/types"
 )
 
@@ -66,9 +66,11 @@ func TestProcessEvent(t *testing.T) {
 	}
 
 	expectedRootFields := map[string]interface{}{
-		"event.kind":   "event",
-		"event.action": "process_started",
-		"message":      "Process zsh (PID: 9086) by user elastic STARTED",
+		"event.kind":     "event",
+		"event.category": []string{"process"},
+		"event.type":     []string{"start"},
+		"event.action":   "process_started",
+		"message":        "Process zsh (PID: 9086) by user elastic STARTED",
 
 		"process.pid":        9086,
 		"process.ppid":       9085,

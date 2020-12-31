@@ -9,17 +9,19 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/inputsource/udp"
+	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 )
 
 type config struct {
 	udp.Config                `config:",inline"`
 	harvester.ForwarderConfig `config:",inline"`
+	InternalNetworks          []string      `config:"internal_networks"`
 	Protocols                 []string      `config:"protocols"`
 	ExpirationTimeout         time.Duration `config:"expiration_timeout"`
 	PacketQueueSize           int           `config:"queue_size"`
 	CustomDefinitions         []string      `config:"custom_definitions"`
+	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
 }
 
 var defaultConfig = config{
@@ -31,7 +33,8 @@ var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: inputName,
 	},
-	Protocols:         []string{"v5", "v9", "ipfix"},
-	ExpirationTimeout: time.Minute * 30,
-	PacketQueueSize:   8192,
+	Protocols:           []string{"v5", "v9", "ipfix"},
+	ExpirationTimeout:   time.Minute * 30,
+	PacketQueueSize:     8192,
+	DetectSequenceReset: true,
 }

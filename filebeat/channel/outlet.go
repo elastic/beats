@@ -18,20 +18,18 @@
 package channel
 
 import (
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type outlet struct {
-	wg     eventCounter
 	client beat.Client
 	isOpen atomic.Bool
 	done   chan struct{}
 }
 
-func newOutlet(client beat.Client, wg eventCounter) *outlet {
+func newOutlet(client beat.Client) *outlet {
 	o := &outlet{
-		wg:     wg,
 		client: client,
 		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
@@ -55,10 +53,6 @@ func (o *outlet) Done() <-chan struct{} {
 func (o *outlet) OnEvent(event beat.Event) bool {
 	if !o.isOpen.Load() {
 		return false
-	}
-
-	if o.wg != nil {
-		o.wg.Add(1)
 	}
 
 	o.client.Publish(event)

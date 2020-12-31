@@ -20,7 +20,7 @@ package mage
 import (
 	"github.com/pkg/errors"
 
-	devtools "github.com/elastic/beats/dev-tools/mage"
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 // PackagingFlavor specifies the type of packaging (OSS vs X-Pack).
@@ -95,7 +95,6 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
 				sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
 			case devtools.Docker:
-				args.Spec.ExtraVar("user", "root")
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}

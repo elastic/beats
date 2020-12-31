@@ -1,8 +1,6 @@
 import os
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
@@ -31,5 +29,5 @@ class Test(XPackTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
-            self.assertIn("prometheus", evt.keys(), evt)
-            self.assertIn("metrics", evt["prometheus"].keys(), evt)
+            self.assertIn("prometheus", list(evt.keys()), evt)
+            self.assertIn("metrics", list(evt["prometheus"].keys()), evt)

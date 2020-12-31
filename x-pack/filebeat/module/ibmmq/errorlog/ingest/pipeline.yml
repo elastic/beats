@@ -1,0 +1,79 @@
+description: Pipeline for parsing MQ error logs.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- gsub:
+    field: message
+    pattern: ^[\-]{5}[a-z0-9\. :]*[\-]{5,}
+    replacement: ""
+- gsub:
+    field: message
+    pattern: |2+
+
+    replacement: ' '
+- gsub:
+    field: message
+    pattern: '[ ]{2,}'
+    replacement: ' '
+- trim:
+    field: message
+- rename:
+    field: '@timestamp'
+    target_field: event.created
+- grok:
+    field: message
+    patterns:
+    - ^%{DATA:log_timestamp} -
+- grok:
+    field: message
+    patterns:
+    - 'Process\(%{DATA:process.pid}\) User\(%{WORD:user.name}\) Program\(%{DATA:process.title}\)
+      Host\(%{DATA:host.hostname}\) Installation\(%{WORD:ibmmq.errorlog.installation}\)
+      VRMF\(%{DATA:service.version}\)( QMgr\(%{DATA:ibmmq.errorlog.qmgr}\))?( Time\(%{TIMESTAMP_ISO8601:@timestamp}\))?(
+      RemoteHost\(%{DATA:destination.address}\))?( ArithInsert1\(%{DATA:ibmmq.errorlog.arithinsert1}\))?(
+      ArithInsert2\(%{DATA:ibmmq.errorlog.arithinsert2}\))?( CommentInsert1\(%{DATA:ibmmq.errorlog.commentinsert1}\))?(
+      CommentInsert2\(%{DATA:ibmmq.errorlog.commentinsert2}\))?( CommentInsert3\(%{DATA:ibmmq.errorlog.commentinsert3}\))?
+      (?=AMQ[0-9]{4})%{DATA:ibmmq.errorlog.code}((?<=AMQ[0-9]{4}[A-Z])%{DATA:log.level})?:
+      %{DATA:ibmmq.errorlog.errordescription} [^\ ]+:( %{DATA:ibmmq.errorlog.explanation})?
+      [^\ ]+:( %{DATA:ibmmq.errorlog.action})?$'
+- date:
+    field: log_timestamp
+    target_field: '@timestamp'
+    formats:
+    - MM/dd/yyyy hh:mm:ss aa
+    - dd/MM/yyyy HH:mm:ss
+    ignore_failure: true
+- append:
+    field: ibmmq.errorlog.commentinsert
+    value:
+    - '{{ibmmq.errorlog.commentinsert1}}'
+    - '{{ibmmq.errorlog.commentinsert2}}'
+    - '{{ibmmq.errorlog.commentinsert3}}'
+    ignore_failure: true
+- append:
+    field: ibmmq.errorlog.arithinsert
+    value:
+    - '{{ibmmq.errorlog.arithinsert1}}'
+    - '{{ibmmq.errorlog.arithinsert2}}'
+    ignore_failure: true
+- remove:
+    field:
+    - log_timestamp
+    - message
+    - ibmmq.errorlog.arithinsert1
+    - ibmmq.errorlog.arithinsert2
+    - ibmmq.errorlog.commentinsert1
+    - ibmmq.errorlog.commentinsert2
+    - ibmmq.errorlog.commentinsert3
+    ignore_missing: true
+- rename:
+    field: ibmmq.errorlog.errordescription
+    target_field: message
+- set:
+    field: event.kind
+    value: event
+on_failure:
+- set:
+    field: error.message
+    value: 'pipeline-entry: {{ _ingest.on_failure_message }}'

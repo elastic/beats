@@ -13,9 +13,9 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // Guess the offsets within a struct inet_sock where the local and remote
@@ -35,7 +35,7 @@ import (
 // matched the remote address. This is used by guess_inet_sock6.
 
 func init() {
-	if err := Registry.AddGuess(&guessInetSockIPv4{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInetSockIPv4{} }); err != nil {
 		panic(err)
 	}
 }

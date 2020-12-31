@@ -19,11 +19,12 @@ package readfile
 
 import (
 	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 func TestEncodeLines(t *testing.T) {
@@ -46,7 +47,7 @@ func TestEncodeLines(t *testing.T) {
 
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
-			r := bytes.NewReader(testCase.Input)
+			r := ioutil.NopCloser(bytes.NewReader(testCase.Input))
 			codec, err := encFactory(r)
 			assert.Nil(t, err, "failed to initialize encoding: %v", err)
 

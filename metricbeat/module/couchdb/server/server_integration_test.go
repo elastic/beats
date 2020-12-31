@@ -20,12 +20,13 @@
 package server
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
@@ -51,6 +52,12 @@ func TestData(t *testing.T) {
 }
 
 func getConfig(host string) map[string]interface{} {
+	h := os.Getenv("COUCHDB_HOST")
+
+	if h != "" {
+		host = h
+	}
+
 	return map[string]interface{}{
 		"module":     "couchdb",
 		"metricsets": []string{"server"},

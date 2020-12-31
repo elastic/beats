@@ -1,0 +1,17 @@
+{
+    "failed": [
+        {
+            "command": "dfb format=json-pretty",
+            "outb": "",
+            "outs": "command not known"
+        }
+    ],
+    "finished": [],
+    "has_failed": true,
+    "id": "139687220237200",
+    "is_finished": true,
+    "is_waiting": false,
+    "running": [],
+    "state": "failed",
+    "waiting": []
+}

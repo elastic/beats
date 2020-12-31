@@ -2,14 +2,11 @@ import os
 import sys
 import subprocess
 import json
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
-                         "agent.type", "agent.hostname", "agent.version",
+                         "agent.type", "agent.name", "agent.version",
                          "event.kind", "event.category", "event.dataset", "event.start",
                          "source.ip", "destination.ip",
                          "client.ip", "server.ip",
@@ -17,7 +14,7 @@ TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
                          ]
 
 FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
-                         "agent.type", "agent.hostname", "agent.version",
+                         "agent.type", "agent.name", "agent.version",
                          "event.kind", "event.category", "event.dataset", "event.action", "event.start", "event.end", "event.duration",
                          "source.ip", "destination.ip",
                          "flow.id",
@@ -126,7 +123,7 @@ class BaseTest(TestCase):
                     types=None,
                     required_fields=None):
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r") as f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding='utf_8') as f:
             for line in f:
                 document = self.flatten_object(json.loads(line), self.dict_fields)
                 if not types or document["type"] in types:

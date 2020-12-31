@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   mongodb:
-    image: docker.elastic.co/observability-ci/beats-integration-mongodb:${MONGODB_VERSION:-3.4}-1
+    image: docker.elastic.co/integrations-ci/beats-mongodb:${MONGODB_VERSION:-3.4}-1
     build:
       context: ./_meta
       args:

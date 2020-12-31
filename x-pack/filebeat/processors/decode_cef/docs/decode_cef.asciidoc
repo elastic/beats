@@ -2,7 +2,9 @@
 [role="xpack"]
 === Decode CEF
 
-beta[]
+++++
+<titleabbrev>decode_cef</titleabbrev>
+++++
 
 The `decode_cef` processor decodes Common Event Format (CEF) messages. This
 processor is available in Filebeat.
@@ -14,11 +16,11 @@ renaming it to `event.original`. It is best to rename `message` to
 [source,yaml]
 ----
 processors:
-- rename:
-    fields:
-      - {from: "message", to: "event.original"}
-- decode_cef:
-    field: event.original
+  - rename:
+      fields:
+        - {from: "message", to: "event.original"}
+  - decode_cef:
+      field: event.original
 ----
 
 The `decode_cef` processor has the following configuration settings.
@@ -26,7 +28,7 @@ The `decode_cef` processor has the following configuration settings.
 .Decode CEF options
 [options="header"]
 |======
-| Name             | Required | Default | Description
+| Name             | Required | Default | Description |
 | `field`          | no       | message | Source field containing the CEF message to be parsed.                        |
 | `target_field`   | no       | cef     | Target field where the parsed CEF object will be written.                    |
 | `ecs`            | no       | true    | Generate Elastic Common Schema (ECS) fields from the CEF data.

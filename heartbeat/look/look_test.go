@@ -25,14 +25,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	reason2 "github.com/elastic/beats/heartbeat/reason"
-	"github.com/elastic/beats/libbeat/common"
+	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // helper
 func testRTT(t *testing.T, expected time.Duration, provided time.Duration) {
 	actual, err := RTT(provided).GetValue("us")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
 

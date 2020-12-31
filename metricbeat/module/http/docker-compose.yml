@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   http:
-    image: docker.elastic.co/observability-ci/beats-integration-http:1
+    image: docker.elastic.co/integrations-ci/beats-http:1
     build:
       context: ./_meta
     ports:

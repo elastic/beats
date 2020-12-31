@@ -20,18 +20,17 @@ package input
 import (
 	"fmt"
 
-	"github.com/elastic/beats/filebeat/channel"
-	"github.com/elastic/beats/filebeat/input/file"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type Context struct {
-	States        []file.State
-	Done          chan struct{}
-	BeatDone      chan struct{}
-	DynamicFields *common.MapStrPointer
-	Meta          map[string]string
+	States   []file.State
+	Done     chan struct{}
+	BeatDone chan struct{}
+	Meta     map[string]string
 }
 
 // Factory is used to register functions creating new Input instances.

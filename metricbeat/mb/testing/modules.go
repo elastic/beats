@@ -28,7 +28,7 @@ that Metricbeat does it and with the same validations.
 	package mymetricset_test
 
 	import (
-		mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+		mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	)
 
 	func TestFetch(t *testing.T) {
@@ -59,8 +59,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type TestModule struct {
@@ -86,6 +86,22 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.
 func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
+	metricsets := NewMetricSets(t, config)
+
+	if len(metricsets) != 1 {
+		t.Fatal("invalid number of metricsets instantiated")
+	}
+
+	metricset := metricsets[0]
+	if metricset == nil {
+		t.Fatal("metricset is nil")
+	}
+	return metricset
+}
+
+// NewMetricSets instantiates a list of new MetricSets using the given
+// module configuration.
+func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	c, err := common.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
@@ -98,15 +114,7 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 		t.Fatal("no module instantiated")
 	}
 
-	if len(metricsets) != 1 {
-		t.Fatal("invalid number of metricsets instantiated")
-	}
-
-	metricset := metricsets[0]
-	if metricset == nil {
-		t.Fatal("metricset is nil")
-	}
-	return metricset
+	return metricsets
 }
 
 // NewEventFetcher instantiates a new EventFetcher using the given
@@ -180,6 +188,22 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 	}
 
 	return reportingMetricSetV2Error
+}
+
+// NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
+func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
+	metricSets := NewMetricSets(t, config)
+	var reportingMetricSets []mb.ReportingMetricSetV2Error
+	for _, metricSet := range metricSets {
+		rMS, ok := metricSet.(mb.ReportingMetricSetV2Error)
+		if !ok {
+			t.Fatalf("MetricSet %v does not implement ReportingMetricSetV2Error", metricSet.Name())
+		}
+
+		reportingMetricSets = append(reportingMetricSets, rMS)
+	}
+
+	return reportingMetricSets
 }
 
 // NewReportingMetricSetV2WithContext returns a new ReportingMetricSetV2WithContext instance. Then

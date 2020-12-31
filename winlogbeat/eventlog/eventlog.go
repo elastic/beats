@@ -26,12 +26,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
 // Debug selectors used in this package.
@@ -53,6 +53,12 @@ var (
 
 	// readErrors contains counters for the read error types that occur.
 	readErrors = expvar.NewMap("read_errors")
+)
+
+// Keyword Constants
+const (
+	keywordAuditFailure = 0x10000000000000
+	keywordAuditSuccess = 0x20000000000000
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -137,6 +143,12 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "host.name", e.Computer)
 
 	m.Put("event.created", time.Now())
+
+	if e.KeywordsRaw&keywordAuditFailure > 0 {
+		m.Put("event.outcome", "failure")
+	} else if e.KeywordsRaw&keywordAuditSuccess > 0 {
+		m.Put("event.outcome", "success")
+	}
 
 	addOptional(m, "log.file.path", e.File)
 	addOptional(m, "log.level", strings.ToLower(e.Level))

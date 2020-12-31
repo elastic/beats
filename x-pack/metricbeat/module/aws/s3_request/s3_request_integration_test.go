@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // +build integration
+// +build aws
 
 package s3_request
 
@@ -11,15 +12,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestFetch: " + info)
-	}
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/21826")
+	config := mtest.GetConfigForTest(t, "s3_request", "60s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
@@ -30,39 +30,31 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 
 	for _, event := range events {
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
 		mtest.CheckEventField("cloud.region", "string", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("bucket.name", "string", event, t)
-		mtest.CheckEventField("requests.total", "int", event, t)
-		mtest.CheckEventField("requests.get", "int", event, t)
-		mtest.CheckEventField("requests.put", "int", event, t)
-		mtest.CheckEventField("requests.delete", "int", event, t)
-		mtest.CheckEventField("requests.head", "int", event, t)
-		mtest.CheckEventField("requests.post", "int", event, t)
-		mtest.CheckEventField("select.requests", "int", event, t)
-		mtest.CheckEventField("select_scanned.bytes", "float", event, t)
-		mtest.CheckEventField("select_returned.bytes", "float", event, t)
-		mtest.CheckEventField("requests.list", "int", event, t)
-		mtest.CheckEventField("downloaded.bytes", "float", event, t)
-		mtest.CheckEventField("uploaded.bytes", "float", event, t)
-		mtest.CheckEventField("errors.4xx", "int", event, t)
-		mtest.CheckEventField("errors.5xx", "int", event, t)
-		mtest.CheckEventField("latency.first_byte.ms", "float", event, t)
-		mtest.CheckEventField("latency.total_request.ms", "float", event, t)
+		mtest.CheckEventField("aws.dimensions.BucketName", "string", event, t)
+		mtest.CheckEventField("aws.dimensions.StorageType", "string", event, t)
+		mtest.CheckEventField("s3.metrics.AllRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.GetRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.PutRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.DeleteRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.HeadRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.PostRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.SelectRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.SelectScannedBytes.avg", "float", event, t)
+		mtest.CheckEventField("s3.metrics.SelectReturnedBytes.avg", "float", event, t)
+		mtest.CheckEventField("s3.metrics.ListRequests.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.BytesDownloaded.avg", "float", event, t)
+		mtest.CheckEventField("s3.metrics.BytesUploaded.avg", "float", event, t)
+		mtest.CheckEventField("s3.metrics.4xxErrors.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.5xxErrors.avg", "int", event, t)
+		mtest.CheckEventField("s3.metrics.FirstByteLatency.avg", "float", event, t)
+		mtest.CheckEventField("s3.metrics.TotalRequestLatency.avg", "float", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
-	if info != "" {
-		t.Skip("Skipping TestData: " + info)
-	}
+	config := mtest.GetConfigForTest(t, "s3_request", "60s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

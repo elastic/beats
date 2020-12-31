@@ -24,7 +24,7 @@
       type: keyword
     - name: user.roles
       description: "Roles to which the principal belongs"
-      example: [ "kibana_user", "beats_admin" ]
+      example: [ "kibana_admin", "beats_admin" ]
       type: keyword
     - name: action
       description: "The name of the action that was executed"

@@ -7,7 +7,7 @@
 package netflow
 
 import (
-	"github.com/elastic/beats/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 func init() {
@@ -19,5 +19,5 @@ func init() {
 // AssetNetflow returns asset data.
 // This is the base64 encoded gzipped contents of module/netflow.
 func AssetNetflow() string {
-	return "eJw8jjFOw0AQRfs9xbtAcoAtqFCkFKAUINGazBiPWHas3Ymt3B4Z4fTv/f8OfOs9UzXG4uvhx+VWNEFYFM28apyKrwlE+7XZHOY185QAXv5gRm80vaotVr92g6EK58vp/ME2vAHepOOLNt6fL0feJuVxB+LaqR4MIoymRTqfevcqrNMQxKR7JVbnWzA3X0y0HxP/Qk6/AQAA//9CcUYh"
+	return "eJw8jjFOw0AQRfs9xbtAcoAtqFCkFKAUINEazxiPsuxYuxNbuT0KwvTv/f8OXPWeqRpT8e3w7XIrmiAsimZeNU7FtwSifWy2hHnNPCWAl1+YyRtNR7XV6tduMFThfDmdP3gMPwBv0vFVG+/PlyNvs/J/B+LaqR4MIkymRTqfevcqbPMQxKx7JVaXW7A0X020HxP0qy3iY8+JPzmnnwAAAP//qK1KBQ=="
 }

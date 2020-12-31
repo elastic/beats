@@ -1,5 +1,8 @@
 description: "Pipeline for Palo Alto Networks PAN-OS Logs"
 processors:
+ - set:
+     field: event.ingested
+     value: '{{_ingest.timestamp}}'
 
 # keep message as log.original.
  - rename:
@@ -75,6 +78,8 @@ processors:
  - convert: { type: long, ignore_missing: true, field: panw.panos.sequence_number }
  - convert: { type: long, ignore_missing: true, field: source.nat.port }
  - convert: { type: long, ignore_missing: true, field: destination.nat.port }
+ - convert: { type: long, ignore_missing: true, field: client.nat.port }
+ - convert: { type: long, ignore_missing: true, field: server.nat.port }
 
 # Remove PCAP ID when zero (no packet capture).
  - remove:
@@ -129,126 +134,210 @@ processors:
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: internal
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: external
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ((ctx?.panw?.panos?.source?.zone != "trust" && ctx?.panw?.panos?.source?.zone != "untrust") || (ctx?.panw?.panos?.destination?.zone != "trust" && ctx?.panw?.panos?.destination?.zone != "untrust"))'
-
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       (
+         (
+           !ctx._temp_.external_zones.contains(ctx?.observer?.egress?.zone) &&
+           !ctx._temp_.internal_zones.contains(ctx?.observer?.egress?.zone)
+         ) ||
+         (
+           !ctx._temp_.external_zones.contains(ctx?.observer?.ingress?.zone) &&
+           !ctx._temp_.internal_zones.contains(ctx?.observer?.ingress?.zone)
+         )
+       )
 # Set network.direction from threat direction (Threat logs).
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && (ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
 
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?._temp_?.message_type == "THREAT" && (ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && (ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
 
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?._temp_?.message_type == "THREAT" && ctx?.network?.direction == null'
+     if: 'ctx?.panw?.panos?.type == "THREAT" && ctx?.network?.direction == null'
 
 # Set network.type for TRAFFIC.
  - set:
      field: network.type
      value: 'ipv4'
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.labels?.ipv6_session == null'
  - set:
      field: network.type
      value: 'ipv6'
-     if: 'ctx?._temp_?.message_type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.labels?.ipv6_session != null'
 
   # Set event.category depending on log type.
  - set:
+     field: event.kind
+     value: event
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
+ - append:
      field: event.category
-     value: network_traffic
-     if: 'ctx?._temp_?.message_type == "TRAFFIC"'
+     value:
+       - network_traffic
+       - network
+     if: 'ctx?.panw?.panos?.type == "TRAFFIC"'
  - set:
+     field: event.kind
+     value: alert
+     if: 'ctx?.panw?.panos?.type == "THREAT"'
+ - append:
      field: event.category
-     value: security_threat
-     if: 'ctx?._temp_?.message_type == "THREAT"'
+     value:
+       - security_threat
+       - intrusion_detection
+       - network
+     if: 'ctx?.panw?.panos?.type == "THREAT"'
+ - append:
+     field: event.type
+     value: allowed
+     if: "ctx?.panw?.panos?.action != null && ['alert', 'allow', 'continue'].contains(ctx.panw.panos.action)"
+ - append:
+     field: event.type
+     value: denied
+     if: "ctx?.panw?.panos?.action != null && ['deny', 'drop', 'reset-client', 'reset-server', 'reset-both', 'block-url', 'block-ip', 'random-drop', 'sinkhole', 'block'].contains(ctx.panw.panos.action)"
+ - set:
+     field: event.outcome
+     value: success
 
- - drop:
-     if: 'ctx?.event?.category == null'
 
 # event.action for traffic logs.
  - set:
      field: event.action
      value: flow_started
-     if: 'ctx?._temp_?.message_subtype == "start"'
+     if: 'ctx?.panw?.panos?.sub_type == "start"'
+ - append:
+     field: event.type
+     value:
+       - start
+       - connection
+     if: 'ctx?.panw?.panos?.sub_type == "start"'
  - set:
      field: event.action
      value: flow_terminated
-     if: 'ctx?._temp_?.message_subtype == "end"'
+     if: 'ctx?.panw?.panos?.sub_type == "end"'
+ - append:
+     field: event.type
+     value:
+       - end
+       - connection
+     if: 'ctx?.panw?.panos?.sub_type == "end"'
  - set:
      field: event.action
      value: flow_dropped
-     if: 'ctx?._temp_?.message_subtype == "drop"'
+     if: 'ctx?.panw?.panos?.sub_type == "drop"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
+     if: 'ctx?.panw?.panos?.sub_type == "drop"'
  - set:
      field: event.action
      value: flow_denied
-     if: 'ctx?._temp_?.message_subtype == "deny"'
+     if: 'ctx?.panw?.panos?.sub_type == "deny"'
+ - append:
+     field: event.type
+     value:
+       - denied
+       - connection
+     if: 'ctx?.panw?.panos?.sub_type == "deny"'
 
 # event.action for threat logs.
  - set:
      field: event.action
      value: data_match
-     if: 'ctx?._temp_?.message_subtype == "data"'
+     if: 'ctx?.panw?.panos?.sub_type == "data"'
  - set:
      field: event.action
      value: file_match
-     if: 'ctx?._temp_?.message_subtype == "file"'
+     if: 'ctx?.panw?.panos?.sub_type == "file"'
  - set:
      field: event.action
      value: flood_detected
-     if: 'ctx?._temp_?.message_subtype == "flood"'
+     if: 'ctx?.panw?.panos?.sub_type == "flood"'
  - set:
      field: event.action
      value: packet_attack
-     if: 'ctx?._temp_?.message_subtype == "packet"'
+     if: 'ctx?.panw?.panos?.sub_type == "packet"'
  - set:
      field: event.action
      value: scan_detected
-     if: 'ctx?._temp_?.message_subtype == "scan"'
+     if: 'ctx?.panw?.panos?.sub_type == "scan"'
  - set:
      field: event.action
      value: spyware_detected
-     if: 'ctx?._temp_?.message_subtype == "spyware"'
+     if: 'ctx?.panw?.panos?.sub_type == "spyware"'
  - set:
      field: event.action
      value: url_filtering
-     if: 'ctx?._temp_?.message_subtype == "url"'
+     if: 'ctx?.panw?.panos?.sub_type == "url"'
  - set:
      field: event.action
      value: virus_detected
-     if: 'ctx?._temp_?.message_subtype == "virus"'
+     if: 'ctx?.panw?.panos?.sub_type == "virus"'
  - set:
      field: event.action
      value: exploit_detected
-     if: 'ctx?._temp_?.message_subtype == "vulnerability"'
+     if: 'ctx?.panw?.panos?.sub_type == "vulnerability"'
  - set:
      field: event.action
-     value: wildfire_veredict
-     if: 'ctx?._temp_?.message_subtype == "wildfire"'
+     value: wildfire_verdict
+     if: 'ctx?.panw?.panos?.sub_type == "wildfire"'
  - set:
      field: event.action
      value: wildfire_virus_detected
-     if: 'ctx?._temp_?.message_subtype == "wildfire-virus"'
+     if: 'ctx?.panw?.panos?.sub_type == "wildfire-virus"'
 
 
 # Set numeric log.level from event.severity.
@@ -276,21 +365,21 @@ processors:
 # Normalize event.outcome.
 # These values appear in the TRAFFIC docs but look like a mistake.
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'drop-icmp'
-     if: 'ctx?.event?.outcome == "drop icmp" || ctx?.event?.outcome == "drop ICMP"'
+     if: 'ctx?.panw?.panos?.action == "drop icmp" || ctx?.panw?.panos?.action == "drop ICMP"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-both'
-     if: 'ctx?.event?.outcome == "reset both"'
+     if: 'ctx?.panw?.panos?.action == "reset both"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-client'
-     if: 'ctx?.event?.outcome == "reset client"'
+     if: 'ctx?.panw?.panos?.action == "reset client"'
  - set:
-     field: event.outcome
+     field: panw.panos.action
      value: 'reset-server'
-     if: 'ctx?.event?.outcome == "reset server"'
+     if: 'ctx?.panw?.panos?.action == "reset server"'
 
 # Build related.ip array from src/dest/NAT IPs.
  - append:
@@ -391,11 +480,116 @@ processors:
      value: 'URL-filtering'
      if: 'ctx?.panw?.panos?.threat?.id == "9999"'
 
+ - set:
+     field: rule.name
+     value: "{{panw.panos.ruleset}}"
+     ignore_empty_value: true
+
+# Set url and file values
+ - rename:
+     if: 'ctx?.panw?.panos?.sub_type != "url"'
+     field: url.original
+     target_field: file.name
+     ignore_missing: true
+
+ - grok:
+     field: url.original
+     patterns:
+       - '(%{ANY:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
+     ignore_missing: true
+     pattern_definitions:
+       USERNAME: '[^\:]*'
+       PASSWORD: '[^@]*'
+       DOMAIN: '[^\/\?#\:]*'
+       PATH: '[^\?#]*'
+       QUERY: '[^#]*'
+       ANY: '.*'
+     if: 'ctx?.url?.original != null && ctx?.url?.original != "-/" && ctx?.url?.original != ""'
+
+ - grok:
+     field: url.path
+     patterns:
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:url.extension}))?'
+     ignore_missing: true
+     pattern_definitions:
+       FILENAME: '[^\.]+'
+       ANY: '.*'
+     if: 'ctx?.url?.path != null && ctx?.url?.path != ""'
+
+ - grok:
+     field: file.name
+     patterns:
+       - '%{FILENAME}((?:\.%{ANY})*(\.%{ANY:file.extension}))?'
+     ignore_missing: true
+     pattern_definitions:
+       FILENAME: '[^\.]+'
+       ANY: '.*'
+     if: 'ctx?.file?.name != null && ctx?.file?.name != ""'
+
+ - append:
+     field: related.user
+     value: "{{client.user.name}}"
+     if: "ctx?.client?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{source.user.name}}"
+     if: "ctx?.source?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{server.user.name}}"
+     if: "ctx?.server?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{destination.user.name}}"
+     if: "ctx?.destination?.user?.name != null"
+
+ - append:
+     field: related.user
+     value: "{{url.username}}"
+     if: "ctx?.url?.username != null && ctx?.url?.username != ''"
+     allow_duplicates: false
+
+ - append:
+     field: related.hash
+     value: "{{panw.panos.file.hash}}"
+     if: "ctx?.panw?.panos?.file?.hash != null"
+
+ - append:
+     field: related.hosts
+     value: "{{observer.hostname}}"
+     if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
+     allow_duplicates: false
+
+ - append:
+     field: related.hosts
+     value: "{{url.domain}}"
+     if: "ctx?.url?.domain != null && ctx.url?.domain != ''"
+     allow_duplicates: false
+
 # Remove temporary fields.
  - remove:
      field:
        - _temp_
      ignore_missing: true
+
+# Remove NAT fields when translation was not done.
+ - remove:
+     field:
+       - source.nat.ip
+       - source.nat.port
+       - client.nat.ip
+       - client.nat.port
+     if: 'ctx?.source?.nat?.ip == "0.0.0.0" && ctx?.source?.nat?.port == 0'
+ - remove:
+     field:
+       - destination.nat.ip
+       - destination.nat.port
+       - server.nat.ip
+       - server.nat.port
+     if: 'ctx?.destination?.nat?.ip == "0.0.0.0" && ctx?.destination?.nat?.port == 0'
 
 on_failure:
   - set:

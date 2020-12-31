@@ -5,7 +5,7 @@ var:
     default:
       - /var/log/cisco-ftd.log
   - name: tags
-    default: [cisco-ftd]
+    default: [cisco-ftd, forwarded]
   - name: syslog_host
     default: localhost
   - name: syslog_port
@@ -24,6 +24,9 @@ var:
     default: ftd
   - name: internal_PREFIX
     default: FTD
+  - name: external_zones
+  - name: internal_zones
+
 ingest_pipeline: ../shared/ingest/asa-ftd-pipeline.yml
 input: config/input.yml
 

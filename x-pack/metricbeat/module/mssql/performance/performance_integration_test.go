@@ -11,10 +11,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/tests/compose"
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	mtest "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/testing"
 )
 
 type keyAssertion struct {
@@ -81,7 +81,7 @@ func TestFetch(t *testing.T) {
 		{key: "connections_reset_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "logouts_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "logins_per_sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "recompilations_per_sec", assertion: int64Assertion(int64EqualZero)},
+		{key: "recompilations_per_sec", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "compilations_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "batch_requests_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "buffer.cache_hit.pct", assertion: float64Assertion(float64HigherThanZero)},

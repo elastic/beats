@@ -2,11 +2,19 @@
   {
     "@timestamp": "2019-10-22T11:33:45.5433159Z",
     "event": {
-      "action": "deleted-group-account-from",
+      "action": "removed-member-from-group",
+      "category": [
+        "iam"
+      ],
       "code": 4729,
       "kind": "event",
       "module": "security",
-      "provider": "Microsoft-Windows-Security-Auditing"
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "group",
+        "change"
+      ]
     },
     "group": {
       "domain": "WLBEAT",
@@ -18,8 +26,8 @@
     "log": {
       "level": "information"
     },
-    "process": {
-      "name": "null"
+    "related": {
+      "user": "Administrator"
     },
     "user": {
       "domain": "WLBEAT",

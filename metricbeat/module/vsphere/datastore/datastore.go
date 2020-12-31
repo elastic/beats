@@ -23,9 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
@@ -47,8 +46,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere datastore metricset is beta")
-
 	config := struct {
 		Username string `config:"username"`
 		Password string `config:"password"`
@@ -114,9 +111,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, ds := range dst {
-		var usedSpacePercent int64
+		var usedSpacePercent float64
 		if ds.Summary.Capacity > 0 {
-			usedSpacePercent = 100 * (ds.Summary.Capacity - ds.Summary.FreeSpace) / ds.Summary.Capacity
+			usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
 		}
 		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 

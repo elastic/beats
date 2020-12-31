@@ -31,11 +31,11 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/winlogbeat/checkpoint"
-	"github.com/elastic/beats/winlogbeat/sys"
-	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
 const (
@@ -46,10 +46,6 @@ const (
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
 )
-
-var winEventLogConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"batch_read_size", "ignore_older", "include_xml", "event_id", "forwarded",
-	"level", "provider", "no_more_events")...)
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
@@ -366,7 +362,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 // using the Windows Event Log.
 func newWinEventLog(options *common.Config) (EventLog, error) {
 	c := defaultWinEventLogConfig
-	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 

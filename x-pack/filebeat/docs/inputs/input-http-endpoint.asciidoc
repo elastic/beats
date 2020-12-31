@@ -1,0 +1,155 @@
+[role="xpack"]
+
+:type: http_endpoint
+
+[id="{beatname_lc}-input-{type}"]
+=== HTTP Endpoint input
+
+++++
+<titleabbrev>HTTP Endpoint</titleabbrev>
+++++
+
+beta[]
+
+Use the `http_endpoint` input to create a HTTP listener that can receive incoming HTTP POST requests.
+
+This input can for example be used to receive incoming webhooks from a third-party application or service.
+
+Example configurations:
+
+Basic example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+----
+
+Custom response example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  response_code: 200
+  response_body: '{"message": "success"}'
+  url: "/"
+  prefix: "json"
+----
+
+Disable Content-Type checks
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  content_type: ""
+  prefix: "json"
+----
+
+Basic auth and SSL example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  ssl.enabled: true
+  ssl.certificate: "/home/user/server.pem"
+  ssl.key: "/home/user/server.key"
+  ssl.verification_mode: "none"
+  ssl.certificate_authority: "/home/user/ca.pem"
+  basic_auth: true
+  username: someuser
+  password: somepassword
+----
+
+Authentication or checking that a specific header includes a specific value
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  secret.header: someheadername
+  secret.value: secretheadertoken
+----
+
+
+==== Configuration options
+
+The `http_endpoint` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `basic_auth`
+
+Enables or disables HTTP basic auth for each incoming request. If enabled then `username` and `password` will also need to be configured.
+
+[float]
+==== `username`
+
+If `basic_auth` is enabled, this is the username used for authentication against the HTTP listener. Requires `password` to also be set.
+
+[float]
+==== `password`
+
+If `basic_auth` is eanbled, this is the password used for authentication against the HTTP listener. Requires `username` to also be set.
+
+[float]
+==== `secret.header`
+
+The header to check for a specific value specified by `secret.value`. Certain webhooks provide the possibility to include a special header and secret to identify the source.
+
+[float]
+==== `secret.value`
+
+The secret stored in the header name specified by `secret.header`. Certain webhooks provide the possibility to include a special header and secret to identify the source.
+
+[float]
+==== `content_type`
+
+By default the input expects the incoming POST to include a Content-Type of `application/json` to try to enforce the incoming data to be valid JSON.
+In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null
+
+[float]
+==== `response_code`
+
+The HTTP response code returned upon success. Should be in the 2XX range.
+
+[float]
+==== `response_body`
+
+The response body returned upon success.
+
+[float]
+==== `listen_address`
+
+If multiple interfaces is present the `listen_address` can be set to control which IP address the listener binds to. Defaults to `127.0.0.1`.
+
+[float]
+==== `listen_port`
+
+Which port the listener binds to. Defaults to 8000
+
+[float]
+==== `url`
+
+This options specific which URL path to accept requests on. Defaults to `/`
+
+[float]
+==== `prefix`
+
+This option specifies which prefix the incoming request will be mapped to.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

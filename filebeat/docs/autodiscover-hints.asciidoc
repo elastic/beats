@@ -11,7 +11,9 @@ list of supported hints:
 Filebeat gets logs from all containers by default, you can set this hint to `false` to ignore
 the output of the container. Filebeat won't read or send logs from it. If default config is
 disabled, you can use this annotation to enable log retrieval only for containers with this
-set to `true`.
+set to `true`. If you are aiming to use this with Kubernetes, have in mind that annotation
+values can only be of string type so you will need to explicitly define this as `"true"`
+or `"false"` accordingly.
 
 [float]
 ===== `co.elastic.logs/multiline.*`
@@ -112,7 +114,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: container
         paths:
-          - /var/log/container/*-${container.id}.log  # CRI path
+          - /var/log/containers/*-${data.container.id}.log  # CRI path
 -----
 
 You can also disable default settings entirely, so only Pods annotated like `co.elastic.logs/enabled: true`
@@ -155,6 +157,40 @@ annotations:
   co.elastic.logs.sidecar/exclude_lines: '^DBG'
 -----
 
+[float]
+===== Multiple sets of hints
+When a container needs multiple inputs to be defined on it, sets of annotations can be provided with numeric prefixes.
+If there are hints that don't have a numeric prefix then they get grouped together into a single configuration.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/exclude_lines: '^DBG'
+  co.elastic.logs/1.include_lines: '^DBG'
+  co.elastic.logs/1.processors.dissect.tokenizer: "%{key2} %{key1}"
+-------------------------------------------------------------------------------------
+
+The above configuration would generate two input configurations. The first input handles only debug logs and passes it through a dissect
+tokenizer. The second input handles everything but debug logs.
+
+[float]
+=====  Namespace Defaults
+
+Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
+The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
+enable Namespace defaults configure the `add_resource_metadata` for Namespace objects as follows:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      add_resource_metadata:
+        namespace:
+          include_annotations: ["nsannotation1"]
+-------------------------------------------------------------------------------------
+
 
 
 [float]
@@ -181,7 +217,7 @@ filebeat.autodiscover:
       hints.default_config:
         type: container
         paths:
-          - /var/log/container/*-${container.id}.log  # CRI path
+          - /var/log/containers/*-${data.container.id}.log  # CRI path
 -----
 
 You can also disable default settings entirely, so only containers labeled with `co.elastic.logs/enabled: true`

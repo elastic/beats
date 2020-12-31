@@ -19,16 +19,17 @@ package registered_domain
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
@@ -103,6 +104,28 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 			return event, nil
 		}
 		return event, errors.Wrapf(err, "failed to write registered domain to target field [%v]", p.TargetField)
+	}
+
+	if p.TargetETLDField != "" {
+		tld, _ := publicsuffix.PublicSuffix(domain)
+		if tld != "" {
+			if _, err = event.PutValue(p.TargetETLDField, tld); err != nil && !p.IgnoreFailure {
+				return event, errors.Wrapf(err, "failed to write effective top-level domain to target field [%v]", p.TargetETLDField)
+			}
+		}
+	}
+
+	if p.TargetSubdomainField != "" {
+		subdomain := strings.TrimSuffix(strings.TrimSuffix(domain, rd), ".")
+		if subdomain != "" {
+			_, err = event.PutValue(p.TargetSubdomainField, subdomain)
+			if err != nil {
+				if p.IgnoreFailure {
+					return event, nil
+				}
+				return event, errors.Wrapf(err, "failed to write subdomain to target field [%v]", p.TargetSubdomainField)
+			}
+		}
 	}
 
 	return event, nil

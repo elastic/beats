@@ -1,0 +1,9 @@
+{
+  "txid": 3,
+  "datafile": "3.json",
+  "entries": {
+    "key0": {"a": 30},
+    "key1": {"a": 31},
+    "key2": {"a": 32}
+  }
+}

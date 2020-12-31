@@ -4,10 +4,10 @@ import unittest
 from heartbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
-import nose.tools
+from beat import common_tests
 
 
-class Test(BaseTest):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     def test_base(self):
         """
@@ -18,6 +18,30 @@ class Test(BaseTest):
             "monitors": [
                 {
                     "type": "http",
+                    "urls": ["http://localhost:9200"],
+                }
+            ]
+        }
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            **config
+        )
+
+        heartbeat_proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+        heartbeat_proc.check_kill_and_wait()
+
+    def test_disabled(self):
+        """
+        Basic test against a disabled monitor
+        """
+
+        config = {
+            "monitors": [
+                {
+                    "type": "http",
+                    "enabled": "false",
                     "urls": ["http://localhost:9200"],
                 }
             ]
@@ -108,7 +132,7 @@ class Test(BaseTest):
         heartbeat_proc.check_kill_and_wait()
         doc = self.read_output()[0]
 
-        assert not doc.has_key("host.name")
+        assert "host.name" not in doc
 
     def run_fields(self, expected, local=None, top=None):
         monitor = {
@@ -134,7 +158,7 @@ class Test(BaseTest):
         heartbeat_proc.check_kill_and_wait()
 
         doc = self.read_output()[0]
-        self.assertDictContainsSubset(expected, doc)
+        assert expected.items() <= doc.items()
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -180,7 +204,7 @@ class Test(BaseTest):
             heartbeat_proc.check_kill_and_wait()
 
         for output in self.read_output():
-            nose.tools.assert_equal(
+            self.assertEqual(
                 output["event.dataset"],
                 "uptime",
                 "Check for event.dataset in {} failed".format(output)

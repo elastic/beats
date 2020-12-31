@@ -9,9 +9,9 @@ package guess
 import (
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
 
 // Guess the position of size parameter in tcp_sendmsg.
@@ -24,7 +24,7 @@ import (
 //  TCP_SENDMSG_LEN  : +4(%sp)
 
 func init() {
-	if err := Registry.AddGuess(&guessTCPSendMsg{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessTCPSendMsg{} }); err != nil {
 		panic(err)
 	}
 }

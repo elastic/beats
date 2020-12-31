@@ -1,12 +1,13 @@
+import datetime
+import json
+import logging
+import os
+import pytest
+import shutil
+import unittest
+
 from base import BaseTest
 from idxmgmt import IdxMgmt
-import os
-from nose.plugins.attrib import attr
-import unittest
-import shutil
-import datetime
-import logging
-import json
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -37,7 +38,7 @@ class TestRunILM(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_ilm_default(self):
         """
         Test ilm default settings to load ilm policy, write alias and ilm template
@@ -55,7 +56,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_ilm_disabled(self):
         """
         Test ilm disabled to not load ilm related components
@@ -67,12 +68,12 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_policy_name(self):
         """
         Test setting ilm policy name
@@ -92,7 +93,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_policy_created(policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_rollover_alias(self):
         """
         Test settings ilm rollover alias
@@ -111,7 +112,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_pattern(self):
         """
         Test setting ilm pattern
@@ -131,7 +132,7 @@ class TestRunILM(BaseTest):
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_pattern_date(self):
         """
         Test setting ilm pattern with date
@@ -161,7 +162,7 @@ class TestCommandSetupILMPolicy(BaseTest):
     def setUp(self):
         super(TestCommandSetupILMPolicy, self).setUp()
 
-        self.setupCmd = "--ilm-policy"
+        self.setupCmd = "--index-management"
 
         self.alias_name = self.index_name = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
@@ -187,24 +188,24 @@ class TestCommandSetupILMPolicy(BaseTest):
         )
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_policy_and_template(self):
         """
         Test combination of ilm policy and template setup
         """
         self.render_config()
 
+        # NOTE: --template is deprecated for 8.0.0./
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd, "--template"])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_default(self):
         """
         Test ilm policy setup with default config
@@ -217,12 +218,11 @@ class TestCommandSetupILMPolicy(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
-        self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_setup_ilm_disabled(self):
         """
         Test ilm policy setup when ilm disabled
@@ -234,12 +234,12 @@ class TestCommandSetupILMPolicy(BaseTest):
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_policy_name(self):
         """
         Test ilm policy setup when policy_name is configured
@@ -255,7 +255,7 @@ class TestCommandSetupILMPolicy(BaseTest):
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_rollover_alias(self):
         """
         Test ilm policy setup when rollover_alias is configured
@@ -268,7 +268,6 @@ class TestCommandSetupILMPolicy(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
-        self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
 

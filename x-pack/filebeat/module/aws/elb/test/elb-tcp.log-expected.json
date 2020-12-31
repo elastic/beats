@@ -8,9 +8,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.000943,
         "aws.elb.response_processing_time.sec": 1.5e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 859,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:22:51.758Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -22,12 +25,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51600"
+        "source.port": "51600",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:07.523Z",
@@ -38,9 +45,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.000501,
         "aws.elb.response_processing_time.sec": 1.5e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 859,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:23:07.523Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -52,12 +62,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51726"
+        "source.port": "51726",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:08.477Z",
@@ -68,9 +82,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.001105,
         "aws.elb.response_processing_time.sec": 1.5e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 859,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:23:08.477Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -82,12 +99,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51734"
+        "source.port": "51734",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:23:09.174Z",
@@ -98,9 +119,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.000422,
         "aws.elb.response_processing_time.sec": 1.3e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 859,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:23:09.174Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -112,12 +136,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "51738"
+        "source.port": "51738",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:26:14.308Z",
@@ -128,9 +156,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.000534,
         "aws.elb.response_processing_time.sec": 1.6e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 343,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:26:14.308Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -142,12 +173,16 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "46288"
+        "source.port": "46288",
+        "tags": [
+            "forwarded"
+        ]
     },
     {
         "@timestamp": "2019-10-17T13:26:19.318Z",
@@ -158,9 +193,12 @@
         "aws.elb.protocol": "tcp",
         "aws.elb.request_processing_time.sec": 0.001004,
         "aws.elb.response_processing_time.sec": 1.5e-05,
+        "cloud.provider": "aws",
         "destination.bytes": 343,
+        "event.category": "network",
         "event.dataset": "aws.elb",
         "event.end": "2019-10-17T13:26:19.318Z",
+        "event.kind": "event",
         "event.module": "aws",
         "fileset.name": "elb",
         "input.type": "log",
@@ -172,11 +210,15 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
         "source.geo.region_name": "Teruel",
         "source.ip": "77.227.156.41",
-        "source.port": "46304"
+        "source.port": "46304",
+        "tags": [
+            "forwarded"
+        ]
     }
 ]

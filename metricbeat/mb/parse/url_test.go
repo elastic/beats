@@ -20,10 +20,10 @@ package parse
 import (
 	"testing"
 
-	"github.com/elastic/beats/metricbeat/helper/dialer"
-	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -97,7 +97,7 @@ func TestParseURL(t *testing.T) {
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, transport.Path)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe", hostData.URI)
 			assert.Equal(t, "http://npipe", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)
@@ -112,7 +112,22 @@ func TestParseURL(t *testing.T) {
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
-			assert.Equal(t, `\\.pipe\custom`, transport.Path)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
+	t.Run("http+npipe short with", func(t *testing.T) {
+		rawURL := "http+npipe:///custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
 			assert.Equal(t, "http://npipe/apath", hostData.URI)
 			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
 			assert.Equal(t, "npipe", hostData.Host)

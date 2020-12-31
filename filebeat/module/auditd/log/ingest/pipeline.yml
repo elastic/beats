@@ -1,17 +1,22 @@
 ---
 description: Pipeline for parsing Linux auditd logs
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     pattern_definitions:
-      AUDIT_TYPE: "^type=%{NOTSPACE:auditd.log.record_type}"
-      AUDIT_PREFIX: "%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
+      AUDIT_TYPE: "type=%{NOTSPACE:auditd.log.record_type}"
+      AUDIT_NODE: "node=%{IPORHOST:auditd.log.node} "
+      AUDIT_PREFIX: "^(?:%{AUDIT_NODE})?%{AUDIT_TYPE} msg=audit\\(%{NUMBER:auditd.log.epoch}:%{NUMBER:auditd.log.sequence}\\):(%{DATA})?"
       AUDIT_KEY_VALUES: "%{WORD}=%{GREEDYDATA}"
+      ANY: ".*"
     patterns:
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} old auid=%{NUMBER:auditd.log.old_auid}
       new auid=%{NUMBER:auditd.log.new_auid} old ses=%{NUMBER:auditd.log.old_ses}
       new ses=%{NUMBER:auditd.log.new_ses}"
-    - '%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=[''"](%{DATA:auditd.log.msg}\s+)?%{AUDIT_KEY_VALUES:auditd.log.sub_kv}[''"]'
+    - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv} msg=['\"]([^=]*\\s)?%{ANY:auditd.log.sub_kv}['\"]"
     - "%{AUDIT_PREFIX} %{AUDIT_KEY_VALUES:auditd.log.kv}"
     - "%{AUDIT_PREFIX}"
     - "%{AUDIT_TYPE} %{AUDIT_KEY_VALUES:auditd.log.kv}"
@@ -44,10 +49,14 @@ processors:
 - remove:
     field: auditd.log.epoch
     ignore_failure: true
-- convert:
-    field: auditd.log.sequence
-    type: integer
-    ignore_missing: true
+- rename:
+    ignore_failure: true
+    field: auditd.log.old-auid
+    target_field: auditd.log.old_auid
+- rename:
+    ignore_failure: true
+    field: auditd.log.old-ses
+    target_field: auditd.log.old_ses
 - script:
     lang: painless
     source: |
@@ -132,6 +141,188 @@ processors:
     params:
       single_quote: "'"
       double_quote: "\""
+- convert:
+    field: auditd.log.sequence
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.lport
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.rport
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.entries
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.dst_prefixlen
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.ksize
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.size
+    type: long
+    ignore_missing: true
+- convert:
+    field: auditd.log.src_prefixlen
+    type: long
+    ignore_missing: true
+- set:
+    field: event.kind
+    value: event
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      DAEMON_CONFIG:
+        category:
+          - configuration
+        type:
+          - change
+      DAEMON_RECONFIG:
+        category:
+          - configuration
+        type:
+          - info
+      USYS_CONFIG:
+        category:
+          - configuration
+        type:
+          - change
+      NETFILTER_CFG:
+        category:
+          - configuration
+        type:
+          - change
+      FEATURE_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      MAC_CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      MAC_POLICY_LOAD:
+        category:
+          - configuration
+        type:
+          - access
+      MAC_STATUS:
+        category:
+          - configuration
+        type:
+          - change
+      USER_MAC_CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      USER_MAC_POLICY_LOAD:
+        category:
+          - configuration
+        type:
+          - access
+      USER_AUTH:
+        category:
+          - authentication
+        type:
+          - info
+      KERN_MODULE:
+        category:
+          - driver
+        type:
+          - info
+      SOFTWARE_UPDATE:
+        category:
+          - package
+        type:
+          - info
+    source: >-
+      if (ctx?.auditd?.log.record_type == null) {
+        return;
+      }
+      def hm = new HashMap(params.get(ctx.auditd.log.record_type));
+      hm.forEach((k, v) -> ctx.event[k] = v);
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
+    field: event.category
+    value: host
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSCALL' && ctx.auditd.log?.syscall == 'execve'"
+    field: event.category
+    value: process
+- set:
+    if: "ctx.auditd.log?.record_type == 'SYSCALL' && ctx.auditd.log?.syscall == 'execve'"
+    field: event.type
+    value: info
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' || ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: event.category
+    value: host
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'start'"
+    field: event.type
+    value: start
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'stop'"
+    field: event.type
+    value: end
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'create'"
+    field: event.type
+    value: creation
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_CONTROL' && ctx.auditd.log?.op == 'delete'"
+    field: event.type
+    value: deletion
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: event.type
+    value: creation
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: container.name
+    value: "{{ auditd.log.vm }}"
+    ignore_empty_value: true
+- set:
+    if: "ctx.auditd.log?.record_type == 'VIRT_MACHINE_ID'"
+    field: container.runtime
+    value: "{{ auditd.log.virt }}"
+    ignore_empty_value: true
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'accept' || ctx.auditd.log?.syscall == '43' ||
+      ctx.auditd.log?.syscall == 'recvfrom' || ctx.auditd.log?.syscall == '45' ||
+      ctx.auditd.log?.syscall == 'recvmsg' || ctx.auditd.log?.syscall == '47' ||
+      ctx.auditd.log?.syscall == 'accept4' || ctx.auditd.log?.syscall == '288' )
+    field: network.direction
+    value: ingress
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'connect' || ctx.auditd.log?.syscall == '42' ||
+      ctx.auditd.log?.syscall == 'sendto' || ctx.auditd.log?.syscall == '44' ||
+      ctx.auditd.log?.syscall == 'sendmsg' || ctx.auditd.log?.syscall == '46')
+    field: network.direction
+    value: egress
 - rename:
     ignore_failure: true
     field: auditd.log.arch
@@ -139,6 +330,10 @@ processors:
 - rename:
     ignore_failure: true
     field: auditd.log.acct
+    target_field: user.name
+- rename:
+    ignore_failure: true
+    field: auditd.log.user
     target_field: user.name
 - rename:
     ignore_failure: true
@@ -222,6 +417,33 @@ processors:
     separator: "\\s+"
 - rename:
     ignore_failure: true
+    field: auditd.log.argc
+    target_field: process.args_count
+- script:
+    if: "ctx?.process?.args != null"
+    lang: painless
+    source: >-
+      if (ctx.process.args instanceof List) {
+        ctx.process.args_count = ctx.process.args.length;
+      }
+- convert:
+    ignore_missing: true
+    field: process.args_count
+    type: long
+- rename:
+    ignore_failure: true
+    field: auditd.log.exit
+    target_field: process.exit_code
+- convert:
+    ignore_missing: true
+    field: process.exit_code
+    type: long
+- rename:
+    ignore_missing: true
+    field: auditd.log.cwd
+    target_field: process.working_directory
+- rename:
+    ignore_failure: true
     field: auditd.log.terminal
     target_field: user.terminal
 - rename:
@@ -243,6 +465,11 @@ processors:
     ignore_failure: true
     field: auditd.log.src
     target_field: source.address
+- rename:
+    ignore_failure: true
+    field: auditd.log.addr
+    target_field: source.address
+    if: ctx?.source?.address == null
 - rename:
     ignore_failure: true
     field: auditd.log.dst

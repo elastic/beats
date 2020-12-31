@@ -1,12 +1,9 @@
+import metricbeat
 import os
 import requests
 import sys
 import time
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 HTTP_FIELDS = metricbeat.COMMON_FIELDS + ["http"]
@@ -41,7 +38,7 @@ class Test(metricbeat.BaseTest):
 
         del evt["http"]["test"]["hello"]
 
-        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -74,7 +71,7 @@ class Test(metricbeat.BaseTest):
         # Delete dynamic namespace part for fields comparison
         del evt["http"]["server"]
 
-        self.assertItemsEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
+        self.assertCountEqual(self.de_dot(HTTP_FIELDS), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
