@@ -87,7 +87,10 @@ As with JSON, dictionaries and lists are constructed using `{}` and `[]`. But
 unlike JSON, the syntax allows for trailing commas and slightly different string
 quotation rules. Strings can be unquoted, single-quoted, or double-quoted, as a
 convenience for simple settings and to make it easier for you to mix quotation
-usage in the shell. Arrays at the top-level do not require brackets (`[]`).
+usage in the shell.
+
+NOTE: Do not use brackets (`[]`) for arrays at the top-level, or it will be interpreted as a character.
+For now, you can't set an empty array (e.g. to set coordinating only nodes) with this syntax.
 
 For example, the following environment variable is set to a list:
 
