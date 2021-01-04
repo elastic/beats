@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/postgresql/postgresql-*-*.csv
+    os.darwin:
+      - /usr/local/var/postgres/*.csv
+    os.windows:
+      - "c:/Program Files/PostgreSQL/*/logs/*.csv"
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/csv.yml

@@ -105575,6 +105575,191 @@ Fields from PostgreSQL logs.
 [float]
 === log
 
+Fields from the PostgreSQL CSV log files.
+
+
+
+*`postgresql.log.database`*::
++
+--
+Name of database.
+
+example: postgres
+
+--
+
+*`postgresql.log.client_addr`*::
++
+--
+Host where the connection originated from.
+
+example: 127.0.0.1
+
+--
+
+*`postgresql.log.client_port`*::
++
+--
+Port where the connection originated from.
+
+example: 59700
+
+--
+
+*`postgresql.log.session_id`*::
++
+--
+PostgreSQL session.
+
+example: 5ff1dd98.22
+
+--
+
+*`postgresql.log.session_line_num`*::
++
+--
+Line number inside a session. (session_id,session_line_num) identifies uniquely an event.
+
+
+type: long
+
+--
+
+*`postgresql.log.command_tag`*::
++
+--
+Type of session's current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
+
+
+example: SELECT
+
+--
+
+*`postgresql.log.session_start_time`*::
++
+--
+Time when this session started.
+
+type: date
+
+--
+
+*`postgresql.log.virtual_transaction_id`*::
++
+--
+Backend local transaction id .
+
+--
+
+*`postgresql.log.transaction_id`*::
++
+--
+The id of current transaction.
+
+type: long
+
+--
+
+*`postgresql.log.error_severity`*::
++
+--
+Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
+
+example: LOG
+
+--
+
+*`postgresql.log.sql_state_code`*::
++
+--
+State code returned by Postgres (if any). This code is not a number. See also https://www.postgresql.org/docs/current/errcodes-appendix.html
+
+
+--
+
+*`postgresql.log.message`*::
++
+--
+Main message of this event.
+
+--
+
+*`postgresql.log.detail`*::
++
+--
+--
+
+*`postgresql.log.hint`*::
++
+--
+--
+
+*`postgresql.log.internal_query`*::
++
+--
+internal query that led to the error (if any).
+
+--
+
+*`postgresql.log.internal_query_pos`*::
++
+--
+character count of the error position (if any).
+
+type: long
+
+--
+
+*`postgresql.log.context`*::
++
+--
+Error context.
+
+--
+
+*`postgresql.log.query`*::
++
+--
+User query that led to the error (if any and enabled by log_min_error_statement).
+
+--
+
+*`postgresql.log.query_pos`*::
++
+--
+character count of the error position (if any).
+
+type: long
+
+--
+
+*`postgresql.log.location`*::
++
+--
+Location of the error in the PostgreSQL source code (if log_error_verbosity is set to verbose).
+
+--
+
+*`postgresql.log.application_name`*::
++
+--
+Name of the application of this event. It is defined by the client.
+
+--
+
+*`postgresql.log.backend_type`*::
++
+--
+Type of backend of this event. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. In addition, background workers registered by extensions may have additional types.
+
+
+example: client backend
+
+--
+
+[float]
+=== log
+
 Fields from the PostgreSQL log files.
 
 
