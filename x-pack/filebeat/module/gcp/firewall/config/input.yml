@@ -31,6 +31,9 @@ processors:
       params:
         debug: {{ .debug }}
         keep_original_message: {{ .keep_original_message }}
+        {{ if .internal_networks }}
+        internal_networks: {{ .internal_networks | tojson }}
+        {{ end }}
       file: ${path.home}/module/gcp/firewall/config/pipeline.js
   - add_fields:
       target: ''

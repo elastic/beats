@@ -325,6 +325,20 @@ func TestNormalization(t *testing.T) {
 	}
 }
 
+func BenchmarkNormalization(b *testing.B) {
+	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	require.NoError(b, err)
+
+	prog, err := s.Create(beat.ProcessingConfig{}, false)
+	require.NoError(b, err)
+
+	fields := common.MapStr{"a": "b"}
+	for i := 0; i < b.N; i++ {
+		f := fields.Clone()
+		_, _ = prog.Run(&beat.Event{Fields: f})
+	}
+}
+
 func TestAlwaysDrop(t *testing.T) {
 	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
 	require.NoError(t, err)

@@ -65,7 +65,7 @@ function PipelineBuilder(pipelineName, debug) {
     }
 }
 
-function FirewallProcessor(keep_original_message, debug) {
+function FirewallProcessor(keep_original_message, debug, internalNetworks) {
     var builder = new PipelineBuilder("firewall", debug);
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
@@ -313,9 +313,17 @@ function FirewallProcessor(keep_original_message, debug) {
         event.AppendTo("related.ip", event.Get("destination.ip"));
     });
 
-    var chain = builder.Build();
+    if (internalNetworks) {
+        builder.Add("addNetworkDirection", processor.AddNetworkDirection({
+            source: "source.ip",
+            destination: "destination.ip",
+            target: "network.direction",
+            internal_networks: internalNetworks,
+        }))
+    }
+
     return {
-        process: chain.Run
+        process: builder.Build().Run
     };
 }
 
@@ -323,7 +331,7 @@ var firewall;
 
 // Register params from configuration.
 function register(params) {
-    firewall = new FirewallProcessor(params.keep_original_message, params.debug);
+    firewall = new FirewallProcessor(params.keep_original_message, params.debug, params.internal_networks);
 }
 
 function process(evt) {

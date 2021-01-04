@@ -40,6 +40,7 @@
         "host.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 174,
+        "network.direction": "egress",
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",
         "process.exit_code": 184,
         "process.name": "charon",
@@ -178,12 +179,16 @@
         "auditd.log.sw": "gcc-4.8.5-39.el7.x86_64",
         "auditd.log.sw_type": "rpm",
         "event.action": "software_update",
-        "event.category": "package",
+        "event.category": [
+            "package"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1893,
@@ -296,11 +301,15 @@
         "auditd.log.name": "mymodule",
         "auditd.log.sequence": 579397,
         "event.action": "kern_module",
-        "event.category": "driver",
+        "event.category": [
+            "driver"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.type": "info",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 3153,

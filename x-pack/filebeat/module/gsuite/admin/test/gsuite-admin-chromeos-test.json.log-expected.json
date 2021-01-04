@@ -2,7 +2,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_ANDROID_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -109,7 +110,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -262,7 +264,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_DEVICE_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -364,7 +367,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_PUBLIC_SESSION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -707,7 +711,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -758,7 +763,8 @@
     {
         "event.action": "CHANGE_CHROME_OS_USER_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1010,7 +1016,8 @@
     {
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

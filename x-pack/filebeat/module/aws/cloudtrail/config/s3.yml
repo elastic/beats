@@ -2,16 +2,16 @@ type: s3
 queue_url: {{ .queue_url }}
 file_selectors:
 {{ if .process_cloudtrail_logs }}
-  - regex: '^AWSLogs/\d+/CloudTrail/'
+  - regex: '/CloudTrail/'
     expand_event_list_from_field: 'Records'
 {{ end }}
 
 {{ if .process_digest_logs }}
-  - regex: '^AWSLogs/\d+/CloudTrail-Digest/'
+  - regex: '/CloudTrail-Digest/'
 {{ end }}
 
 {{ if .process_insight_logs }}
-  - regex: '^AWSLogs/\d+/CloudTrail-Insight/'
+  - regex: '/CloudTrail-Insight/'
     expand_event_list_from_field: 'Records'
 {{ end }}
 

@@ -13,7 +13,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cef>>
   * <<filebeat-module-checkpoint>>
   * <<filebeat-module-cisco>>
-  * <<filebeat-module-citrix>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cyberark>>
@@ -23,6 +22,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
   * <<filebeat-module-gcp>>
+  * <<filebeat-module-google_workspace>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
@@ -40,6 +40,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
+  * <<filebeat-module-mysqlenterprise>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-netscout>>
@@ -56,11 +57,11 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-redis>>
   * <<filebeat-module-santa>>
   * <<filebeat-module-snort>>
+  * <<filebeat-module-snyk>>
   * <<filebeat-module-sonicwall>>
   * <<filebeat-module-sophos>>
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
-  * <<filebeat-module-symantec>>
   * <<filebeat-module-system>>
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
@@ -82,7 +83,6 @@ include::modules/bluecoat.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
-include::modules/citrix.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cyberark.asciidoc[]
@@ -92,6 +92,7 @@ include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
 include::modules/gcp.asciidoc[]
+include::modules/google_workspace.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
@@ -109,6 +110,7 @@ include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
+include::modules/mysqlenterprise.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/netscout.asciidoc[]
@@ -125,11 +127,11 @@ include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/santa.asciidoc[]
 include::modules/snort.asciidoc[]
+include::modules/snyk.asciidoc[]
 include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
-include::modules/symantec.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]

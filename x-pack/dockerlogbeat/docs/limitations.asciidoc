@@ -2,7 +2,6 @@
 [role="xpack"]
 == Known problems and limitations
 
-experimental[]
 
 This release of the {log-driver} has the following known problems and
 limitations:

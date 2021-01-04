@@ -110,9 +110,9 @@ func urlChecks(urlStr string) validator.Validator {
 	})
 }
 
-func respondingHTTPChecks(url string, statusCode int) validator.Validator {
+func respondingHTTPChecks(url, mimeType string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		minimalRespondingHTTPChecks(url, statusCode),
+		minimalRespondingHTTPChecks(url, mimeType, statusCode),
 		respondingHTTPStatusAndTimingChecks(statusCode),
 		respondingHTTPHeaderChecks(),
 	)
@@ -131,12 +131,13 @@ func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
 	})
 }
 
-func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
+func minimalRespondingHTTPChecks(url, mimeType string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		urlChecks(url),
 		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
+				"response.mime_type":   mimeType,
 				"response.status_code": statusCode,
 				"rtt.total.us":         isdef.IsDuration,
 			},
@@ -259,7 +260,7 @@ func TestUpStatuses(t *testing.T) {
 						hbtest.BaseChecks("127.0.0.1", "up", "http"),
 						hbtest.RespondingTCPChecks(),
 						hbtest.SummaryChecks(1, 0),
-						respondingHTTPChecks(server.URL, status),
+						respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					)),
 					event.Fields,
 				)
@@ -276,7 +277,7 @@ func TestHeadersDisabled(t *testing.T) {
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, 200),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
 	)
@@ -294,7 +295,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(0, 1),
-					respondingHTTPChecks(server.URL, status),
+					respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
 					respondingHTTPBodyChecks("hello, world!"),
 				)),
@@ -333,7 +334,7 @@ func TestLargeResponse(t *testing.T) {
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, 200),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
 	)
@@ -394,7 +395,7 @@ func runHTTPSServerCheck(
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, http.StatusOK),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", http.StatusOK),
 		)),
 		event.Fields,
 	)
@@ -549,7 +550,7 @@ func TestRedirect(t *testing.T) {
 			lookslike.Strict(lookslike.Compose(
 				hbtest.BaseChecks("", "up", "http"),
 				hbtest.SummaryChecks(1, 0),
-				minimalRespondingHTTPChecks(testURL, 200),
+				minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
 				respondingHTTPHeaderChecks(),
 				lookslike.MustCompile(map[string]interface{}{
 					// For redirects that are followed we shouldn't record this header because there's no sensible
@@ -595,7 +596,7 @@ func TestNoHeaders(t *testing.T) {
 			hbtest.SummaryChecks(1, 0),
 			hbtest.RespondingTCPChecks(),
 			respondingHTTPStatusAndTimingChecks(200),
-			minimalRespondingHTTPChecks(server.URL, 200),
+			minimalRespondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 			lookslike.MustCompile(map[string]interface{}{
 				"http.response.headers": isdef.KeyMissing,
 			}),

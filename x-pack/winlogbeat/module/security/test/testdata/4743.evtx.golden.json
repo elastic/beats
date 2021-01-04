@@ -3,7 +3,9 @@
     "@timestamp": "2019-12-18T16:25:21.5781833Z",
     "event": {
       "action": "deleted-computer-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4743,
       "kind": "event",
       "module": "security",

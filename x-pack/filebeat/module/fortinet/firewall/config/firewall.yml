@@ -28,3 +28,17 @@ processors:
       target: ''
       fields:
         ecs.version: 1.7.0
+
+{{ if .external_interfaces }}
+  - add_fields:
+      target: _temp
+      fields:
+        external_interfaces: {{ .external_interfaces | tojson }}
+{{ end }}
+
+{{ if .internal_interfaces }}
+  - add_fields:
+      target: _temp
+      fields:
+        internal_interfaces: {{ .internal_interfaces | tojson }}
+{{ end }}

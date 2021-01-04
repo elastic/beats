@@ -1,0 +1,110 @@
+[
+    {
+        "@timestamp": "2020-10-02T15:00:00.000Z",
+        "event.action": "login_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "google_workspace.saml",
+        "event.id": "1",
+        "event.module": "google_workspace",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"login\",\"name\":\"login_failure\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"failure_type\",\"value\":\"failure_app_not_configured_for_user\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_second_level_status_code\",\"value\":\"400\"},{\"name\":\"saml_status_code\",\"value\":\"400\"}]}}",
+        "event.outcome": "failure",
+        "event.provider": "saml",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "saml",
+        "google_workspace.actor.type": "USER",
+        "google_workspace.event.type": "login",
+        "google_workspace.kind": "admin#reports#activity",
+        "google_workspace.organization.domain": "elastic.com",
+        "google_workspace.saml.application_name": "app",
+        "google_workspace.saml.failure_type": "failure_app_not_configured_for_user",
+        "google_workspace.saml.initiated_by": "idp",
+        "google_workspace.saml.orgunit_path": "ounit",
+        "google_workspace.saml.second_level_status_code": 400,
+        "google_workspace.saml.status_code": 400,
+        "input.type": "log",
+        "log.offset": 0,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "google_workspace",
+        "source.as.number": 7922,
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
+        "source.geo.city_name": "State College",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 40.7957,
+        "source.geo.location.lon": -77.8618,
+        "source.geo.region_iso_code": "US-PA",
+        "source.geo.region_name": "Pennsylvania",
+        "source.ip": "98.235.162.24",
+        "source.user.domain": "bar.com",
+        "source.user.email": "foo@bar.com",
+        "source.user.id": "1",
+        "source.user.name": "foo",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-02T15:00:01.000Z",
+        "event.action": "login_success",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "google_workspace.saml",
+        "event.id": "1",
+        "event.module": "google_workspace",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:01Z\",\"uniqueQualifier\":1,\"applicationName\":\"saml\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"login\",\"name\":\"login_success\",\"parameters\":[{\"name\":\"application_name\",\"value\":\"app\"},{\"name\":\"initiated_by\",\"value\":\"idp\"},{\"name\":\"orgunit_path\",\"value\":\"ounit\"},{\"name\":\"saml_status_code\",\"value\":\"400\"}]}}",
+        "event.outcome": "success",
+        "event.provider": "saml",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "saml",
+        "google_workspace.actor.type": "USER",
+        "google_workspace.event.type": "login",
+        "google_workspace.kind": "admin#reports#activity",
+        "google_workspace.organization.domain": "elastic.com",
+        "google_workspace.saml.application_name": "app",
+        "google_workspace.saml.initiated_by": "idp",
+        "google_workspace.saml.orgunit_path": "ounit",
+        "google_workspace.saml.status_code": 400,
+        "input.type": "log",
+        "log.offset": 606,
+        "organization.id": "1",
+        "related.ip": [
+            "98.235.162.24"
+        ],
+        "related.user": [
+            "foo"
+        ],
+        "service.type": "google_workspace",
+        "source.as.number": 7922,
+        "source.as.organization.name": "Comcast Cable Communications, LLC",
+        "source.geo.city_name": "State College",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 40.7957,
+        "source.geo.location.lon": -77.8618,
+        "source.geo.region_iso_code": "US-PA",
+        "source.geo.region_name": "Pennsylvania",
+        "source.ip": "98.235.162.24",
+        "source.user.domain": "bar.com",
+        "source.user.email": "foo@bar.com",
+        "source.user.id": "1",
+        "source.user.name": "foo",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]

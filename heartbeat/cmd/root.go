@@ -25,12 +25,15 @@ import (
 	// include all heartbeat specific autodiscovery builders
 	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 
-	// register default heartbeat monitors
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+
+	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 )
 
 const (

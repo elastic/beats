@@ -15,6 +15,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// we define custom delimiters to prevent issues when using template values as part of other Go templates.
+const (
+	leftDelim  = "[["
+	rightDelim = "]]"
+)
+
 type valueTpl struct {
 	*template.Template
 }
@@ -34,6 +40,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"toInt":               toInt,
 			"add":                 add,
 		}).
+		Delims(leftDelim, rightDelim).
 		Parse(in)
 	if err != nil {
 		return err
