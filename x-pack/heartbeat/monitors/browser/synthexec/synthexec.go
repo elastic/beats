@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,17 +24,33 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/otiai10/copy"
 )
 
 const debugSelector = "synthexec"
 
 func init() {
-	beater.RegisterJourneyLister(ListJourneys)
+	beater.RegisterJourneyLister(InitSuite)
+}
+
+func InitSuite(ctx context.Context, origSuitePath string, params common.MapStr) (journeyNames []string, err error) {
+	dir, err := ioutil.TempDir("/tmp", "elastic-synthetics-")
+	if err != nil {
+		return nil, err
+	}
+
+	err = copy.Copy(origSuitePath, dir)
+	if err != nil {
+		return nil, err
+	}
+
+	return ListJourneys(ctx, dir, params)
 }
 
 // ListJourneys takes the given suite performs a dry run, capturing the Journey names, and returns the list.
-func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (journeyNames []string, err error) {
-	dir, err := getSuiteDir(suiteFile)
+func ListJourneys(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error) {
+	dir, err := getSuiteDir(suitePath)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +70,7 @@ func ListJourneys(ctx context.Context, suiteFile string, params common.MapStr) (
 		}
 	}
 
-	cmdFactory, err := suiteCommandFactory(dir, suiteFile, "--dry-run")
+	cmdFactory, err := suiteCommandFactory(dir, suitePath, "--dry-run")
 	if err != nil {
 		return nil, err
 	}
