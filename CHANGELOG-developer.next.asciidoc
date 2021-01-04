@@ -105,3 +105,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add packaging for docker image based on UBI minimal 8. {pull}20576[20576]
 - Make the mage binary used by the build process in the docker container to be statically compiled. {pull}20827[20827]
 - Update ecszap to v0.3.0 for using ECS 1.6.0 in logs {pull}22267[22267]
+- Add support for customized monitoring API. {pull}22605[22605]
