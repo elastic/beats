@@ -169,7 +169,7 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 }
 
 // Provide hook to define journey list discovery from x-pack
-type JourneyLister func(ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) ([]string, error)
 
 var mainJourneyLister JourneyLister
 
