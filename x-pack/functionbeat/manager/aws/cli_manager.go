@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
@@ -24,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
 	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -199,14 +199,18 @@ func NewCLI(
 	cfg *common.Config,
 	provider provider.Provider,
 ) (provider.CLIManager, error) {
-	awsCfg, err := external.LoadDefaultAWSConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	config := &fnaws.Config{}
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
+	}
+	awsCfg, err := awscommon.GetAWSCredentials(config.Credentials)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
+	}
+
+	_, err = awsCfg.Credentials.Retrieve()
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
 
 	builder, err := provider.TemplateBuilder()

@@ -15,6 +15,11 @@ You configure the functions in the the +{beatname_lc}.yml+ configuration file.
 When you're done, you can <<deploy-to-cloud-provider,deploy the functions>>
 to your serverless environment.
 
+The `aws` functions require AWS credentials configuration in order to make AWS API calls.
+Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
+`AWS_SESSION_TOKEN`, or use shared AWS credentials file.
+Please see <<aws-credentials-config,AWS credentials options>> for more details.
+
 The following example configures two functions: `cloudwatch` and `sqs`. The
 `cloudwatch` function collects events from CloudWatch Logs. The `sqs` function
 collects messages from Amazon Simple Queue Service (SQS). Both functions forward
