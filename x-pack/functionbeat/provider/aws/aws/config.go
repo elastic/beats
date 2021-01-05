@@ -20,9 +20,8 @@ import (
 
 // Config expose the configuration option the AWS provider.
 type Config struct {
-	Endpoint     string              `config:"endpoint" validate:"nonzero,required"`
 	DeployBucket bucket              `config:"deploy_bucket" validate:"nonzero,required"`
-	Credentials  awscommon.ConfigAWS `config:"credentials"`
+	Credentials  awscommon.ConfigAWS `config:",inline"`
 }
 
 // maxMegabytes maximums memory that a lambda can use.

@@ -19,14 +19,14 @@ functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 # Configure credentials of Functionbeat while deploying to AWS.
 # Available options:
 # * access_key_id, secret_access_key and/or session_token
-#functionbeat.provider.aws.credentials.access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-#functionbeat.provider.aws.credentials.secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-#functionbeat.provider.aws.credentials.session_token: '${AWS_SESSION_TOKEN:""}'
+#functionbeat.provider.aws.access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+#functionbeat.provider.aws.secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+#functionbeat.provider.aws.session_token: '${AWS_SESSION_TOKEN:""}'
 # * role_arn
-#functionbeat.provider.aws.credentials.role_arn: arn:aws:iam::123456789012:role/test-fnb
+#functionbeat.provider.aws.role_arn: arn:aws:iam::123456789012:role/test-fnb
 # * credential_profile_name and/or shared_credential_file
-#functionbeat.provider.aws.credentials.credential_profile_name: fnb-aws
-#functionbeat.provider.aws.credentials.shared_credential_file: /etc/functionbeat/aws_credentials
+#functionbeat.provider.aws.credential_profile_name: fnb-aws
+#functionbeat.provider.aws.shared_credential_file: /etc/functionbeat/aws_credentials
 
 functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
