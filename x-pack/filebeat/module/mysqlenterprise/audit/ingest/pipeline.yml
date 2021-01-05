@@ -3,6 +3,10 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- remove:
+    field: '@timestamp'
+    ignore_missing: true
+    if: ctx?.mysqlenterprise?.audit?.timestamp != null
 - json:
     field: message
     target_field: mysqlenterprise.audit
@@ -146,7 +150,7 @@ processors:
 - date:
     field: mysqlenterprise.audit.timestamp
     formats:
-    - YYYY-MM-DD HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss
     if: ctx?.mysqlenterprise?.audit?.timestamp != null
 - remove:
     field:
