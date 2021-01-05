@@ -19,7 +19,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,10 +28,6 @@ import (
 )
 
 const debugSelector = "synthexec"
-
-func init() {
-	beater.RegisterJourneyLister(InitSuite)
-}
 
 func InitSuite(ctx context.Context, origSuitePath string, params common.MapStr) (journeyNames []string, err error) {
 	dir, err := ioutil.TempDir("/tmp", "elastic-synthetics-")

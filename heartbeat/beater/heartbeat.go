@@ -171,13 +171,48 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	return nil
 }
 
-// Provide hook to define journey list discovery from x-pack
+var suiteFactory cfgfile.RunnerFactory
+
+func RegisterSuiteFactory(factory cfgfile.RunnerFactory) {
+	suiteFactory = factory
+}
+
+// RunCentralMgmtMonitors loads any central management configured configs.
+func (bt *Heartbeat) RunSuiteMonitors(b *beat.Beat) {
+	monitors := cfgfile.NewRunnerList(management.DebugK, suiteFactory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".suites", monitors)
+}
+
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) ([]string, error)
 
-var mainJourneyLister JourneyLister
+// Provide hook to define journey list discovery from x-pack
+var suiteReloader SuiteReloader
 
-func RegisterJourneyLister(jl JourneyLister) {
-	mainJourneyLister = jl
+type SuiteReloader interface {
+	Check(factory *monitors.RunnerFactory) error
+	Run(factory *monitors.RunnerFactory) error
+}
+
+// RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
+func (bt *Heartbeat) RunReloadableSuites(b *beat.Beat) (err error) {
+	// If we are running without XPack this will be nil
+	if suiteReloader == nil {
+		return nil
+	}
+
+	// Check monitor configs
+	if err := suiteReloader.Check(bt.dynamicFactory); err != nil {
+		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
+	}
+
+	// Execute the monitor
+	go suiteReloader.Run(bt.dynamicFactory)
+
+	return nil
+}
+
+func RegisterSuiteReloader(sr SuiteReloader) {
+	suiteReloader = sr
 }
 
 func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
@@ -276,12 +311,6 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	close(bt.done)
-}
-
-type SuiteReloader interface {
-	String() string
-	Check() (bool, error)
-	WorkingPath() string
 }
 
 func NewLocalReloader(origSuitePath string) (*LocalReloader, error) {
