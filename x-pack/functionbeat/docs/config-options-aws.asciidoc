@@ -61,11 +61,8 @@ to deploy.
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
 
-[float]
-[id="{beatname_lc}-endpoint"]
-==== `provider.aws.endpoint`
-
-AWS endpoint to use in the URL template to load functions.
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
