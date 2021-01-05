@@ -91,11 +91,10 @@ processors:
       value: "{{json.eventName}}"
       ignore_failure: true
       ignore_empty_value: true
-  - set:
-      field: "event.action"
-      value: "{{json.eventCategory}}"
+  - rename:
+      field: "json.eventCategory"
+      target_field: "aws.cloudtrail.event_category"
       ignore_failure: true
-      ignore_empty_value: true
   - rename:
       field: "json.awsRegion"
       target_field: "cloud.region"

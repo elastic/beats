@@ -24,7 +24,7 @@ import (
 //  TCP_SENDMSG_LEN  : +4(%sp)
 
 func init() {
-	if err := Registry.AddGuess(&guessTCPSendMsg{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessTCPSendMsg{} }); err != nil {
 		panic(err)
 	}
 }

@@ -56,7 +56,7 @@
         ],
         "log.offset": 0,
         "message": "Firewall Rule 'Inbound SMB Block & Log Private' triggered",
-        "network.direction": "inbound",
+        "network.direction": "ingress",
         "network.type": "ipv4",
         "process.pid": "206158879910",
         "related.ip": [

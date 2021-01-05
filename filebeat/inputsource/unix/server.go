@@ -18,50 +18,69 @@
 package unix
 
 import (
+	"context"
 	"fmt"
 	"net"
-	"os"
-	"os/user"
-	"runtime"
-	"strconv"
 
-	"github.com/pkg/errors"
 	"golang.org/x/net/netutil"
 
-	"github.com/elastic/beats/v7/filebeat/inputsource/common"
+	"github.com/elastic/beats/v7/filebeat/inputsource"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/dgram"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// Server represent a unix server
-type Server struct {
-	*common.Listener
+// Server is run by the input.
+type Server interface {
+	inputsource.Network
+	Run(context.Context) error
+}
 
+// streamServer is a server for reading from Unix stream sockets.
+type streamServer struct {
+	*streaming.Listener
 	config *Config
 }
 
-// New creates a new unix server
-func New(
-	config *Config,
-	factory common.HandlerFactory,
-) (*Server, error) {
-	if factory == nil {
-		return nil, fmt.Errorf("HandlerFactory can't be empty")
-	}
-
-	server := &Server{
-		config: config,
-	}
-	server.Listener = common.NewListener(common.FamilyUnix, config.Path, factory, server.createServer, &common.ListenerConfig{
-		Timeout:        config.Timeout,
-		MaxMessageSize: config.MaxMessageSize,
-		MaxConnections: config.MaxConnections,
-	})
-
-	return server, nil
+// datagramServer is a server for reading from Unix datagram sockets.
+type datagramServer struct {
+	*dgram.Listener
+	config *Config
 }
 
-func (s *Server) createServer() (net.Listener, error) {
-	if err := s.cleanupStaleSocket(); err != nil {
+// New creates a new unix server.
+func New(log *logp.Logger, config *Config, nf inputsource.NetworkFunc) (Server, error) {
+	switch config.SocketType {
+	case StreamSocket:
+		splitFunc := streaming.SplitFunc([]byte(config.LineDelimiter))
+		if splitFunc == nil {
+			return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+		}
+		factory := streaming.SplitHandlerFactory(inputsource.FamilyUnix, log, MetadataCallback, nf, splitFunc)
+		server := &streamServer{config: config}
+		server.Listener = streaming.NewListener(inputsource.FamilyUnix, config.Path, factory, server.createServer, &streaming.ListenerConfig{
+			Timeout:        config.Timeout,
+			MaxMessageSize: config.MaxMessageSize,
+			MaxConnections: config.MaxConnections,
+		})
+		return server, nil
+
+	case DatagramSocket:
+		server := &datagramServer{config: config}
+		factory := dgram.DatagramReaderFactory(inputsource.FamilyUnix, log, nf)
+		server.Listener = dgram.NewListener(inputsource.FamilyUnix, config.Path, factory, server.createConn, &dgram.ListenerConfig{
+			Timeout:        config.Timeout,
+			MaxMessageSize: config.MaxMessageSize,
+		})
+		return server, nil
+
+	default:
+	}
+	return nil, fmt.Errorf("unknown unix server type")
+}
+
+func (s *streamServer) createServer() (net.Listener, error) {
+	if err := cleanupStaleSocket(s.config.Path); err != nil {
 		return nil, err
 	}
 
@@ -70,11 +89,11 @@ func (s *Server) createServer() (net.Listener, error) {
 		return nil, err
 	}
 
-	if err := s.setSocketOwnership(); err != nil {
+	if err := setSocketOwnership(s.config.Path, s.config.Group); err != nil {
 		return nil, err
 	}
 
-	if err := s.setSocketMode(); err != nil {
+	if err := setSocketMode(s.config.Path, s.config.Mode); err != nil {
 		return nil, err
 	}
 
@@ -84,68 +103,26 @@ func (s *Server) createServer() (net.Listener, error) {
 	return l, nil
 }
 
-func (s *Server) cleanupStaleSocket() error {
-	path := s.config.Path
-	info, err := os.Lstat(path)
+func (s *datagramServer) createConn() (net.PacketConn, error) {
+	if err := cleanupStaleSocket(s.config.Path); err != nil {
+		return nil, err
+	}
+
+	addr, err := net.ResolveUnixAddr("unixgram", s.config.Path)
 	if err != nil {
-		// If the file does not exist, then the cleanup can be considered successful.
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return errors.Wrapf(err, "cannot lstat unix socket file at location %s", path)
+		return nil, err
 	}
-
-	if runtime.GOOS != "windows" {
-		// see https://github.com/golang/go/issues/33357 for context on Windows socket file attributes bug
-		if info.Mode()&os.ModeSocket == 0 {
-			return fmt.Errorf("refusing to remove file at location %s, it is not a socket", path)
-		}
-	}
-
-	if err := os.Remove(path); err != nil {
-		return errors.Wrapf(err, "cannot remove existing unix socket file at location %s", path)
-	}
-
-	return nil
-}
-
-func (s *Server) setSocketOwnership() error {
-	if s.config.Group != nil {
-		if runtime.GOOS == "windows" {
-			logp.NewLogger("unix").Warn("windows does not support the 'group' configuration option, ignoring")
-			return nil
-		}
-		g, err := user.LookupGroup(*s.config.Group)
-		if err != nil {
-			return err
-		}
-		gid, err := strconv.Atoi(g.Gid)
-		if err != nil {
-			return err
-		}
-		return os.Chown(s.config.Path, -1, gid)
-	}
-	return nil
-}
-
-func (s *Server) setSocketMode() error {
-	if s.config.Mode != nil {
-		mode, err := parseFileMode(*s.config.Mode)
-		if err != nil {
-			return err
-		}
-		return os.Chmod(s.config.Path, mode)
-	}
-	return nil
-}
-
-func parseFileMode(mode string) (os.FileMode, error) {
-	parsed, err := strconv.ParseUint(mode, 8, 32)
+	conn, err := net.ListenUnixgram("unixgram", addr)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	if parsed > 0777 {
-		return 0, errors.New("invalid file mode")
+
+	if err := setSocketOwnership(s.config.Path, s.config.Group); err != nil {
+		return nil, err
 	}
-	return os.FileMode(parsed), nil
+
+	if err := setSocketMode(s.config.Path, s.config.Mode); err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

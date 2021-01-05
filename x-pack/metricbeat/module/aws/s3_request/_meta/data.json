@@ -5,32 +5,32 @@
             "namespace": "AWS/S3"
         },
         "dimensions": {
-            "BucketName": "test-ks-1",
-            "FilterId": "EntireBucket"
+            "FilterId": "request-metrics"
         },
         "s3": {
-            "metrics": {
-                "4xxErrors": {
-                    "avg": 0
+            "bucket": {
+                "name": "test-ks-1"
+            }
+        },
+        "s3_request": {
+            "errors": {
+                "4xx": 0,
+                "5xx": 0
+            },
+            "latency": {
+                "first_byte": {
+                    "ms": 47.25
                 },
-                "5xxErrors": {
-                    "avg": 0
-                },
-                "AllRequests": {
-                    "avg": 1
-                },
-                "BytesUploaded": {
-                    "avg": 684
-                },
-                "FirstByteLatency": {
-                    "avg": 21.791666666666668
-                },
-                "PutRequests": {
-                    "avg": 1
-                },
-                "TotalRequestLatency": {
-                    "avg": 35.916666666666664
+                "total_request": {
+                    "ms": 57.75
                 }
+            },
+            "requests": {
+                "put": 1,
+                "total": 1
+            },
+            "uploaded": {
+                "bytes": 463
             }
         }
     },

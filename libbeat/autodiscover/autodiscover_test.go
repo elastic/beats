@@ -72,7 +72,10 @@ type mockAdapter struct {
 }
 
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-func (m *mockAdapter) CreateConfig(bus.Event) ([]*common.Config, error) {
+func (m *mockAdapter) CreateConfig(event bus.Event) ([]*common.Config, error) {
+	if cfgs, ok := event["config"]; ok {
+		return cfgs.([]*common.Config), nil
+	}
 	return m.configs, nil
 }
 
@@ -84,7 +87,6 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	c.Unpack(&config)
 
 	if config.Broken {
-		fmt.Println("broken")
 		return fmt.Errorf("Broken config")
 	}
 

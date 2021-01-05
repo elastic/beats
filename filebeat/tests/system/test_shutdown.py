@@ -1,5 +1,6 @@
 import gzip
 import os
+import platform
 import time
 import unittest
 from filebeat import BaseTest
@@ -11,6 +12,8 @@ Tests that Filebeat shuts down cleanly.
 
 class Test(BaseTest):
 
+    @unittest.skipIf(platform.platform().startswith("Windows-7"),
+                     "Flaky test: https://github.com/elastic/beats/issues/22795")
     def test_shutdown(self):
         """
         Test starting and stopping Filebeat under load.

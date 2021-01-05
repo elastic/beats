@@ -546,7 +546,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
-      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: User Requested."
+      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: %{event.reason}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"
@@ -723,6 +723,7 @@ processors:
         EgressZone:
           target: egress_zone
           id: ["430001", "430002", "430003"]
+          ecs: [observer.egress.zone]
         Endpoint Profile:
           target: endpoint_profile
           id: ["430002", "430003"]
@@ -795,6 +796,7 @@ processors:
         IngressZone:
           target: ingress_zone
           id: ["430001", "430002", "430003"]
+          ecs: [observer.ingress.zone]
         InitiatorBytes:
           target: initiator_bytes
           id: ["430003"]
@@ -1390,6 +1392,70 @@ processors:
       value: "{{_temp_.cisco.mapped_destination_port}}"
       if: "ctx?._temp_?.cisco?.mapped_destination_port != ctx?.destination?.port"
       ignore_empty_value: true
+  #
+  # Zone-based Network Directionality
+  #
+  # If external and internal zones are specified and our ingress/egress zones are
+  # populated, then we can classify traffic directionality based off of our defined
+  # zones rather than the logs.
+  - set:
+      field: network.direction
+      value: inbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+  - set:
+      field: network.direction
+      value: outbound
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: internal
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: external
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+        ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
+  - set:
+      field: network.direction
+      value: unknown
+      if: >
+        ctx?._temp_?.external_zones != null &&
+        ctx?._temp_?.internal_zones != null &&
+        ctx?.observer?.egress?.zone != null &&
+        ctx?.observer?.ingress?.zone != null &&
+        (
+          (
+            !ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+          ) ||
+          (
+            !ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+            !ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+          )
+        )
 
   #
   # Populate ECS event.code

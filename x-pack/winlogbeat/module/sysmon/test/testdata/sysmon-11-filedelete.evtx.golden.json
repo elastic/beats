@@ -26,7 +26,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42F11C3B-C36F-5EB3-2C07-290000000000}",
+      "entity_id": "{42f11c3b-c36f-5eb3-2c07-290000000000}",
       "executable": "C:\\Users\\vagrant\\.gvm\\versions\\go1.13.10.windows.amd64\\bin\\go.exe",
       "hash": {
         "md5": "199e1cf5b2250bd515ecccf4ca686301"
@@ -68,7 +68,7 @@
           "id": 2360
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 612,
       "user": {
@@ -104,7 +104,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42F11C3B-B2B6-5EB3-18AB-000000000000}",
+      "entity_id": "{42f11c3b-b2b6-5eb3-18ab-000000000000}",
       "executable": "C:\\Windows\\System32\\svchost.exe",
       "hash": {
         "sha1": "115106f5b338c87ae6836d50dd890de3da296367"
@@ -140,7 +140,7 @@
           "id": 2360
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
@@ -175,7 +175,7 @@
       "level": "information"
     },
     "process": {
-      "entity_id": "{42F11C3B-4664-5EBA-91AE-000000000000}",
+      "entity_id": "{42f11c3b-4664-5eba-91ae-000000000000}",
       "executable": "C:\\Windows\\system32\\svchost.exe",
       "hash": {
         "md5": "5a9bddf83be530b481f0fd24db28a6ff"
@@ -211,7 +211,7 @@
           "id": 1600
         }
       },
-      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2243,
       "user": {
