@@ -329,24 +329,24 @@ func TestConfigOauth2Validation(t *testing.T) {
 			input: map[string]interface{}{
 				"oauth2": map[string]interface{}{
 					"provider": "google",
-					"google.credentials_json": []byte(`{
+					"google.credentials_json": `{
 						"type":           "service_account",
 						"project_id":     "foo",
 						"private_key_id": "x",
 						"client_email":   "foo@bar.com",
 						"client_id":      "0"
-					}`),
+					}`,
 				},
 				"url": "localhost",
 			},
 		},
 		{
 			name:        "google must fail if credentials_json is not a valid JSON",
-			expectedErr: "invalid configuration: google.credentials_json must be valid JSON accessing 'oauth2'",
+			expectedErr: "the field can't be converted to valid JSON accessing 'oauth2.google.credentials_json'",
 			input: map[string]interface{}{
 				"oauth2": map[string]interface{}{
 					"provider":                "google",
-					"google.credentials_json": []byte(`invalid`),
+					"google.credentials_json": `invalid`,
 				},
 				"url": "localhost",
 			},
