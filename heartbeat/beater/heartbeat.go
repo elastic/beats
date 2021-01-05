@@ -20,6 +20,7 @@ package beater
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"time"
 
 	"github.com/pkg/errors"
@@ -36,6 +37,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+
+
+	dirCopy "github.com/otiai10/copy"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -182,9 +186,47 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 	if mainJourneyLister == nil {
 		return nil
 	}
-	for _, suite := range bt.config.SyntheticSuites {
-		logp.Info("Listing suite %s", suite.Path)
-		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
+	for _, rawSuiteCfg := range bt.config.SyntheticSuites {
+		suite := &config.SyntheticSuite{}
+		err := rawSuiteCfg.Unpack(suite)
+		if err != nil {
+			logp.Err("could not parse suite config: %s", err)
+			continue
+		}
+
+		var suiteReloader SuiteReloader
+
+		switch suite.Type {
+		case "local":
+			localConfig := &config.LocalSyntheticSuite{}
+			err := rawSuiteCfg.Unpack(localConfig)
+			if err != nil {
+				logp.Err("could not parse local synthetic suite: %s", err)
+				continue
+			}
+			suiteReloader, err = NewLocalReloader(localConfig.Path)
+			if err != nil {
+				logp.Err("could not load local synthetics suite: %s", err)
+				continue
+			}
+		case "zipurl":
+			localConfig := &config.LocalSyntheticSuite{}
+			err := rawSuiteCfg.Unpack(localConfig)
+			if err != nil {
+				logp.Err("could not parse zip URL synthetic suite: %s", err)
+				continue
+			}
+		case "github":
+			localConfig := &config.LocalSyntheticSuite{}
+			err := rawSuiteCfg.Unpack(localConfig)
+			if err != nil {
+				logp.Err("could not parse github synthetic suite: %s", err)
+				continue
+			}
+		}
+
+		logp.Info("Listing suite %s", suiteReloader.WorkingPath())
+		journeyNames, err := mainJourneyLister(context.TODO(), suiteReloader.WorkingPath(), suite.Params)
 		if err != nil {
 			return err
 		}
@@ -192,7 +234,7 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 		for _, name := range journeyNames {
 			cfg, err := common.NewConfigFrom(map[string]interface{}{
 				"type":         "browser",
-				"path":         suite.Path,
+				"path":         suiteReloader.WorkingPath(),
 				"schedule":     suite.Schedule,
 				"params":       suite.Params,
 				"journey_name": name,
@@ -232,3 +274,65 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 func (bt *Heartbeat) Stop() {
 	close(bt.done)
 }
+
+type SuiteReloader interface {
+	String() string
+	Check() (bool, error)
+	WorkingPath() string
+}
+
+func NewLocalReloader(origSuitePath string) (*LocalReloader, error) {
+	dir, err := ioutil.TempDir("/tmp", "elastic-synthetics-")
+	if err != nil {
+		return nil, err
+	}
+
+	err = dirCopy.Copy(origSuitePath, dir)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LocalReloader{workPath: origSuitePath}, nil
+}
+
+type LocalReloader struct {
+	origPath string
+	workPath string
+}
+
+func (l *LocalReloader) String() string {
+	return fmt.Sprintf("[Local Synthetics Suite origPath=%s workingPath=%s]", l.origPath, l.WorkingPath())
+}
+
+// Only loads once on startup, no rechecks
+func (l *LocalReloader) Check() (bool, error) {
+	return false, nil
+}
+
+func (l *LocalReloader) WorkingPath() string {
+	return l.workPath
+}
+
+func NewZipURLReloader(url string, headers map[string]string) (*ZipURLReloader, error) {
+	return &ZipURLReloader{URL: url, Headers: headers}, nil
+}
+
+type ZipURLReloader struct {
+	URL string
+	Headers map[string]string
+	etag string // used to determine if the URL contents has changed
+	workingPath string
+}
+
+func (z *ZipURLReloader) String() string {
+	return fmt.Sprintf("[ZipURL Synthetics suite url=%s workingPath=%s]", z.URL, z.workingPath)
+}
+
+func (z *ZipURLReloader) Check() (bool, error) {
+	panic("implement me")
+}
+
+func (z *ZipURLReloader) WorkingPath() string {
+	panic("implement me")
+}
+
