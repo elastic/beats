@@ -21,8 +21,8 @@ type Summary struct {
 	Node struct {
 		CPU struct {
 			Time                 string `json:"time"`
-			UsageCoreNanoSeconds uint64  `json:"usageCoreNanoSeconds"`
-			UsageNanoCores       uint64  `json:"usageNanoCores"`
+			UsageCoreNanoSeconds uint64 `json:"usageCoreNanoSeconds"`
+			UsageNanoCores       uint64 `json:"usageNanoCores"`
 		} `json:"cpu"`
 		Fs struct {
 			AvailableBytes uint64 `json:"availableBytes"`
@@ -33,20 +33,20 @@ type Summary struct {
 			UsedBytes      uint64 `json:"usedBytes"`
 		} `json:"fs"`
 		Memory struct {
-			AvailableBytes  uint64  `json:"availableBytes"`
-			MajorPageFaults uint64  `json:"majorPageFaults"`
-			PageFaults      uint64  `json:"pageFaults"`
-			RssBytes        uint64  `json:"rssBytes"`
+			AvailableBytes  uint64 `json:"availableBytes"`
+			MajorPageFaults uint64 `json:"majorPageFaults"`
+			PageFaults      uint64 `json:"pageFaults"`
+			RssBytes        uint64 `json:"rssBytes"`
 			Time            string `json:"time"`
-			UsageBytes      uint64  `json:"usageBytes"`
-			WorkingSetBytes uint64  `json:"workingSetBytes"`
+			UsageBytes      uint64 `json:"usageBytes"`
+			WorkingSetBytes uint64 `json:"workingSetBytes"`
 		} `json:"memory"`
 		Network struct {
-			RxBytes  uint64  `json:"rxBytes"`
-			RxErrors uint64  `json:"rxErrors"`
+			RxBytes  uint64 `json:"rxBytes"`
+			RxErrors uint64 `json:"rxErrors"`
 			Time     string `json:"time"`
-			TxBytes  uint64  `json:"txBytes"`
-			TxErrors uint64  `json:"txErrors"`
+			TxBytes  uint64 `json:"txBytes"`
+			TxErrors uint64 `json:"txErrors"`
 		} `json:"network"`
 		NodeName string `json:"nodeName"`
 		Runtime  struct {
@@ -60,16 +60,16 @@ type Summary struct {
 		SystemContainers []struct {
 			CPU struct {
 				Time                 string `json:"time"`
-				UsageCoreNanoSeconds uint64  `json:"usageCoreNanoSeconds"`
-				UsageNanoCores       uint64  `json:"usageNanoCores"`
+				UsageCoreNanoSeconds uint64 `json:"usageCoreNanoSeconds"`
+				UsageNanoCores       uint64 `json:"usageNanoCores"`
 			} `json:"cpu"`
 			Memory struct {
-				MajorPageFaults uint64  `json:"majorPageFaults"`
-				PageFaults      uint64  `json:"pageFaults"`
-				RssBytes        uint64  `json:"rssBytes"`
+				MajorPageFaults uint64 `json:"majorPageFaults"`
+				PageFaults      uint64 `json:"pageFaults"`
+				RssBytes        uint64 `json:"rssBytes"`
 				Time            string `json:"time"`
-				UsageBytes      uint64  `json:"usageBytes"`
-				WorkingSetBytes uint64  `json:"workingSetBytes"`
+				UsageBytes      uint64 `json:"usageBytes"`
+				WorkingSetBytes uint64 `json:"workingSetBytes"`
 			} `json:"memory"`
 			Name               string      `json:"name"`
 			StartTime          string      `json:"startTime"`
@@ -80,8 +80,8 @@ type Summary struct {
 		Containers []struct {
 			CPU struct {
 				Time                 string `json:"time"`
-				UsageCoreNanoSeconds uint64  `json:"usageCoreNanoSeconds"`
-				UsageNanoCores       uint64  `json:"usageNanoCores"`
+				UsageCoreNanoSeconds uint64 `json:"usageCoreNanoSeconds"`
+				UsageNanoCores       uint64 `json:"usageNanoCores"`
 			} `json:"cpu"`
 			Logs struct {
 				AvailableBytes uint64 `json:"availableBytes"`
@@ -92,13 +92,13 @@ type Summary struct {
 				UsedBytes      uint64 `json:"usedBytes"`
 			} `json:"logs"`
 			Memory struct {
-				AvailableBytes  uint64  `json:"availableBytes"`
-				MajorPageFaults uint64  `json:"majorPageFaults"`
-				PageFaults      uint64  `json:"pageFaults"`
-				RssBytes        uint64  `json:"rssBytes"`
+				AvailableBytes  uint64 `json:"availableBytes"`
+				MajorPageFaults uint64 `json:"majorPageFaults"`
+				PageFaults      uint64 `json:"pageFaults"`
+				RssBytes        uint64 `json:"rssBytes"`
 				Time            string `json:"time"`
-				UsageBytes      uint64  `json:"usageBytes"`
-				WorkingSetBytes uint64  `json:"workingSetBytes"`
+				UsageBytes      uint64 `json:"usageBytes"`
+				WorkingSetBytes uint64 `json:"workingSetBytes"`
 			} `json:"memory"`
 			Name   string `json:"name"`
 			Rootfs struct {
@@ -111,11 +111,11 @@ type Summary struct {
 			UserDefinedMetrics interface{} `json:"userDefinedMetrics"`
 		} `json:"containers"`
 		Network struct {
-			RxBytes  uint64  `json:"rxBytes"`
-			RxErrors uint64  `json:"rxErrors"`
+			RxBytes  uint64 `json:"rxBytes"`
+			RxErrors uint64 `json:"rxErrors"`
 			Time     string `json:"time"`
-			TxBytes  uint64  `json:"txBytes"`
-			TxErrors uint64  `json:"txErrors"`
+			TxBytes  uint64 `json:"txBytes"`
+			TxErrors uint64 `json:"txErrors"`
 		} `json:"network"`
 		PodRef struct {
 			Name      string `json:"name"`
@@ -124,13 +124,13 @@ type Summary struct {
 		} `json:"podRef"`
 		StartTime string `json:"startTime"`
 		Volume    []struct {
-			AvailableBytes uint64  `json:"availableBytes"`
-			CapacityBytes  uint64  `json:"capacityBytes"`
-			Inodes         uint64  `json:"inodes"`
-			InodesFree     uint64  `json:"inodesFree"`
-			InodesUsed     uint64  `json:"inodesUsed"`
+			AvailableBytes uint64 `json:"availableBytes"`
+			CapacityBytes  uint64 `json:"capacityBytes"`
+			Inodes         uint64 `json:"inodes"`
+			InodesFree     uint64 `json:"inodesFree"`
+			InodesUsed     uint64 `json:"inodesUsed"`
 			Name           string `json:"name"`
-			UsedBytes      uint64  `json:"usedBytes"`
+			UsedBytes      uint64 `json:"usedBytes"`
 		} `json:"volume"`
 	} `json:"pods"`
 }
