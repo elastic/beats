@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -167,4 +168,26 @@ func InClusterNamespace() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(data)), nil
+}
+
+// DiscoverPodInstanceNumber tries in a best effort manner to use the Pod's hostname to discover what is the instance in an
+// N sized stateful set it is.
+func DiscoverPodInstanceNumber() (int, bool) {
+	instance := -1
+	pod, _ := os.Hostname()
+	i := strings.LastIndex(pod, "-")
+
+	if i != -1 {
+		ins := pod[i+1:]
+		var err error
+		instance, err = strconv.Atoi(ins)
+
+		if err != nil {
+			return -1, false
+		}
+
+		return instance, true
+	}
+
+	return instance, false
 }

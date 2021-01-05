@@ -32,6 +32,8 @@ type shardedListWatch struct {
 	instance uint64
 }
 
+// NewShardedListWatch creates a kubernetes ListerWatcher that can take an instance number and total number of instances
+// as input and use them to return a moded subset of the lists and watches that the client sees based on the instance number.
 func NewShardedListWatch(instance int, count int, lw cache.ListerWatcher) cache.ListerWatcher {
 	if count == 0 {
 		return lw
