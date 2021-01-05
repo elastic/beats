@@ -35,5 +35,9 @@ processors:
         }
 on_failure:
   - append:
-        field: error.message
-        value: "{{ _ingest.on_failure_message }}"
+      field: error.message
+      value: >-
+        error in DNS v1 pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}
