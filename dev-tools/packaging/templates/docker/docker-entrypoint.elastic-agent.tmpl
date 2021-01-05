@@ -50,8 +50,8 @@ function enroll(){
       if [ $exitCode -ne 0 ]; then
         exit $exitCode
       fi
+      apikey=$(echo $enrollResp | jq -r '.item.api_key')
     fi
-    apikey=$(echo $enrollResp | jq -r '.item.api_key')
     echo $apikey
 
     if [[ -n "${FLEET_ENROLL_INSECURE}" ]] && [[ ${FLEET_ENROLL_INSECURE} == 1 ]]; then

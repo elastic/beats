@@ -59,6 +59,7 @@ LABEL \
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
+ENV GODEBUG="madvdontneed=1"
 
 # Add an init process, check the checksum to make sure it's a match
 RUN set -e ; \
@@ -88,6 +89,11 @@ USER {{ .user }}
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
 {{- end }}
+
+# When running under Docker, we must ensure libbeat monitoring pulls cgroup
+# metrics from /sys/fs/cgroup/<subsystem>/, ignoring any paths found in
+# /proc/self/cgroup.
+ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]

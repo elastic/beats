@@ -21,6 +21,7 @@ package metrics
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,6 +36,11 @@ var (
 	beatProcessStats *process.Stats
 	systemMetrics    *monitoring.Registry
 )
+
+// libbeatMonitoringCgroupsHierarchyOverride is an undocumented environment variable which
+// overrides the cgroups path under /sys/fs/cgroup, which should be set to "/" when running
+// Beats under Docker.
+const libbeatMonitoringCgroupsHierarchyOverride = "LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE"
 
 func init() {
 	systemMetrics = monitoring.Default.NewRegistry("system")
@@ -258,7 +264,7 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
+	monitoring.ReportInt(V, "cores", int64(runtime.NumCPU()))
 }
 
 func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
@@ -278,7 +284,10 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 		return
 	}
 
-	cgroups, err := cgroup.NewReader("", true)
+	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		IgnoreRootCgroups:        true,
+		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
+	})
 	if err != nil {
 		if err == cgroup.ErrCgroupsMissing {
 			logp.Warn("cgroup data collection disabled: %v", err)
