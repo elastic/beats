@@ -24,6 +24,14 @@ type Config struct {
 	Credentials  awscommon.ConfigAWS `config:",inline"`
 }
 
+func DefaultConfig() *Config {
+	return &Config{
+		Credentials: awscommon.ConfigAWS{
+			Endpoint: "s3.amazonaws.com",
+		},
+	}
+}
+
 // maxMegabytes maximums memory that a lambda can use.
 const maxMegabytes = 3008
 

@@ -210,7 +210,7 @@ func NewCLI(
 	cfg *common.Config,
 	provider provider.Provider,
 ) (provider.CLIManager, error) {
-	config := &fnaws.Config{}
+	config := fnaws.DefaultConfig()
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
 	}
