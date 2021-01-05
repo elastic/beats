@@ -66,7 +66,6 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
-	fmt.Println(config.Sharding)
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,

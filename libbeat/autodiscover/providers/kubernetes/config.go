@@ -21,11 +21,9 @@ package kubernetes
 
 import (
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -126,6 +124,11 @@ func (c *Config) Validate() error {
 			c.Sharding.Count = 0
 			c.Sharding.Instance = -1
 		} else {
+			// Validate if instance is within the total number of shards being reported by `count`.
+			if c.Sharding.Instance > c.Sharding.Count-1 {
+				return fmt.Errorf("instance can't be greater that the total number of shards - 1 but has value %d", c.Sharding.Instance)
+			}
+
 			// Ensure that if a user decides to run cluster mode sharded Beats, then each instance and its replica do leader election.
 			if c.Unique && c.LeaderLease != "" {
 				c.LeaderLease = fmt.Sprintf("%s-%d", c.LeaderLease, c.Sharding.Instance)
@@ -133,25 +136,13 @@ func (c *Config) Validate() error {
 
 			// On a best effort try to get the sharded instance from the pod name if deployed as a statefulset
 			if c.Sharding.Instance == -1 {
-				pod, _ := os.Hostname()
-				i := strings.LastIndex(pod, "-")
-
-				if i != -1 {
-					ins := pod[i+1:]
-					var err error
-					c.Sharding.Instance, err = strconv.Atoi(ins)
-
-					if err != nil {
-						return fmt.Errorf("unable to determine `instance` number. `instance` is either derived from a statefulset pod or defined explicitly on the config")
-					}
+				var ok bool
+				c.Sharding.Instance, ok = kubernetes.DiscoverPodInstanceNumber()
+				if !ok {
+					return fmt.Errorf("unable to determine `instance` number. `instance` is either derived from a statefulset pod or defined explicitly on the config")
 				}
 			}
-
-			if c.Sharding.Instance > c.Sharding.Count-1 {
-				return fmt.Errorf("instance can't be greater that the total number of shards - 1 but has value %d", c.Sharding.Instance)
-			}
 		}
-
 	}
 
 	if c.Unique && c.Scope != "cluster" {
