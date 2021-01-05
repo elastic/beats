@@ -6,6 +6,7 @@ heartbeat.config.monitors:
 
 heartbeat.synthetic_suites:
 - name: Todos suite
+  type: "local"
   path: "/home/andrewvc/projects/synthetics/examples/todos"
   schedule: "@every 1m"
 
@@ -16,6 +17,7 @@ heartbeat.monitors:
   schedule: "@every 15s"
   name: Simple HTTP
 - type: browser
+  enabled: false
   id: my-monitor
   name: My Monitor
   script: |-

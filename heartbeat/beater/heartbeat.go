@@ -103,7 +103,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 			return err
 		}
 	}
-
 	if len(bt.config.SyntheticSuites) > 0 {
 		err := bt.RunSyntheticSuiteMonitors(b)
 		if err != nil {
@@ -197,18 +196,6 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 		var suiteReloader SuiteReloader
 
 		switch suite.Type {
-		case "local":
-			localConfig := &config.LocalSyntheticSuite{}
-			err := rawSuiteCfg.Unpack(localConfig)
-			if err != nil {
-				logp.Err("could not parse local synthetic suite: %s", err)
-				continue
-			}
-			suiteReloader, err = NewLocalReloader(localConfig.Path)
-			if err != nil {
-				logp.Err("could not load local synthetics suite: %s", err)
-				continue
-			}
 		case "zipurl":
 			localConfig := &config.LocalSyntheticSuite{}
 			err := rawSuiteCfg.Unpack(localConfig)
@@ -223,13 +210,29 @@ func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 				logp.Err("could not parse github synthetic suite: %s", err)
 				continue
 			}
+		case "local":
+			localConfig := &config.LocalSyntheticSuite{}
+			err := rawSuiteCfg.Unpack(localConfig)
+			if err != nil {
+				logp.Err("could not parse local synthetic suite: %s", err)
+				continue
+			}
+			suiteReloader, err = NewLocalReloader(localConfig.Path)
+			if err != nil {
+				logp.Err("could not load local synthetics suite: %s", err)
+				continue
+			}
+		default:
+			return fmt.Errorf("suite type not specified! Expected 'local', 'github', or 'zipurl'")
 		}
 
+		logp.Warn("PRELIST %v", suiteReloader)
 		logp.Info("Listing suite %s", suiteReloader.WorkingPath())
 		journeyNames, err := mainJourneyLister(context.TODO(), suiteReloader.WorkingPath(), suite.Params)
 		if err != nil {
 			return err
 		}
+		logp.Warn("POSTLIST")
 		factory := monitors.NewFactory(b.Info, bt.scheduler, false)
 		for _, name := range journeyNames {
 			cfg, err := common.NewConfigFrom(map[string]interface{}{
