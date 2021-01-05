@@ -67,6 +67,12 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	}
 
 	c.log.Debugf("Using cloudformation template:\n%s", templateData.json)
+
+	_, err = c.awsCfg.Credentials.Retrieve()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+	}
+
 	svcCF := cf.New(c.awsCfg)
 
 	executer := executor.NewExecutor(c.log)
@@ -144,6 +150,11 @@ func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("Removing function: %s", name)
 	defer c.log.Debugf("Removal of function '%s' complete", name)
 
+	_, err := c.awsCfg.Credentials.Retrieve()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+	}
+
 	svc := cf.New(c.awsCfg)
 	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
@@ -206,11 +217,6 @@ func NewCLI(
 	awsCfg, err := awscommon.GetAWSCredentials(config.Credentials)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
-	}
-
-	_, err = awsCfg.Credentials.Retrieve()
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
 
 	builder, err := provider.TemplateBuilder()
