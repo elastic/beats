@@ -1,7 +1,7 @@
 [id="configuration-{beatname_lc}-options"]
 [role="xpack"]
 
-:libbeat-xpack-dir: ../../../../x-pack/libbeat
+:libbeat-xpack-dir: ../../../x-pack/libbeat
 
 == Configure AWS functions
 
@@ -63,9 +63,6 @@ to deploy.
 
 TIP: If you change the configuration after deploying the function, use
 the <<update-command,`update` command>> to update your deployment.
-
-[id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 [float]
 [id="{beatname_lc}-deploy-bucket"]
@@ -217,3 +214,6 @@ version and the event timestamp; for access to dynamic fields, use
 
 Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
 expand to `"functionbeat-myindex-2019.12.13"`.
+
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
