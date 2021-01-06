@@ -32,6 +32,13 @@ func DefaultConfig() *Config {
 	}
 }
 
+func (c *Config) Validate() error {
+	if c.Credentials.Endpoint == "" {
+		return fmt.Errorf("functionbeat.providers.aws.enpoint cannot be empty")
+	}
+	return nil
+}
+
 // maxMegabytes maximums memory that a lambda can use.
 const maxMegabytes = 3008
 

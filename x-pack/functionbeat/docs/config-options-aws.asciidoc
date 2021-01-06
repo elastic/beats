@@ -1,5 +1,8 @@
 [id="configuration-{beatname_lc}-options"]
 [role="xpack"]
+
+:libbeat-xpack-dir: ../../../../x-pack/libbeat
+
 == Configure AWS functions
 
 ++++
