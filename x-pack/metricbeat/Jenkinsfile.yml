@@ -19,7 +19,7 @@ stages:
           make -C x-pack/metricbeat update;
           make check-no-changes;
     unitTest:
-        make: "mage build unitTest"
+        mage: "mage build unitTest"
     cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
