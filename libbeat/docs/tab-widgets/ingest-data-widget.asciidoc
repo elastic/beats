@@ -1,0 +1,40 @@
+++++
+<div class="tabs" data-tab-group="ingest-data">
+  <div role="tablist" aria-label="Ingest data">
+    <button role="tab"
+            aria-selected="true"
+            aria-controls="use-modules-tab"
+            id="use-modules">
+      Data collection modules
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="application-logs-tab"
+            id="application-logs"
+            tabindex="-1">
+      Application logs
+    </button>
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="use-modules-tab"
+       aria-labelledby="use-modules">
+++++
+
+include::ingest-data.asciidoc[tag=modules]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="application-logs-tab"
+       aria-labelledby="application-logs"
+       hidden="">
+++++
+
+include::ingest-data.asciidoc[tag=application-logs]
+
+++++
+  </div>
+</div>
+++++
