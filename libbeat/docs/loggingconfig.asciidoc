@@ -153,10 +153,11 @@ endif::serverless[]
 [float]
 ==== `logging.metrics.enabled`
 
-If enabled, {beatname_uc} periodically logs its internal metrics that have
+By default, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
 value at the beginning of the period is logged. Also, the total values for all
-non-zero internal metrics are logged on shutdown. The default is true.
+non-zero internal metrics are logged on shutdown. Set this to false to disable 
+this behavior. The default is true.
 
 Here is an example log line:
 
