@@ -179,41 +179,14 @@ func RegisterSuiteFactory(factory cfgfile.RunnerFactory) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunSuiteMonitors(b *beat.Beat) {
+	if suiteFactory == nil {
+		return
+	}
 	monitors := cfgfile.NewRunnerList(management.DebugK, suiteFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".suites", monitors)
 }
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) ([]string, error)
-
-// Provide hook to define journey list discovery from x-pack
-var suiteReloader SuiteReloader
-
-type SuiteReloader interface {
-	Check(factory *monitors.RunnerFactory) error
-	Run(factory *monitors.RunnerFactory) error
-}
-
-// RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunReloadableSuites(b *beat.Beat) (err error) {
-	// If we are running without XPack this will be nil
-	if suiteReloader == nil {
-		return nil
-	}
-
-	// Check monitor configs
-	if err := suiteReloader.Check(bt.dynamicFactory); err != nil {
-		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
-	}
-
-	// Execute the monitor
-	go suiteReloader.Run(bt.dynamicFactory)
-
-	return nil
-}
-
-func RegisterSuiteReloader(sr SuiteReloader) {
-	suiteReloader = sr
-}
 
 func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
 	// If we are running without XPack this will be nil
