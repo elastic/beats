@@ -57,9 +57,6 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	header := http.Header{}
 	header.Set("Accept", "application/json")
 	header.Set("User-Agent", userAgent)
-	if rf.method == "POST" {
-		header.Set("Content-Type", "application/json")
-	}
 	req.setHeader(header)
 
 	var err error
@@ -109,19 +106,29 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 	}
 
 	var body []byte
-	if len(trReq.body()) > 0 {
-		switch rf.method {
-		case "POST":
+	url := trReq.url()
+	if rf.method == "POST" {
+		if len(trReq.body()) > 0 && url.RawQuery == "" {
 			body, err = json.Marshal(trReq.body())
 			if err != nil {
 				return nil, err
 			}
-		default:
-			rf.log.Errorf("A body is set, but method is not POST. The body will be ignored.")
+			header := trReq.header()
+			header.Set("Content-Type", "application/json")
+			trReq.setHeader(header)
+		} else if len(trReq.body()) == 0 && url.RawQuery != "" {
+			body = []byte(url.RawQuery)
+			url.RawQuery = ""
+			header := trReq.header()
+			header.Set("Content-Type", "application/x-www-form-urlencoded")
+			trReq.setHeader(header)
+		} else if len(trReq.body()) > 0 && url.RawQuery != "" {
+			rf.log.Errorf("Method is POST, only body or params can be set not both")
+		} else {
+			rf.log.Debugf("Method is POST, but no body or params set")
 		}
 	}
 
-	url := trReq.url()
 	req, err := http.NewRequest(rf.method, url.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
