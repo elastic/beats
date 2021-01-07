@@ -27909,7 +27909,7 @@ CPU usage metrics
 Container CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -27919,7 +27919,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -27961,7 +27961,7 @@ Logs info
 Logs available capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27974,7 +27974,7 @@ format: bytes
 Logs total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27987,7 +27987,7 @@ format: bytes
 Logs used capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28000,7 +28000,7 @@ format: bytes
 Total available inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28010,7 +28010,7 @@ type: long
 Total free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28020,7 +28020,7 @@ type: long
 Total used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28032,7 +28032,7 @@ type: long
 Total available memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28045,7 +28045,7 @@ format: bytes
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28082,7 +28082,7 @@ format: percent
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28095,7 +28095,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28107,7 +28107,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28117,7 +28117,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28129,7 +28129,7 @@ type: long
 Root filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28142,7 +28142,7 @@ format: bytes
 Root filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28155,7 +28155,7 @@ format: bytes
 Root filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28168,7 +28168,7 @@ format: bytes
 Used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28749,7 +28749,7 @@ CPU usage metrics
 Node CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -28759,7 +28759,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -28771,7 +28771,7 @@ type: long
 Total available memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28784,7 +28784,7 @@ format: bytes
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28797,7 +28797,7 @@ format: bytes
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28810,7 +28810,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28822,7 +28822,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28832,7 +28832,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28844,7 +28844,7 @@ type: long
 Received bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28856,7 +28856,7 @@ format: bytes
 Rx errors
 
 
-type: long
+type: double
 
 --
 
@@ -28867,7 +28867,7 @@ type: long
 Transmitted bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28879,7 +28879,7 @@ format: bytes
 Tx errors
 
 
-type: long
+type: double
 
 --
 
@@ -28891,7 +28891,7 @@ type: long
 Filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28904,7 +28904,7 @@ format: bytes
 Filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28917,7 +28917,7 @@ format: bytes
 Filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28930,7 +28930,7 @@ format: bytes
 Number of used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28940,7 +28940,7 @@ type: long
 Number of inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28950,7 +28950,7 @@ type: long
 Number of free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -28963,7 +28963,7 @@ type: long
 Image filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28976,7 +28976,7 @@ format: bytes
 Image filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28989,7 +28989,7 @@ format: bytes
 Image filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29020,7 +29020,7 @@ type: date
 Received bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29032,7 +29032,7 @@ format: bytes
 Rx errors
 
 
-type: long
+type: double
 
 --
 
@@ -29043,7 +29043,7 @@ type: long
 Transmitted bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29055,7 +29055,7 @@ format: bytes
 Tx errors
 
 
-type: long
+type: double
 
 --
 
@@ -29073,7 +29073,7 @@ CPU usage metrics
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -29109,7 +29109,7 @@ format: percent
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29146,7 +29146,7 @@ format: percent
 Total memory available
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29159,7 +29159,7 @@ format: bytes
 Total working set memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29172,7 +29172,7 @@ format: bytes
 Total resident set size memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29184,7 +29184,7 @@ format: bytes
 Total page faults
 
 
-type: long
+type: double
 
 --
 
@@ -29194,7 +29194,7 @@ type: long
 Total major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -30768,7 +30768,7 @@ CPU usage metrics
 CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -30778,7 +30778,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -30790,7 +30790,7 @@ type: long
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30803,7 +30803,7 @@ format: bytes
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30816,7 +30816,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30828,7 +30828,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -30838,7 +30838,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -30867,7 +30867,7 @@ type: keyword
 Filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30880,7 +30880,7 @@ format: bytes
 Filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30893,7 +30893,7 @@ format: bytes
 Filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -30906,7 +30906,7 @@ format: bytes
 Used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -30916,7 +30916,7 @@ type: long
 Free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -30926,7 +30926,7 @@ type: long
 Total inodes
 
 
-type: long
+type: double
 
 --
 
