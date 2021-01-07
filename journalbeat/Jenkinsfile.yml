@@ -34,3 +34,6 @@ stages:
             tags: true         ## for all the tags
     unitTest:
         mage: "mage build unitTest"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match

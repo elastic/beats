@@ -34,8 +34,14 @@ stages:
             tags: true         ## for all the tags
     build:
         mage: "mage build test"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
     crosscompile:
         make: "make -C auditbeat crosscompile"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -55,6 +61,9 @@ stages:
             - "windows-2019"
             #- "windows-7-32-bit" https://github.com/elastic/beats/issues/19831
             #- "windows-2008-r2" https://github.com/elastic/beats/issues/19799
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

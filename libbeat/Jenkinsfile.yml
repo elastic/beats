@@ -31,7 +31,16 @@ stages:
                 - "armTest"
     build:
         mage: "mage build test"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
     crosscompile:
         make: "make -C libbeat crosscompile"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
     stress-tests:
         make: "make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests"
+        when:                  ## Override the top-level when.
+            not_changeset:
+                - "^x-pack/.*" ## A generic match
