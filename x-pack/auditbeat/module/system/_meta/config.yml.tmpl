@@ -20,7 +20,7 @@
     - login   # User logins, logouts, and system boots.
     {{- end }}
     - process # Started and stopped processes
-    {{- if and (eq .GOOS "linux") (eq .GOARCH "amd64") }}
+    {{- if and (eq .GOOS "linux") (or (eq .GOARCH "amd64") (eq .GOARCH "386")) }}
     - socket  # Opened and closed sockets
     {{- end }}
     {{- if eq .GOOS "linux" }}
