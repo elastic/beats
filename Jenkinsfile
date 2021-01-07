@@ -36,7 +36,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
-    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
