@@ -82,6 +82,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address and shard ID are required settings in the Cloud Foundry module. {pull}21759[21759]
 - Rename googlecloud module to gcp module. {pull}22246[22246]
 - Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
+- Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
 
 *Packetbeat*
 
@@ -389,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Improve equals check. {pull}22778[22778]
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
+- Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
 
 *Auditbeat*
 
@@ -647,6 +649,7 @@ port. {pull}19209[19209]
 
 *Functionbeat*
 
+- Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 
 *Winlogbeat*
 
