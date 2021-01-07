@@ -153,9 +153,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		return nil, "", fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
 
+	// Create a sharded list watch in case the Beat is configured to run in cluster mode with multiple shards.
+	slw := NewShardedListWatch(opts.Instance, opts.ShardCount, listwatch)
 	if indexers != nil {
-		return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
+		return cache.NewSharedIndexInformer(slw, resource, opts.SyncTimeout, indexers), objType, nil
 	}
 
-	return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
+	return cache.NewSharedInformer(slw, resource, opts.SyncTimeout), objType, nil
 }
