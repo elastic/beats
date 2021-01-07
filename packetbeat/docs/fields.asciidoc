@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nfs>>
+* <<exported-fields-nomad-processor>>
 * <<exported-fields-pgsql>>
 * <<exported-fields-process>>
 * <<exported-fields-raw>>
@@ -12485,6 +12486,134 @@ RPC reply size with argument.
 type: alias
 
 alias to: destination.bytes
+
+--
+
+[[exported-fields-nomad-processor]]
+== Nomad fields
+
+Information collected from Nomad.
+
+
+
+
+*`nomad.allocation.id`*::
++
+--
+Unique identifier of the allocation.
+
+
+type: keyword
+
+--
+
+*`nomad.allocation.name`*::
++
+--
+Name of the allocation.
+
+
+type: keyword
+
+--
+
+*`nomad.allocation.status`*::
++
+--
+Status of the allocation.
+
+
+type: keyword
+
+--
+
+*`nomad.datacenter`*::
++
+--
+Datacenter where the allocation is deployed.
+
+
+type: keyword
+
+--
+
+*`nomad.job.name`*::
++
+--
+Name of the job to which the allocation belongs.
+
+
+type: keyword
+
+--
+
+*`nomad.job.type`*::
++
+--
+Type of the job to which the allocation belongs (service, batch...).
+
+
+type: keyword
+
+--
+
+*`nomad.namespace`*::
++
+--
+Namespace where the allocation is deployed.
+
+
+type: keyword
+
+--
+
+*`nomad.region`*::
++
+--
+Region where the allocation is deployed.
+
+
+type: keyword
+
+--
+
+*`nomad.task.name`*::
++
+--
+Name of the task.
+
+
+type: keyword
+
+--
+
+*`nomad.task.service.name`*::
++
+--
+Names of the services associated to this task.
+
+
+type: keyword
+
+--
+
+*`nomad.task.service.tags`*::
++
+--
+Tags of the services associated to this task.
+
+
+type: keyword
+
+--
+
+*`nomad.task.service.canary_tags`*::
++
+--
+Canary tags of the services associated to this task.
+
+
+type: keyword
 
 --
 
