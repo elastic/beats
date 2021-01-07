@@ -3,11 +3,9 @@ description: Pipeline for Suricata TLS Events
 
 processors:
   - dissect:
-      if: ctx?.suricata?.eve?.tls?.version != "UNDETERMINED"
       field: suricata.eve.tls.version
       pattern: '%{tls.version_protocol} %{tls.version}'
       ignore_missing: true
-      ignore_failure: true
   - lowercase:
       field: tls.version_protocol
       ignore_missing: true
@@ -37,7 +35,6 @@ processors:
       value_split: '='
       target_field: suricata.eve.tls.kv_subject
       ignore_missing: true
-      ignore_failure: true
   - rename:
       field: suricata.eve.tls.kv_subject.C
       target_field: tls.server.x509.subject.country
@@ -78,7 +75,6 @@ processors:
       value_split: '='
       target_field: suricata.eve.tls.kv_issuerdn
       ignore_missing: true
-      ignore_failure: true
   - rename:
       field: suricata.eve.tls.kv_issuerdn.C
       target_field: tls.server.x509.issuer.country
@@ -188,9 +184,5 @@ processors:
       ignore_missing: true
 on_failure:
   - append:
-      field: error.message
-      value: >-
-        error in TLS pipeline:
-        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
-        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
-        {{ _ingest.on_failure_message }}
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
