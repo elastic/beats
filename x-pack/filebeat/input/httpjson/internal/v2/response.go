@@ -50,10 +50,11 @@ func (resp *response) clone() *response {
 }
 
 type responseProcessor struct {
-	log        *logp.Logger
-	transforms []basicTransform
-	split      *split
-	pagination *pagination
+	log         *logp.Logger
+	transforms  []basicTransform
+	split       *split
+	pagination  *pagination
+	forceNdjson bool
 }
 
 func newResponseProcessor(config *responseConfig, pagination *pagination, log *logp.Logger) *responseProcessor {
@@ -71,6 +72,8 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 
 	rp.split = split
 
+	rp.forceNdjson = config.ForceNdjson
+
 	return rp
 }
 
@@ -79,6 +82,10 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 
 	go func() {
 		defer close(ch)
+
+		if rp.forceNdjson {
+			resp.Header.Set("Content-Type", "application/x-ndjson")
+		}
 
 		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
 		for {

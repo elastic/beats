@@ -5,6 +5,7 @@
 package v2
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io/ioutil"
@@ -159,6 +160,13 @@ func (iter *pageIterator) getPage() (*response, error) {
 	r.url = *iter.resp.Request.URL
 	r.page = iter.n
 
+	if len(bodyBytes) > 0 && r.header.Get("Content-Type") == "application/x-ndjson" {
+		bodyBytes = append([]byte("{\"ndjson-results\":["), bodyBytes...)
+		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\r\n"), []byte(","))
+		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\n"), []byte(","))
+		bodyBytes = bytes.TrimRight(bodyBytes, ",")
+		bodyBytes = append(bodyBytes, []byte("]}")...)
+	}
 	if len(bodyBytes) > 0 {
 		if err := json.Unmarshal(bodyBytes, &r.body); err != nil {
 			return nil, err

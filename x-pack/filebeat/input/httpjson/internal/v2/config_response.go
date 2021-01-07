@@ -19,6 +19,7 @@ type responseConfig struct {
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`
 	Split                   *splitConfig     `config:"split"`
+	ForceNdjson             bool             `config:"force_ndjson"`
 }
 
 type splitConfig struct {
