@@ -32,15 +32,12 @@ stages:
     build:
         mage: "mage build test"
         when:                  ## Override the top-level when.
-            not_changeset:
-                - "^x-pack/.*" ## A generic match
+            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
     crosscompile:
         make: "make -C libbeat crosscompile"
         when:                  ## Override the top-level when.
-            not_changeset:
-                - "^x-pack/.*" ## A generic match
+            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
     stress-tests:
         make: "make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests"
         when:                  ## Override the top-level when.
-            not_changeset:
-                - "^x-pack/.*" ## A generic match
+            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
