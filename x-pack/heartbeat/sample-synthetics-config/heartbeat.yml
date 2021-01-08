@@ -4,19 +4,22 @@ heartbeat.config.monitors:
   reload.enabled: false
   reload.period: 5s
 
-heartbeat.synthetic_suites:
-- name: Todos suite
-  type: "local"
-  path: "/home/andrewvc/projects/synthetics/examples/todos"
-  schedule: "@every 1m"
-
 heartbeat.monitors:
+- type: synthetic_suite
+  enabled: true
+  id: todos-suite
+  name: Todos Suite
+  source:
+    local:
+      path: "/home/andrewvc/projects/synthetics/examples/todos"
+  schedule: '@every 1m'
 - type: http
+  enabled: false
   id: SimpleHTTP
   urls: http://www.google.com
   schedule: "@every 15s"
   name: Simple HTTP
-- type: browser
+- type: synthetic_script
   enabled: false
   id: my-monitor
   name: My Monitor
@@ -39,12 +42,7 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 setup.kibana:
-output.elasticsearch:
-  hosts:
-  - localhost:9200
-  protocol: http
-  username: elastic
-  password: changeme
+output.console: ~
 processors:
 - add_observer_metadata:
 

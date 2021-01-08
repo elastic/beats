@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package browser
+package synthetic_script
 
 import (
 	"context"
@@ -19,8 +19,11 @@ import (
 )
 
 func init() {
+	// TODO: Remove this deprecated option, it was part of experimental,
+	// so no need for deprecation phase
 	monitors.RegisterActive("browser", create)
-	monitors.RegisterActive("synthetic/browser", create)
+	monitors.RegisterActive("synthetic_script", create)
+	monitors.RegisterActive("synthetic/script", create)
 }
 
 var showExperimentalOnce = sync.Once{}

@@ -53,9 +53,9 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 	}
 
 	// TODO: Run this before each suite job invocation, not just at startup
-	ss.fetcher.Fetch()
+	ss.Fetch()
 
-	j, err := synthexec.SuiteJob(context.TODO(), ss.fetcher.Workdir(), ss.suiteCfg.Params)
+	j, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params())
 	if err != nil {
 			return nil, 0, err
 		}

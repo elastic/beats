@@ -2,7 +2,6 @@ package synthetic_suite
 
 import (
 	"context"
-	"fmt"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -12,21 +11,12 @@ type JourneyLister func(ctx context.Context, suitePath string, params common.Map
 
 var journeyListSingleton JourneyLister
 
-func RegisterJourneyLister(jl JourneyLister) {
-	journeyListSingleton = jl
-}
-
 type SyntheticSuite struct {
-	rawCfg          *common.Config
-	suiteCfg        *BaseSuite
-	fetcher         SuiteFetcher
+	rawCfg   *common.Config
+	suiteCfg *Config
 }
 
 func NewSuite(rawCfg *common.Config) (ss *SyntheticSuite, err error) {
-	if journeyListSingleton == nil {
-		return nil, fmt.Errorf("synthetic monitoring is only supported with x-pack heartbeat")
-	}
-
 	ss = &SyntheticSuite{
 		rawCfg: rawCfg,
 	}
@@ -36,25 +26,19 @@ func NewSuite(rawCfg *common.Config) (ss *SyntheticSuite, err error) {
 		logp.Err("could not parse suite config: %s", err)
 	}
 
-	switch ss.suiteCfg.Type {
-	case "local":
-		ss.fetcher = LocalSuite{}
-	case "github":
-		ss.fetcher = GithubSuite{}
-	case "zip_url":
-		ss.fetcher = ZipURLSuite{}
-	}
-
-	err = ss.rawCfg.Unpack(&ss.fetcher)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse local synthetic suite: %s", err)
-	}
-
 	return
 }
 
 func (s *SyntheticSuite) String() string {
 	panic("implement me")
+}
+
+func (s *SyntheticSuite) Fetch() error {
+	return s.suiteCfg.Source.active().Fetch()
+}
+
+func (s *SyntheticSuite) Workdir() string {
+	return s.suiteCfg.Source.active().Workdir()
 }
 
 func (s *SyntheticSuite) Start() {
@@ -63,4 +47,8 @@ func (s *SyntheticSuite) Start() {
 
 func (s *SyntheticSuite) Stop() {
 	panic("implement me")
+}
+
+func (s *SyntheticSuite) Params() map[string]interface{} {
+	return s.suiteCfg.Params
 }
