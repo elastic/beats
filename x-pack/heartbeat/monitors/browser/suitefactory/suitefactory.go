@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	b "github.com/elastic/beats/v7/metricbeat/module/beat"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/synthexec"
 	"github.com/pkg/errors"
 )
 

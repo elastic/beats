@@ -89,8 +89,8 @@ Outer:
 }
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suiteFile string, journeyName string, params common.MapStr) (jobs.Job, error) {
-	newCmd, err := suiteCommandFactory(suiteFile, suiteFile, "--screenshots", "--journey-name", journeyName)
+func SuiteJob(ctx context.Context, suiteFile string, params common.MapStr) (jobs.Job, error) {
+	newCmd, err := suiteCommandFactory(suiteFile, suiteFile, "--screenshots")
 	if err != nil {
 		return nil, err
 	}

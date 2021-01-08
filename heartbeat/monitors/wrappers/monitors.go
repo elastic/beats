@@ -64,7 +64,11 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 			started := time.Now()
 			cont, e := job(event)
 			thisID := stdMonFields.ID
-
+			// Allow jobs to override the ID, useful for suites
+			// which do this logic on their own
+			if v, _ := event.GetValue("monitor.id"); v != nil {
+				thisID = v.(string)
+			}
 			if isMulti {
 				url, err := event.GetValue("url.full")
 				if err != nil {

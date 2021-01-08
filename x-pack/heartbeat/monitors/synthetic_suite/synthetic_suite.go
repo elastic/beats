@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package browser
+package synthetic_suite
 
 import (
 	"context"
@@ -19,8 +19,8 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("browser", create)
-	monitors.RegisterActive("synthetic/browser", create)
+	monitors.RegisterActive("synthetic_suite", create)
+	monitors.RegisterActive("synthetic/suite", create)
 }
 
 var showExperimentalOnce = sync.Once{}
@@ -47,12 +47,17 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		return nil, 0, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
 	}
 
-	config := defaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	ss, err := NewSuite(cfg)
+	if err != nil {
 		return nil, 0, err
 	}
 
+	// TODO: Run this before each suite job invocation, not just at startup
+	ss.fetcher.Fetch()
 
-	j := synthexec.InlineJourneyJob(context.TODO(), config.Script, config.Params)
+	j, err := synthexec.SuiteJob(context.TODO(), ss.fetcher.Workdir(), ss.suiteCfg.Params)
+	if err != nil {
+			return nil, 0, err
+		}
 	return []jobs.Job{j}, 1, nil
 }

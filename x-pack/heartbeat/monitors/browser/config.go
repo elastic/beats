@@ -11,15 +11,13 @@ import (
 )
 
 type Config struct {
-	Path        string        `config:"path"`
 	Script      string        `config:"script"`
 	Params      common.MapStr `config:"script_params"`
-	JourneyName string        `config:"journey_name"`
 }
 
 func (c *Config) Validate() error {
-	if c.Script != "" && c.Path != "" {
-		return fmt.Errorf("both path and script specified! Only one of these options may be present!")
+	if c.Script != "" {
+		return fmt.Errorf("no script specified for journey!")
 	}
 	return nil
 }

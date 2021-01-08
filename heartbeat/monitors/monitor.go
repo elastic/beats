@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -93,6 +94,10 @@ func (e ErrDuplicateMonitorID) Error() string {
 	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
 }
 
+type MonitorAlike interface {
+	cfgfile.Runner
+}
+
 // newMonitor Creates a new monitor, without leaking resources in the event of an error.
 func newMonitor(
 	config *common.Config,
@@ -100,7 +105,7 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-) (*Monitor, error) {
+) (MonitorAlike, error) {
 	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
 	if m != nil && err != nil {
 		m.Stop()
@@ -116,22 +121,28 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-) (*Monitor, error) {
+) (MonitorAlike, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have
-	stdFields, err := stdfields.ConfigToStdMonitorFields(config)
+	standardFields, err := stdfields.ConfigToStdMonitorFields(config)
 	if err != nil {
 		return nil, err
 	}
 
-	monitorPlugin, found := registrar.get(stdFields.Type)
+	monitorPlugin, found := registrar.get(standardFields.Type)
 	if !found {
-		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", stdFields.Type, registrar.monitorNames())
+		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.monitorNames())
+	}
+
+	if standardFields.Type == "synthetic_suite" {
+
+	} else {
+
 	}
 
 	m := &Monitor{
-		stdFields:         stdFields,
+		stdFields:         standardFields,
 		pluginName:        monitorPlugin.name,
 		scheduler:         scheduler,
 		configuredJobs:    []*configuredJob{},
