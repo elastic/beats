@@ -13,6 +13,7 @@
         "destination.bytes": 5976,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "184.51.253.152",
@@ -76,7 +77,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16418,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "184.51.253.152",
@@ -117,6 +123,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -180,7 +187,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -222,6 +234,7 @@
         "destination.geo.city_name": "Dallas",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 32.7787,
         "destination.geo.location.lon": -96.8217,
         "destination.geo.region_iso_code": "US-TX",
@@ -287,7 +300,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51990,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.253.3.202",
@@ -328,6 +346,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -391,7 +410,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -433,6 +457,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.3861,
         "destination.geo.location.lon": -122.0839,
         "destination.geo.region_iso_code": "US-CA",
@@ -498,7 +523,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 15252,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "216.58.194.99",
@@ -539,6 +569,7 @@
         "destination.bytes": 21111,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "209.234.224.22",
@@ -602,7 +633,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 40763,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "209.234.224.22",
@@ -643,6 +679,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -706,7 +743,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -747,6 +789,7 @@
         "destination.bytes": 3732,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.2.238",
@@ -810,7 +853,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52881,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.2.238",
@@ -851,6 +899,7 @@
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -914,7 +963,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 26654,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -955,6 +1009,7 @@
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1018,7 +1073,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2486,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1059,6 +1119,7 @@
         "destination.bytes": 5469,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "17.249.60.78",
@@ -1122,7 +1183,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42021,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "17.249.60.78",
@@ -1163,6 +1229,7 @@
         "destination.bytes": 224,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1226,7 +1293,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24377,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1267,6 +1339,7 @@
         "destination.bytes": 117,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1330,7 +1403,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 48792,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1371,6 +1449,7 @@
         "destination.bytes": 307,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1434,7 +1513,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2987,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1475,6 +1559,7 @@
         "destination.bytes": 365,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1538,7 +1623,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6945,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -1579,6 +1669,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1642,7 +1733,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1683,6 +1779,7 @@
         "destination.bytes": 161,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1746,7 +1843,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42208,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -1787,6 +1889,7 @@
         "destination.bytes": 7805,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "98.138.49.44",
@@ -1850,7 +1953,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14660,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "98.138.49.44",
@@ -1891,6 +1999,7 @@
         "destination.bytes": 6106,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "72.30.3.43",
@@ -1954,7 +2063,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16483,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "72.30.3.43",
@@ -1995,6 +2109,7 @@
         "destination.bytes": 196,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2058,7 +2173,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -2099,6 +2219,7 @@
         "destination.bytes": 3245,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.9.142",
@@ -2162,7 +2283,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5570,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2203,6 +2329,7 @@
         "destination.bytes": 179,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2266,7 +2393,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 24430,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.207",
             "8.8.8.8",
@@ -2308,6 +2440,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -2373,7 +2506,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12122,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.84.80.198",
@@ -2413,6 +2551,7 @@
         "destination.geo.city_name": "Sunnyvale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.386,
         "destination.geo.location.lon": -122.0144,
         "destination.geo.region_iso_code": "US-CA",
@@ -2478,7 +2617,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49145,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "drop",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -2519,6 +2663,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2582,7 +2727,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "deny",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -2623,6 +2773,7 @@
         "destination.bytes": 130,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2683,7 +2834,11 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33110,
         "panw.panos.source.zone": "trust",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -2724,6 +2879,7 @@
         "destination.bytes": 1991,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "172.217.9.142",
@@ -2784,7 +2940,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 9299,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "test",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "172.217.9.142",
@@ -2825,6 +2986,7 @@
         "destination.bytes": 523,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "151.101.2.2",
@@ -2888,7 +3050,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 47194,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "151.101.2.2",
@@ -2930,6 +3097,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.3861,
         "destination.geo.location.lon": -122.0839,
         "destination.geo.region_iso_code": "US-CA",
@@ -2995,7 +3163,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 62921,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "216.58.194.66",
@@ -3036,6 +3209,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3099,7 +3273,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3140,6 +3319,7 @@
         "destination.bytes": 196,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3203,7 +3383,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.210",
             "8.8.8.8",
@@ -3244,6 +3429,7 @@
         "destination.bytes": 5003,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "184.51.253.193",
@@ -3307,7 +3493,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 41958,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.253.193",
@@ -3348,6 +3539,7 @@
         "destination.bytes": 171,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3411,7 +3603,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 51374,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3451,6 +3648,7 @@
         "destination.geo.city_name": "Sunnyvale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.386,
         "destination.geo.location.lon": -122.0144,
         "destination.geo.region_iso_code": "US-CA",
@@ -3516,7 +3714,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 25566,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.55.52",
@@ -3558,6 +3761,7 @@
         "destination.geo.city_name": "Sunnyvale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.386,
         "destination.geo.location.lon": -122.0144,
         "destination.geo.region_iso_code": "US-CA",
@@ -3623,7 +3827,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63757,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "199.167.52.219",
@@ -3665,6 +3874,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -3730,7 +3940,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3803,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.71.117.196",
@@ -3771,6 +3986,7 @@
         "destination.bytes": 244,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3834,7 +4050,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 34994,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3875,6 +4096,7 @@
         "destination.bytes": 205,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3938,7 +4160,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38064,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -3980,6 +4207,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.4043,
         "destination.geo.location.lon": -122.0748,
         "destination.geo.region_iso_code": "US-CA",
@@ -4045,7 +4273,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42924,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.194.41",
@@ -4148,7 +4381,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58977,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.124.9",
@@ -4190,6 +4428,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -4255,7 +4494,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64732,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.131.237",
@@ -4296,6 +4540,7 @@
         "destination.bytes": 661,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "184.51.252.247",
@@ -4359,7 +4604,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58292,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -4401,6 +4651,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.4043,
         "destination.geo.location.lon": -122.0748,
         "destination.geo.region_iso_code": "US-CA",
@@ -4466,7 +4717,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32209,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.190.88.148",
@@ -4508,6 +4764,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.4043,
         "destination.geo.location.lon": -122.0748,
         "destination.geo.region_iso_code": "US-CA",
@@ -4573,7 +4830,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 38822,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.186.243.83",
@@ -4614,6 +4876,7 @@
         "destination.bytes": 182,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -4677,7 +4940,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16044,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4718,6 +4986,7 @@
         "destination.bytes": 90,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -4781,7 +5050,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 56614,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -4823,6 +5097,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -4888,7 +5163,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53168,
         "panw.panos.source.zone": "untrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "100.24.165.74",
@@ -4929,6 +5209,7 @@
         "destination.bytes": 661,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "184.51.252.247",
@@ -4992,7 +5273,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28012,
         "panw.panos.source.zone": "xtrust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "184.51.252.247",
@@ -5095,7 +5381,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 16050,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.201.94.140",
@@ -5136,6 +5427,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5195,7 +5487,12 @@
         "panw.panos.source.interface": "ethernet1/2",
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5236,6 +5533,7 @@
         "destination.bytes": 144,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5299,7 +5597,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5340,6 +5643,7 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5403,7 +5707,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14247,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5444,6 +5753,7 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5507,7 +5817,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33580,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5548,6 +5863,7 @@
         "destination.bytes": 169,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5611,7 +5927,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13498,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5652,6 +5973,7 @@
         "destination.bytes": 132,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5715,7 +6037,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 20365,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5756,6 +6083,7 @@
         "destination.bytes": 127,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5819,7 +6147,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61464,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -5860,6 +6193,7 @@
         "destination.bytes": 105,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -5923,7 +6257,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42877,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -5964,6 +6303,7 @@
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6027,7 +6367,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5918,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6068,6 +6413,7 @@
         "destination.bytes": 134,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6131,7 +6477,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 28944,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6172,6 +6523,7 @@
         "destination.bytes": 179,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6235,7 +6587,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13415,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6276,6 +6633,7 @@
         "destination.bytes": 218,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6339,7 +6697,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2489,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6380,6 +6743,7 @@
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6443,7 +6807,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 49328,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6484,6 +6853,7 @@
         "destination.bytes": 305,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6547,7 +6917,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 36036,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6589,6 +6964,7 @@
         "destination.geo.city_name": "Lanham",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9705,
         "destination.geo.location.lon": -76.8388,
         "destination.geo.region_iso_code": "US-MD",
@@ -6654,7 +7030,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 33744,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "66.28.0.45",
@@ -6695,6 +7076,7 @@
         "destination.bytes": 153,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6758,7 +7140,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 45809,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6799,6 +7186,7 @@
         "destination.bytes": 169,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6862,7 +7250,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 3675,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -6903,6 +7296,7 @@
         "destination.bytes": 128,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -6966,7 +7360,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 5787,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7007,6 +7406,7 @@
         "destination.bytes": 181,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7070,7 +7470,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 12342,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7111,6 +7516,7 @@
         "destination.bytes": 121,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7174,7 +7580,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 18729,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7216,6 +7627,7 @@
         "destination.geo.city_name": "San Antonio",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 29.4551,
         "destination.geo.location.lon": -98.6498,
         "destination.geo.region_iso_code": "US-TX",
@@ -7281,7 +7693,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57858,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "23.52.174.25",
@@ -7322,6 +7739,7 @@
         "destination.bytes": 315,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7385,7 +7803,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 2722,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7426,6 +7849,7 @@
         "destination.bytes": 130,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7489,7 +7913,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 6674,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7531,6 +7960,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.54,
         "destination.geo.location.lon": -122.3032,
         "destination.geo.region_iso_code": "US-WA",
@@ -7596,7 +8026,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37427,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "54.230.5.228",
@@ -7637,6 +8072,7 @@
         "destination.bytes": 149,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7700,7 +8136,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22408,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7741,6 +8182,7 @@
         "destination.bytes": 202,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7804,7 +8246,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 27899,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7845,6 +8292,7 @@
         "destination.bytes": 195,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -7908,7 +8356,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 52939,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -7949,6 +8402,7 @@
         "destination.bytes": 90,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "208.83.246.20",
@@ -8012,7 +8466,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 42907,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.195",
             "208.83.246.20",
@@ -8053,6 +8512,7 @@
         "destination.bytes": 192,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8115,7 +8575,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19658,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.196",
             "8.8.8.8",
@@ -8156,6 +8621,7 @@
         "destination.bytes": 208,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8218,7 +8684,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 64352,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8259,6 +8730,7 @@
         "destination.bytes": 100,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8321,7 +8793,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 60126,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8362,6 +8839,7 @@
         "destination.bytes": 7237,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.6583,
         "destination.geo.location.lon": -77.2481,
         "destination.geo.region_iso_code": "US-VA",
@@ -8426,7 +8904,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 59771,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "35.185.88.112",
@@ -8467,6 +8950,7 @@
         "destination.bytes": 109,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8530,7 +9014,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 35748,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8571,6 +9060,7 @@
         "destination.bytes": 116,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8634,7 +9124,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 63701,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8675,6 +9170,7 @@
         "destination.bytes": 96,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -8738,7 +9234,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 57872,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -8780,6 +9281,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -8845,7 +9347,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 37581,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -8887,6 +9394,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -8952,7 +9460,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 19226,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -8994,6 +9507,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -9059,7 +9573,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 61721,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9100,6 +9619,7 @@
         "destination.bytes": 7820,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "104.254.150.9",
@@ -9163,7 +9683,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10098,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "104.254.150.9",
@@ -9205,6 +9730,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -9270,7 +9796,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 4564,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "50.19.85.24",
@@ -9312,6 +9843,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -9377,7 +9909,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 32104,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.0.218.108",
@@ -9419,6 +9956,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -9484,7 +10022,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 14172,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "52.6.117.19",
@@ -9526,6 +10069,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -9591,7 +10135,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 10286,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "34.238.96.22",
@@ -9633,6 +10182,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.4043,
         "destination.geo.location.lon": -122.0748,
         "destination.geo.region_iso_code": "US-CA",
@@ -9698,7 +10248,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 30799,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "130.211.47.17",
@@ -9739,6 +10294,7 @@
         "destination.bytes": 172,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -9802,7 +10358,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 13490,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -9843,6 +10404,7 @@
         "destination.bytes": 588,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -9906,7 +10468,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -9947,6 +10514,7 @@
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -10010,7 +10578,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 53751,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10051,6 +10624,7 @@
         "destination.bytes": 170,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -10114,7 +10688,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 21643,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10155,6 +10734,7 @@
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -10218,7 +10798,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22446,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10259,6 +10844,7 @@
         "destination.bytes": 94,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -10322,7 +10908,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 22301,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",
@@ -10363,6 +10954,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -10426,7 +11018,12 @@
         "panw.panos.source.nat.ip": "192.168.1.63",
         "panw.panos.source.nat.port": 58124,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "related.hosts": [
+            "PA-220"
+        ],
         "related.ip": [
             "192.168.15.224",
             "8.8.8.8",

@@ -1,0 +1,113 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_ora_13779_20201007105801980871631378.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 7
+Unix process pid: 13779, image: oracle@testlab.local (TNS V1-V3)
+
+Wed Oct  7 10:58:01 2020 -04:00
+LENGTH : '261'
+ACTION :[7] 'CONNECT'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[3] '100'
+
+Wed Oct  7 10:58:02 2020 -04:00
+LENGTH : '341'
+ACTION :[87] 'BEGIN dbms_backup_restore.resetCfileSection(dbms_backup_restore.RTYP_DFILE_COPY); END; '
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '47'
+
+Wed Oct  7 10:58:02 2020 -04:00
+LENGTH : '308'
+ACTION :[54] 'BEGIN dbms_backup_restore.resetCfileSection(13); END; '
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '47'
+
+Wed Oct  7 10:59:01 2020 -04:00
+LENGTH : '301'
+ACTION :[48] 'select NAME FROM V$DATAFILE_COPY where file# = 3'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:59:01 2020 -04:00
+LENGTH : '301'
+ACTION :[48] 'select NAME FROM V$DATAFILE_COPY where file# = 1'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:59:01 2020 -04:00
+LENGTH : '301'
+ACTION :[48] 'select NAME FROM V$DATAFILE_COPY where file# = 4'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:59:01 2020 -04:00
+LENGTH : '301'
+ACTION :[48] 'select NAME FROM V$DATAFILE_COPY where file# = 7'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+

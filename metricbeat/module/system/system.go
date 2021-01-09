@@ -21,10 +21,12 @@ import (
 	"flag"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
+	// HostFS is an alternate mountpoint for the filesytem root, for when metricbeat is running inside a container.
 	HostFS = flag.String("system.hostfs", "", "mountpoint of the host's filesystem for use in monitoring a host from within a container")
 )
 
@@ -37,16 +39,19 @@ func init() {
 	}
 }
 
+// Module represents the system module
 type Module struct {
 	mb.BaseModule
-	HostFS string // Mountpoint of the host's filesystem for use in monitoring inside a container.
+	HostFS  string // Mountpoint of the host's filesystem for use in monitoring inside a container.
+	IsAgent bool   // Looks to see if metricbeat is running under agent. Useful if we have breaking changes in one but not the other.
 }
 
+// NewModule instatiates the system module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// This only needs to be configured once for all system modules.
 	once.Do(func() {
 		initModule()
 	})
 
-	return &Module{BaseModule: base, HostFS: *HostFS}, nil
+	return &Module{BaseModule: base, HostFS: *HostFS, IsAgent: fleetmode.Enabled()}, nil
 }

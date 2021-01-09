@@ -97,6 +97,7 @@ type httpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 var (
@@ -111,6 +112,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
@@ -121,19 +123,20 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(results protos.Reporter, config *httpConfig) error {
+func (http *httpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
 	isDebug = logp.IsDebug("http")
 	isDetailed = logp.IsDebug("httpdetailed")
 	http.results = results
+	http.watcher = watcher
 	return nil
 }
 
@@ -435,7 +438,7 @@ func (http *httpPlugin) handleHTTP(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = http.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	http.hideHeaders(m)
 
 	if m.isRequest {

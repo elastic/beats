@@ -15,8 +15,8 @@
 ifdef::has_solutions[]
 TIP: For deeper observability into your infrastructure, you can use the
 {metrics-app} and the {logs-app} in {kib}.
-For more details, see the {metrics-guide}[Metrics Monitoring Guide]
-and the {logs-guide}[Logs Monitoring Guide].
+For more details, see {observability-guide}/analyze-metrics.html[Analyze metrics]
+and {observability-guide}/monitor-logs.html[Monitor logs].
 endif::has_solutions[]
 
 {beatname_uc} comes packaged with example Kibana dashboards, visualizations,

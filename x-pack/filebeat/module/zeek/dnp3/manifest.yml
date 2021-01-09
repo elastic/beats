@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/dnp3.log
   - name: tags
     default: [zeek.dnp3]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/dnp3.yml

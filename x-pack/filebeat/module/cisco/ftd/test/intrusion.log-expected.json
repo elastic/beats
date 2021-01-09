@@ -57,11 +57,16 @@
         "network.protocol": "http",
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -139,11 +144,16 @@
         "network.protocol": "http",
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -217,11 +227,16 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
         "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"
@@ -295,11 +310,16 @@
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
         "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.100.30",
             "10.0.1.20"

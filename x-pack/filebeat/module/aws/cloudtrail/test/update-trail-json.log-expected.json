@@ -32,6 +32,7 @@
         "source.geo.city_name": "Boardman",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 45.8491,
         "source.geo.location.lon": -119.7143,
         "source.geo.region_iso_code": "US-OR",

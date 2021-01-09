@@ -13,6 +13,9 @@
         "message": "shutting down for system halt",
         "process.name": "shutdown",
         "process.pid": 2649,
+        "related.hosts": [
+            "rmbkmonitor04"
+        ],
         "service.type": "system"
     },
     {
@@ -28,6 +31,9 @@
         "log.offset": 89,
         "message": "constraint_0_power_limit_uw exceeded.",
         "process.name": "thermald",
+        "related.hosts": [
+            "rmbkmonitor04"
+        ],
         "service.type": "system"
     },
     {
@@ -43,6 +49,9 @@
         "log.offset": 184,
         "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
         "process.name": "sudo",
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "system"
     }
 ]

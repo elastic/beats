@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,6 +41,7 @@ const (
 	buildDir       = "build"
 	metaDir        = "_meta"
 	snapshotEnv    = "SNAPSHOT"
+	devEnv         = "DEV"
 	configFile     = "elastic-agent.yml"
 	agentDropPath  = "AGENT_DROP_PATH"
 )
@@ -79,11 +81,34 @@ type Format mg.Namespace
 // Demo runs agent out of container.
 type Demo mg.Namespace
 
+// Dev runs package and build for dev purposes.
+type Dev mg.Namespace
+
 // Env returns information about the environment.
 func (Prepare) Env() {
 	mg.Deps(Mkdir("build"), Build.GenerateConfig)
 	RunGo("version")
 	RunGo("env")
+}
+
+// Build builds the agent binary with DEV flag set.
+func (Dev) Build() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	mg.Deps(Build.All)
+}
+
+// Package packages the agent binary with DEV flag set.
+func (Dev) Package() {
+	dev := os.Getenv(devEnv)
+	defer os.Setenv(devEnv, dev)
+
+	os.Setenv(devEnv, "true")
+	devtools.DevBuild = true
+	Package()
 }
 
 // InstallGoLicenser install go-licenser to check license of the files.
@@ -311,7 +336,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return devtools.TestPackages(devtools.WithRootUserContainer())
+	return devtools.TestPackages()
 }
 
 // RunGo runs go command and output the feedback to the stdout and the stderr.
@@ -345,7 +370,7 @@ func commitID() string {
 
 // Update is an alias for executing control protocol, configs, and specs.
 func Update() {
-	mg.SerialDeps(Config, BuildSpec, BuildFleetCfg)
+	mg.SerialDeps(Config, BuildSpec, BuildPGP, BuildFleetCfg)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -370,12 +395,22 @@ func ControlProto() error {
 
 // BuildSpec make sure that all the suppported program spec are built into the binary.
 func BuildSpec() error {
-	// go run x-pack/agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/agent/pkg/agent/program/supported.go
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildspec/buildspec.go --in x-pack/agent/spec/*.yml --out x-pack/elastic-agent/pkg/agent/program/supported.go
 	goF := filepath.Join("dev-tools", "cmd", "buildspec", "buildspec.go")
 	in := filepath.Join("spec", "*.yml")
 	out := filepath.Join("pkg", "agent", "program", "supported.go")
 
 	fmt.Printf(">> Buildspec from %s to %s\n", in, out)
+	return RunGo("run", goF, "--in", in, "--out", out)
+}
+
+func BuildPGP() error {
+	// go run x-pack/elastic-agent/dev-tools/cmd/buildpgp/build_pgp.go --in x-pack/agent/spec/GPG-KEY-elasticsearch --out x-pack/elastic-agent/pkg/release/pgp.go
+	goF := filepath.Join("dev-tools", "cmd", "buildpgp", "build_pgp.go")
+	in := "GPG-KEY-elasticsearch"
+	out := filepath.Join("pkg", "release", "pgp.go")
+
+	fmt.Printf(">> BuildPGP from %s to %s\n", in, out)
 	return RunGo("run", goF, "--in", in, "--out", out)
 }
 
@@ -478,8 +513,13 @@ func runAgent(env map[string]string) error {
 		}
 
 		// build docker image
-		if err := sh.Run("docker", "build", "-t", tag, "."); err != nil {
-			return err
+		if err := dockerBuild(tag); err != nil {
+			fmt.Println(">> Building docker images again (after 10 seconds)")
+			// This sleep is to avoid hitting the docker build issues when resources are not available.
+			time.Sleep(10)
+			if err := dockerBuild(tag); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -537,7 +577,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
+		packedBeats := []string{"filebeat", "metricbeat"}
 
 		for _, b := range packedBeats {
 			pwd, err := filepath.Abs(filepath.Join("..", b))
@@ -590,6 +630,10 @@ func copyAll(from, to string) error {
 	})
 }
 
+func dockerBuild(tag string) error {
+	return sh.Run("docker", "build", "-t", tag, ".")
+}
+
 func dockerTag() string {
 	const commitLen = 7
 	tagBase := "elastic-agent"
@@ -619,6 +663,13 @@ func buildVars() map[string]string {
 
 	isSnapshot, _ := os.LookupEnv(snapshotEnv)
 	vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.snapshot"] = isSnapshot
+
+	if isDevFlag, devFound := os.LookupEnv(devEnv); devFound {
+		if isDev, err := strconv.ParseBool(isDevFlag); err == nil && isDev {
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowEmptyPgp"] = "true"
+			vars["github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release.allowUpgrade"] = "true"
+		}
+	}
 
 	return vars
 }

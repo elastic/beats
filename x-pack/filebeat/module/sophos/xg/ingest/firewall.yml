@@ -390,6 +390,10 @@ processors:
     field: network.direction
     value: internal
     if: "['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.ingress?.zone) && ['LAN', 'DMZ', 'VPN', 'WiFi'].contains(ctx?.observer?.egress?.zone)"
+- set:
+    field: network.direction
+    value: external
+    if: "ctx?.observer?.ingress?.zone == 'WAN' && ctx?.observer?.egress?.zone == 'WAN'"
 
 #########################
 ## ECS Related Mapping ##

@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -295,7 +296,11 @@ func TestBuildEvent(t *testing.T) {
 		assertHasKey(t, fields, "event.type")
 
 		assertHasKey(t, fields, "file.path")
-		assertHasKey(t, fields, "file.extension")
+		if assertHasKey(t, fields, "file.extension") {
+			ext, err := fields.GetValue("file.extension")
+			require.NoError(t, err)
+			assert.Equal(t, ext, "txt")
+		}
 		assertHasKey(t, fields, "file.target_path")
 		assertHasKey(t, fields, "file.inode")
 		assertHasKey(t, fields, "file.uid")
@@ -427,10 +432,12 @@ func mustDecodeHex(v string) []byte {
 	return data
 }
 
-func assertHasKey(t testing.TB, m common.MapStr, key string) {
+func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
 	t.Helper()
 	found, err := m.HasKey(key)
 	if err != nil || !found {
 		t.Errorf("key %v not found: %v", key, err)
+		return false
 	}
+	return true
 }

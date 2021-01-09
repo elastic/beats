@@ -69,6 +69,9 @@ var gceMetadataFetcher = provider{
 					"project": s.Object{
 						"id": c.Str("projectId"),
 					},
+					"account": s.Object{
+						"id": c.Str("projectId"),
+					},
 				}.ApplyTo(out, project)
 			}
 

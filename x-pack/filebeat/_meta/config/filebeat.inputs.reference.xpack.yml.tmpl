@@ -30,7 +30,7 @@
 
 #---------------------------- Google Cloud Pub/Sub Input -----------------------
 # Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: google-pubsub
+- type: gcp-pubsub
   enabled: false
 
   # Google Cloud project ID. Required.
@@ -67,8 +67,8 @@
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-s3-input
 
-  # Queue urls (required) to receive queue messages from
-  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+  # Queue url (required) to receive queue messages from
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"
 
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.

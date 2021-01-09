@@ -1,0 +1,153 @@
+The `task_stats` metricset in `awsfargate` module allows users to monitor
+containers inside the same AWS Fargate task. It fetches runtime CPU metrics,
+disk I/O metrics, memory metrics, network metrics and container metadata from
+both endpoint `${ECS_CONTAINER_METADATA_URI_V4}/task/stats` and
+`${ECS_CONTAINER_METADATA_URI_V4}/task`.
+
+[float]
+=== Configuration Example
+This metricset should be ran as a sidecar inside the same AWS Fargate task
+definition, and the default configuration file should work.
+
+[source,yaml]
+----
+- module: awsfargate
+  period: 10s
+  metricsets:
+    - task_stats
+----
+
+[float]
+=== Setup Metricbeat Using AWS Fargate
+This section is to provide users an AWS native way of configuring Fargate task
+definition to run application containers and Metricbeat container using AWS
+CloudFormation.
+
+[float]
+==== Store Elastic Cloud Credentials into AWS Secret Manager
+If users are using Elastic Cloud, it's recommended to store cloud id and cloud
+auth into AWS secret manager. Here are the AWS CLI example:
+
+Create secret ELASTIC_CLOUD_AUTH:
+----
+aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_AUTH --secret-string XXX
+----
+
+Create secret ELASTIC_CLOUD_ID:
+----
+aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_ID --secret-string YYYY
+----
+
+[float]
+==== AWS CloudFormation Template Example
+Here is an example of AWS CloudFormation template to create a new cluster,
+create a task definition that runs Metricbeat container and start the service.
+Please copy this section into a `cloud_formation.yml` file locally and replace
+`<your-cluster-name>`, `<your-log-group-name>`, and `<your-service-name>` with
+your own preferred names. Also you can find `<ELASTIC_CLOUD_ID secret ARN>` and
+`<ELASTIC_CLOUD_AUTH secret ARN>` values from AWS secret manager.
+
+[source,yaml]
+----
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SubnetID:
+    Type: String
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: <your-cluster-name>
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: <your-log-group-name>
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsFargateTaskExecutionRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: !Sub 'EcsTaskExecutionRole-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - <ELASTIC_CLOUD_ID secret ARN>
+                  - <ELASTIC_CLOUD_AUTH secret ARN>
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: deployment-task-metricbeat
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: deployment-task-metricbeat-container
+          Image: kaiyansheng/metricbeat-awsfargate:v1
+          Secrets:
+            - Name: ELASTIC_CLOUD_ID
+              ValueFrom: <ELASTIC_CLOUD_ID secret ARN>
+            - Name: ELASTIC_CLOUD_AUTH
+              ValueFrom: <ELASTIC_CLOUD_AUTH secret ARN>
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: ecs
+          EntryPoint:
+            - sh
+            - -c
+          Command:
+            - ./metricbeat setup && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: <your-service-name>
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID
+----
+
+[float]
+==== Create CloudFormation Stack
+Here is the AWS CLI to create a stack using the CloudFormation config file above:
+----
+aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters 'ParameterKey=SubnetID,ParameterValue=<your-subnet-id>'
+----
+
+Make sure to replace `<your-subnet-id>` with your own subnet in this command. Please go
+to Services -> VPC -> Subnets to find subnet ID to use. You can also add several
+more containers under the TaskDefinition section.
+
+[float]
+==== Delete CloudFormation Stack
+Here is the AWS CLI to delete a stack including the cluster, task definition and
+all containers:
+----
+aws cloudformation delete-stack --stack-name <your-stack-name>
+----

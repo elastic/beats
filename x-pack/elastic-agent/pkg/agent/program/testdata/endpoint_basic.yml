@@ -3,6 +3,8 @@ name: Endpoint Host
 fleet:
   agent:
     id: fleet-agent-id
+  host:
+    id: host-agent-id
   access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
   kibana:
     protocol: https

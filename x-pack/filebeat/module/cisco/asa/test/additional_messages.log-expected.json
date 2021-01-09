@@ -40,6 +40,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -95,6 +98,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -140,6 +146,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -163,12 +172,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T17:51:17.000-02:00",
+        "event.end": "2021-05-05T17:51:17.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-609002: Teardown local-host net:192.168.2.2 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T19:51:17.000Z",
+        "event.start": "2021-05-05T19:51:17.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -184,6 +193,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2"
         ],
@@ -223,6 +235,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2"
         ],
@@ -265,6 +280,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -317,6 +335,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -370,6 +391,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.192.18.4",
             "10.192.70.66"
@@ -415,6 +439,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -463,6 +490,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.192.18.4"
@@ -501,6 +531,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -536,6 +569,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -574,6 +610,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -615,6 +654,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10"
         ],
@@ -636,12 +678,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:24:31.000-02:00",
+        "event.end": "2021-05-05T18:24:31.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-609002: Teardown local-host identity:10.10.10.10 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T20:24:31.000Z",
+        "event.start": "2021-05-05T20:24:31.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -657,6 +699,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10"
         ],
@@ -699,6 +744,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.192.46.90",
             "10.10.10.10"
@@ -743,6 +791,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -771,12 +822,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 2960892904 for out111:10.10.10.10/443 to fw111:192.168.2.2/55225 duration 0:00:00 bytes 0 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -796,6 +847,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -850,6 +904,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -878,12 +935,12 @@
         "event.code": 302012,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -902,6 +959,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -949,6 +1009,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -995,6 +1058,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1043,6 +1109,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1067,6 +1136,7 @@
         "destination.geo.city_name": "Thousand Oaks",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 34.197,
         "destination.geo.location.lon": -118.8199,
         "destination.geo.region_iso_code": "US-CA",
@@ -1080,12 +1150,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.asa",
         "event.duration": 124000000000,
-        "event.end": "2020-05-05T18:40:50.000-02:00",
+        "event.end": "2021-05-05T18:40:50.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-302016: Teardown UDP connection 1671727 for intfacename:10.10.10.10/161 to net:192.186.2.2/53356 duration 0:02:04 bytes 64585",
         "event.severity": 2,
-        "event.start": "2020-05-05T20:38:46.000Z",
+        "event.start": "2021-05-05T20:38:46.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1105,6 +1175,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.186.2.2"
@@ -1159,6 +1232,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1214,6 +1290,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1265,6 +1344,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1311,6 +1393,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1358,6 +1443,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1403,6 +1491,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1448,6 +1539,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1493,6 +1587,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1531,6 +1628,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1562,6 +1662,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1595,6 +1698,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1628,6 +1734,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1671,6 +1780,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1721,6 +1833,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2",
             "10.10.10.10"
@@ -1759,6 +1874,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1790,6 +1908,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1828,6 +1949,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1866,6 +1990,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1897,6 +2024,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1939,6 +2069,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "10.10.10.10"
@@ -1983,6 +2116,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -2025,6 +2161,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "10.10.10.10"
@@ -2072,6 +2211,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -2114,6 +2256,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.20.30.40",
             "10.20.30.40"
@@ -2156,6 +2301,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.20.30.40",
             "10.20.30.40"
@@ -2198,6 +2346,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.20.30.40",
             "10.20.30.40"
@@ -2240,6 +2391,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.20.30.40",
             "10.20.30.40"
@@ -2264,6 +2418,7 @@
         "destination.geo.city_name": "Clermont-Ferrand",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "FR",
+        "destination.geo.country_name": "France",
         "destination.geo.location.lat": 45.7838,
         "destination.geo.location.lon": 3.0966,
         "destination.geo.region_iso_code": "FR-63",
@@ -2277,12 +2432,12 @@
         "event.code": 302304,
         "event.dataset": "cisco.asa",
         "event.duration": 3602000000000,
-        "event.end": "2020-04-27T04:12:23.000-02:00",
+        "event.end": "2021-04-27T04:12:23.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:1.2.3.4/54242 to server.deflan:2.3.4.5/9101 duration 1:00:02 bytes 245 Connection timeout",
         "event.severity": 6,
-        "event.start": "2020-04-27T05:12:21.000Z",
+        "event.start": "2021-04-27T05:12:21.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -2302,6 +2457,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "1.2.3.4",
             "2.3.4.5"
@@ -2311,6 +2469,7 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
@@ -2359,6 +2518,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.2",
             "192.168.2.2"
@@ -2383,6 +2545,7 @@
         "destination.geo.city_name": "Riga",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "LV",
+        "destination.geo.country_name": "Latvia",
         "destination.geo.location.lat": 56.9496,
         "destination.geo.location.lon": 24.0978,
         "destination.geo.region_iso_code": "LV-RIX",
@@ -2418,6 +2581,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01",
+            "somedomainname.local"
+        ],
         "related.ip": [
             "195.122.12.242"
         ],
@@ -2456,6 +2623,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01",
+            "console"
+        ],
         "service.type": "cisco",
         "source.address": "console",
         "source.domain": "console",
@@ -2491,6 +2662,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
         ],
@@ -2530,6 +2704,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -2568,6 +2745,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.1.212",
             "10.10.1.254"
@@ -2609,6 +2789,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
         ],
@@ -2652,6 +2835,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87",
             "10.10.1.254"
@@ -2693,6 +2879,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
         ],
@@ -2729,6 +2918,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178"
         ],
@@ -2739,6 +2931,7 @@
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
         "source.geo.location.lat": 51.5888,
         "source.geo.location.lon": -0.0247,
         "source.geo.region_iso_code": "GB-ENG",
@@ -2758,6 +2951,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5888,
         "destination.geo.location.lon": -0.0247,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -2770,12 +2964,12 @@
         "event.code": 113019,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.end": "2021-04-27T02:03:03.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
         "event.severity": 4,
-        "event.start": "2020-04-27T04:03:03.000Z",
+        "event.start": "2021-04-27T04:03:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -2789,6 +2983,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178"
         ],
@@ -2826,6 +3023,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "8.8.8.8"
         ],
@@ -2835,6 +3035,7 @@
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "8.8.8.8",
@@ -2855,6 +3056,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.",
+        "event.reason": "User Requested.",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2869,6 +3071,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "8.8.8.8"
         ],
@@ -2878,10 +3083,52 @@
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "8.8.8.8",
         "source.user.name": "testuser",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "716002",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.",
+        "event.reason": "Idle timeout.",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 9810,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.user.name": "alice",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -2896,6 +3143,7 @@
         "destination.geo.city_name": "Stoke Newington",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5638,
         "destination.geo.location.lon": -0.0765,
         "destination.geo.region_iso_code": "GB-HCK",
@@ -2920,7 +3168,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
-        "log.offset": 9810,
+        "log.offset": 9937,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.hostname": "dev01",
@@ -2928,6 +3176,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "104.46.88.19",
             "195.74.114.34"
@@ -2939,6 +3190,7 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "IE",
+        "source.geo.country_name": "Ireland",
         "source.geo.location.lat": 53.3338,
         "source.geo.location.lon": -6.2488,
         "source.geo.region_iso_code": "IE-L",

@@ -95,6 +95,8 @@ func TestMakeClientWorker(t *testing.T) {
 }
 
 func TestReplaceClientWorker(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/17965")
+
 	tests := map[string]func(mockPublishFn) outputs.Client{
 		"client":         newMockClient,
 		"network_client": newMockNetworkClient,

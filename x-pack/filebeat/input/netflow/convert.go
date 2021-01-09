@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
 
@@ -35,10 +36,10 @@ var (
 	}
 )
 
-func toBeatEvent(flow record.Record) (event beat.Event) {
+func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
 	switch flow.Type {
 	case record.Flow:
-		return flowToBeatEvent(flow)
+		return flowToBeatEvent(flow, internalNetworks)
 	case record.Options:
 		return optionsToBeatEvent(flow)
 	default:
@@ -113,7 +114,7 @@ func optionsToBeatEvent(flow record.Record) beat.Event {
 	return toBeatEventCommon(flow)
 }
 
-func flowToBeatEvent(flow record.Record) (event beat.Event) {
+func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
 	event = toBeatEventCommon(flow)
 
 	ecsEvent, ok := event.Fields["event"].(common.MapStr)
@@ -179,12 +180,12 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 			}
 			if srcIP != nil {
 				ecsSource["ip"] = srcIP
-				ecsSource["locality"] = getIPLocality(srcIP).String()
+				ecsSource["locality"] = getIPLocality(internalNetworks, srcIP).String()
 			}
 			ecsSource["mac"] = srcMac
 			if dstIP != nil {
 				ecsDest["ip"] = dstIP
-				ecsDest["locality"] = getIPLocality(dstIP).String()
+				ecsDest["locality"] = getIPLocality(internalNetworks, dstIP).String()
 			}
 			ecsDest["mac"] = dstMac
 		}
@@ -194,7 +195,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	if ip, found := getKeyIP(flow.Fields, "sourceIPv4Address"); found {
 		ecsSource["ip"] = ip
 		relatedIP = append(relatedIP, ip)
-		ecsSource["locality"] = getIPLocality(ip).String()
+		ecsSource["locality"] = getIPLocality(internalNetworks, ip).String()
 	}
 	if sourcePort, found := getKeyUint64(flow.Fields, "sourceTransportPort"); found {
 		ecsSource["port"] = sourcePort
@@ -207,7 +208,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	if ip, found := getKeyIP(flow.Fields, "destinationIPv4Address"); found {
 		ecsDest["ip"] = ip
 		relatedIP = append(relatedIP, ip)
-		ecsDest["locality"] = getIPLocality(ip).String()
+		ecsDest["locality"] = getIPLocality(internalNetworks, ip).String()
 	}
 	if destPort, found := getKeyUint64(flow.Fields, "destinationTransportPort"); found {
 		ecsDest["port"] = destPort
@@ -243,7 +244,7 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		dstIP = net.IPv4(0, 0, 0, 0).To4()
 	}
 	ecsFlow["id"] = flowID(srcIP, dstIP, srcPort, dstPort, uint8(protocol))
-	ecsFlow["locality"] = getIPLocality(srcIP, dstIP).String()
+	ecsFlow["locality"] = getIPLocality(internalNetworks, srcIP, dstIP).String()
 
 	// ECS Fields -- network
 	ecsNetwork := common.MapStr{}
@@ -394,19 +395,8 @@ func (l Locality) String() string {
 	return "unknown (" + strconv.Itoa(int(l)) + ")"
 }
 
-func isPrivateNetwork(ip net.IP) bool {
-	for _, net := range privateIPv4 {
-		if net.Contains(ip) {
-			return true
-		}
-	}
-
-	return privateIPv6.Contains(ip)
-}
-
-func isLocalOrPrivate(ip net.IP) bool {
-	return isPrivateNetwork(ip) ||
-		ip.IsLoopback() ||
+func isLocal(ip net.IP) bool {
+	return ip.IsLoopback() ||
 		ip.IsUnspecified() ||
 		ip.Equal(net.IPv4bcast) ||
 		ip.IsLinkLocalUnicast() ||
@@ -414,9 +404,14 @@ func isLocalOrPrivate(ip net.IP) bool {
 		ip.IsInterfaceLocalMulticast()
 }
 
-func getIPLocality(ip ...net.IP) Locality {
-	for _, addr := range ip {
-		if !isLocalOrPrivate(addr) {
+func getIPLocality(internalNetworks []string, ips ...net.IP) Locality {
+	for _, ip := range ips {
+		contains, err := conditions.NetworkContains(ip, internalNetworks...)
+		if err != nil {
+			return LocalityPublic
+		}
+		// always consider loopback/link-local private
+		if !contains && !isLocal(ip) {
 			return LocalityPublic
 		}
 	}

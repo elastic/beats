@@ -13,6 +13,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -33,6 +35,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -53,6 +57,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -73,6 +79,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -93,6 +101,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -113,6 +123,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -133,6 +145,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -153,6 +167,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -173,6 +189,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -193,6 +211,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -213,6 +233,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -233,6 +255,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -253,6 +277,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -273,6 +299,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -293,6 +321,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "general",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -313,6 +343,8 @@
         "observer.serial_number": "1606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "general",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -333,6 +365,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "general",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -353,6 +387,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -373,6 +409,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -393,6 +431,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -413,6 +453,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -433,6 +475,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -453,6 +497,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "general",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -473,6 +519,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -493,6 +541,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -513,6 +563,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "routing",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -533,6 +585,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -553,6 +607,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -573,6 +629,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -593,6 +651,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "0",
+        "panw.panos.type": "CONFIG",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -613,6 +673,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "general",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -633,6 +695,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "ras",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -653,6 +717,8 @@
         "observer.serial_number": "01606001116",
         "observer.type": "firewall",
         "observer.vendor": "Palo Alto Networks",
+        "panw.panos.sub_type": "vpn",
+        "panw.panos.type": "SYSTEM",
         "service.type": "panw",
         "tags": [
             "pan-os",
@@ -673,6 +739,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -730,6 +797,8 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",

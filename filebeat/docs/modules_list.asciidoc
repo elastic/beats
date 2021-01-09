@@ -15,12 +15,14 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
+  * <<filebeat-module-cyberark>>
   * <<filebeat-module-cylance>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
-  * <<filebeat-module-googlecloud>>
+  * <<filebeat-module-gcp>>
+  * <<filebeat-module-google_workspace>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
   * <<filebeat-module-ibmmq>>
@@ -38,19 +40,24 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mssql>>
   * <<filebeat-module-mysql>>
+  * <<filebeat-module-mysqlenterprise>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
   * <<filebeat-module-netscout>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-o365>>
   * <<filebeat-module-okta>>
+  * <<filebeat-module-oracle>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
   * <<filebeat-module-postgresql>>
+  * <<filebeat-module-proofpoint>>
   * <<filebeat-module-rabbitmq>>
   * <<filebeat-module-radware>>
   * <<filebeat-module-redis>>
   * <<filebeat-module-santa>>
+  * <<filebeat-module-snort>>
+  * <<filebeat-module-snyk>>
   * <<filebeat-module-sonicwall>>
   * <<filebeat-module-sophos>>
   * <<filebeat-module-squid>>
@@ -59,6 +66,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
+  * <<filebeat-module-zoom>>
   * <<filebeat-module-zscaler>>
 
 
@@ -77,12 +85,14 @@ include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
+include::modules/cyberark.asciidoc[]
 include::modules/cylance.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
-include::modules/googlecloud.asciidoc[]
+include::modules/gcp.asciidoc[]
+include::modules/google_workspace.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
@@ -100,19 +110,24 @@ include::modules/misp.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/mysql.asciidoc[]
+include::modules/mysqlenterprise.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
 include::modules/netscout.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/o365.asciidoc[]
 include::modules/okta.asciidoc[]
+include::modules/oracle.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
 include::modules/postgresql.asciidoc[]
+include::modules/proofpoint.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/santa.asciidoc[]
+include::modules/snort.asciidoc[]
+include::modules/snyk.asciidoc[]
 include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
@@ -121,4 +136,5 @@ include::modules/system.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
+include::modules/zoom.asciidoc[]
 include::modules/zscaler.asciidoc[]

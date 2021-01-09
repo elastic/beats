@@ -79,7 +79,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -273,69 +274,71 @@ func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.Met
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
-	if !timestamp.IsZero() {
-		for _, output := range getMetricDataResults {
-			if len(output.Values) == 0 {
-				continue
+	if timestamp.IsZero() {
+		return nil, nil
+	}
+
+	for _, output := range getMetricDataResults {
+		if len(output.Values) == 0 {
+			continue
+		}
+		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+		if exists {
+			labels := strings.Split(*output.Label, " ")
+			// Collect dimension values from the labels and initialize events and metricSetFieldResults with dimValues
+			var dimValues string
+			for i := 1; i < len(labels); i += 2 {
+				dimValues = dimValues + labels[i+1]
 			}
-			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-			if exists {
-				labels := strings.Split(*output.Label, " ")
-				// Collect dimension values from the labels and initialize events and metricSetFieldResults with dimValues
-				var dimValues string
+
+			if _, ok := events[dimValues]; !ok {
+				events[dimValues] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+			}
+
+			if _, ok := metricSetFieldResults[dimValues]; !ok {
+				metricSetFieldResults[dimValues] = map[string]interface{}{}
+			}
+
+			if len(output.Values) > timestampIdx && len(labels) > 0 {
+				if labels[metricNameIdx] == "CPUUtilization" {
+					metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx] / 100)
+				} else {
+					metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+				}
+
 				for i := 1; i < len(labels); i += 2 {
-					dimValues = dimValues + labels[i+1]
+					if labels[i] == "DBInstanceIdentifier" {
+						dbIdentifier := labels[i+1]
+						if _, found := events[dbIdentifier]; found {
+							if _, found := dbInstanceMap[dbIdentifier]; !found {
+								delete(metricSetFieldResults, dimValues)
+								continue
+							}
+							events[dbIdentifier].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbIdentifier].dbAvailabilityZone)
+							events[dbIdentifier].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbIdentifier].dbArn)
+							events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)
+							events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
+							events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
+
+							for _, tag := range dbInstanceMap[dbIdentifier].tags {
+								events[dbIdentifier].ModuleFields.Put("tags."+tag.Key, tag.Value)
+							}
+						}
+					}
+					metricSetFieldResults[dimValues][labels[i]] = fmt.Sprint(labels[(i + 1)])
 				}
 
-				if _, ok := events[dimValues]; !ok {
-					events[dimValues] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-				}
-
-				if _, ok := metricSetFieldResults[dimValues]; !ok {
-					metricSetFieldResults[dimValues] = map[string]interface{}{}
-				}
-
-				if len(output.Values) > timestampIdx && len(labels) > 0 {
-					if labels[metricNameIdx] == "CPUUtilization" {
-						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx] / 100)
-					} else {
-						metricSetFieldResults[dimValues][labels[metricNameIdx]] = fmt.Sprint(output.Values[timestampIdx])
+				// if tags_filter is given, then only return metrics with DBInstanceIdentifier as dimension
+				if m.TagsFilter != nil {
+					if len(labels) == 1 {
+						delete(events, dimValues)
+						delete(metricSetFieldResults, dimValues)
 					}
 
 					for i := 1; i < len(labels); i += 2 {
-						if labels[i] == "DBInstanceIdentifier" {
-							dbIdentifier := labels[i+1]
-							if _, found := events[dbIdentifier]; found {
-								if _, found := dbInstanceMap[dbIdentifier]; !found {
-									delete(metricSetFieldResults, dimValues)
-									continue
-								}
-								events[dbIdentifier].RootFields.Put("cloud.availability_zone", dbInstanceMap[dbIdentifier].dbAvailabilityZone)
-								events[dbIdentifier].MetricSetFields.Put("db_instance.arn", dbInstanceMap[dbIdentifier].dbArn)
-								events[dbIdentifier].MetricSetFields.Put("db_instance.class", dbInstanceMap[dbIdentifier].dbClass)
-								events[dbIdentifier].MetricSetFields.Put("db_instance.identifier", dbInstanceMap[dbIdentifier].dbIdentifier)
-								events[dbIdentifier].MetricSetFields.Put("db_instance.status", dbInstanceMap[dbIdentifier].dbStatus)
-
-								for _, tag := range dbInstanceMap[dbIdentifier].tags {
-									events[dbIdentifier].ModuleFields.Put("tags."+tag.Key, tag.Value)
-								}
-							}
-						}
-						metricSetFieldResults[dimValues][labels[i]] = fmt.Sprint(labels[(i + 1)])
-					}
-
-					// if tags_filter is given, then only return metrics with DBInstanceIdentifier as dimension
-					if m.TagsFilter != nil {
-						if len(labels) == 1 {
+						if labels[i] != "DBInstanceIdentifier" && i == len(labels)-2 {
 							delete(events, dimValues)
 							delete(metricSetFieldResults, dimValues)
-						}
-
-						for i := 1; i < len(labels); i += 2 {
-							if labels[i] != "DBInstanceIdentifier" && i == len(labels)-2 {
-								delete(events, dimValues)
-								delete(metricSetFieldResults, dimValues)
-							}
 						}
 					}
 				}

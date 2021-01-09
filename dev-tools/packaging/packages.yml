@@ -59,7 +59,7 @@ shared:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/elastic-agent.unit.tmpl'
         mode: 0644
       /etc/init.d/{{.BeatServiceName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
+        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/elastic-agent.init.sh.tmpl'
         mode: 0755
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -72,16 +72,6 @@ shared:
         mode: 0644
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
-        mode: 0644
-        skip_on_missing: true
-      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
-        mode: 0644
-      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
-        mode: 0644
-      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
@@ -165,17 +155,6 @@ shared:
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
-      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
-        mode: 0644
-      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
-        mode: 0644
-        skip_on_missing: true
-      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
-        mode: 0644
-        skip_on_missing: true
       /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
@@ -246,16 +225,6 @@ shared:
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
-        mode: 0644
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
-        mode: 0644
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
-        mode: 0644
-        skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
@@ -284,12 +253,6 @@ shared:
     <<: *common
     files:
       <<: *agent_binary_files
-      install-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service-elastic-agent.ps1.tmpl'
-        mode: 0755
-      uninstall-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
-        mode: 0755
       'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
@@ -298,16 +261,6 @@ shared:
         mode: 0644
       'data/{{.BeatName}}-{{ commit_short }}/downloads/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
         source: '{{.AgentDropPath}}/filebeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
-        mode: 0644
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
-        mode: 0644
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
-        source: '{{.AgentDropPath}}/heartbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
         skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
@@ -340,7 +293,7 @@ shared:
       buildFrom: 'centos:7'
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
-      user: 'root'
+      user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
       'elastic-agent.yml':
@@ -509,7 +462,7 @@ shared:
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi-minimal'
+      from: 'docker.elastic.co/ubi8/ubi-minimal'
 
   - &elastic_docker_spec
     extra_vars:

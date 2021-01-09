@@ -15,6 +15,10 @@ services:
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=false"
     - "indices.id_field_data.enabled=true"
+    - "script.context.template.max_compilations_rate=unlimited"
+    - "script.context.ingest.cache_max_size=2000"
+    - "script.context.processor_conditional.cache_max_size=2000"
+    - "script.context.template.cache_max_size=2000"
 
   logstash:
     image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33

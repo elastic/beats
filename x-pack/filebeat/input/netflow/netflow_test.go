@@ -197,7 +197,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 			}
 			ev := make([]beat.Event, len(flows))
 			for i := range flows {
-				ev[i] = toBeatEvent(flows[i])
+				ev[i] = toBeatEvent(flows[i], []string{"private"})
 			}
 			//return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
 			events = append(events, ev...)
@@ -242,7 +242,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 		}
 		ev := make([]beat.Event, len(flows))
 		for i := range flows {
-			ev[i] = toBeatEvent(flows[i])
+			ev[i] = toBeatEvent(flows[i], []string{"private"})
 		}
 		events = append(events, ev...)
 	}
@@ -341,7 +341,7 @@ func TestReverseFlows(t *testing.T) {
 
 	var evs []beat.Event
 	for _, f := range flows {
-		evs = append(evs, toBeatEvent(f))
+		evs = append(evs, toBeatEvent(f, []string{"private"}))
 	}
 	if !assert.Len(t, evs, 2) {
 		t.Fatal()

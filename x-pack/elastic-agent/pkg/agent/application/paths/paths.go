@@ -6,121 +6,103 @@ package paths
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
+	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	tempSubdir = "tmp"
 )
 
 var (
-	homePath    string
-	configPath  string
-	dataPath    string
-	logsPath    string
-	serviceName string
-
-	overridesLoader sync.Once
+	topPath    string
+	configPath string
+	logsPath   string
+	tmpCreator sync.Once
 )
 
 func init() {
-	initialHome := initialHome()
+	topPath = initialTop()
+	configPath = topPath
+	logsPath = topPath
 
 	fs := flag.CommandLine
-	fs.StringVar(&homePath, "path.home", initialHome, "Agent root path")
-	fs.StringVar(&configPath, "path.config", initialHome, "Config path is the directory Agent looks for its config file")
-	fs.StringVar(&dataPath, "path.data", filepath.Join(initialHome, "data"), "Data path contains Agent managed binaries")
-	fs.StringVar(&logsPath, "path.logs", initialHome, "Logs path contains Agent log output")
+	fs.StringVar(&topPath, "path.home", topPath, "Agent root path")
+	fs.StringVar(&configPath, "path.config", configPath, "Config path is the directory Agent looks for its config file")
+	fs.StringVar(&logsPath, "path.logs", logsPath, "Logs path contains Agent log output")
 }
 
-// UpdatePaths update paths based on changes in paths file.
-func UpdatePaths() {
-	getOverrides()
+// Top returns the top directory for Elastic Agent, all the versioned
+// home directories live under this top-level/data/elastic-agent-${hash}
+func Top() string {
+	return topPath
 }
 
-func getOverrides() {
-	type paths struct {
-		HomePath    string `config:"path.home" yaml:"path.home"`
-		ConfigPath  string `config:"path.config" yaml:"path.config"`
-		DataPath    string `config:"path.data" yaml:"path.data"`
-		LogsPath    string `config:"path.logs" yaml:"path.logs"`
-		ServiceName string `config:"path.service_name" yaml:"path.service_name"`
-	}
-
-	defaults := &paths{
-		HomePath:   homePath,
-		ConfigPath: configPath,
-		DataPath:   dataPath,
-		LogsPath:   logsPath,
-	}
-
-	pathsFile := filepath.Join(dataPath, "paths.yml")
-	rawConfig, err := config.LoadYAML(pathsFile)
-	if err != nil {
-		return
-	}
-
-	rawConfig.Unpack(defaults)
-	homePath = defaults.HomePath
-	configPath = defaults.ConfigPath
-	dataPath = defaults.DataPath
-	logsPath = defaults.LogsPath
-	serviceName = defaults.ServiceName
-}
-
-// ServiceName return predefined service name if defined by initial call.
-func ServiceName() string {
-	// needs to do this at this place because otherwise it will
-	// get overwritten by flags behavior.
-	overridesLoader.Do(getOverrides)
-	return serviceName
+// TempDir returns agent temp dir located within data dir.
+func TempDir() string {
+	tmpDir := filepath.Join(Data(), tempSubdir)
+	tmpCreator.Do(func() {
+		// create tempdir as it probably don't exists
+		os.MkdirAll(tmpDir, 0750)
+	})
+	return tmpDir
 }
 
 // Home returns a directory where binary lives
-// Executable is not supported on nacl.
 func Home() string {
-	overridesLoader.Do(getOverrides)
-	return homePath
+	return versionedHome(topPath)
 }
 
 // Config returns a directory where configuration file lives
 func Config() string {
-	overridesLoader.Do(getOverrides)
 	return configPath
 }
 
 // Data returns the data directory for Agent
 func Data() string {
-	overridesLoader.Do(getOverrides)
-	return dataPath
+	return filepath.Join(Top(), "data")
 }
 
 // Logs returns a the log directory for Agent
 func Logs() string {
-	overridesLoader.Do(getOverrides)
 	return logsPath
 }
 
+// initialTop returns the initial top-level path for the binary
+//
+// When nested in top-level/data/elastic-agent-${hash}/ the result is top-level/.
+func initialTop() string {
+	exePath := retrieveExecutablePath()
+	if insideData(exePath) {
+		return filepath.Dir(filepath.Dir(exePath))
+	}
+	return exePath
+}
+
+// retrieveExecutablePath returns the executing binary, even if the started binary was a symlink
 func retrieveExecutablePath() string {
 	execPath, err := os.Executable()
 	if err != nil {
 		panic(err)
 	}
-
 	evalPath, err := filepath.EvalSymlinks(execPath)
 	if err != nil {
 		panic(err)
 	}
-
 	return filepath.Dir(evalPath)
 }
 
-func initialHome() string {
-	exePath := retrieveExecutablePath()
-	if runtime.GOOS == "windows" {
-		return exePath
-	}
+// insideData returns true when the exePath is inside of the current Agents data path.
+func insideData(exePath string) bool {
+	expectedPath := filepath.Join("data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
+	return strings.HasSuffix(exePath, expectedPath)
+}
 
-	return filepath.Dir(filepath.Dir(exePath)) // is two level up the executable (symlink evaluated)
+func versionedHome(base string) string {
+	return filepath.Join(base, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
 }

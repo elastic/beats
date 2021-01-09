@@ -37,6 +37,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -94,6 +97,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.104",
             "172.31.98.44"
@@ -151,6 +157,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -208,6 +217,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -265,6 +277,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.185.90",
             "172.31.98.44"
@@ -322,6 +337,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.185.90",
             "172.31.98.44"
@@ -379,6 +397,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.160.197",
             "172.31.98.44"
@@ -436,6 +457,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.14",
             "172.31.98.44"
@@ -493,6 +517,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.33",
             "172.31.98.44"
@@ -550,6 +577,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.35.9",
             "172.31.98.44"
@@ -607,6 +637,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.211.242",
             "172.31.98.44"
@@ -664,6 +697,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.218.21",
             "172.31.98.44"
@@ -721,6 +757,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.27",
             "172.31.98.44"
@@ -778,6 +817,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.27",
             "172.31.98.44"
@@ -835,6 +877,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.202.211",
             "172.31.98.44"
@@ -892,6 +937,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.15",
             "172.31.98.44"
@@ -949,6 +997,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.124.15",
             "172.31.98.44"
@@ -1006,6 +1057,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.209.247",
             "172.31.98.44"
@@ -1063,6 +1117,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.35.162",
             "172.31.98.44"
@@ -1114,6 +1171,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -1171,6 +1231,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.80.32",
             "172.31.98.44"
@@ -1228,6 +1291,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.80.32",
             "172.31.98.44"
@@ -1285,6 +1351,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.6",
             "172.31.98.44"
@@ -1342,6 +1411,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.6",
             "172.31.98.44"
@@ -1393,6 +1465,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -1450,6 +1525,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.226",
             "172.31.98.44"
@@ -1501,6 +1579,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -1558,6 +1639,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.252.226",
             "172.31.98.44"
@@ -1615,6 +1699,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.238.126",
             "172.31.98.44"
@@ -1672,6 +1759,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.93.51",
             "172.31.98.44"
@@ -1729,6 +1819,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.238.126",
             "172.31.98.44"
@@ -1786,6 +1879,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.93.51",
             "172.31.98.44"
@@ -1837,6 +1933,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -1894,6 +1993,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.225.103",
             "172.31.98.44"
@@ -1945,6 +2047,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -2002,6 +2107,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.240.126",
             "172.31.98.44"
@@ -2059,6 +2167,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.44.45",
             "172.31.98.44"
@@ -2116,6 +2227,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.240.126",
             "172.31.98.44"
@@ -2173,6 +2287,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.44.45",
             "172.31.98.44"
@@ -2224,6 +2341,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -2281,6 +2401,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.179.219",
             "172.31.98.44"
@@ -2338,6 +2461,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2395,6 +2521,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.178.133",
             "172.31.98.44"
@@ -2452,6 +2581,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2509,6 +2641,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.178.133",
             "172.31.98.44"
@@ -2560,6 +2695,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -2617,6 +2755,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.133.112",
             "172.31.98.44"
@@ -2674,6 +2815,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.133.112",
             "172.31.98.44"
@@ -2731,6 +2875,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.204.197",
             "172.31.98.44"
@@ -2788,6 +2935,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.157.232",
             "172.31.98.44"
@@ -2845,6 +2995,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.204.197",
             "172.31.98.44"
@@ -2896,6 +3049,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -2953,6 +3109,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3004,6 +3163,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3061,6 +3223,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3112,6 +3277,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3169,6 +3337,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.128.3",
             "172.31.98.44"
@@ -3226,6 +3397,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.100.4",
             "172.31.98.44"
@@ -3283,6 +3457,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.100.4",
             "172.31.98.44"
@@ -3334,6 +3511,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3391,6 +3571,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3442,6 +3625,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3499,6 +3685,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3556,6 +3745,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.1.107",
             "172.31.98.44"
@@ -3613,6 +3805,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3664,6 +3859,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3721,6 +3919,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.198.40",
             "172.31.98.44"
@@ -3778,6 +3979,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.1.107",
             "172.31.98.44"
@@ -3829,6 +4033,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -3886,6 +4093,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.192.44",
             "172.31.98.44"
@@ -3928,6 +4138,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -3972,6 +4185,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.156.80",
             "100.66.98.44"
@@ -4029,6 +4245,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.156.80"
@@ -4071,6 +4290,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4106,6 +4328,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4141,6 +4366,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4176,6 +4404,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4211,6 +4442,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4246,6 +4480,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -4296,6 +4533,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.115.46",
             "172.31.156.80"
@@ -4353,6 +4593,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.156.80"
@@ -4404,6 +4647,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.156.80",
             "100.66.98.44"
@@ -4461,6 +4707,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.115.46",
             "172.31.156.80"
@@ -4515,6 +4764,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4569,6 +4821,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4623,6 +4878,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4677,6 +4935,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4731,6 +4992,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4785,6 +5049,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4839,6 +5106,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4893,6 +5163,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -4947,6 +5220,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5001,6 +5277,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5055,6 +5334,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5109,6 +5391,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5163,6 +5448,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.19.254",
             "172.31.98.44"
@@ -5214,6 +5502,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -5271,6 +5562,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.205.99",
             "172.31.98.44"
@@ -5322,6 +5616,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "172.31.98.44",
             "100.66.98.44"
@@ -5379,6 +5676,9 @@
         "observer.vendor": "Cisco",
         "process.name": "CiscoASA",
         "process.pid": 999,
+        "related.hosts": [
+            "localhost"
+        ],
         "related.ip": [
             "100.66.14.30",
             "172.31.98.44"

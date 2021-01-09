@@ -26,8 +26,7 @@ import (
 )
 
 type config struct {
-	unix.Config   `config:",inline"`
-	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+	unix.Config `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -35,7 +34,8 @@ func defaultConfig() config {
 		Config: unix.Config{
 			Timeout:        time.Minute * 5,
 			MaxMessageSize: 20 * humanize.MiByte,
+			SocketType:     unix.StreamSocket,
+			LineDelimiter:  "\n",
 		},
-		LineDelimiter: "\n",
 	}
 }

@@ -7,17 +7,22 @@ package application
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
 
 func TestMonitoringInjection(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMap)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +30,7 @@ func TestMonitoringInjection(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -83,12 +88,16 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDefaults(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMapDefaults)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +105,7 @@ func TestMonitoringInjectionDefaults(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -154,12 +163,16 @@ GROUPLOOP:
 }
 
 func TestMonitoringInjectionDisabled(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ast, err := transpiler.NewAST(inputConfigMapDisabled)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	programsToRun, err := program.Programs(ast)
+	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,7 +180,7 @@ func TestMonitoringInjectionDisabled(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(group, ast, ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP

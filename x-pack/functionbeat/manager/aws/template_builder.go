@@ -66,7 +66,7 @@ func NewTemplateBuilder(log *logp.Logger, cfg *common.Config, p provider.Provide
 	return &defaultTemplateBuilder{
 		provider: p,
 		log:      log,
-		endpoint: config.Endpoint,
+		endpoint: config.Credentials.Endpoint,
 		bucket:   string(config.DeployBucket),
 	}, nil
 }

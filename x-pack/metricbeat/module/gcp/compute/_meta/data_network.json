@@ -1,0 +1,70 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "8174466357339614075",
+            "name": "ron-loadtest-kibana"
+        },
+        "machine": {
+            "type": "n1-standard-8"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "instance": {
+                "network": {
+                    "received_bytes_count": {
+                        "value": 43502
+                    },
+                    "received_packets_count": {
+                        "value": 94
+                    },
+                    "sent_bytes_count": {
+                        "value": 202
+                    },
+                    "sent_packets_count": {
+                        "value": 4
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "loadbalanced": "false"
+            }
+        }
+    },
+    "host": {
+        "id": "8174466357339614075",
+        "name": "ron-loadtest-kibana",
+        "network": {
+            "in": {
+                "bytes": 202,
+                "packets": 4
+            },
+            "out": {
+                "bytes": 43502,
+                "packets": 94
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

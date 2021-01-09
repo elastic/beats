@@ -1,0 +1,35 @@
+[
+    {
+        "@timestamp": "2020-10-07T17:01:06.000Z",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "NONE",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 573,
+        "oracle.database_audit.action": "BEGIN sys.prvt_hdm.auto_execute( db_id => :bind_dbid, inst_id => :bind_inst, end_snap => :bind_snap, time_left_in_secs => :bind_time); END;",
+        "oracle.database_audit.action_number": "47",
+        "oracle.database_audit.client.terminal": "UNKNOWN",
+        "oracle.database_audit.database.id": "2824230686",
+        "oracle.database_audit.length": 447,
+        "oracle.database_audit.session_id": "0",
+        "oracle.database_audit.status": "0",
+        "process.pid": "29815",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "/",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]

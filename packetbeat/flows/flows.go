@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
 type Flows struct {
@@ -41,7 +42,7 @@ const (
 	defaultPeriod  = 10 * time.Second
 )
 
-func NewFlows(pub Reporter, config *config.Flows) (*Flows, error) {
+func NewFlows(pub Reporter, watcher procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil
@@ -67,7 +68,7 @@ func NewFlows(pub Reporter, config *config.Flows) (*Flows, error) {
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(pub, table, counter, timeout, period)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err

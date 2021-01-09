@@ -17,9 +17,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-// Config contains information about httpjson configuration
+// config contains information about httpjson configuration
 type config struct {
-	OAuth2               *OAuth2           `config:"oauth2"`
+	OAuth2               *oauth2Config     `config:"oauth2"`
 	APIKey               string            `config:"api_key"`
 	AuthenticationScheme string            `config:"authentication_scheme"`
 	HTTPClientTimeout    time.Duration     `config:"http_client_timeout"`
@@ -30,21 +30,21 @@ type config struct {
 	JSONObjects          string            `config:"json_objects_array"`
 	SplitEventsBy        string            `config:"split_events_by"`
 	NoHTTPBody           bool              `config:"no_http_body"`
-	Pagination           *Pagination       `config:"pagination"`
-	RateLimit            *RateLimit        `config:"rate_limit"`
+	Pagination           *paginationConfig `config:"pagination"`
+	RateLimit            *rateLimitConfig  `config:"rate_limit"`
 	RetryMax             int               `config:"retry.max_attempts"`
 	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
 	TLS                  *tlscommon.Config `config:"ssl"`
-	URL                  *URL              `config:"url" validate:"required"`
-	DateCursor           *DateCursor       `config:"date_cursor"`
+	URL                  *urlConfig        `config:"url" validate:"required"`
+	DateCursor           *dateCursorConfig `config:"date_cursor"`
 }
 
 // Pagination contains information about httpjson pagination settings
-type Pagination struct {
+type paginationConfig struct {
 	Enabled          *bool         `config:"enabled"`
 	ExtraBodyContent common.MapStr `config:"extra_body_content"`
-	Header           *Header       `config:"header"`
+	Header           *headerConfig `config:"header"`
 	IDField          string        `config:"id_field"`
 	RequestField     string        `config:"req_field"`
 	URLField         string        `config:"url_field"`
@@ -52,83 +52,88 @@ type Pagination struct {
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (p *Pagination) IsEnabled() bool {
+func (p *paginationConfig) isEnabled() bool {
 	return p != nil && (p.Enabled == nil || *p.Enabled)
 }
 
 // HTTP Header information for pagination
-type Header struct {
+type headerConfig struct {
 	FieldName    string         `config:"field_name" validate:"required"`
 	RegexPattern *regexp.Regexp `config:"regex_pattern" validate:"required"`
 }
 
 // HTTP Header Rate Limit information
-type RateLimit struct {
+type rateLimitConfig struct {
 	Limit     string `config:"limit"`
 	Reset     string `config:"reset"`
 	Remaining string `config:"remaining"`
 }
 
-type DateCursor struct {
-	Enabled         *bool         `config:"enabled"`
-	Field           string        `config:"field"`
-	URLField        string        `config:"url_field" validate:"required"`
-	ValueTemplate   *Template     `config:"value_template"`
-	DateFormat      string        `config:"date_format"`
-	InitialInterval time.Duration `config:"initial_interval"`
+type dateCursorConfig struct {
+	Enabled         *bool           `config:"enabled"`
+	Field           string          `config:"field"`
+	URLField        string          `config:"url_field" validate:"required"`
+	ValueTemplate   *templateConfig `config:"value_template"`
+	DateFormat      string          `config:"date_format"`
+	InitialInterval time.Duration   `config:"initial_interval"`
 }
 
-type Template struct {
+type templateConfig struct {
 	*template.Template
 }
 
-func (t *Template) Unpack(in string) error {
+func (t *templateConfig) Unpack(in string) error {
 	tpl, err := template.New("tpl").Parse(in)
 	if err != nil {
 		return err
 	}
 
-	*t = Template{Template: tpl}
+	*t = templateConfig{Template: tpl}
 
 	return nil
 }
 
-type URL struct {
+type urlConfig struct {
 	*url.URL
 }
 
-func (u *URL) Unpack(in string) error {
+func (u *urlConfig) Unpack(in string) error {
 	parsed, err := url.Parse(in)
 	if err != nil {
 		return err
 	}
 
-	*u = URL{URL: parsed}
+	*u = urlConfig{URL: parsed}
 
 	return nil
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (dc *DateCursor) IsEnabled() bool {
+func (dc *dateCursorConfig) isEnabled() bool {
 	return dc != nil && (dc.Enabled == nil || *dc.Enabled)
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (dc *DateCursor) GetDateFormat() string {
+func (dc *dateCursorConfig) getDateFormat() string {
 	if dc.DateFormat == "" {
 		return time.RFC3339
 	}
 	return dc.DateFormat
 }
 
-func (dc *DateCursor) Validate() error {
+func (dc *dateCursorConfig) Validate() error {
 	if dc.DateFormat == "" {
 		return nil
 	}
-	now := time.Now().Format(dc.DateFormat)
-	if _, err := time.Parse(dc.DateFormat, now); err != nil {
+
+	const knownTimestamp = 1602601228 // 2020-10-13T15:00:28+00:00 RFC3339
+	knownDate := time.Unix(knownTimestamp, 0).UTC()
+
+	dateStr := knownDate.Format(dc.DateFormat)
+	if _, err := time.Parse(dc.DateFormat, dateStr); err != nil {
 		return errors.New("invalid configuration: date_format is not a valid date layout")
 	}
+
 	return nil
 }
 
@@ -154,7 +159,7 @@ func (c *config) Validate() error {
 			}
 		}
 	}
-	if c.OAuth2.IsEnabled() {
+	if c.OAuth2.isEnabled() {
 		if c.APIKey != "" || c.AuthenticationScheme != "" {
 			return errors.New("invalid configuration: oauth2 and api_key or authentication_scheme cannot be set simultaneously")
 		}
@@ -162,7 +167,7 @@ func (c *config) Validate() error {
 	return nil
 }
 
-func defaultConfig() config {
+func newDefaultConfig() config {
 	var c config
 	c.HTTPMethod = "GET"
 	c.HTTPClientTimeout = 60 * time.Second

@@ -11,6 +11,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -54,7 +55,10 @@ func LoadConfigFromFile(path string) (*config.Config, error) {
 //
 // This must be used to load the Agent configuration, so that variables defined in the inputs are not
 // parsed by go-ucfg. Variables from the inputs should be parsed by the transpiler.
-func LoadConfig(m map[string]interface{}) (*config.Config, error) {
+func LoadConfig(in map[string]interface{}) (*config.Config, error) {
+	// make copy of a map so we dont affect a caller
+	m := common.MapStr(in).Clone()
+
 	inputs, ok := m["inputs"]
 	if ok {
 		// remove the inputs

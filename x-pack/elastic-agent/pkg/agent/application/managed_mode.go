@@ -11,8 +11,11 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/go-sysinfo"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -22,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -51,18 +55,17 @@ type Managed struct {
 	router      *router
 	srv         *server.Server
 	as          *actionStore
+	upgrader    *upgrade.Upgrader
 }
 
 func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
 	rawConfig *config.Config,
+	reexec reexecManager,
+	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
-	}
-
+	statusController := status.NewController(log)
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
@@ -113,6 +116,13 @@ func newManaged(
 			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
 	}
 
+	sysInfo, err := sysinfo.Host()
+	if err != nil {
+		return nil, errors.New(err,
+			"fail to get system information",
+			errors.TypeUnexpected)
+	}
+
 	managedApplication := &Managed{
 		log:       log,
 		agentInfo: agentInfo,
@@ -142,7 +152,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, cfg.Settings, managedApplication.srv, combinedReporter, monitor))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusController))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -156,11 +166,12 @@ func newManaged(
 	emit, err := emitter(
 		managedApplication.bgContext,
 		log,
+		agentInfo,
 		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config)},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info(), agentInfo)},
 		},
 		monitor,
 	)
@@ -187,12 +198,26 @@ func newManaged(
 		return nil, err
 	}
 
+	managedApplication.upgrader = upgrade.NewUpgrader(
+		agentInfo,
+		cfg.Settings.DownloadConfig,
+		log,
+		[]context.CancelFunc{managedApplication.cancelCtxFn},
+		reexec,
+		acker,
+		combinedReporter)
+
+	policyChanger := &handlerPolicyChange{
+		log:       log,
+		emitter:   emit,
+		agentInfo: agentInfo,
+		config:    cfg,
+		store:     store,
+		setters:   []clientSetter{acker},
+	}
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
-			log:     log,
-			emitter: emit,
-		},
+		&fleetapi.ActionPolicyChange{},
+		policyChanger,
 	)
 
 	actionDispatcher.MustRegister(
@@ -203,6 +228,23 @@ func newManaged(
 			dispatcher:  router,
 			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
 			actionStore: actionStore,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionUpgrade{},
+		&handlerUpgrade{
+			upgrader: managedApplication.upgrader,
+			log:      log,
+		},
+	)
+
+	actionDispatcher.MustRegister(
+		&fleetapi.ActionSettings{},
+		&handlerSettings{
+			log:       log,
+			reexec:    reexec,
+			agentInfo: agentInfo,
 		},
 	)
 
@@ -230,10 +272,14 @@ func newManaged(
 		actionDispatcher,
 		fleetR,
 		actionAcker,
+		statusController,
 	)
 	if err != nil {
 		return nil, err
 	}
+	// add the gateway to setters, so the gateway can be updated
+	// when the hosts for Kibana are updated by the policy.
+	policyChanger.setters = append(policyChanger.setters, gateway)
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
@@ -245,6 +291,10 @@ func (m *Managed) Start() error {
 	if m.wasUnenrolled() {
 		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
 		return nil
+	}
+
+	if err := m.upgrader.Ack(m.bgContext); err != nil {
+		m.log.Warnf("failed to ack update %v", err)
 	}
 
 	m.gateway.Start()

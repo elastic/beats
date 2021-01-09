@@ -17,10 +17,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
-const checkingPath = "/api/ingest_manager/fleet/agents/%s/checkin"
+const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
+	Status   string              `json:"status"`
 	Events   []SerializableEvent `json:"events"`
 	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }

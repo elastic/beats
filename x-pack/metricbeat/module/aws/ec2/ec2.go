@@ -88,7 +88,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -174,115 +175,117 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID st
 }
 
 func (m *MetricSet) createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, instanceOutput map[string]ec2.Instance, regionName string) (map[string]mb.Event, error) {
-	// Initialize events and metricSetFieldResults per instanceID
-	events := map[string]mb.Event{}
-	metricSetFieldResults := map[idStat]map[string]interface{}{}
-	for instanceID := range instanceOutput {
-		for _, statistic := range statistics {
-			events[instanceID] = aws.InitEvent(regionName, m.AccountName, m.AccountID)
-			metricSetFieldResults[idStat{instanceID: instanceID, statistic: statistic}] = map[string]interface{}{}
-		}
-	}
-
 	// monitoring state for each instance
 	monitoringStates := map[string]string{}
 
 	// Find a timestamp for all metrics in output
 	timestamp := aws.FindTimestamp(getMetricDataResults)
-	if !timestamp.IsZero() {
-		for _, output := range getMetricDataResults {
-			if len(output.Values) == 0 {
+	if timestamp.IsZero() {
+		return nil, nil
+	}
+
+	// Initialize events and metricSetFieldResults per instanceID
+	events := map[string]mb.Event{}
+	metricSetFieldResults := map[idStat]map[string]interface{}{}
+	for instanceID := range instanceOutput {
+		for _, statistic := range statistics {
+			events[instanceID] = aws.InitEvent(regionName, m.AccountName, m.AccountID, timestamp)
+			metricSetFieldResults[idStat{instanceID: instanceID, statistic: statistic}] = map[string]interface{}{}
+		}
+	}
+
+	for _, output := range getMetricDataResults {
+		if len(output.Values) == 0 {
+			continue
+		}
+
+		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+		if exists {
+			label, err := newLabelFromJSON(*output.Label)
+			if err != nil {
+				m.logger.Errorf("convert cloudwatch MetricDataResult label failed for label = %s: %w", *output.Label, err)
 				continue
 			}
 
-			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-			if exists {
-				label, err := newLabelFromJSON(*output.Label)
-				if err != nil {
-					m.logger.Errorf("convert cloudwatch MetricDataResult label failed for label = %s: %w", *output.Label, err)
+			instanceID := label.InstanceID
+			statistic := label.Statistic
+
+			// Add tags
+			tags := instanceOutput[instanceID].Tags
+			if m.TagsFilter != nil {
+				// Check with each tag filter
+				// If tag filter doesn't exist in tagKeys/tagValues,
+				// then do not report this event/instance.
+				if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
+					// if tag filter doesn't exist, remove this event initial
+					// entry to avoid report an empty event.
+					delete(events, instanceID)
 					continue
 				}
-
-				instanceID := label.InstanceID
-				statistic := label.Statistic
-
-				// Add tags
-				tags := instanceOutput[instanceID].Tags
-				if m.TagsFilter != nil {
-					// Check with each tag filter
-					// If tag filter doesn't exist in tagKeys/tagValues,
-					// then do not report this event/instance.
-					if exists := aws.CheckTagFiltersExist(m.TagsFilter, tags); !exists {
-						// if tag filter doesn't exist, remove this event initial
-						// entry to avoid report an empty event.
-						delete(events, instanceID)
-						continue
-					}
-				}
-
-				// By default, replace dot "." using underscore "_" for tag keys.
-				// Note: tag values are not dedotted.
-				for _, tag := range tags {
-					events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
-					// add cloud.instance.name and host.name into ec2 events
-					if *tag.Key == "Name" {
-						events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
-						events[instanceID].RootFields.Put("host.name", *tag.Value)
-					}
-				}
-
-				machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
-				if err != nil {
-					return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
-				}
-
-				events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
-				events[instanceID].RootFields.Put("cloud.machine.type", machineType)
-
-				placement := instanceOutput[instanceID].Placement
-				if placement != nil {
-					events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
-				}
-
-				if len(output.Values) > timestampIdx {
-					metricSetFieldResults[idStat{instanceID: instanceID, statistic: statistic}][label.MetricName] = fmt.Sprint(output.Values[timestampIdx])
-				}
-
-				instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
-				if err != nil {
-					return events, errors.Wrap(err, "instance.State.Name.MarshalValue failed")
-				}
-
-				monitoringState, err := instanceOutput[instanceID].Monitoring.State.MarshalValue()
-				if err != nil {
-					return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
-				}
-
-				monitoringStates[instanceID] = monitoringState
-
-				cpuOptions := instanceOutput[instanceID].CpuOptions
-				if cpuOptions != nil {
-					events[instanceID].MetricSetFields.Put("instance.core.count", *cpuOptions.CoreCount)
-					events[instanceID].MetricSetFields.Put("instance.threads_per_core", *cpuOptions.ThreadsPerCore)
-				}
-
-				publicIP := instanceOutput[instanceID].PublicIpAddress
-				if publicIP != nil {
-					events[instanceID].MetricSetFields.Put("instance.public.ip", *publicIP)
-				}
-
-				privateIP := instanceOutput[instanceID].PrivateIpAddress
-				if privateIP != nil {
-					events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
-				}
-
-				events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
-				events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
-				events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
-				events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
-				events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
-				events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 			}
+
+			// By default, replace dot "." using underscore "_" for tag keys.
+			// Note: tag values are not dedotted.
+			for _, tag := range tags {
+				events[instanceID].ModuleFields.Put("tags."+common.DeDot(*tag.Key), *tag.Value)
+				// add cloud.instance.name and host.name into ec2 events
+				if *tag.Key == "Name" {
+					events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
+					events[instanceID].RootFields.Put("host.name", *tag.Value)
+				}
+			}
+
+			machineType, err := instanceOutput[instanceID].InstanceType.MarshalValue()
+			if err != nil {
+				return events, errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+			}
+
+			events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
+			events[instanceID].RootFields.Put("cloud.machine.type", machineType)
+
+			placement := instanceOutput[instanceID].Placement
+			if placement != nil {
+				events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+			}
+
+			if len(output.Values) > timestampIdx {
+				metricSetFieldResults[idStat{instanceID: instanceID, statistic: statistic}][label.MetricName] = fmt.Sprint(output.Values[timestampIdx])
+			}
+
+			instanceStateName, err := instanceOutput[instanceID].State.Name.MarshalValue()
+			if err != nil {
+				return events, errors.Wrap(err, "instance.State.Name.MarshalValue failed")
+			}
+
+			monitoringState, err := instanceOutput[instanceID].Monitoring.State.MarshalValue()
+			if err != nil {
+				return events, errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
+			}
+
+			monitoringStates[instanceID] = monitoringState
+
+			cpuOptions := instanceOutput[instanceID].CpuOptions
+			if cpuOptions != nil {
+				events[instanceID].MetricSetFields.Put("instance.core.count", *cpuOptions.CoreCount)
+				events[instanceID].MetricSetFields.Put("instance.threads_per_core", *cpuOptions.ThreadsPerCore)
+			}
+
+			publicIP := instanceOutput[instanceID].PublicIpAddress
+			if publicIP != nil {
+				events[instanceID].MetricSetFields.Put("instance.public.ip", *publicIP)
+			}
+
+			privateIP := instanceOutput[instanceID].PrivateIpAddress
+			if privateIP != nil {
+				events[instanceID].MetricSetFields.Put("instance.private.ip", *privateIP)
+			}
+
+			events[instanceID].MetricSetFields.Put("instance.image.id", *instanceOutput[instanceID].ImageId)
+			events[instanceID].MetricSetFields.Put("instance.state.name", instanceStateName)
+			events[instanceID].MetricSetFields.Put("instance.state.code", *instanceOutput[instanceID].State.Code)
+			events[instanceID].MetricSetFields.Put("instance.monitoring.state", monitoringState)
+			events[instanceID].MetricSetFields.Put("instance.public.dns_name", *instanceOutput[instanceID].PublicDnsName)
+			events[instanceID].MetricSetFields.Put("instance.private.dns_name", *instanceOutput[instanceID].PrivateDnsName)
 		}
 	}
 
