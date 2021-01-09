@@ -1,4 +1,4 @@
-- name: log
+- name: csv
   type: group
   description: >
     Fields from the PostgreSQL CSV log files.
