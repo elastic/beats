@@ -16,17 +16,17 @@ type SyntheticSuite struct {
 	suiteCfg *Config
 }
 
-func NewSuite(rawCfg *common.Config) (ss *SyntheticSuite, err error) {
-	ss = &SyntheticSuite{
+func NewSuite(rawCfg *common.Config) (*SyntheticSuite, error) {
+	ss := &SyntheticSuite{
 		rawCfg: rawCfg,
+		suiteCfg: &Config{},
 	}
-
-	err = rawCfg.Unpack(ss.suiteCfg)
+	err := rawCfg.Unpack(ss.suiteCfg)
 	if err != nil {
 		logp.Err("could not parse suite config: %s", err)
 	}
 
-	return
+	return ss, err
 }
 
 func (s *SyntheticSuite) String() string {

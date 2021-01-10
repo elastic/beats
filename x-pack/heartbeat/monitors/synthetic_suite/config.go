@@ -39,12 +39,12 @@ func (s *Source) active() ISource {
 	return s.ActiveMemo
 }
 
-func (s *Source) Validate() error {
-	if  s.active() == nil {
-		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
-	}
-	return nil
-}
+//func (s *Source) Validate() error {
+//	if  s.active() == nil {
+//		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
+//	}
+//	return nil
+//}
 
 type ISource interface {
 	Fetch() error
@@ -113,4 +113,3 @@ func (z *ZipURLSource) Fetch() error {
 func (z *ZipURLSource) Workdir() string {
 	panic("implement me")
 }
-
