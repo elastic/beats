@@ -338,7 +338,14 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	return err
 }
 
+// getNpmRoot gets the closest ancestor path that contains package.json.
 func getNpmRoot(path string) (string, error) {
+	return getNpmRootIn(path, path)
+}
+
+// getNpmRootIn does the same as getNpmRoot but remembers the original path for
+// debugging.
+func getNpmRootIn(path, origPath string) (string, error) {
 	candidate := filepath.Join(path, "package.json")
 	_, err := os.Lstat(candidate)
 	if err == nil {
@@ -347,7 +354,7 @@ func getNpmRoot(path string) (string, error) {
 	// Try again one level up
 	parent := filepath.Dir(path)
 	if len(parent) < 2 {
-		return "", fmt.Errorf("no package.json found")
+		return "", fmt.Errorf("no package.json found in %s", origPath)
 	}
-	return getNpmRoot(parent)
+	return getNpmRootIn(parent, origPath)
 }

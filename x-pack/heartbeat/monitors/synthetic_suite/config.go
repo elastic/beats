@@ -3,7 +3,6 @@ package synthetic_suite
 import (
 	"fmt"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/otiai10/copy"
 	"io/ioutil"
 )
@@ -23,7 +22,6 @@ type Source struct {
 }
 
 func (s *Source) active() ISource {
-	logp.Warn("IN ACTIVE!!!")
 	if s.ActiveMemo != nil {
 		return s.ActiveMemo
 	}
@@ -39,12 +37,12 @@ func (s *Source) active() ISource {
 	return s.ActiveMemo
 }
 
-//func (s *Source) Validate() error {
-//	if  s.active() == nil {
-//		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
-//	}
-//	return nil
-//}
+func (s *Source) Validate() error {
+	if  s.active() == nil {
+		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
+	}
+	return nil
+}
 
 type ISource interface {
 	Fetch() error
@@ -61,17 +59,18 @@ type PollingSource struct {
 }
 
 type LocalSource struct {
-	Path     string                 `config:"path"`
+	OrigPath     string                 `config:"path"`
+	workingPath string
 	BaseSource
 }
 
-func (l *LocalSource) Fetch() error {
-	dir, err := ioutil.TempDir("/tmp", "elastic-synthetics-")
+func (l *LocalSource) Fetch() (err error) {
+	l.workingPath, err = ioutil.TempDir("/tmp", "elastic-synthetics-")
 	if err != nil {
 		return fmt.Errorf("could not create tmp dir: %w", err)
 	}
 
-	err = copy.Copy(l.Path, dir)
+	err = copy.Copy(l.OrigPath, l.workingPath)
 	if err != nil {
 		return fmt.Errorf("could not copy suite: %w", err)
 	}
@@ -79,7 +78,7 @@ func (l *LocalSource) Fetch() error {
 }
 
 func (l *LocalSource) Workdir() string {
-	panic("implement me")
+	return l.workingPath
 }
 
 // GithubSource handles configs for github repos, using the API defined here:
