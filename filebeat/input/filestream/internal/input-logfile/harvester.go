@@ -119,6 +119,8 @@ type HarvesterGroup interface {
 	Start(input.Context, Source)
 	// Restart starts a Harvester if it might be already running.
 	Restart(input.Context, Source)
+	// Continue starts a new Harvester with the state information of the previous.
+	Continue(ctx input.Context, previous, next Source)
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
 	// StopGroup cancels all running Harvesters.
@@ -215,6 +217,32 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		return nil
 	}
+}
+
+// Continue start a new Harvester with the state information from a different Source.
+func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Source) {
+	hg.tg.Go(func(canceler unison.Canceler) error {
+		previousResource, err := lock(ctx, hg.store, previous.Name())
+		if err != nil {
+			return fmt.Errorf("error while locking previous resource: %v", err)
+		}
+		// mark previous state out of date
+		// so when reading starts again the offset is set to zero
+		hg.store.UpdateTTL(previousResource, -1)
+
+		nextResource, err := lock(ctx, hg.store, next.Name())
+		if err != nil {
+			return fmt.Errorf("error while locking next resource: %v", err)
+		}
+		hg.store.UpdateTTL(nextResource, hg.cleanTimeout)
+
+		nextResource = previousResource.CopyWithNewKey(next.Name())
+		releaseResource(nextResource)
+		releaseResource(previousResource)
+
+		hg.Start(ctx, next)
+		return nil
+	})
 }
 
 // Stop stops the running Harvester for a given Source.

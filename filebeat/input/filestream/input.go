@@ -20,6 +20,7 @@ package filestream
 import (
 	"fmt"
 	"os"
+	"regexp"
 
 	"golang.org/x/text/transform"
 
@@ -98,12 +99,25 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	prospector := &fileProspector{
+	var prospector loginp.Prospector
+	fileprospector := fileProspector{
 		filewatcher:       filewatcher,
 		identifier:        identifier,
 		ignoreOlder:       config.IgnoreOlder,
 		cleanRemoved:      config.CleanRemoved,
 		stateChangeCloser: config.Close.OnStateChange,
+	}
+
+	if config.Rotation != (rotationConfig{}) {
+		if config.Rotation.Method == CopyTruncate {
+			suffix, err := regexp.Compile(config.Rotation.SuffixRegex)
+			if err != nil {
+				return nil, nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
+			}
+			prospector = &copyTruncateFileProspector{fileprospector, suffix, make(map[string]*rotatedFileGroup)}
+		}
+	} else {
+		prospector = &fileprospector
 	}
 
 	filestream := &filestream{
@@ -320,6 +334,10 @@ func (inp *filestream) readFromSource(
 				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
+			case reader.ErrLineUnparsable:
+				log.Info("Skipping unparsable line in file.")
+				s.Offset += int64(message.Bytes)
+				continue
 			default:
 				log.Errorf("Read line error: %v", err)
 			}
