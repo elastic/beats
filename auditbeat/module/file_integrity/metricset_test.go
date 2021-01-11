@@ -481,13 +481,7 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 
 type expectedEvents []expectedEvent
 
-func (e expectedEvents) validate(t *testing.T, ms *MetricSet) {
-	for _, ev := range e {
-		ev.validate(t, ms)
-	}
-}
-
-func TestEventFailedHash(t *testing.T) {
+func (e expectedEvents) validate(t *testing.T) {
 	store, err := ioutil.TempFile("", "bucket")
 	if err != nil {
 		t.Fatal(err)
@@ -507,7 +501,12 @@ func TestEventFailedHash(t *testing.T) {
 		t.Fatal("can't create metricset")
 	}
 	ms.bucket = bucket.(datastore.BoltBucket)
+	for _, ev := range e {
+		ev.validate(t, ms)
+	}
+}
 
+func TestEventFailedHash(t *testing.T) {
 	baseTime := time.Now()
 	t.Run("failed hash on update", func(t *testing.T) {
 		expectedEvents{
@@ -619,7 +618,7 @@ func TestEventFailedHash(t *testing.T) {
 					"file.hash.sha1": Digest("33333333333333333333"),
 				},
 			},
-		}.validate(t, ms)
+		}.validate(t)
 	})
 	t.Run("failed hash on creation", func(t *testing.T) {
 		expectedEvents{
@@ -665,7 +664,7 @@ func TestEventFailedHash(t *testing.T) {
 					"file.hash.sha1": Digest("22222222222222222222"),
 				},
 			},
-		}.validate(t, ms)
+		}.validate(t)
 	})
 	t.Run("delete", func(t *testing.T) {
 		expectedEvents{
@@ -698,9 +697,8 @@ func TestEventFailedHash(t *testing.T) {
 					Path:      "/some/other/path",
 					Info:      nil,
 					Source:    SourceFSNotify,
-					// FSEvents likes to add extra flags to delete events.
-					Action: Deleted,
-					Hashes: nil,
+					Action:    Deleted,
+					Hashes:    nil,
 				},
 				expected: map[string]interface{}{
 					"event.action":   []string{"deleted"},
@@ -708,7 +706,7 @@ func TestEventFailedHash(t *testing.T) {
 					"file.hash.sha1": nil,
 				},
 			},
-		}.validate(t, ms)
+		}.validate(t)
 	})
 	t.Run("move", func(t *testing.T) {
 		expectedEvents{
@@ -751,7 +749,228 @@ func TestEventFailedHash(t *testing.T) {
 					"file.hash.sha1": nil,
 				},
 			},
-		}.validate(t, ms)
+		}.validate(t)
+	})
+}
+
+func TestEventDelete(t *testing.T) {
+	store, err := ioutil.TempFile("", "bucket")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	defer os.Remove(store.Name())
+	ds := datastore.New(store.Name(), 0644)
+	bucket, err := ds.OpenBucket(bucketName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bucket.Close()
+	config := getConfig("somepath")
+	config["hash_types"] = []string{"sha1"}
+	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	if !assert.True(t, ok) {
+		t.Fatal("can't create metricset")
+	}
+	ms.bucket = bucket.(datastore.BoltBucket)
+
+	baseTime := time.Now()
+	sha := Digest("22222222222222222222")
+	t.Run("delete event for file missing on disk", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "creation event",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": sha,
+				},
+			},
+			expectedEvent{
+				title: "delete",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/file",
+					Source:    SourceFSNotify,
+					Action:    Deleted,
+				},
+				expected: map[string]interface{}{
+					"event.action": []string{"deleted"},
+					"event.type":   []string{"deletion"},
+				},
+			},
+			expectedEvent{
+				title: "creation event",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": sha,
+				},
+			},
+		}.validate(t)
+	})
+
+	// This tests getting a DELETE followed by a CREATE, but by the time we observe the former the file already
+	// exists on disk.
+	shaNext := Digest("22222222222222222223")
+	t.Run("delete event for file present on disk (different contents)", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "create",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": sha,
+				},
+			},
+			expectedEvent{
+				title: "delete",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Deleted,
+					Hashes: map[HashType]Digest{
+						SHA1: shaNext,
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"updated"},
+					"event.type":     []string{"change"},
+					"file.hash.sha1": shaNext,
+				},
+			},
+			expectedEvent{
+				title: "re-create",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: shaNext,
+					},
+				},
+				expected: nil, // Already observed during handling of previous event.
+			},
+		}.validate(t)
+	})
+
+	t.Run("delete event for file present on disk (same contents)", func(t *testing.T) {
+		expectedEvents{
+			expectedEvent{
+				title: "create",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				expected: map[string]interface{}{
+					"event.action":   []string{"created"},
+					"event.type":     []string{"creation"},
+					"file.hash.sha1": sha,
+				},
+			},
+			expectedEvent{
+				title: "delete",
+				input: Event{
+					Timestamp: time.Now(),
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Source: SourceFSNotify,
+					Action: Deleted,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				// No event because it has the same contents as before.
+				expected: nil,
+			},
+			expectedEvent{
+				title: "re-create",
+				input: Event{
+					Timestamp: baseTime,
+					Path:      "/file",
+					Info: &Metadata{
+						MTime: baseTime,
+						CTime: baseTime,
+						Type:  FileType,
+					},
+					Action: Created,
+					Source: SourceFSNotify,
+					Hashes: map[HashType]Digest{
+						SHA1: sha,
+					},
+				},
+				// No event because it has the same contents as before.
+				expected: nil,
+			},
+		}.validate(t)
 	})
 }
 

@@ -268,6 +268,16 @@ func (ms *MetricSet) hasFileChangedSinceLastEvent(event *Event) (changed bool, l
 		return true, lastEvent
 	}
 
+	// Received a deleted event but the file now exists on disk (already re-created).
+	if event.Action&Deleted != 0 && event.Info != nil {
+		event.Action &= ^Action(Deleted)
+		event.Action |= Updated
+	}
+	// We receive a creation event for a deletion that we didn't observe due to the above.
+	if event.Action&Created != 0 && lastEvent != nil && lastEvent.Info != nil {
+		event.Action &= ^Action(Created)
+		event.Action |= Updated
+	}
 	action, changed := diffEvents(lastEvent, event)
 	if uint8(event.Action)&^uint8(Updated) == 0 {
 		if event.hashFailed && !changed {
