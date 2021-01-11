@@ -8,7 +8,7 @@ a system. All datasets send both periodic state information (e.g. all currently
 running processes) and real-time changes (e.g. when a new process starts
 or stops).
 
-The module is fully implemented for Linux. Some datasets are also available
+The module is fully implemented for Linux on x86. Currently, the `socket` module is not available on ARM. Some datasets are also available
 for macOS (Darwin) and Windows.
 
 [float]
