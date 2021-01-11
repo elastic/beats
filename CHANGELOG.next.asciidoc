@@ -271,6 +271,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Change the `event.created` in Netflow events to be the time the event was created by Filebeat
   to be consistent with ECS. {pull}23094[23094]
+- Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
 
 *Filebeat*
 
