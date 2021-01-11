@@ -19,17 +19,18 @@ package kubernetes
 
 import (
 	"fmt"
+	"github.com/golang/glog"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -114,7 +115,21 @@ func (s *service) OnUpdate(obj interface{}) {
 // OnDelete ensures processing of service objects that are deleted
 func (s *service) OnDelete(obj interface{}) {
 	s.logger.Debugf("Watcher service delete: %+v", obj)
-	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
+	service, isNode := obj.(*kubernetes.Service)
+	// We can get DeletedFinalStateUnknown instead of *kubernetes.Service here and we need to handle that correctly. #23385
+	if !isNode {
+		deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			glog.Errorf("Received unexpected object: %v", obj)
+			return
+		}
+		service, ok = deletedState.Obj.(*kubernetes.Service)
+		if !ok {
+			glog.Errorf("DeletedFinalStateUnknown contained non-Node object: %v", deletedState.Obj)
+			return
+		}
+	}
+	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(service, "stop") })
 }
 
 // GenerateHints creates hints needed for hints builder

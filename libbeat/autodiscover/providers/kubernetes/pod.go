@@ -163,7 +163,21 @@ func (p *pod) OnUpdate(obj interface{}) {
 // OnDelete stops pod objects that are deleted
 func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+	pod, isPod := obj.(*kubernetes.Pod)
+	// We can get DeletedFinalStateUnknown instead of *kubernetes.Pod here and we need to handle that correctly. #23385
+	if !isPod {
+		deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			p.logger.Debugf("Received unexpected object: %+v", obj)
+			return
+		}
+		pod, ok = deletedState.Obj.(*kubernetes.Pod)
+		if !ok {
+			p.logger.Debugf("DeletedFinalStateUnknown contained non-Pod object: %+v", deletedState.Obj)
+			return
+		}
+	}
+	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
 }
 
 // GenerateHints creates hints needed for hints builder
