@@ -124,7 +124,7 @@ func (s *service) OnDelete(obj interface{}) {
 		}
 		service, ok = deletedState.Obj.(*kubernetes.Service)
 		if !ok {
-			s.logger.Errorf("DeletedFinalStateUnknown contained non-Node object: %+v", deletedState.Obj)
+			s.logger.Errorf("DeletedFinalStateUnknown contained non-Service object: %+v", deletedState.Obj)
 			return
 		}
 	}
