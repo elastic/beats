@@ -13,7 +13,7 @@ RUN mkdir -p {{ $beatHome }}/.node \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
     {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites && \
+    {{ $beatHome }}/suites
 {{- end }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
