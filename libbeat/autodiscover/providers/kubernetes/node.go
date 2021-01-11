@@ -19,7 +19,6 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/golang/glog"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -121,12 +120,12 @@ func (n *node) OnDelete(obj interface{}) {
 	if !isNode {
 		deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
 		if !ok {
-			glog.Errorf("Received unexpected object: %v", obj)
+			n.logger.Errorf("Received unexpected object: %+v", obj)
 			return
 		}
 		node, ok = deletedState.Obj.(*kubernetes.Node)
 		if !ok {
-			glog.Errorf("DeletedFinalStateUnknown contained non-Node object: %v", deletedState.Obj)
+			n.logger.Errorf("DeletedFinalStateUnknown contained non-Node object: %+v", deletedState.Obj)
 			return
 		}
 	}
