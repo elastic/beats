@@ -12,28 +12,7 @@ processors:
     field: payload_raw 
     target_field: json
 - remove: 
-    field: syslog5424_sd
-    ignore_missing: true
-- remove: 
-    field: syslog5424_app
-    ignore_missing: true
-- remove: 
-    field: syslog5424_host
-    ignore_missing: true
-- remove:
-    field: syslog5424_msgid
-    ignore_missing: true
-- remove: 
-    field: syslog5424_pri
-    ignore_missing: true
-- remove: 
-    field: syslog5424_proc
-    ignore_missing: true
-- remove:
-    field: syslog5424_ver
-    ignore_missing: true
-- remove:
-    field: host
+    field: syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host
     ignore_missing: true
 - date:
     field: json.timestamp
