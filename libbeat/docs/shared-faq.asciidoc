@@ -212,4 +212,4 @@ endif::no_dashboards[]
 
 In versions of {beatname_lc} prior to 7.10.2, the go runtime defaults to `MADV_FREE` by default.
 In some cases, this can lead to high RSS memory usage while the kernel waits to reclaim any pages assigned to {beatname_lc}.
-On versions prior to 7.10.2, set the `GODEBUG="madvdontneed=1"` environment variable if you run into 
+On versions prior to 7.10.2, set the `GODEBUG="madvdontneed=1"` environment variable if you run into RSS usage issues.
