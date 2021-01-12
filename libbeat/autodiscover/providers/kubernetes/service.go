@@ -23,7 +23,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -114,21 +113,7 @@ func (s *service) OnUpdate(obj interface{}) {
 // OnDelete ensures processing of service objects that are deleted
 func (s *service) OnDelete(obj interface{}) {
 	s.logger.Debugf("Watcher service delete: %+v", obj)
-	service, isNode := obj.(*kubernetes.Service)
-	// We can get DeletedFinalStateUnknown instead of *kubernetes.Service here and we need to handle that correctly. #23385
-	if !isNode {
-		deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			s.logger.Errorf("Received unexpected object: %+v", obj)
-			return
-		}
-		service, ok = deletedState.Obj.(*kubernetes.Service)
-		if !ok {
-			s.logger.Errorf("DeletedFinalStateUnknown contained non-Service object: %+v", deletedState.Obj)
-			return
-		}
-	}
-	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(service, "stop") })
+	time.AfterFunc(s.config.CleanupTimeout, func() { s.emit(obj.(*kubernetes.Service), "stop") })
 }
 
 // GenerateHints creates hints needed for hints builder

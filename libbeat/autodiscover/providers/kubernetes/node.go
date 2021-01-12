@@ -25,7 +25,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -115,21 +114,7 @@ func (n *node) OnUpdate(obj interface{}) {
 // OnDelete ensures processing of node objects that are deleted
 func (n *node) OnDelete(obj interface{}) {
 	n.logger.Debugf("Watcher Node delete: %+v", obj)
-	node, isNode := obj.(*kubernetes.Node)
-	// We can get DeletedFinalStateUnknown instead of *kubernetes.Node here and we need to handle that correctly. #23385
-	if !isNode {
-		deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
-		if !ok {
-			n.logger.Errorf("Received unexpected object: %+v", obj)
-			return
-		}
-		node, ok = deletedState.Obj.(*kubernetes.Node)
-		if !ok {
-			n.logger.Errorf("DeletedFinalStateUnknown contained non-Node object: %+v", deletedState.Obj)
-			return
-		}
-	}
-	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(node, "stop") })
+	time.AfterFunc(n.config.CleanupTimeout, func() { n.emit(obj.(*kubernetes.Node), "stop") })
 }
 
 // GenerateHints creates hints needed for hints builder
