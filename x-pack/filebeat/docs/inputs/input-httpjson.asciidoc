@@ -9,7 +9,7 @@
 <titleabbrev>HTTP JSON</titleabbrev>
 ++++
 
-Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
+Use the `httpjson` input to read messages from an HTTP API with JSON or ndjson payloads.  In the case of ndjson each newline separated object becomes an event.
 
 This input supports:
 
@@ -447,27 +447,6 @@ filebeat.inputs:
         target: body.from
         value: '[[now (parseDuration "-1h")]]'
 ----
-
-[[response-force_ndjson]]
-[float]
-==== `response.force_ndjson`
-
-If the Content-Type header is set to "application/x-ndjson" then the ndjson results will be available in a new array called "ndjson-results".
-
-["source","json",subs="attributes"]
-----
-{
-  "ndjson-results" : [
-    {ndjson-obj-1},
-    {ndjson-obj-2},
-    ...
-    {ndjson-obj-n}
-  ]
-}
-----
-
-setting `response.force_ndjson` to `true` will force the results to be treated as ndjson regardless of the Content-Type header.
-
 
 [[response-transforms]]
 [float]

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -159,18 +160,25 @@ func (iter *pageIterator) getPage() (*response, error) {
 	r.header = iter.resp.Header
 	r.url = *iter.resp.Request.URL
 	r.page = iter.n
+	var results []interface{}
 
-	if len(bodyBytes) > 0 && r.header.Get("Content-Type") == "application/x-ndjson" {
-		bodyBytes = append([]byte("["), bodyBytes...)
-		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\r\n"), []byte(","))
-		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\n"), []byte(","))
-		bodyBytes = bytes.TrimRight(bodyBytes, ",")
-		bodyBytes = append(bodyBytes, ']')
-	}
 	if len(bodyBytes) > 0 {
-		if err := json.Unmarshal(bodyBytes, &r.body); err != nil {
-			return nil, err
+		dec := json.NewDecoder(bytes.NewReader(bodyBytes))
+		for {
+			var o interface{}
+			err := dec.Decode(&o)
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				return nil, err
+			}
+			results = append(results, o)
 		}
+	}
+	if len(results) == 1 {
+		r.body = results[0]
+	} else {
+		r.body = results
 	}
 
 	return &r, nil
