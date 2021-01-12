@@ -47,13 +47,6 @@ IF ERRORLEVEL 1 (
     exit /b 1
 )
 
-go get gotest.tools/gotestsum
-IF ERRORLEVEL 1 (
-    REM failed to install gotestsum
-    exit /b 1
-)
-go mod tidy
-
 go get github.com/magefile/mage
 where mage
 mage -version

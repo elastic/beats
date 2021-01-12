@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -179,10 +180,19 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	return nil
 }
 
+// InstallGoTestTools installs additional tools that are required to run unit and integration tests.
+func InstallGoTestTools() {
+	gotool.Install(
+		gotool.Install.Package("gotest.tools/gotestsum"),
+	)
+}
+
 // GoTest invokes "go test" and reports the results to stdout. It returns an
 // error if there was any failure executing the tests or if there were any
 // test failures.
 func GoTest(ctx context.Context, params GoTestArgs) error {
+	mg.Deps(InstallGoTestTools)
+
 	fmt.Println(">> go test:", params.TestName, "Testing")
 
 	// We use gotestsum to drive the tests and produce a junit report.
