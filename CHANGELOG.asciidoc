@@ -5,7 +5,7 @@
 
 [[release-notes-7.10.1]]
 === Beats version 7.10.1
-https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
+https://github.com/elastic/beats/compare/v7.10.0\...v7.10.1[View commits]
 
 ==== Bugfixes
 
@@ -48,7 +48,7 @@ https://github.com/elastic/beats/compare/v7.10.0...v7.10.1[View commits]
 
 [[release-notes-7.10.0]]
 === Beats version 7.10.0
-https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
+https://github.com/elastic/beats/compare/v7.9.3\...v7.10.0[View commits]
 
 ==== Breaking changes
 
@@ -303,7 +303,7 @@ https://github.com/elastic/beats/compare/v7.9.3...v7.10.0[View commits]
 
 [[release-notes-7.9.3]]
 === Beats version 7.9.3
-https://github.com/elastic/beats/compare/v7.9.2...v7.9.3[View commits]
+https://github.com/elastic/beats/compare/v7.9.2\...v7.9.3[View commits]
 
 ==== Bugfixes
 
@@ -328,7 +328,7 @@ https://github.com/elastic/beats/compare/v7.9.2...v7.9.3[View commits]
 
 [[release-notes-7.9.2]]
 === Beats version 7.9.2
-https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
+https://github.com/elastic/beats/compare/v7.9.1\...v7.9.2[View commits]
 
 ==== Breaking changes
 
@@ -369,7 +369,7 @@ https://github.com/elastic/beats/compare/v7.9.1...v7.9.2[View commits]
 
 [[release-notes-7.9.1]]
 === Beats version 7.9.1
-https://github.com/elastic/beats/compare/v7.9.0...v7.9.1[View commits]
+https://github.com/elastic/beats/compare/v7.9.0\...v7.9.1[View commits]
 
 ==== Breaking changes
 
@@ -415,7 +415,7 @@ https://github.com/elastic/beats/compare/v7.9.0...v7.9.1[View commits]
 
 [[release-notes-7.9.0]]
 === Beats version 7.9.0
-https://github.com/elastic/beats/compare/v7.8.1...v7.9.0[View commits]
+https://github.com/elastic/beats/compare/v7.8.1\...v7.9.0[View commits]
 
 ==== Breaking changes
 
@@ -622,7 +622,7 @@ field. You can revert this change by configuring tags for the module and omittin
 
 [[release-notes-7.8.1]]
 === Beats version 7.8.1
-https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
+https://github.com/elastic/beats/compare/v7.8.0\...v7.8.1[View commits]
 
 ==== Breaking changes
 
@@ -667,7 +667,7 @@ https://github.com/elastic/beats/compare/v7.8.0...v7.8.1[View commits]
 
 [[release-notes-7.8.0]]
 === Beats version 7.8.0
-https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
+https://github.com/elastic/beats/compare/v7.7.0\...v7.8.0[View commits]
 
 ==== Breaking changes
 
@@ -783,7 +783,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.8.0[View commits]
 
 [[release-notes-7.7.1]]
 === Beats version 7.7.1
-https://github.com/elastic/beats/compare/v7.7.0...v7.7.1[View commits]
+https://github.com/elastic/beats/compare/v7.7.0\...v7.7.1[View commits]
 
 ==== Bugfixes
 
@@ -815,7 +815,7 @@ https://github.com/elastic/beats/compare/v7.7.0...v7.7.1[View commits]
 
 [[release-notes-7.7.0]]
 === Beats version 7.7.0
-https://github.com/elastic/beats/compare/v7.6.2...v7.7.0[View commits]
+https://github.com/elastic/beats/compare/v7.6.2\...v7.7.0[View commits]
 
 ==== Breaking changes
 
@@ -1015,7 +1015,7 @@ present. {pull}16116[16116]
 
 [[release-notes-7.6.2]]
 === Beats version 7.6.2
-https://github.com/elastic/beats/compare/v7.6.1...v7.6.2[View commits]
+https://github.com/elastic/beats/compare/v7.6.1\...v7.6.2[View commits]
 
 ==== Breaking changes
 
@@ -1056,7 +1056,7 @@ https://github.com/elastic/beats/compare/v7.6.1...v7.6.2[View commits]
 
 [[release-notes-7.6.1]]
 === Beats version 7.6.1
-https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
+https://github.com/elastic/beats/compare/v7.6.0\...v7.6.1[View commits]
 
 ==== Bugfixes
 
@@ -1093,7 +1093,7 @@ https://github.com/elastic/beats/compare/v7.6.0...v7.6.1[View commits]
 
 [[release-notes-7.6.0]]
 === Beats version 7.6.0
-https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
+https://github.com/elastic/beats/compare/v7.5.1\...v7.6.0[View commits]
 
 ==== Breaking changes
 
@@ -1230,7 +1230,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.6.0[View commits]
 
 [[release-notes-7.5.2]]
 === Beats version 7.5.2
-https://github.com/elastic/beats/compare/v7.5.1...v7.5.2[View commits]
+https://github.com/elastic/beats/compare/v7.5.1\...v7.5.2[View commits]
 
 ==== Breaking changes
 
@@ -1273,7 +1273,7 @@ https://github.com/elastic/beats/compare/v7.5.1...v7.5.2[View commits]
 
 [[release-notes-7.5.1]]
 === Beats version 7.5.1
-https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
+https://github.com/elastic/beats/compare/v7.5.0\...v7.5.1[View commits]
 
 ==== Bugfixes
 
@@ -1305,7 +1305,7 @@ https://github.com/elastic/beats/compare/v7.5.0...v7.5.1[View commits]
 
 [[release-notes-7.5.0]]
 === Beats version 7.5.0
-https://github.com/elastic/beats/compare/v7.4.1...v7.5.0[View commits]
+https://github.com/elastic/beats/compare/v7.4.1\...v7.5.0[View commits]
 
 ==== Breaking changes
 
@@ -1472,7 +1472,7 @@ processing events. (CVE-2019-17596) See https://www.elastic.co/community/securit
 
 [[release-notes-7.4.2]]
 === Beats version 7.4.2
-https://github.com/elastic/beats/compare/v7.4.1...v7.4.2[View commits]
+https://github.com/elastic/beats/compare/v7.4.1\...v7.4.2[View commits]
 
 ==== Bugfixes
 
@@ -1482,7 +1482,7 @@ https://github.com/elastic/beats/compare/v7.4.1...v7.4.2[View commits]
 
 [[release-notes-7.4.1]]
 === Beats version 7.4.1
-https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
+https://github.com/elastic/beats/compare/v7.4.0\...v7.4.1[View commits]
 
 ==== Bugfixes
 
@@ -1507,7 +1507,7 @@ https://github.com/elastic/beats/compare/v7.4.0...v7.4.1[View commits]
 
 [[release-notes-7.4.0]]
 === Beats version 7.4.0
-https://github.com/elastic/beats/compare/v7.3.1...v7.4.0[View commits]
+https://github.com/elastic/beats/compare/v7.3.1\...v7.4.0[View commits]
 
 ==== Breaking changes
 
@@ -1675,7 +1675,7 @@ https://github.com/elastic/beats/compare/v7.3.1...v7.4.0[View commits]
 
 [[release-notes-7.3.2]]
 === Beats version 7.3.2
-https://github.com/elastic/beats/compare/v7.3.1...v7.3.2[View commits]
+https://github.com/elastic/beats/compare/v7.3.1\...v7.3.2[View commits]
 
 ==== Bugfixes
 
@@ -1693,7 +1693,7 @@ https://github.com/elastic/beats/compare/v7.3.1...v7.3.2[View commits]
 
 [[release-notes-7.3.1]]
 === Beats version 7.3.1
-https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
+https://github.com/elastic/beats/compare/v7.3.0\...v7.3.1[View commits]
 
 ==== Bugfixes
 
@@ -1719,7 +1719,7 @@ https://github.com/elastic/beats/compare/v7.3.0...v7.3.1[View commits]
 
 [[release-notes-7.3.0]]
 === Beats version 7.3.0
-https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
+https://github.com/elastic/beats/compare/v7.2.0\...v7.3.0[View commits]
 
 ==== Breaking changes
 
@@ -1845,7 +1845,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.3.0[View commits]
 
 [[release-notes-7.2.1]]
 === Beats version 7.2.1
-https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
+https://github.com/elastic/beats/compare/v7.2.0\...v7.2.1[View commits]
 
 ==== Bugfixes
 
@@ -1869,7 +1869,7 @@ https://github.com/elastic/beats/compare/v7.2.0...v7.2.1[View commits]
 
 [[release-notes-7.2.0]]
 === Beats version 7.2.0
-https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
+https://github.com/elastic/beats/compare/v7.1.1\...v7.2.0[View commits]
 
 ==== Breaking changes
 
@@ -2086,13 +2086,13 @@ https://github.com/elastic/beats/compare/v7.1.1...v7.2.0[View commits]
 
 [[release-notes-7.1.1]]
 === Beats version 7.1.1
-https://github.com/elastic/beats/compare/v7.1.0...v7.1.1[View commits]
+https://github.com/elastic/beats/compare/v7.1.0\...v7.1.1[View commits]
 
 No changes in this release.
 
 [[release-notes-7.1.0]]
 === Beats version 7.1.0
-https://github.com/elastic/beats/compare/v7.0.0...v7.1.0[View commits]
+https://github.com/elastic/beats/compare/v7.0.0\...v7.1.0[View commits]
 
 * Updates to support changes to licensing of security features.
 +
@@ -2101,7 +2101,7 @@ role-based access control, are now available in more subscription levels. For de
 
 [[release-notes-7.0.1]]
 === Beats version 7.0.1
-https://github.com/elastic/beats/compare/v7.0.0...v7.0.1[View commits]
+https://github.com/elastic/beats/compare/v7.0.0\...v7.0.1[View commits]
 
 ==== Breaking changes
 
@@ -2144,7 +2144,7 @@ include::libbeat/docs/release-notes/7.0.0.asciidoc[]
 
 [[release-notes-7.0.0-ga]]
 === Beats version 7.0.0-GA
-https://github.com/elastic/beats/compare/v7.0.0-rc2...v7.0.0[View commits]
+https://github.com/elastic/beats/compare/v7.0.0-rc2\...v7.0.0[View commits]
 
 The list below covers the changes between 7.0.0-rc2 and 7.0.0 GA only.
 
@@ -2167,7 +2167,7 @@ The list below covers the changes between 7.0.0-rc2 and 7.0.0 GA only.
 
 [[release-notes-7.0.0-rc2]]
 === Beats version 7.0.0-rc2
-https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-rc1\...v7.0.0-rc2[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -2213,7 +2213,7 @@ https://github.com/elastic/beats/compare/v7.0.0-rc1...v7.0.0-rc2[Check the HEAD 
 
 [[release-notes-7.0.0-rc1]]
 === Beats version 7.0.0-rc1
-https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-beta1\...v7.0.0-rc1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -2331,7 +2331,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...v7.0.0-rc1[Check the HEA
 
 [[release-notes-7.0.0-beta1]]
 === Beats version 7.0.0-beta1
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-alpha2\...v7.0.0-beta1[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -2664,7 +2664,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 
 [[release-notes-7.0.0-alpha2]]
 === Beats version 7.0.0-alpha2
-https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-alpha1\...v7.0.0-alpha2[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -2800,7 +2800,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 
 [[release-notes-7.0.0-alpha1]]
 === Beats version 7.0.0-alpha1
-https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
+https://github.com/elastic/beats/compare/v6.5.0\...v7.0.0-alpha1[View commits]
 
 ==== Breaking changes
 
@@ -2901,7 +2901,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 
 [[release-notes-6.8.9]]
 === Beats version 6.8.9
-https://github.com/elastic/beats/compare/v6.8.8...v6.8.9[View commits]
+https://github.com/elastic/beats/compare/v6.8.8\...v6.8.9[View commits]
 
 ==== Bugfixes
 
@@ -2911,7 +2911,7 @@ https://github.com/elastic/beats/compare/v6.8.8...v6.8.9[View commits]
 
 [[release-notes-6.8.8]]
 === Beats version 6.8.8
-https://github.com/elastic/beats/compare/v6.8.7...v6.8.8[View commits]
+https://github.com/elastic/beats/compare/v6.8.7\...v6.8.8[View commits]
 
 ==== Bugfixes
 
@@ -2921,7 +2921,7 @@ https://github.com/elastic/beats/compare/v6.8.7...v6.8.8[View commits]
 
 [[release-notes-6.8.7]]
 === Beats version 6.8.7
-https://github.com/elastic/beats/compare/v6.8.6...v6.8.7[View commits]
+https://github.com/elastic/beats/compare/v6.8.6\...v6.8.7[View commits]
 
 ==== Bugfixes
 
@@ -2932,7 +2932,7 @@ https://github.com/elastic/beats/compare/v6.8.6...v6.8.7[View commits]
 
 [[release-notes-6.8.6]]
 === Beats version 6.8.6
-https://github.com/elastic/beats/compare/v6.8.5...v6.8.6[View commits]
+https://github.com/elastic/beats/compare/v6.8.5\...v6.8.6[View commits]
 
 ==== Bugfixes
 
@@ -2947,7 +2947,7 @@ https://github.com/elastic/beats/compare/v6.8.5...v6.8.6[View commits]
 
 [[release-notes-6.8.5]]
 === Beats version 6.8.5
-https://github.com/elastic/beats/compare/v6.8.4...v6.8.5[View commits]
+https://github.com/elastic/beats/compare/v6.8.4\...v6.8.5[View commits]
 
 ==== Bugfixes
 
@@ -2957,7 +2957,7 @@ https://github.com/elastic/beats/compare/v6.8.4...v6.8.5[View commits]
 
 [[release-notes-6.8.4]]
 === Beats version 6.8.4
-https://github.com/elastic/beats/compare/v6.8.3...v6.8.4[View commits]
+https://github.com/elastic/beats/compare/v6.8.3\...v6.8.4[View commits]
 
 ==== Breaking changes
 
@@ -2980,7 +2980,7 @@ https://github.com/elastic/beats/compare/v6.8.3...v6.8.4[View commits]
 
 [[release-notes-6.8.3]]
 === Beats version 6.8.3
-https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits
+https://github.com/elastic/beats/compare/v6.8.2\...v6.8.3[View commits
 
 ==== Bugfixes
 
@@ -3001,7 +3001,7 @@ https://github.com/elastic/beats/compare/v6.8.2...v6.8.3[View commits
 
 [[release-notes-6.8.2]]
 === Beats version 6.8.2
-https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
+https://github.com/elastic/beats/compare/v6.8.1\...v6.8.2[View commits]
 
 ==== Bugfixes
 
@@ -3019,7 +3019,7 @@ https://github.com/elastic/beats/compare/v6.8.1...v6.8.2[View commits]
 
 [[release-notes-6.8.1]]
 === Beats version 6.8.1
-https://github.com/elastic/beats/compare/v6.8.0...v6.8.1[View commits]
+https://github.com/elastic/beats/compare/v6.8.0\...v6.8.1[View commits]
 
 ==== Bugfixes
 
@@ -3081,7 +3081,7 @@ role-based access control, are now available in more subscription levels. For de
 
 [[release-notes-6.7.2]]
 === Beats version 6.7.2
-https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
+https://github.com/elastic/beats/compare/v6.7.1\...v6.7.2[View commits]
 
 ==== Bugfixes
 
@@ -3116,7 +3116,7 @@ https://github.com/elastic/beats/compare/v6.7.1...v6.7.2[View commits]
 
 [[release-notes-6.7.1]]
 === Beats version 6.7.1
-https://github.com/elastic/beats/compare/v6.7.0...v6.7.1[View commits]
+https://github.com/elastic/beats/compare/v6.7.0\...v6.7.1[View commits]
 
 ==== Breaking changes
 
@@ -3132,7 +3132,7 @@ https://github.com/elastic/beats/compare/v6.7.0...v6.7.1[View commits]
 
 [[release-notes-6.7.0]]
 === Beats version 6.7.0
-https://github.com/elastic/beats/compare/v6.6.2...v6.7.0[View commits]
+https://github.com/elastic/beats/compare/v6.6.2\...v6.7.0[View commits]
 
 ==== Breaking changes
 
@@ -3314,7 +3314,7 @@ https://github.com/elastic/beats/compare/v6.6.2...v6.7.0[View commits]
 
 [[release-notes-6.6.2]]
 === Beats version 6.6.2
-https://github.com/elastic/beats/compare/v6.6.1...6.6.2[View commits]
+https://github.com/elastic/beats/compare/v6.6.1\...6.6.2[View commits]
 
 ==== Bugfixes
 
@@ -3340,7 +3340,7 @@ https://github.com/elastic/beats/compare/v6.6.1...6.6.2[View commits]
 
 [[release-notes-6.6.1]]
 === Beats version 6.6.1
-https://github.com/elastic/beats/compare/v6.6.0...6.6.1[View commits]
+https://github.com/elastic/beats/compare/v6.6.0\...6.6.1[View commits]
 
 ==== Breaking changes
 
@@ -3387,7 +3387,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.6.1[View commits]
 
 [[release-notes-6.6.0]]
 === Beats version 6.6.0
-https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
+https://github.com/elastic/beats/compare/v6.5.4\...6.6[View commits]
 
 ==== Breaking changes
 
@@ -3513,7 +3513,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
 
 [[release-notes-6.5.4]]
 === Beats version 6.5.4
-https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
+https://github.com/elastic/beats/compare/v6.5.3\...v6.5.4[View commits]
 
 ==== Bugfixes
 
@@ -3535,7 +3535,7 @@ https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
 
 [[release-notes-6.5.3]]
 === Beats version 6.5.3
-https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
+https://github.com/elastic/beats/compare/v6.5.2\...v6.5.3[View commits]
 
 ==== Bugfixes
 
@@ -3552,7 +3552,7 @@ https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
 
 [[release-notes-6.5.2]]
 === Beats version 6.5.2
-https://github.com/elastic/beats/compare/v6.5.1...v6.5.2[View commits]
+https://github.com/elastic/beats/compare/v6.5.1\...v6.5.2[View commits]
 
 ==== Bugfixes
 
@@ -3567,7 +3567,7 @@ https://github.com/elastic/beats/compare/v6.5.1...v6.5.2[View commits]
 
 [[release-notes-6.5.1]]
 === Beats version 6.5.1
-https://github.com/elastic/beats/compare/v6.5.0...v6.5.1[View commits]
+https://github.com/elastic/beats/compare/v6.5.0\...v6.5.1[View commits]
 
 ==== Bugfixes
 
@@ -3588,7 +3588,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v6.5.1[View commits]
 
 [[release-notes-6.5.0]]
 === Beats version 6.5.0
-https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
+https://github.com/elastic/beats/compare/v6.4.0\...v6.5.0[View commits]
 
 ==== Bugfixes
 
@@ -3748,7 +3748,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 
 [[release-notes-6.4.3]]
 === Beats version 6.4.3
-https://github.com/elastic/beats/compare/v6.4.2...v6.4.3[View commits]
+https://github.com/elastic/beats/compare/v6.4.2\...v6.4.3[View commits]
 
 ==== Bugfixes
 
@@ -3772,7 +3772,7 @@ https://github.com/elastic/beats/compare/v6.4.2...v6.4.3[View commits]
 
 [[release-notes-6.4.2]]
 === Beats version 6.4.2
-https://github.com/elastic/beats/compare/v6.4.1...v6.4.2[View commits]
+https://github.com/elastic/beats/compare/v6.4.1\...v6.4.2[View commits]
 
 ==== Bugfixes
 
@@ -3788,7 +3788,7 @@ https://github.com/elastic/beats/compare/v6.4.1...v6.4.2[View commits]
 
 [[release-notes-6.4.1]]
 === Beats version 6.4.1
-https://github.com/elastic/beats/compare/v6.4.0...v6.4.1[View commits]
+https://github.com/elastic/beats/compare/v6.4.0\...v6.4.1[View commits]
 
 ==== Bugfixes
 
@@ -3823,7 +3823,7 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.4.1[View commits]
 
 [[release-notes-6.4.0]]
 === Beats version 6.4.0
-https://github.com/elastic/beats/compare/v6.3.1...v6.4.0[View commits]
+https://github.com/elastic/beats/compare/v6.3.1\...v6.4.0[View commits]
 
 ==== Known issue
 
@@ -3993,7 +3993,7 @@ deprecated in favor of `cpu.*.cores`. {pull}6916[6916]
 
 [[release-notes-6.3.1]]
 === Beats version 6.3.1
-https://github.com/elastic/beats/compare/v6.3.0...v6.3.1[View commits]
+https://github.com/elastic/beats/compare/v6.3.0\...v6.3.1[View commits]
 
 ==== Bugfixes
 
@@ -4044,7 +4044,7 @@ https://github.com/elastic/beats/compare/v6.3.0...v6.3.1[View commits]
 
 [[release-notes-6.3.0]]
 === Beats version 6.3.0
-https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
+https://github.com/elastic/beats/compare/v6.2.3\...v6.3.0[View commits]
 
 ==== Breaking changes
 
@@ -4254,7 +4254,7 @@ https://github.com/elastic/beats/compare/v6.2.3...v6.3.0[View commits]
 
 [[release-notes-6.2.3]]
 === Beats version 6.2.3
-https://github.com/elastic/beats/compare/v6.2.2...v6.2.3[View commits]
+https://github.com/elastic/beats/compare/v6.2.2\...v6.2.3[View commits]
 
 ==== Breaking changes
 
@@ -4276,7 +4276,7 @@ https://github.com/elastic/beats/compare/v6.2.2...v6.2.3[View commits]
 
 [[release-notes-6.2.2]]
 === Beats version 6.2.2
-https://github.com/elastic/beats/compare/v6.2.1...v6.2.2[View commits]
+https://github.com/elastic/beats/compare/v6.2.1\...v6.2.2[View commits]
 
 ==== Bugfixes
 
@@ -4292,13 +4292,13 @@ https://github.com/elastic/beats/compare/v6.2.1...v6.2.2[View commits]
 
 [[release-notes-6.2.1]]
 === Beats version 6.2.1
-https://github.com/elastic/beats/compare/v6.2.0...v6.2.1[View commits]
+https://github.com/elastic/beats/compare/v6.2.0\...v6.2.1[View commits]
 
 No changes in this release.
 
 [[release-notes-6.2.0]]
 === Beats version 6.2.0
-https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
+https://github.com/elastic/beats/compare/v6.1.3\...v6.2.0[View commits]
 
 ==== Breaking changes
 
@@ -4399,13 +4399,13 @@ https://github.com/elastic/beats/compare/v6.1.3...v6.2.0[View commits]
 
 [[release-notes-6.1.3]]
 === Beats version 6.1.3
-https://github.com/elastic/beats/compare/v6.1.2...v6.1.3[View commits]
+https://github.com/elastic/beats/compare/v6.1.2\...v6.1.3[View commits]
 
 No changes in this release.
 
 [[release-notes-6.1.2]]
 === Beats version 6.1.2
-https://github.com/elastic/beats/compare/v6.1.1...v6.1.2[View commits]
+https://github.com/elastic/beats/compare/v6.1.1\...v6.1.2[View commits]
 
 ==== Bugfixes
 
@@ -4422,13 +4422,13 @@ https://github.com/elastic/beats/compare/v6.1.1...v6.1.2[View commits]
 
 [[release-notes-6.1.1]]
 === Beats version 6.1.1
-https://github.com/elastic/beats/compare/v6.1.0...v6.1.1[View commits]
+https://github.com/elastic/beats/compare/v6.1.0\...v6.1.1[View commits]
 
 No changes in this release.
 
 [[release-notes-6.1.0]]
 === Beats version 6.1.0
-https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
+https://github.com/elastic/beats/compare/v6.0.1\...v6.1.0[View commits]
 
 ==== Breaking changes
 
@@ -4547,7 +4547,7 @@ https://github.com/elastic/beats/compare/v6.0.1...v6.1.0[View commits]
 
 [[release-notes-6.0.1]]
 === Beats version 6.0.1
-https://github.com/elastic/beats/compare/v6.0.0...v6.0.1[View commits]
+https://github.com/elastic/beats/compare/v6.0.0\...v6.0.1[View commits]
 
 ==== Bugfixes
 
@@ -4572,7 +4572,7 @@ include::libbeat/docs/release-notes/6.0.0.asciidoc[]
 
 [[release-notes-6.0.0-ga]]
 === Beats version 6.0.0-GA
-https://github.com/elastic/beats/compare/v6.0.0-rc2...v6.0.0[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-rc2\...v6.0.0[View commits]
 
 The list below covers the changes between 6.0.0-rc2 and 6.0.0 GA only.
 
@@ -4601,7 +4601,7 @@ The list below covers the changes between 6.0.0-rc2 and 6.0.0 GA only.
 
 [[release-notes-6.0.0-rc2]]
 === Beats version 6.0.0-rc2
-https://github.com/elastic/beats/compare/v6.0.0-rc1...v6.0.0-rc2[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-rc1\...v6.0.0-rc2[View commits]
 
 ==== Breaking changes
 
@@ -4642,7 +4642,7 @@ https://github.com/elastic/beats/compare/v6.0.0-rc1...v6.0.0-rc2[View commits]
 
 [[release-notes-6.0.0-rc1]]
 === Beats version 6.0.0-rc1
-https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-beta2\...v6.0.0-rc1[View commits]
 
 ==== Bugfixes
 
@@ -4696,7 +4696,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta2...v6.0.0-rc1[View commits]
 
 [[release-notes-6.0.0-beta2]]
 === Beats version 6.0.0-beta2
-https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-beta1\...v6.0.0-beta2[View commits]
 
 ==== Breaking changes
 
@@ -4758,7 +4758,7 @@ https://github.com/elastic/beats/compare/v6.0.0-beta1...v6.0.0-beta2[View commit
 
 [[release-notes-6.0.0-beta1]]
 === Beats version 6.0.0-beta1
-https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-alpha2\...v6.0.0-beta1[View commits]
 
 ==== Breaking changes
 
@@ -4884,7 +4884,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha2...v6.0.0-beta1[View commi
 
 [[release-notes-6.0.0-alpha2]]
 === Beats version 6.0.0-alpha2
-https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View commits]
+https://github.com/elastic/beats/compare/v6.0.0-alpha1\...v6.0.0-alpha2[View commits]
 
 ==== Breaking changes
 
@@ -4974,7 +4974,7 @@ https://github.com/elastic/beats/compare/v6.0.0-alpha1...v6.0.0-alpha2[View comm
 
 [[release-notes-6.0.0-alpha1]]
 === Beats version 6.0.0-alpha1
-https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
+https://github.com/elastic/beats/compare/v5.4.0\...v6.0.0-alpha1[View commits]
 
 ==== Breaking changes
 
@@ -5100,31 +5100,31 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 
 [[release-notes-5.6.14]]
 === Beats version 5.6.14
-https://github.com/elastic/beats/compare/v5.6.13...v5.6.14[View commits]
+https://github.com/elastic/beats/compare/v5.6.13\...v5.6.14[View commits]
 
 No changes in this version.
 
 [[release-notes-5.6.13]]
 === Beats version 5.6.13
-https://github.com/elastic/beats/compare/v5.6.12...v5.6.13[View commits]
+https://github.com/elastic/beats/compare/v5.6.12\...v5.6.13[View commits]
 
 No changes in this version.
 
 [[release-notes-5.6.12]]
 === Beats version 5.6.12
-https://github.com/elastic/beats/compare/v5.6.11...v5.6.12[View commits]
+https://github.com/elastic/beats/compare/v5.6.11\...v5.6.12[View commits]
 
 No changes in this version.
 
 [[release-notes-5.6.11]]
 === Beats version 5.6.11
-https://github.com/elastic/beats/compare/v5.6.10...v5.6.11[View commits]
+https://github.com/elastic/beats/compare/v5.6.10\...v5.6.11[View commits]
 
 No changes in this version.
 
 [[release-notes-5.6.10]]
 === Beats version 5.6.10
-https://github.com/elastic/beats/compare/v5.6.9...v5.6.10[View commits]
+https://github.com/elastic/beats/compare/v5.6.9\...v5.6.10[View commits]
 
 ==== Bugfixes
 
@@ -5134,7 +5134,7 @@ https://github.com/elastic/beats/compare/v5.6.9...v5.6.10[View commits]
 
 [[release-notes-5.6.9]]
 === Beats version 5.6.9
-https://github.com/elastic/beats/compare/v5.6.8...v5.6.9[View commits]
+https://github.com/elastic/beats/compare/v5.6.8\...v5.6.9[View commits]
 
 ==== Bugfixes
 
@@ -5158,7 +5158,7 @@ https://github.com/elastic/beats/compare/v5.6.8...v5.6.9[View commits]
 
 [[release-notes-5.6.8]]
 === Beats version 5.6.8
-https://github.com/elastic/beats/compare/v5.6.7...v5.6.8[View commits]
+https://github.com/elastic/beats/compare/v5.6.7\...v5.6.8[View commits]
 
 ==== Bugfixes
 
@@ -5169,21 +5169,21 @@ https://github.com/elastic/beats/compare/v5.6.7...v5.6.8[View commits]
 
 [[release-notes-5.6.7]]
 === Beats version 5.6.7
-https://github.com/elastic/beats/compare/v5.6.6...v5.6.7[View commits]
+https://github.com/elastic/beats/compare/v5.6.6\...v5.6.7[View commits]
 
 No changes in this release.
 
 
 [[release-notes-5.6.6]]
 === Beats version 5.6.6
-https://github.com/elastic/beats/compare/v5.6.5...v5.6.6[View commits]
+https://github.com/elastic/beats/compare/v5.6.5\...v5.6.6[View commits]
 
 No changes in this release.
 
 
 [[release-notes-5.6.5]]
 === Beats version 5.6.5
-https://github.com/elastic/beats/compare/v5.6.4...v5.6.5[View commits]
+https://github.com/elastic/beats/compare/v5.6.4\...v5.6.5[View commits]
 
 ==== Bugfixes
 
@@ -5198,7 +5198,7 @@ https://github.com/elastic/beats/compare/v5.6.4...v5.6.5[View commits]
 
 [[release-notes-5.6.4]]
 === Beats version 5.6.4
-https://github.com/elastic/beats/compare/v5.6.3...v5.6.4[View commits]
+https://github.com/elastic/beats/compare/v5.6.3\...v5.6.4[View commits]
 
 ==== Bugfixes
 
@@ -5219,25 +5219,25 @@ https://github.com/elastic/beats/compare/v5.6.3...v5.6.4[View commits]
 
 [[release-notes-5.6.3]]
 === Beats version 5.6.3
-https://github.com/elastic/beats/compare/v5.6.2...v5.6.3[View commits]
+https://github.com/elastic/beats/compare/v5.6.2\...v5.6.3[View commits]
 
 No changes in this release.
 
 [[release-notes-5.6.2]]
 === Beats version 5.6.2
-https://github.com/elastic/beats/compare/v5.6.1...v5.6.2[View commits]
+https://github.com/elastic/beats/compare/v5.6.1\...v5.6.2[View commits]
 
 No changes in this release.
 
 [[release-notes-5.6.1]]
 === Beats version 5.6.1
-https://github.com/elastic/beats/compare/v5.6.0...v5.6.1[View commits]
+https://github.com/elastic/beats/compare/v5.6.0\...v5.6.1[View commits]
 
 No changes in this release.
 
 [[release-notes-5.6.0]]
 === Beats version 5.6.0
-https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
+https://github.com/elastic/beats/compare/v5.5.3\...v5.6.0[View commits]
 
 ==== Breaking changes
 
@@ -5287,18 +5287,18 @@ https://github.com/elastic/beats/compare/v5.5.3...v5.6.0[View commits]
 
 [[release-notes-5.5.3]]
 === Beats version 5.5.3
-https://github.com/elastic/beats/compare/v5.5.2...v5.5.3[View commits]
+https://github.com/elastic/beats/compare/v5.5.2\...v5.5.3[View commits]
 
 No changes in this release.
 
 [[release-notes-5.5.2]]
 === Beats version 5.5.2
-https://github.com/elastic/beats/compare/v5.5.1...v5.5.2[View commits]
+https://github.com/elastic/beats/compare/v5.5.1\...v5.5.2[View commits]
 
 No changes in this release.
 [[release-notes-5.5.1]]
 === Beats version 5.5.1
-https://github.com/elastic/beats/compare/v5.5.0...v5.5.1[View commits]
+https://github.com/elastic/beats/compare/v5.5.0\...v5.5.1[View commits]
 
 ==== Bugfixes
 
@@ -5308,7 +5308,7 @@ https://github.com/elastic/beats/compare/v5.5.0...v5.5.1[View commits]
 
 [[release-notes-5.5.0]]
 === Beats version 5.5.0
-https://github.com/elastic/beats/compare/v5.4.2...v5.5.0[View commits]
+https://github.com/elastic/beats/compare/v5.4.2\...v5.5.0[View commits]
 
 ==== Breaking changes
 
@@ -5353,7 +5353,7 @@ https://github.com/elastic/beats/compare/v5.4.2...v5.5.0[View commits]
 
 [[release-notes-5.4.2]]
 === Beats version 5.4.2
-https://github.com/elastic/beats/compare/v5.4.1...v5.4.2[View commits]
+https://github.com/elastic/beats/compare/v5.4.1\...v5.4.2[View commits]
 
 ==== Bugfixes
 
@@ -5373,7 +5373,7 @@ https://github.com/elastic/beats/compare/v5.4.1...v5.4.2[View commits]
 
 [[release-notes-5.4.1]]
 === Beats version 5.4.1
-https://github.com/elastic/beats/compare/v5.4.0...v5.4.1[View commits]
+https://github.com/elastic/beats/compare/v5.4.0\...v5.4.1[View commits]
 
 ==== Bugfixes
 
@@ -5400,7 +5400,7 @@ https://github.com/elastic/beats/compare/v5.4.0...v5.4.1[View commits]
 
 [[release-notes-5.4.0]]
 === Beats version 5.4.0
-https://github.com/elastic/beats/compare/v5.3.2...v5.4.0[View commits]
+https://github.com/elastic/beats/compare/v5.3.2\...v5.4.0[View commits]
 
 ==== Bugfixes
 
@@ -5455,7 +5455,7 @@ https://github.com/elastic/beats/compare/v5.3.2...v5.4.0[View commits]
 
 [[release-notes-5.3.2]]
 === Beats version 5.3.2
-https://github.com/elastic/beats/compare/v5.3.1...v5.3.2[View commits]
+https://github.com/elastic/beats/compare/v5.3.1\...v5.3.2[View commits]
 
 ==== Bugfixes
 
@@ -5467,7 +5467,7 @@ https://github.com/elastic/beats/compare/v5.3.1...v5.3.2[View commits]
 
 [[release-notes-5.3.1]]
 === Beats version 5.3.1
-https://github.com/elastic/beats/compare/v5.3.0...v5.3.1[View commits]
+https://github.com/elastic/beats/compare/v5.3.0\...v5.3.1[View commits]
 
 ==== Bugfixes
 
@@ -5488,7 +5488,7 @@ https://github.com/elastic/beats/compare/v5.3.0...v5.3.1[View commits]
 
 [[release-notes-5.3.0]]
 === Beats version 5.3.0
-https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
+https://github.com/elastic/beats/compare/v5.2.2\...v5.3.0[View commits]
 
 ==== Breaking changes
 
@@ -5580,7 +5580,7 @@ https://github.com/elastic/beats/compare/v5.2.2...v5.3.0[View commits]
 
 [[release-notes-5.2.2]]
 === Beats version 5.2.2
-https://github.com/elastic/beats/compare/v5.2.1...v5.2.2[View commits]
+https://github.com/elastic/beats/compare/v5.2.1\...v5.2.2[View commits]
 
 *Metricbeat*
 
@@ -5589,7 +5589,7 @@ https://github.com/elastic/beats/compare/v5.2.1...v5.2.2[View commits]
 
 [[release-notes-5.2.1]]
 === Beats version 5.2.1
-https://github.com/elastic/beats/compare/v5.2.0...v5.2.1[View commits]
+https://github.com/elastic/beats/compare/v5.2.0\...v5.2.1[View commits]
 
 ==== Bugfixes
 
@@ -5607,7 +5607,7 @@ https://github.com/elastic/beats/compare/v5.2.0...v5.2.1[View commits]
 
 [[release-notes-5.2.0]]
 === Beats version 5.2.0
-https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
+https://github.com/elastic/beats/compare/v5.1.2\...v5.2.0[View commits]
 
 ==== Bugfixes
 
@@ -5665,7 +5665,7 @@ https://github.com/elastic/beats/compare/v5.1.2...v5.2.0[View commits]
 
 [[release-notes-5.1.2]]
 === Beats version 5.1.2
-https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
+https://github.com/elastic/beats/compare/v5.1.1\...v5.1.2[View commits]
 
 ==== Bugfixes
 
@@ -5684,7 +5684,7 @@ https://github.com/elastic/beats/compare/v5.1.1...v5.1.2[View commits]
 
 [[release-notes-5.1.1]]
 === Beats version 5.1.1
-https://github.com/elastic/beats/compare/v5.0.2...v5.1.1[View commits]
+https://github.com/elastic/beats/compare/v5.0.2\...v5.1.1[View commits]
 
 ==== Breaking changes
 
@@ -5749,7 +5749,7 @@ realizing, we decided to skip the 5.1.0 version and release 5.1.1 instead.
 
 [[release-notes-5.0.2]]
 === Beats version 5.0.2
-https://github.com/elastic/beats/compare/v5.0.1...v5.0.2[View commits]
+https://github.com/elastic/beats/compare/v5.0.1\...v5.0.2[View commits]
 
 ==== Bugfixes
 
@@ -5760,7 +5760,7 @@ https://github.com/elastic/beats/compare/v5.0.1...v5.0.2[View commits]
 
 [[release-notes-5.0.1]]
 === Beats version 5.0.1
-https://github.com/elastic/beats/compare/v5.0.0...v5.0.1[View commits]
+https://github.com/elastic/beats/compare/v5.0.0\...v5.0.1[View commits]
 
 ==== Bugfixes
 
@@ -5803,7 +5803,7 @@ include::libbeat/docs/release-notes/5.0.0.asciidoc[]
 
 [[release-notes-5.0.0-ga]]
 === Beats version 5.0.0-GA
-https://github.com/elastic/beats/compare/v5.0.0-rc1...v5.0.0[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-rc1\...v5.0.0[View commits]
 
 The list below covers the changes between 5.0.0-rc1 and 5.0.0 GA only.
 
@@ -5835,7 +5835,7 @@ The list below covers the changes between 5.0.0-rc1 and 5.0.0 GA only.
 
 [[release-notes-5.0.0-rc1]]
 === Beats version 5.0.0-rc1
-https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-beta1\...v5.0.0-rc1[View commits]
 
 ==== Breaking changes
 
@@ -5873,7 +5873,7 @@ https://github.com/elastic/beats/compare/v5.0.0-beta1...v5.0.0-rc1[View commits]
 
 [[release-notes-5.0.0-beta1]]
 === Beats version 5.0.0-beta1
-https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha5\...v5.0.0-beta1[View commits]
 
 ==== Breaking changes
 
@@ -5993,7 +5993,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha5...v5.0.0-beta1[View commi
 
 [[release-notes-5.0.0-alpha5]]
 === Beats version 5.0.0-alpha5
-https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha4\...v5.0.0-alpha5[View commits]
 
 ==== Breaking changes
 
@@ -6071,7 +6071,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha4...v5.0.0-alpha5[View comm
 
 [[release-notes-5.0.0-alpha4]]
 === Beats version 5.0.0-alpha4
-https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha3\...v5.0.0-alpha4[View commits]
 
 ==== Breaking changes
 
@@ -6121,7 +6121,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha3...v5.0.0-alpha4[View comm
 
 [[release-notes-5.0.0-alpha3]]
 === Beats version 5.0.0-alpha3
-https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha2\...v5.0.0-alpha3[View commits]
 
 ==== Breaking changes
 
@@ -6167,7 +6167,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha2...v5.0.0-alpha3[View comm
 
 [[release-notes-5.0.0-alpha2]]
 === Beats version 5.0.0-alpha2
-https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View commits]
+https://github.com/elastic/beats/compare/v5.0.0-alpha1\...v5.0.0-alpha2[View commits]
 
 ==== Breaking changes
 
@@ -6240,7 +6240,7 @@ https://github.com/elastic/beats/compare/v5.0.0-alpha1...v5.0.0-alpha2[View comm
 
 [[release-notes-5.0.0-alpha1]]
 === Beats version 5.0.0-alpha1
-https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
+https://github.com/elastic/beats/compare/v1.2.0\...v5.0.0-alpha1[View commits]
 
 ==== Breaking changes
 
@@ -6349,7 +6349,7 @@ https://github.com/elastic/beats/compare/v1.2.0...v5.0.0-alpha1[View commits]
 
 [[release-notes-1.3.1]]
 === Beats version 1.3.1
-https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
+https://github.com/elastic/beats/compare/v1.3.0\...v1.3.1[View commits]
 
 ==== Bugfixes
 
@@ -6367,7 +6367,7 @@ https://github.com/elastic/beats/compare/v1.3.0...v1.3.1[View commits]
 
 [[release-notes-1.3.0]]
 === Beats version 1.3.0
-https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
+https://github.com/elastic/beats/compare/v1.2.3\...v1.3.0[View commits]
 
 ==== Deprecated
 
@@ -6400,7 +6400,7 @@ https://github.com/elastic/beats/compare/v1.2.3...v1.3.0[View commits]
 
 [[release-notes-1.2.3]]
 === Beats version 1.2.3
-https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
+https://github.com/elastic/beats/compare/v1.2.2\...v1.2.3[View commits]
 
 ==== Bugfixes
 
@@ -6425,7 +6425,7 @@ https://github.com/elastic/beats/compare/v1.2.2...v1.2.3[View commits]
 
 [[release-notes-1.2.2]]
 === Beats version 1.2.2
-https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
+https://github.com/elastic/beats/compare/v1.2.0\...v1.2.2[View commits]
 
 ==== Bugfixes
 
@@ -6441,7 +6441,7 @@ https://github.com/elastic/beats/compare/v1.2.0...v1.2.2[View commits]
 
 [[release-notes-1.2.1]]
 === Beats version 1.2.1
-https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
+https://github.com/elastic/beats/compare/v1.2.0\...v1.2.1[View commits]
 
 ==== Breaking changes
 
@@ -6464,7 +6464,7 @@ https://github.com/elastic/beats/compare/v1.2.0...v1.2.1[View commits]
 
 [[release-notes-1.2.0]]
 === Beats version 1.2.0
-https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
+https://github.com/elastic/beats/compare/v1.1.2\...v1.2.0[View commits]
 
 ==== Breaking changes
 
@@ -6500,7 +6500,7 @@ https://github.com/elastic/beats/compare/v1.1.2...v1.2.0[View commits]
 
 [[release-notes-1.1.2]]
 === Beats version 1.1.2
-https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
+https://github.com/elastic/beats/compare/v1.1.1\...v1.1.2[View commits]
 
 ==== Bugfixes
 
@@ -6511,7 +6511,7 @@ https://github.com/elastic/beats/compare/v1.1.1...v1.1.2[View commits]
 
 [[release-notes-1.1.1]]
 === Beats version 1.1.1
-https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
+https://github.com/elastic/beats/compare/v1.1.0\...v1.1.1[View commits]
 
 ==== Bugfixes
 
@@ -6522,7 +6522,7 @@ https://github.com/elastic/beats/compare/v1.1.0...v1.1.1[View commits]
 
 [[release-notes-1.1.0]]
 === Beats version 1.1.0
-https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
+https://github.com/elastic/beats/compare/v1.0.1\...v1.1.0[View commits]
 
 ==== Bugfixes
 
@@ -6582,7 +6582,7 @@ https://github.com/elastic/beats/compare/v1.0.1...v1.1.0[View commits]
 
 [[release-notes-1.0.1]]
 === Beats version 1.0.1
-https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[Check 1.0.1 diff]
+https://github.com/elastic/beats/compare/v1.0.0\...v1.0.1[Check 1.0.1 diff]
 
 ==== Bugfixes
 
@@ -6601,7 +6601,7 @@ https://github.com/elastic/beats/compare/v1.0.0...v1.0.1[Check 1.0.1 diff]
 
 [[release-notes-1.0.0]]
 === Beats version 1.0.0
-https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
+https://github.com/elastic/beats/compare/1.0.0-rc2\...1.0.0[Check 1.0.0 diff]
 
 ==== Breaking changes
 
@@ -6628,7 +6628,7 @@ https://github.com/elastic/beats/compare/1.0.0-rc2...1.0.0[Check 1.0.0 diff]
 
 [[release-notes-1.0.0-rc2]]
 === Beats version 1.0.0-rc2
-https://github.com/elastic/beats/compare/1.0.0-rc1...1.0.0-rc2[Check 1.0.0-rc2
+https://github.com/elastic/beats/compare/1.0.0-rc1\...1.0.0-rc2[Check 1.0.0-rc2
 diff]
 
 ==== Breaking changes
@@ -6694,7 +6694,7 @@ diff]
 
 [[release-notes-1.0.0-rc1]]
 === Beats version 1.0.0-rc1
-https://github.com/elastic/beats/compare/1.0.0-beta4...1.0.0-rc1[Check
+https://github.com/elastic/beats/compare/1.0.0-beta4\...1.0.0-rc1[Check
 1.0.0-rc1 diff]
 
 ==== Breaking changes
@@ -6790,7 +6790,7 @@ level in the output dictionary. #188
 
 [[release-notes-1.0.0-beta4]]
 === Beats version 1.0.0-beta4
-https://github.com/elastic/beats/compare/1.0.0-beta3...1.0.0-beta4[Check
+https://github.com/elastic/beats/compare/1.0.0-beta3\...1.0.0-beta4[Check
 1.0.0-beta4 diff]
 
 
