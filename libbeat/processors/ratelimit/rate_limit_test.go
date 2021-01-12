@@ -147,20 +147,6 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: inEvents,
 		},
-		"with_metric": {
-			config: common.MapStr{
-				"limit":        "2/s",
-				"metric_field": "num_dropped",
-			},
-			delay:    200 * time.Millisecond,
-			inEvents: inEvents,
-			outEvents: []beat.Event{
-				inEvents[0],
-				inEvents[1],
-				withField(inEvents[3], "num_dropped", uint64(1)),
-				withField(inEvents[5], "num_dropped", uint64(1)),
-			},
-		},
 	}
 
 	for name, test := range cases {
