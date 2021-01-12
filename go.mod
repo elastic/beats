@@ -108,7 +108,6 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/kardianos/service v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
