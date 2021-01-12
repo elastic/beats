@@ -83,6 +83,32 @@ For more information, see
 <<configuration-monitor,Monitoring configuration options>>.
 --
 
+. Configure host (optional). +
++
+--
+// tag::set-http-host[]
+If you intend to get metrics using {metricbeat} installed on another server, you need to bind the {beatname_uc} to host's IP:
+
+[source,yaml]
+----------------------------------
+http.host: xxx.xxx.xxx.xxx
+----------------------------------
+// end::set-http-host[]
+--
+
+. Configure cluster uuid (optional). +
++
+--
+// tag::set-cluster-uuid[]
+To see the Beats monitoring section in Kibana if you have a cluster, you need to associate the {beatname_uc} with cluster UUID:
+
+[source,yaml]
+----------------------------------
+monitoring.cluster_uuid: "cluster-uuid"
+----------------------------------
+// end::set-cluster-uuid[]
+--
+
 ifndef::serverless[]
 . Start {beatname_uc}.
 endif::[]
