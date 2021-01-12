@@ -30,6 +30,7 @@
 - Fix shell wrapper for deb/rpm packaging {pull}23038[23038]
 - Fixed parsing of npipe URI {pull}22978[22978]
 - Remove artifacts on transient download errors {pull}23235[23235]
+- Skip top level files when unziping archive during upgrade {pull}23456[23456]
 
 ==== New features
 
