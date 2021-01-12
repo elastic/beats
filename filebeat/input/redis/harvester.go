@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	rd "github.com/garyburd/redigo/redis"
+	rd "github.com/gomodule/redigo/redis"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
