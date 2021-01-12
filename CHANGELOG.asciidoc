@@ -2901,7 +2901,7 @@ https://github.com/elastic/beats/compare/v6.5.0\...v7.0.0-alpha1[View commits]
 
 [[release-notes-6.8.13]]
 === Beats version 6.8.13
-https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
+https://github.com/elastic/beats/compare/v6.8.12\...v6.8.13[View commits]
 
 ==== Added
 
@@ -2911,7 +2911,7 @@ https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
 
 [[release-notes-6.8.12]]
 === Beats version 6.8.12
-https://github.com/elastic/beats/compare/v6.8.11...v6.8.12[View commits]
+https://github.com/elastic/beats/compare/v6.8.11\...v6.8.12[View commits]
 
 ==== Bugfixes
 
@@ -2921,7 +2921,7 @@ https://github.com/elastic/beats/compare/v6.8.11...v6.8.12[View commits]
 
 [[release-notes-6.8.11]]
 === Beats version 6.8.11
-https://github.com/elastic/beats/compare/v6.8.10...v6.8.11[View commits]
+https://github.com/elastic/beats/compare/v6.8.10\...v6.8.11[View commits]
 
 ==== Bugfixes
 
@@ -2931,7 +2931,7 @@ https://github.com/elastic/beats/compare/v6.8.10...v6.8.11[View commits]
 
 [[release-notes-6.8.10]]
 === Beats version 6.8.10
-https://github.com/elastic/beats/compare/v6.8.9...v6.8.10[View commits]
+https://github.com/elastic/beats/compare/v6.8.9\...v6.8.10[View commits]
 
 ==== Bugfixes
 
