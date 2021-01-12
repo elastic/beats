@@ -249,6 +249,13 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionApp{},
+		&handlerAppAction{
+			log: log,
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)

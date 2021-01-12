@@ -82,7 +82,7 @@ func (o *retryableOperations) runOnce(application Application) func(context.Cont
 
 			o.logger.Debugf("running operation '%s' of the block '%s'", op.Name(), o.Name())
 			if err := op.Run(ctx, application); err != nil {
-				o.logger.Errorf("operation %s failed", op.Name())
+				o.logger.Errorf("operation %s failed, err: %v", op.Name(), err)
 				return err
 			}
 		}

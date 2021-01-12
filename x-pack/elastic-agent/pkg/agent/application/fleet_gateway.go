@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -77,6 +79,7 @@ type fleetGateway struct {
 	unauthCounter    int
 	statusController status.Controller
 	statusReporter   status.Reporter
+	ats              *ackTokenStore
 }
 
 func newFleetGateway(
@@ -122,6 +125,11 @@ func newFleetGatewayWithScheduler(
 	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
 
+	ats, err := newAckTokenStore(log, storage.NewDiskStore(info.AgentAckTokenFile()))
+	if err != nil {
+		return nil, err
+	}
+
 	return &fleetGateway{
 		bgContext:  ctx,
 		log:        log,
@@ -140,6 +148,7 @@ func newFleetGatewayWithScheduler(
 		acker:            acker,
 		statusReporter:   statusController.Register("gateway"),
 		statusController: statusController,
+		ats:              ats,
 	}, nil
 }
 
@@ -209,9 +218,16 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 		f.log.Error(errors.New("failed to load metadata", err))
 	}
 
+	// retrieve ack token from the store
+	ackToken := f.ats.GetToken()
+	if ackToken != "" {
+		f.log.Debug("using previously saved ack token: %v", ackToken)
+	}
+
 	// checkin
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
+		AckToken: ackToken,
 		Events:   ee,
 		Metadata: ecsMeta,
 		Status:   f.statusController.StatusString(),
@@ -234,6 +250,14 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	f.unauthCounter = 0
 	if err != nil {
 		return nil, err
+	}
+
+	// Save the latest ackToken
+	if resp.AckToken != "" {
+		serr := f.ats.Save(resp.AckToken)
+		if serr != nil {
+			f.log.Errorf("failed to save the ack token, err: %v", serr)
+		}
 	}
 
 	// ack events so they are dropped from queue

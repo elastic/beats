@@ -27,6 +27,7 @@ const agentInfoKey = "agent"
 const defaultAgentActionStoreFile = "action_store.yml"
 
 const defaultLogLevel = "info"
+const defaultAgentAckTokenFile = "action_ack_token.yml"
 
 type persistentAgentInfo struct {
 	ID       string `json:"id" yaml:"id" config:"id"`
@@ -65,6 +66,10 @@ func updateLogLevel(level string) error {
 
 	ai.LogLevel = level
 	return updateAgentInfo(s, ai)
+}
+
+func AgentAckTokenFile() string {
+	return filepath.Join(paths.Home(), defaultAgentAckTokenFile)
 }
 
 func generateAgentID() (string, error) {
