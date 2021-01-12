@@ -192,9 +192,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			r.log.Errorf("error publishing event: %v", err)
 			continue
 		}
-
+		if n == 0 {
+			trCtx.updateFirstEvent(maybeMsg.msg)
+		}
 		trCtx.updateLastEvent(maybeMsg.msg)
-		n += 1
+		n++
 	}
 
 	trCtx.updateCursor()

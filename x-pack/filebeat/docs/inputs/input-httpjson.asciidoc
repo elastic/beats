@@ -100,6 +100,7 @@ The state has the following elements:
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
+- `first_event`: A map representing the last first sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
 - `url.value`: The full URL with params and fragments.
 - `url.params`: A map containing the URL params.
@@ -507,7 +508,7 @@ A set of transforms can be defined. This list will be applied after `response.tr
 
 Available transforms for response: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`].
 
 Can write state to: [`body.*`].
 
@@ -541,7 +542,7 @@ List of transforms that will be applied to the response to every new page reques
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
@@ -799,7 +800,7 @@ This will output:
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
-Can read state from: [`.last_response.*`, `.last_event.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
 NOTE: Default templates do not have access to any state, only to functions.
 
