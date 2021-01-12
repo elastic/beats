@@ -186,7 +186,6 @@ processors:
     field:
       - syslog5424_ts
       - json
-      - payload_raw
     ignore_missing: true
 on_failure: 
 - set:
