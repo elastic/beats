@@ -174,7 +174,7 @@ more containers under the TaskDefinition section.
 Here is the AWS CLI to delete a stack including the cluster, task definition and
 all containers:
 ----
-aws cloudformation delete-stack --stack-name <your-stack-name>
+aws --region us-east-1 cloudformation delete-stack --stack-name <your-stack-name>
 ----
 
 [float]
