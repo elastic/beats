@@ -34,20 +34,13 @@ func (s *SyntheticSuite) String() string {
 }
 
 func (s *SyntheticSuite) Fetch() error {
-	return s.suiteCfg.Source.active().Fetch()
+	return s.suiteCfg.Source.Active().Fetch()
 }
 
 func (s *SyntheticSuite) Workdir() string {
-	return s.suiteCfg.Source.active().Workdir()
+	return s.suiteCfg.Source.Active().Workdir()
 }
 
-func (s *SyntheticSuite) Start() {
-	panic("implement me")
-}
-
-func (s *SyntheticSuite) Stop() {
-	panic("implement me")
-}
 
 func (s *SyntheticSuite) Params() map[string]interface{} {
 	return s.suiteCfg.Params
