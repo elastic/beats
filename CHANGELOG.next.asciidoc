@@ -20,17 +20,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
 - Make error message about locked data path actionable. {pull}18667[18667]
-- Ensure dynamic template names are unique for the same field. {pull}18849[18849]
-- Autodiscover doesn't generate any configuration when a variable is missing. Previously it generated an incomplete configuration. {pull}20898[20898]
-- Added `certificate` TLS verification mode to ignore server name mismatch. {issue}12283[12283] {pull}20293[20293]
-- Remove redundant `cloudfoundry.*.timestamp` fields. This value is set in `@timestamp`. {pull}21175[21175]
-- Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs https://github.com/elastic/beats/pull/21179
-- Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs. {pull}21179[21179]
-- Update to Golang 1.12.1. {pull}11330[11330]
-- Disable Alibaba Cloud and Tencent Cloud metadata providers by default. {pull}13812[12812]
-- API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
-- Update to ECS 1.7.0. {pull}22571[22571]
-- Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 
 *Auditbeat*
 
@@ -96,21 +85,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not load dashboards where not available. {pull}15802[15802]
-- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
-- Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516[15516]
-- Update replicaset group to apps/v1 {pull}15854[15802]
-- Fix issue where default go logger is not discarded when either * or stdout is selected. {issue}10251[10251] {pull}15708[15708]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937[15937]
+- Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937[15937]
 - Fix loading processors from annotation hints. {pull}16348[16348]
-- Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
-- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
-- Fix an issue that could cause redundant configuration reloads. {pull}16440[16440]
-- Fix k8s pods labels broken schema. {pull}16480[16480]
-- Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450[16450]
+- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
 - Do not rotate log files on startup when interval is configured and rotateonstartup is disabled. {pull}17613[17613]
@@ -143,12 +124,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
-- Rewrite azure filebeat dashboards, due to changes in kibana. {pull}16466[16466]
-- Adding the var definitions in azure manifest files, fix for errors when executing command setup. {issue}16270[16270] {pull}16468[16468]
 - Fix merging of fileset inputs to replace paths and append processors. {pull}16450[16450]
-- Add queue_url definition in manifest file for aws module. {pull}16640[16640]
-- Fix issue where autodiscover hints default configuration was not being copied. {pull}16987[16987]
-- Fix Elasticsearch `_id` field set by S3 and Google Pub/Sub inputs. {pull}17026[17026]
+- Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 - Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 - Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
 - Fix `elasticsearch.gc` fileset to not collect _all_ logs when Elasticsearch is running in Docker. {issue}13164[13164] {issue}16583[16583] {pull}17164[17164]
@@ -247,10 +224,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
 - Add required option for `metrics` in app_insights. {pull}20406[20406]
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
-- Fix config example in the perfmon configuration files. {pull}19539[19539]
-- Add missing info about the rest of the azure metricsets in the documentation. {pull}19601[19601]
-- Fix k8s scheduler compatibility issue. {pull}19699[19699]
-- Fix SQL module mapping NULL values as string {pull}18955[18955] {issue}18898[18898]
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
@@ -282,27 +255,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for multiple password in redis output. {issue}16058[16058] {pull}16206[16206]
 - Add support for Histogram type in fields.yml {pull}16570[16570]
 - Remove experimental flag from `setup.template.append_fields` {pull}16576[16576]
-- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
-- Add Kerberos support to Kafka input and output. {pull}16781[16781]
-- Add `add_cloudfoundry_metadata` processor to annotate events with Cloud Foundry application data. {pull}16621[16621]
 - Add support for kubernetes provider to recognize namespace level defaults {pull}16321[16321]
 - Add capability of enrich `container.id` with process id in `add_process_metadata` processor {pull}15947[15947]
-- Update RPM packages contained in Beat Docker images. {issue}17035[17035]
-- Update supported versions of `redis` output. {pull}17198[17198]
-- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
-- Add `replace` processor for replacing string values of fields. {pull}17342[17342]
-- Add optional regex based cid extractor to `add_kubernetes_metadata` processor. {pull}17360[17360]
-- Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
-- Add support for AWS IAM `role_arn` in credentials config. {pull}17658[17658] {issue}12464[12464]
-- Add keystore support for autodiscover static configurations. {pull}16306[16306]
-- Add Kerberos support to Elasticsearch output. {pull}17927[17927]
-- Add k8s keystore backend. {pull}18096[18096]
-- Add support for fixed length extraction in `dissect` processor. {pull}17191[17191]
-- Set `agent.name` to the hostname by default. {issue}16377[16377] {pull}18000[18000]
-- Add support for basic ECS logging. {pull}17974[17974]
-- Add config example of how to skip the `add_host_metadata` processor when forwarding logs. {issue}13920[13920] {pull}18153[18153]
-- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
-- Add backoff configuration options for the Kafka output. {issue}16777[16777] {pull}17808[17808]
 - Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
 - Add `urldecode` processor to for decoding URL-encoded fields. {pull}17505[17505]
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
@@ -410,8 +364,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add pilot metricset for Istio Metricbeat module {pull}15761[15761]
 - Add galley metricset for Istio Metricbeat module {pull}15857[15857]
 - Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
-- Add `key/value` mode for SQL module. {issue}15770[15770] {pull}15845[15845]
-- Add STAN dashboard {pull}15654[15654]
 - Add support for Unix socket in Memcached metricbeat module. {issue}13685[13685] {pull}15822[15822]
 - Add `up` metric to prometheus metrics collected from host {pull}15948[15948]
 - Add citadel metricset for Istio Metricbeat module {pull}15990[15990]
@@ -486,9 +438,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
-
-
-
-
-
