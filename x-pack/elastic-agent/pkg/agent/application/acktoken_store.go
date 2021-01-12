@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	atsCached AckTokenSerializer
+	atsCached ackTokenSerializer
 	mx        sync.RWMutex
 )
 
@@ -31,7 +31,7 @@ func newAckTokenStore(log *logger.Logger, store storeLoad) (*ackTokenStore, erro
 	}
 	defer reader.Close()
 
-	var ats AckTokenSerializer
+	var ats ackTokenSerializer
 
 	dec := yaml.NewDecoder(reader)
 	err = dec.Decode(&ats)
@@ -57,7 +57,7 @@ func newAckTokenStore(log *logger.Logger, store storeLoad) (*ackTokenStore, erro
 
 func (s *ackTokenStore) Save(ackToken string) error {
 	var reader io.Reader
-	var ats AckTokenSerializer
+	var ats ackTokenSerializer
 	ats.AckToken = ackToken
 	reader, err := yamlToReader(&ats)
 	if err != nil {
@@ -81,6 +81,6 @@ func (s *ackTokenStore) GetToken() string {
 	return ats.AckToken
 }
 
-type AckTokenSerializer struct {
+type ackTokenSerializer struct {
 	AckToken string `yaml:"ack_token"`
 }

@@ -44,9 +44,14 @@ func AgentConfigFile() string {
 	return filepath.Join(paths.Config(), defaultAgentConfigFile)
 }
 
-// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+// AgentActionStoreFile is the file that contains the action that can be replayed after restart.
 func AgentActionStoreFile() string {
 	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
+}
+
+// AgentAckTokenFile is the file that contains the latest agent ack token.
+func AgentAckTokenFile() string {
+	return filepath.Join(paths.Home(), defaultAgentAckTokenFile)
 }
 
 // updateLogLevel updates log level and persists it to disk.
@@ -66,10 +71,6 @@ func updateLogLevel(level string) error {
 
 	ai.LogLevel = level
 	return updateAgentInfo(s, ai)
-}
-
-func AgentAckTokenFile() string {
-	return filepath.Join(paths.Home(), defaultAgentAckTokenFile)
 }
 
 func generateAgentID() (string, error) {

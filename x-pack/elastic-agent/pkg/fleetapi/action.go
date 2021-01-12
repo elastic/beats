@@ -21,7 +21,7 @@ const (
 	ActionTypePolicyChange = "POLICY_CHANGE"
 	// ActionTypeSettings specifies change of agent settings.
 	ActionTypeSettings = "SETTINGS"
-	// ActionTypeAppAction specifies agent action.
+	// ActionTypeApplication specifies agent action.
 	ActionTypeApplication = "APP_ACTION"
 )
 
@@ -156,10 +156,12 @@ type ActionSettings struct {
 	LogLevel   string `json:"log_level"`
 }
 
+// ID returns the ID of the Action.
 func (a *ActionSettings) ID() string {
 	return a.ActionID
 }
 
+// Type returns the type of the Action.
 func (a *ActionSettings) Type() string {
 	return a.ActionType
 }
@@ -194,12 +196,14 @@ func (a *ActionApp) String() string {
 	return s.String()
 }
 
-func (a *ActionApp) Type() string {
-	return a.ActionType
-}
-
+// ID returns the ID of the Action.
 func (a *ActionApp) ID() string {
 	return a.ActionID
+}
+
+// Type returns the type of the Action.
+func (a *ActionApp) Type() string {
+	return a.ActionType
 }
 
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
