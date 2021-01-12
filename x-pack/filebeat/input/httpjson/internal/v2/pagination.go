@@ -161,11 +161,11 @@ func (iter *pageIterator) getPage() (*response, error) {
 	r.page = iter.n
 
 	if len(bodyBytes) > 0 && r.header.Get("Content-Type") == "application/x-ndjson" {
-		bodyBytes = append([]byte("{\"ndjson-results\":["), bodyBytes...)
+		bodyBytes = append([]byte("["), bodyBytes...)
 		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\r\n"), []byte(","))
 		bodyBytes = bytes.ReplaceAll(bodyBytes, []byte("\n"), []byte(","))
 		bodyBytes = bytes.TrimRight(bodyBytes, ",")
-		bodyBytes = append(bodyBytes, []byte("]}")...)
+		bodyBytes = append(bodyBytes, ']')
 	}
 	if len(bodyBytes) > 0 {
 		if err := json.Unmarshal(bodyBytes, &r.body); err != nil {
