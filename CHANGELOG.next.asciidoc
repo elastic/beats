@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - file_integrity: stop monitoring excluded paths {issue}21278[21278] {pull}21282[21282]
 - system/socket: Fixed startup error with some 5.x kernels. {issue}18755[18755] {pull}22787[22787]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
+- Note incompatibility of system/socket on ARM. {pull}23381[23381]
 
 *Filebeat*
 
