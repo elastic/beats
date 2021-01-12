@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -43,18 +44,27 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 		addMonitorStatus(stdMonFields.Type),
 	}
 
-	if stdMonFields.Type != "browser" {
+	if stdMonFields.Type == "synthetic" {
 		jobWrappers = append(jobWrappers, addMonitorDuration)
 	}
 
-	return jobs.WrapAllSeparately(
-		jobs.WrapAll(
-			js,
-			jobWrappers...,
-		),
-		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields.Type)
-		})
+	baseWrapped := jobs.WrapAll(
+		js,
+		jobWrappers...,
+	)
+	if stdMonFields.Type == "synthetic" {
+		return jobs.WrapAllSeparately(
+			baseWrapped,
+			func() jobs.JobWrapper {
+				return makeAddSummary(stdMonFields.Type)
+			})
+	}
+	return baseWrapped
+}
+
+func isSyntheticType(typ string) bool {
+	logp.Warn("CHECK TYP %s", typ)
+	return strings.HasPrefix(typ, "synthetic_")
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
@@ -64,10 +74,14 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 			started := time.Now()
 			cont, e := job(event)
 			thisID := stdMonFields.ID
+			thisName := stdMonFields.Name
 			// Allow jobs to override the ID, useful for suites
 			// which do this logic on their own
 			if v, _ := event.GetValue("monitor.id"); v != nil {
 				thisID = v.(string)
+			}
+			if v, _ := event.GetValue("monitor.name"); v != nil {
+				thisName = v.(string)
 			}
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -82,7 +96,7 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 			fieldsToMerge := common.MapStr{
 				"monitor": common.MapStr{
 					"id":       thisID,
-					"name":     stdMonFields.Name,
+					"name":     thisName,
 					"type":     stdMonFields.Type,
 					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
 				},
@@ -217,20 +231,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
-			// Jobs can append to the check group to delineate discrete jobs
-			// A nifty property here is that check groups remain a single unique value
-			// but you can still use an efficient prefix search in a pinch to group those
-			// if necessary.
-			checkGroupExt, _ := event.Meta.GetValue("check_group_ext")
-
-			// No error check needed here
-			var cg string
-			if checkGroupExt != "" {
-				cg = fmt.Sprintf("%s-%s", state.checkGroup, checkGroupExt)
-			} else {
-				cg = state.checkGroup
-			}
-			event.PutValue("monitor.check_group", cg)
+			event.PutValue("monitor.check_group", state.checkGroup)
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))
@@ -242,17 +243,6 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				up := state.up
 				down := state.down
 
-				// Browser monitors only count as a single up/down
-				// event
-				if monitorType == "browser" {
-					if eventStatus == "down" {
-						up = 0
-						down = 1
-					} else {
-						up = 1
-						down = 0
-					}
-				}
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
 						"up":   up,

@@ -135,12 +135,6 @@ func newMonitorUnsafe(
 		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", standardFields.Type, registrar.monitorNames())
 	}
 
-	if standardFields.Type == "synthetic_suite" {
-
-	} else {
-
-	}
-
 	m := &Monitor{
 		stdFields:         standardFields,
 		pluginName:        monitorPlugin.name,

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package synthetic_suite
+package synthetic
 
 import (
 	"context"
@@ -19,8 +19,9 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("synthetic_suite", create)
-	monitors.RegisterActive("synthetic/suite", create)
+	monitors.RegisterActive("browser", create)
+	monitors.RegisterActive("synthetic", create)
+	monitors.RegisterActive("synthetics/synthetic", create)
 }
 
 var showExperimentalOnce = sync.Once{}

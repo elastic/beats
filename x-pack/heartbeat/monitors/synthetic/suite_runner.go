@@ -1,4 +1,4 @@
-package synthetic_suite
+package synthetic
 
 import (
 	"context"
@@ -40,7 +40,6 @@ func (s *SyntheticSuite) Fetch() error {
 func (s *SyntheticSuite) Workdir() string {
 	return s.suiteCfg.Source.Active().Workdir()
 }
-
 
 func (s *SyntheticSuite) Params() map[string]interface{} {
 	return s.suiteCfg.Params

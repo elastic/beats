@@ -1,8 +1,8 @@
-package synthetic_suite
+package synthetic
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/synthetic_suite/source"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/synthetic/source"
 )
 
 type Config struct {

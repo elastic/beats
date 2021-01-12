@@ -132,19 +132,20 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), newJourneyEnricher())}, nil
+		senr := streamEnricher{}
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, je *journeyEnricher) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-synthEvents:
-			err = je.enrich(event, se)
+			err = enrich(event, se)
 			if se != nil {
-				return []jobs.Job{readResultsJob(ctx, synthEvents, je)}, err
+				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
 			} else {
 				return nil, err
 			}

@@ -6,6 +6,8 @@ package synthexec
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/gofrs/uuid"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -13,12 +15,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+type enricher func (event *beat.Event, se *SynthEvent) error
+
+type streamEnricher struct {
+	je *journeyEnricher
+}
+
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+	if e.je == nil || (se != nil && se.Type == "journey/start") {
+		e.je = newJourneyEnricher()
+	}
+
+	return e.je.enrich(event, se)
+}
+
 // journeyEnricher holds state across received SynthEvents retaining fields
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
 	journeyComplete bool
-	monitorId string
-	checkGroupExt string
+	journey *Journey
+	checkGroup      string
 	errorCount      int
 	lastError       error
 	stepCount       int
@@ -31,8 +47,16 @@ type journeyEnricher struct {
 
 func newJourneyEnricher() *journeyEnricher {
 	return &journeyEnricher{
-		checkGroupExt: "init",
+		checkGroup: makeUuid(),
 	}
+}
+
+func makeUuid() string {
+	u, err := uuid.NewV1()
+	if err != nil {
+		panic("Cannot generate v1 UUID, this should never happen!")
+	}
+	return u.String()
 }
 
 func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
@@ -41,7 +65,9 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case "journey/start":
-			je.checkGroupExt = se.Journey.Name
+			je.lastError = nil
+			je.checkGroup = makeUuid()
+			je.journey = se.Journey
 			je.start = event.Timestamp
 		case "journey/end":
 			je.end = event.Timestamp
@@ -52,21 +78,25 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 
 	// No more synthEvents? In this case this is the summary event
 	if se == nil {
-		return je.createSummary(event)
+		return nil
 	}
+
+	eventext.MergeEventFields(event, common.MapStr{
+		"monitor": common.MapStr{
+			"id": je.journey.Id,
+			"name": je.journey.Name,
+			"check_group": je.checkGroup,
+		},
+	})
 
 	return je.enrichSynthEvent(event, se)
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
-	// For synthetics we manually set the monitor ID since we run
-	// the whole suite as one shot
-	event.PutValue("monitor.id", se.Journey.Name)
-	event.Meta.Put("check_group_ext", je.checkGroupExt)
-
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
+		return je.createSummary(event)
 	case "step/end":
 		je.stepCount++
 	}
@@ -92,6 +122,15 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 }
 
 func (je *journeyEnricher) createSummary(event *beat.Event) error {
+	var up, down int
+	if je.errorCount > 0 {
+		up = 0
+		down = 1
+	} else {
+		up = 1
+		down = 0
+	}
+
 	if je.journeyComplete {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": je.urlFields,
@@ -103,9 +142,15 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 					"us": int64(je.end.Sub(je.start) / time.Microsecond),
 				},
 			},
+			"summary": common.MapStr{
+				"up": up,
+				"down": down,
+			},
 		})
+		logp.Warn("TRIGGER SUMMARY %#v", event.Fields)
 		return je.lastError
 	}
+
 	return fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
 }
 
