@@ -17,6 +17,8 @@ import (
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
 	journeyComplete bool
+	monitorId string
+	checkGroupExt string
 	errorCount      int
 	lastError       error
 	stepCount       int
@@ -28,7 +30,9 @@ type journeyEnricher struct {
 }
 
 func newJourneyEnricher() *journeyEnricher {
-	return &journeyEnricher{}
+	return &journeyEnricher{
+		checkGroupExt: "init",
+	}
 }
 
 func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
@@ -37,6 +41,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case "journey/start":
+			je.checkGroupExt = se.Journey.Name
 			je.start = event.Timestamp
 		case "journey/end":
 			je.end = event.Timestamp
@@ -54,6 +59,11 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+	// For synthetics we manually set the monitor ID since we run
+	// the whole suite as one shot
+	event.PutValue("monitor.id", se.Journey.Name)
+	event.Meta.Put("check_group_ext", je.checkGroupExt)
+
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true

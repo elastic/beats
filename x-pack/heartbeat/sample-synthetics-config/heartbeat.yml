@@ -42,7 +42,10 @@ setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 setup.kibana:
-output.console: ~
+output.elasticsearch:
+  host: "127.0.0.1:9200"
+  username: elastic
+  password: changeme
 processors:
 - add_observer_metadata:
 

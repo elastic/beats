@@ -171,6 +171,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 	// state struct here.
 	state := struct {
 		mtx        sync.Mutex
+		monitorId  string
 		remaining  uint16
 		up         uint16
 		down       uint16
@@ -195,6 +196,10 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
+			if v, _ := event.GetValue("monitor.id"); v != state.monitorId {
+				resetState()
+			}
+
 			cont, jobErr := job(event)
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
@@ -212,8 +217,20 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
+			// Jobs can append to the check group to delineate discrete jobs
+			// A nifty property here is that check groups remain a single unique value
+			// but you can still use an efficient prefix search in a pinch to group those
+			// if necessary.
+			checkGroupExt, _ := event.Meta.GetValue("check_group_ext")
+
 			// No error check needed here
-			event.PutValue("monitor.check_group", state.checkGroup)
+			var cg string
+			if checkGroupExt != "" {
+				cg = fmt.Sprintf("%s-%s", state.checkGroup, checkGroupExt)
+			} else {
+				cg = state.checkGroup
+			}
+			event.PutValue("monitor.check_group", cg)
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))
@@ -224,6 +241,9 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 			if state.remaining == 0 {
 				up := state.up
 				down := state.down
+
+				// Browser monitors only count as a single up/down
+				// event
 				if monitorType == "browser" {
 					if eventStatus == "down" {
 						up = 0
