@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -337,6 +338,195 @@ func TestEmitEvent_Node(t *testing.T) {
 			case event := <-listener.Events():
 				assert.Equal(t, test.Expected, event, test.Message)
 			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
+	}
+}
+
+func TestNode_OnDelete(t *testing.T) {
+	name := "metricbeat"
+	nameUnknown := "metricbeat-unknown"
+	nodeIP := "192.168.0.1"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	UUID, err := uuid.NewV4()
+
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Node",
+		APIVersion: "v1",
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		Message  string
+		Flag     string
+		Node     *kubernetes.Node
+		Expected bus.Event
+	}{
+		{
+			Message: "Test node stop",
+			Node: &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{
+						{
+							Type:    v1.NodeExternalIP,
+							Address: nodeIP,
+						},
+						{
+							Type:    v1.NodeInternalIP,
+							Address: "1.2.3.4",
+						},
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
+					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "192.168.0.1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"node": common.MapStr{
+						"name":     "metricbeat",
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
+					},
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"node": common.MapStr{
+							"name":     "metricbeat",
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test node stop with DeletedFinalStateUnknown",
+			Node: &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        nameUnknown,
+					UID:         types.UID(uid),
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{
+						{
+							Type:    v1.NodeExternalIP,
+							Address: nodeIP,
+						},
+						{
+							Type:    v1.NodeInternalIP,
+							Address: "1.2.3.4",
+						},
+						{
+							Type:    v1.NodeHostName,
+							Address: "node1",
+						},
+					},
+					Conditions: []v1.NodeCondition{
+						{
+							Type:   v1.NodeReady,
+							Status: v1.ConditionTrue,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "192.168.0.1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"node": common.MapStr{
+						"name":     nameUnknown,
+						"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+						"hostname": "node1",
+					},
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"node": common.MapStr{
+							"name":     nameUnknown,
+							"uid":      "005f3b90-4b9d-12f8-acf0-31020a840133",
+							"hostname": "node1",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen := metadata.NewNodeMetadataGenerator(common.NewConfig(), nil)
+			config := defaultConfig()
+			p := &Provider{
+				config:    config,
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				templates: mapper,
+				logger:    logp.NewLogger("kubernetes"),
+			}
+
+			no := &node{
+				metagen: metaGen,
+				config:  defaultConfig(),
+				publish: p.publish,
+				uuid:    UUID,
+				logger:  logp.NewLogger("kubernetes.no"),
+			}
+			no.config.CleanupTimeout = 1 * time.Second
+			p.eventManager = NewMockNodeEventerManager(no)
+
+			listener := p.bus.Subscribe()
+
+			if test.Node.Name == nameUnknown {
+				deletedState := cache.DeletedFinalStateUnknown{
+					Key: "testnode",
+					Obj: test.Node,
+				}
+				no.OnDelete(deletedState)
+			} else {
+				no.OnDelete(test.Node)
+			}
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(4 * time.Second):
 				if test.Expected != nil {
 					t.Fatal("Timeout while waiting for event")
 				}

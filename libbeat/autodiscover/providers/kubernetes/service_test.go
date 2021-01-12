@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -421,6 +422,174 @@ func TestEmitEvent_Service(t *testing.T) {
 			case event := <-listener.Events():
 				assert.Equal(t, test.Expected, event, test.Message)
 			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
+	}
+}
+
+func TestService_OnDelete(t *testing.T) {
+	name := "metricbeat"
+	nameUnknown := "metricbeat-unknown"
+	namespace := "default"
+	clusterIP := "192.168.0.1"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Service",
+		APIVersion: "v1",
+	}
+
+	tests := []struct {
+		Message  string
+		Flag     string
+		Service  *kubernetes.Service
+		Expected bus.Event
+	}{
+		{
+			Message: "Test service stop",
+			Flag:    "stop",
+			Service: &kubernetes.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Spec: v1.ServiceSpec{
+					Ports: []v1.ServicePort{
+						{
+							Name: "http",
+							Port: 8080,
+						},
+					},
+					ClusterIP: clusterIP,
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "192.168.0.1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"service": common.MapStr{
+						"name": "metricbeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"namespace":   "default",
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"service": common.MapStr{
+							"name": "metricbeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test service stop with DeletedFinalStateUnknown",
+			Flag:    "stop",
+			Service: &kubernetes.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        nameUnknown,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Spec: v1.ServiceSpec{
+					Ports: []v1.ServicePort{
+						{
+							Name: "http",
+							Port: 8080,
+						},
+					},
+					ClusterIP: clusterIP,
+				},
+			},
+			Expected: bus.Event{
+				"stop":     true,
+				"host":     "192.168.0.1",
+				"id":       uid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"service": common.MapStr{
+						"name": nameUnknown,
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"namespace":   "default",
+					"annotations": common.MapStr{},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"service": common.MapStr{
+							"name": nameUnknown,
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil)
+
+			p := &Provider{
+				config:    defaultConfig(),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				templates: mapper,
+				logger:    logp.NewLogger("kubernetes"),
+			}
+
+			service := &service{
+				metagen: metaGen,
+				config:  defaultConfig(),
+				publish: p.publish,
+				uuid:    UUID,
+				logger:  logp.NewLogger("kubernetes.service"),
+			}
+			service.config.CleanupTimeout = 1 * time.Second
+			p.eventManager = NewMockServiceEventerManager(service)
+
+			listener := p.bus.Subscribe()
+
+			if test.Service.Name == nameUnknown {
+				deletedState := cache.DeletedFinalStateUnknown{
+					Key: "testsvc",
+					Obj: test.Service,
+				}
+				service.OnDelete(deletedState)
+			} else {
+				service.OnDelete(test.Service)
+			}
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(4 * time.Second):
 				if test.Expected != nil {
 					t.Fatal("Timeout while waiting for event")
 				}

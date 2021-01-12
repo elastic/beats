@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -1538,6 +1539,311 @@ func TestEmitEvent(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPod_OnDelete(t *testing.T) {
+	name := "filebeat"
+	nameUnknown := "filebeat-unknown"
+	namespace := "default"
+	podIP := "127.0.0.1"
+	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	containerImage := "elastic/filebeat:6.3.0"
+	node := "node"
+	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	typeMeta := metav1.TypeMeta{
+		Kind:       "Pod",
+		APIVersion: "v1",
+	}
+
+	tests := []struct {
+		Message  string
+		Flag     string
+		Pod      *kubernetes.Pod
+		Expected []bus.Event
+	}{
+		{
+			Message: "Test stop pod",
+			Flag:    "stop",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        name,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        name,
+							ContainerID: containerID,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: []bus.Event{
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
+					"kubernetes": common.MapStr{
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"port":     0,
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							},
+							"pod": common.MapStr{
+								"name": "filebeat",
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+						"container": common.MapStr{
+							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"runtime": "docker",
+							"id":      "foobar",
+						},
+					},
+					"config": []*common.Config{},
+				},
+			},
+		},
+		{
+			Message: "Test stop pod with DeletedFinalStateUnknown",
+			Flag:    "stop",
+			Pod: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        nameUnknown,
+					UID:         types.UID(uid),
+					Namespace:   namespace,
+					Labels:      map[string]string{},
+					Annotations: map[string]string{},
+				},
+				TypeMeta: typeMeta,
+				Status: v1.PodStatus{
+					PodIP: podIP,
+					ContainerStatuses: []kubernetes.PodContainerStatus{
+						{
+							Name:        name,
+							ContainerID: containerID,
+						},
+					},
+				},
+				Spec: v1.PodSpec{
+					NodeName: node,
+					Containers: []kubernetes.Container{
+						{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+			Expected: []bus.Event{
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"id":       uid,
+					"provider": UUID,
+					"ports":    common.MapStr{},
+					"kubernetes": common.MapStr{
+						"pod": common.MapStr{
+							"name": nameUnknown,
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"pod": common.MapStr{
+								"name": nameUnknown,
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+					},
+					"config": []*common.Config{},
+				},
+				{
+					"stop":     true,
+					"host":     "127.0.0.1",
+					"port":     0,
+					"id":       cid,
+					"provider": UUID,
+					"kubernetes": common.MapStr{
+						"container": common.MapStr{
+							"id":      "foobar",
+							"name":    "filebeat",
+							"image":   "elastic/filebeat:6.3.0",
+							"runtime": "docker",
+						},
+						"pod": common.MapStr{
+							"name": nameUnknown,
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						},
+						"node": common.MapStr{
+							"name": "node",
+						},
+						"namespace":   "default",
+						"annotations": common.MapStr{},
+					},
+					"meta": common.MapStr{
+						"kubernetes": common.MapStr{
+							"namespace": "default",
+							"container": common.MapStr{
+								"name":  "filebeat",
+								"image": "elastic/filebeat:6.3.0",
+							},
+							"pod": common.MapStr{
+								"name": nameUnknown,
+								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+							}, "node": common.MapStr{
+								"name": "node",
+							},
+						},
+						"container": common.MapStr{
+							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
+							"runtime": "docker",
+							"id":      "foobar",
+						},
+					},
+					"config": []*common.Config{},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil, nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
+			p := &Provider{
+				config:    defaultConfig(),
+				bus:       bus.New(logp.NewLogger("bus"), "test"),
+				templates: mapper,
+				logger:    logp.NewLogger("kubernetes"),
+			}
+
+			pub := &publisher{b: p.bus}
+			pod := &pod{
+				metagen: metaGen,
+				config:  defaultConfig(),
+				publish: pub.publish,
+				uuid:    UUID,
+				logger:  logp.NewLogger("kubernetes.pod"),
+			}
+			pod.config.CleanupTimeout = 1 * time.Second
+			p.eventManager = NewMockPodEventerManager(pod)
+
+			listener := p.bus.Subscribe()
+
+			if test.Pod.Name == nameUnknown {
+				deletedState := cache.DeletedFinalStateUnknown{
+					Key: "testpod",
+					Obj: test.Pod,
+				}
+				pod.OnDelete(deletedState)
+			} else {
+				pod.OnDelete(test.Pod)
+			}
+
+			for i := 0; i < len(test.Expected); i++ {
+				select {
+				case event := <-listener.Events():
+					assert.Equalf(t, test.Expected[i], event, "%s/#%d", test.Message, i)
+				case <-time.After(2 * time.Second):
+					if test.Expected != nil {
+						t.Fatalf("Timeout while waiting for event #%d", i)
+					}
+				}
+			}
+
+			select {
+			case <-listener.Events():
+				t.Error("More events received than expected")
+			default:
+			}
+		})
+	}
+
 }
 
 func NewMockPodEventerManager(pod *pod) EventManager {
