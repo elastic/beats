@@ -652,6 +652,7 @@ port. {pull}19209[19209]
 *Functionbeat*
 
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
+- Add support for multiple regions {pull}21065[21065]
 
 *Winlogbeat*
 
