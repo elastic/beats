@@ -55,7 +55,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19800
-            - "windows-7-32-bit" #https://github.com/elastic/beats/issues/19835
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
     windows-2016:
@@ -111,5 +110,16 @@ stages:
                 - "/test metricbeat for windows-7"
             labels:
                 - "windows-7"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    windows-7-32:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7-32-bit"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test metricbeat for windows-7-32"
+            labels:
+                - "windows-7-32"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
