@@ -25,6 +25,7 @@ type transforms []transform
 type transformContext struct {
 	lock         sync.RWMutex
 	cursor       *cursor
+	firstEvent   *common.MapStr
 	lastEvent    *common.MapStr
 	lastResponse *response
 }
@@ -33,6 +34,7 @@ func emptyTransformContext() *transformContext {
 	return &transformContext{
 		cursor:       &cursor{},
 		lastEvent:    &common.MapStr{},
+		firstEvent:   &common.MapStr{},
 		lastResponse: &response{},
 	}
 }
@@ -50,6 +52,13 @@ func (ctx *transformContext) lastEventClone() *common.MapStr {
 	return &clone
 }
 
+func (ctx *transformContext) firstEventClone() *common.MapStr {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	clone := ctx.firstEvent.Clone()
+	return &clone
+}
+
 func (ctx *transformContext) lastResponseClone() *response {
 	ctx.lock.RLock()
 	defer ctx.lock.RUnlock()
@@ -63,6 +72,7 @@ func (ctx *transformContext) updateCursor() {
 	// we do not want to pass the cursor data to itself
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
+	newCtx.firstEvent = ctx.firstEvent
 	newCtx.lastResponse = ctx.lastResponse
 
 	ctx.cursor.update(newCtx)
@@ -72,6 +82,12 @@ func (ctx *transformContext) updateLastEvent(e common.MapStr) {
 	ctx.lock.Lock()
 	defer ctx.lock.Unlock()
 	*ctx.lastEvent = e
+}
+
+func (ctx *transformContext) updateFirstEvent(e common.MapStr) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	*ctx.firstEvent = e
 }
 
 func (ctx *transformContext) updateLastResponse(r response) {
