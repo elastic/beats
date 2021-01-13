@@ -249,6 +249,7 @@ def clean_keys(obj):
         "imperva.securesphere",
         "infoblox.nios",
         "iptables.log",
+        "juniper.junos",
         "juniper.netscreen",
         "netscout.sightline",
         "proofpoint.emailsecurity",
