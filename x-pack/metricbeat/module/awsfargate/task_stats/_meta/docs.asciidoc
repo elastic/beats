@@ -40,12 +40,10 @@ aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_ID --se
 
 [float]
 ==== AWS CloudFormation Template Example
-Here is an example of AWS CloudFormation template to create a new cluster,
-create a task definition that runs Metricbeat container and start the service.
-Please copy this section into a `cloud_formation.yml` file locally and replace
-`<your-cluster-name>`, `<your-log-group-name>`, and `<your-service-name>` with
-your own preferred names. Also you can find `<ELASTIC_CLOUD_ID secret ARN>` and
-`<ELASTIC_CLOUD_AUTH secret ARN>` values from AWS secret manager.
+Here is an example of AWS CloudFormation template for testing purpose only.
+Please replace this with actual applications. This template shows how to define
+a new cluster, how to create a task definition with multiple containers(including
+Metricbeat), and how to start the service.
 
 [source,yaml]
 ----
@@ -160,9 +158,10 @@ Resources:
 
 [float]
 ==== Create CloudFormation Stack
-Here is the AWS CLI to create a stack using the CloudFormation config file above:
+Once the CloudFormation template is saved locally into `clouformation.yml`, AWS
+CLI can be used to create a stack using one command:
 ----
-aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./module/awsfargate/cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<cloud-id-arn> ParameterKey=ClusterName,ParameterValue=<cluster-name> ParameterKey=RoleName,ParameterValue=<role-name> ParameterKey=TaskName,ParameterValue=<task-name> ParameterKey=ServiceName,ParameterValue=<service-name> ParameterKey=LogGroupName,ParameterValue=<log-group-name>
+aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<cloud-id-arn> ParameterKey=ClusterName,ParameterValue=<cluster-name> ParameterKey=RoleName,ParameterValue=<role-name> ParameterKey=TaskName,ParameterValue=<task-name> ParameterKey=ServiceName,ParameterValue=<service-name> ParameterKey=LogGroupName,ParameterValue=<log-group-name>
 ----
 
 Make sure to replace `<subnet-id>` with your own subnet in this command. Please go
