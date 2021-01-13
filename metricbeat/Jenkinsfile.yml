@@ -23,20 +23,28 @@ stages:
         mage: "mage build unitTest"
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     goIntegTest:
         mage: "mage goIntegTest"
         withModule: true
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     pythonIntegTest:
         mage: "mage pythonIntegTest"
         withModule: true
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     crosscompile:
         make: "make -C metricbeat crosscompile"
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -58,6 +66,8 @@ stages:
             #- "windows-7-32-bit" https://github.com/elastic/beats/issues/19835
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
