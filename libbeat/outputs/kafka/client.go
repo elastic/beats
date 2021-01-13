@@ -49,6 +49,7 @@ type client struct {
 	codec    codec.Codec
 	config   sarama.Config
 	mux      sync.Mutex
+	done     chan struct{}
 
 	producer sarama.AsyncProducer
 
@@ -87,6 +88,7 @@ func newKafkaClient(
 		index:    strings.ToLower(index),
 		codec:    writer,
 		config:   *cfg,
+		done:     make(chan struct{}),
 	}
 	return c, nil
 }
@@ -123,6 +125,7 @@ func (c *client) Close() error {
 		return nil
 	}
 
+	close(c.done)
 	c.producer.AsyncClose()
 	c.wg.Wait()
 	c.producer = nil
@@ -313,7 +316,13 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 				if msg.ref.err != nil {
 					c.log.Errorf("Kafka (topic=%v): %v", msg.topic, msg.ref.err)
 				}
-				time.Sleep(10 * time.Second)
+				select {
+				case <-time.After(10 * time.Second):
+					// Sarama's circuit breaker is hard-coded to reject all inputs
+					// for 10sec.
+				case <-msg.ref.client.done:
+					// Allow early bailout if the output itself is closing.
+				}
 				breakerOpen = false
 			} else {
 				breakerOpen = true
