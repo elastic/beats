@@ -308,6 +308,11 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 			// sitting in the channel from 10 seconds ago. So we only end up
 			// sleeping every _other_ reported breaker error.
 			if breakerOpen {
+				// Immediately log the error that presumably caused this state,
+				// since the error reporting on this batch will be delayed.
+				if msg.ref.err != nil {
+					c.log.Errorf("Kafka (topic=%v): %v", msg.topic, msg.ref.err)
+				}
 				time.Sleep(10 * time.Second)
 				breakerOpen = false
 			} else {
