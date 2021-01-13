@@ -65,9 +65,6 @@ processors:
     target_field: pensando.dfw.source_port
     ignore_failure: true
 - set:
-    field: event.module
-    value: pensando
-- set:
     field: event.category
     value: ['network']
 - set:
