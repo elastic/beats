@@ -199,6 +199,10 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	if err != nil {
 		return
 	}
+	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
+		obj = deleted.Obj
+	}
 	w.queue.Add(&item{key, obj, state})
 }
 
