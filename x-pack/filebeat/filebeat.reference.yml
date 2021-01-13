@@ -604,7 +604,7 @@ filebeat.modules:
   umbrella:
     enabled: true
 
-    #var.input: s3
+    #var.input: aws-s3
     # AWS SQS queue url
     #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
     # Access ID to authenticate with the S3 input
