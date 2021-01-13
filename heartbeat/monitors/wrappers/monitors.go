@@ -19,7 +19,6 @@ package wrappers
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -44,7 +43,7 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 		addMonitorStatus(stdMonFields.Type),
 	}
 
-	if stdMonFields.Type == "synthetic" {
+	if stdMonFields.Type == "browser" {
 		jobWrappers = append(jobWrappers, addMonitorDuration)
 	}
 
@@ -52,7 +51,7 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 		js,
 		jobWrappers...,
 	)
-	if stdMonFields.Type == "synthetic" {
+	if stdMonFields.Type != "browser" {
 		return jobs.WrapAllSeparately(
 			baseWrapped,
 			func() jobs.JobWrapper {
@@ -60,11 +59,6 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 			})
 	}
 	return baseWrapped
-}
-
-func isSyntheticType(typ string) bool {
-	logp.Warn("CHECK TYP %s", typ)
-	return strings.HasPrefix(typ, "synthetic_")
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.

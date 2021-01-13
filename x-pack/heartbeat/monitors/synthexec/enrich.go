@@ -6,7 +6,6 @@ package synthexec
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/gofrs/uuid"
 	"time"
 
@@ -147,7 +146,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 				"down": down,
 			},
 		})
-		logp.Warn("TRIGGER SUMMARY %#v", event.Fields)
 		return je.lastError
 	}
 

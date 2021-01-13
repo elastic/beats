@@ -1,8 +1,8 @@
-package synthetic
+package browser
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/synthetic/source"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 )
 
 type Config struct {
