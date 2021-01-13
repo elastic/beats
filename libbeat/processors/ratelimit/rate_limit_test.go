@@ -61,32 +61,23 @@ func TestNew(t *testing.T) {
 }
 
 func TestRateLimit(t *testing.T) {
-	inEvents := []beat.Event{
-		{
+	var inEvents []beat.Event
+	for i := 1; i <= 6; i++ {
+		event := beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"foo": "bar",
+				"event_number": i,
 			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"foo": "bar",
-				"baz": "mosquito",
-			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"baz": "qux",
-			},
-		},
-		{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"foo": "seger",
-			},
-		},
+		}
+		inEvents = append(inEvents, event)
+	}
+
+	withField := func(in beat.Event, key string, value interface{}) beat.Event {
+		out := in
+		out.Fields = in.Fields.Clone()
+
+		out.Fields.Put(key, value)
+		return out
 	}
 
 	cases := map[string]struct {
@@ -114,9 +105,9 @@ func TestRateLimit(t *testing.T) {
 			inEvents:  inEvents,
 			outEvents: inEvents[0:2],
 		},
-		"rate_5_per_min": {
+		"rate_6_per_min": {
 			config: common.MapStr{
-				"limit": "5/m",
+				"limit": "6/m",
 			},
 			inEvents:  inEvents,
 			outEvents: inEvents,
@@ -127,16 +118,25 @@ func TestRateLimit(t *testing.T) {
 			},
 			delay:     200 * time.Millisecond,
 			inEvents:  inEvents,
-			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3]},
+			outEvents: []beat.Event{inEvents[0], inEvents[1], inEvents[3], inEvents[5]},
 		},
 		"with_fields": {
 			config: common.MapStr{
 				"limit":  "1/s",
 				"fields": []string{"foo"},
 			},
-			delay:     400 * time.Millisecond,
-			inEvents:  inEvents,
-			outEvents: []beat.Event{inEvents[0], inEvents[2], inEvents[3]},
+			delay: 400 * time.Millisecond,
+			inEvents: []beat.Event{
+				withField(inEvents[0], "foo", "bar"),
+				withField(inEvents[1], "foo", "bar"),
+				inEvents[2],
+				withField(inEvents[3], "foo", "seger"),
+			},
+			outEvents: []beat.Event{
+				withField(inEvents[0], "foo", "bar"),
+				inEvents[2],
+				withField(inEvents[3], "foo", "seger"),
+			},
 		},
 		"with_burst": {
 			config: common.MapStr{
@@ -160,7 +160,10 @@ func TestRateLimit(t *testing.T) {
 
 			out := make([]beat.Event, 0)
 			for _, in := range test.inEvents {
-				o, err := p.Run(&in)
+				inCopy := in
+				inCopy.Fields = in.Fields.Clone()
+
+				o, err := p.Run(&inCopy)
 				require.NoError(t, err)
 				if o != nil {
 					out = append(out, *o)
