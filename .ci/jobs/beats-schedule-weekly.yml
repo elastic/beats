@@ -15,7 +15,7 @@
       scm:
         - git:
             url: git@github.com:elastic/beats.git
-            refspec: +refs/heads/*:refs/remotes/origin/* +refs/pull/*/head:refs/remotes/origin/pr/*
+            refspec: +refs/heads/*:refs/remotes/origin/*
             wipe-workspace: 'True'
             name: origin
             shallow-clone: true
