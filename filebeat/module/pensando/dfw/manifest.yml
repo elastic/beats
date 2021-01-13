@@ -7,8 +7,6 @@ var:
     default: 9001
   - name: input
     default: syslog
-  - name: log_level
-    default: 7
 
 ingest_pipeline: 
   - ingest/pipeline.yml
