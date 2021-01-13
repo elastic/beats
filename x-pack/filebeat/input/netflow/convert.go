@@ -65,7 +65,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	// ECS Fields -- event
 	ecsEvent := common.MapStr{
-		"created":  time.Now(),
+		"created":  time.Now().UTC(),
 		"kind":     "event",
 		"category": []string{"network_traffic", "network"},
 		"action":   flow.Fields["type"],
