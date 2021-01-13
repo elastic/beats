@@ -15,7 +15,7 @@ function DeviceProcessor() {
 	}
 }
 
-var dup1 = match("HEADER#0:006/0", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{p0}");
+var dup1 = match("HEADER#1:006/0", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{p0}");
 
 var dup2 = setc("eventcategory","1401070000");
 
@@ -236,16 +236,20 @@ var dup77 = match_copy("MESSAGE#225:syslog", "nwparser.payload", "event_descript
 	dup62,
 ]));
 
-var part1 = match("HEADER#0:006/1_0", "nwparser.p0", "%{hhostip} %{messageid}[%{data}]: %{p0}");
+var hdr1 = match("HEADER#0:001", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{messageid}[%{data}]: %{payload}", processor_chain([
+	setc("header_id","001"),
+]));
 
-var part2 = match("HEADER#0:006/1_1", "nwparser.p0", "%{hhostip} %{messageid}: %{p0}");
+var part1 = match("HEADER#1:006/1_0", "nwparser.p0", "%{hhostip} %{messageid}[%{data}]: %{p0}");
+
+var part2 = match("HEADER#1:006/1_1", "nwparser.p0", "%{hhostip} %{messageid}: %{p0}");
 
 var select1 = linear_select([
 	part1,
 	part2,
 ]);
 
-var part3 = match_copy("HEADER#0:006/2", "nwparser.p0", "payload");
+var part3 = match_copy("HEADER#1:006/2", "nwparser.p0", "payload");
 
 var all1 = all_match({
 	processors: [
@@ -257,10 +261,6 @@ var all1 = all_match({
 		setc("header_id","006"),
 	]),
 });
-
-var hdr1 = match("HEADER#1:001", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{messageid}[%{data}]: %{payload}", processor_chain([
-	setc("header_id","001"),
-]));
 
 var hdr2 = match("HEADER#2:005", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{hdata}: %{messageid->} %{payload}", processor_chain([
 	setc("header_id","005"),
@@ -301,8 +301,8 @@ var hdr5 = match("HEADER#6:0005", "message", "%{month->} %{day->} %{time->} %{hh
 ]));
 
 var select3 = linear_select([
-	all1,
 	hdr1,
+	all1,
 	hdr2,
 	all2,
 	hdr3,
@@ -3565,7 +3565,7 @@ var chain1 = processor_chain([
 	}),
 ]);
 
-var hdr6 = match("HEADER#0:006/0", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{p0}");
+var hdr6 = match("HEADER#1:006/0", "message", "%{month->} %{day->} %{time->} %{hhostname->} %{p0}");
 
 var part324 = match("MESSAGE#19:dhcpd:18/0", "nwparser.payload", "%{} %{p0}");
 

@@ -34,7 +34,7 @@ This is an example configuration for the module.
 
 [source,yaml]
 ----
-- module okta
+- module: okta
   system:
     var.url: https://yourOktaDomain/api/v1/logs
     var.api_key: '00QCjAl4MlV-WPXM...0HmjFx-vbGua'
