@@ -32,7 +32,7 @@ wrapperopts="-r / -n -p $pidfile"
 user_wrapper="su"
 user_wrapperopts="$beat_user -c"
 RETVAL=0
-DEFAULT_GODEBUG="madvdontneed=1"
+DEFAULT_GODEBUG="madvdontneed=1,x509ignoreCN=0"
 export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 # Source function library.
