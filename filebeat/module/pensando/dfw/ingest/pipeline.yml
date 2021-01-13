@@ -94,7 +94,7 @@ processors:
     field: source.address
     value: '{{pensando.dfw.source_address}}'
     ignore_failure: true
-    if: ctx.pensando.dfw?.source_address != null
+    ignore_empty_value: true
 - set:
     field: source.port
     value: '{{pensando.dfw.source_port}}'
@@ -103,7 +103,7 @@ processors:
     field: destination.address
     value: '{{pensando.dfw.destination_address}}'
     ignore_failure: true
-    if: ctx.pensando.dfw?.destination_address != null
+    ignore_empty_value: true
 - set:
     field: destination.port
     value: '{{pensando.dfw.destination_port}}'
