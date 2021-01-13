@@ -25,7 +25,8 @@ file to listen for firewall logs sent from the Pensando DSC(s) on port 5514 (def
 - module: pensando
   access:
     enabled: true
-    var.syslog_port: [5514]
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: [9001]
 -----
 :fileset_ex: dfw
 
