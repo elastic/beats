@@ -696,6 +696,3 @@ port. {pull}19209[19209]
 ==== Known Issue
 
 *Journalbeat*
-
-
-
