@@ -34,31 +34,71 @@ const (
 	copyTruncateProspectorDebugKey = "copy_truncate_file_prospector"
 )
 
+type copyTruncateConfig struct {
+	commonRotationConfig `config:",inline"`
+}
+
+// rotatedFileInfo stores the file information of a rotated file.
 type rotatedFileInfo struct {
 	path string
 	src  loginp.Source
 }
 
+// rotatedFileGroup includes the information of the original file
+// and its identifier, and the list of its rotated files.
 type rotatedFileGroup struct {
 	originalSrc loginp.Source
 	rotated     []rotatedFileInfo
 }
 
+// rotatedFiles is a map of original files and their rotated instances.
+type rotatedFiles map[string]*rotatedFileGroup
+
+// addOriginalFile adds a new original file and its identifying information
+// to the bookkeeper.
+func (r rotatedFiles) addOriginalFile(path string, src loginp.Source) {
+	if _, ok := r[path]; ok {
+		return
+	}
+	r[path] = &rotatedFileGroup{originalSrc: src, rotated: make([]rotatedFileInfo, 0)}
+}
+
+// isOriginalAdded checks if an original file has been found.
+func (r rotatedFiles) isOriginalAdded(path string) bool {
+	_, ok := r[path]
+	return ok
+}
+
+// originalSrc returns the original Source information of a given
+// original file path.
+func (r rotatedFiles) originalSrc(path string) loginp.Source {
+	return r[path].originalSrc
+}
+
+// previousSrc returns the source identifier for the previous file, so its state
+// information can be used when continuing on the rotated instance.
+func (r rotatedFiles) previousSrc(originalPath string, idx int) loginp.Source {
+	if idx == 0 {
+		return r.originalSrc(originalPath)
+	}
+	return r[originalPath].rotated[idx-1].src
+}
+
 // addRotatedFile adds a new rotated file to the list and returns its index.
-func (r *rotatedFileGroup) addRotatedFile(path string, src loginp.Source) int {
-	for i, info := range r.rotated {
-		if info.path == path {
+func (r rotatedFiles) addRotatedFile(original, rotated string, src loginp.Source) int {
+	for i, info := range r[original].rotated {
+		if info.path == rotated {
 			return i
 		}
 	}
 
-	r.rotated = append(r.rotated, rotatedFileInfo{path, src})
-	sort.Slice(r.rotated, func(i, j int) bool {
-		return r.rotated[i].path < r.rotated[j].path
+	r[original].rotated = append(r[original].rotated, rotatedFileInfo{rotated, src})
+	sort.Slice(r[original].rotated, func(i, j int) bool {
+		return r[original].rotated[i].path < r[original].rotated[j].path
 	})
 
-	for i, info := range r.rotated {
-		if info.path == path {
+	for i, info := range r[original].rotated {
+		if info.path == rotated {
 			return i
 		}
 	}
@@ -68,7 +108,7 @@ func (r *rotatedFileGroup) addRotatedFile(path string, src loginp.Source) int {
 type copyTruncateFileProspector struct {
 	fileProspector
 	rotatedSuffix *regexp.Regexp
-	rotatedFiles  map[string]*rotatedFileGroup
+	rotatedFiles  rotatedFiles
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
@@ -117,7 +157,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 					// The original will be picked up again when updated and read from the beginning.
 					originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")
 					// if we haven't encountered the original file which was rotated, get its information
-					if _, ok := p.rotatedFiles[originalPath]; !ok {
+					if !p.rotatedFiles.isOriginalAdded(originalPath) {
 						fi, err := os.Stat(originalPath)
 						if err != nil {
 							log.Errorf("Cannot continue file, error while getting the information of the original file: %+v", err)
@@ -126,19 +166,16 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 							continue
 						}
 						originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
-						p.rotatedFiles[originalPath] = &rotatedFileGroup{originalSrc: originalSrc, rotated: make([]rotatedFileInfo, 0)}
+						p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 					}
-					currentIdx := p.rotatedFiles[originalPath].addRotatedFile(fe.NewPath, src)
-					previousSrc := p.rotatedFiles[originalPath].originalSrc
-					if currentIdx != 0 {
-						previousSrc = p.rotatedFiles[originalPath].rotated[currentIdx-1].src
-					}
+					currentIdx := p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
+					previousSrc := p.rotatedFiles.previousSrc(originalPath, currentIdx)
 					hg.Continue(ctx, previousSrc, src)
+
 				} else {
 					// if file is original, add it to the bookeeper
-					if _, ok := p.rotatedFiles[fe.NewPath]; !ok {
-						p.rotatedFiles[fe.NewPath] = &rotatedFileGroup{originalSrc: src, rotated: make([]rotatedFileInfo, 0)}
-					}
+					p.rotatedFiles.addOriginalFile(fe.NewPath, src)
+
 					hg.Start(ctx, src)
 				}
 

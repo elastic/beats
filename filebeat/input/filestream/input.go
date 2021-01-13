@@ -20,7 +20,6 @@ package filestream
 import (
 	"fmt"
 	"os"
-	"regexp"
 
 	"golang.org/x/text/transform"
 
@@ -99,25 +98,9 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	var prospector loginp.Prospector
-	fileprospector := fileProspector{
-		filewatcher:       filewatcher,
-		identifier:        identifier,
-		ignoreOlder:       config.IgnoreOlder,
-		cleanRemoved:      config.CleanRemoved,
-		stateChangeCloser: config.Close.OnStateChange,
-	}
-
-	if config.Rotation != (rotationConfig{}) {
-		if config.Rotation.Method == CopyTruncate {
-			suffix, err := regexp.Compile(config.Rotation.SuffixRegex)
-			if err != nil {
-				return nil, nil, fmt.Errorf("invalid suffix regex for copytruncate rotation")
-			}
-			prospector = &copyTruncateFileProspector{fileprospector, suffix, make(map[string]*rotatedFileGroup)}
-		}
-	} else {
-		prospector = &fileprospector
+	prospector, err := newProspector(config)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot create prospector: %+v", err)
 	}
 
 	filestream := &filestream{

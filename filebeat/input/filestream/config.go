@@ -41,7 +41,7 @@ type config struct {
 	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
-	Rotation       rotationConfig          `config:"rotation"`
+	Rotation       *common.ConfigNamespace `config:"rotation"`
 }
 
 type closerConfig struct {
@@ -79,35 +79,8 @@ type backoffConfig struct {
 	Max  time.Duration `config:"max" validate:"nonzero"`
 }
 
-type rotationMethod uint8
-
-const (
-	CopyTruncate rotationMethod = iota
-)
-
-var rotationMethods = map[string]rotationMethod{
-	"copytruncate": CopyTruncate,
-}
-
-func (m *rotationMethod) Unpack(value string) error {
-	setting, ok := rotationMethods[value]
-	if !ok {
-		availableTypes := make([]string, len(rotationMethods))
-		i := 0
-		for t := range rotationMethods {
-			availableTypes[i] = t
-			i++
-		}
-		return fmt.Errorf("unknown socket type: %s, supported types: %v", value, availableTypes)
-	}
-
-	*m = setting
-	return nil
-}
-
-type rotationConfig struct {
-	Method      rotationMethod `config:"method"`
-	SuffixRegex string         `config:"suffix_regex" validate:"required"`
+type commonRotationConfig struct {
+	SuffixRegex string
 }
 
 func defaultConfig() config {
