@@ -49,7 +49,7 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            - "windows-7-32-bit" https://github.com/elastic/beats/issues/19835
+            - "windows-7-32-bit" #https://github.com/elastic/beats/issues/19835
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

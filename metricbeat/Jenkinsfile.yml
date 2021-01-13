@@ -55,7 +55,7 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19800
-            - "windows-7-32-bit" https://github.com/elastic/beats/issues/19835
+            - "windows-7-32-bit" #https://github.com/elastic/beats/issues/19835
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
     windows-2016:
