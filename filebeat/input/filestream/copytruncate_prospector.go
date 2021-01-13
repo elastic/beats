@@ -49,30 +49,41 @@ type rotatedFileInfo struct {
 type rotatedFileGroup struct {
 	originalSrc loginp.Source
 	rotated     []rotatedFileInfo
+	count       int
+}
+
+func newRotatedFiles(config copyTruncateConfig) *rotatedFiles {
+	return &rotatedFiles{
+		table:            make(map[string]*rotatedFileGroup, 0),
+		maxRotationCount: config.Rotate,
+	}
 }
 
 // rotatedFiles is a map of original files and their rotated instances.
-type rotatedFiles map[string]*rotatedFileGroup
+type rotatedFiles struct {
+	table            map[string]*rotatedFileGroup
+	maxRotationCount int
+}
 
 // addOriginalFile adds a new original file and its identifying information
 // to the bookkeeper.
 func (r rotatedFiles) addOriginalFile(path string, src loginp.Source) {
-	if _, ok := r[path]; ok {
+	if _, ok := r.table[path]; ok {
 		return
 	}
-	r[path] = &rotatedFileGroup{originalSrc: src, rotated: make([]rotatedFileInfo, 0)}
+	r.table[path] = &rotatedFileGroup{originalSrc: src, rotated: make([]rotatedFileInfo, r.maxRotationCount)}
 }
 
 // isOriginalAdded checks if an original file has been found.
 func (r rotatedFiles) isOriginalAdded(path string) bool {
-	_, ok := r[path]
+	_, ok := r.table[path]
 	return ok
 }
 
 // originalSrc returns the original Source information of a given
 // original file path.
 func (r rotatedFiles) originalSrc(path string) loginp.Source {
-	return r[path].originalSrc
+	return r.table[path].originalSrc
 }
 
 // previousSrc returns the source identifier for the previous file, so its state
@@ -81,12 +92,12 @@ func (r rotatedFiles) previousSrc(originalPath string, idx int) loginp.Source {
 	if idx == 0 {
 		return r.originalSrc(originalPath)
 	}
-	return r[originalPath].rotated[idx-1].src
+	return r.table[originalPath].rotated[idx-1].src
 }
 
 // addRotatedFile adds a new rotated file to the list and returns its index.
 func (r rotatedFiles) addRotatedFile(original, rotated string, src loginp.Source) int {
-	for i, info := range r[original].rotated {
+	for i, info := range r.table[original].rotated {
 		if info.path == rotated {
 			return i
 		}
