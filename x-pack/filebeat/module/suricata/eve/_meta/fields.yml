@@ -714,9 +714,6 @@
         type: alias
         path: source.packets
 
-      - name: end
-        type: date
-
       - name: alerted
         type: boolean
 

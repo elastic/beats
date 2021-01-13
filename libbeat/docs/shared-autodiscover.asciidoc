@@ -252,8 +252,11 @@ running configuration for a container, 60s by default.
   and `add_resource_metadata` settings are not taken into account.
 `leader_lease`:: (Optional) Defaults to `{beatname_lc}-cluster-leader`. This will be name of the lock lease.
   One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
-  Different Beats that refer to the same leader lease will be competetitors in holding the lease
-  and only one will be elected as leader each time. Example:
+  Different Beats that refer to the same leader lease will be competitors in holding the lease
+  and only one will be elected as leader each time.
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+Example:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -277,8 +280,8 @@ metricbeat.autodiscover:
 The above configuration when deployed on one or more Metribceat instances will enable `state_node`
 metricset only for the Metricbeat instance that will gain the leader lease/lock. With this deployment
 strategy we can ensure that cluster-wide metricsets are only enabled by one Beat instance when
-deploying a Beat as Daemonset.
-
+deploying a Beat as DaemonSet.
+endif::[]
 
 include::../../{beatname_lc}/docs/autodiscover-kubernetes-config.asciidoc[]
 
@@ -304,7 +307,7 @@ application to find the more suitable way to set them in your case.
 
 Jolokia Discovery is based on UDP multicast requests. Agents join the multicast
 group 239.192.48.84, port 24884, and discovery is done by sending queries to
-this group. You have to take into account that UDP traffic between Metricbeat
+this group. You have to take into account that UDP traffic between {beatname_uc}
 and the Jolokia agents has to be allowed. Also notice that this multicast
 address is in the 239.0.0.0/8 range, that is reserved for private use within an
 organization, so it can only be used in private networks.
@@ -382,6 +385,110 @@ include::../../x-pack/libbeat/docs/aws-credentials-config.asciidoc[]
 
 endif::autodiscoverAWSELB[]
 
+ifdef::autodiscoverNomad[]
+[float]
+===== Nomad
+
+experimental[]
+
+The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
+
+These are the available fields during config templating. The `nomad.*` fields will be available
+on each emitted event.
+
+* nomad.allocation.id
+* nomad.allocation.name
+* nomad.allocation.status
+* nomad.datacenter
+* nomad.job.name
+* nomad.job.type
+* nomad.namespace
+* nomad.region
+* nomad.task.name
+* nomad.task.service.canary_tags
+* nomad.task.service.name
+* nomad.task.service.tags
+
+If the `include_labels` config is added to the provider config, then the list of labels present in
+the config will be added to the event.
+
+If the `exclude_labels` config is added to the provider config, then the list of labels present in
+the config will be excluded from the event.
+
+if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be
+replaced with `_`.
+
+For example:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+{
+  ...
+  "region": "europe",
+  "allocation": {
+    "name": "coffeshop.api[0]",
+    "id": "35eba07f-e5e4-20ac-6def-85117bee6efb",
+    "status": "running"
+  },
+  "datacenters": [
+    "europe-west4"
+  ],
+  "namespace": "default",
+  "job": {
+    "type": "service",
+    "name": "coffeshop"
+  },
+  "task": {
+    "service": {
+      "name": [
+        "coffeshop"
+      ],
+      "tags": [
+        "coffeshop",
+        "nginx"
+      ],
+      "canary_tags": [
+        "coffeshop"
+      ]
+    },
+    "name": "api"
+  },
+  ...
+}
+-------------------------------------------------------------------------------------
+
+The configuration of templates and conditions is similar to that of the Docker provider.
+Configuration templates can contain variables from the autodiscover event. They can be accessed under
+`data` namespace.
+
+The `nomad` autodiscover provider has the following configuration settings:
+
+`address`:: (Optional) Specify the address of the Nomad agent. By default it will try to talk to a
+  Nomad agent running locally (`http://127.0.0.1:4646`).
+
+`region`:: (Optional) Region to use. If not provided, the default agent region is used.
+
+`namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
+
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad.
+
+`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+  cannot be accurately detected when `node` scope is used.
+
+`scope`:: (Optional) Specify at what level autodiscover needs to be done at. `scope` can
+  either take `node` or `cluster` as values. `node` scope allows discovery of resources in
+  the specified node. `cluster` scope allows cluster wide discovery. Defaults to `node`.
+
+`wait_time`:: (Optional) Limits how long a Watch will block. If not specified (or set to `0`) the
+  default configuration from the agent will be used.
+
+`allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
+  means that the local node where filebeat is allocated will service filebeat's requests.
+
+include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
+
+endif::autodiscoverNomad[]
+
 ifdef::autodiscoverAWSEC2[]
 [float]
 ===== Amazon EC2s
@@ -389,8 +496,12 @@ ifdef::autodiscoverAWSEC2[]
 *Note: This provider is experimental*
 
 The Amazon EC2 autodiscover provider discovers https://aws.amazon.com/ec2/[EC2 instances].
-This is useful for users to launch Metricbeat modules to monitor services running on AWS EC2 instances.
-For example, to gather MySQL metrics from mysql servers running on EC2 instances with specific tag `service: mysql`.
+This is useful for users to launch {beatname_uc} modules to monitor services running on AWS EC2 instances.
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+For example, you can use this provider to gather MySQL metrics from MySQL
+servers running on EC2 instances that have a specific tag, `service: mysql`.
+endif::[]
 
 This provider will load AWS credentials using the standard AWS environment variables and shared credentials files
 see https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html[Best Practices for Managing AWS Access Keys]

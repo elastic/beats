@@ -58,7 +58,7 @@ func TestEventMapping(t *testing.T) {
 		"fs.capacity.bytes":  101258067968,
 		"fs.used.bytes":      2514276352,
 		"fs.inodes.used":     138624,
-		"fs.inodes.free":     6120096,
+		"fs.inodes.free":     uint64(18446744073709551615),
 		"fs.inodes.count":    6258720,
 
 		"network.rx.bytes":  1115133198,

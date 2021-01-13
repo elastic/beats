@@ -4,7 +4,7 @@ Apr 15 2014 09:34:34 EDT: %ASA-session-5-106100: access-list acl_in permitted tc
 Apr 24 2013 16:00:28 INT-FW01 : %ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]
 Apr 24 2013 16:00:27 INT-FW01 : %ASA-6-106100: access-list inside permitted udp inside/172.29.2.3(1065) -> outside/192.0.2.57(53) hit-cnt 144 300-second interval [0xe982c7a4, 0x0]
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4952 to outside:192.0.2.130/12834
-Apr 29 2013 12:59:50: %ASA-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42.130/12834)
+Apr 29 2013 12:59:50: %ASA-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42/12834)
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic UDP translation from outside:10.123.1.35/52925 to outside:192.0.2.130/25882
 Apr 29 2013 12:59:50: %ASA-6-302015: Built outbound UDP connection 89743275 for outside:192.0.2.222/53 (192.0.2.43/53) to outside:10.123.1.35/52925 (10.123.1.35/25882)
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4953 to outside:192.0.2.130/45392
