@@ -94,10 +94,13 @@ func TestFetchEventContents(t *testing.T) {
 
 	//check pg info
 	pgInfo := event["pg"].(common.MapStr)
+	var avb int64 = 9965821952
+	var tb int64 = 12838682624
+	var ub int64 = 2872860672
 	assert.EqualValues(t, 1054023794, pgInfo["data_bytes"])
-	assert.EqualValues(t, 9965821952, pgInfo["avail_bytes"])
-	assert.EqualValues(t, 12838682624, pgInfo["total_bytes"])
-	assert.EqualValues(t, 2872860672, pgInfo["used_bytes"])
+	assert.EqualValues(t, avb, pgInfo["avail_bytes"])
+	assert.EqualValues(t, tb, pgInfo["total_bytes"])
+	assert.EqualValues(t, ub, pgInfo["used_bytes"])
 
 	//check pg_state info
 	pgStateInfo := events[1].MetricSetFields["pg_state"].(common.MapStr)
