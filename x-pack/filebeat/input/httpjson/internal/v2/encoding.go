@@ -11,15 +11,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type encoderFunc func(v interface{}) ([]byte, error)
+type encoderFunc func(trReq transformable) ([]byte, error)
 
-type decoderFunc func(p []byte, dst interface{}) error
+type decoderFunc func(p []byte, dst *response) error
 
 var (
-	registeredEncoders = map[string]encoderFunc{}
-	registeredDecoders = map[string]decoderFunc{}
-	defaultEncoder     = json.Marshal
-	defaultDecoder     = json.Unmarshal
+	registeredEncoders             = map[string]encoderFunc{}
+	registeredDecoders             = map[string]decoderFunc{}
+	defaultEncoder     encoderFunc = encodeAsJSON
+	defaultDecoder     decoderFunc = decodeAsJSON
 )
 
 func registerEncoder(contentType string, enc encoderFunc) error {
@@ -58,28 +58,36 @@ func registerDecoder(contentType string, dec decoderFunc) error {
 	return nil
 }
 
-func encode(contentType string, v interface{}) ([]byte, error) {
+func encode(contentType string, trReq transformable) ([]byte, error) {
 	enc, found := registeredEncoders[contentType]
 	if !found {
-		return defaultEncoder(v)
+		return defaultEncoder(trReq)
 	}
-	return enc(v)
+	return enc(trReq)
 }
 
-func decode(contentType string, p []byte, v interface{}) error {
+func decode(contentType string, p []byte, dst *response) error {
 	dec, found := registeredDecoders[contentType]
 	if !found {
-		return defaultDecoder(p, v)
+		return defaultDecoder(p, dst)
 	}
-	return dec(p, v)
+	return dec(p, dst)
 }
 
 func registerEncoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerEncoder("application/json", json.Marshal))
+	log.Debug(registerEncoder("application/json", encodeAsJSON))
 }
 
 func registerDecoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerDecoder("application/json", json.Unmarshal))
+	log.Debug(registerDecoder("application/json", decodeAsJSON))
+}
+
+func encodeAsJSON(trReq transformable) ([]byte, error) {
+	return json.Marshal(trReq.body())
+}
+
+func decodeAsJSON(p []byte, dst *response) error {
+	return json.Unmarshal(p, &dst.body)
 }

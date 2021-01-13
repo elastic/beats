@@ -164,9 +164,9 @@ func (iter *pageIterator) getPage() (*response, error) {
 
 	if len(bodyBytes) > 0 {
 		if iter.pagination.decoder != nil {
-			err = iter.pagination.decoder(bodyBytes, &r.body)
+			err = iter.pagination.decoder(bodyBytes, &r)
 		} else {
-			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r.body)
+			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
 		}
 		if err != nil {
 			return nil, err

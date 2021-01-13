@@ -114,9 +114,9 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 		switch rf.method {
 		case "POST":
 			if rf.encoder != nil {
-				body, err = rf.encoder(trReq.body())
+				body, err = rf.encoder(trReq)
 			} else {
-				body, err = encode(trReq.header().Get("Content-Type"), trReq.body())
+				body, err = encode(trReq.header().Get("Content-Type"), trReq)
 			}
 			if err != nil {
 				return nil, err
