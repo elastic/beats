@@ -36,3 +36,5 @@ stages:
         mage: "mage build unitTest"
         when:                  ## Override the top-level when.
             not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
