@@ -3,6 +3,22 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.10.2]]
+=== Beats version 7.10.2
+https://github.com/elastic/beats/compare/v7.10.1\...v7.10.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Add JSON body check for SQS message. {pull}21727[21727]
+- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
+
+*Metricbeat*
+
+- Change `vsphere.datastore.capacity.used.pct` value to betweeen 0 and 1. {pull}23148[23148]
+
 [[release-notes-7.10.1]]
 === Beats version 7.10.1
 https://github.com/elastic/beats/compare/v7.10.0\...v7.10.1[View commits]

@@ -29,12 +29,12 @@ import (
 // ReadInput shows the text and ask the user to provide input.
 func ReadInput(prompt string) (string, error) {
 	reader := bufio.NewReader(os.Stdin)
-	return input(reader, prompt)
+	return input(reader, os.Stdout, prompt)
 }
 
-func input(r io.Reader, prompt string) (string, error) {
+func input(r io.Reader, out io.Writer, prompt string) (string, error) {
 	reader := bufio.NewScanner(r)
-	fmt.Print(prompt + " ")
+	fmt.Fprintf(out, prompt+" ")
 
 	if !reader.Scan() {
 		return "", errors.New("error reading user input")

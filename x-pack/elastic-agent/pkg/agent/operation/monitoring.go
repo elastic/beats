@@ -188,7 +188,9 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log*"),
 				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log*"),
 			},
 			"index": "logs-elastic_agent-default",
 			"processors": []map[string]interface{}{
@@ -531,7 +533,10 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Spec(), o.pipelineID)
 		if logPath != "" {
-			paths[strings.ReplaceAll(a.Name(), "-", "_")] = append(paths[a.Name()], logPath)
+			paths[strings.ReplaceAll(a.Name(), "-", "_")] = []string{
+				logPath,
+				fmt.Sprintf("%s*", logPath),
+			}
 		}
 	}
 
