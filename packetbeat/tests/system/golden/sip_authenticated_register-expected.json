@@ -138,5 +138,80 @@
         "source.port": 5060,
         "status": "OK",
         "type": "sip"
+    },
+    {
+        "@metadata.beat": "packetbeat",
+        "@metadata.type": "_doc",
+        "client.ip": "212.242.33.35",
+        "client.port": 5060,
+        "destination.ip": "192.168.1.2",
+        "destination.port": 5060,
+        "event.action": "sip-register",
+        "event.category": [
+            "network",
+            "protocol"
+        ],
+        "event.dataset": "sip",
+        "event.duration": 0,
+        "event.kind": "event",
+        "event.original": "SIP/2.0 200 OK\r\nCall-ID: 578222729-4665d775@578222732-4665d772\r\nContact: <sip:voi18062@192.168.1.2:5060;line=aca6b97ca3f5e51a>;q=0.500;expires=1200\r\nCSeq: 75 REGISTER\r\nFrom: <sip:voi18062@sip.cybercity.dk>;tag=6bac55c\r\nP-Associated-URI: <sip:35104723@sip.cybercity.dk>\r\nTo: <sip:voi18062@sip.cybercity.dk>;tag=00-04081-1701b256-5586b7324\r\nVia: SIP/2.0/UDP 192.168.1.2;received=80.230.219.70;rport=5060;branch=z9hG4bKnp112903503-43a64480192.168.1.2\r\nContent-Length: 0\r\n\r\n",
+        "event.outcome": "success",
+        "event.reason": "OK",
+        "event.sequence": 75,
+        "event.type": [
+            "info"
+        ],
+        "network.application": "sip",
+        "network.community_id": "1:dOa61R2NaaJsJlcFAiMIiyXX+Kk=",
+        "network.iana_number": "17",
+        "network.protocol": "sip",
+        "network.transport": "udp",
+        "network.type": "ipv4",
+        "related.hosts": [
+            "sip.cybercity.dk>",
+            "sip.cybercity.dk"
+        ],
+        "related.ip": [
+            "212.242.33.35",
+            "192.168.1.2"
+        ],
+        "related.user": [
+            "35104723",
+            "voi18062"
+        ],
+        "server.ip": "192.168.1.2",
+        "server.port": 5060,
+        "sip.call_id": "578222729-4665d775@578222732-4665d772",
+        "sip.code": 200,
+        "sip.contact.uri.host": "sip.cybercity.dk",
+        "sip.contact.uri.original": "sip:voi18062@sip.cybercity.dk",
+        "sip.contact.uri.scheme": "sip",
+        "sip.contact.uri.username": "voi18062",
+        "sip.cseq.code": 75,
+        "sip.cseq.method": "REGISTER",
+        "sip.from.tag": "6bac55c",
+        "sip.from.uri.host": "sip.cybercity.dk",
+        "sip.from.uri.original": "sip:voi18062@sip.cybercity.dk",
+        "sip.from.uri.scheme": "sip",
+        "sip.from.uri.username": "voi18062",
+        "sip.private.uri.host": "sip.cybercity.dk>",
+        "sip.private.uri.original": "<sip:35104723@sip.cybercity.dk>",
+        "sip.private.uri.scheme": "<sip",
+        "sip.private.uri.username": "35104723",
+        "sip.status": "OK",
+        "sip.to.tag": "00-04081-1701b256-5586b7324",
+        "sip.to.uri.host": "sip.cybercity.dk",
+        "sip.to.uri.original": "sip:voi18062@sip.cybercity.dk",
+        "sip.to.uri.scheme": "sip",
+        "sip.to.uri.username": "voi18062",
+        "sip.type": "response",
+        "sip.version": "2.0",
+        "sip.via.original": [
+            "SIP/2.0/UDP 192.168.1.2;received=80.230.219.70;rport=5060;branch=z9hG4bKnp112903503-43a64480192.168.1.2"
+        ],
+        "source.ip": "212.242.33.35",
+        "source.port": 5060,
+        "status": "OK",
+        "type": "sip"
     }
 ]
