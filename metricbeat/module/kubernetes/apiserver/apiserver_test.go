@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration, !386
+// +build !integration,!windows,!386
 
 package apiserver
 
