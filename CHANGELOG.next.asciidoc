@@ -985,6 +985,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update to Golang 1.15.6 requires users to add `x509ignoreCN=0` to the `GODEBUG` environment variable if
+they are using a X.509 certificates without Subject Alternative Names in the following use cases:
+ * running Beats/Agent on Windows
+ * compiling Beats/Agent and then running the binary
+
+In other use cases, Beats and Agent can set this variable automatically for the users.
+
+In the future, these certificates must be updated as the legacy behaviour of Common Name field
+is going to be removed in later versions. {pull}22495[22495]
+
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
