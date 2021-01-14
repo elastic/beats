@@ -5,6 +5,8 @@
 package application
 
 import (
+	"runtime"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -30,6 +32,10 @@ func agentGlobalConfig() map[string]interface{} {
 			"config": paths.Config(),
 			"home":   paths.Home(),
 			"logs":   paths.Logs(),
+		},
+		"runtime": map[string]interface{}{
+			"os":   runtime.GOOS,
+			"arch": runtime.GOARCH,
 		},
 	}
 }
