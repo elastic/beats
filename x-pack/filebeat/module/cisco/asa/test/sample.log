@@ -69,3 +69,4 @@ Jan 14 2015 13:16:14: %ASA-4-338008: Dynamic Filter dropped blacklisted TCP traf
 Nov 16 2009 14:12:35: %ASA-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app
 Nov 16 2009 14:12:36: %ASA-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com
 Nov 16 2009 14:12:37: %ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside
+Jan 13 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)
