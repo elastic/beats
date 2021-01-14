@@ -18,11 +18,20 @@ stages:
           make -C x-pack/metricbeat check;
           make -C x-pack/metricbeat update;
           make check-no-changes;
-    build:
+    unitTest:
+        mage: "mage build unitTest"
+    cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         dirs:                  ## run the cloud tests for the given modules.
             - "x-pack/metricbeat/module/aws"
+        when:                  ## Override the top-level when.
+            parameters:
+                - "awsCloudTests"
+            comments:
+                - "/test x-pack/metricbeat for aws cloud"
+            labels:
+                - "aws"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

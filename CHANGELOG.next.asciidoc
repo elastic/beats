@@ -15,8 +15,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Libbeat: Do not overwrite agent.*, ecs.version, and host.name. {pull}14407[14407]
 - Libbeat: Cleanup the x-pack licenser code to use the new license endpoint and the new format. {pull}15091[15091]
 - Refactor metadata generator to support adding metadata across resources {pull}14875[14875]
-- Variable substitution from environment variables is not longer supported. {pull}15937{15937}
-- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402{16402}
+- Variable substitution from environment variables is not longer supported. {pull}15937[15937]
+- Change aws_elb autodiscover provider field name from elb_listener.* to aws.elb.*. {issue}16219[16219] {pull}16402[16402]
 - Remove `AddDockerMetadata` and `AddKubernetesMetadata` processors from the `script` processor. They can still be used as normal processors in the configuration. {issue}16349[16349] {pull}16514[16514]
 - Introduce APM libbeat instrumentation, active when running the beat with ELASTIC_APM_ACTIVE=true. {pull}17938[17938]
 - Make error message about locked data path actionable. {pull}18667[18667]
@@ -85,12 +85,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - Fix missing output in dockerlogbeat {pull}15719[15719]
 - Do not load dashboards where not available. {pull}15802[15802]
-- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516{15516}
+- Fix issue where TLS settings would be ignored when a forward proxy was in use. {pull}15516[15516]
 - Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
 - Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
-- Upgrade go-ucfg to latest v0.8.1. {pull}15937{15937}
+- Upgrade go-ucfg to latest v0.8.1. {pull}15937[15937]
 - Fix loading processors from annotation hints. {pull}16348[16348]
-- Upgrade go-ucfg to latest v0.8.3. {pull}16450{16450}
+- Upgrade go-ucfg to latest v0.8.3. {pull}16450[16450]
 - Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866{16866}
@@ -124,7 +124,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
-- Fix merging of fileset inputs to replace paths and append processors. {pull}16450{16450}
+- Fix merging of fileset inputs to replace paths and append processors. {pull}16450[16450]
 - Add queue_url definition in manifest file for aws module. {pull}16640{16640}
 - Fixed various Cisco FTD parsing issues. {issue}16863[16863] {pull}16889[16889]
 - Fix default index pattern in IBM MQ filebeat dashboard. {pull}17146[17146]
@@ -162,8 +162,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
-- Add json body check for sqs message. {pull}21727[21727]
-- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 
 *Heartbeat*
 
@@ -226,7 +224,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
-- Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 
 *Packetbeat*
 
@@ -437,9 +434,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
-
-
-
-
-
