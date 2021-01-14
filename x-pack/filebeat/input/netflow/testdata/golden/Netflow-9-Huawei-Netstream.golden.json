@@ -17,7 +17,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-01-29T03:02:20Z",
           "duration": 327060000000,
           "end": "2018-01-29T03:02:19Z",
           "kind": "event",
