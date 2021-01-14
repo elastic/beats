@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -92,7 +91,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -168,7 +166,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -244,7 +241,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -320,7 +316,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -396,7 +391,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2020-04-16T23:22:51Z",
           "kind": "event",
           "type": [
             "connection"

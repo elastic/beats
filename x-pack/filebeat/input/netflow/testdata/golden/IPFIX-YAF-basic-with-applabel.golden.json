@@ -18,7 +18,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-25T13:03:38Z",
           "kind": "event",
           "type": [
             "connection"
@@ -103,7 +102,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-25T12:58:38Z",
           "kind": "event",
           "type": [
             "connection"
@@ -187,7 +185,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-25T13:03:33Z",
           "kind": "event"
         },
         "netflow": {
