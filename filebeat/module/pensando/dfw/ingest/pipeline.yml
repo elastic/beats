@@ -1,17 +1,17 @@
 ---
-description: Pipeline for parsing Penando DFW logs 
-processors: 
+description: Pipeline for parsing Penando DFW logs
+processors:
 - rename:
     field: message
     target_field: event.original
 - grok:
     field: event.original
-    patterns: 
+    patterns:
       - "%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-) +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app}) +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid}) +\\[%{GREEDYDATA:payload_raw}\\]$"
 - json:
-    field: payload_raw 
+    field: payload_raw
     target_field: json
-- remove: 
+- remove:
     field: syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host
     ignore_missing: true
 - date:
@@ -87,24 +87,30 @@ processors:
     field: network.transport
     ignore_missing: true
     ignore_failure: true
-- set:
-    field: source.address
-    value: '{{pensando.dfw.source_address}}'
+- convert:
+    field: pensando.dfw.source_address
+    target_field: source.address
+    type: ip
     ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: source.port
-    value: '{{pensando.dfw.source_port}}'
+    ignore_missing: true
+- convert:
+    field: pensando.dfw.source_port
+    target_field: source.port
+    type: integer
     ignore_failure: true
-- set:
-    field: destination.address
-    value: '{{pensando.dfw.destination_address}}'
+    ignore_missing: true
+- convert:
+    field: pensando.dfw.destination_address
+    target_field: destination.address
+    type: ip
     ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: destination.port
-    value: '{{pensando.dfw.destination_port}}'
+    ignore_missing: true
+- convert:
+    field: pensando.dfw.destination_port
+    target_field: destination.port
+    type: integer
     ignore_failure: true
+    ignore_missing: true
 - set:
     field: client.ip
     value: '{{pensando.dfw.source_address}}'
@@ -158,9 +164,9 @@ processors:
     value: 'allowed'
     if: '[''allow''].contains(ctx.pensando.dfw?.action)'
 - set:
-    field: rule.id 
+    field: rule.id
     value: '{{pensando.dfw.rule_id}}'
-    ignore_failure: true 
+    ignore_failure: true
 - set:
     field: event.outcome
     value: success
@@ -185,7 +191,7 @@ processors:
       - json
       - payload_raw
     ignore_missing: true
-on_failure: 
+on_failure:
 - set:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
