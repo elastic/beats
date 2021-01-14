@@ -137,7 +137,11 @@ func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
 func mockPluginBuilder() pluginBuilder {
 	reg := monitoring.NewRegistry()
 
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
+	return pluginBuilder{
+		"test",
+		"testAlias",
+		ActiveMonitor,
+		func(s string, config *common.Config) ([]jobs.Job, int, error) {
 		// Declare a real config block with a required attr so we can see what happens when it doesn't work
 		unpacked := struct {
 			URLs []string `config:"urls" validate:"required"`

@@ -31,7 +31,7 @@ import (
 
 type pluginBuilder struct {
 	name    string
-	typ     Type
+	aliases []string
 	builder PluginBuilder
 	stats   registryRecorder
 }
@@ -62,7 +62,7 @@ func init() {
 		}
 
 		stats := statsForPlugin(p.name)
-		return globalPluginsReg.register(pluginBuilder{p.name, p.typ, p.builder, stats})
+		return globalPluginsReg.register(pluginBuilder{p.name, p.aliases, p.builder, stats})
 	})
 }
 
@@ -94,9 +94,9 @@ func newPluginsReg() *pluginsReg {
 }
 
 // RegisterActive registers a new active (as opposed to passive) monitor.
-func RegisterActive(name string, builder PluginBuilder) {
+func RegisterActive(name string, builder PluginBuilder, aliases ...string,) {
 	stats := statsForPlugin(name)
-	if err := globalPluginsReg.add(pluginBuilder{name, ActiveMonitor, builder, stats}); err != nil {
+	if err := globalPluginsReg.add(pluginBuilder{name, aliases, builder, stats}); err != nil {
 		panic(err)
 	}
 }
@@ -106,7 +106,7 @@ func RegisterActive(name string, builder PluginBuilder) {
 type ErrPluginAlreadyExists pluginBuilder
 
 func (m ErrPluginAlreadyExists) Error() string {
-	return fmt.Sprintf("monitor plugin '%s' already exists", m.typ)
+	return fmt.Sprintf("monitor plugin named '%s' with aliases %v already exists", m.name, m.aliases)
 }
 
 func (r *pluginsReg) add(plugin pluginBuilder) error {
@@ -114,12 +114,18 @@ func (r *pluginsReg) add(plugin pluginBuilder) error {
 		return ErrPluginAlreadyExists(plugin)
 	}
 	r.monitors[plugin.name] = plugin
+	for _, alias := range plugin.aliases {
+		if _, exists := r.monitors[alias]; exists {
+			return ErrPluginAlreadyExists(plugin)
+		}
+		r.monitors[alias] = plugin
+	}
 	return nil
 }
 
 func (r *pluginsReg) register(plugin pluginBuilder) error {
 	if _, found := r.monitors[plugin.name]; found {
-		return fmt.Errorf("monitor type %v already exists", plugin.typ)
+		return fmt.Errorf("monitor type %v already exists", plugin.name)
 	}
 
 	r.monitors[plugin.name] = plugin

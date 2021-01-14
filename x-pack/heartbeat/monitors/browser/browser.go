@@ -19,9 +19,7 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("browser", create)
-	monitors.RegisterActive("synthetic", create)
-	monitors.RegisterActive("synthetics/synthetic", create)
+	monitors.RegisterActive("browser", create, "synthetic", "synthetics/synthetic")
 }
 
 var showExperimentalOnce = sync.Once{}

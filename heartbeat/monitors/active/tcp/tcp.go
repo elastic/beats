@@ -39,8 +39,7 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("tcp", create)
-	monitors.RegisterActive("synthetics/tcp", create)
+	monitors.RegisterActive("tcp", create, "synthetics/tcp")
 }
 
 var debugf = logp.MakeDebug("tcp")

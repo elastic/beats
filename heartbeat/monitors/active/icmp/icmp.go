@@ -35,8 +35,7 @@ import (
 var debugf = logp.MakeDebug("icmp")
 
 func init() {
-	monitors.RegisterActive("icmp", create)
-	monitors.RegisterActive("synthetics/icmp", create)
+	monitors.RegisterActive("icmp", create, "synthetics/icmp")
 }
 
 func create(
