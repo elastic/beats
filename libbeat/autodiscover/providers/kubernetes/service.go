@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
 
@@ -30,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -39,13 +38,13 @@ type service struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func(bus.Event)
+	publish          func([]bus.Event)
 	watcher          kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
+func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()
@@ -55,8 +54,9 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 	}
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
+		SyncTimeout:  config.SyncPeriod,
+		Namespace:    config.Namespace,
+		HonorReSyncs: true,
 	}, nil)
 
 	if err != nil {
@@ -214,6 +214,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		}
 	}
 
+	var events []bus.Event
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
 			"provider":   s.uuid,
@@ -226,7 +227,8 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				"kubernetes": meta,
 			},
 		}
-		s.publish(event)
+		events = append(events, event)
 	}
+	s.publish(events)
 
 }

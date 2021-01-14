@@ -24,11 +24,11 @@
               type: group
               fields:
                 - name: ns
-                  type: long
+                  type: double
                   description: >
                     CPU Core usage nanoseconds
             - name: nanocores
-              type: long
+              type: double
               description: >
                 CPU used nanocores
     - name: memory
@@ -38,7 +38,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total memory usage
@@ -46,7 +46,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 RSS memory usage
@@ -54,15 +54,15 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Working set memory usage
         - name: pagefaults
-          type: long
+          type: double
           description: >
             Number of page faults
         - name: majorpagefaults
-          type: long
+          type: double
           description: >
             Number of major page faults

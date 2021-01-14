@@ -2254,6 +2254,16 @@ type: keyword
 
 --
 
+*`aws.vpcflow.tcp_flags_array`*::
++
+--
+List of TCP flags: 'fin, syn, rst, psh, ack, urg'
+
+
+type: keyword
+
+--
+
 *`aws.vpcflow.type`*::
 +
 --
@@ -142332,13 +142342,6 @@ type: keyword
 type: alias
 
 alias to: source.packets
-
---
-
-*`suricata.eve.flow.end`*::
-+
---
-type: date
 
 --
 

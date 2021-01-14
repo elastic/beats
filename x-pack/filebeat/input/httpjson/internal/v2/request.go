@@ -7,7 +7,6 @@ package v2
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -83,6 +82,7 @@ type requestFactory struct {
 	user       string
 	password   string
 	log        *logp.Logger
+	encoder    encoderFunc
 }
 
 func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.Logger) *requestFactory {
@@ -94,6 +94,7 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 		body:       config.Body,
 		transforms: ts,
 		log:        log,
+		encoder:    registeredEncoders[config.EncodeAs],
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
 		rf.user = authConfig.Basic.User
@@ -112,7 +113,11 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 	if len(trReq.body()) > 0 {
 		switch rf.method {
 		case "POST":
-			body, err = json.Marshal(trReq.body())
+			if rf.encoder != nil {
+				body, err = rf.encoder(trReq)
+			} else {
+				body, err = encode(trReq.header().Get("Content-Type"), trReq)
+			}
 			if err != nil {
 				return nil, err
 			}
@@ -192,9 +197,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			r.log.Errorf("error publishing event: %v", err)
 			continue
 		}
-
+		if len(*trCtx.firstEventClone()) == 0 {
+			trCtx.updateFirstEvent(maybeMsg.msg)
+		}
 		trCtx.updateLastEvent(maybeMsg.msg)
-		n += 1
+		n++
 	}
 
 	trCtx.updateCursor()

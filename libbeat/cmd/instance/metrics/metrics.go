@@ -264,7 +264,7 @@ func reportSystemCPUUsage(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	monitoring.ReportInt(V, "cores", int64(process.NumCPU))
+	monitoring.ReportInt(V, "cores", int64(runtime.NumCPU()))
 }
 
 func reportRuntime(_ monitoring.Mode, V monitoring.Visitor) {
@@ -298,7 +298,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 	selfStats, err := cgroups.GetStatsForProcess(pid)
 	if err != nil {
-		logp.Err("error getting group status: %v", err)
+		logp.Err("error getting cgroup stats: %v", err)
 		return
 	}
 	// GetStatsForProcess returns a nil selfStats and no error when there's no stats
