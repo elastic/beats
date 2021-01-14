@@ -304,6 +304,11 @@ func TestErrorReporting(t *testing.T) {
 		// events or the non-readable permissions trick it somehow.
 		t.Skip("Skip this test on Darwin")
 	}
+	if runtime.GOOS != "windows" && os.Getuid() == 0 {
+		// There's no easy way to make a file unreadable by root
+		// in UNIX/Linux OS.
+		t.Skip("This test can't be run as root")
+	}
 	defer abtest.SetupDataDir(t)()
 
 	dir, err := ioutil.TempDir("", "audit-file")
