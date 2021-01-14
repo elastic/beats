@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sync"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -28,6 +29,8 @@ type stateStore struct {
 	store storeLoad
 	dirty bool
 	state stateT
+
+	mx sync.RWMutex
 }
 
 type stateT struct {
@@ -178,6 +181,9 @@ func newStateStore(log *logger.Logger, store storeLoad) (*stateStore, error) {
 // Add is only taking care of ActionPolicyChange for now and will only keep the last one it receive,
 // any other type of action will be silently ignored.
 func (s *stateStore) Add(a action) {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+
 	switch v := a.(type) {
 	case *fleetapi.ActionPolicyChange, *fleetapi.ActionUnenroll:
 		// Only persist the action if the action is different.
@@ -191,6 +197,9 @@ func (s *stateStore) Add(a action) {
 
 // SetAckToken set ack token to the agent state
 func (s *stateStore) SetAckToken(ackToken string) {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+
 	if s.state.ackToken == ackToken {
 		return
 	}
@@ -199,6 +208,9 @@ func (s *stateStore) SetAckToken(ackToken string) {
 }
 
 func (s *stateStore) Save() error {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+
 	defer func() { s.dirty = false }()
 	if !s.dirty {
 		return nil
@@ -234,6 +246,9 @@ func (s *stateStore) Save() error {
 // Actions returns a slice of action to execute in order, currently only a action policy change is
 // persisted.
 func (s *stateStore) Actions() []action {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
+
 	if s.state.action == nil {
 		return []action{}
 	}
@@ -243,6 +258,8 @@ func (s *stateStore) Actions() []action {
 
 // AckToken return the agent state persisted ack_token
 func (s *stateStore) AckToken() string {
+	s.mx.RLock()
+	defer s.mx.RUnlock()
 	return s.state.ackToken
 }
 
