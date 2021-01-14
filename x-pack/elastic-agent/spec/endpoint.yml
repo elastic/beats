@@ -61,4 +61,5 @@ rules:
     - output
     - revision
 
-when: ${runtime.arch} != 'arm64' and length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+constraints: ${runtime.arch} != 'arm64'

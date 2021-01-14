@@ -33,9 +33,7 @@ func agentGlobalConfig() map[string]interface{} {
 			"home":   paths.Home(),
 			"logs":   paths.Logs(),
 		},
-		"runtime": map[string]interface{}{
-			"os":   runtime.GOOS,
-			"arch": runtime.GOARCH,
-		},
+		"runtime.os":   runtime.GOOS,
+		"runtime.arch": runtime.GOARCH,
 	}
 }
