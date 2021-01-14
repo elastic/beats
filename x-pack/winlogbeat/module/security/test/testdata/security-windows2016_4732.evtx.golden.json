@@ -3,15 +3,17 @@
     "@timestamp": "2019-10-22T11:31:58.0398598Z",
     "event": {
       "action": "added-member-to-group",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4732,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "change",
-        "group"
+        "group",
+        "change"
       ]
     },
     "group": {

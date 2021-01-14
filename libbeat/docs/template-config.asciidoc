@@ -26,10 +26,12 @@ existing one.
 *`setup.template.enabled`*:: Set to false to disable template loading. If this is set to false,
 you must <<load-template-manually,load the template manually>>.
 
+ifndef::apm-server[]
 *`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
 before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `component`
 and `index`. Selecting `component` loads a component template which can be included in new index templates.
 The option `index` loads the new index template.
+endif::[]
 
 *`setup.template.name`*:: The name of the template. The default is
 +{beatname_lc}+. The {beatname_uc} version is always appended to the given

@@ -176,30 +176,86 @@ processors:
 - set:
     field: event.kind
     value: event
-- set:
-    if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
-    field: event.category
-    value: authentication
-- set:
-    if: "ctx.auditd.log?.record_type == 'USER_AUTH'"
-    field: event.type
-    value: info
-- set:
-    if: "ctx.auditd.log?.record_type == 'KERN_MODULE'"
-    field: event.category
-    value: driver
-- set:
-    if: "ctx.auditd.log?.record_type == 'KERN_MODULE'"
-    field: event.type
-    value: info
-- set:
-    if: "ctx.auditd.log?.record_type == 'SOFTWARE_UPDATE'"
-    field: event.category
-    value: package
-- set:
-    if: "ctx.auditd.log?.record_type == 'SOFTWARE_UPDATE'"
-    field: event.type
-    value: info
+- script:
+    lang: painless
+    ignore_failure: true
+    params:
+      CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      DAEMON_CONFIG:
+        category:
+          - configuration
+        type:
+          - change
+      DAEMON_RECONFIG:
+        category:
+          - configuration
+        type:
+          - info
+      USYS_CONFIG:
+        category:
+          - configuration
+        type:
+          - change
+      NETFILTER_CFG:
+        category:
+          - configuration
+        type:
+          - change
+      FEATURE_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      MAC_CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      MAC_POLICY_LOAD:
+        category:
+          - configuration
+        type:
+          - access
+      MAC_STATUS:
+        category:
+          - configuration
+        type:
+          - change
+      USER_MAC_CONFIG_CHANGE:
+        category:
+          - configuration
+        type:
+          - change
+      USER_MAC_POLICY_LOAD:
+        category:
+          - configuration
+        type:
+          - access
+      USER_AUTH:
+        category:
+          - authentication
+        type:
+          - info
+      KERN_MODULE:
+        category:
+          - driver
+        type:
+          - info
+      SOFTWARE_UPDATE:
+        category:
+          - package
+        type:
+          - info
+    source: >-
+      if (ctx?.auditd?.log.record_type == null) {
+        return;
+      }
+      def hm = new HashMap(params.get(ctx.auditd.log.record_type));
+      hm.forEach((k, v) -> ctx.event[k] = v);
 - set:
     if: "ctx.auditd.log?.record_type == 'SYSTEM_BOOT' || ctx.auditd.log?.record_type == 'SYSTEM_SHUTDOWN'"
     field: event.category
@@ -250,6 +306,23 @@ processors:
     field: container.runtime
     value: "{{ auditd.log.virt }}"
     ignore_empty_value: true
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'accept' || ctx.auditd.log?.syscall == '43' ||
+      ctx.auditd.log?.syscall == 'recvfrom' || ctx.auditd.log?.syscall == '45' ||
+      ctx.auditd.log?.syscall == 'recvmsg' || ctx.auditd.log?.syscall == '47' ||
+      ctx.auditd.log?.syscall == 'accept4' || ctx.auditd.log?.syscall == '288' )
+    field: network.direction
+    value: ingress
+- set:
+    if: >
+      ctx.auditd.log?.record_type == 'SYSCALL' && (
+      ctx.auditd.log?.syscall == 'connect' || ctx.auditd.log?.syscall == '42' ||
+      ctx.auditd.log?.syscall == 'sendto' || ctx.auditd.log?.syscall == '44' ||
+      ctx.auditd.log?.syscall == 'sendmsg' || ctx.auditd.log?.syscall == '46')
+    field: network.direction
+    value: egress
 - rename:
     ignore_failure: true
     field: auditd.log.arch

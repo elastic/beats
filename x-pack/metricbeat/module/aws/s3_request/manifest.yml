@@ -62,3 +62,7 @@ processors:
           to: "aws.s3_request.latency.total_request.ms"
         - from: "aws.dimensions.BucketName"
           to: "aws.s3.bucket.name"
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.s3.metrics"

@@ -3,7 +3,10 @@
     "@timestamp": "2020-04-02T14:34:08.8896056Z",
     "event": {
       "action": "service-installed",
-      "category": "iam",
+      "category": [
+        "iam",
+        "configuration"
+      ],
       "code": 4697,
       "kind": "event",
       "module": "security",

@@ -134,24 +134,62 @@ processors:
  - set:
      field: network.direction
      value: inbound
-     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
  - set:
      field: network.direction
      value: outbound
-     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: internal
-     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "trust" && ctx?.panw?.panos?.destination?.zone == "trust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.internal_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: external
-     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ctx?.panw?.panos?.source?.zone == "untrust" && ctx?.panw?.panos?.destination?.zone == "untrust"'
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?.observer?.ingress?.zone != null &&
+       ctx?.observer?.egress?.zone != null &&
+       ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+       ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
  - set:
      field: network.direction
      value: unknown
-     if: 'ctx?.panw?.panos?.type == "TRAFFIC" && ((ctx?.panw?.panos?.source?.zone != "trust" && ctx?.panw?.panos?.source?.zone != "untrust") || (ctx?.panw?.panos?.destination?.zone != "trust" && ctx?.panw?.panos?.destination?.zone != "untrust"))'
-
+     if: >
+       ctx?.panw?.panos?.type == "TRAFFIC" &&
+       ctx?._temp_?.external_zones != null &&
+       ctx?._temp_?.internal_zones != null &&
+       (
+         (
+           !ctx._temp_.external_zones.contains(ctx?.observer?.egress?.zone) &&
+           !ctx._temp_.internal_zones.contains(ctx?.observer?.egress?.zone)
+         ) ||
+         (
+           !ctx._temp_.external_zones.contains(ctx?.observer?.ingress?.zone) &&
+           !ctx._temp_.internal_zones.contains(ctx?.observer?.ingress?.zone)
+         )
+       )
 # Set network.direction from threat direction (Threat logs).
  - set:
      field: network.direction

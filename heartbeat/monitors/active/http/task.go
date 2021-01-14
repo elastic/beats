@@ -249,11 +249,15 @@ func execPing(
 		return start, time.Now(), errReason
 	}
 
-	bodyFields, errReason := processBody(resp, responseConfig, validator)
+	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
+	}
+
+	if mimeType != "" {
+		responseFields["mime_type"] = mimeType
 	}
 
 	if responseConfig.IncludeHeaders {

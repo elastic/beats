@@ -191,6 +191,19 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 
 	fullEvent := e.BeatEvent(ms.Module().Name(), ms.Name(), modifiers...)
 
+	// Run processors if defined for the metricset, it can happen for light metricsets
+	// with processors in the manifest.
+	processors, err := mb.Registry.ProcessorsForMetricSet(ms.Module().Name(), ms.Name())
+	if err == nil && processors != nil {
+		enriched, err := processors.Run(&fullEvent)
+		if err != nil {
+			panic(err)
+		}
+		if enriched != nil {
+			fullEvent = *enriched
+		}
+	}
+
 	return fullEvent
 }
 

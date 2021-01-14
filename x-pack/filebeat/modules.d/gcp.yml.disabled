@@ -20,6 +20,16 @@
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # direction is determined by whether it is between source and destination
+    # instance information rather than IP.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
   firewall:
     enabled: true
 
@@ -37,6 +47,15 @@
     # Credentials file for the service account with authorization to read from
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # is taken from the direction data in the rule_details event payload.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
 
   audit:
     enabled: true

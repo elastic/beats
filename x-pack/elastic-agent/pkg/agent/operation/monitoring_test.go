@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 func TestGenerateSteps(t *testing.T) {
@@ -132,7 +133,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m, status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}

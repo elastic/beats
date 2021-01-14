@@ -6,36 +6,80 @@ var login = (function () {
     var processor = require("processor");
 
     var categorizeEvent = function(evt) {
+        // not convinced that these should be iam
         evt.Put("event.category", ["iam"]);
         switch (evt.Get("event.action")) {
             case "CHANGE_APPLICATION_SETTING":
             case "UPDATE_MANAGED_CONFIGURATION":
-            case "GPLUS_PREMIUM_FEATURES":
-            case "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED":
-            case "UPDATE_BUILDING":
-            case "UPDATE_CALENDAR_RESOURCE_FEATURE":
-            case "RENAME_CALENDAR_RESOURCE":
-            case "UPDATE_CALENDAR_RESOURCE":
             case "CHANGE_CALENDAR_SETTING":
-            case "CANCEL_CALENDAR_EVENTS":
-            case "RELEASE_CALENDAR_RESOURCES":
-            case "MEET_INTEROP_MODIFY_GATEWAY":
             case "CHANGE_CHAT_SETTING":
             case "CHANGE_CHROME_OS_ANDROID_APPLICATION_SETTING":
-            case "CHANGE_DEVICE_STATE":
+            case "GPLUS_PREMIUM_FEATURES":
+            case "UPDATE_CALENDAR_RESOURCE_FEATURE":
+            case "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED":
+            case "MEET_INTEROP_MODIFY_GATEWAY":
             case "CHANGE_CHROME_OS_APPLICATION_SETTING":
-            case "CHANGE_CHROME_OS_DEVICE_ANNOTATION":
             case "CHANGE_CHROME_OS_DEVICE_SETTING":
-            case "CHANGE_CHROME_OS_DEVICE_STATE":
             case "CHANGE_CHROME_OS_PUBLIC_SESSION_SETTING":
-            case "UPDATE_CHROME_OS_PRINT_SERVER":
-            case "UPDATE_CHROME_OS_PRINTER":
             case "CHANGE_CHROME_OS_SETTING":
             case "CHANGE_CHROME_OS_USER_SETTING":
+            case "CHANGE_CONTACTS_SETTING":
+            case "CHANGE_DOCS_SETTING":
+            case "CHANGE_SITES_SETTING":
+            case "CHANGE_EMAIL_SETTING":
+            case "CHANGE_GMAIL_SETTING":
+            case "ALLOW_STRONG_AUTHENTICATION":
+            case "ALLOW_SERVICE_FOR_OAUTH2_ACCESS":
+            case "DISALLOW_SERVICE_FOR_OAUTH2_ACCESS":
+            case "CHANGE_APP_ACCESS_SETTINGS_COLLECTION_ID":
+            case "CHANGE_TWO_STEP_VERIFICATION_ENROLLMENT_PERIOD_DURATION":
+            case "CHANGE_TWO_STEP_VERIFICATION_FREQUENCY":
+            case "CHANGE_TWO_STEP_VERIFICATION_GRACE_PERIOD_DURATION":
+            case "CHANGE_TWO_STEP_VERIFICATION_START_DATE":
+            case "CHANGE_ALLOWED_TWO_STEP_VERIFICATION_METHODS":
+            case "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES":
+            case "ENABLE_NON_ADMIN_USER_PASSWORD_RECOVERY":
+            case "ENFORCE_STRONG_AUTHENTICATION":
+            case "UPDATE_ERROR_MSG_FOR_RESTRICTED_OAUTH2_APPS":
+            case "WEAK_PROGRAMMATIC_LOGIN_SETTINGS_CHANGED":
+            case "SESSION_CONTROL_SETTINGS_CHANGE":
+            case "CHANGE_SESSION_LENGTH":
+            case "TOGGLE_OAUTH_ACCESS_TO_ALL_APIS":
+            case "TOGGLE_ALLOW_ADMIN_PASSWORD_RESET":
+            case "ENABLE_API_ACCESS":
+            case "CHANGE_WHITELIST_SETTING":
+            case "COMMUNICATION_PREFERENCES_SETTING_CHANGE":
+            case "ENABLE_FEEDBACK_SOLICITATION":
+            case "TOGGLE_CONTACT_SHARING":
+            case "TOGGLE_USE_CUSTOM_LOGO":
+            case "CHANGE_DATA_LOCALIZATION_SETTING":
+            case "TOGGLE_ENABLE_OAUTH_CONSUMER_KEY":
+            case "TOGGLE_SSO_ENABLED":
+            case "TOGGLE_SSL":
+            case "TOGGLE_NEW_APP_FEATURES":
+            case "TOGGLE_USE_NEXT_GEN_CONTROL_PANEL":
+            case "TOGGLE_OPEN_ID_ENABLED":
+            case "TOGGLE_OUTBOUND_RELAY":
+            case "CHANGE_SSO_SETTINGS":
+            case "ENABLE_SERVICE_OR_FEATURE_NOTIFICATIONS":
+            case "CHANGE_MOBILE_APPLICATION_SETTINGS":
+            case "CHANGE_MOBILE_SETTING":
+                evt.AppendTo("event.category", "configuration")
+                evt.Put("event.type", ["change"]);
+                break;
+            case "UPDATE_BUILDING":
+            case "RENAME_CALENDAR_RESOURCE":
+            case "UPDATE_CALENDAR_RESOURCE":
+            case "CANCEL_CALENDAR_EVENTS":
+            case "RELEASE_CALENDAR_RESOURCES":
+            case "CHANGE_DEVICE_STATE":
+            case "CHANGE_CHROME_OS_DEVICE_ANNOTATION":
+            case "CHANGE_CHROME_OS_DEVICE_STATE":
+            case "UPDATE_CHROME_OS_PRINT_SERVER":
+            case "UPDATE_CHROME_OS_PRINTER":
             case "MOVE_DEVICE_TO_ORG_UNIT_DETAILED":
             case "UPDATE_DEVICE":
             case "SEND_CHROME_OS_DEVICE_COMMAND":
-            case "CHANGE_CONTACTS_SETTING":
             case "ASSIGN_ROLE":
             case "ADD_PRIVILEGE":
             case "REMOVE_PRIVILEGE":
@@ -43,9 +87,6 @@ var login = (function () {
             case "UPDATE_ROLE":
             case "UNASSIGN_ROLE":
             case "TRANSFER_DOCUMENT_OWNERSHIP":
-            case "CHANGE_DOCS_SETTING":
-            case "CHANGE_SITES_SETTING":
-            case "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES":
             case "ORG_USERS_LICENSE_ASSIGNMENT":
             case "ORG_ALL_USERS_LICENSE_ASSIGNMENT":
             case "USER_LICENSE_ASSIGNMENT":
@@ -55,8 +96,6 @@ var login = (function () {
             case "USER_LICENSE_REVOKE":
             case "UPDATE_DYNAMIC_LICENSE":
             case "DROP_FROM_QUARANTINE":
-            case "CHANGE_EMAIL_SETTING":
-            case "CHANGE_GMAIL_SETTING":
             case "REJECT_FROM_QUARANTINE":
             case "RELEASE_FROM_QUARANTINE":
             case "CHROME_LICENSES_ENABLED":
@@ -70,29 +109,14 @@ var login = (function () {
             case "EDIT_ORG_UNIT_NAME":
             case "REVOKE_DEVICE_ENROLLMENT_TOKEN":
             case "TOGGLE_SERVICE_ENABLED":
-            case "ALLOW_STRONG_AUTHENTICATION":
-            case "ALLOW_SERVICE_FOR_OAUTH2_ACCESS":
-            case "DISALLOW_SERVICE_FOR_OAUTH2_ACCESS":
-            case "CHANGE_APP_ACCESS_SETTINGS_COLLECTION_ID":
             case "ADD_TO_TRUSTED_OAUTH2_APPS":
             case "REMOVE_FROM_TRUSTED_OAUTH2_APPS":
             case "BLOCK_ON_DEVICE_ACCESS":
-            case "CHANGE_TWO_STEP_VERIFICATION_ENROLLMENT_PERIOD_DURATION":
-            case "CHANGE_TWO_STEP_VERIFICATION_FREQUENCY":
-            case "CHANGE_TWO_STEP_VERIFICATION_GRACE_PERIOD_DURATION":
-            case "CHANGE_TWO_STEP_VERIFICATION_START_DATE":
-            case "CHANGE_ALLOWED_TWO_STEP_VERIFICATION_METHODS":
             case "TOGGLE_CAA_ENABLEMENT":
             case "CHANGE_CAA_ERROR_MESSAGE":
             case "CHANGE_CAA_APP_ASSIGNMENTS":
             case "UNTRUST_DOMAIN_OWNED_OAUTH2_APPS":
             case "TRUST_DOMAIN_OWNED_OAUTH2_APPS":
-            case "ENABLE_NON_ADMIN_USER_PASSWORD_RECOVERY":
-            case "ENFORCE_STRONG_AUTHENTICATION":
-            case "UPDATE_ERROR_MSG_FOR_RESTRICTED_OAUTH2_APPS":
-            case "WEAK_PROGRAMMATIC_LOGIN_SETTINGS_CHANGED":
-            case "SESSION_CONTROL_SETTINGS_CHANGE":
-            case "CHANGE_SESSION_LENGTH":
             case "UNBLOCK_ON_DEVICE_ACCESS":
             case "CHANGE_ACCOUNT_AUTO_RENEWAL":
             case "ADD_APPLICATION":
@@ -104,23 +128,14 @@ var login = (function () {
             case "ALERT_STATUS_CHANGED":
             case "ADD_DOMAIN_ALIAS":
             case "REMOVE_DOMAIN_ALIAS":
-            case "TOGGLE_OAUTH_ACCESS_TO_ALL_APIS":
-            case "TOGGLE_ALLOW_ADMIN_PASSWORD_RESET":
-            case "ENABLE_API_ACCESS":
             case "AUTHORIZE_API_CLIENT_ACCESS":
             case "REMOVE_API_CLIENT_ACCESS":
             case "CHROME_LICENSES_REDEEMED":
             case "TOGGLE_AUTO_ADD_NEW_SERVICE":
             case "CHANGE_PRIMARY_DOMAIN":
-            case "CHANGE_WHITELIST_SETTING":
-            case "COMMUNICATION_PREFERENCES_SETTING_CHANGE":
             case "CHANGE_CONFLICT_ACCOUNT_ACTION":
-            case "ENABLE_FEEDBACK_SOLICITATION":
-            case "TOGGLE_CONTACT_SHARING":
-            case "TOGGLE_USE_CUSTOM_LOGO":
             case "CHANGE_CUSTOM_LOGO":
             case "CHANGE_DATA_LOCALIZATION_FOR_RUSSIA":
-            case "CHANGE_DATA_LOCALIZATION_SETTING":
             case "CHANGE_DATA_PROTECTION_OFFICER_CONTACT_INFO":
             case "CHANGE_DOMAIN_DEFAULT_LOCALE":
             case "CHANGE_DOMAIN_DEFAULT_TIMEZONE":
@@ -130,24 +145,16 @@ var login = (function () {
             case "ADD_TRUSTED_DOMAINS":
             case "REMOVE_TRUSTED_DOMAINS":
             case "CHANGE_EDU_TYPE":
-            case "TOGGLE_ENABLE_OAUTH_CONSUMER_KEY":
-            case "TOGGLE_SSO_ENABLED":
-            case "TOGGLE_SSL":
             case "CHANGE_EU_REPRESENTATIVE_CONTACT_INFO":
             case "CHANGE_LOGIN_BACKGROUND_COLOR":
             case "CHANGE_LOGIN_BORDER_COLOR":
             case "CHANGE_LOGIN_ACTIVITY_TRACE":
             case "PLAY_FOR_WORK_ENROLL":
             case "PLAY_FOR_WORK_UNENROLL":
-            case "TOGGLE_NEW_APP_FEATURES":
-            case "TOGGLE_USE_NEXT_GEN_CONTROL_PANEL":
-            case "TOGGLE_OPEN_ID_ENABLED":
+            case "UPDATE_DOMAIN_PRIMARY_ADMIN_EMAIL":
             case "CHANGE_ORGANIZATION_NAME":
-            case "TOGGLE_OUTBOUND_RELAY":
             case "CHANGE_PASSWORD_MAX_LENGTH":
             case "CHANGE_PASSWORD_MIN_LENGTH":
-            case "UPDATE_DOMAIN_PRIMARY_ADMIN_EMAIL":
-            case "ENABLE_SERVICE_OR_FEATURE_NOTIFICATIONS":
             case "REMOVE_APPLICATION":
             case "REMOVE_APPLICATION_FROM_WHITELIST":
             case "CHANGE_RENEW_DOMAIN_REGISTRATION":
@@ -159,7 +166,6 @@ var login = (function () {
             case "ADD_SECONDARY_DOMAIN":
             case "REMOVE_SECONDARY_DOMAIN":
             case "UPDATE_DOMAIN_SECONDARY_EMAIL":
-            case "CHANGE_SSO_SETTINGS":
             case "UPDATE_RULE":
             case "ADD_MOBILE_CERTIFICATE":
             case "COMPANY_OWNED_DEVICE_BLOCKED":
@@ -168,9 +174,7 @@ var login = (function () {
             case "CHANGE_MOBILE_APPLICATION_PERMISSION_GRANT":
             case "CHANGE_MOBILE_APPLICATION_PRIORITY_ORDER":
             case "REMOVE_MOBILE_APPLICATION_FROM_WHITELIST":
-            case "CHANGE_MOBILE_APPLICATION_SETTINGS":
             case "ADD_MOBILE_APPLICATION_TO_WHITELIST":
-            case "CHANGE_MOBILE_SETTING":
             case "CHANGE_ADMIN_RESTRICTIONS_PIN":
             case "CHANGE_MOBILE_WIRELESS_NETWORK":
             case "ADD_MOBILE_WIRELESS_NETWORK":
@@ -180,6 +184,10 @@ var login = (function () {
                 evt.Put("event.type", ["change"]);
                 break;
             case "CREATE_APPLICATION_SETTING":
+            case "CREATE_GMAIL_SETTING":
+                evt.AppendTo("event.category", "configuration")
+                evt.Put("event.type", ["creation"]);
+                break;
             case "CREATE_MANAGED_CONFIGURATION":
             case "CREATE_BUILDING":
             case "CREATE_CALENDAR_RESOURCE":
@@ -190,7 +198,6 @@ var login = (function () {
             case "CREATE_ROLE":
             case "ADD_WEB_ADDRESS":
             case "EMAIL_UNDELETE":
-            case "CREATE_GMAIL_SETTING":
             case "CHROME_APPLICATION_LICENSE_RESERVATION_CREATED":
             case "CREATE_DEVICE_ENROLLMENT_TOKEN":
             case "CREATE_ENROLLMENT_TOKEN":
@@ -205,6 +212,10 @@ var login = (function () {
                 evt.Put("event.type", ["creation"]);
                 break;
             case "DELETE_APPLICATION_SETTING":
+            case "DELETE_GMAIL_SETTING":
+                evt.AppendTo("event.category", "configuration")
+                evt.Put("event.type", ["deletion"]);
+                break;
             case "DELETE_MANAGED_CONFIGURATION":
             case "DELETE_BUILDING":
             case "DELETE_CALENDAR_RESOURCE":
@@ -215,7 +226,6 @@ var login = (function () {
             case "REMOVE_CHROME_OS_APPLICATION_SETTINGS":
             case "DELETE_ROLE":
             case "DELETE_WEB_ADDRESS":
-            case "DELETE_GMAIL_SETTING":
             case "CHROME_APPLICATION_LICENSE_RESERVATION_DELETED":
             case "REMOVE_ORG_UNIT":
             case "DELETE_ALERT":
