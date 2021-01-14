@@ -15,6 +15,7 @@ const (
 )
 
 type responseConfig struct {
+	DecodeAs                string           `config:"decode_as"`
 	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`
@@ -36,6 +37,11 @@ func (c *responseConfig) Validate() error {
 	}
 	if _, err := newBasicTransformsFromConfig(c.Pagination, paginationNamespace, nil); err != nil {
 		return err
+	}
+	if c.DecodeAs != "" {
+		if _, found := registeredDecoders[c.DecodeAs]; !found {
+			return fmt.Errorf("decoder not found for contentType: %v", c.DecodeAs)
+		}
 	}
 	return nil
 }
