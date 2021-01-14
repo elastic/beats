@@ -30,6 +30,9 @@ import (
 
 func TestGroupToEvents(t *testing.T) {
 	reader := Reader{
+		config: Config{
+			GroupMeasurements: true,
+		},
 		query:    pdh.Query{},
 		executed: true,
 		log:      nil,
@@ -42,6 +45,26 @@ func TestGroupToEvents(t *testing.T) {
 				ObjectField:  "object",
 				ChildQueries: []string{`\UDPv4\Datagrams Sent/sec`},
 			},
+			{
+				QueryField:    "%_processor_time",
+				QueryName:     `\Processor Information(_Total)\% Processor Time`,
+				Format:        "float",
+				ObjectName:    "Processor Information",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\Processor Information(_Total)\% Processor Time`},
+			},
+			{
+				QueryField:    "current_disk_queue_length",
+				QueryName:     `\PhysicalDisk(_Total)\Current Disk Queue Length`,
+				Format:        "float",
+				ObjectName:    "PhysicalDisk",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\PhysicalDisk(_Total)\Current Disk Queue Length`},
+			},
 		},
 	}
 	counters := map[string][]pdh.CounterValue{
@@ -52,22 +75,71 @@ func TestGroupToEvents(t *testing.T) {
 				Err:         pdh.CounterValueError{},
 			},
 		},
+		`\Processor Information(_Total)\% Processor Time`: {
+			{
+				Instance:    "_Total",
+				Measurement: 11,
+			},
+		},
+		`\PhysicalDisk(_Total)\Current Disk Queue Length`: {
+			{
+				Instance:    "_Total",
+				Measurement: 20,
+			},
+		},
 	}
+
 	events := reader.groupToEvents(counters)
 	assert.NotNil(t, events)
-	assert.Equal(t, len(events), 1)
+	assert.Equal(t, 3, len(events))
+
 	ok, err := events[0].MetricSetFields.HasKey("datagrams_sent_per_sec")
 	assert.NoError(t, err)
 	assert.True(t, ok)
+
 	ok, err = events[0].MetricSetFields.HasKey("object")
 	assert.NoError(t, err)
 	assert.True(t, ok)
+
 	val, err := events[0].MetricSetFields.GetValue("datagrams_sent_per_sec")
 	assert.NoError(t, err)
 	assert.Equal(t, val, 23)
+
 	val, err = events[0].MetricSetFields.GetValue("object")
 	assert.NoError(t, err)
 	assert.Equal(t, val, "UDPv4")
+
+	ok, err = events[1].MetricSetFields.HasKey("%_processor_time")
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	ok, err = events[1].MetricSetFields.HasKey("object")
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	val, err = events[1].MetricSetFields.GetValue("%_processor_time")
+	assert.NoError(t, err)
+	assert.Equal(t, val, 11)
+
+	val, err = events[1].MetricSetFields.GetValue("object")
+	assert.NoError(t, err)
+	assert.Equal(t, val, "Processor Information")
+
+	ok, err = events[2].MetricSetFields.HasKey("current_disk_queue_length")
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	ok, err = events[2].MetricSetFields.HasKey("object")
+	assert.NoError(t, err)
+	assert.True(t, ok)
+
+	val, err = events[2].MetricSetFields.GetValue("current_disk_queue_length")
+	assert.NoError(t, err)
+	assert.Equal(t, val, 20)
+
+	val, err = events[2].MetricSetFields.GetValue("object")
+	assert.NoError(t, err)
+	assert.Equal(t, val, "PhysicalDisk")
 
 }
 
