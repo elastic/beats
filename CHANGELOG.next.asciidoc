@@ -995,6 +995,8 @@ In other use cases, Beats and Agent can set this variable automatically for the 
 In the future, these certificates must be updated as the legacy behaviour of Common Name field
 is going to be removed in later versions. {pull}22495[22495]
 
+See more about the change in Golang here: https://golang.org/doc/go1.15#commonname
+
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
