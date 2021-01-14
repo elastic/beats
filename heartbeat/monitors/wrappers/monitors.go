@@ -38,27 +38,32 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	jobWrappers := []jobs.JobWrapper{
+	if stdMonFields.Type == "browser" {
+		return WrapBrowser(js, stdMonFields)
+	} else {
+		return WrapLightweight(js, stdMonFields)
+	}
+}
+
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	return jobs.WrapAllSeparately(
+		jobs.WrapAll(
+			js,
+			addMonitorMeta(stdMonFields, len(js) > 1),
+			addMonitorStatus(stdMonFields.Type),
+			addMonitorDuration,
+		),
+		func() jobs.JobWrapper {
+			return makeAddSummary(stdMonFields.Type)
+		})
+}
+
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	return jobs.WrapAll(
+		js,
 		addMonitorMeta(stdMonFields, len(js) > 1),
 		addMonitorStatus(stdMonFields.Type),
-	}
-
-	if stdMonFields.Type == "browser" {
-		jobWrappers = append(jobWrappers, addMonitorDuration)
-	}
-
-	baseWrapped := jobs.WrapAll(
-		js,
-		jobWrappers...,
 	)
-	if stdMonFields.Type != "browser" {
-		return jobs.WrapAllSeparately(
-			baseWrapped,
-			func() jobs.JobWrapper {
-				return makeAddSummary(stdMonFields.Type)
-			})
-	}
-	return baseWrapped
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
@@ -69,7 +74,7 @@ func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.
 			cont, e := job(event)
 			thisID := stdMonFields.ID
 			thisName := stdMonFields.Name
-			// Allow jobs to override the ID, useful for suites
+			// Allow jobs to override the ID, useful for browser suites
 			// which do this logic on their own
 			if v, _ := event.GetValue("monitor.id"); v != nil {
 				thisID = v.(string)
@@ -131,13 +136,6 @@ func addMonitorStatus(monitorType string) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
-
-			// Non-summary browser events have no status associated
-			if monitorType == "browser" {
-				if t, _ := event.GetValue("synthetics.type"); t != "heartbeat/summary" {
-					return cont, nil
-				}
-			}
 
 			fields := common.MapStr{
 				"monitor": common.MapStr{

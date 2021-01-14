@@ -56,7 +56,7 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 
 	j, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params())
 	if err != nil {
-			return nil, 0, err
-		}
+		return nil, 0, err
+	}
 	return []jobs.Job{j}, 1, nil
 }

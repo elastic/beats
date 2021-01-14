@@ -6,15 +6,16 @@ package synthexec
 
 import (
 	"fmt"
-	"github.com/gofrs/uuid"
 	"time"
+
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func (event *beat.Event, se *SynthEvent) error
+type enricher func(event *beat.Event, se *SynthEvent) error
 
 type streamEnricher struct {
 	je *journeyEnricher
@@ -32,7 +33,7 @@ func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 // where relevant to properly enrich *beat.Event instances.
 type journeyEnricher struct {
 	journeyComplete bool
-	journey *Journey
+	journey         *Journey
 	checkGroup      string
 	errorCount      int
 	lastError       error
@@ -82,8 +83,8 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 
 	eventext.MergeEventFields(event, common.MapStr{
 		"monitor": common.MapStr{
-			"id": je.journey.Id,
-			"name": je.journey.Name,
+			"id":          je.journey.Id,
+			"name":        je.journey.Name,
 			"check_group": je.checkGroup,
 		},
 	})
@@ -142,7 +143,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 				},
 			},
 			"summary": common.MapStr{
-				"up": up,
+				"up":   up,
 				"down": down,
 			},
 		})

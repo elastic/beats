@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"sync"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -94,10 +93,6 @@ func (e ErrDuplicateMonitorID) Error() string {
 	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
 }
 
-type MonitorAlike interface {
-	cfgfile.Runner
-}
-
 // newMonitor Creates a new monitor, without leaking resources in the event of an error.
 func newMonitor(
 	config *common.Config,
@@ -105,7 +100,7 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-) (MonitorAlike, error) {
+) (*Monitor, error) {
 	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
 	if m != nil && err != nil {
 		m.Stop()
@@ -121,7 +116,7 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-) (MonitorAlike, error) {
+) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have

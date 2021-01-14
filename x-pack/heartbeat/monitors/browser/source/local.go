@@ -1,13 +1,18 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package source
 
 import (
 	"fmt"
 	"io/ioutil"
+
 	"github.com/otiai10/copy"
 )
 
 type LocalSource struct {
-	OrigPath     string                `config:"path"`
+	OrigPath    string `config:"path"`
 	workingPath string
 	BaseSource
 }

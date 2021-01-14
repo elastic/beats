@@ -1,11 +1,15 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package browser
 
 import (
 	"context"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
-
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
 
@@ -18,7 +22,7 @@ type SyntheticSuite struct {
 
 func NewSuite(rawCfg *common.Config) (*SyntheticSuite, error) {
 	ss := &SyntheticSuite{
-		rawCfg: rawCfg,
+		rawCfg:   rawCfg,
 		suiteCfg: &Config{},
 	}
 	err := rawCfg.Unpack(ss.suiteCfg)

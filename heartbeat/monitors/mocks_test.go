@@ -139,21 +139,20 @@ func mockPluginBuilder() pluginBuilder {
 
 	return pluginBuilder{
 		"test",
-		"testAlias",
-		ActiveMonitor,
+		[]string{"testAlias"},
 		func(s string, config *common.Config) ([]jobs.Job, int, error) {
-		// Declare a real config block with a required attr so we can see what happens when it doesn't work
-		unpacked := struct {
-			URLs []string `config:"urls" validate:"required"`
-		}{}
-		err := config.Unpack(&unpacked)
-		if err != nil {
-			return nil, 0, err
-		}
-		c := common.Config{}
-		j, err := createMockJob("test", &c)
-		return j, 1, err
-	}, newPluginCountersRecorder("test", reg)}
+			// Declare a real config block with a required attr so we can see what happens when it doesn't work
+			unpacked := struct {
+				URLs []string `config:"urls" validate:"required"`
+			}{}
+			err := config.Unpack(&unpacked)
+			if err != nil {
+				return nil, 0, err
+			}
+			c := common.Config{}
+			j, err := createMockJob("test", &c)
+			return j, 1, err
+		}, newPluginCountersRecorder("test", reg)}
 }
 
 func mockPluginsReg() *pluginsReg {

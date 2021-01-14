@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package source
 
 import (
@@ -28,7 +32,7 @@ func (s *Source) Active() ISource {
 }
 
 func (s *Source) Validate() error {
-	if  s.Active() == nil {
+	if s.Active() == nil {
 		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
 	}
 	return nil
@@ -40,11 +44,10 @@ type ISource interface {
 }
 
 type BaseSource struct {
-	Type	 string					`config:"type"`
+	Type string `config:"type"`
 }
 
 type PollingSource struct {
 	CheckEvery int `config:"check_every"`
 	BaseSource
 }
-

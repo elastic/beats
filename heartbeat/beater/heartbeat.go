@@ -160,21 +160,6 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	return nil
 }
 
-var suiteFactory cfgfile.RunnerFactory
-
-func RegisterSuiteFactory(factory cfgfile.RunnerFactory) {
-	suiteFactory = factory
-}
-
-// RunCentralMgmtMonitors loads any central management configured configs.
-func (bt *Heartbeat) RunSuiteMonitors(b *beat.Beat) {
-	if suiteFactory == nil {
-		return
-	}
-	monitors := cfgfile.NewRunnerList(management.DebugK, suiteFactory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".suites", monitors)
-}
-
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
 	autodiscover, err := autodiscover.NewAutodiscover(

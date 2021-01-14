@@ -32,7 +32,7 @@ type Config struct {
 	ConfigMonitors  *common.Config       `config:"config.monitors"`
 	Scheduler       Scheduler            `config:"scheduler"`
 	Autodiscover    *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*common.Config    `config:"synthetic_suites"`
+	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
 }
 
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.

@@ -94,7 +94,7 @@ func newPluginsReg() *pluginsReg {
 }
 
 // RegisterActive registers a new active (as opposed to passive) monitor.
-func RegisterActive(name string, builder PluginBuilder, aliases ...string,) {
+func RegisterActive(name string, builder PluginBuilder, aliases ...string) {
 	stats := statsForPlugin(name)
 	if err := globalPluginsReg.add(pluginBuilder{name, aliases, builder, stats}); err != nil {
 		panic(err)
