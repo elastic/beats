@@ -18,6 +18,7 @@ func TestEmptyTransformContext(t *testing.T) {
 	ctx := emptyTransformContext()
 	assert.Equal(t, &cursor{}, ctx.cursor)
 	assert.Equal(t, &common.MapStr{}, ctx.lastEvent)
+	assert.Equal(t, &common.MapStr{}, ctx.firstEvent)
 	assert.Equal(t, &response{}, ctx.lastResponse)
 }
 

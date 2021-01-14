@@ -483,6 +483,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Fix SIP parser logic related to line length check. {pull}23411[23411]
+
 
 *Winlogbeat*
 
@@ -572,6 +574,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
 - Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
+- Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
 
 *Auditbeat*
 
@@ -795,7 +798,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 - Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
 - Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
+- Added support for first_event context in filebeat httpjson input {pull}23437[23437]
+- Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
+- Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
 
 *Heartbeat*
 
@@ -990,7 +996,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
