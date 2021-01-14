@@ -237,7 +237,6 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 	env := map[string]string{
 		insideIntegrationTestEnvVar: "true",
 		"GOFLAGS":                   "-mod=readonly",
-		"GODEBUG":                   "x509ignoreCN=0",
 	}
 	for name, value := range passInEnv {
 		env[name] = value

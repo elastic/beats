@@ -149,5 +149,13 @@ func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 		}
 	}
 
+	legacyCommonName := cfg.Verification == VerifyLegacyCommonName
+	if legacyCommonName {
+		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			_, _, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
+			return err
+		}
+	}
+
 	return nil
 }

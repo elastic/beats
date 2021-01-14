@@ -127,13 +127,15 @@ const (
 	VerifyFull TLSVerificationMode = iota
 	VerifyNone
 	VerifyCertificate
+	VerifyLegacyCommonName
 )
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
-	"":            VerifyFull,
+	"":            VerifyLegacyCommonName,
 	"full":        VerifyFull,
 	"none":        VerifyNone,
 	"certificate": VerifyCertificate,
+	"common_name": VerifyLegacyCommonName,
 }
 
 func (m TLSVerificationMode) String() string {

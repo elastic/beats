@@ -31,7 +31,7 @@ SCRIPTNAME=/etc/init.d/{{.ServiceName}}
 # Read configuration variable file if it is present
 [ -r /etc/default/{{.ServiceName}} ] && . /etc/default/{{.ServiceName}}
 
-DEFAULT_GODEBUG="madvdontneed=1,x509ignoreCN=0"
+DEFAULT_GODEBUG="madvdontneed=1"
 export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 [ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
