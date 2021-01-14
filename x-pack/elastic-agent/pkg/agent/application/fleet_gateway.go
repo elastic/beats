@@ -10,9 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -79,7 +77,7 @@ type fleetGateway struct {
 	unauthCounter    int
 	statusController status.Controller
 	statusReporter   status.Reporter
-	ats              *ackTokenStore
+	stateStore       *stateStore
 }
 
 func newFleetGateway(
@@ -91,6 +89,7 @@ func newFleetGateway(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
+	stateStore *stateStore,
 ) (*fleetGateway, error) {
 
 	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
@@ -105,6 +104,7 @@ func newFleetGateway(
 		r,
 		acker,
 		statusController,
+		stateStore,
 	)
 }
 
@@ -119,16 +119,12 @@ func newFleetGatewayWithScheduler(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
+	stateStore *stateStore,
 ) (*fleetGateway, error) {
 
 	// Backoff implementation doesn't support the using context as the shutdown mechanism.
 	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
-
-	ats, err := newAckTokenStore(log, storage.NewDiskStore(info.AgentAckTokenFile()))
-	if err != nil {
-		return nil, err
-	}
 
 	return &fleetGateway{
 		bgContext:  ctx,
@@ -148,7 +144,7 @@ func newFleetGatewayWithScheduler(
 		acker:            acker,
 		statusReporter:   statusController.Register("gateway"),
 		statusController: statusController,
-		ats:              ats,
+		stateStore:       stateStore,
 	}, nil
 }
 
@@ -219,7 +215,7 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	}
 
 	// retrieve ack token from the store
-	ackToken := f.ats.GetToken()
+	ackToken := f.stateStore.AckToken()
 	if ackToken != "" {
 		f.log.Debug("using previously saved ack token: %v", ackToken)
 	}
@@ -254,7 +250,8 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 
 	// Save the latest ackToken
 	if resp.AckToken != "" {
-		serr := f.ats.Save(resp.AckToken)
+		f.stateStore.SetAckToken(resp.AckToken)
+		serr := f.stateStore.Save()
 		if serr != nil {
 			f.log.Errorf("failed to save the ack token, err: %v", serr)
 		}

@@ -25,9 +25,9 @@ const agentInfoKey = "agent"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
+const defaultAgentStateStoreFile = "state.yml"
 
 const defaultLogLevel = "info"
-const defaultAgentAckTokenFile = "action_ack_token.yml"
 
 type persistentAgentInfo struct {
 	ID       string `json:"id" yaml:"id" config:"id"`
@@ -49,9 +49,9 @@ func AgentActionStoreFile() string {
 	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
 }
 
-// AgentAckTokenFile is the file that contains the latest agent ack token.
-func AgentAckTokenFile() string {
-	return filepath.Join(paths.Home(), defaultAgentAckTokenFile)
+// AgentStateStoreFile is the file that contains the persisted state of the agent including the action that can be replayed after restart.
+func AgentStateStoreFile() string {
+	return filepath.Join(paths.Home(), defaultAgentStateStoreFile)
 }
 
 // updateLogLevel updates log level and persists it to disk.
