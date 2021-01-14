@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !386
+// +build !windows,!386
 
 package data
 
