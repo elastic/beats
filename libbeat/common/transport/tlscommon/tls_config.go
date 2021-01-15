@@ -125,9 +125,16 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	pin := len(cfg.CASha256) > 0
 	skipHostName := cfg.Verification == VerifyCertificate
+	legacyCommonName := cfg.Verification == VerifyLegacyCommonName
 
 	if pin && !skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			if legacyCommonName {
+				_, _, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
+				if err != nil {
+					return err
+				}
+			}
 			return verifyCAPin(cfg.CASha256, verifiedChains)
 		}
 	}
@@ -149,7 +156,6 @@ func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 		}
 	}
 
-	legacyCommonName := cfg.Verification == VerifyLegacyCommonName
 	if legacyCommonName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 			_, _, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
