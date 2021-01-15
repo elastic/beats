@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -110,12 +109,9 @@ func encodeAsForm(trReq transformable) ([]byte, error) {
 func decodeAsNdjson(p []byte, dst *response) error {
 	var results []interface{}
 	dec := json.NewDecoder(bytes.NewReader(p))
-	for {
+	for dec.More() {
 		var o interface{}
-		err := dec.Decode(&o)
-		if err == io.EOF {
-			break
-		} else if err != nil {
+		if err := dec.Decode(&o); err != nil {
 			return err
 		}
 		results = append(results, o)
