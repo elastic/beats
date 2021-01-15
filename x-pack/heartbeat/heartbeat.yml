@@ -33,7 +33,7 @@ heartbeat.monitors:
   # Total test connection and data exchange timeout
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service_name: my-apm-service-name
+  #service.name: my-apm-service-name
 
 # ======================= Elasticsearch template setting =======================
 
@@ -140,7 +140,7 @@ processors:
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
+# "publisher", "service".
 #logging.selectors: ["*"]
 
 # ============================= X-Pack Monitoring ==============================

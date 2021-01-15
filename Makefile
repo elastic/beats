@@ -12,13 +12,13 @@ GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
 REVIEWDOG=reviewdog
 REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
+REVIEWDOG_REPO=github.com/reviewdog/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
 # in the x-pack directory (rather than having the OSS build produce both sets
 # of artifacts). This will be removed once we complete the transition.
-PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/winlogbeat
+PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/winlogbeat x-pack/packetbeat
 # PROJECTS_XPACK_MAGE is a list of Beats whose primary build logic is based in
 # Mage. For compatibility with CI testing these projects support a subset of the
 # makefile targets. After all Beats converge to primarily using Mage we can
@@ -94,19 +94,34 @@ clean: mage
 
 ## check : TBD.
 .PHONY: check
-check: python-env
+check:
 	@$(foreach var,$(PROJECTS) dev-tools $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) check || exit 1;)
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	$(MAKE) check-python
 	# check if vendor folder does not exists
 	[ ! -d vendor ]
-	@# Validate that all updates were committed
+	# Validate that all updates were committed
 	@$(MAKE) update
 	@$(MAKE) check-headers
-	go mod tidy
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
+## ccheck-go : Check there is no changes in Go modules.
+.PHONY: check-go
+check-go:
+	@go mod tidy
+
+## ccheck-no-changes : Check there is no local changes.
+.PHONY: check-no-changes
+check-no-changes:
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --
+
+## check-python : Python Linting.
+.PHONY: check-python
+check-python: python-env
+	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
+	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 
 ## check-headers : Check the license headers.
 .PHONY: check-headers
@@ -175,6 +190,11 @@ python-env:
 .PHONY: test-apm
 test-apm:
 	sh ./script/test_apm.sh
+
+## get-version : Get the libbeat version
+.PHONY: get-version
+get-version:
+	@mage dumpVariables | grep 'beat_version' | cut -d"=" -f 2 | tr -d " "
 
 ### Packaging targets ####
 

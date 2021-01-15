@@ -1,9 +1,9 @@
-- key: awscloudwatch
-  title: "awscloudwatch"
+- key: aws-cloudwatch
+  title: "aws-cloudwatch"
   description: >
     Fields from AWS CloudWatch logs.
   fields:
-    - name: awscloudwatch
+    - name: aws-cloudwatch
       type: group
       default_field: false
       description: >

@@ -93,25 +93,6 @@ func TestStreamCheck(t *testing.T) {
 			},
 			result: ErrInvalidDataset,
 		},
-
-		{
-			name: "dataset invalid dot - compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"data_stream.dataset": "."}}},
-				},
-			},
-			result: ErrInvalidDataset,
-		},
-		{
-			name: "dataset invalid dotdot- compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"data_stream.dataset": ".."}}},
-				},
-			},
-			result: ErrInvalidDataset,
-		},
 		{
 			name: "dataset invalid uppercase - compact",
 			configMap: map[string]interface{}{
@@ -140,35 +121,9 @@ func TestStreamCheck(t *testing.T) {
 			result: ErrInvalidDataset,
 		},
 		{
-			name: "dataset invalid invalid prefix- compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{"streams": []map[string]interface{}{{"data_stream.dataset": "_isthisvalid"}}},
-				},
-			},
-			result: ErrInvalidDataset,
-		},
-
-		{
 			name: "namespace invalid - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{{"data_stream.namespace": ""}},
-			},
-			result: ErrInvalidNamespace,
-		},
-		{
-			name: "namespace invalid name 1 - compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{"data_stream.namespace": "."},
-				},
-			},
-			result: ErrInvalidNamespace,
-		},
-		{
-			name: "namespace invalid name 2 - compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"data_stream.namespace": ".."}},
 			},
 			result: ErrInvalidNamespace,
 		},
@@ -190,13 +145,6 @@ func TestStreamCheck(t *testing.T) {
 			name: "namespace invalid name invalid char - compact",
 			configMap: map[string]interface{}{
 				"inputs": []map[string]interface{}{{"data_stream.namespace": "isitok?"}},
-			},
-			result: ErrInvalidNamespace,
-		},
-		{
-			name: "namespace invalid name invalid prefix - compact",
-			configMap: map[string]interface{}{
-				"inputs": []map[string]interface{}{{"data_stream.namespace": "+isitok"}},
 			},
 			result: ErrInvalidNamespace,
 		},
@@ -273,6 +221,33 @@ func TestStreamCheck(t *testing.T) {
 				},
 			},
 			result: nil,
+		},
+		{
+			name: "type invalid prefix _",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"data_stream.type": "_type"},
+				},
+			},
+			result: ErrInvalidIndex,
+		},
+		{
+			name: "type invalid prefix -",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"data_stream.type": "-type"},
+				},
+			},
+			result: ErrInvalidIndex,
+		},
+		{
+			name: "type invalid prefix +",
+			configMap: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{"data_stream.type": "+type"},
+				},
+			},
+			result: ErrInvalidIndex,
 		},
 	}
 

@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/smb_mapping.log
   - name: tags
     default: [zeek.smb_mapping]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/smb_mapping.yml

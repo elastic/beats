@@ -1,0 +1,70 @@
+- name: database_audit
+  type: group
+  release: beta
+  description: >
+    Module for parsing Oracle Database audit logs
+  fields:
+    - name: status
+      type: keyword
+      description: >
+        Database Audit Status.
+
+    - name: session_id
+      type: keyword
+      description: >
+        Indicates the audit session ID number.
+
+    - name: client.terminal
+      type: keyword
+      description: >
+        If available, the client terminal type, for example "pty".
+
+    - name: client.address
+      type: keyword
+      description: >
+        The IP Address or Domain used by the client.
+
+    - name: client.user
+      type: keyword
+      description: >
+        The user running the client or connection to the database.
+
+    - name: database.user
+      type: keyword
+      description: >
+        The database user used to authenticate.
+
+    - name: privilege
+      type: keyword
+      description: >
+        The privilege group related to the database user.
+
+    - name: entry.id
+      type: keyword
+      description: >
+        Indicates the current audit entry number, assigned to each audit trail record. The audit entry.id sequence number is shared between fine-grained audit records and regular audit records.
+
+    - name: database.host
+      type: keyword
+      description: >
+        Client host machine name.
+
+    - name: action
+      type: keyword
+      description: >
+        The action performed during the audit event. This could for example be the raw query.
+
+    - name: action_number
+      type: keyword
+      description: >
+        Action is a numeric value representing the action the user performed. The corresponding name of the action type is in the AUDIT_ACTIONS table. For example, action 100 refers to LOGON.
+
+    - name: database.id
+      type: keyword
+      description: >
+        Database identifier calculated when the database is created. It corresponds to the DBID column of the V$DATABASE data dictionary view.
+
+    - name: length
+      type: long
+      description: >
+        Refers to the total number of bytes used in this audit record. This number includes the trailing newline bytes (\n), if any, at the end of the audit record.

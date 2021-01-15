@@ -185,6 +185,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.101",
             "192.0.2.10"
@@ -236,6 +239,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "INT-FW01"
+        ],
         "related.ip": [
             "172.29.2.3",
             "192.0.2.57"
@@ -317,7 +323,7 @@
         "event.dataset": "cisco.ftd",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%FTD-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42.130/12834)",
+        "event.original": "%FTD-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42/12834)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -373,7 +379,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1110,
+        "log.offset": 1106,
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -425,7 +431,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1237,
+        "log.offset": 1233,
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -473,7 +479,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1405,
+        "log.offset": 1401,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -526,7 +532,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1531,
+        "log.offset": 1527,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -578,7 +584,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1696,
+        "log.offset": 1692,
         "network.bytes": 140,
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -632,7 +638,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1848,
+        "log.offset": 1844,
         "network.bytes": 9999999,
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -679,13 +685,16 @@
         "host.hostname": "FJSG2NRFW01",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 2012,
+        "log.offset": 2008,
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "FJSG2NRFW01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "FJSG2NRFW01"
+        ],
         "related.ip": [
             "192.168.132.46",
             "172.24.177.29"
@@ -723,7 +732,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 2167,
+        "log.offset": 2163,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -776,7 +785,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 2293,
+        "log.offset": 2289,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -823,7 +832,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 2458,
+        "log.offset": 2454,
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -872,7 +881,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 2567,
+        "log.offset": 2563,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -921,7 +930,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 2726,
+        "log.offset": 2722,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -970,7 +979,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 2887,
+        "log.offset": 2883,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1019,7 +1028,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3048,
+        "log.offset": 3044,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1068,7 +1077,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3209,
+        "log.offset": 3205,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1117,7 +1126,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3370,
+        "log.offset": 3366,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1166,7 +1175,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3531,
+        "log.offset": 3527,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1215,7 +1224,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3692,
+        "log.offset": 3688,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1264,7 +1273,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 3851,
+        "log.offset": 3847,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1313,7 +1322,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 4008,
+        "log.offset": 4004,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1360,7 +1369,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 4167,
+        "log.offset": 4163,
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -1406,7 +1415,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 4278,
+        "log.offset": 4274,
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -1455,7 +1464,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 4387,
+        "log.offset": 4383,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1504,7 +1513,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 4546,
+        "log.offset": 4542,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1553,7 +1562,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 4707,
+        "log.offset": 4703,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1602,7 +1611,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 4866,
+        "log.offset": 4862,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1651,7 +1660,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 5022,
+        "log.offset": 5018,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1700,7 +1709,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 5178,
+        "log.offset": 5174,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1749,7 +1758,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 5325,
+        "log.offset": 5321,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -1798,7 +1807,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 5472,
+        "log.offset": 5468,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1847,7 +1856,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 5635,
+        "log.offset": 5631,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1897,7 +1906,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 5796,
+        "log.offset": 5792,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -1949,7 +1958,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 5967,
+        "log.offset": 5963,
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -1959,6 +1968,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.77.12",
             "10.0.13.13"
@@ -2001,7 +2013,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 6332,
+        "log.offset": 6328,
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "dmz",
@@ -2010,6 +2022,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -2052,7 +2067,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 6487,
+        "log.offset": 6483,
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "dmz",
@@ -2061,6 +2076,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.33",
             "192.0.0.12"
@@ -2105,7 +2123,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 6642,
+        "log.offset": 6638,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2115,6 +2133,10 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2158,7 +2180,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 6817,
+        "log.offset": 6813,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2168,6 +2190,10 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1",
+            "OCSP_Server"
+        ],
         "related.ip": [
             "192.0.2.222"
         ],
@@ -2211,7 +2237,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 6992,
+        "log.offset": 6988,
         "network.bytes": 14804,
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2221,6 +2247,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2265,7 +2294,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 7162,
+        "log.offset": 7158,
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2275,6 +2304,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -2319,7 +2351,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 7333,
+        "log.offset": 7329,
         "network.bytes": 134781,
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2329,6 +2361,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.35"
@@ -2368,13 +2403,16 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 7504,
+        "log.offset": 7500,
         "network.transport": "(no",
         "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2414,13 +2452,16 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 7651,
+        "log.offset": 7647,
         "network.transport": "(no",
         "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2463,7 +2504,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 7798,
+        "log.offset": 7794,
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "dmz",
@@ -2472,6 +2513,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.168.1.34",
             "192.0.0.12"
@@ -2516,7 +2560,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 7954,
+        "log.offset": 7950,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2526,6 +2570,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2570,7 +2617,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 8133,
+        "log.offset": 8129,
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2580,6 +2627,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "192.168.1.34"
@@ -2624,7 +2674,7 @@
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 8312,
+        "log.offset": 8308,
         "network.bytes": 11420,
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -2634,6 +2684,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "127.0.0.1"
+        ],
         "related.ip": [
             "192.0.2.222",
             "10.10.10.10"
@@ -2677,7 +2730,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 8482,
+        "log.offset": 8478,
         "network.bytes": 1416,
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -2725,12 +2778,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 8624,
+        "log.offset": 8620,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2769,12 +2825,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 8745,
+        "log.offset": 8741,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2813,12 +2872,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 8866,
+        "log.offset": 8862,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2857,12 +2919,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 8987,
+        "log.offset": 8983,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.47"
@@ -2901,12 +2966,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 9108,
+        "log.offset": 9104,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2945,12 +3013,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 9229,
+        "log.offset": 9225,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.88.99.57"
@@ -2989,12 +3060,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 9350,
+        "log.offset": 9346,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3033,12 +3107,15 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
-        "log.offset": 9472,
+        "log.offset": 9468,
         "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "0.0.0.0",
             "192.168.1.255"
@@ -3080,7 +3157,7 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 9594,
+        "log.offset": 9590,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -3089,6 +3166,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "192.0.2.95",
             "10.32.112.125"
@@ -3128,7 +3208,7 @@
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "error",
-        "log.offset": 9748,
+        "log.offset": 9744,
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "Outside",
@@ -3136,6 +3216,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "GIFRCHN01"
+        ],
         "related.ip": [
             "10.2.3.5"
         ],
@@ -3173,7 +3256,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 9858,
+        "log.offset": 9854,
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "inside",
@@ -3225,7 +3308,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 9994,
+        "log.offset": 9990,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -3233,6 +3316,9 @@
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "bad.example.com"
+        ],
         "related.ip": [
             "10.1.1.45",
             "192.88.99.129"
@@ -3283,7 +3369,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 10245,
+        "log.offset": 10241,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -3340,7 +3426,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 10544,
+        "log.offset": 10540,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
@@ -3386,7 +3472,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 10843,
+        "log.offset": 10839,
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3427,7 +3513,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 10920,
+        "log.offset": 10916,
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3469,7 +3555,7 @@
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 11012,
+        "log.offset": 11008,
         "observer.egress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",

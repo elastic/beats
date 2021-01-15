@@ -27,6 +27,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -246,5 +247,17 @@ func dockerComposeBuildImages() error {
 		os.Stderr,
 		"docker-compose", args...,
 	)
+
+	// This sleep is to avoid hitting the docker build issues when resources are not available.
+	if err != nil {
+		fmt.Println(">> Building docker images again")
+		time.Sleep(10)
+		_, err = sh.Exec(
+			composeEnv,
+			out,
+			os.Stderr,
+			"docker-compose", args...,
+		)
+	}
 	return err
 }

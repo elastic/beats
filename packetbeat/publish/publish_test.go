@@ -125,7 +125,7 @@ func TestPublish(t *testing.T) {
 		}
 
 		dir, _ := res.GetValue("network.direction")
-		assert.Equal(t, "inbound", dir)
+		assert.Equal(t, "ingress", dir)
 	})
 
 	t.Run("direction/outbound", func(t *testing.T) {
@@ -140,7 +140,7 @@ func TestPublish(t *testing.T) {
 		}
 
 		dir, _ := res.GetValue("network.direction")
-		assert.Equal(t, "outbound", dir)
+		assert.Equal(t, "egress", dir)
 	})
 
 	t.Run("direction/internal", func(t *testing.T) {
@@ -155,7 +155,7 @@ func TestPublish(t *testing.T) {
 		}
 
 		dir, _ := res.GetValue("network.direction")
-		assert.Equal(t, "internal", dir)
+		assert.Equal(t, "ingress", dir)
 	})
 
 	t.Run("direction/none", func(t *testing.T) {
@@ -170,7 +170,7 @@ func TestPublish(t *testing.T) {
 		}
 
 		dir, _ := res.GetValue("network.direction")
-		assert.Nil(t, dir)
+		assert.Equal(t, "unknown", dir)
 	})
 
 	t.Run("ignore_outgoing", func(t *testing.T) {

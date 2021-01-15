@@ -17,7 +17,7 @@ import (
 
 func TestContextProvider(t *testing.T) {
 	builder, _ := composable.Providers.GetContextProvider("env")
-	provider, err := builder(nil)
+	provider, err := builder(nil, nil)
 	require.NoError(t, err)
 
 	comm := ctesting.NewContextComm(context.Background())

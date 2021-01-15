@@ -9,10 +9,14 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -32,18 +36,24 @@ func TestManagedModeRouting(t *testing.T) {
 
 	log, _ := logger.New("")
 	router, _ := newRouter(log, streamFn)
-	composableCtrl, _ := composable.New(nil)
-	emit, err := emitter(ctx, log, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}})
+	agentInfo, _ := info.NewAgentInfo()
+	nullStore := &storage.NullStore{}
+	composableCtrl, _ := composable.New(log, nil)
+	emit, err := emitter(ctx, log, agentInfo, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}})
 	require.NoError(t, err)
 
 	actionDispatcher, err := newActionDispatcher(ctx, log, &handlerDefault{log: log})
 	require.NoError(t, err)
 
+	cfg := configuration.DefaultConfiguration()
 	actionDispatcher.MustRegister(
-		&fleetapi.ActionConfigChange{},
-		&handlerConfigChange{
-			log:     log,
-			emitter: emit,
+		&fleetapi.ActionPolicyChange{},
+		&handlerPolicyChange{
+			log:       log,
+			emitter:   emit,
+			agentInfo: agentInfo,
+			config:    cfg,
+			store:     nullStore,
 		},
 	)
 
@@ -100,9 +110,9 @@ const fleetResponse = `
 	"action": "checkin",
 	"actions": [{
 		"agent_id": "17e93530-7f42-11ea-9330-71e968b29fa4",
-		"type": "CONFIG_CHANGE",
+		"type": "POLICY_CHANGE",
 		"data": {
-			"config": {
+			"policy": {
 				"id": "86561d50-7f3b-11ea-9fab-3db3bdb4efa4",
 				"outputs": {
 					"default": {

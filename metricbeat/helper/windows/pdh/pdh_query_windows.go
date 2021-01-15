@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	instanceNameRegexp = regexp.MustCompile(`.*?\((.*?)\).*`)
+	instanceNameRegexp = regexp.MustCompile(`(\(.+\))\\`)
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 
@@ -86,7 +86,7 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 	var instanceName string
 	// Extract the instance name from the counterPath.
 	if instance == "" || wildcard {
-		instanceName, err = MatchInstanceName(counterPath)
+		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
@@ -233,16 +233,48 @@ func (q *Query) Close() error {
 	return PdhCloseQuery(q.Handle)
 }
 
-// MatchInstanceName will check first for instance and then for any objects names.
-func MatchInstanceName(counterPath string) (string, error) {
+// matchInstanceName will check first for instance and then for any objects names.
+func matchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
-	if len(matches) != 2 {
-		matches = objectNameRegexp.FindStringSubmatch(counterPath)
+	if len(matches) == 2 {
+		return returnLastInstance(matches[1]), nil
 	}
+	matches = objectNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) == 2 {
 		return matches[1], nil
 	}
 	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
+}
+
+// returnLastInstance will return the content from the last parentheses, this covers cases as `\WF (System.Workflow) 4.0.0.0(*)\Workflows Created`.
+func returnLastInstance(match string) string {
+	var openedParanth int
+	var innerMatch string
+	var matches []string
+	runeMatch := []rune(match)
+	for i := 0; i < len(runeMatch); i++ {
+		char := string(runeMatch[i])
+
+		// check if string ends between parentheses
+		if char == ")" {
+			openedParanth -= 1
+		}
+		if openedParanth > 0 {
+			innerMatch += char
+		}
+		if openedParanth == 0 && innerMatch != "" {
+			matches = append(matches, innerMatch)
+			innerMatch = ""
+		}
+		// check if string starts between parentheses
+		if char == "(" {
+			openedParanth += 1
+		}
+	}
+	if len(matches) > 0 {
+		return matches[len(matches)-1]
+	}
+	return match
 }
 
 // getCounterValue will retrieve the counter value based on the format applied in the config options

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // ContextProviderComm is the interface that a context provider uses to communicate back to Elastic Agent.
@@ -27,7 +28,7 @@ type ContextProvider interface {
 }
 
 // ContextProviderBuilder creates a new context provider based on the given config and returns it.
-type ContextProviderBuilder func(config *config.Config) (ContextProvider, error)
+type ContextProviderBuilder func(log *logger.Logger, config *config.Config) (ContextProvider, error)
 
 // AddContextProvider adds a new ContextProviderBuilder
 func (r *providerRegistry) AddContextProvider(name string, builder ContextProviderBuilder) error {

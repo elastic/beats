@@ -31,7 +31,7 @@ func TestGetApps(t *testing.T) {
 
 	client, err := hub.Client()
 	require.NoError(t, err)
-	apps, err := client.(*clientCacheWrap).client.(*cfclient.Client).ListApps()
+	apps, err := client.ListApps()
 	require.NoError(t, err)
 
 	t.Logf("%d applications available", len(apps))
@@ -40,8 +40,9 @@ func TestGetApps(t *testing.T) {
 		if len(apps) == 0 {
 			t.Skip("no apps in account?")
 		}
-		client, err := hub.Client()
+		client, err := hub.ClientWithCache()
 		require.NoError(t, err)
+		defer client.Close()
 
 		guid := apps[0].Guid
 		app, err := client.GetAppByGuid(guid)
@@ -50,13 +51,15 @@ func TestGetApps(t *testing.T) {
 	})
 
 	t.Run("handle error when application is not available", func(t *testing.T) {
-		client, err := hub.Client()
+		client, err := hub.ClientWithCache()
 		require.NoError(t, err)
+		defer client.Close()
 
 		testNotExists := func(t *testing.T) {
 			app, err := client.GetAppByGuid("notexists")
 			assert.Nil(t, app)
-			assert.True(t, cfclient.IsAppNotFoundError(err))
+			assert.Error(t, err)
+			assert.True(t, cfclient.IsAppNotFoundError(err), "Error found: %v", err)
 		}
 
 		var firstTimeDuration time.Duration

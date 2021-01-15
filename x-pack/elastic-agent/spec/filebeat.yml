@@ -60,11 +60,11 @@ rules:
     key: type
     values:
     - awscloudwatch
-    - azureeventhub
+    - azure-eventhub
     - cloudfoundry
     - container
     - docker
-    - googlepubsub
+    - gcp-pubsub
     - http_endpoint
     - httpjson
     - kafka
@@ -86,6 +86,8 @@ rules:
     key: enabled
     values:
     - true
+
+- inject_agent_info: {}
 
 - copy:
     from: inputs

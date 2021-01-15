@@ -37,6 +37,14 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+{{ if .fips_enabled }}
+fips_enabled: {{ .fips_enabled }}
+{{ end }}
+
+{{ if .max_number_of_messages }}
+max_number_of_messages: {{ .max_number_of_messages }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
@@ -44,4 +52,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.7.0

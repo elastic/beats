@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
@@ -42,6 +43,7 @@ type Application interface {
 	Configure(ctx context.Context, config map[string]interface{}) error
 	Monitor() monitoring.Monitor
 	State() state.State
+	Spec() program.Spec
 	SetState(status state.Status, msg string, payload map[string]interface{})
 	OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{})
 }
@@ -49,6 +51,7 @@ type Application interface {
 // Descriptor defines a program which needs to be run.
 // Is passed around operator operations.
 type Descriptor interface {
+	Spec() program.Spec
 	ServicePort() int
 	BinaryName() string
 	ArtifactName() string

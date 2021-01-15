@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -53,6 +54,7 @@ type addCloudMetadata struct {
 type initData struct {
 	fetchers  []metadataFetcher
 	timeout   time.Duration
+	tlsConfig *tlscommon.TLSConfig
 	overwrite bool
 }
 
@@ -63,14 +65,24 @@ func New(c *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
 	}
 
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	if err != nil {
+		return nil, errors.Wrap(err, "TLS configuration load")
+	}
+
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
 	fetchers, err := setupFetchers(initProviders, c)
 	if err != nil {
 		return nil, err
 	}
 	p := &addCloudMetadata{
-		initData: &initData{fetchers, config.Timeout, config.Overwrite},
-		logger:   logp.NewLogger("add_cloud_metadata"),
+		initData: &initData{
+			fetchers:  fetchers,
+			timeout:   config.Timeout,
+			tlsConfig: tlsConfig,
+			overwrite: config.Overwrite,
+		},
+		logger: logp.NewLogger("add_cloud_metadata"),
 	}
 
 	go p.init()

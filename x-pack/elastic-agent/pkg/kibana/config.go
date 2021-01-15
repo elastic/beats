@@ -53,7 +53,7 @@ func DefaultClientConfig() *Config {
 		SpaceID:  "",
 		Username: "",
 		Password: "",
-		Timeout:  90 * time.Second,
+		Timeout:  5 * time.Minute,
 		TLS:      nil,
 	}
 }

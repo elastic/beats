@@ -12,8 +12,6 @@ import (
 	"github.com/gofrs/flock"
 )
 
-const lockFileName = "agent.lock"
-
 // ErrAppAlreadyRunning error returned when another elastic-agent is already holding the lock.
 var ErrAppAlreadyRunning = fmt.Errorf("another elastic-agent is already running")
 
@@ -23,7 +21,7 @@ type AppLocker struct {
 }
 
 // NewAppLocker creates an AppLocker that locks the agent.lock file inside the provided directory.
-func NewAppLocker(dir string) *AppLocker {
+func NewAppLocker(dir, lockFileName string) *AppLocker {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		_ = os.Mkdir(dir, 0755)
 	}

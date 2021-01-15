@@ -338,7 +338,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 8: pipeline processors list
-	processors.add(b.processors)
+	if b.processors != nil {
+		// Add the global pipeline as a function processor, so clients cannot close it
+		processors.add(newProcessor(b.processors.title, b.processors.Run))
+	}
 
 	// setup 9: time series metadata
 	if b.timeSeries {
@@ -356,6 +359,13 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	return processors, nil
+}
+
+func (b *builder) Close() error {
+	if b.processors != nil {
+		return b.processors.Close()
+	}
+	return nil
 }
 
 func makeClientProcessors(

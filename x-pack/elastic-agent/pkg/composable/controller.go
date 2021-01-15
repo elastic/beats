@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"reflect"
 	"sort"
@@ -38,11 +39,8 @@ type controller struct {
 }
 
 // New creates a new controller.
-func New(c *config.Config) (Controller, error) {
-	l, err := logger.New("composable")
-	if err != nil {
-		return nil, err
-	}
+func New(log *logger.Logger, c *config.Config) (Controller, error) {
+	l := log.Named("composable")
 	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
@@ -61,7 +59,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l, pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
@@ -78,7 +76,7 @@ func New(c *config.Config) (Controller, error) {
 			// explicitly disabled; skipping
 			continue
 		}
-		provider, err := builder(pCfg)
+		provider, err := builder(l.Named(strings.Join([]string{"providers", name}, ".")), pCfg)
 		if err != nil {
 			return nil, errors.New(err, fmt.Sprintf("failed to build provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
@@ -216,6 +214,7 @@ func (c *contextProviderState) Current() map[string]interface{} {
 }
 
 type dynamicProviderMapping struct {
+	priority   int
 	mapping    map[string]interface{}
 	processors transpiler.Processors
 }
@@ -230,7 +229,11 @@ type dynamicProviderState struct {
 }
 
 // AddOrUpdate adds or updates the current mapping for the dynamic provider.
-func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interface{}, processors []map[string]interface{}) error {
+//
+// `priority` ensures that order is maintained when adding the mapping to the current state
+// for the processor. Lower priority mappings will always be sorted before higher priority mappings
+// to ensure that matching of variables occurs on the lower priority mappings first.
+func (c *dynamicProviderState) AddOrUpdate(id string, priority int, mapping map[string]interface{}, processors []map[string]interface{}) error {
 	var err error
 	mapping, err = cloneMap(mapping)
 	if err != nil {
@@ -254,6 +257,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, mapping map[string]interfa
 		return nil
 	}
 	c.mappings[id] = dynamicProviderMapping{
+		priority:   priority,
 		mapping:    mapping,
 		processors: processors,
 	}
@@ -278,14 +282,24 @@ func (c *dynamicProviderState) Mappings() []dynamicProviderMapping {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
+	// add the mappings sorted by (priority,id)
 	mappings := make([]dynamicProviderMapping, 0)
-	ids := make([]string, 0)
-	for name := range c.mappings {
-		ids = append(ids, name)
+	priorities := make([]int, 0)
+	for _, mapping := range c.mappings {
+		priorities = addToSet(priorities, mapping.priority)
 	}
-	sort.Strings(ids)
-	for _, name := range ids {
-		mappings = append(mappings, c.mappings[name])
+	sort.Ints(priorities)
+	for _, priority := range priorities {
+		ids := make([]string, 0)
+		for name, mapping := range c.mappings {
+			if mapping.priority == priority {
+				ids = append(ids, name)
+			}
+		}
+		sort.Strings(ids)
+		for _, name := range ids {
+			mappings = append(mappings, c.mappings[name])
+		}
 	}
 	return mappings
 }
@@ -320,4 +334,13 @@ func cloneMapArray(source []map[string]interface{}) ([]map[string]interface{}, e
 		return nil, fmt.Errorf("failed to clone: %s", err)
 	}
 	return dest, nil
+}
+
+func addToSet(set []int, i int) []int {
+	for _, j := range set {
+		if j == i {
+			return set
+		}
+	}
+	return append(set, i)
 }

@@ -6,6 +6,7 @@ package sorted
 
 import (
 	"sort"
+	"sync"
 )
 
 // Set is a sorted set that allow to iterate on they keys in an ordered manner, when
@@ -13,6 +14,7 @@ import (
 type Set struct {
 	mapped map[string]interface{}
 	keys   []string
+	rwlock sync.RWMutex
 }
 
 // NewSet returns an ordered set.
@@ -24,6 +26,9 @@ func NewSet() *Set {
 
 // Add adds an items to the set.
 func (s *Set) Add(k string, v interface{}) {
+	s.rwlock.Lock()
+	defer s.rwlock.Unlock()
+
 	_, ok := s.mapped[k]
 	if !ok {
 		s.keys = append(s.keys, k)
@@ -35,6 +40,9 @@ func (s *Set) Add(k string, v interface{}) {
 
 // Remove removes an items from the Set.
 func (s *Set) Remove(k string) {
+	s.rwlock.Lock()
+	defer s.rwlock.Unlock()
+
 	_, ok := s.mapped[k]
 	if !ok {
 		return
@@ -50,11 +58,17 @@ func (s *Set) Remove(k string) {
 
 // Get retrieves a specific values from the map and will return false if the key is not found.
 func (s *Set) Get(k string) (interface{}, bool) {
+	s.rwlock.RLock()
+	defer s.rwlock.RUnlock()
+
 	v, ok := s.mapped[k]
 	return v, ok
 }
 
 // Keys returns slice of keys where the keys are ordered alphabetically.
 func (s *Set) Keys() []string {
+	s.rwlock.RLock()
+	defer s.rwlock.RUnlock()
+
 	return append(s.keys[:0:0], s.keys...)
 }

@@ -11,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -36,7 +38,7 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(_ context.Context, programName, artifactName, version string) (_ string, err error) {
+func (e *Downloader) Download(_ context.Context, spec program.Spec, version string) (_ string, err error) {
 	downloadedFiles := make([]string, 0, 2)
 	defer func() {
 		if err != nil {
@@ -47,24 +49,24 @@ func (e *Downloader) Download(_ context.Context, programName, artifactName, vers
 	}()
 
 	// download from source to dest
-	path, err := e.download(e.config.OS(), programName, artifactName, version)
+	path, err := e.download(e.config.OS(), spec, version)
 	downloadedFiles = append(downloadedFiles, path)
 	if err != nil {
 		return "", err
 	}
 
-	hashPath, err := e.downloadHash(e.config.OS(), programName, artifactName, version)
+	hashPath, err := e.downloadHash(e.config.OS(), spec, version)
 	downloadedFiles = append(downloadedFiles, hashPath)
 	return path, err
 }
 
-func (e *Downloader) download(operatingSystem, programName, _, version string) (string, error) {
-	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+func (e *Downloader) download(operatingSystem string, spec program.Spec, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(spec, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
 	if err != nil {
 		return "", errors.New(err, "generating package path failed")
 	}
@@ -72,13 +74,13 @@ func (e *Downloader) download(operatingSystem, programName, _, version string) (
 	return e.downloadFile(filename, fullPath)
 }
 
-func (e *Downloader) downloadHash(operatingSystem, programName, _, version string) (string, error) {
-	filename, err := artifact.GetArtifactName(programName, version, operatingSystem, e.config.Arch())
+func (e *Downloader) downloadHash(operatingSystem string, spec program.Spec, version string) (string, error) {
+	filename, err := artifact.GetArtifactName(spec, version, operatingSystem, e.config.Arch())
 	if err != nil {
 		return "", errors.New(err, "generating package name failed")
 	}
 
-	fullPath, err := artifact.GetArtifactPath(programName, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(spec, version, operatingSystem, e.config.Arch(), e.config.TargetDirectory)
 	if err != nil {
 		return "", errors.New(err, "generating package path failed")
 	}

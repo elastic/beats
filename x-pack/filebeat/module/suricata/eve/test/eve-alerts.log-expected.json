@@ -9,6 +9,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -41,6 +42,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -86,6 +90,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -118,6 +123,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -163,6 +171,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -195,6 +204,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -240,6 +252,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -272,6 +285,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -317,6 +333,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -349,6 +366,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -394,6 +414,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -426,6 +447,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -471,6 +495,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -503,6 +528,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -548,6 +576,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -580,6 +609,9 @@
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -625,6 +657,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -657,6 +690,9 @@
         "network.packets": 11,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -702,6 +738,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -734,6 +771,9 @@
         "network.packets": 126,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -779,6 +819,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -811,6 +852,9 @@
         "network.packets": 185,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -856,6 +900,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -888,6 +933,9 @@
         "network.packets": 377,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -933,6 +981,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -965,6 +1014,9 @@
         "network.packets": 131,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1010,6 +1062,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1042,6 +1095,9 @@
         "network.packets": 210,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1087,6 +1143,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1119,6 +1176,9 @@
         "network.packets": 412,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1164,6 +1224,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1196,6 +1257,9 @@
         "network.packets": 504,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1241,6 +1305,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1273,6 +1338,9 @@
         "network.packets": 916,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1318,6 +1386,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1350,6 +1419,9 @@
         "network.packets": 921,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1395,6 +1467,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1426,6 +1499,9 @@
         "network.packets": 1503,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1471,6 +1547,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1502,6 +1579,9 @@
         "network.packets": 1654,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1553,17 +1633,6 @@
         "event.type": [
             "protocol"
         ],
-        "file.x509.issuer.common_name": "Google Internet Authority G2",
-        "file.x509.issuer.country": "US",
-        "file.x509.issuer.organization": "Google Inc",
-        "file.x509.not_after": "2024-07-16T14:52:35.000Z",
-        "file.x509.not_before": "2019-07-17T14:52:35.000Z",
-        "file.x509.serial_number": "001122334455667788",
-        "file.x509.subject.common_name": "*.google.com",
-        "file.x509.subject.country": "US",
-        "file.x509.subject.locality": "Mountain View",
-        "file.x509.subject.organization": "Google Inc",
-        "file.x509.subject.state_or_province": "California",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 16546,
@@ -1607,6 +1676,17 @@
         "tls.server.not_after": "2024-07-16T14:52:35.000Z",
         "tls.server.not_before": "2019-07-17T14:52:35.000Z",
         "tls.server.subject": "C=US, ST=California, L=Mountain View, O=Google Inc, CN=*.google.com",
+        "tls.server.x509.issuer.common_name": "Google Internet Authority G2",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.organization": "Google Inc",
+        "tls.server.x509.not_after": "2024-07-16T14:52:35.000Z",
+        "tls.server.x509.not_before": "2019-07-17T14:52:35.000Z",
+        "tls.server.x509.serial_number": "001122334455667788",
+        "tls.server.x509.subject.common_name": "*.google.com",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.locality": "Mountain View",
+        "tls.server.x509.subject.organization": "Google Inc",
+        "tls.server.x509.subject.state_or_province": "California",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     },
@@ -1631,21 +1711,6 @@
         "event.type": [
             "allowed"
         ],
-        "file.x509.issuer.common_name": "Unknown",
-        "file.x509.issuer.country": "Unknown",
-        "file.x509.issuer.locality": "Unknown",
-        "file.x509.issuer.organization": "Unknown",
-        "file.x509.issuer.organizational_unit": "Unknown",
-        "file.x509.issuer.state_or_province": "Unknown",
-        "file.x509.not_after": "2026-06-25T17:36:29.000Z",
-        "file.x509.not_before": "2016-06-27T17:36:29.000Z",
-        "file.x509.serial_number": "72A92C51",
-        "file.x509.subject.common_name": "Unknown",
-        "file.x509.subject.country": "Unknown",
-        "file.x509.subject.locality": "Unknown",
-        "file.x509.subject.organization": "Unknown",
-        "file.x509.subject.organizational_unit": "Unknown",
-        "file.x509.subject.state_or_province": "Unknown",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 17541,
@@ -1701,6 +1766,21 @@
         "tls.server.not_after": "2026-06-25T17:36:29.000Z",
         "tls.server.not_before": "2016-06-27T17:36:29.000Z",
         "tls.server.subject": "C=Unknown, ST=Unknown, L=Unknown, O=Unknown, OU=Unknown, CN=Unknown",
+        "tls.server.x509.issuer.common_name": "Unknown",
+        "tls.server.x509.issuer.country": "Unknown",
+        "tls.server.x509.issuer.locality": "Unknown",
+        "tls.server.x509.issuer.organization": "Unknown",
+        "tls.server.x509.issuer.organizational_unit": "Unknown",
+        "tls.server.x509.issuer.state_or_province": "Unknown",
+        "tls.server.x509.not_after": "2026-06-25T17:36:29.000Z",
+        "tls.server.x509.not_before": "2016-06-27T17:36:29.000Z",
+        "tls.server.x509.serial_number": "72A92C51",
+        "tls.server.x509.subject.common_name": "Unknown",
+        "tls.server.x509.subject.country": "Unknown",
+        "tls.server.x509.subject.locality": "Unknown",
+        "tls.server.x509.subject.organization": "Unknown",
+        "tls.server.x509.subject.organizational_unit": "Unknown",
+        "tls.server.x509.subject.state_or_province": "Unknown",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     }

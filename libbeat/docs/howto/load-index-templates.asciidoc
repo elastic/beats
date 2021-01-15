@@ -48,6 +48,10 @@ If the template already exists, it’s not overwritten unless you configure
 [[overwrite-template]]
 === Overwrite an existing index template
 
+WARNING: Do not enable this option for more than one instance of {beatname_uc}. If you start
+multiple instances at the same time, it can overload your {es} with too many
+template update requests.
+
 To overwrite a template that's already loaded into {es}, set:
 
 [source,yaml]

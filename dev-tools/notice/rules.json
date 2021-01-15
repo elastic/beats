@@ -9,7 +9,8 @@
     "ISC",
     "MIT",
     "MPL-2.0",
-    "Public Domain"
+    "Public Domain",
+    "Zlib"
   ],
   "maybelist": [
     "EPL-1.0",

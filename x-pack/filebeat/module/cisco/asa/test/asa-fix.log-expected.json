@@ -40,6 +40,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.233.123.123"
@@ -89,6 +92,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -187,6 +193,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -229,6 +238,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.123.123.123"
@@ -274,6 +286,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "fe80::1ff:fe23:4567:890a"
         ],
@@ -494,6 +509,7 @@
         "destination.address": "1.2.33.40",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "CN",
+        "destination.geo.country_name": "China",
         "destination.geo.location.lat": 23.1167,
         "destination.geo.location.lon": 113.25,
         "destination.geo.region_iso_code": "CN-GD",

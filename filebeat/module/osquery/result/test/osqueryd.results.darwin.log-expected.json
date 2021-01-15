@@ -22,6 +22,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "org.python.python.app",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -52,6 +55,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.ruby",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -82,6 +88,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.a2p",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -112,6 +121,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.javajdk16.cmd",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -142,6 +154,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.php",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -172,6 +187,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.nc",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -202,6 +220,9 @@
         "osquery.result.name": "pack_it-compliance_alf_explicit_auths",
         "osquery.result.unix_time": "1514471990",
         "process.name": "com.apple.ksh",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -234,6 +255,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "httpd",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -266,6 +290,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "cupsd",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -298,6 +325,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AEServer",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -330,6 +360,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "ftpd",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -362,6 +395,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AppleFileServer",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -394,6 +430,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "sshd-keygen-wrapper",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -426,6 +465,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "smbd",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -458,6 +500,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "AppleVNCServer",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -490,6 +535,9 @@
         "osquery.result.name": "pack_it-compliance_alf_services",
         "osquery.result.unix_time": "1514471990",
         "process.name": "ODSAgent",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -544,6 +592,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -599,6 +650,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -653,6 +707,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -707,6 +764,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -761,6 +821,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -815,6 +878,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -869,6 +935,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -923,6 +992,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -977,6 +1049,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1031,6 +1106,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1085,6 +1163,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1139,6 +1220,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1193,6 +1277,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_firefox_addons",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1226,6 +1313,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1258,6 +1348,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1290,6 +1383,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1322,6 +1418,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1354,6 +1453,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1386,6 +1488,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1418,6 +1523,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1450,6 +1558,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1482,6 +1593,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1514,6 +1628,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1546,6 +1663,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1578,6 +1698,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1610,6 +1733,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1642,6 +1768,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1674,6 +1803,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1706,6 +1838,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1738,6 +1873,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1770,6 +1908,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1802,6 +1943,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1834,6 +1978,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1866,6 +2013,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1898,6 +2048,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1930,6 +2083,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1962,6 +2118,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -1994,6 +2153,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2026,6 +2188,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2058,6 +2223,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2090,6 +2258,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2122,6 +2293,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2154,6 +2328,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2186,6 +2363,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2218,6 +2398,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2250,6 +2433,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2282,6 +2468,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2314,6 +2503,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2346,6 +2538,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2378,6 +2573,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2410,6 +2608,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2442,6 +2643,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2474,6 +2678,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2506,6 +2713,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2538,6 +2748,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2570,6 +2783,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2602,6 +2818,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2634,6 +2853,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2666,6 +2888,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2698,6 +2923,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2730,6 +2958,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2762,6 +2993,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2794,6 +3028,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2826,6 +3063,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2858,6 +3098,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2890,6 +3133,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2922,6 +3168,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2954,6 +3203,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -2986,6 +3238,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3018,6 +3273,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3050,6 +3308,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3082,6 +3343,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3114,6 +3378,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3146,6 +3413,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3178,6 +3448,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3210,6 +3483,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3242,6 +3518,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3274,6 +3553,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3306,6 +3588,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3338,6 +3623,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3370,6 +3658,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3402,6 +3693,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3434,6 +3728,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],
@@ -3466,6 +3763,9 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_homebrew_packages",
         "osquery.result.unix_time": "1514471991",
+        "related.hosts": [
+            "192-168-0-4.rdsnet.ro"
+        ],
         "related.user": [
             "tsg"
         ],

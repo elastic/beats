@@ -147,6 +147,8 @@ func TestContainerIndexer(t *testing.T) {
 	containerImage := "containerimage"
 	initContainerImage := "initcontainerimage"
 	initContainer := "initcontainer"
+	ephemeralContainerImage := "ephemeralcontainerimage"
+	ephemeralContainer := "ephemeralcontainer"
 	nodeName := "testnode"
 
 	pod := kubernetes.Pod{
@@ -158,11 +160,8 @@ func TestContainerIndexer(t *testing.T) {
 				"labelkey": "labelvalue",
 			},
 		},
-		Status: v1.PodStatus{
-			ContainerStatuses:     make([]kubernetes.PodContainerStatus, 0),
-			InitContainerStatuses: make([]kubernetes.PodContainerStatus, 0),
-		},
-		Spec: v1.PodSpec{},
+		Status: v1.PodStatus{},
+		Spec:   v1.PodSpec{},
 	}
 
 	indexers := conIndexer.GetMetadata(&pod)
@@ -199,16 +198,26 @@ func TestContainerIndexer(t *testing.T) {
 			ContainerID: container2,
 		},
 	}
+	container3 := "docker://klmno"
+	pod.Status.EphemeralContainerStatuses = []kubernetes.PodContainerStatus{
+		{
+			Name:        ephemeralContainer,
+			Image:       ephemeralContainerImage,
+			ContainerID: container3,
+		},
+	}
 
 	indexers = conIndexer.GetMetadata(&pod)
-	assert.Equal(t, len(indexers), 2)
+	assert.Equal(t, len(indexers), 3)
 	assert.Equal(t, indexers[0].Index, "abcde")
 	assert.Equal(t, indexers[1].Index, "fghij")
+	assert.Equal(t, indexers[2].Index, "klmno")
 
 	indices = conIndexer.GetIndexes(&pod)
-	assert.Equal(t, len(indices), 2)
+	assert.Equal(t, len(indices), 3)
 	assert.Equal(t, indices[0], "abcde")
 	assert.Equal(t, indices[1], "fghij")
+	assert.Equal(t, indices[2], "klmno")
 
 	expected["container"] = common.MapStr{
 		"name":    container,
@@ -225,6 +234,14 @@ func TestContainerIndexer(t *testing.T) {
 		"runtime": "docker",
 	}
 	assert.Equal(t, expected.String(), indexers[1].Data.String())
+
+	expected["container"] = common.MapStr{
+		"name":    ephemeralContainer,
+		"image":   ephemeralContainerImage,
+		"id":      "klmno",
+		"runtime": "docker",
+	}
+	assert.Equal(t, expected.String(), indexers[2].Data.String())
 }
 
 func TestFilteredGenMeta(t *testing.T) {

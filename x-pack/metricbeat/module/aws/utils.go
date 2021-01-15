@@ -22,8 +22,13 @@ import (
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
-func GetStartTimeEndTime(period time.Duration) (time.Time, time.Time) {
+func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time, time.Time) {
 	endTime := time.Now()
+	if latency != 0 {
+		// add latency if config is not 0
+		endTime = endTime.Add(latency * -1)
+	}
+
 	// Set startTime double the period earlier than the endtime in order to
 	// make sure GetMetricDataRequest gets the latest data point for each metric.
 	return endTime.Add(period * -2), endTime

@@ -20,6 +20,8 @@
 package process_summary
 
 import (
+	"runtime"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -79,7 +81,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		state := sigar.ProcState{}
 		err = state.Get(pid)
 		if err != nil {
-			summary.unknown += 1
+			summary.unknown++
 			continue
 		}
 
@@ -104,15 +106,25 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}
 
-	event := common.MapStr{
-		"total":    len(pids),
-		"sleeping": summary.sleeping,
-		"running":  summary.running,
-		"idle":     summary.idle,
-		"stopped":  summary.stopped,
-		"zombie":   summary.zombie,
-		"unknown":  summary.unknown,
-		"dead":     summary.dead,
+	event := common.MapStr{}
+	if runtime.GOOS == "windows" {
+		event = common.MapStr{
+			"total":    len(pids),
+			"sleeping": summary.sleeping,
+			"running":  summary.running,
+			"unknown":  summary.unknown,
+		}
+	} else {
+		event = common.MapStr{
+			"total":    len(pids),
+			"sleeping": summary.sleeping,
+			"running":  summary.running,
+			"idle":     summary.idle,
+			"stopped":  summary.stopped,
+			"zombie":   summary.zombie,
+			"unknown":  summary.unknown,
+			"dead":     summary.dead,
+		}
 	}
 
 	r.Event(mb.Event{

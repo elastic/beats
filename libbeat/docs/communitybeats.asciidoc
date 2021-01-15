@@ -9,8 +9,8 @@
 The open source community has been hard at work developing new Beats. You can check
 out some of them here.
 
-Have a question about a community Beat? You can post questions and discuss issues in the
-https://discuss.elastic.co/c/beats/community-beats[Community Beats] category of the Beats discussion forum.
+Have a question about developing a community Beat? You can post questions and discuss issues in the
+https://discuss.elastic.co/tags/c/elastic-stack/beats/28/beats-development[Beats discussion forum].
 
 Have you created a Beat that's not listed? Add the name and description of your Beat to the source document for
 https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[Community Beats] and https://help.github.com/articles/using-pull-requests[open a pull request] in the https://github.com/elastic/beats[Beats GitHub repository] to get your change merged. When you're ready, go ahead and https://discuss.elastic.co/c/announcements[announce] your new Beat in the Elastic
@@ -46,7 +46,7 @@ https://github.com/gamegos/etcdbeat[etcdbeat]:: Reads stats from the Etcd v2 API
 https://gitlab.com/hatricker/etherbeat[etherbeat]:: Reads blocks from Ethereum compatible blockchain and indexes them into Elasticsearch.
 https://github.com/christiangalsterer/execbeat[execbeat]:: Periodically executes shell commands and sends the standard output and standard error to
 Logstash or Elasticsearch.
-https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://puppetlabs.com/facter[Facter].
+https://github.com/jarpy/factbeat[factbeat]:: Collects facts from https://github.com/puppetlabs/facter[Facter].
 https://github.com/ctindel/fastcombeat[fastcombeat]:: Periodically gather internet download speed from  https://fast.com[fast.com].
 https://github.com/cloudronics/fileoccurancebeat[fileoccurencebeat]:: Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
 https://github.com/FStelzer/flowbeat[flowbeat]:: Collects, parses, and indexes http://www.sflow.org/index.php[sflow] samples.
@@ -88,10 +88,12 @@ https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.
 https://github.com/eBay/nvidiagpubeat[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
 https://github.com/counteractive/o365beat[o365beat]:: Ships Office 365 logs from the O365 Management Activities API
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
+https://github.com/nabeel-shakeel/openvpnbeat[openvpnbeat]:: Collects OpenVPN connection metrics
 https://github.com/radoondas/owmbeat[owmbeat]:: Open Weather Map beat to pull weather data from all around the world and store and visualize them in Elastic Stack
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
-https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance metrics on the AIX operating system.
+https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collects performance metrics on the AIX operating system.
+https://github.com/stric-co/phishbeat[phishbeat]:: Monitors Certificate Transparency logs for phishing and defamatory domains.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.

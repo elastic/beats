@@ -9,6 +9,9 @@ var:
     default: 9001
   - name: input
     default: syslog
+  - name: ssl
+  - name: internal_zones
+  - name: external_zones
 
 ingest_pipeline:
   - ingest/pipeline.yml

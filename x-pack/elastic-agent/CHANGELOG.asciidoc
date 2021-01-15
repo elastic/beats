@@ -27,6 +27,7 @@
 - Improve GRPC stop to be more relaxed {pull}20118[20118]
 - Fix Windows service installation script {pull}20203[20203]
 - Fix timeout issue stopping service applications {pull}20256[20256]
+- Fix incorrect hash when upgrading agent {pull}22322[22322]
 
 ==== New features
 
@@ -108,3 +109,4 @@
 - Pick up version from libbeat {pull}18350[18350]
 - More clear output of inspect command {pull}18405[18405]
 - When not port are specified and the https is used fallback to 443 {pull}18844[18844]
+- Basic upgrade process {pull}21002[21002]

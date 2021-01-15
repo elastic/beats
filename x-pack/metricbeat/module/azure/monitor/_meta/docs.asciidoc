@@ -50,6 +50,9 @@ Metrics with dimensions are exported as flattened single dimensional metrics, ag
 `name`:: Dimension key
 `value`:: Dimension value. (Users can select * to return metric values for each dimension)
 
+`ignore_unsupported`:: (_bool_) Namespaces can be unsupported by some resources and supported in some, this configuration option makes sure no error messages are returned if the namespace is unsupported.
+The same will go for the metrics configured, some can be removed from Azure Monitor and it should not affect the state of the module.
+
 Users can select the options to retrieve all metrics from a specific namespace using the following:
 
 ["source","yaml"]

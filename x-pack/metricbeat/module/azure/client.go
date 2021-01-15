@@ -32,7 +32,7 @@ type mapResourceMetrics func(client *Client, resources []resources.GenericResour
 
 // NewClient instantiates the an Azure monitoring client
 func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config.ClientId, config.ClientSecret, config.TenantId, config.SubscriptionId)
+	azureMonitorService, err := NewService(config)
 	if err != nil {
 		return nil, err
 	}
@@ -65,14 +65,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			err = errors.Wrap(err, "failed to retrieve resources")
 			return err
 		}
-		if len(resourceList.Values()) == 0 {
+		if len(resourceList) == 0 {
 			err = errors.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
 			continue
 		}
 		//map resources to the client
-		for _, resource := range resourceList.Values() {
+		for _, resource := range resourceList {
 			if !containsResource(*resource.ID, client.Resources) {
 				client.Resources = append(client.Resources, Resource{
 					Id:           *resource.ID,
@@ -84,7 +84,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 					Subscription: client.Config.SubscriptionId})
 			}
 		}
-		resourceMetrics, err := fn(client, resourceList.Values(), resource)
+		resourceMetrics, err := fn(client, resourceList, resource)
 		if err != nil {
 			return err
 		}
@@ -185,37 +185,70 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []insights.MetricDef
 	return clientMetrics
 }
 
-// GetResourceForData will retrieve resource details for the selected metric configuration
-func (client *Client) GetResourceForData(resourceId string) Resource {
-	for i, res := range client.Resources {
-		if res.Id == resourceId {
-			var vmSize string
-			var vmId string
-			if client.Config.AddCloudMetadata && res.Vm == (VmResource{}) {
-				expandedResource, err := client.AzureMonitorService.GetResourceDefinitionById(res.Id)
-				if err != nil {
-					client.Log.Error(err, "could not retrieve the resource details by resource ID %s", res.Id)
-					return Resource{}
+// GetVMForMetaData func will retrieve the vm details in order to fill in the cloud metadata and also update the client resources
+func (client *Client) GetVMForMetaData(resource *Resource, metricValues []MetricValue) VmResource {
+	var vm VmResource
+	resourceName := resource.Name
+	resourceId := resource.Id
+	// check first if this is a vm scaleset and the instance name is stored in the dimension value
+	if dimension, ok := getDimension("VMName", metricValues[0].dimensions); ok {
+		instanceId := getInstanceId(dimension.Value)
+		if instanceId != "" {
+			resourceId += fmt.Sprintf("/virtualMachines/%s", instanceId)
+			resourceName = dimension.Value
+		}
+	}
+	// if vm has been already added to the resource then it should be returned
+	if existingVM, ok := getVM(resourceName, resource.Vms); ok {
+		return existingVM
+	}
+	// an additional call is necessary in order to retrieve the vm specific details
+	expandedResource, err := client.AzureMonitorService.GetResourceDefinitionById(resourceId)
+	if err != nil {
+		client.Log.Error(err, "could not retrieve the resource details by resource ID %s", resourceId)
+		return VmResource{}
+	}
+	vm.Name = *expandedResource.Name
+	if expandedResource.Properties != nil {
+		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
+			if hardware, ok := properties["hardwareProfile"]; ok {
+				if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
+					vm.Size = vmSz.(string)
 				}
-				if expandedResource.Properties != nil {
-					if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
-						if hardware, ok := properties["hardwareProfile"]; ok {
-							if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
-								vmSize = vmSz.(string)
-							}
-							if vmID, ok := properties["vmId"]; ok {
-								vmId = vmID.(string)
-							}
-						}
-					}
+				if vmID, ok := properties["vmId"]; ok {
+					vm.Id = vmID.(string)
 				}
-				client.Resources[i].Vm = VmResource{Size: vmSize, Id: vmId}
-				return client.Resources[i]
 			}
+		}
+	}
+	if len(vm.Size) == 0 && expandedResource.Sku != nil && expandedResource.Sku.Name != nil {
+		vm.Size = *expandedResource.Sku.Name
+	}
+	// the client resource and selected resources are being updated in order to avoid additional calls
+	client.AddVmToResource(resource.Id, vm)
+	resource.Vms = append(resource.Vms, vm)
+	return vm
+}
+
+// GetResourceForMetaData will retrieve resource details for the selected metric configuration
+func (client *Client) GetResourceForMetaData(grouped Metric) Resource {
+	for _, res := range client.Resources {
+		if res.Id == grouped.ResourceId {
 			return res
 		}
 	}
 	return Resource{}
+}
+
+// AddVmToResource will add the vm details to the resource
+func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
+	if len(vm.Id) > 0 && len(vm.Name) > 0 {
+		for i, res := range client.Resources {
+			if res.Id == resourceId {
+				client.Resources[i].Vms = append(client.Resources[i].Vms, vm)
+			}
+		}
+	}
 }
 
 // NewMockClient instantiates a new client with the mock azure service

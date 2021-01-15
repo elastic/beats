@@ -37,6 +37,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "related.ip": [
             "10.1.123.45",
             "10.8.12.47"
@@ -81,6 +84,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",
@@ -120,6 +126,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-ftd",
@@ -171,6 +180,9 @@
         "observer.vendor": "Cisco",
         "process.name": "ftd",
         "process.pid": 1234,
+        "related.hosts": [
+            "beats"
+        ],
         "related.ip": [
             "127.0.0.1",
             "192.168.3.33"

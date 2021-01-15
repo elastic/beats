@@ -3,7 +3,10 @@
     "@timestamp": "2020-04-01T14:34:34.6061085Z",
     "event": {
       "action": "scheduled-task-created",
-      "category": "iam",
+      "category": [
+        "iam",
+        "configuration"
+      ],
       "code": 4698,
       "kind": "event",
       "module": "security",

@@ -34,6 +34,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/dns"
 	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
 	_ "github.com/elastic/beats/v7/libbeat/processors/fingerprint"
+	_ "github.com/elastic/beats/v7/libbeat/processors/ratelimit"
 	_ "github.com/elastic/beats/v7/libbeat/processors/registered_domain"
 	_ "github.com/elastic/beats/v7/libbeat/processors/translate_sid"
 	_ "github.com/elastic/beats/v7/libbeat/processors/urldecode"

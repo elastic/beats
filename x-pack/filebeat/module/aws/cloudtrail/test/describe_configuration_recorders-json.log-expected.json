@@ -1,0 +1,39 @@
+[
+    {
+        "@timestamp": "2014-03-25T21:08:19.000Z",
+        "aws.cloudtrail.event_category": "Management",
+        "aws.cloudtrail.event_type": "AwsApiCall",
+        "aws.cloudtrail.event_version": "1.07",
+        "aws.cloudtrail.management_event": true,
+        "aws.cloudtrail.read_only": true,
+        "aws.cloudtrail.recipient_account_id": "REDACTED",
+        "aws.cloudtrail.user_identity.access_key_id": "REDACTED",
+        "aws.cloudtrail.user_identity.arn": "arn:aws:iam::REDACTED:user/REDACTED",
+        "aws.cloudtrail.user_identity.session_context.mfa_authenticated": "true",
+        "aws.cloudtrail.user_identity.type": "IAMUser",
+        "cloud.account.id": "REDACTED",
+        "cloud.region": "us-east-1",
+        "event.action": "DescribeConfigurationRecorders",
+        "event.dataset": "aws.cloudtrail",
+        "event.id": "REDACTED",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "{\"awsRegion\":\"us-east-1\",\"eventCategory\":\"Management\",\"eventID\":\"REDACTED\",\"eventName\":\"DescribeConfigurationRecorders\",\"eventSource\":\"config.amazonaws.com\",\"eventTime\":\"2014-03-25T21:08:19Z\",\"eventType\":\"AwsApiCall\",\"eventVersion\":\"1.07\",\"managementEvent\":true,\"readOnly\":true,\"recipientAccountId\":\"REDACTED\",\"requestID\":\"REDACTED\",\"requestParameters\":null,\"responseElements\":null,\"sourceIPAddress\":\"REDACTED\",\"userAgent\":\"REDACTED\",\"userIdentity\":{\"accessKeyId\":\"REDACTED\",\"accountId\":\"REDACTED\",\"arn\":\"arn:aws:iam::REDACTED:user/REDACTED\",\"principalId\":\"REDACTED\",\"sessionContext\":{\"attributes\":{\"creationDate\":\"REDACTED\",\"mfaAuthenticated\":\"true\"},\"sessionIssuer\":{},\"webIdFederationData\":{}},\"type\":\"IAMUser\",\"userName\":\"REDACTED\"}}",
+        "event.outcome": "success",
+        "event.provider": "config.amazonaws.com",
+        "event.type": "info",
+        "fileset.name": "cloudtrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "aws",
+        "source.address": "REDACTED",
+        "tags": [
+            "forwarded"
+        ],
+        "user.id": "REDACTED",
+        "user.name": "REDACTED",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "REDACTED"
+    }
+]

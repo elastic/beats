@@ -38,13 +38,13 @@ endif::[]
 |===
 |Elastic apps | Use to
 
-|{kibana-ref}/xpack-infra.html[{metrics-app}]
+|{observability-guide}/analyze-metrics.html[{metrics-app}]
 |Explore metrics about systems and services across your ecosystem
 
-|{kibana-ref}/xpack-logs.html[{logs-app}]
+|{observability-guide}/monitor-logs.html[{logs-app}]
 |Tail related log data in real time
 
-|{kibana-ref}/xpack-uptime.html[{uptime-app}]
+|{observability-guide}/monitor-uptime.html[{uptime-app}]
 |Monitor availability issues across your apps and services
 
 |{kibana-ref}/xpack-apm.html[APM app]

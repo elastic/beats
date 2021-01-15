@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.99Z",
           "kind": "event",
@@ -102,7 +101,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 1130000000,
           "end": "2018-05-11T00:54:09.74Z",
           "kind": "event",
@@ -188,7 +186,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 1130000000,
           "end": "2018-05-11T00:54:09.74Z",
           "kind": "event",
@@ -274,7 +271,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 1040000000,
           "end": "2018-05-11T00:54:09.74Z",
           "kind": "event",
@@ -360,7 +356,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 1040000000,
           "end": "2018-05-11T00:54:09.74Z",
           "kind": "event",
@@ -446,7 +441,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.11Z",
           "kind": "event",
@@ -532,7 +526,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 410000000,
           "end": "2018-05-11T00:54:09.11Z",
           "kind": "event",
@@ -618,7 +611,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 370000000,
           "end": "2018-05-11T00:54:08.53Z",
           "kind": "event",
@@ -704,7 +696,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 370000000,
           "end": "2018-05-11T00:54:08.53Z",
           "kind": "event",
@@ -790,7 +781,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
           "kind": "event",
@@ -872,7 +862,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
           "kind": "event",
@@ -954,7 +943,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
           "kind": "event",
@@ -1036,7 +1024,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 80000000,
           "end": "2018-05-11T00:51:08.63Z",
           "kind": "event",
@@ -1118,7 +1105,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 2020000000,
           "end": "2018-05-11T00:54:06.21Z",
           "kind": "event",
@@ -1200,7 +1186,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 2020000000,
           "end": "2018-05-11T00:54:06.21Z",
           "kind": "event",
@@ -1282,7 +1267,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 4000000000,
           "end": "2018-05-11T00:54:00.19Z",
           "kind": "event",
@@ -1364,7 +1348,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-05-11T00:54:11Z",
           "duration": 4000000000,
           "end": "2018-05-11T00:54:00.19Z",
           "kind": "event",
