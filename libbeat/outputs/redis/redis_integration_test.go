@@ -77,7 +77,7 @@ func TestPublishListTLS(t *testing.T) {
 		"datatype": "list",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "common_name", // full + common name workaround
+		"ssl.verification_mode": "full",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
@@ -112,7 +112,7 @@ func TestWithSchema(t *testing.T) {
 				"datatype": "list",
 				"timeout":  "5s",
 
-				"ssl.verification_mode": "common_name", // full + common name workaround
+				"ssl.verification_mode": "full",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 				},
@@ -190,7 +190,7 @@ func TestPublishChannelTLS(t *testing.T) {
 		"datatype": "channel",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "common_name", // full + common name workaround,
+		"ssl.verification_mode": "full",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},

@@ -55,6 +55,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	ErrMissingDNSNameCommonName = errors.New("missing DNSNames and CommonName")
+)
+
 // verifyCertificateExceptServerName is a TLS Certificate verification utility method that verifies that the provided
 // certificate chain is valid and is signed by one of the root CAs in the provided tls.Config. It is intended to be
 // as similar as possible to the default verify, but does not verify that the provided certificate matches the
@@ -63,9 +67,16 @@ func verifyCertificateExceptServerName(
 	rawCerts [][]byte,
 	c *TLSConfig,
 ) ([]*x509.Certificate, [][]*x509.Certificate, error) {
-	certs, err := overwriteSANWithCommonName(rawCerts)
-	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with CommonName")
+	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
+	// during the handshake.
+	// the verification code here is taken from verifyServerCertificate in crypto/tls/handshake_client.go:824
+	certs := make([]*x509.Certificate, len(rawCerts))
+	for i, asn1Data := range rawCerts {
+		cert, err := x509.ParseCertificate(asn1Data)
+		if err != nil {
+			return nil, nil, fmt.Errorf("tls: failed to parse certificate from server: %+v", err)
+		}
+		certs[i] = cert
 	}
 
 	var t time.Time
@@ -97,9 +108,22 @@ func verifyCertificateWithLegacyCommonName(
 	rawCerts [][]byte,
 	c *TLSConfig,
 ) ([]*x509.Certificate, [][]*x509.Certificate, error) {
-	certs, err := overwriteSANWithCommonName(rawCerts)
-	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with CommonName")
+	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
+	// during the handshake.
+	// the verification code here is taken from verifyServerCertificate in crypto/tls/handshake_client.go:824
+	certs := make([]*x509.Certificate, len(rawCerts))
+	for i, asn1Data := range rawCerts {
+		cert, err := x509.ParseCertificate(asn1Data)
+		if err != nil {
+			return nil, nil, fmt.Errorf("tls: failed to parse certificate from server: %+v", err)
+		}
+		if len(cert.DNSNames) == 0 || len(cert.DNSNames) == 1 && cert.DNSNames[0] == "" {
+			if len(cert.Subject.CommonName) == 0 {
+				return nil, nil, ErrMissingDNSNameCommonName
+			}
+			cert.DNSNames = []string{cert.Subject.CommonName}
+		}
+		certs[i] = cert
 	}
 
 	var t time.Time
@@ -125,31 +149,4 @@ func verifyCertificateWithLegacyCommonName(
 	// defer to the default verification performed
 	chains, err := headCert.Verify(opts)
 	return certs, chains, err
-}
-
-// overwriteSANWithCommonName adds the Common Name to DNSNames, if the list is empty.
-// It is a workaround to address the changes introduced in Golang 1.15: https://golang.org/doc/go1.15#commonname.
-func overwriteSANWithCommonName(
-	rawCerts [][]byte,
-) ([]*x509.Certificate, error) {
-	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
-	// during the handshake.
-	// the verification code here is taken from verifyServerCertificate in crypto/tls/handshake_client.go:824
-	certs := make([]*x509.Certificate, len(rawCerts))
-	for i, asn1Data := range rawCerts {
-		cert, err := x509.ParseCertificate(asn1Data)
-		if err != nil {
-			return nil, errors.Wrap(err, "tls: failed to parse certificate from server")
-		}
-		fmt.Println(cert.DNSNames, cert.Subject.CommonName, len(cert.DNSNames))
-		if len(cert.DNSNames) == 0 || len(cert.DNSNames) == 1 && cert.DNSNames[0] == "" {
-			if len(cert.Subject.CommonName) == 0 {
-				return nil, fmt.Errorf("missing DNSNames and CommonName")
-			}
-			cert.DNSNames = []string{cert.Subject.CommonName}
-		}
-		certs[i] = cert
-	}
-
-	return certs, nil
 }

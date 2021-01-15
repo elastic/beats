@@ -495,10 +495,10 @@ output.elasticsearch:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -506,8 +506,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -628,10 +628,10 @@ output.elasticsearch:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -639,8 +639,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -831,10 +831,10 @@ output.elasticsearch:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -842,8 +842,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -993,10 +993,10 @@ output.elasticsearch:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1004,8 +1004,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -1295,10 +1295,10 @@ setup.kibana:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1306,8 +1306,8 @@ setup.kibana:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -1498,10 +1498,10 @@ logging.files:
   # matches the names identified within the certificate.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
-  # * common_name, which verifies that the provided certificate is signed by a trusted
+  # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
-  # matches the names identified within the certificate. If DNSNames is empty
-  # it is overwritten with the value from Common Name.
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1509,8 +1509,8 @@ logging.files:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is common_name.
-  #ssl.verification_mode: common_name
+  # The default value is full.
+  #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
