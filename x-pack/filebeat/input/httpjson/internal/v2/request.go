@@ -56,9 +56,6 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	header := http.Header{}
 	header.Set("Accept", "application/json")
 	header.Set("User-Agent", userAgent)
-	if rf.method == "POST" {
-		header.Set("Content-Type", "application/json")
-	}
 	req.setHeader(header)
 
 	var err error
@@ -66,6 +63,14 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 		req, err = t.run(ctx, req)
 		if err != nil {
 			return transformable{}, err
+		}
+	}
+
+	if rf.method == "POST" {
+		header = req.header()
+		if header.Get("Content-Type") == "" {
+			header.Set("Content-Type", "application/json")
+			req.setHeader(header)
 		}
 	}
 
@@ -110,19 +115,14 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 	}
 
 	var body []byte
-	if len(trReq.body()) > 0 {
-		switch rf.method {
-		case "POST":
-			if rf.encoder != nil {
-				body, err = rf.encoder(trReq)
-			} else {
-				body, err = encode(trReq.header().Get("Content-Type"), trReq)
-			}
-			if err != nil {
-				return nil, err
-			}
-		default:
-			rf.log.Errorf("A body is set, but method is not POST. The body will be ignored.")
+	if rf.method == "POST" {
+		if rf.encoder != nil {
+			body, err = rf.encoder(trReq)
+		} else {
+			body, err = encode(trReq.header().Get("Content-Type"), trReq)
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 
