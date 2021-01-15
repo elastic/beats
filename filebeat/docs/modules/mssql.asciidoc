@@ -27,7 +27,7 @@ file to override the default paths for MSSQL logs:
 - module: mssql
   log:
     enabled: true
-    var.paths: ["C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*"]
+    var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
 -----
 
 
@@ -35,7 +35,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
--M "mssql.log.var.paths=[C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*]"
+-M "mssql.log.var.paths=['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']"
 -----
 
 //set the fileset name used in the included example
