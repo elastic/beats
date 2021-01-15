@@ -9,6 +9,7 @@ var:
     default: 24h
   - name: api_token
   - name: ssl
+  - name: filters
   - name: url
     default: "https://localhost/events/restSearch"
   - name: tags

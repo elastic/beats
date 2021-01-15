@@ -1,46 +1,85 @@
 description: Pipeline for parsing Abuse.ch URL Threat Intel
 processors:
+
+####################
+# Event ECS fields #
+####################
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
 - set:
-    field: url.scheme
-    value: https
-    if: ctx?.json?.url.startsWith('https:')
+    field: event.kind
+    value: enrichment
 - set:
-    field: url.scheme
-    value: http
-    if: ctx?.json?.url.startsWith('http:')
-- remove:
-    field:
-    - "@timestamp"
+    field: event.category
+    value: threat
+- set:
+    field: event.type
+    value: indicator
+
+######################
+# General ECS fields #
+######################
+- rename:
+    field: json
+    target_field: threatintel.abuseurl
     ignore_missing: true
-    if: ctx?.json?.date_added != null
+
+#####################
+# Threat ECS Fields #
+#####################
+- set:
+    field: threat.indicator.type
+    value: url
+- set:
+    field: threat.indicator.url.scheme
+    value: https
+    if: ctx?.threatintel?.abuseurl?.url.startsWith('https:')
+- set:
+    field: threat.indicator.url.scheme
+    value: http
+    if: ctx?.threatintel?.abuseurl?.url.startsWith('http:')
 - date:
-    field: json.date_added
+    field: threatintel.abuseurl.date_added
+    target_field: threat.indicator.first_seen
     formats:
       - "yyyy-MM-dd HH:mm:ss z"
       - "yyyy-MM-dd HH:mm:ss Z"
-    if: "ctx?.json?.date_added != null"
+    if: "ctx?.threatintel?.abuseurl?.date_added != null"
 - rename:
-    field: json.url
-    target_field: url.full
+    field: threatintel.abuseurl.url
+    target_field: threat.indicator.url.full
     ignore_missing: true
 - rename:
-    field: json.host
-    target_field: url.domain
+    field: threatintel.abuseurl.host
+    target_field: threat.indicator.domain
     ignore_missing: true
+
+# Host can be both IP addresses and domain names
+- grok:
+    field: threatintel.abuseurl.host
+    patterns:
+      - "(?:%{IP:threat.indicator.ip}|%{GREEDYDATA:threat.indicator.domain})"
+    ignore_failure: true
+- rename:
+    field: threatintel.abuseurl.reporter
+    target_field: threat.indicator.provider
+    ignore_missing: true
+
+######################
+# Cleanup processors #
+######################
+- set:
+    field: ctx.threat.indicator.type
+    value: unknown
+    if: ctx?.threat?.indicator?.type == null
 - convert:
-    field: json.larted
+    field: threatintel.abuseurl.larted
     type: boolean
-    ignore_missing: true
-- rename:
-    field: json
-    target_field: threatintel
     ignore_missing: true
 - remove:
     field:
-    - threatintel.date_added
+    - threatintel.abuseurl.date_added
     - message
     ignore_missing: true
 on_failure:

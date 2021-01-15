@@ -4,34 +4,37 @@ type: httpjson
 config_version: "2"
 interval: {{ .interval }}
 
+auth.basic.user: {{ .username }}
+auth.basic.password: {{ .password }}
+
 request.method: GET
 request.ssl: {{ .ssl | tojson }}
 request.url: {{ .url }}
+request.redirect.forward_headers: true
 request.transforms:
 - set:
     target: header.Content-Type
-    value: application/json
+    value: application/vnd.oasis.taxii+json
 - set:
-    target: header.X-OTX-API-KEY
-    value: {{ .api_token }}
+    target: header.Accept
+    value: application/vnd.oasis.taxii+json
 - set:
-    target: url.params.types
+    target: header.Range
+    value: items 0-10000
+- set:
+    target: url.params.match[type]
     value: {{ .types }}
 - set:
-    target: url.params.modified_since
+    target: url.params.added_after
     value: '[[.cursor.timestamp]]'
-    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "RFC3339" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05.999Z" ]]'
 
 response.split:
   target: body.results
 
-response.pagination:
-- set:
-    target: url.value
-    value: '[[ .last_response.body.next ]]'
 cursor:
   timestamp:
-    value: '[[ formatDate (now (parseDuration "-{{ .lookback_range }}")) "RFC3339" ]]'
+    value: '[[ .last_response.header.X-TAXII-Date-Added-Last ]]'
 
 {{ else if eq .input "file" }}
 

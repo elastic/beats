@@ -1,12 +1,130 @@
 description: Pipeline for parsing MISP Threat Intel
 processors:
+
+####################
+# Event ECS fields #
+####################
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: enrichment
+- set:
+    field: event.category
+    value: threat
+- set:
+    field: event.type
+    value: indicator
+
+######################
+# General ECS fields #
+######################
 - rename:
     field: json
     target_field: threatintel.otx
     ignore_missing: true
+
+#####################
+# Threat ECS Fields #
+#####################
+## File indicator operations
+- set:
+    field: threat.indicator.type
+    value: file
+    if: "ctx.threatintel?.otx?.type.startsWith('FileHash') || ctx.threatintel?.otx?.type == 'filepath'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.file.hash.md5
+    ignore_missing: true
+    if: "ctx.threatintel?.otx?.type == 'FileHash-MD5'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.file.hash.sha1
+    ignore_missing: true
+    if: "ctx.threatintel?.otx?.type == 'FileHash-SHA1'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.file.hash.sha256
+    ignore_missing: true
+    if: "ctx.threatintel?.otx?.type == 'FileHash-SHA256'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.file.hash.pehash
+    ignore_missing: true
+    if: "ctx.threatintel?.otx?.type == 'FileHash-PEHASH'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.file.hash.imphash
+    ignore_missing: true
+    if: "ctx.threatintel?.otx?.type == 'FileHash-IMPHASH'"
+
+## IP indicator operations
+- set:
+    field: threat.indicator.type
+    value: ipv4-addr
+    if: ctx.threatintel?.otx?.type == 'IPv4'
+- set:
+    field: threat.indicator.type
+    value: ipv6-addr
+    if: ctx.threatintel?.otx?.type == 'IPv6'
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.ip
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type != null && ['ipv4-addr', 'ipv6-addr'].contains(ctx?.threat?.indicator?.type)"
+
+## URL indicator operations
+- set:
+    field: threat.indicator.type
+    value: url
+    if: "ctx?.threat?.indicator?.type == null && ['url', 'uri'].contains(ctx.threatintel?.otx?.type)"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.url.full
+    ignore_missing: true
+    if: "ctx?.threatintel?.otx?.type == 'url'"
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.url.path
+    ignore_missing: true
+    if: "ctx?.threatintel?.otx?.type == 'uri'"
+
+## Email indicator operations
+- set:
+    field: threat.indicator.type
+    value: email-addr
+    if: ctx?.threatintel?.otx?.type == 'email'
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.email.address
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'email-addr'"
+
+## Domain indicator operations
+- set:
+    field: threat.indicator.type
+    value: domain-name
+    if: ctx.threatintel?.otx?.type == 'domain'
+- rename:
+    field: threatintel.otx.indicator
+    target_field: threat.indicator.domain
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'domain-name'"
+
+######################
+# Cleanup processors #
+######################
+- set:
+    field: ctx.threat.indicator.type
+    value: unknown
+    if: ctx?.threat?.indicator?.type == null
+- remove:
+    field:
+    - threatintel.otx.type
+    - threatintel.otx.id
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type != null
 on_failure:
 - set:
     field: error.message

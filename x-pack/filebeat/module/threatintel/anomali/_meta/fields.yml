@@ -1,7 +1,7 @@
-- name: otx
+- name: anomali
   type: group
   description: >
-    Fields for OTX Threat Intel
+    Fields for Anomali Threat Intel
   fields:
   - name: id
     type: keyword

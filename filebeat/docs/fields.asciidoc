@@ -142777,7 +142777,14 @@ Fields from threatintel.
 
 
 
-*`threatintel.file_type`*::
+[float]
+=== abusemalware
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abusemalware.file_type`*::
 +
 --
 File type guessed by URLhaus.
@@ -142787,7 +142794,7 @@ type: keyword
 
 --
 
-*`threatintel.signature`*::
+*`threatintel.abusemalware.signature`*::
 +
 --
 Malware familiy.
@@ -142797,7 +142804,7 @@ type: keyword
 
 --
 
-*`threatintel.urlhaus_download`*::
+*`threatintel.abusemalware.urlhaus_download`*::
 +
 --
 Location (URL) where you can download a copy of this file.
@@ -142807,7 +142814,7 @@ type: keyword
 
 --
 
-*`threatintel.virustotal.result`*::
+*`threatintel.abusemalware.virustotal.result`*::
 +
 --
 AV detection ration.
@@ -142817,7 +142824,7 @@ type: keyword
 
 --
 
-*`threatintel.virustotal.percent`*::
+*`threatintel.abusemalware.virustotal.percent`*::
 +
 --
 AV detection in percent.
@@ -142827,7 +142834,7 @@ type: float
 
 --
 
-*`threatintel.virustotal.link`*::
+*`threatintel.abusemalware.virustotal.link`*::
 +
 --
 Link to the Virustotal report.
@@ -142837,7 +142844,7 @@ type: keyword
 
 --
 
-*`threatintel.imphash`*::
+*`threatintel.abusemalware.imphash`*::
 +
 --
 The file's import hash, if available.
@@ -142847,7 +142854,7 @@ type: keyword
 
 --
 
-*`threatintel.ssdeep`*::
+*`threatintel.abusemalware.ssdeep`*::
 +
 --
 The file's ssdeep hash, if available.
@@ -142857,7 +142864,7 @@ type: keyword
 
 --
 
-*`threatintel.tlsh`*::
+*`threatintel.abusemalware.tlsh`*::
 +
 --
 The file's tlsh hash, if available.
@@ -142867,7 +142874,14 @@ type: keyword
 
 --
 
-*`threatintel.id`*::
+[float]
+=== abuseurl
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abuseurl.id`*::
 +
 --
 The ID of the url.
@@ -142877,7 +142891,7 @@ type: keyword
 
 --
 
-*`threatintel.urlhaus_reference`*::
+*`threatintel.abuseurl.urlhaus_reference`*::
 +
 --
 Link to URLhaus entry.
@@ -142887,7 +142901,7 @@ type: keyword
 
 --
 
-*`threatintel.url_status`*::
+*`threatintel.abuseurl.url_status`*::
 +
 --
 The current status of the URL. Possible values are: online, offline and unknown.
@@ -142897,7 +142911,7 @@ type: keyword
 
 --
 
-*`threatintel.threat`*::
+*`threatintel.abuseurl.threat`*::
 +
 --
 The threat corresponding to this malware URL.
@@ -142907,7 +142921,7 @@ type: keyword
 
 --
 
-*`threatintel.blacklists.surbl`*::
+*`threatintel.abuseurl.blacklists.surbl`*::
 +
 --
 SURBL blacklist status. Possible values are: listed and not_listed
@@ -142917,7 +142931,7 @@ type: keyword
 
 --
 
-*`threatintel.blacklists.spamhaus_dbl`*::
+*`threatintel.abuseurl.blacklists.spamhaus_dbl`*::
 +
 --
 Spamhaus DBL blacklist status.
@@ -142927,7 +142941,7 @@ type: keyword
 
 --
 
-*`threatintel.reporter`*::
+*`threatintel.abuseurl.reporter`*::
 +
 --
 The Twitter handle of the reporter that has reported this malware URL (or anonymous).
@@ -142937,7 +142951,7 @@ type: keyword
 
 --
 
-*`threatintel.larted`*::
+*`threatintel.abuseurl.larted`*::
 +
 --
 Indicates whether the malware URL has been reported to the hosting provider (true or false)
@@ -142947,10 +142961,77 @@ type: boolean
 
 --
 
-*`threatintel.tags`*::
+*`threatintel.abuseurl.tags`*::
 +
 --
 A list of tags associated with the queried malware URL
+
+
+type: keyword
+
+--
+
+[float]
+=== anomali
+
+Fields for Anomali Threat Intel
+
+
+
+*`threatintel.anomali.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
 
 
 type: keyword
@@ -142967,7 +143048,7 @@ Fields for MISP Threat Intel
 *`threatintel.misp.id`*::
 +
 --
-ID
+Attribute ID.
 
 
 type: keyword
@@ -142977,7 +143058,7 @@ type: keyword
 *`threatintel.misp.orgc_id`*::
 +
 --
-ID
+Organization Community ID of the event.
 
 
 type: keyword
@@ -142987,7 +143068,7 @@ type: keyword
 *`threatintel.misp.org_id`*::
 +
 --
-ID
+Organization ID of the event.
 
 
 type: keyword
@@ -142997,27 +143078,27 @@ type: keyword
 *`threatintel.misp.threat_level_id`*::
 +
 --
-ID
+Threat level from 5 to 1, where 1 is the most critical.
 
 
-type: keyword
+type: long
 
 --
 
 *`threatintel.misp.info`*::
 +
 --
-ID
+Additional text or information related to the event.
 
 
-type: text
+type: keyword
 
 --
 
 *`threatintel.misp.published`*::
 +
 --
-ID
+When the event was published.
 
 
 type: boolean
@@ -143027,7 +143108,7 @@ type: boolean
 *`threatintel.misp.uuid`*::
 +
 --
-ID
+The UUID of the event object.
 
 
 type: keyword
@@ -143037,7 +143118,7 @@ type: keyword
 *`threatintel.misp.date`*::
 +
 --
-ID
+The date of when the event object was created.
 
 
 type: date
@@ -143047,27 +143128,17 @@ type: date
 *`threatintel.misp.attribute_count`*::
 +
 --
-ID
+How many attributes are included in a single event object.
 
 
 type: long
 
 --
 
-*`threatintel.misp.analysis`*::
-+
---
-ID
-
-
-type: keyword
-
---
-
 *`threatintel.misp.timestamp`*::
 +
 --
-ID
+The timestamp of when the event object was created.
 
 
 type: date
@@ -143077,7 +143148,7 @@ type: date
 *`threatintel.misp.distribution`*::
 +
 --
-ID
+Distribution type related to MISP.
 
 
 type: keyword
@@ -143087,7 +143158,7 @@ type: keyword
 *`threatintel.misp.proposal_email_lock`*::
 +
 --
-ID
+Settings configured on MISP for email lock on this event object.
 
 
 type: boolean
@@ -143097,7 +143168,7 @@ type: boolean
 *`threatintel.misp.locked`*::
 +
 --
-ID
+If the current MISP event object is locked or not.
 
 
 type: boolean
@@ -143107,17 +143178,17 @@ type: boolean
 *`threatintel.misp.publish_timestamp`*::
 +
 --
-ID
+At what time the event object was published
 
 
-type: keyword
+type: date
 
 --
 
 *`threatintel.misp.sharing_group_id`*::
 +
 --
-ID
+The ID of the grouped events or sources of the event.
 
 
 type: keyword
@@ -143127,7 +143198,7 @@ type: keyword
 *`threatintel.misp.disable_correlation`*::
 +
 --
-ID
+If correlation is disabled on the MISP event object.
 
 
 type: boolean
@@ -143137,7 +143208,7 @@ type: boolean
 *`threatintel.misp.extends_uuid`*::
 +
 --
-ID
+The UUID of the event object it might extend.
 
 
 type: keyword
@@ -143147,7 +143218,7 @@ type: keyword
 *`threatintel.misp.org.id`*::
 +
 --
-ID
+The organization ID related to the event object.
 
 
 type: keyword
@@ -143157,7 +143228,7 @@ type: keyword
 *`threatintel.misp.org.name`*::
 +
 --
-ID
+The organization name related to the event object.
 
 
 type: keyword
@@ -143167,7 +143238,7 @@ type: keyword
 *`threatintel.misp.org.uuid`*::
 +
 --
-ID
+The UUID of the organization related to the event object.
 
 
 type: keyword
@@ -143177,7 +143248,7 @@ type: keyword
 *`threatintel.misp.org.local`*::
 +
 --
-ID
+If the event object is local or from a remote source.
 
 
 type: boolean
@@ -143187,7 +143258,7 @@ type: boolean
 *`threatintel.misp.orgc.id`*::
 +
 --
-ID
+The Organization Community ID in which the event object was reported from.
 
 
 type: keyword
@@ -143197,7 +143268,7 @@ type: keyword
 *`threatintel.misp.orgc.name`*::
 +
 --
-ID
+The Organization Community name in which the event object was reported from.
 
 
 type: keyword
@@ -143207,7 +143278,7 @@ type: keyword
 *`threatintel.misp.orgc.uuid`*::
 +
 --
-ID
+The Organization Community UUID in which the event object was reported from.
 
 
 type: keyword
@@ -143217,7 +143288,7 @@ type: keyword
 *`threatintel.misp.orgc.local`*::
 +
 --
-ID
+If the Organization Community was local or synced from a remote source.
 
 
 type: boolean
@@ -143227,7 +143298,7 @@ type: boolean
 *`threatintel.misp.attribute.id`*::
 +
 --
-ID
+The ID of the attribute related to the event object.
 
 
 type: keyword
@@ -143237,7 +143308,7 @@ type: keyword
 *`threatintel.misp.attribute.type`*::
 +
 --
-ID
+The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
 
 
 type: keyword
@@ -143247,7 +143318,7 @@ type: keyword
 *`threatintel.misp.attribute.category`*::
 +
 --
-ID
+The category of the attribute related to the event object. For example "Network Activity".
 
 
 type: keyword
@@ -143257,7 +143328,7 @@ type: keyword
 *`threatintel.misp.attribute.to_ids`*::
 +
 --
-ID
+If the attribute should be automatically synced with an IDS.
 
 
 type: boolean
@@ -143267,7 +143338,7 @@ type: boolean
 *`threatintel.misp.attribute.uuid`*::
 +
 --
-ID
+The UUID of the attribute related to the event.
 
 
 type: keyword
@@ -143277,7 +143348,7 @@ type: keyword
 *`threatintel.misp.attribute.event_id`*::
 +
 --
-ID
+The local event ID of the attribute related to the event.
 
 
 type: keyword
@@ -143287,37 +143358,37 @@ type: keyword
 *`threatintel.misp.attribute.distribution`*::
 +
 --
-ID
+How the attribute has been distributed, represented by integer numbers.
 
 
-type: keyword
+type: long
 
 --
 
 *`threatintel.misp.attribute.timestamp`*::
 +
 --
-ID
+The timestamp in which the attribute was attached to the event object.
 
 
-type: keyword
+type: date
 
 --
 
 *`threatintel.misp.attribute.comment`*::
 +
 --
-ID
+Comments made to the attribute itself.
 
 
-type: text
+type: keyword
 
 --
 
 *`threatintel.misp.attribute.sharing_group_id`*::
 +
 --
-ID
+The group ID of the sharing group related to the specific attribute.
 
 
 type: keyword
@@ -143327,7 +143398,7 @@ type: keyword
 *`threatintel.misp.attribute.deleted`*::
 +
 --
-ID
+If the attribute has been removed from the event object.
 
 
 type: boolean
@@ -143337,7 +143408,7 @@ type: boolean
 *`threatintel.misp.attribute.disable_correlation`*::
 +
 --
-ID
+If correlation has been enabled on the attribute related to the event object.
 
 
 type: boolean
@@ -143347,7 +143418,7 @@ type: boolean
 *`threatintel.misp.attribute.object_id`*::
 +
 --
-ID
+The ID of the Object in which the attribute is attached.
 
 
 type: keyword
@@ -143357,47 +143428,17 @@ type: keyword
 *`threatintel.misp.attribute.object_relation`*::
 +
 --
-ID
+The type of relation the attribute has with the event object itself.
 
 
 type: keyword
-
---
-
-*`threatintel.misp.attribute.first_seen`*::
-+
---
-ID
-
-
-type: date
-
---
-
-*`threatintel.misp.attribute.last_seen`*::
-+
---
-ID
-
-
-type: date
 
 --
 
 *`threatintel.misp.attribute.value`*::
 +
 --
-ID
-
-
-type: keyword
-
---
-
-*`threatintel.misp.tags`*::
-+
---
-ID
+The value of the attribute, depending on the type like "url, sha1, email-src".
 
 
 type: keyword
@@ -143407,14 +143448,14 @@ type: keyword
 [float]
 === otx
 
-Fields for MISP Threat Intel
+Fields for OTX Threat Intel
 
 
 
 *`threatintel.otx.id`*::
 +
 --
-ID
+The ID of the indicator.
 
 
 type: keyword
@@ -143424,7 +143465,7 @@ type: keyword
 *`threatintel.otx.indicator`*::
 +
 --
-ID
+The value of the indicator, for example if the type is domain, this would be the value.
 
 
 type: keyword
@@ -143434,7 +143475,7 @@ type: keyword
 *`threatintel.otx.description`*::
 +
 --
-ID
+A description of the indicator.
 
 
 type: keyword
@@ -143444,7 +143485,7 @@ type: keyword
 *`threatintel.otx.title`*::
 +
 --
-ID
+Title describing the indicator.
 
 
 type: keyword
@@ -143454,7 +143495,7 @@ type: keyword
 *`threatintel.otx.content`*::
 +
 --
-ID
+Extra text or descriptive content related to the indicator.
 
 
 type: keyword
@@ -143464,7 +143505,7 @@ type: keyword
 *`threatintel.otx.type`*::
 +
 --
-ID
+The indicator type, can for example be "domain, email, FileHash-SHA256".
 
 
 type: keyword

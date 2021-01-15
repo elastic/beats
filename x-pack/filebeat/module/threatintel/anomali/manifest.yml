@@ -5,11 +5,11 @@ var:
     default: httpjson
   - name: interval
     default: 60m
-  - name: api_token
   - name: ssl
   - name: types
-  - name: lookback_range
-    default: 2h
+    default: indicators
+  - name: username
+  - name: password
   - name: url
     default: "https://otx.alienvault.com/api/v1/indicators/export"
   - name: tags

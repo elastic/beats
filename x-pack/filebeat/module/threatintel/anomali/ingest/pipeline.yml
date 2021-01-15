@@ -1,0 +1,71 @@
+description: Pipeline for parsing Anomali Threat Intel
+processors:
+
+####################
+# Event ECS fields #
+####################
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: enrichment
+- set:
+    field: event.category
+    value: threat
+- set:
+    field: event.type
+    value: indicator
+
+######################
+# General ECS fields #
+######################
+- rename:
+    field: json
+    target_field: threatintel.anomali
+    ignore_missing: true
+
+#####################
+# Threat ECS Fields #
+#####################
+## File indicator operations
+- grok:
+    field: threatintel.anomali.pattern
+    patterns: 
+      - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}%{QUOTEDSTRING:_tmp.threatvalue}\\]"
+- rename:
+    field: _tmp.threattype
+    target_field: threat.indicator.type
+    ignore_missing: true
+- rename:
+    field: _tmp.threatvalue
+    target_field: threat.indicator.ip
+    ignore_missing: true
+    if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threat?.indicator?.type)"
+- rename:
+    field: _tmp.threatvalue
+    target_field: threat.indicator.url.full
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'url'
+- rename:
+    field: _tmp.threatvalue
+    target_field: threat.indicator.email.address
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'email-addr'
+- rename:
+    field: _tmp.threatvalue
+    target_field: threat.indicator.domain
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'domain-name'
+- set:
+    field: ctx.threat.indicator.type
+    value: unknown
+    if: ctx?.threat?.indicator?.type == null
+######################
+# Cleanup processors #
+######################
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

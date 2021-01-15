@@ -1,12 +1,40 @@
 description: Pipeline for parsing MISP Threat Intel
 processors:
+
+####################
+# Event ECS fields #
+####################
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: enrichment
+- set:
+    field: event.category
+    value: threat
+- set:
+    field: event.type
+    value: indicator
+
+######################
+# General ECS fields #
+######################
 - rename:
     field: json.Event
     target_field: threatintel.misp
     ignore_missing: true
+- set:
+    field: threat.indicator.provider
+    value: misp
+    if: ctx?.threatintel?.misp?.Orgc?.local != 'false'
+- set:
+    field: threat.indicator.provider
+    value: '{{misp.Orgc.name}}'
+    if: ctx?.threatintel?.misp?.Orgc?.local == 'false'
+    ignore_empty_value: true
+
+# Removing fields not needed anymore, either because its copied somewhere else, or is not relevant to this event
 - remove:
     field:
     - threatintel.misp.ShadowAttribute
@@ -22,6 +50,7 @@ processors:
     field: threatintel.misp.Attribute.timestamp
     formats:
       - UNIX
+    ignore_failure: true
 - rename:
     field: threatintel.misp.Attribute
     target_field: threatintel.misp.attribute
@@ -42,6 +71,162 @@ processors:
     field: threatintel.misp.Tag
     target_field: threatintel.misp.tag
     ignore_missing: true
+
+#####################
+# Threat ECS Fields #
+#####################
+- rename:
+    field: threatintel.misp.attribute.first_seen
+    target_field: threat.indicator.first_seen
+    ignore_missing: true
+- rename:
+    field: threatintel.misp.attribute.last_seen
+    target_field: threat.indicator.last_seen
+    ignore_missing: true
+- convert:
+    field: threatintel.misp.analysis
+    type: long
+    target_field: threat.indicator.scanner_stats
+    ignore_missing: true
+- convert:
+    field: threatintel.misp.threat_level_id
+    type: long
+    ignore_missing: true
+
+## File/Hash indicator operations
+- set:
+    field: threat.indicator.type
+    value: file
+    if: "['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename')"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: "threat.indicator.file.hash.{{threatintel.misp.attribute.type}}"
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'file' && !ctx?.threatintel?.misp?.attribute?.type.startsWith('filename')"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.file.name
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'file' && ctx?.threatintel?.misp?.attribute?.type != 'filename'"
+- grok:
+    field: threatintel.misp.attribute.type
+    patterns: 
+      - "%{DATA}\\|%{DATA:_tmp.hashtype}"
+    ignore_missing: true
+    if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+- grok:
+    field: threatintel.misp.attribute.value
+    patterns: 
+      - "%{DATA:threat.indicator.file.name}\\|%{DATA:_tmp.hashvalue}"
+    ignore_missing: true
+    if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+- set:
+    field: threat.indicator.file.hash.{{_tmp.hashtype}}
+    value: '{{_tmp.hashvalue}}'
+    if: "ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
+
+## URL/URI indicator operations
+- set:
+    field: threat.indicator.type
+    value: url
+    if: "ctx?.threat?.indicator?.type == null && ['url', 'link', 'uri'].contains(ctx?.threatintel?.misp?.attribute?.type)"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.url.full
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.url.path
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type == 'uri'"
+
+## Regkey indicator operations
+- set:
+    field: threat.indicator.type
+    value: windows-registry-key
+    if: "ctx?.threat?.indicator?.type == null && ctx?.threatintel?.misp?.attribute?.type.startsWith('regkey')"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.registry.key
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'windows-registry-key' && ctx?.threatintel?.misp?.attribute?.type == 'regkey'"
+- grok:
+    field: threatintel.misp.attribute.value
+    patterns: 
+      - "%{DATA:threat.indicator.registry.key}\\|%{DATA:threat.indicator.registry.value}"
+    ignore_missing: true
+    if: "ctx?.threatintel?.misp?.attribute?.type == 'regkey|value'"
+
+## AS indicator operations
+- set:
+    field: threat.indicator.type
+    value: autonomous-system
+    if: "ctx?.threat?.indicator?.type == null && ctx?.threatintel?.misp?.attribute?.type == 'AS'"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.as
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'autonomous-system'
+
+## Domain/IP/Port indicator operations
+- append:
+    field: threat.indicator.type
+    value: domain-name
+    if: "ctx?.threat?.indicator?.type == null && ctx?.threatintel?.misp?.attribute?.type.startsWith('domain')"
+- append:
+    field: threat.indicator.type
+    value: ipv4-addr
+    if: "['domain|ip', 'ip-src', 'ip-src|port', 'ip-dst', 'ip-dst|port'].contains(ctx?.threatintel?.misp?.attribute?.type)"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.domain
+    ignore_missing: true
+    if: "ctx?.threat?.indicator?.type == 'domain-name' && ctx?.threatintel?.misp?.attribute?.type != 'domain|ip'"
+- grok:
+    field: threatintel.misp.attribute.value
+    patterns: 
+      - "%{DATA:threat.indicator.domain}\\|%{IP:threat.indicator.ip}"
+    ignore_missing: true
+    if: ctx.threatintel?.misp?.attribute?.type == 'domain|ip'
+- grok:
+    field: threatintel.misp.attribute.value
+    patterns: 
+      - "%{IP:threat.indicator.ip}\\|%{NUMBER:threat.indicator.port}"
+    ignore_missing: true
+    if: "['ip-src|port', 'ip-dst|port'].contains(ctx.threatintel?.misp?.attribute?.type)"
+
+## Email indicator operations
+# Currently this ignores email-message, except setting the type it will leave the rest of the fields under misp.
+- set:
+    field: threat.indicator.type
+    value: email-addr
+    if: "ctx?.threat?.indicator?.type == null && ['email-dst', 'email-src'].contains(ctx.threatintel?.misp?.attribute?.type)"
+- set:
+    field: threat.indicator.type
+    value: email-message
+    if: "ctx?.threat?.indicator?.type == null && ctx.threatintel?.misp?.attribute?.type.startsWith('email') && !['email-dst', 'email-src'].contains(ctx.threatintel?.misp?.attribute?.type)"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.email.address
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'email-addr'
+
+## MAC Address indicator operations
+- set:
+    field: threat.indicator.type
+    value: mac-addr
+    if: "ctx?.threat?.indicator?.type == null && ['mac-address', 'mac-eui-64'].contains(ctx.threatintel?.misp?.attribute?.type)"
+- rename:
+    field: threatintel.misp.attribute.value
+    target_field: threat.indicator.mac
+    ignore_missing: true
+    if: ctx?.threat?.indicator?.type == 'mac-addr'
+
+###################
+# Tags ECS fields #
+###################
+# Stripping special characters from tags
 - foreach:
     field: threatintel.misp.tag
     processor:
@@ -53,12 +238,52 @@ processors:
     field: threatintel.misp.tag
     processor:
       append:
-        field: "threatintel.misp.tags"
+        field: "tags"
         value: "{{ _ingest._value.name }}"
+
+# Setting indicator type to unknown if it does not match anything
+- set:
+    field: threat.indicator.type
+    value: unknown
+    if: ctx?.threat?.indicator?.type == null
+
+######################
+# Cleanup processors #
+######################
+# Removing fields not needed anymore, either because its copied somewhere else, or is not relevant to this event
 - remove:
     field:
+    - threatintel.misp.Attribute.timestamp
+    - threatintel.misp.timestamp
     - threatintel.misp.tag
+    - threatintel.misp.org
+    - threatintel.misp.analysis
+    - _tmp
     ignore_missing: true
+- script:
+    lang: painless
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

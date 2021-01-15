@@ -8,9 +8,12 @@ request.method: POST
 request.ssl: {{ .ssl | tojson }}
 request.url: {{ .url }}
 request.body:
-    limit: 15
+    limit: 100
     page: 1
     returnFormat: json
+{{if .filters}}
+    {{ range $key, $value := .filters}}{{$key}}: {{$value | tojson}}{{end}}
+{{end}}
 request.transforms:
 - set:
     target: header.Authorization
