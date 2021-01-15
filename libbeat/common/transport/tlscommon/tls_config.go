@@ -20,6 +20,7 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -87,12 +88,12 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
 	// or when we are using 'certificate' TLS verification mode, we add a custom callback
 	verifyPeerCertFn := makeVerifyPeerCertificate(c)
+	verifyConnectionFn := makeVerifyConnection(c)
 
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
-
 	return &tls.Config{
 		MinVersion:            minVersion,
 		MaxVersion:            maxVersion,
@@ -106,6 +107,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		ClientAuth:            c.ClientAuth,
 		VerifyPeerCertificate: verifyPeerCertFn,
 		Time:                  c.time,
+		VerifyConnection:      verifyConnectionFn,
 	}
 }
 
@@ -121,21 +123,41 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	return config
 }
 
+func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+	if cfg.Verification == VerifyFull {
+		return func(cs tls.ConnectionState) error {
+			dnsnames := cs.PeerCertificates[0].DNSNames
+			var serverName string
+			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
+				serverName = cs.PeerCertificates[0].Subject.CommonName
+			} else {
+				serverName = dnsnames[0]
+			}
+			if serverName != cs.ServerName {
+				return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
+			}
+			opts := x509.VerifyOptions{
+				Roots:         cfg.RootCAs,
+				Intermediates: x509.NewCertPool(),
+			}
+			for _, cert := range cs.PeerCertificates[1:] {
+				opts.Intermediates.AddCert(cert)
+			}
+			_, err := cs.PeerCertificates[0].Verify(opts)
+			return err
+		}
+	}
+	return nil
+
+}
+
 // makeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
 func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	pin := len(cfg.CASha256) > 0
 	skipHostName := cfg.Verification == VerifyCertificate
-	legacyCommonName := cfg.Verification == VerifyFull
 
 	if pin && !skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			if legacyCommonName {
-				_, chains, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
-				if err != nil {
-					return err
-				}
-				return verifyCAPin(cfg.CASha256, chains)
-			}
 			return verifyCAPin(cfg.CASha256, verifiedChains)
 		}
 	}
@@ -153,13 +175,6 @@ func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	if !pin && skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
-			return err
-		}
-	}
-
-	if legacyCommonName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
 			return err
 		}
 	}
