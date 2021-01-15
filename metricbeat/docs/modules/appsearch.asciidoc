@@ -40,5 +40,5 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-appsearch-stats,stats>>
 
-include::appsearch/stats.asciidoc[]
+include::appsearch/stats.asciidoc[] 
 
