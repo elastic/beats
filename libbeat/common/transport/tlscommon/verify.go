@@ -65,7 +65,7 @@ func verifyCertificateExceptServerName(
 ) ([]*x509.Certificate, [][]*x509.Certificate, error) {
 	certs, err := overwriteSANWithCommonName(rawCerts)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with Common Name")
+		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with CommonName")
 	}
 
 	var t time.Time
@@ -99,7 +99,7 @@ func verifyCertificateWithLegacyCommonName(
 ) ([]*x509.Certificate, [][]*x509.Certificate, error) {
 	certs, err := overwriteSANWithCommonName(rawCerts)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with Common Name")
+		return nil, nil, errors.Wrapf(err, "failed to overwrite SAN with CommonName")
 	}
 
 	var t time.Time
@@ -112,7 +112,7 @@ func verifyCertificateWithLegacyCommonName(
 	headCert := certs[0]
 
 	opts := x509.VerifyOptions{
-		DNSName:       headCert.Subject.CommonName,
+		DNSName:       headCert.DNSNames[0],
 		Roots:         c.RootCAs,
 		CurrentTime:   t,
 		Intermediates: x509.NewCertPool(),
@@ -141,9 +141,10 @@ func overwriteSANWithCommonName(
 		if err != nil {
 			return nil, errors.Wrap(err, "tls: failed to parse certificate from server")
 		}
-		if len(cert.DNSNames) == 0 {
+		fmt.Println(cert.DNSNames, cert.Subject.CommonName, len(cert.DNSNames))
+		if len(cert.DNSNames) == 0 || len(cert.DNSNames) == 1 && cert.DNSNames[0] == "" {
 			if len(cert.Subject.CommonName) == 0 {
-				return nil, fmt.Errorf("missing DNSNames and Common Name")
+				return nil, fmt.Errorf("missing DNSNames and CommonName")
 			}
 			cert.DNSNames = []string{cert.Subject.CommonName}
 		}

@@ -3218,8 +3218,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -3351,8 +3351,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -3554,8 +3554,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -3716,8 +3716,8 @@ output.elasticsearch:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -4018,8 +4018,8 @@ setup.kibana:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
@@ -4221,8 +4221,8 @@ logging.files:
   # after very careful consideration. It is primarily intended as a temporary
   # diagnostic mechanism when attempting to resolve TLS errors; its use in
   # production environments is strongly discouraged.
-  # The default value is full.
-  #ssl.verification_mode: full
+  # The default value is common_name.
+  #ssl.verification_mode: common_name
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
