@@ -31,7 +31,7 @@ Please see <<aws-credentials-config,AWS credentials options>> for more details.
 This module also accepts optional configuration `regions` to specify which
 AWS regions to query metrics from. If the `regions` parameter is not set in the
 config file, then by default, the `aws` module will query metrics from all available
-AWS regions.
+AWS regions. If `endpoint` is specified, `regions` becomes a required config parameter.
 
 * *latency*
 
