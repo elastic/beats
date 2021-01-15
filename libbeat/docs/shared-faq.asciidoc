@@ -208,7 +208,7 @@ pattern] in the {kib} docs.
 endif::no_dashboards[]
 
 [[madvdontneed-rss]]
-==== High RSS memory usage due to MADV settings
+=== High RSS memory usage due to MADV settings
 
 In versions of {beatname_lc} prior to 7.10.2, the go runtime defaults to `MADV_FREE` by default.
 In some cases, this can lead to high RSS memory usage while the kernel waits to reclaim any pages assigned to {beatname_lc}.
