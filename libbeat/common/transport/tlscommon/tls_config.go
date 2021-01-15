@@ -130,7 +130,8 @@ func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
 	if pin && !skipHostName {
 		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 			if legacyCommonName {
-				_, _, err := verifyCertificateWithLegacyCommonName(rawCerts, cfg)
+				var err error
+				_, verifiedChains, err = verifyCertificateWithLegacyCommonName(rawCerts, cfg)
 				if err != nil {
 					return err
 				}
