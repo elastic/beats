@@ -112,4 +112,4 @@ inputs:
         file: true
         network: true
 runtime:
-  arch: x86_64
+  arch: arm64

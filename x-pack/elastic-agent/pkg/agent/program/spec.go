@@ -39,6 +39,7 @@ type Spec struct {
 	PostInstallSteps  *transpiler.StepList `yaml:"post_install"`
 	PreUninstallSteps *transpiler.StepList `yaml:"pre_uninstall"`
 	When              string               `yaml:"when"`
+	Constraints       string               `yaml:"constraints"`
 }
 
 // ReadSpecs reads all the specs that match the provided globbing path.
