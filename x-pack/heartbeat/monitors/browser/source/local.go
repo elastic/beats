@@ -7,6 +7,11 @@ package source
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/otiai10/copy"
 )
@@ -18,6 +23,9 @@ type LocalSource struct {
 }
 
 func (l *LocalSource) Fetch() (err error) {
+	if l.workingPath != "" {
+		return nil
+	}
 	l.workingPath, err = ioutil.TempDir("/tmp", "elastic-synthetics-")
 	if err != nil {
 		return fmt.Errorf("could not create tmp dir: %w", err)
@@ -27,9 +35,63 @@ func (l *LocalSource) Fetch() (err error) {
 	if err != nil {
 		return fmt.Errorf("could not copy suite: %w", err)
 	}
+
+	dir, err := getSuiteDir(l.workingPath)
+	if err != nil {
+		return err
+	}
+
+	if os.Getenv("ELASTIC_SYNTHETICS_OFFLINE") != "true" {
+		// Ensure all deps installed
+		err = runSimpleCommand(exec.Command("npm", "install"), dir)
+		if err != nil {
+			return err
+		}
+
+		// Update playwright, needs to run separately to ensure post-install hook is run that downloads
+		// chrome. See https://github.com/microsoft/playwright/issues/3712
+		err = runSimpleCommand(exec.Command("npm", "install", "playwright-chromium"), dir)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 func (l *LocalSource) Workdir() string {
 	return l.workingPath
+}
+
+func (l *LocalSource) Close() error {
+	if l.workingPath != "" {
+		return os.RemoveAll(l.workingPath)
+	}
+
+	return nil
+}
+
+func getSuiteDir(suiteFile string) (string, error) {
+	path, err := filepath.Abs(suiteFile)
+	if err != nil {
+		return "", err
+	}
+	stat, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if stat.IsDir() {
+		return suiteFile, nil
+	}
+
+	return filepath.Dir(suiteFile), nil
+}
+
+func runSimpleCommand(cmd *exec.Cmd, dir string) error {
+	cmd.Dir = dir
+	logp.Info("Running %s in %s", cmd, dir)
+	output, err := cmd.CombinedOutput()
+	logp.Info("Ran %s got %s", cmd, string(output))
+	return err
 }

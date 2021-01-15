@@ -254,31 +254,6 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	return
 }
 
-func getSuiteDir(suiteFile string) (string, error) {
-	path, err := filepath.Abs(suiteFile)
-	if err != nil {
-		return "", err
-	}
-	stat, err := os.Stat(path)
-	if err != nil {
-		return "", err
-	}
-
-	if stat.IsDir() {
-		return suiteFile, nil
-	}
-
-	return filepath.Dir(suiteFile), nil
-}
-
-func runSimpleCommand(cmd *exec.Cmd, dir string) error {
-	cmd.Dir = dir
-	logp.Info("Running %s in %s", cmd, dir)
-	output, err := cmd.CombinedOutput()
-	logp.Info("Ran %s got %s", cmd, string(output))
-	return err
-}
-
 // getNpmRoot gets the closest ancestor path that contains package.json.
 func getNpmRoot(path string) (string, error) {
 	return getNpmRootIn(path, path)

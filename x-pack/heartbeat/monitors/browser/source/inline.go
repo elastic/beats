@@ -16,3 +16,7 @@ func (l *InlineSource) Fetch() (err error) {
 func (l *InlineSource) Workdir() string {
 	return ""
 }
+
+func (l *InlineSource) Close() error {
+	return nil
+}

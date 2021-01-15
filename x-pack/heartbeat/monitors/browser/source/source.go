@@ -38,6 +38,7 @@ func (s *Source) Validate() error {
 type ISource interface {
 	Fetch() error
 	Workdir() string
+	Close() error
 }
 
 type BaseSource struct {
