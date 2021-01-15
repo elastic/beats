@@ -20,6 +20,7 @@ package ratelimit
 import (
 	"fmt"
 	"sort"
+	"strconv"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/mitchellh/hashstructure"
@@ -27,20 +28,32 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
 )
+
+// instanceID is used to assign each instance a unique monitoring namespace.
+var instanceID = atomic.MakeUint32(0)
+
+const processorName = "rate_limit"
+const logName = "processor." + processorName
 
 func init() {
 	processors.RegisterPlugin(processorName, new)
 }
 
-const processorName = "rate_limit"
+type metrics struct {
+	Dropped *monitoring.Int
+}
 
 type rateLimit struct {
 	config    config
 	algorithm algorithm
-	logger    *logp.Logger
+
+	logger  *logp.Logger
+	metrics metrics
 }
 
 // new constructs a new rate limit processor.
@@ -63,10 +76,20 @@ func new(cfg *common.Config) (processors.Processor, error) {
 		return nil, errors.Wrap(err, "could not construct rate limiting algorithm")
 	}
 
+	// Logging and metrics (each processor instance has a unique ID).
+	var (
+		id  = int(instanceID.Inc())
+		log = logp.NewLogger(logName).With("instance_id", id)
+		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+	)
+
 	p := &rateLimit{
 		config:    config,
 		algorithm: algo,
-		logger:    logp.NewLogger("rate_limit"),
+		logger:    log,
+		metrics: metrics{
+			Dropped: monitoring.NewInt(reg, "dropped"),
+		},
 	}
 
 	p.setClock(clockwork.NewRealClock())
@@ -87,6 +110,7 @@ func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	p.logger.Debugf("event [%v] dropped by rate_limit processor", event)
+	p.metrics.Dropped.Inc()
 	return nil, nil
 }
 

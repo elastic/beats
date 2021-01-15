@@ -57,6 +57,7 @@ require (
 	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.0
+	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.6.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
@@ -73,10 +74,9 @@ require (
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1 // indirect
 	github.com/elastic/gosigar v0.13.0
-	github.com/fatih/color v1.5.0
+	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/garyburd/redigo v1.0.1-0.20160525165706-b8dc90050f24
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1
@@ -89,8 +89,9 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/golang/snappy v0.0.1
+	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
-	github.com/google/go-cmp v0.4.0
+	github.com/google/go-cmp v0.5.2
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2-0.20190416172445-c2e93f3ae59f
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -109,15 +110,13 @@ require (
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/jstemmer/go-junit-report v0.9.1
 	github.com/kardianos/service v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
 	github.com/magefile/mage v1.10.0
 	github.com/mailru/easyjson v0.7.1 // indirect
-	github.com/mattn/go-colorable v0.1.4
+	github.com/mattn/go-colorable v0.1.6
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/miekg/dns v1.1.15
 	github.com/mitchellh/gox v1.0.1
@@ -143,7 +142,7 @@ require (
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/shirou/gopsutil v2.19.11+incompatible
+	github.com/shirou/gopsutil v3.20.12+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
@@ -170,7 +169,7 @@ require (
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
+	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634
 	golang.org/x/text v0.3.3
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200904185747-39188db58858
@@ -183,6 +182,7 @@ require (
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
 	gotest.tools v2.2.0+incompatible
+	gotest.tools/gotestsum v0.6.0
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 	k8s.io/api v0.19.4
 	k8s.io/apimachinery v0.19.4
