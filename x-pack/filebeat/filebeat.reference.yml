@@ -1410,7 +1410,7 @@ filebeat.modules:
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    #var.paths: ["C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*"]
+    #var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
 
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
