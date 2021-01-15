@@ -77,7 +77,9 @@ func (c *Config) Arch() string {
 	}
 
 	arch := "32"
-	if strings.Contains(runtime.GOARCH, "64") {
+	if strings.Contains(runtime.GOARCH, "arm64") {
+		arch = "arm64"
+	} else if strings.Contains(runtime.GOARCH, "64") {
 		arch = "64"
 	}
 
