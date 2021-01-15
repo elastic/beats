@@ -11,11 +11,13 @@ import (
 	"os/user"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/synthexec"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func init() {
@@ -51,12 +53,23 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 		return nil, 0, err
 	}
 
-	// TODO: Run this before each suite job invocation, not just at startup
-	ss.Fetch()
-
-	j, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params())
-	if err != nil {
-		return nil, 0, err
+	var j jobs.Job
+	if src, ok := ss.InlineSource(); ok {
+		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params())
+	} else {
+		j = func(event *beat.Event) ([]jobs.Job, error) {
+			err := ss.Fetch()
+			if err != nil {
+				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
+			}
+			logp.Warn("WORKDIR IS %s", ss.Workdir())
+			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params())
+			if err != nil {
+				return nil, err
+			}
+			return sj(event)
+		}
 	}
+
 	return []jobs.Job{j}, 1, nil
 }

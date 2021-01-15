@@ -4,16 +4,15 @@
 
 package source
 
-type ZipURLSource struct {
-	Url     string            `config:"url"`
-	Headers map[string]string `config:"headers"`
-	PollingSource
+type InlineSource struct {
+	Script string `config:"script"`
+	BaseSource
 }
 
-func (z *ZipURLSource) Fetch() error {
-	panic("implement me")
+func (l *InlineSource) Fetch() (err error) {
+	return nil
 }
 
-func (z *ZipURLSource) Workdir() string {
-	panic("implement me")
+func (l *InlineSource) Workdir() string {
+	return ""
 }

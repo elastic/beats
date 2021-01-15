@@ -10,8 +10,7 @@ import (
 
 type Source struct {
 	Local      *LocalSource  `config:"local"`
-	Github     *GithubSource `config:"github"`
-	ZipURL     *ZipURLSource `config:"zip_url"`
+	Inline     *InlineSource `config:"inline"`
 	ActiveMemo ISource       // cache for selected source
 }
 
@@ -22,10 +21,8 @@ func (s *Source) Active() ISource {
 
 	if s.Local != nil {
 		s.ActiveMemo = s.Local
-	} else if s.Github != nil {
-		s.ActiveMemo = s.Github
-	} else if s.ZipURL != nil {
-		s.ActiveMemo = s.ZipURL
+	} else if s.Inline != nil {
+		s.ActiveMemo = s.Inline
 	}
 
 	return s.ActiveMemo

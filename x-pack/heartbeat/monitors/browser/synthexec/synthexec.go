@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,74 +22,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-
-	"github.com/otiai10/copy"
 )
 
 const debugSelector = "synthexec"
 
-func InitSuite(ctx context.Context, origSuitePath string, params common.MapStr) (journeyNames []string, err error) {
-	dir, err := ioutil.TempDir("/tmp", "elastic-synthetics-")
-	if err != nil {
-		return nil, err
-	}
-
-	err = copy.Copy(origSuitePath, dir)
-	if err != nil {
-		return nil, err
-	}
-
-	return ListJourneys(ctx, dir, params)
-}
-
-// ListJourneys takes the given suite performs a dry run, capturing the Journey names, and returns the list.
-func ListJourneys(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error) {
-	dir, err := getSuiteDir(suitePath)
-	if err != nil {
-		return nil, err
-	}
-
-	if os.Getenv("ELASTIC_SYNTHETICS_OFFLINE") != "true" {
-		// Ensure all deps installed
-		err = runSimpleCommand(exec.Command("npm", "install"), dir)
-		if err != nil {
-			return nil, err
-		}
-
-		// Update playwright, needs to run separately to ensure post-install hook is run that downloads
-		// chrome. See https://github.com/microsoft/playwright/issues/3712
-		err = runSimpleCommand(exec.Command("npm", "install", "playwright-chromium"), dir)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	cmdFactory, err := suiteCommandFactory(dir, suitePath, "--dry-run")
-	if err != nil {
-		return nil, err
-	}
-
-	mpx, err := runCmd(ctx, cmdFactory(), nil, params)
-Outer:
-	for {
-		select {
-		case se := <-mpx.SynthEvents():
-			if se == nil {
-				break Outer
-			}
-			if se.Type == "journey/register" {
-				journeyNames = append(journeyNames, se.Journey.Name)
-			}
-		}
-	}
-
-	logp.Info("Discovered journeys %#v", journeyNames)
-	return journeyNames, nil
-}
-
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suiteFile string, params common.MapStr) (jobs.Job, error) {
-	newCmd, err := suiteCommandFactory(suiteFile, suiteFile, "--screenshots")
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr) (jobs.Job, error) {
+	newCmd, err := suiteCommandFactory(suitePath, "--screenshots")
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +36,8 @@ func SuiteJob(ctx context.Context, suiteFile string, params common.MapStr) (jobs
 	return startCmdJob(ctx, newCmd, nil, params), nil
 }
 
-func suiteCommandFactory(suiteFile string, args ...string) (func() *exec.Cmd, error) {
-	npmRoot, err := getNpmRoot(suiteFile)
+func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
+	npmRoot, err := getNpmRoot(suitePath)
 	if err != nil {
 		return nil, err
 	}
@@ -347,6 +285,9 @@ func getNpmRoot(path string) (string, error) {
 // getNpmRootIn does the same as getNpmRoot but remembers the original path for
 // debugging.
 func getNpmRootIn(path, origPath string) (string, error) {
+	if path == "" {
+		return "", fmt.Errorf("cannot check for package.json in empty path: '%s'", origPath)
+	}
 	candidate := filepath.Join(path, "package.json")
 	_, err := os.Lstat(candidate)
 	if err == nil {
@@ -355,7 +296,7 @@ func getNpmRootIn(path, origPath string) (string, error) {
 	// Try again one level up
 	parent := filepath.Dir(path)
 	if len(parent) < 2 {
-		return "", fmt.Errorf("no package.json found in %s", origPath)
+		return "", fmt.Errorf("no package.json found in '%s'", origPath)
 	}
 	return getNpmRootIn(parent, origPath)
 }

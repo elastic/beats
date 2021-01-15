@@ -83,11 +83,18 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 
 	eventext.MergeEventFields(event, common.MapStr{
 		"monitor": common.MapStr{
-			"id":          je.journey.Id,
-			"name":        je.journey.Name,
 			"check_group": je.checkGroup,
 		},
 	})
+	// Inline jobs have no journey
+	if je.journey != nil {
+		eventext.MergeEventFields(event, common.MapStr{
+			"monitor": common.MapStr{
+				"id":   je.journey.Id,
+				"name": je.journey.Name,
+			},
+		})
+	}
 
 	return je.enrichSynthEvent(event, se)
 }

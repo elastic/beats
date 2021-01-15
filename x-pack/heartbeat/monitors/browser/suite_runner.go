@@ -45,6 +45,13 @@ func (s *SyntheticSuite) Workdir() string {
 	return s.suiteCfg.Source.Active().Workdir()
 }
 
+func (s *SyntheticSuite) InlineSource() (string, bool) {
+	if s.suiteCfg.Source.Inline != nil {
+		return s.suiteCfg.Source.Inline.Script, true
+	}
+	return "", false
+}
+
 func (s *SyntheticSuite) Params() map[string]interface{} {
 	return s.suiteCfg.Params
 }
