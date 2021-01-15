@@ -22,16 +22,18 @@ stages:
     crosscompile:
         make: "make -C winlogbeat crosscompile"
         when:                  ## Override the top-level when.
-            not_changeset:
-                - "^x-pack/.*" ## A generic match
+            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
             - "windows-2008-r2"
         when:                  ## Override the top-level when.
-            not_changeset:
-                - "^x-pack/.*" ## A generic match
+            not_changeset_full_match: "^x-pack/.*" ## Disable the stage if ONLY changes for the x-pack
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

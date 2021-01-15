@@ -229,6 +229,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix typo in config docs {pull}23185[23185]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
+- Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
+- Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 
 *Auditbeat*
 
@@ -249,6 +251,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
+- Note incompatibility of system/socket on ARM. {pull}23381[23381]
 
 *Filebeat*
 
@@ -272,6 +275,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Juniper SRX: Change JSON field types to match the field mappings. {pull}23424[23424]
 - Suricata EVE: Convert `suricata.eve.flow_id` to string because the field is a keyword in the mapping. {pull}23424[23424]
 - Zeek DNS: Ignore failures in data type conversions. And change `dns.id` JSON field to a string to match its `keyword` mapping. {pull}23424[23424]
+- Change the `event.created` in Netflow events to be the time the event was created by Filebeat
+  to be consistent with ECS. {pull}23094[23094]
 
 *Filebeat*
 
@@ -368,6 +373,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
+- Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 
 *Heartbeat*
 
@@ -483,8 +489,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 
 *Packetbeat*
+
+- Fix SIP parser logic related to line length check. {pull}23411[23411]
 
 
 *Winlogbeat*
@@ -575,6 +584,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
 - Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
+- Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
 
 *Auditbeat*
 
@@ -798,7 +808,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 - Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
 - Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
+- Added support for first_event context in filebeat httpjson input {pull}23437[23437]
+- Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
+- Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
 
 *Heartbeat*
 
@@ -947,6 +960,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
+- Add support for multiple regions {pull}21065[21065]
 
 *Winlogbeat*
 
@@ -992,7 +1006,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 

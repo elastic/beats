@@ -30,6 +30,7 @@ func TestValueTpl(t *testing.T) {
 			name:  "can render values from ctx",
 			value: "[[.last_response.body.param]]",
 			paramCtx: &transformContext{
+				firstEvent:   &common.MapStr{},
 				lastEvent:    &common.MapStr{},
 				lastResponse: newTestResponse(common.MapStr{"param": 25}, nil, ""),
 			},
@@ -159,7 +160,8 @@ func TestValueTpl(t *testing.T) {
 			name:  "func getRFC5988Link",
 			value: `[[ getRFC5988Link "previous" .last_response.header.Link ]]`,
 			paramCtx: &transformContext{
-				lastEvent: &common.MapStr{},
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
 				lastResponse: newTestResponse(
 					nil,
 					http.Header{"Link": []string{
