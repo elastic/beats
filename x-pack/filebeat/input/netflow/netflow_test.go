@@ -197,7 +197,9 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 			}
 			ev := make([]beat.Event, len(flows))
 			for i := range flows {
-				ev[i] = toBeatEvent(flows[i], []string{"private"})
+				flow := toBeatEvent(flows[i], []string{"private"})
+				flow.Fields.Delete("event.created")
+				ev[i] = flow
 			}
 			//return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
 			events = append(events, ev...)
@@ -242,7 +244,9 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 		}
 		ev := make([]beat.Event, len(flows))
 		for i := range flows {
-			ev[i] = toBeatEvent(flows[i], []string{"private"})
+			flow := toBeatEvent(flows[i], []string{"private"})
+			flow.Fields.Delete("event.created")
+			ev[i] = flow
 		}
 		events = append(events, ev...)
 	}

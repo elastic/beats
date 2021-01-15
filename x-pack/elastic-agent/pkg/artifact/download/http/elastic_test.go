@@ -137,6 +137,7 @@ func getTestCases() []testCase {
 	return []testCase{
 		{"linux", "32"},
 		{"linux", "64"},
+		{"linux", "arm64"},
 		{"darwin", "32"},
 		{"darwin", "64"},
 		{"windows", "32"},
@@ -164,6 +165,7 @@ func getElasticCoClient() http.Client {
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "i686.rpm"):             struct{}{},
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "x86_64.rpm"):           struct{}{},
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "linux-x86.tar.gz"):     struct{}{},
+		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "linux-arm64.tar.gz"):   struct{}{},
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "linux-x86_64.tar.gz"):  struct{}{},
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "windows-x86.zip"):      struct{}{},
 		fmt.Sprintf("%s-%s-%s", beatSpec.Cmd, version, "windows-x86_64.zip"):   struct{}{},
