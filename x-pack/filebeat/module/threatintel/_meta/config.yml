@@ -79,7 +79,7 @@
     var.input: httpjson
 
     # The URL used for Threat Intel API calls.
-    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects?match[type]=indicator
+    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
 
     # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
     #var.username: guest
