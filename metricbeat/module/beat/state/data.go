@@ -65,8 +65,6 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		RootFields: common.MapStr{},
 	}
 
-	event.Service = info.Beat
-
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -87,11 +85,18 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		}
 	}
 
+	event.MetricSetFields, _ = schema.Apply(data)
+
 	if event.MetricSetFields != nil {
 		event.MetricSetFields.Put("cluster.uuid", clusterUUID)
+		event.MetricSetFields.Put("beat", common.MapStr{
+			"name":    info.Name,
+			"host":    info.Hostname,
+			"type":    info.Beat,
+			"uuid":    info.UUID,
+			"version": info.Version,
+		})
 	}
-
-	event.MetricSetFields, _ = schema.Apply(data)
 
 	//Extract ECS fields from the host key
 	host, ok := event.MetricSetFields["host"]

@@ -2,6 +2,16 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "state": {
+            "beat": {
+                "host": "c6242501b92b",
+                "name": "c6242501b92b",
+                "type": "metricbeat",
+                "uuid": "2c7647a3-3839-455e-939d-04f10b7cd788",
+                "version": "7.10.0"
+            },
+            "cluster": {
+                "uuid": "foobar"
+            },
             "host": {
                 "containerized": "containerized",
                 "os": {
@@ -32,7 +42,7 @@
     },
     "host": {
         "architecture": "x86_64",
-        "hostname": "1e43167a954e"
+        "hostname": "c6242501b92b"
     },
     "metricset": {
         "name": "state",
@@ -40,6 +50,6 @@
     },
     "service": {
         "address": "172.20.0.2:5066",
-        "type": "metricbeat"
+        "type": "beat"
     }
 }
