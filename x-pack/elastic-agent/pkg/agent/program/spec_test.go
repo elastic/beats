@@ -54,7 +54,8 @@ func TestSerialization(t *testing.T) {
 		PreUninstallSteps: transpiler.NewStepList(
 			transpiler.ExecFile(30, "app", "uninstall", "--force"),
 		),
-		When: "1 == 1",
+		When:        "1 == 1",
+		Constraints: "2 == 2",
 	}
 	yml := `name: hello
 cmd: hellocmd
@@ -118,6 +119,7 @@ pre_uninstall:
     - --force
     timeout: 30
 when: 1 == 1
+constraints: 2 == 2
 `
 	t.Run("serialization", func(t *testing.T) {
 		b, err := yaml.Marshal(spec)

@@ -111,3 +111,5 @@ inputs:
         process: true
         file: true
         network: true
+runtime:
+  arch: x86_64
