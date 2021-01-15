@@ -38,7 +38,7 @@ Apr 30 2013 09:23:43: %FTD-5-106100: access-list acl_in est-allowed tcp inside/1
 Apr 30 2013 09:23:43: %FTD-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Apr 15 2018 09:34:34 EDT: %FTD-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Dec 11 2018 08:01:24 127.0.0.1: %FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)
-Dec 11 2018 08:01:24 127.0.0.1: %FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)
+Dec 11 2018 08:01:24 127.0.0.1: %FTD-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)
 Dec 11 2018 08:01:24 127.0.0.1: %FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
 Dec 11 2018 08:01:24 127.0.0.1: %FTD-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
 Dec 11 2018 08:01:31 127.0.0.1: %FTD-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
