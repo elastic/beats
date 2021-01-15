@@ -105,7 +105,7 @@
       description: >
         Categorization of a network event related to a file, for example "Malicious" or "Clean".
 
-    - name: nfm.direction
+    - name: network_info.nfm.direction
       type: keyword
       description: >
         The current direction based on source and destination IP.
@@ -190,10 +190,10 @@
       description: >
         An array of related files when an attack is detected by Exploit Prevention.
 
-    - name: file.attack_details.indicators
-      type: flattened
+    - name: file.parent.disposition
+      type: keyword
       description: >
-        Different indicator types that matches the exploit detected, for example different MITRE tactics.
+        Categorization of parrent, for example "Malicious" or "Clean".
 
     - name: error.description
       type: keyword
@@ -204,3 +204,73 @@
       type: keyword
       description: >
         The error code describing the related error event.
+
+    - name: threat_hunting.severity
+      type: keyword
+      description: >
+        Severity result of the threat hunt registered to the malicious event. Can be Low-Critical.
+
+    - name: threat_hunting.incident_report_guid
+      type: keyword
+      description: >
+        The GUID of the related threat hunting report.
+
+    - name: threat_hunting.incident_hunt_guid
+      type: keyword
+      description: >
+        The GUID of the related investigation tracking issue.
+
+    - name: threat_hunting.incident_title
+      type: keyword
+      description: >
+        Title of the incident related to the threat hunting activity.
+
+    - name: threat_hunting.incident_summary
+      type: keyword
+      description: >
+        Summary of the outcome on the threat hunting activity.
+
+    - name: threat_hunting.incident_remediation
+      type: keyword
+      description: >
+        Recommendations to resolve the vulnerability or exploited host.
+
+    - name: threat_hunting.incident_id
+      type: keyword
+      description: >
+        The id of the related incident for the threat hunting activity.
+
+    - name: threat_hunting.incident_end_time
+      type: keyword
+      description: >
+        When the threat hunt finalized or closed.
+
+    - name: threat_hunting.incident_start_time
+      type: keyword
+      description: >
+        When the threat hunt was initiated.
+
+    - name: file.attack_details.indicators
+      type: flattened
+      description: >
+        Different indicator types that matches the exploit detected, for example different MITRE tactics.
+
+    - name: threat_hunting.tactics
+      type: flattened
+      description: >
+        List of all MITRE tactics related to the incident found.
+
+    - name: threat_hunting.techniques
+      type: flattened
+      description: >
+        List of all MITRE techniques related to the incident found.
+
+    - name: tactics
+      type: flattened
+      description: >
+        List of all MITRE tactics related to the incident found.
+
+    - name: techniques
+      type: flattened
+      description: >
+        List of all MITRE techniques related to the incident found.

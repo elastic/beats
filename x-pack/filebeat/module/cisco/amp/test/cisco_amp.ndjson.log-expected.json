@@ -1,119 +1,75 @@
 [
     {
-        "@timestamp": "2020-11-11T08:52:30.000Z",
+        "@timestamp": "2020-11-11T09:51:38.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
         "cisco.amp.computer.external_ip": "8.8.8.8",
         "cisco.amp.computer.network_addresses": [
             {
-                "ip": "192.168.1.184",
-                "mac": "av:6b:fc:23:a1:29"
+                "ip": "192.168.196.22",
+                "mac": "aa:d9:ac:af:1d:ad"
             },
             {
-                "ip": "192.168.2.1",
-                "mac": "00:50:24:c0:01:01"
+                "ip": "192.168.120.1",
+                "mac": "12:24:56:c2:00:01"
             },
             {
-                "ip": "192.168.12.1",
-                "mac": "55:50:22:c0:12:11"
+                "ip": "192.168.160.1",
+                "mac": "12:50:56:c2:53:08"
             }
         ],
         "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
-        "cisco.amp.date": "2020-11-11T08:52:30+00:00",
-        "cisco.amp.error.description": "File not found",
-        "cisco.amp.error.error_code": 3240099848,
-        "cisco.amp.event_type_id": 2164260910,
-        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.detection": "W32.Trojan.22gp.1201",
+        "cisco.amp.detection_id": "12365423467",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Unknown",
         "cisco.amp.group_guids": [
             "6542345gdfs-234-sdf2-34-6345243"
         ],
         "cisco.amp.related.mac": [
-            "av:6b:fc:23:a1:29",
-            "00:50:24:c0:01:01",
-            "55:50:22:c0:12:11"
+            "aa:d9:ac:af:1d:ad",
+            "12:24:56:c2:00:01",
+            "12:50:56:c2:53:08"
         ],
-        "cisco.amp.timestamp_nanoseconds": 736000000,
-        "event.action": "File Fetch Failed",
+        "cisco.amp.timestamp_nanoseconds": 153000000,
+        "event.action": "Threat Detected",
         "event.dataset": "cisco.amp",
         "event.id": 123578990,
+        "event.kind": "alert",
         "event.module": "cisco",
-        "file.hash.sha256": "a8b424b65d1550c87b531f7a14523bvdf982d8f869976f99fa1cef5342ausdy",
-        "file.name": "setup.exe",
-        "file.path": "\\\\?\\C:\\Users\\elastic\\AppData\\Local\\Temp\\somezip.zip\\Visual_install\\setup.exe",
+        "event.severity": 2,
+        "file.hash.md5": "9a8557b98ed1469272fa0ace91d63477",
+        "file.hash.sha1": "d0c4192b65e36553fvfd2b83f3113f6ae8390baa",
+        "file.hash.sha256": "e678899d7ea9702184067b56655f91b69f8a0bdc9df65613762252c055c2cdvc",
+        "file.name": "HYXiN3hY.exe.part",
+        "file.path": "\\\\?\\C:\\Users\\elastic\\AppData\\Local\\Temp\\HYXiN3hY.exe.part",
         "fileset.name": "amp",
         "host.hostname": "testhost",
         "host.name": "testhost",
+        "host.user.name": "user@domain",
         "input.type": "log",
-        "log.offset": 4724,
+        "log.offset": 0,
+        "process.parent.hash.md5": "e50ab86d5409d4d0ad386b27ea7f78fb",
+        "process.parent.hash.sha1": "d539afb0991e823c7cdf824b610a5a5d7655a2da",
+        "process.parent.hash.sha256": "a7ca534327103ec5fac749f5ab8b7a1fe81209aa580a52df656284ef6215f0ab",
+        "process.parent.name": "firefox.exe",
+        "process.parent.pid": 88,
         "related.hash": [
-            "a8b424b65d1550c87b531f7a14523bvdf982d8f869976f99fa1cef5342ausdy"
+            "a7ca534327103ec5fac749f5ab8b7a1fe81209aa580a52df656284ef6215f0ab",
+            "e50ab86d5409d4d0ad386b27ea7f78fb",
+            "d539afb0991e823c7cdf824b610a5a5d7655a2da",
+            "e678899d7ea9702184067b56655f91b69f8a0bdc9df65613762252c055c2cdvc",
+            "9a8557b98ed1469272fa0ace91d63477",
+            "d0c4192b65e36553fvfd2b83f3113f6ae8390baa"
         ],
         "related.ip": [
-            "192.168.1.184",
-            "192.168.2.1",
-            "192.168.12.1"
+            "192.168.196.22",
+            "192.168.120.1",
+            "192.168.160.1"
         ],
-        "service.type": "cisco",
-        "tags": [
-            "cisco-amp",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2020-11-11T07:22:33.000Z",
-        "cisco.amp.computer.active": true,
-        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
-        "cisco.amp.computer.network_addresses": [
-            {
-                "ip": "192.168.1.2",
-                "mac": "11:50:f1:12:23:23"
-            },
-            {
-                "ip": "192.168.1.1",
-                "mac": "0a:12:27:52:00:12"
-            },
-            {
-                "ip": "192.168.2.1",
-                "mac": "00:c1:12:c0:22:12"
-            }
-        ],
-        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
-        "cisco.amp.date": "2020-11-11T07:22:33+00:00",
-        "cisco.amp.event_type_id": 553648173,
-        "cisco.amp.file.disposition": "Unknown",
-        "cisco.amp.group_guids": [
-            "6542345gdfs-234-sdf2-34-6345243"
-        ],
-        "cisco.amp.related.mac": [
-            "11:50:f1:12:23:23",
-            "0a:12:27:52:00:12",
-            "00:c1:12:c0:22:12"
-        ],
-        "cisco.amp.timestamp_nanoseconds": 170000000,
-        "event.action": "File Fetch Completed",
-        "event.dataset": "cisco.amp",
-        "event.id": 123578990,
-        "event.module": "cisco",
-        "file.hash.md5": "asdgsdrf2346523279149285c8ddc8",
-        "file.hash.sha1": "asdfsadf1234140de34a45db0124e5c518bf612",
-        "file.hash.sha256": "asdf123sdfaac359fcb0d488ca489e2d55645ce34709fdafb78e336405cb",
-        "file.name": "locale.exe",
-        "file.path": "\\\\?\\C:\\tools\\msys64\\usr\\bin\\locale.exe",
-        "fileset.name": "amp",
-        "host.hostname": "testhost",
-        "host.name": "testhost",
-        "input.type": "log",
-        "log.offset": 7566,
-        "related.hash": [
-            "asdf123sdfaac359fcb0d488ca489e2d55645ce34709fdafb78e336405cb",
-            "asdgsdrf2346523279149285c8ddc8",
-            "asdfsadf1234140de34a45db0124e5c518bf612"
-        ],
-        "related.ip": [
-            "192.168.1.2",
-            "192.168.1.1",
-            "192.168.2.1"
+        "related.user": [
+            "user@domain"
         ],
         "service.type": "cisco",
         "tags": [

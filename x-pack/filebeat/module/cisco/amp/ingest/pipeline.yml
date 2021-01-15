@@ -4,8 +4,6 @@ processors:
 - remove:
     field:
     - message
-    - version
-    - metadata
     ignore_missing: true
 #########################
 ## ECS General Mapping ##
@@ -13,8 +11,11 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: alert
 - rename:
-    field: json
+    field: json.data
     target_field: cisco.amp
     ignore_missing: true
 - remove:
@@ -39,10 +40,34 @@ processors:
     field: cisco.amp.event_type
     target_field: event.action
     ignore_missing: true
-- rename:
-    field: cisco.amp.severity
-    target_field: event.severity
-    ignore_missing: true
+- set:
+    field: event.severity
+    value: 1
+    if: ctx?.cisco?.amp?.severity == 'Low'
+- set:
+    field: event.severity
+    value: 2
+    if: ctx?.cisco?.amp?.severity == 'Medium'
+- set:
+    field: event.severity
+    value: 3
+    if: ctx?.cisco?.amp?.severity == 'High'
+- set:
+    field: event.severity
+    value: 3
+    if: ctx?.cisco?.amp?.severity == 'Critical'
+- set:
+    field: event.severity
+    value: 0
+    if: ctx?.cisco?.amp?.severity == null
+
+- date:
+    field: cisco.amp.start_timestamp
+    target_field: event.start
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.start_timestamp != null
 
 ######################
 ## ECS Host Mapping ##
@@ -192,42 +217,60 @@ processors:
     field: related.user
     value: "{{ host.user.name }}"
     if: ctx?.host?.user?.name != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ process.parent.hash.sha256 }}"
     if: ctx?.process?.parent?.hash?.sha256 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ process.parent.hash.md5 }}"
     if: ctx?.process?.parent?.hash?.md5 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ process.parent.hash.sha1 }}"
     if: ctx?.process?.parent?.hash?.sha1 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ file.hash.sha256 }}"
     if: ctx?.file?.hash?.sha256 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ file.hash.md5 }}"
     if: ctx?.file?.hash?.md5 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ file.hash.sha1 }}"
     if: ctx?.file?.hash?.sha1 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ cisco.amp.network_info.parent.identity.sha256 }}"
     if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha256 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ cisco.amp.network_info.parent.identity.md5 }}"
     if: ctx?.cisco?.amp?.network_info?.parent?.identity?.md5 != null
+    allow_duplicates: false
 - append:
     field: related.hash
     value: "{{ cisco.amp.network_info.parent.identity.sha1 }}"
     if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha1 != null
+    allow_duplicates: false
+- append:
+    field: related.ip
+    value: "{{ source.ip }}"
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: "{{ destination.ip }}"
+    if: ctx?.destination?.ip != null
 - foreach:
     field: cisco.amp.computer.network_addresses
     processor:
@@ -257,6 +300,12 @@ processors:
     field:
     - cisco.amp.timestamp
     - cisco.amp.computer.links
+    - json
+    - cisco.amp.severity
+    - cisco.amp.start_timestamp
+    - cisco.amp.date
+    - cisco.amp.start_timestamp_nanoseconds
+    - cisco.amp.start_date
     ignore_missing: true
 on_failure:
 - set:

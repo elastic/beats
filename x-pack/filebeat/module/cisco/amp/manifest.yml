@@ -8,27 +8,14 @@ var:
   - name: tags
     default: [cisco-amp, forwarded]
   - name: ssl
+  - name: request_timeout
+    default: 60s
   - name: client_id
   - name: api_key
+  - name: first_interval
+    default: 24h
   - name: interval
-    default: 1m
-  - name: start_date
-    default:
-      target: url.params.start_date
-      value: '{{ formatDate (now (parseDuration "-1m")) "2006-01-02T15:04:05-0700" }}'
-  - name: link_pagination
-    default:
-      target: url.value
-      value: '{{ last_response.body.metadata.links.next }}'
-  - name: rate_limit
-    default:
-      value: '{{ last_response.header.Get "x-ratelimit-limit"}}'
-  - name: rate_reset
-    default:
-      value: '{{ last_response.header.Get "x-ratelimit-reset"}}'
-  - name: rate_remaining
-    default:
-      value: '{{ last_response.header.Get "x-ratelimit-remaining"}}'
+    default: 60m
 
 ingest_pipeline:
   - ingest/pipeline.yml

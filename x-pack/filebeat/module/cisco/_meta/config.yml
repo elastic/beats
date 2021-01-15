@@ -133,3 +133,7 @@
     #var.client_id:
     # The API key related to the client ID.
     #var.api_key:
+    # How far to look back the first time the module is started. Expects an amount of hours.
+    #var.first_interval: 24h
+    # Overriding the default request timeout, optional.
+    #var.request_timeout: 60s
