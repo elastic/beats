@@ -366,6 +366,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
+- Fix concurrent modification exception in Suricata ingest node pipeline. {pull}NNNN[NNNN]
 
 *Heartbeat*
 

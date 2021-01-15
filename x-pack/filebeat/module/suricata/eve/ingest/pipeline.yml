@@ -96,6 +96,8 @@ processors:
                 } else {
                     ctx.network.protocol = v;
                 }
+            } else if (v instanceof List) {
+                ctx.event[k] = new ArrayList(v);
             } else {
                 ctx.event[k] = v;
             }
