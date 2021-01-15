@@ -62,7 +62,6 @@ func create(name string, cfg *common.Config) (js []jobs.Job, endpoints int, err 
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			logp.Warn("WORKDIR IS %s", ss.Workdir())
 			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params())
 			if err != nil {
 				return nil, err

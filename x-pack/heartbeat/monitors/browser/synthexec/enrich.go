@@ -142,7 +142,8 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": je.urlFields,
 			"synthetics": common.MapStr{
-				"type": "heartbeat/summary",
+				"type":    "heartbeat/summary",
+				"journey": je.journey,
 			},
 			"monitor": common.MapStr{
 				"duration": common.MapStr{

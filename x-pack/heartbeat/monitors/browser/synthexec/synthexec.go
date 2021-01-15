@@ -28,7 +28,9 @@ const debugSelector = "synthexec"
 
 // SuiteJob will run a single journey by name from the given suite.
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr) (jobs.Job, error) {
-	newCmd, err := suiteCommandFactory(suitePath, "--screenshots")
+	// Run the command in the given suitePath, use '.' as the first arg since the command runs
+	// in the correct dir
+	newCmd, err := suiteCommandFactory(suitePath, ".", "--screenshots")
 	if err != nil {
 		return nil, err
 	}
