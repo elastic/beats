@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:48.299Z",
           "kind": "event",
@@ -100,7 +99,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:48.299Z",
           "kind": "event",
@@ -184,7 +182,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
           "kind": "event",
@@ -268,7 +265,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
           "kind": "event",
@@ -352,7 +348,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
           "kind": "event",
@@ -436,7 +431,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.469Z",
           "kind": "event",
@@ -520,7 +514,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
           "kind": "event",
@@ -604,7 +597,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
           "kind": "event",
@@ -688,7 +680,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
           "kind": "event",
@@ -772,7 +763,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-12-23T01:35:31Z",
           "duration": 0,
           "end": "2016-12-23T01:34:51.569Z",
           "kind": "event",

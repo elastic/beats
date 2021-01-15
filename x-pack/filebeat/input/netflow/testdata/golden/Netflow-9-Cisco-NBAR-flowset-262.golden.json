@@ -17,7 +17,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
@@ -110,7 +109,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
           "kind": "event",
@@ -203,7 +201,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
           "kind": "event",
@@ -296,7 +293,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
           "kind": "event",
@@ -389,7 +385,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:10:36Z",
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
           "kind": "event",
