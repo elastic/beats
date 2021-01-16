@@ -22,6 +22,23 @@ type LocalSource struct {
 	BaseSource
 }
 
+func (l *LocalSource) Validate() error {
+	if l.OrigPath == "" {
+		return fmt.Errorf("local source defined with no path specified")
+	}
+
+	s, err := os.Stat(l.OrigPath)
+	base := fmt.Sprintf("local source has invalid path '%s'", l.OrigPath)
+	if err != nil {
+		return fmt.Errorf("%s: %w", base, err)
+	}
+	if !s.IsDir() {
+		return fmt.Errorf("%s: path points to a non-directory", base)
+	}
+
+	return nil
+}
+
 func (l *LocalSource) Fetch() (err error) {
 	if l.workingPath != "" {
 		return nil

@@ -4,19 +4,32 @@
 
 package source
 
+import (
+	"fmt"
+	"regexp"
+)
+
 type InlineSource struct {
 	Script string `config:"script"`
 	BaseSource
 }
 
-func (l *InlineSource) Fetch() (err error) {
+func (s *InlineSource) Validate() error {
+	if !regexp.MustCompile("\\S").MatchString(s.Script) {
+		return fmt.Errorf("no 'script' value specified for inline source")
+	}
+
 	return nil
 }
 
-func (l *InlineSource) Workdir() string {
+func (s *InlineSource) Fetch() (err error) {
+	return nil
+}
+
+func (s *InlineSource) Workdir() string {
 	return ""
 }
 
-func (l *InlineSource) Close() error {
+func (s *InlineSource) Close() error {
 	return nil
 }

@@ -11,7 +11,7 @@ heartbeat.monitors:
   name: Todos Suite
   source:
     local:
-      path: "/home/andrewvc/projects/synthetics/examples/todos"
+      path: "/home/andrewvc/projects/synthetics/examples/todos/"
   schedule: '@every 1m'
 - type: http
   enabled: true
