@@ -60,7 +60,11 @@ func makeUuid() string {
 }
 
 func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
-	if se != nil && !se.Timestamp().IsZero() {
+	if se == nil {
+		return nil
+	}
+
+	if !se.Timestamp().IsZero() {
 		event.Timestamp = se.Timestamp()
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
@@ -76,10 +80,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		event.Timestamp = time.Now()
 	}
 
-	// No more synthEvents? In this case this is the summary event
-	if se == nil {
-		return nil
-	}
+
 
 	eventext.MergeEventFields(event, common.MapStr{
 		"monitor": common.MapStr{
