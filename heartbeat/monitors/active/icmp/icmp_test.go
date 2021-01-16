@@ -65,7 +65,7 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	tl := mockLoop{pingRtt: time.Microsecond * 1000, pingRequests: 1}
 	jf, err := newJobFactory(cfg, monitors.NewStdResolver(), tl)
 	require.NoError(t, err)
-	j, endpoints, err := jf.makeJobs()
+	j, endpoints, err := jf.makePlugin()
 	require.Len(t, j, 1)
 	require.Equal(t, 1, endpoints)
 	e := &beat.Event{}

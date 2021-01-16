@@ -55,3 +55,11 @@ func (s *SyntheticSuite) InlineSource() (string, bool) {
 func (s *SyntheticSuite) Params() map[string]interface{} {
 	return s.suiteCfg.Params
 }
+
+func (s *SyntheticSuite) Close() error {
+	if s.suiteCfg.Source.ActiveMemo != nil {
+		s.suiteCfg.Source.ActiveMemo.Close()
+	}
+
+	return nil
+}

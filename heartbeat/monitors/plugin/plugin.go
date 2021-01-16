@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package monitors
+package plugin
 
 import (
 	"errors"
@@ -29,11 +29,19 @@ import (
 	"github.com/elastic/beats/v7/libbeat/plugin"
 )
 
-type pluginBuilder struct {
-	name    string
-	aliases []string
-	builder PluginBuilder
-	stats   registryRecorder
+type PluginFactory struct {
+	Name    string
+	Aliases []string
+	Builder PluginFactoryCreate
+	Stats   RegistryRecorder
+}
+
+type PluginFactoryCreate func(string, *common.Config) (p Plugin, err error)
+
+type Plugin struct {
+	Jobs      []jobs.Job
+	Close     func() error
+	Endpoints int
 }
 
 var pluginKey = "heartbeat.monitor"
@@ -41,13 +49,13 @@ var pluginKey = "heartbeat.monitor"
 // stateGlobalRecorder records statistics across all plugin types
 var stateGlobalRecorder = newRootGaugeRecorder(hbregistry.TelemetryRegistry)
 
-func statsForPlugin(pluginName string) registryRecorder {
-	return multiRegistryRecorder{
-		recorders: []registryRecorder{
+func statsForPlugin(pluginName string) RegistryRecorder {
+	return MultiRegistryRecorder{
+		recorders: []RegistryRecorder{
 			// state (telemetry)
 			newPluginGaugeRecorder(pluginName, hbregistry.TelemetryRegistry),
 			// Record global monitors / endpoints count
-			newPluginCountersRecorder(pluginName, hbregistry.StatsRegistry),
+			NewPluginCountersRecorder(pluginName, hbregistry.StatsRegistry),
 			// When stats for this plugin are updated, update the global stats as well
 			stateGlobalRecorder,
 		},
@@ -56,19 +64,15 @@ func statsForPlugin(pluginName string) registryRecorder {
 
 func init() {
 	plugin.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(pluginBuilder)
+		p, ok := ifc.(PluginFactory)
 		if !ok {
 			return errors.New("plugin does not match monitor plugin type")
 		}
 
-		stats := statsForPlugin(p.name)
-		return globalPluginsReg.register(pluginBuilder{p.name, p.aliases, p.builder, stats})
+		stats := statsForPlugin(p.Name)
+		return GlobalPluginsReg.Register(PluginFactory{p.Name, p.Aliases, p.Builder, stats})
 	})
 }
-
-// PluginBuilder is the signature of functions used to build active
-// monitorStarts
-type PluginBuilder func(string, *common.Config) (jobs []jobs.Job, endpoints int, err error)
 
 // Type represents whether a plugin is active or passive.
 type Type uint8
@@ -81,40 +85,40 @@ const (
 )
 
 // globalPluginsReg maintains the canonical list of valid Heartbeat monitorStarts at runtime.
-var globalPluginsReg = newPluginsReg()
+var GlobalPluginsReg = NewPluginsReg()
 
-type pluginsReg struct {
-	monitors map[string]pluginBuilder
+type PluginsReg struct {
+	monitors map[string]PluginFactory
 }
 
-func newPluginsReg() *pluginsReg {
-	return &pluginsReg{
-		monitors: map[string]pluginBuilder{},
+func NewPluginsReg() *PluginsReg {
+	return &PluginsReg{
+		monitors: map[string]PluginFactory{},
 	}
 }
 
-// RegisterActive registers a new active (as opposed to passive) monitor.
-func RegisterActive(name string, builder PluginBuilder, aliases ...string) {
+// Register registers a new active (as opposed to passive) monitor.
+func Register(name string, builder PluginFactoryCreate, aliases ...string) {
 	stats := statsForPlugin(name)
-	if err := globalPluginsReg.add(pluginBuilder{name, aliases, builder, stats}); err != nil {
+	if err := GlobalPluginsReg.Add(PluginFactory{name, aliases, builder, stats}); err != nil {
 		panic(err)
 	}
 }
 
 // ErrPluginAlreadyExists is returned when there is an attempt to register two plugins
 // with the same pluginName.
-type ErrPluginAlreadyExists pluginBuilder
+type ErrPluginAlreadyExists PluginFactory
 
 func (m ErrPluginAlreadyExists) Error() string {
-	return fmt.Sprintf("monitor plugin named '%s' with aliases %v already exists", m.name, m.aliases)
+	return fmt.Sprintf("monitor plugin named '%s' with Aliases %v already exists", m.Name, m.Aliases)
 }
 
-func (r *pluginsReg) add(plugin pluginBuilder) error {
-	if _, exists := r.monitors[plugin.name]; exists {
+func (r *PluginsReg) Add(plugin PluginFactory) error {
+	if _, exists := r.monitors[plugin.Name]; exists {
 		return ErrPluginAlreadyExists(plugin)
 	}
-	r.monitors[plugin.name] = plugin
-	for _, alias := range plugin.aliases {
+	r.monitors[plugin.Name] = plugin
+	for _, alias := range plugin.Aliases {
 		if _, exists := r.monitors[alias]; exists {
 			return ErrPluginAlreadyExists(plugin)
 		}
@@ -123,22 +127,22 @@ func (r *pluginsReg) add(plugin pluginBuilder) error {
 	return nil
 }
 
-func (r *pluginsReg) register(plugin pluginBuilder) error {
-	if _, found := r.monitors[plugin.name]; found {
-		return fmt.Errorf("monitor type %v already exists", plugin.name)
+func (r *PluginsReg) Register(plugin PluginFactory) error {
+	if _, found := r.monitors[plugin.Name]; found {
+		return fmt.Errorf("monitor type %v already exists", plugin.Name)
 	}
 
-	r.monitors[plugin.name] = plugin
+	r.monitors[plugin.Name] = plugin
 
 	return nil
 }
 
-func (r *pluginsReg) get(name string) (pluginBuilder, bool) {
+func (r *PluginsReg) Get(name string) (PluginFactory, bool) {
 	e, found := r.monitors[name]
 	return e, found
 }
 
-func (r *pluginsReg) String() string {
+func (r *PluginsReg) String() string {
 	var monitors []string
 	for m := range r.monitors {
 		monitors = append(monitors, m)
@@ -148,7 +152,7 @@ func (r *pluginsReg) String() string {
 	return fmt.Sprintf("globalPluginsReg, monitor: %v",
 		strings.Join(monitors, ", "))
 }
-func (r *pluginsReg) monitorNames() []string {
+func (r *PluginsReg) MonitorNames() []string {
 	names := make([]string, 0, len(r.monitors))
 	for k := range r.monitors {
 		names = append(names, k)
@@ -156,17 +160,6 @@ func (r *pluginsReg) monitorNames() []string {
 	return names
 }
 
-func (e *pluginBuilder) create(cfg *common.Config) (jobs []jobs.Job, endpoints int, err error) {
-	return e.builder(e.name, cfg)
-}
-
-func (t Type) String() string {
-	switch t {
-	case ActiveMonitor:
-		return "active"
-	case PassiveMonitor:
-		return "passive"
-	default:
-		return "unknown type"
-	}
+func (e *PluginFactory) Create(cfg *common.Config) (p Plugin, err error) {
+	return e.Builder(e.Name, cfg)
 }

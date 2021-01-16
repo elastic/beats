@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -68,13 +69,13 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 	}
 
 	p = pipetool.WithClientConfigEdit(p, configEditor)
-	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches)
+	monitor, err := newMonitor(c, plugin.GlobalPluginsReg, p, f.sched, f.allowWatches)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg, f.allowWatches)
 }
 
 func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.ConfigEditor, error) {

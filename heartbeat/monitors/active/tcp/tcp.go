@@ -23,6 +23,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -39,7 +41,7 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("tcp", create, "synthetics/tcp")
+	plugin.Register("tcp", create, "synthetics/tcp")
 }
 
 var debugf = logp.MakeDebug("tcp")
@@ -47,7 +49,7 @@ var debugf = logp.MakeDebug("tcp")
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []jobs.Job, endpoints int, err error) {
+) (p plugin.Plugin, err error) {
 	return createWithResolver(cfg, monitors.NewStdResolver())
 }
 
@@ -56,18 +58,18 @@ func create(
 func createWithResolver(
 	cfg *common.Config,
 	resolver monitors.Resolver,
-) (jobs []jobs.Job, endpoints int, err error) {
+) (p plugin.Plugin, err error) {
 	jc, err := newJobFactory(cfg, resolver)
 	if err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
-	jobs, err = jc.makeJobs()
+	js, err := jc.makeJobs()
 	if err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
-	return jobs, len(jc.endpoints), nil
+	return plugin.Plugin{js, nil, len(jc.endpoints)}, nil
 }
 
 // jobFactory is where most of the logic here lives. It provides a common context around

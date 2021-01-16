@@ -23,6 +23,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -134,30 +136,30 @@ func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
 	return []jobs.Job{j}, nil
 }
 
-func mockPluginBuilder() pluginBuilder {
+func mockPluginBuilder() plugin.PluginFactory {
 	reg := monitoring.NewRegistry()
 
-	return pluginBuilder{
+	return plugin.PluginFactory{
 		"test",
 		[]string{"testAlias"},
-		func(s string, config *common.Config) ([]jobs.Job, int, error) {
+		func(s string, config *common.Config) (plugin.Plugin, error) {
 			// Declare a real config block with a required attr so we can see what happens when it doesn't work
 			unpacked := struct {
 				URLs []string `config:"urls" validate:"required"`
 			}{}
 			err := config.Unpack(&unpacked)
 			if err != nil {
-				return nil, 0, err
+				return plugin.Plugin{}, err
 			}
 			c := common.Config{}
 			j, err := createMockJob("test", &c)
-			return j, 1, err
-		}, newPluginCountersRecorder("test", reg)}
+			return plugin.Plugin{j, nil, 1}, err
+		}, plugin.NewPluginCountersRecorder("test", reg)}
 }
 
-func mockPluginsReg() *pluginsReg {
-	reg := newPluginsReg()
-	reg.add(mockPluginBuilder())
+func mockPluginsReg() *plugin.PluginsReg {
+	reg := plugin.NewPluginsReg()
+	reg.Add(mockPluginBuilder())
 	return reg
 }
 
