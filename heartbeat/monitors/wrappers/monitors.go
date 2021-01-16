@@ -202,10 +202,6 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			if v, _ := event.GetValue("monitor.id"); v != state.monitorId {
-				resetState()
-			}
-
 			cont, jobErr := job(event)
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
