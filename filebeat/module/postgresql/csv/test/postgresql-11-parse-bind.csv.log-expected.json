@@ -22,6 +22,8 @@
         "postgresql.log.timestamp": "2021-01-04 00:51:56.837 UTC",
         "postgresql.csv.transaction_id": 0,
         "postgresql.csv.virtual_transaction_id": "3/135",
+        "postgresql.csv.message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
         "process.pid": "105",
         "related.user": [
             "postgres"
@@ -53,6 +55,8 @@
         "postgresql.log.timestamp": "2021-01-04 00:51:56.843 UTC",
         "postgresql.csv.transaction_id": 0,
         "postgresql.csv.virtual_transaction_id": "3/136",
+        "postgresql.csv.message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
         "process.pid": "105",
         "related.user": [
             "postgres"
@@ -84,6 +88,8 @@
         "postgresql.log.timestamp": "2021-01-04 00:51:56.843 UTC",
         "postgresql.csv.transaction_id": 0,
         "postgresql.csv.virtual_transaction_id": "3/136",
+        "postgresql.csv.message": "SELECT * from information_schema.tables WHERE table_name = $1",
+        "postgresql.log.query_name": "py:0x7fde12d61b80",
         "process.pid": "105",
         "related.user": [
             "postgres"

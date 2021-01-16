@@ -15,7 +15,7 @@
         "postgresql.csv.command_tag": "startup",
         "postgresql.log.database": "loggiproduction",
         "postgresql.csv.error_severity": "FATAL",
-        "postgresql.log.query": "role \"jose.villanova\" does not exist",
+        "postgresql.csv.message": "role \"jose.villanova\" does not exist",
         "postgresql.csv.session_id": "5ff202ad.4fec",
         "postgresql.csv.session_start_time": "2021-01-03T17:45:17.000Z",
         "postgresql.csv.sql_state_code": "28000",

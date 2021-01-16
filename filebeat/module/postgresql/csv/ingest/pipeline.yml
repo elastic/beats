@@ -69,13 +69,15 @@ processors:
     field: temp.message
     ignore_missing: true
     patterns:
-    - '^duration: %{NUMBER:temp.duration:float} ms'
-    - '^duration: %{NUMBER:temp.duration:float} ms  statement: %{GREEDYDATA:postgresql.log.query}$'
-    - '^(statement: )?%{GREEDYDATA:postgresql.log.query}$'
+    - '^duration: %{NUMBER:temp.duration:float} ms$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP} %{DATA:postgresql.log.query_name}: %{GREEDYDATA:postgresql.csv.message}$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:postgresql.csv.message}$'
+    - '^(%{POSTGRESQL_QUERY_STEP}: )?%{GREEDYDATA:postgresql.csv.message}$'
     pattern_definitions:
       GREEDYDATA: |-
         (.|
         |   )*
+      POSTGRESQL_QUERY_STEP: '(parse|bind|statement|fastpath function call|execute|execute fetch from)'
 - script:
     lang: painless
     source: ctx.event.duration = Math.round(ctx.temp.duration * params.scale)

@@ -20,6 +20,7 @@
         "postgresql.csv.command_tag": "SELECT",
         "postgresql.log.database": "postgres",
         "postgresql.csv.error_severity": "LOG",
+        "postgresql.csv.message": "SELECT 'multi',\n'line';",
         "postgresql.csv.session_id": "5ff25f96.3b",
         "postgresql.csv.session_start_time": "2021-01-04T00:21:42.000Z",
         "postgresql.csv.sql_state_code": "00000",
