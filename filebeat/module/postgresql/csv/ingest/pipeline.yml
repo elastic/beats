@@ -12,25 +12,25 @@ processors:
                     "postgresql.log.database",
                     "process.pid",
                     "temp.connection_from",
-                    "postgresql.log.session_id",
+                    "postgresql.csv.session_id",
                     "temp.session_line_num",
-                    "postgresql.log.command_tag",
+                    "postgresql.csv.command_tag",
                     "temp.session_start_time",
-                    "postgresql.log.virtual_transaction_id",
-                    "postgresql.log.transaction_id",
-                    "postgresql.log.error_severity",
-                    "postgresql.log.sql_state_code",
+                    "postgresql.csv.virtual_transaction_id",
+                    "postgresql.csv.transaction_id",
+                    "postgresql.csv.error_severity",
+                    "postgresql.csv.sql_state_code",
                     "temp.message",
-                    "postgresql.log.detail",
-                    "postgresql.log.hint",
+                    "postgresql.csv.detail",
+                    "postgresql.csv.hint",
                     "postgresql.internal_query",
                     "temp.internal_query_pos",
-                    "postgresql.log.context",
+                    "postgresql.csv.context",
                     "postgresql.log.query",
                     "temp.query_pos",
-                    "postgresql.log.location",
-                    "postgresql.log.application_name",
-                    "postgresql.log.backend_type"]
+                    "postgresql.csv.location",
+                    "postgresql.csv.application_name",
+                    "postgresql.csv.backend_type"]
     ignore_missing: true
     trim: true
 - remove:
@@ -48,21 +48,21 @@ processors:
    field: temp.connection_from
    ignore_missing: true
    patterns:
-    - '^%{DATA:postgresql.log.client_addr}(:%{NUMBER:postgresql.log.client_port:int})?$'
+    - '^%{DATA:postgresql.csv.client_addr}(:%{NUMBER:postgresql.csv.client_port:int})?$'
 
 - convert:
-    field: "postgresql.log.session_line_num"
+    field: "postgresql.csv.session_line_num"
     type: long
     ignore_missing: true
 - date:
     field: temp.session_start_time
-    target_field: postgresql.log.session_start_time
+    target_field: postgresql.csv.session_start_time
     formats:
     - yyyy-MM-dd HH:mm:ss.SSS zz
     - yyyy-MM-dd HH:mm:ss zz
 
 - convert:
-    field: postgresql.log.transaction_id
+    field: postgresql.csv.transaction_id
     type: long
     ignore_missing: true
 - grok:
