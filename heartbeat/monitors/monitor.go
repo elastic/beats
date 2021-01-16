@@ -328,9 +328,11 @@ func (m *Monitor) Stop() {
 		t.Stop()
 	}
 
-	err := m.close()
-	if err != nil {
-		logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+	if m.close != nil {
+		err := m.close()
+		if err != nil {
+			logp.Error(fmt.Errorf("error closing monitor %s: %w", m.String(), err))
+		}
 	}
 
 	m.stats.StopMonitor(int64(m.endpoints))

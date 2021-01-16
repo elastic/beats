@@ -20,7 +20,7 @@ heartbeat.monitors:
   schedule: "@every 15s"
   name: Simple HTTP
 - type: browser
-  enabled: false
+  enabled: true
   id: my-monitor
   name: My Monitor
   source:

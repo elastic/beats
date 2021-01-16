@@ -57,6 +57,7 @@ func (s *SyntheticSuite) Params() map[string]interface{} {
 }
 
 func (s *SyntheticSuite) Close() error {
+	logp.Warn("INTERNAL CLOSE!!!")
 	if s.suiteCfg.Source.ActiveMemo != nil {
 		s.suiteCfg.Source.ActiveMemo.Close()
 	}
