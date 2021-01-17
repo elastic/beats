@@ -127,6 +127,8 @@ class Test(BaseTest):
         with pytest.raises(ssl.SSLError):
             tls.connect((config.get('host'), config.get('port')))
 
+        sock.close()
+
     def test_tcp_over_tls_mutual_auth_fails(self):
         """
         Test filebeat TCP with TLS with default setting to enforce client auth, with bad client certificates
@@ -274,6 +276,8 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         assert path.isfile(path.join(self.working_dir, "output/" + self.beat_name)) is False
+
+        sock.close()
 
     def assert_output(self, output):
         assert len(output) == 2

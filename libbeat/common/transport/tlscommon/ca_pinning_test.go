@@ -44,23 +44,6 @@ var ser int64 = 1
 func TestCAPinning(t *testing.T) {
 	host := "127.0.0.1"
 
-	t.Run("when the ca_sha256 field is not defined we use normal certificate validation",
-		func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(map[string]interface{}{
-				"certificate_authorities": []string{"ca_test.pem"},
-			})
-
-			config := &Config{}
-			err := cfg.Unpack(config)
-			require.NoError(t, err)
-
-			tlsCfg, err := LoadTLSConfig(config)
-			require.NoError(t, err)
-
-			tls := tlsCfg.BuildModuleConfig(host)
-			require.Nil(t, tls.VerifyPeerCertificate)
-		})
-
 	t.Run("when the ca_sha256 field is defined we use CA cert pinning", func(t *testing.T) {
 		cfg := common.MustNewConfigFrom(map[string]interface{}{
 			"ca_sha256": "hello",
@@ -74,7 +57,7 @@ func TestCAPinning(t *testing.T) {
 		require.NoError(t, err)
 
 		tls := tlsCfg.BuildModuleConfig(host)
-		require.NotNil(t, tls.VerifyPeerCertificate)
+		require.NotNil(t, tls.VerifyConnection)
 	})
 
 	t.Run("CA Root -> Certificate and we have the CA root pin", func(t *testing.T) {
@@ -119,8 +102,9 @@ func TestCAPinning(t *testing.T) {
 		pin := Fingerprint(ca.Leaf)
 
 		tlsC := &TLSConfig{
-			RootCAs:  rootCAs,
-			CASha256: []string{pin},
+			Verification: VerifyFull,
+			RootCAs:      rootCAs,
+			CASha256:     []string{pin},
 		}
 
 		config := tlsC.BuildModuleConfig("localhost")
@@ -300,8 +284,8 @@ func TestCAPinning(t *testing.T) {
 func genCA() (tls.Certificate, error) {
 	ca := &x509.Certificate{
 		SerialNumber: serial(),
-		DNSNames:     []string{"localhost"},
 		Subject: pkix.Name{
+			CommonName:    "localhost",
 			Organization:  []string{"TESTING"},
 			Country:       []string{"CANADA"},
 			Province:      []string{"QUEBEC"},
@@ -344,8 +328,8 @@ func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.C
 	// Create another Cert/key
 	cert := &x509.Certificate{
 		SerialNumber: big.NewInt(2000),
-		DNSNames:     []string{"localhost"},
 		Subject: pkix.Name{
+			CommonName:    "localhost",
 			Organization:  []string{"TESTING"},
 			Country:       []string{"CANADA"},
 			Province:      []string{"QUEBEC"},

@@ -137,7 +137,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
-	assert.Equal(t, false, cfg.InsecureSkipVerify)
+	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 0)
 	assert.Len(t, cfg.CurvePreferences, 0)
 	assert.Equal(t, tls.RenegotiateNever, cfg.Renegotiation)
@@ -193,7 +193,7 @@ key: mykey.pem
 		assert.Len(t, cfg.CipherSuites, 0)
 		assert.Len(t, cfg.CurvePreferences, 0)
 		// values set by default
-		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, true, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.NoClientCert, cfg.ClientAuth)
@@ -222,7 +222,7 @@ key: mykey.pem
 		assert.Len(t, cfg.CipherSuites, 0)
 		assert.Len(t, cfg.CurvePreferences, 0)
 		// values set by default
-		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, true, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)

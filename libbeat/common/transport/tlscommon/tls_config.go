@@ -87,7 +87,6 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 
 	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
 	// or when we are using 'certificate' TLS verification mode, we add a custom callback
-	verifyPeerCertFn := makeVerifyPeerCertificate(c)
 	verifyConnectionFn := makeVerifyConnection(c)
 
 	insecure := c.Verification != VerifyStrict
@@ -95,19 +94,18 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
 	return &tls.Config{
-		MinVersion:            minVersion,
-		MaxVersion:            maxVersion,
-		Certificates:          c.Certificates,
-		RootCAs:               c.RootCAs,
-		ClientCAs:             c.ClientCAs,
-		InsecureSkipVerify:    insecure,
-		CipherSuites:          c.CipherSuites,
-		CurvePreferences:      c.CurvePreferences,
-		Renegotiation:         c.Renegotiation,
-		ClientAuth:            c.ClientAuth,
-		VerifyPeerCertificate: verifyPeerCertFn,
-		Time:                  c.time,
-		VerifyConnection:      verifyConnectionFn,
+		MinVersion:         minVersion,
+		MaxVersion:         maxVersion,
+		Certificates:       c.Certificates,
+		RootCAs:            c.RootCAs,
+		ClientCAs:          c.ClientCAs,
+		InsecureSkipVerify: insecure,
+		CipherSuites:       c.CipherSuites,
+		CurvePreferences:   c.CurvePreferences,
+		Renegotiation:      c.Renegotiation,
+		ClientAuth:         c.ClientAuth,
+		Time:               c.time,
+		VerifyConnection:   verifyConnectionFn,
 	}
 }
 
@@ -124,17 +122,18 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 }
 
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
-	if cfg.Verification == VerifyFull {
+	pin := len(cfg.CASha256) > 0
+
+	switch cfg.Verification {
+	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
 			dnsnames := cs.PeerCertificates[0].DNSNames
-			logp.Info(">>>>> dnsnames %v", dnsnames)
 			var serverName string
 			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
 				serverName = cs.PeerCertificates[0].Subject.CommonName
 			} else {
 				serverName = dnsnames[0]
 			}
-			logp.Info(">>>>> servername %v", serverName)
 			if serverName != cs.ServerName {
 				return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
 			}
@@ -146,41 +145,39 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				opts.Intermediates.AddCert(cert)
 			}
 			_, err := cs.PeerCertificates[0].Verify(opts)
-			logp.Info("verify result %+v", err)
-			return err
-		}
-	}
-	return nil
-
-}
-
-// makeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
-func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
-	pin := len(cfg.CASha256) > 0
-	skipHostName := cfg.Verification == VerifyCertificate
-
-	if pin && !skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			return verifyCAPin(cfg.CASha256, verifiedChains)
-		}
-	}
-
-	if pin && skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
 			if err != nil {
 				return err
 			}
-			return verifyCAPin(cfg.CASha256, verifiedChains)
-		}
-	}
 
-	if !pin && skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
-			return err
+			if pin {
+				verifiedChains := [][]*x509.Certificate{cs.PeerCertificates}
+				return verifyCAPin(cfg.CASha256, verifiedChains)
+			}
+			return nil
 		}
+	case VerifyCertificate:
+		return func(cs tls.ConnectionState) error {
+			opts := x509.VerifyOptions{
+				Roots:         cfg.RootCAs,
+				Intermediates: x509.NewCertPool(),
+			}
+			for _, cert := range cs.PeerCertificates[1:] {
+				opts.Intermediates.AddCert(cert)
+			}
+			_, err := cs.PeerCertificates[0].Verify(opts)
+			if err != nil {
+				return err
+			}
+
+			if pin {
+				verifiedChains := [][]*x509.Certificate{cs.PeerCertificates}
+				return verifyCAPin(cfg.CASha256, verifiedChains)
+			}
+			return nil
+		}
+	default:
 	}
 
 	return nil
+
 }
