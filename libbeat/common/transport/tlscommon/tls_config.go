@@ -127,12 +127,14 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	if cfg.Verification == VerifyFull {
 		return func(cs tls.ConnectionState) error {
 			dnsnames := cs.PeerCertificates[0].DNSNames
+			logp.Infof(">>>>> dnsnames %v", dnsnames)
 			var serverName string
 			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
 				serverName = cs.PeerCertificates[0].Subject.CommonName
 			} else {
 				serverName = dnsnames[0]
 			}
+			logp.Infof(">>>>> servername %v", serverName)
 			if serverName != cs.ServerName {
 				return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
 			}
@@ -144,6 +146,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				opts.Intermediates.AddCert(cert)
 			}
 			_, err := cs.PeerCertificates[0].Verify(opts)
+			logp.Infof("verify result %+v", err)
 			return err
 		}
 	}
