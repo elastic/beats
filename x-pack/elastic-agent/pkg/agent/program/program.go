@@ -69,6 +69,21 @@ func detectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST
 	programs := make([]Program, 0)
 	for _, spec := range Supported {
 		specificAST := singleConfig.Clone()
+		if len(spec.Constraints) > 0 {
+			constraints, err := eql.New(spec.Constraints)
+			if err != nil {
+				return nil, err
+			}
+			ok, err := constraints.Eval(specificAST)
+			if err != nil {
+				return nil, err
+			}
+
+			if !ok {
+				continue
+			}
+		}
+
 		err := spec.Rules.Apply(agentInfo, specificAST)
 		if err != nil {
 			return nil, err
