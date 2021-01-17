@@ -35,7 +35,7 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	statsPath = "/_stats?forbid_closed_indices=false"
 )
 
 var (
