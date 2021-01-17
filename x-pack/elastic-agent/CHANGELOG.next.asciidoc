@@ -33,6 +33,7 @@
 - Skip top level files when unziping archive during upgrade {pull}23456[23456]
 - Do not take ownership of Endpoint log path {pull}23444[23444]
 - Fixed fetching DBus service PID {pull}23496[23496]
+- Fix issue of missing log messages from filebeat monitor {pull}23514[23514]
 
 ==== New features
 
