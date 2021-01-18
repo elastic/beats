@@ -89,7 +89,6 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	// or when we are using 'certificate' TLS verification mode, we add a custom callback
 	verifyConnectionFn := makeVerifyConnection(c)
 
-	fmt.Println(c.Verification)
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
@@ -111,7 +110,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
-func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
+func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
 		return &tls.Config{
@@ -125,6 +124,26 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 
 	config := c.ToConfig()
 	config.ServerName = host
+	config.VerifyConnection = makeVerifyConnection(c)
+	return config
+}
+
+// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
+func (c *TLSConfig) BuildModuleServerConfig(host string) *tls.Config {
+	if c == nil {
+		// use default TLS settings, if config is empty.
+		return &tls.Config{
+			ServerName:         host,
+			InsecureSkipVerify: true,
+			VerifyConnection: makeVerifyServerConnection(&TLSConfig{
+				Verification: VerifyFull,
+			}),
+		}
+	}
+
+	config := c.ToConfig()
+	config.ServerName = host
+	config.VerifyConnection = makeVerifyServerConnection(c)
 	return config
 }
 
@@ -195,6 +214,48 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			return func(cs tls.ConnectionState) error {
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
+		}
+	default:
+	}
+
+	return nil
+
+}
+
+func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+	switch cfg.Verification {
+	case VerifyFull:
+		return func(cs tls.ConnectionState) error {
+			fmt.Println("srever full")
+			if len(cs.PeerCertificates) == 0 {
+				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
+					return fmt.Errorf("no peer certificates")
+				}
+				return nil
+			}
+
+			dnsnames := cs.PeerCertificates[0].DNSNames
+			var serverName string
+			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
+				serverName = cs.PeerCertificates[0].Subject.CommonName
+			} else {
+				serverName = dnsnames[0]
+			}
+			if len(serverName) > 0 && len(cs.ServerName) > 0 && serverName != cs.ServerName {
+				return x509.HostnameError{Certificate: cs.PeerCertificates[0], Host: cs.ServerName}
+			}
+			opts := x509.VerifyOptions{
+				DNSName:       cs.ServerName,
+				Roots:         cfg.RootCAs,
+				Intermediates: x509.NewCertPool(),
+				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			}
+			for _, cert := range cs.PeerCertificates[1:] {
+				opts.Intermediates.AddCert(cert)
+			}
+			_, err := cs.PeerCertificates[0].Verify(opts)
+			fmt.Println(err)
+			return err
 		}
 	default:
 	}

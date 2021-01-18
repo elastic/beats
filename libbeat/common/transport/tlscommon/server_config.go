@@ -28,7 +28,7 @@ import (
 // ServerConfig defines the user configurable tls options for any TCP based service.
 type ServerConfig struct {
 	Enabled          *bool               `config:"enabled"`
-	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full'
+	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full', 'strict'
 	Versions         []TLSVersion        `config:"supported_protocols"`
 	CipherSuites     []tlsCipherSuite    `config:"cipher_suites"`
 	CAs              []string            `config:"certificate_authorities"`

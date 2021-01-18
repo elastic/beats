@@ -132,7 +132,7 @@ func TestApplyEmptyConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
@@ -159,7 +159,7 @@ func TestApplyWithConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
 	assert.Len(t, cfg.Certificates, 1)
 	assert.NotNil(t, cfg.RootCAs)
@@ -184,7 +184,7 @@ key: mykey.pem
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
-		cfg := tmp.BuildModuleConfig("")
+		cfg := tmp.BuildModuleClientConfig("")
 
 		assert.NotNil(t, cfg)
 		// values not set by default
@@ -213,7 +213,7 @@ key: mykey.pem
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
-		cfg := tmp.BuildModuleConfig("")
+		cfg := tmp.BuildModuleClientConfig("")
 
 		assert.NotNil(t, cfg)
 		// values not set by default
@@ -260,7 +260,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 		return
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
 	assert.Len(t, cfg.Certificates, 1)
 	assert.NotNil(t, cfg.ClientCAs)

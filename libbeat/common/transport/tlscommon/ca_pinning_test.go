@@ -56,7 +56,7 @@ func TestCAPinning(t *testing.T) {
 		tlsCfg, err := LoadTLSConfig(config)
 		require.NoError(t, err)
 
-		tls := tlsCfg.BuildModuleConfig(host)
+		tls := tlsCfg.BuildModuleClientConfig(host)
 		require.NotNil(t, tls.VerifyConnection)
 	})
 
@@ -107,7 +107,7 @@ func TestCAPinning(t *testing.T) {
 			CASha256:     []string{pin},
 		}
 
-		config := tlsC.BuildModuleConfig("localhost")
+		config := tlsC.BuildModuleClientConfig("localhost")
 		hostToConnect := l.Addr().String()
 
 		transport := &http.Transport{
@@ -189,7 +189,7 @@ func TestCAPinning(t *testing.T) {
 			CASha256: []string{pin},
 		}
 
-		config := tlsC.BuildModuleConfig("localhost")
+		config := tlsC.BuildModuleClientConfig("localhost")
 		hostToConnect := l.Addr().String()
 
 		transport := &http.Transport{
@@ -263,7 +263,7 @@ func TestCAPinning(t *testing.T) {
 			CASha256: []string{pin},
 		}
 
-		config := tlsC.BuildModuleConfig("localhost")
+		config := tlsC.BuildModuleClientConfig("localhost")
 		hostToConnect := l.Addr().String()
 
 		transport := &http.Transport{
