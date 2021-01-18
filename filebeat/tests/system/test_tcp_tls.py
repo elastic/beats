@@ -173,6 +173,8 @@ class Test(BaseTest):
             # so that the failure can be reported as an exception when it arrives.
             tls.recv(1)
 
+        sock.close()
+
     def test_tcp_over_tls_mutual_auth_succeed(self):
         """
         Test filebeat TCP with TLS when enforcing client auth with good client certificates.

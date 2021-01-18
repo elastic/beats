@@ -245,7 +245,7 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 			}
 			opts := x509.VerifyOptions{
 				DNSName:       cs.ServerName,
-				Roots:         cfg.RootCAs,
+				Roots:         cfg.ClientCAs,
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			}
