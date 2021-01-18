@@ -78,79 +78,88 @@ func TestCAPinning(t *testing.T) {
 	})
 
 	t.Run("CA Root -> Certificate and we have the CA root pin", func(t *testing.T) {
-		msg := []byte("OK received message")
-
-		ca, err := genCA()
-		require.NoError(t, err)
-
-		serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false)
-		require.NoError(t, err)
-
-		mux := http.NewServeMux()
-		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write(msg)
-		})
-
-		// Select a random available port from the OS.
-		addr := "localhost:0"
-
-		l, err := net.Listen("tcp", addr)
-
-		server := &http.Server{
-			Handler: mux,
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{
-					serverCert,
-				},
-			},
+		verificationModes := []TLSVerificationMode{
+			VerifyFull,
+			VerifyStrict,
+			VerifyCertificate,
 		}
+		for _, mode := range verificationModes {
+			t.Run(mode.String(), func(t *testing.T) {
+				msg := []byte("OK received message")
 
-		// Start server and shut it down when the tests are over.
-		go server.ServeTLS(l, "", "")
-		defer l.Close()
+				ca, err := genCA()
+				require.NoError(t, err)
 
-		// Root CA Pool
-		require.NoError(t, err)
-		rootCAs := x509.NewCertPool()
-		rootCAs.AddCert(ca.Leaf)
+				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false)
+				require.NoError(t, err)
 
-		// Get the pin of the RootCA.
-		pin := Fingerprint(ca.Leaf)
+				mux := http.NewServeMux()
+				mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+					w.Write(msg)
+				})
 
-		tlsC := &TLSConfig{
-			Verification: VerifyFull,
-			RootCAs:      rootCAs,
-			CASha256:     []string{pin},
+				// Select a random available port from the OS.
+				addr := "localhost:0"
+
+				l, err := net.Listen("tcp", addr)
+
+				server := &http.Server{
+					Handler: mux,
+					TLSConfig: &tls.Config{
+						Certificates: []tls.Certificate{
+							serverCert,
+						},
+					},
+				}
+
+				// Start server and shut it down when the tests are over.
+				go server.ServeTLS(l, "", "")
+				defer l.Close()
+
+				// Root CA Pool
+				require.NoError(t, err)
+				rootCAs := x509.NewCertPool()
+				rootCAs.AddCert(ca.Leaf)
+
+				// Get the pin of the RootCA.
+				pin := Fingerprint(ca.Leaf)
+
+				tlsC := &TLSConfig{
+					Verification: mode,
+					RootCAs:      rootCAs,
+					CASha256:     []string{pin},
+				}
+
+				config := tlsC.BuildModuleClientConfig("localhost")
+				hostToConnect := l.Addr().String()
+
+				transport := &http.Transport{
+					TLSClientConfig: config,
+				}
+
+				client := &http.Client{Transport: transport}
+
+				port := strings.TrimPrefix(hostToConnect, "127.0.0.1:")
+
+				req, err := http.NewRequest("GET", "https://localhost:"+port, nil)
+				require.NoError(t, err)
+				resp, err := client.Do(req)
+				require.NoError(t, err)
+				content, err := ioutil.ReadAll(resp.Body)
+				require.NoError(t, err)
+
+				assert.True(t, bytes.Equal(msg, content))
+
+				// 1. create key-pair
+				// 2. create pin
+				// 3. start server
+				// 4. Connect
+				// 5. Check wrong key do not work
+				// 6. Check good key work
+				// 7. check plain text fails to work.
+			})
 		}
-
-		config := tlsC.BuildModuleClientConfig("localhost")
-		hostToConnect := l.Addr().String()
-
-		transport := &http.Transport{
-			TLSClientConfig: config,
-		}
-
-		client := &http.Client{Transport: transport}
-
-		port := strings.TrimPrefix(hostToConnect, "127.0.0.1:")
-
-		req, err := http.NewRequest("GET", "https://localhost:"+port, nil)
-		require.NoError(t, err)
-		resp, err := client.Do(req)
-		require.NoError(t, err)
-		content, err := ioutil.ReadAll(resp.Body)
-		require.NoError(t, err)
-
-		assert.True(t, bytes.Equal(msg, content))
-
-		// 1. create key-pair
-		// 2. create pin
-		// 3. start server
-		// 4. Connect
-		// 5. Check wrong key do not work
-		// 6. Check good key work
-		// 7. check plain text fails to work.
 	})
 
 	t.Run("CA Root -> Intermediate -> Certificate and we receive the CA Root Pin", func(t *testing.T) {
@@ -344,6 +353,7 @@ func genCA() (tls.Certificate, error) {
 func genSignedCert(ca tls.Certificate, keyUsage x509.KeyUsage, isCA bool) (tls.Certificate, error) {
 	// Create another Cert/key
 	cert := &x509.Certificate{
+		DNSNames:     []string{"localhost"},
 		SerialNumber: big.NewInt(2000),
 		Subject: pkix.Name{
 			CommonName:    "localhost",

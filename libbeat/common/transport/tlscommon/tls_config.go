@@ -20,8 +20,9 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -75,6 +76,10 @@ type TLSConfig struct {
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
 }
+
+var (
+	MissingPeerCertificate = errors.New("missing peer certificates")
+)
 
 // ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
 // ServerName set, use that method for servers with SNI.
@@ -155,7 +160,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		return func(cs tls.ConnectionState) error {
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
-				return fmt.Errorf("no peer certificates")
+				return MissingPeerCertificate
 			}
 
 			dnsnames := cs.PeerCertificates[0].DNSNames
@@ -189,7 +194,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		return func(cs tls.ConnectionState) error {
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
-				return fmt.Errorf("no peer certificates")
+				return MissingPeerCertificate
 			}
 
 			opts := x509.VerifyOptions{
@@ -228,7 +233,7 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 		return func(cs tls.ConnectionState) error {
 			if len(cs.PeerCertificates) == 0 {
 				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
-					return fmt.Errorf("no peer certificates")
+					return MissingPeerCertificate
 				}
 				return nil
 			}
@@ -247,7 +252,7 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				DNSName:       cs.ServerName,
 				Roots:         cfg.ClientCAs,
 				Intermediates: x509.NewCertPool(),
-				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 			}
 			for _, cert := range cs.PeerCertificates[1:] {
 				opts.Intermediates.AddCert(cert)
