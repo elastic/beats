@@ -44,6 +44,23 @@ var ser int64 = 1
 func TestCAPinning(t *testing.T) {
 	host := "127.0.0.1"
 
+	t.Run("when the ca_sha256 field is not defined we use normal certificate validation", func(t *testing.T) {
+		cfg := common.MustNewConfigFrom(map[string]interface{}{
+			"verification_mode":       "strict",
+			"certificate_authorities": []string{"ca_test.pem"},
+		})
+
+		config := &Config{}
+		err := cfg.Unpack(config)
+		require.NoError(t, err)
+
+		tlsCfg, err := LoadTLSConfig(config)
+		require.NoError(t, err)
+
+		tls := tlsCfg.BuildModuleClientConfig(host)
+		require.Nil(t, tls.VerifyConnection)
+	})
+
 	t.Run("when the ca_sha256 field is defined we use CA cert pinning", func(t *testing.T) {
 		cfg := common.MustNewConfigFrom(map[string]interface{}{
 			"ca_sha256": "hello",
