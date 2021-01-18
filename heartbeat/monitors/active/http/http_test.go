@@ -626,7 +626,9 @@ func TestNewRoundTripper(t *testing.T) {
 			require.NotNil(t, transp.Dial)
 			require.NotNil(t, transport.TLSDialer)
 
-			require.Equal(t, (&tlscommon.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			expected := (&tlscommon.TLSConfig{}).ToConfig()
+			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
+			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
 			require.True(t, transp.DisableKeepAlives)
 		})
 	}

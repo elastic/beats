@@ -89,6 +89,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	// or when we are using 'certificate' TLS verification mode, we add a custom callback
 	verifyConnectionFn := makeVerifyConnection(c)
 
+	fmt.Println(c.Verification)
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
@@ -127,16 +128,17 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
-			dnsnames := cs.PeerCertificates[0].DNSNames
-			var serverName string
-			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
-				serverName = cs.PeerCertificates[0].Subject.CommonName
-			} else {
-				serverName = dnsnames[0]
-			}
-			if serverName != cs.ServerName {
-				return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
-			}
+			//dnsnames := cs.PeerCertificates[0].DNSNames
+			//var serverName string
+			//if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
+			//	serverName = cs.PeerCertificates[0].Subject.CommonName
+			//} else {
+			//	serverName = dnsnames[0]
+			//}
+			//if serverName != cs.ServerName {
+			//	fmt.Println("mas", serverName, "mas", cs.ServerName)
+			//	return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
+			//}
 			opts := x509.VerifyOptions{
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
