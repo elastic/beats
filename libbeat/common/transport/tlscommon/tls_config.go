@@ -226,7 +226,6 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
-			fmt.Println("srever full")
 			if len(cs.PeerCertificates) == 0 {
 				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
 					return fmt.Errorf("no peer certificates")
@@ -254,7 +253,6 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				opts.Intermediates.AddCert(cert)
 			}
 			_, err := cs.PeerCertificates[0].Verify(opts)
-			fmt.Println(err)
 			return err
 		}
 	default:

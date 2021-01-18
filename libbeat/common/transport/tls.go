@@ -62,7 +62,7 @@ func TestTLSDialer(
 			tlsConfig = lastTLSConfig
 		}
 		if tlsConfig == nil {
-			tlsConfig = config.BuildModuleServerConfig(host)
+			tlsConfig = config.BuildModuleClientConfig(host)
 			lastNetwork = network
 			lastAddress = address
 			lastTLSConfig = tlsConfig
