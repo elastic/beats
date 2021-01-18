@@ -136,7 +136,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				serverName = dnsnames[0]
 			}
 			if len(serverName) > 0 && len(cs.ServerName) > 0 && serverName != cs.ServerName {
-				return fmt.Errorf("invalid certificate name %q, expected %q", serverName, cs.ServerName)
+				return x509.HostnameError{Certificate: cs.PeerCertificates[0], Host: cs.ServerName}
 			}
 			opts := x509.VerifyOptions{
 				Roots:         cfg.RootCAs,
