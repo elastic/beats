@@ -50,7 +50,7 @@ group by type dimension and type tag with separate config parameters:
 
 * *group_by_dimension_keys*: A list of keys used in Cost Explorer to group by
 dimensions. Valid values are AZ, INSTANCE_TYPE, LEGAL_ENTITY_NAME,
-LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TAGS, TENANCY, and
+LINKED_ACCOUNT, OPERATION, PLATFORM, PURCHASE_TYPE, SERVICE, TENANCY, and
 USAGE_TYPE.
 
 * *group_by_tag_keys*: A list of keys used in Cost Explorer to group by tags.
