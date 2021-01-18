@@ -114,7 +114,13 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
-		return &tls.Config{ServerName: host}
+		return &tls.Config{
+			ServerName:         host,
+			InsecureSkipVerify: true,
+			VerifyConnection: makeVerifyConnection(&TLSConfig{
+				Verification: VerifyFull,
+			}),
+		}
 	}
 
 	config := c.ToConfig()
@@ -128,6 +134,11 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
+			// On the client side, PeerCertificates can't be empty.
+			if len(cs.PeerCertificates) == 0 {
+				return fmt.Errorf("no peer certificates")
+			}
+
 			dnsnames := cs.PeerCertificates[0].DNSNames
 			var serverName string
 			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
@@ -157,6 +168,11 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
+			// On the client side, PeerCertificates can't be empty.
+			if len(cs.PeerCertificates) == 0 {
+				return fmt.Errorf("no peer certificates")
+			}
+
 			opts := x509.VerifyOptions{
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),

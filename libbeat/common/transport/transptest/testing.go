@@ -126,6 +126,7 @@ func NewMockServerTLS(t *testing.T, to time.Duration, cert string, proxy *transp
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(&tlscommon.Config{
+		VerificationMode: tlscommon.VerifyStrict,
 		Certificate: tlscommon.CertificateConfig{
 			Certificate: cert + ".pem",
 			Key:         cert + ".key",
