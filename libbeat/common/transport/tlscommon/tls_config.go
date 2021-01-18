@@ -145,13 +145,12 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			for _, cert := range cs.PeerCertificates[1:] {
 				opts.Intermediates.AddCert(cert)
 			}
-			_, err := cs.PeerCertificates[0].Verify(opts)
+			verifiedChains, err := cs.PeerCertificates[0].Verify(opts)
 			if err != nil {
 				return err
 			}
 
 			if pin {
-				verifiedChains := [][]*x509.Certificate{cs.PeerCertificates}
 				return verifyCAPin(cfg.CASha256, verifiedChains)
 			}
 			return nil
@@ -165,16 +164,21 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			for _, cert := range cs.PeerCertificates[1:] {
 				opts.Intermediates.AddCert(cert)
 			}
-			_, err := cs.PeerCertificates[0].Verify(opts)
+			verifiedChains, err := cs.PeerCertificates[0].Verify(opts)
 			if err != nil {
 				return err
 			}
 
 			if pin {
-				verifiedChains := [][]*x509.Certificate{cs.PeerCertificates}
 				return verifyCAPin(cfg.CASha256, verifiedChains)
 			}
 			return nil
+		}
+	case VerifyStrict:
+		if pin {
+			return func(cs tls.ConnectionState) error {
+				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
+			}
 		}
 	default:
 	}
