@@ -1335,6 +1335,55 @@
       "type": "visualization",
       "updated_at": "2020-09-10T22:27:54.232Z",
       "version": "WzI1NTAsMTFd"
+    },
+    {
+      "attributes": {
+        "columns": [
+          "host.name",
+          "source.domain",
+          "flow.src_port_name",
+          "destination.domain",
+          "flow.dst_port_name",
+          "network.bytes",
+          "network.packets"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          [
+            "@timestamp",
+            "desc"
+          ]
+        ],
+        "title": "ElastiFlow: Flow Records (src/dst) - search",
+        "version": 1
+      },
+      "id": "0d0216f0-2fe0-11e7-9d02-3f49bde5c1d5",
+      "migrationVersion": {
+        "search": "7.4.0"
+      },
+      "references": [
+        {
+          "id": "elastiflow-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2020-07-20T18:19:27.998Z",
+      "version": "WzEwMiwxXQ=="
     }
   ],
   "version": "7.8.0"
