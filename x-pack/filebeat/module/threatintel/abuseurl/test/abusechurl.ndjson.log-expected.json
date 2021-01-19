@@ -1,10 +1,11 @@
 [
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961548/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -28,15 +29,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961548/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961546/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -60,15 +61,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961546/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961547/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -92,15 +93,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961547/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961545/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -124,15 +125,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961545/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961544/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -156,15 +157,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961544/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961543/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -188,15 +189,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961543/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961540/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -220,15 +221,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961540/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961541/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -252,15 +253,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961541/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961542/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -284,15 +285,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961542/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.431Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961539/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -316,15 +317,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961539/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961538/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -348,15 +349,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961538/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.844Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961537/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -380,15 +381,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961537/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961531/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -412,15 +413,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961531/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961532/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -444,15 +445,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961532/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961533/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -476,15 +477,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961533/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961534/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -508,15 +509,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961534/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961535/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -540,15 +541,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961535/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961536/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -572,15 +573,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961536/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961530/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -604,15 +605,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961530/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961525/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -636,15 +637,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961525/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961526/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -668,15 +669,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961526/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961527/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -700,15 +701,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961527/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961528/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -732,15 +733,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961528/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961529/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -764,15 +765,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961529/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961524/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -795,15 +796,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961524/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961523/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -826,15 +827,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961523/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961520/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -857,15 +858,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961520/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961521/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -888,15 +889,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961521/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961522/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -919,15 +920,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961522/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961518/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -950,15 +951,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961518/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.432Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961519/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -982,15 +983,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961519/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.845Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961516/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1015,15 +1016,15 @@
             "mips"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961516/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961517/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1047,15 +1048,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961517/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961515/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1078,15 +1079,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961515/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961513/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1109,15 +1110,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961513/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961514/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1140,15 +1141,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961514/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961509/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1171,15 +1172,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961509/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961510/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1202,15 +1203,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961510/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961511/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1235,15 +1236,15 @@
             "mips"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961511/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961512/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1266,15 +1267,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961512/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961507/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1298,15 +1299,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961507/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961508/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1330,15 +1331,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961508/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961506/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1362,15 +1363,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961506/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961504/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1394,15 +1395,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961504/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961505/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1426,15 +1427,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961505/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961500/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1458,15 +1459,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961500/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961501/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1490,15 +1491,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961501/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961502/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1522,15 +1523,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961502/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961503/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1554,15 +1555,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961503/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961496/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1586,15 +1587,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961496/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961497/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1618,15 +1619,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961497/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961498/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1650,15 +1651,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961498/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.433Z",
+        "@timestamp": "2021-01-15T19:00:58.846Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961499/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1682,15 +1683,15 @@
             "Mozi"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "online",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961499/"
+        "threatintel.abuseurl.url_status": "online"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961494/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1713,15 +1714,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961494/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961495/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1744,15 +1745,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961495/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961492/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1775,15 +1776,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961492/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961493/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1806,15 +1807,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961493/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961490/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1837,15 +1838,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961490/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961491/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1868,15 +1869,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961491/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961489/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1899,15 +1900,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961489/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961488/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1930,15 +1931,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961488/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961487/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1961,15 +1962,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961487/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961485/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -1992,15 +1993,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961485/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961486/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2023,15 +2024,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961486/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961482/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2054,15 +2055,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961482/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961483/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2085,15 +2086,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961483/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961484/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2116,15 +2117,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961484/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961480/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2147,15 +2148,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961480/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961481/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2178,15 +2179,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961481/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961478/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2209,15 +2210,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961478/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961479/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2240,15 +2241,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961479/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961476/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2271,15 +2272,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961476/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961477/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2302,15 +2303,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961477/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.434Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961470/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2333,15 +2334,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961470/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.847Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961471/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2364,15 +2365,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961471/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961472/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2395,15 +2396,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961472/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961473/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2426,15 +2427,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961473/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961474/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2457,15 +2458,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961474/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961475/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2488,15 +2489,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961475/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961468/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2519,15 +2520,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961468/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961469/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2550,15 +2551,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961469/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961467/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2581,15 +2582,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961467/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961464/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2612,15 +2613,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961464/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961465/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2643,15 +2644,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961465/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961466/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2674,15 +2675,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961466/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961461/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2705,15 +2706,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961461/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961462/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2736,15 +2737,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961462/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961463/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2767,15 +2768,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961463/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961458/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2798,15 +2799,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961458/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961459/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2829,15 +2830,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961459/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961460/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2860,15 +2861,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961460/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.848Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961455/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2891,15 +2892,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961455/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961456/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2922,15 +2923,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961456/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961457/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2953,15 +2954,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961457/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961450/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -2984,15 +2985,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961450/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.435Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961451/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -3015,15 +3016,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961451/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.436Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961452/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -3046,15 +3047,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961452/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.436Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961453/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -3077,15 +3078,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961453/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.436Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961454/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -3108,15 +3109,15 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961454/"
+        "threatintel.abuseurl.url_status": "offline"
     },
     {
-        "@timestamp": "2021-01-15T02:29:06.436Z",
+        "@timestamp": "2021-01-15T19:00:58.849Z",
         "event.category": "threat",
         "event.dataset": "threatintel.abuseurl",
         "event.kind": "enrichment",
         "event.module": "threatintel",
+        "event.reference": "https://urlhaus.abuse.ch/url/961448/",
         "event.type": "indicator",
         "fileset.name": "abuseurl",
         "input.type": "log",
@@ -3139,7 +3140,6 @@
             "sLoad"
         ],
         "threatintel.abuseurl.threat": "malware_download",
-        "threatintel.abuseurl.url_status": "offline",
-        "threatintel.abuseurl.urlhaus_reference": "https://urlhaus.abuse.ch/url/961448/"
+        "threatintel.abuseurl.url_status": "offline"
     }
 ]

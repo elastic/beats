@@ -22,6 +22,9 @@
         "threat.indicator.file.hash.md5": "f2679bdabe46e10edc6352fff3c829bc",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "file",
         "threatintel.misp.attribute.category": "Payload delivery",
         "threatintel.misp.attribute.comment": "- Xchecked via VT: a683494fc0d017fd3b4638f8b84caaaac145cc28bc211bd7361723368b4bb21e",
@@ -80,6 +83,9 @@
         "threat.indicator.ip": "178.128.103.74",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": [
             "domain-name",
             "ipv4-addr"
@@ -137,6 +143,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "url",
         "threat.indicator.url.full": "https://www.virustotal.com/file/7fa4482bfbca550ce296d8e791b1091d60d733ea8042167fd0eb853530584452/analysis/1486030116/",
         "threatintel.misp.attribute.category": "External analysis",
@@ -192,6 +201,9 @@
         "threat.indicator.file.hash.sha256": "0a1103bc90725d4665b932f88e81d39eafa5823b0de3ab146e2d4548b7da79a0",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": "file",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "",
@@ -245,6 +257,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": [
             "ipv4-addr"
         ],
@@ -301,6 +316,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
@@ -355,6 +373,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "",
@@ -410,6 +431,9 @@
         "threat.indicator.file.hash.sha1": "0ea76f1586c008932d90c991dfdd5042f3aac8ea",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": "file",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "Automatically added (via 7915aabb2e66ff14841e4ef0fbff7486)",
@@ -463,6 +487,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "green"
+        ],
         "threat.indicator.type": [
             "domain-name"
         ],
@@ -520,6 +547,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "url",
         "threat.indicator.url.full": "http://get.adobe.com/stats/AbfFcBebD/?q=",
         "threatintel.misp.attribute.category": "Network activity",
@@ -575,6 +605,9 @@
         ],
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "url",
         "threat.indicator.url.path": "/scripts/m/query.php?id=",
         "threatintel.misp.attribute.category": "Network activity",
@@ -631,6 +664,9 @@
         "threat.indicator.file.name": "google_update_checker.js|c51d288469df9f25e2fb7ac491918b3e579282ea",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "file",
         "threatintel.misp.attribute.category": "Artifacts dropped",
         "threatintel.misp.attribute.comment": "JavaScript backdoor",
@@ -684,6 +720,9 @@
         "threat.indicator.email.address": "claudiobonadio88@gmail.com",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "email-addr",
         "threatintel.misp.attribute.category": "Payload delivery",
         "threatintel.misp.attribute.comment": "",
@@ -737,6 +776,9 @@
         "threat.indicator.provider": "misp",
         "threat.indicator.registry.key": "HKLM\\SOFTWARE\\Microsoft\\Active",
         "threat.indicator.scanner_stats": 2,
+        "threat.indicator.tlp": [
+            "white"
+        ],
         "threat.indicator.type": "windows-registry-key",
         "threatintel.misp.attribute.category": "Artifacts dropped",
         "threatintel.misp.attribute.comment": "",

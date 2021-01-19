@@ -54,6 +54,11 @@ processors:
     field: threatintel.abuseurl.host
     target_field: threat.indicator.domain
     ignore_missing: true
+- rename:
+    field: threatintel.abuseurl.urlhaus_reference
+    target_field: event.reference
+    ignore_missing: true
+
 
 # Host can be both IP addresses and domain names
 - grok:

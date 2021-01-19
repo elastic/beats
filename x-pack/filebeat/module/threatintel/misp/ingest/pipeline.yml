@@ -240,6 +240,26 @@ processors:
       append:
         field: "tags"
         value: "{{ _ingest._value.name }}"
+- script:
+      lang: painless
+      if: "ctx?.threatintel?.misp?.tag != null"
+      source: |
+        List lst = new ArrayList();
+        for (def item : ctx.threatintel.misp.tag) {
+            String name = item.get('name');
+            if (name != null && name.startsWith('tlp')) {
+                lst.add(name);
+            }
+        }
+        ctx.threat.indicator['tlp'] = lst;
+
+- foreach:
+    field: threat.indicator.tlp
+    processor:
+      gsub:
+        field: "_ingest._value"
+        pattern: 'tlp:'
+        replacement: ""
 
 # Setting indicator type to unknown if it does not match anything
 - set:
