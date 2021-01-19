@@ -55,7 +55,6 @@ pipeline {
         dir("${BASE_DIR}"){
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
-          setEnvVar('LICENSE_CHANGES', isGitRegionMatch(patterns: [ '^(go.mod|LICENSE.txt)' ], shouldMatchAll: false).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
           setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
@@ -75,7 +74,7 @@ pipeline {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
             setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            whenTrue(env.ONLY_DOCS == 'true' || env.LICENSE_CHANGES == 'true') {
+            whenTrue(env.ONLY_DOCS == 'true') {
               cmd(label: "make check", script: "make check")
             }
             whenTrue(env.ONLY_DOCS == 'false') {
