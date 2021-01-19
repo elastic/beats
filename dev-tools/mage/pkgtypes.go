@@ -172,6 +172,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		},
 		Docker: map[string]string{
 			"amd64": "amd64",
+			"arm64": "arm64",
 		},
 	},
 }
