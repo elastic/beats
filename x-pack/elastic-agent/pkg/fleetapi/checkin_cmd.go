@@ -22,6 +22,7 @@ const checkingPath = "/api/fleet/agents/%s/checkin"
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
 	Status   string              `json:"status"`
+	AckToken string              `json:"ack_token,omitempty"`
 	Events   []SerializableEvent `json:"events"`
 	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }
@@ -49,7 +50,8 @@ func (e *CheckinRequest) Validate() error {
 // CheckinResponse is the response send back from the server which contains all the action that
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
-	Actions Actions `json:"actions"`
+	AckToken string  `json:"ack_token"`
+	Actions  Actions `json:"actions"`
 }
 
 // Validate validates the response send from the server.

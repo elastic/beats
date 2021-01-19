@@ -20,6 +20,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -116,6 +118,9 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 
 		ctx, cancel := context.WithCancel(context.Background())
 
+		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -127,6 +132,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			rep,
 			newNoopAcker(),
 			&noopController{},
+			stateStore,
 		)
 
 		go gateway.Start()
@@ -245,6 +251,9 @@ func TestFleetGateway(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New("tst")
+		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -256,6 +265,7 @@ func TestFleetGateway(t *testing.T) {
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
 			&noopController{},
+			stateStore,
 		)
 
 		go gateway.Start()
@@ -331,6 +341,10 @@ func TestFleetGateway(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New("tst")
+
+		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -345,6 +359,7 @@ func TestFleetGateway(t *testing.T) {
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
 			&noopController{},
+			stateStore,
 		)
 
 		require.NoError(t, err)
