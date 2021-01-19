@@ -179,7 +179,7 @@ var security = (function () {
         "4634": [["authentication"], ["end"], "logged-out"],
         "4647": [["authentication"], ["end"], "logged-out"],
         "4648": [["authentication"], ["start"], "logged-in-explicit"],
-        "4657": [["configuration"], ["change"], "registry-value-modified"],
+        "4657": [["registry", "configuration"], ["change"], "registry-value-modified"],
         "4670": [["iam", "configuration"],["admin", "change"],"permissions-changed"],
         "4672": [["iam"], ["admin"], "logged-in-special"],
         "4673": [["iam"], ["admin"], "privileged-service-called"],

@@ -1195,7 +1195,7 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                category: ["configuration"],
+                category: ["configuration", "registry"],
                 type: ["change"],
             },
             target: "event",
@@ -1234,7 +1234,7 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                category: ["configuration"],
+                category: ["configuration", "registry"],
                 type: ["change"],
             },
             target: "event",
@@ -1273,7 +1273,7 @@ var sysmon = (function () {
         .Add(parseUtcTime)
         .AddFields({
             fields: {
-                category: ["configuration"],
+                category: ["configuration", "registry"],
                 type: ["change"],
             },
             target: "event",
