@@ -83,8 +83,9 @@ var (
 	MissingPeerCertificate = errors.New("missing peer certificates")
 )
 
-// ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
+// ToConfig generates a tls.Config object. Note, you must use BuildModuleClientConfig to generate a config with
 // ServerName set, use that method for servers with SNI.
+// By default VerifyConnection is set to client mode.
 func (c *TLSConfig) ToConfig() *tls.Config {
 	if c == nil {
 		return &tls.Config{}
@@ -108,6 +109,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 		Time:               c.time,
+		VerifyConnection:   makeVerifyConnection(c),
 	}
 }
 
@@ -126,7 +128,6 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 
 	config := c.ToConfig()
 	config.ServerName = host
-	config.VerifyConnection = makeVerifyConnection(c)
 	return config
 }
 
