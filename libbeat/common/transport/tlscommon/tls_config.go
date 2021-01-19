@@ -20,6 +20,7 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"net"
 	"time"
 
 	"github.com/pkg/errors"
@@ -163,16 +164,6 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				return MissingPeerCertificate
 			}
 
-			dnsnames := cs.PeerCertificates[0].DNSNames
-			var serverName string
-			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
-				serverName = cs.PeerCertificates[0].Subject.CommonName
-			} else {
-				serverName = dnsnames[0]
-			}
-			if len(serverName) > 0 && len(cs.ServerName) > 0 && serverName != cs.ServerName {
-				return x509.HostnameError{Certificate: cs.PeerCertificates[0], Host: cs.ServerName}
-			}
 			opts := x509.VerifyOptions{
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
@@ -238,18 +229,33 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				return nil
 			}
 
-			dnsnames := cs.PeerCertificates[0].DNSNames
-			var serverName string
-			if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
-				serverName = cs.PeerCertificates[0].Subject.CommonName
-			} else {
-				serverName = dnsnames[0]
+			err := verifyHostname(cs.PeerCertificates[0], cs.ServerName)
+			if err != nil {
+				return err
 			}
-			if len(serverName) > 0 && len(cs.ServerName) > 0 && serverName != cs.ServerName {
-				return x509.HostnameError{Certificate: cs.PeerCertificates[0], Host: cs.ServerName}
-			}
+
 			opts := x509.VerifyOptions{
 				DNSName:       cs.ServerName,
+				Roots:         cfg.ClientCAs,
+				Intermediates: x509.NewCertPool(),
+				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+			}
+			for _, cert := range cs.PeerCertificates[1:] {
+				opts.Intermediates.AddCert(cert)
+			}
+			_, err = cs.PeerCertificates[0].Verify(opts)
+			return err
+		}
+	case VerifyCertificate:
+		return func(cs tls.ConnectionState) error {
+			if len(cs.PeerCertificates) == 0 {
+				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
+					return MissingPeerCertificate
+				}
+				return nil
+			}
+
+			opts := x509.VerifyOptions{
 				Roots:         cfg.ClientCAs,
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
@@ -265,4 +271,35 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 
 	return nil
 
+}
+
+func verifyHostname(cert *x509.Certificate, hostname string) error {
+	// check if the server name is an IP
+	ip := hostname
+	if len(ip) >= 3 && ip[0] == '[' && ip[len(ip)-1] == ']' {
+		ip = ip[1 : len(ip)-1]
+	}
+	parsedIP := net.ParseIP(ip)
+	if parsedIP != nil {
+		for _, certIP := range cert.IPAddresses {
+			if parsedIP.Equal(certIP) {
+				return nil
+			}
+		}
+		return x509.HostnameError{Certificate: cert, Host: hostname}
+	}
+
+	dnsnames := cert.DNSNames
+	if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
+		if cert.Subject.CommonName != "" {
+			dnsnames = []string{cert.Subject.CommonName}
+		}
+	}
+
+	for _, name := range dnsnames {
+		if len(name) > 0 && len(hostname) > 0 && name == hostname {
+			return nil
+		}
+	}
+	return x509.HostnameError{Certificate: cert, Host: hostname}
 }
