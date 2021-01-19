@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
+- Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
