@@ -130,8 +130,8 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	return config
 }
 
-// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
-func (c *TLSConfig) BuildModuleServerConfig(host string) *tls.Config {
+// BuildServerConfig takes the TLSConfig and transform it into a `tls.Config` for server side objects.
+func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
 		return &tls.Config{
@@ -150,8 +150,6 @@ func (c *TLSConfig) BuildModuleServerConfig(host string) *tls.Config {
 }
 
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
-	pin := len(cfg.CASha256) > 0
-
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
@@ -165,18 +163,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
 			}
-			for _, cert := range cs.PeerCertificates[1:] {
-				opts.Intermediates.AddCert(cert)
-			}
-			verifiedChains, err := cs.PeerCertificates[0].Verify(opts)
-			if err != nil {
-				return err
-			}
-
-			if pin {
-				return verifyCAPin(cfg.CASha256, verifiedChains)
-			}
-			return nil
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
@@ -189,21 +176,10 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
 			}
-			for _, cert := range cs.PeerCertificates[1:] {
-				opts.Intermediates.AddCert(cert)
-			}
-			verifiedChains, err := cs.PeerCertificates[0].Verify(opts)
-			if err != nil {
-				return err
-			}
-
-			if pin {
-				return verifyCAPin(cfg.CASha256, verifiedChains)
-			}
-			return nil
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
 	case VerifyStrict:
-		if pin {
+		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
@@ -236,11 +212,7 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 			}
-			for _, cert := range cs.PeerCertificates[1:] {
-				opts.Intermediates.AddCert(cert)
-			}
-			_, err = cs.PeerCertificates[0].Verify(opts)
-			return err
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
@@ -256,11 +228,13 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 			}
-			for _, cert := range cs.PeerCertificates[1:] {
-				opts.Intermediates.AddCert(cert)
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+		}
+	case VerifyStrict:
+		if len(cfg.CASha256) > 0 {
+			return func(cs tls.ConnectionState) error {
+				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
-			_, err := cs.PeerCertificates[0].Verify(opts)
-			return err
 		}
 	default:
 	}
@@ -301,4 +275,19 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 		}
 	}
 	return x509.HostnameError{Certificate: cert, Host: hostname}
+}
+
+func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509.VerifyOptions) error {
+	for _, cert := range certs[1:] {
+		opts.Intermediates.AddCert(cert)
+	}
+	verifiedChains, err := certs[0].Verify(opts)
+	if err != nil {
+		return err
+	}
+
+	if len(casha256) > 0 {
+		return verifyCAPin(casha256, verifiedChains)
+	}
+	return nil
 }
