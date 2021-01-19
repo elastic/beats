@@ -20,6 +20,7 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"net"
 	"time"
 
@@ -91,10 +92,6 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 
-	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
-	// or when we are using 'certificate' TLS verification mode, we add a custom callback
-	verifyConnectionFn := makeVerifyConnection(c)
-
 	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
@@ -111,7 +108,6 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,
 		Time:               c.time,
-		VerifyConnection:   verifyConnectionFn,
 	}
 }
 
@@ -165,6 +161,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			}
 
 			opts := x509.VerifyOptions{
+				DNSName:       cs.ServerName,
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
 			}
@@ -235,7 +232,6 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 			}
 
 			opts := x509.VerifyOptions{
-				DNSName:       cs.ServerName,
 				Roots:         cfg.ClientCAs,
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
@@ -298,6 +294,9 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 
 	for _, name := range dnsnames {
 		if len(name) > 0 && len(hostname) > 0 && name == hostname {
+			if !validHostname(name, true) {
+				return fmt.Errorf("invalid hostname in cert")
+			}
 			return nil
 		}
 	}
