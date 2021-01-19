@@ -586,6 +586,7 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(udp["all"]["count"], int)
 
+    @unittest.skipIf(sys.platform == "win32", "Flaky test")
     def check_username(self, observed, expected=None):
         if expected is None:
             expected = getpass.getuser()
