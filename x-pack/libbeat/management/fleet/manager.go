@@ -140,6 +140,7 @@ func (cm *Manager) UpdateStatus(status management.Status, msg string) {
 }
 
 func (cm *Manager) OnConfig(s string) {
+	cm.logger.Debugf("Received configuration: %s\n", s)
 	cm.UpdateStatus(management.Configuring, "Updating configuration")
 
 	var configMap common.MapStr
