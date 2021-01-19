@@ -35,6 +35,7 @@
 - Do not take ownership of Endpoint log path {pull}23444[23444]
 - Fixed fetching DBus service PID {pull}23496[23496]
 - Fix issue of missing log messages from filebeat monitor {pull}23514[23514]
+- Increase checkin grace period to 30 seconds {pull}23568[23568]
 
 ==== New features
 
