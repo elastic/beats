@@ -1,4 +1,4 @@
-type: s3
+type: aws-s3
 queue_url: {{ .queue_url }}
 file_selectors:
 {{ if .process_cloudtrail_logs }}
