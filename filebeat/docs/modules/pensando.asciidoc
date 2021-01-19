@@ -8,7 +8,9 @@ This file is generated! See scripts/docs_collector.py
 
 == pensando module
 
-This is the pensando module.
+The +{modulename}+ module parses distributed firewall logs created by the
+http://pensando.io/[Pensando] distributed services card (DSC).
+
 
 include::../include/what-happens.asciidoc[]
 
@@ -17,13 +19,21 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+The Pensando module has been tested with 1.12.0-E-54 and later.
 
 include::../include/configuring-intro.asciidoc[]
+The following example shows how to set parameters in the +modules.d/{modulename}.yml+
+file to listen for firewall logs sent from the Pensando DSC(s) on port 5514 (default is 9001):
 
-TODO: provide an example configuration
-
-:fileset_ex: {fileset}
+["source","yaml",subs="attributes"]
+-----
+- module: pensando
+  access:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: [9001]
+-----
+:fileset_ex: dfw
 
 include::../include/config-option-intro.asciidoc[]
 
@@ -32,7 +42,7 @@ that's common to other modules, you can reuse shared descriptions by including
 the relevant file. For example:
 
 [float]
-==== `{fileset}` log fileset settings
+==== `dfw` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 
@@ -41,8 +51,8 @@ include::../include/var-paths.asciidoc[]
 
 This module comes with a sample dashboard. For example:
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+[role="screenshot"]
+image::./images/filebeat-pensando-dfw.png[]
 
 :has-dashboards!:
 
