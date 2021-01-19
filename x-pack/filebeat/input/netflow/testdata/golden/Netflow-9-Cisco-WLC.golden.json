@@ -14,7 +14,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -80,7 +79,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -142,7 +140,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -208,7 +205,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -270,7 +266,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -334,7 +329,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -400,7 +394,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -462,7 +455,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -528,7 +520,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -590,7 +581,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -656,7 +646,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -718,7 +707,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -784,7 +772,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -846,7 +833,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -912,7 +898,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -974,7 +959,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1040,7 +1024,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1102,7 +1085,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1168,7 +1150,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-06-22T06:31:14Z",
           "kind": "event",
           "type": [
             "connection"

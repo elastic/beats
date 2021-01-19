@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
+- Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
@@ -231,6 +232,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
 - Add FAQ entry for madvdontneed variable {pull}23429[23429]
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
+- Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 
 *Auditbeat*
 
@@ -268,6 +270,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix various processing errors in the Suricata module. {pull}23236[23236]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
+- Change the `event.created` in Netflow events to be the time the event was created by Filebeat
+  to be consistent with ECS. {pull}23094[23094]
 
 *Filebeat*
 
@@ -364,6 +368,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
+- Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 
 *Heartbeat*
 
@@ -480,6 +485,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
+- Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 
 *Packetbeat*
 
@@ -802,6 +808,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
+- Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
+- Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
 
 *Heartbeat*
 
