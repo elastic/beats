@@ -330,13 +330,16 @@ var sysmon = (function () {
     };
 
     var addUser = function (evt) {
+        var id = evt.Get("winlog.user.identifier");
+        if (id) {
+            evt.Put("user.id", id);
+        }
         var userParts = evt.Get("winlog.event_data.User");
         if (!userParts) {
             return;
         }
         userParts = userParts.split("\\");
         if (userParts.length === 2) {
-            evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
             evt.Put("user.name", userParts[1]);
             evt.AppendTo("related.user", userParts[1]);

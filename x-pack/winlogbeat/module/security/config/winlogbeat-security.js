@@ -1351,7 +1351,7 @@ var security = (function () {
         "16903": "Publish",
     };
 
-    // Trust Types 
+    // Trust Types
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustTypes = {
         "1": "TRUST_TYPE_DOWNLEVEL",
@@ -1360,7 +1360,7 @@ var security = (function () {
         "4": "TRUST_TYPE_DCE"
     }
 
-    // Trust Direction 
+    // Trust Direction
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustDirection = {
         "0": "TRUST_DIRECTION_DISABLED",
@@ -1369,7 +1369,7 @@ var security = (function () {
         "3": "TRUST_DIRECTION_BIDIRECTIONAL"
     }
 
-    // Trust Attributes 
+    // Trust Attributes
     // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
     var trustAttributes = {
         "0": "UNDEFINED",
@@ -1899,26 +1899,43 @@ var security = (function () {
 
         })
         .Build();
-    var copyTargetUser = new processor.Chain()
-        .Convert({
-            fields: [
-                {from: "winlog.event_data.TargetUserSid", to: "user.id"},
-                {from: "winlog.event_data.TargetUserName", to: "user.name"},
-                {from: "winlog.event_data.TargetDomainName", to: "user.domain"},
-            ],
-            ignore_missing: true,
-        })
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            if (user) {
-                if (/.@*/.test(user)) {
-                    user = user.split('@')[0];
-                    evt.Put('user.name', user);
-                }
-                evt.AppendTo('related.user', user);
+
+    var copyTargetUser = function(evt) {
+        var targetUserId = evt.Get("winlog.event_data.TargetUserSid");
+        if (targetUserId) {
+            if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
+            else evt.Put("user.id", targetUserId);
+        }
+
+        var targetUserName = evt.Get("winlog.event_data.TargetUserName");
+        if (targetUserName) {
+            if (/.@*/.test(targetUserName)) {
+                targetUserName = targetUserName.split('@')[0];
             }
-        })
-        .Build();
+
+            evt.AppendTo("related.user", targetUserName);
+            if (evt.Get("user.name")) evt.Put("user.target.name", targetUserName);
+            else evt.Put("user.name", targetUserName);
+        }
+
+        var targetUserDomain = evt.Get("winlog.event_data.TargetDomainName");
+        if (targetUserDomain) {
+            if (evt.Get("user.domain")) evt.Put("user.target.domain", targetUserDomain);
+            else evt.Put("user.domain", targetUserDomain);
+        }
+    }
+
+    var copyMemberToUser = function(evt) {
+        var member = evt.Get("winlog.event_data.MemberName");
+        if (!member) {
+            return;
+        }
+
+        var userName = member.split(',')[0].replace('CN=', '').replace('cn=', '');
+
+        evt.AppendTo("related.user", userName);
+        evt.Put("user.target.name", userName);
+    }
 
     var copyTargetUserToGroup = new processor.Chain()
         .Convert({
@@ -2194,16 +2211,10 @@ var security = (function () {
     var groupMgmtEvts = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
+        .Add(copyMemberToUser)
         .Add(copyTargetUserToGroup)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var member = evt.Get("winlog.event_data.MemberName");
-            if (!member) {
-                return;
-            }
-            evt.AppendTo("related.user", member.split(',')[0].replace('CN=', '').replace('cn=', ''));
-        })
         .Build();
 
     var auditLogCleared = new processor.Chain()
