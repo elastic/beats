@@ -5,6 +5,7 @@
 package v2
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 
@@ -77,17 +78,44 @@ func decode(contentType string, p []byte, dst *response) error {
 func registerEncoders() {
 	log := logp.L().Named(logName)
 	log.Debug(registerEncoder("application/json", encodeAsJSON))
+	log.Debug(registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
 }
 
 func registerDecoders() {
 	log := logp.L().Named(logName)
 	log.Debug(registerDecoder("application/json", decodeAsJSON))
+	log.Debug(registerDecoder("application/x-ndjson", decodeAsNdjson))
 }
 
 func encodeAsJSON(trReq transformable) ([]byte, error) {
+	if len(trReq.body()) == 0 {
+		return nil, nil
+	}
 	return json.Marshal(trReq.body())
 }
 
 func decodeAsJSON(p []byte, dst *response) error {
 	return json.Unmarshal(p, &dst.body)
+}
+
+func encodeAsForm(trReq transformable) ([]byte, error) {
+	url := trReq.url()
+	body := []byte(url.RawQuery)
+	url.RawQuery = ""
+	trReq.setURL(url)
+	return body, nil
+}
+
+func decodeAsNdjson(p []byte, dst *response) error {
+	var results []interface{}
+	dec := json.NewDecoder(bytes.NewReader(p))
+	for dec.More() {
+		var o interface{}
+		if err := dec.Decode(&o); err != nil {
+			return err
+		}
+		results = append(results, o)
+	}
+	dst.body = results
+	return nil
 }

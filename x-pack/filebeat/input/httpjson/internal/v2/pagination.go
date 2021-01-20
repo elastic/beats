@@ -31,7 +31,13 @@ type pagination struct {
 
 func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
 	pagination := &pagination{httpClient: httpClient, log: log}
-	if config.Response == nil || len(config.Response.Pagination) == 0 {
+	if config.Response == nil {
+		return pagination
+	}
+
+	pagination.decoder = registeredDecoders[config.Response.DecodeAs]
+
+	if len(config.Response.Pagination) == 0 {
 		return pagination
 	}
 
@@ -55,7 +61,6 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 		log,
 	)
 	pagination.requestFactory = requestFactory
-	pagination.decoder = registeredDecoders[config.Response.DecodeAs]
 	return pagination
 }
 
