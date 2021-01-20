@@ -53,6 +53,42 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloud
 You need to modify the +{beatname_lc}.yml+ file to set the `api_address`,
 `client_id` and `client_secret`.
 
+==== Load {kib} dashboards
+
+{beatname_uc} comes packaged with example {kib} dashboards,
+visualizations, and searches for visualizing {beatname_uc} data in {kib}.
+
+Before you can use the dashboards, you need to create the index pattern,
++{beatname_lc}-*+, and load the dashboards into {kib}. To do this, run the `setup`
+command to load the recommended {ref}/indices-templates.html[index template]
+for writing to {es} and to deploy the sample dashboards for visualizing the data in {kib}.
+For details, see <<load-kibana-dashboards>>.
+
+Otherwise, you can
+<<configuration-dashboards,configure dashboard loading>> in the
++{beatname_lc}.yml+ config file.
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to <<load-template-manually>> and <<load-kibana-dashboards>>.
+=======================================
+endif::[]
+ifeval::["{beatname_lc}"=="filebeat"]
+The `setup` command does not load the ingest pipelines used to parse log lines. By default, ingest pipelines
+are set up automatically the first time you run {beatname_uc} and connect to {es}.
+
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
+=======================================
+endif::[]
 
 ==== Deploy {beatname_uc}
 
