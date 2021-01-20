@@ -5,7 +5,6 @@
 package application
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -19,6 +18,7 @@ import (
 // take care of action policy change every other action are discarded. The store will only keep the
 // last good action on disk, we assume that the action is added to the store after it was ACK with
 // Fleet. The store is not threadsafe.
+// ATTN!!!: THE actionStore is deprecated, please use and extend the stateStore instead. The actionStore will be eventually removed.
 type actionStore struct {
 	log    *logger.Logger
 	store  storeLoad
@@ -148,42 +148,3 @@ type actionUnenrollSerializer struct {
 
 // Add a guards between the serializer structs and the original struct.
 var _ actionUnenrollSerializer = actionUnenrollSerializer(fleetapi.ActionUnenroll{})
-
-// actionStoreAcker wraps an existing acker and will send any acked event to the action store,
-// its up to the action store to decide if we need to persist the event for future replay or just
-// discard the event.
-type actionStoreAcker struct {
-	acker fleetAcker
-	store *actionStore
-}
-
-func (a *actionStoreAcker) Ack(ctx context.Context, action fleetapi.Action) error {
-	if err := a.acker.Ack(ctx, action); err != nil {
-		return err
-	}
-	a.store.Add(action)
-	return a.store.Save()
-}
-
-func (a *actionStoreAcker) Commit(ctx context.Context) error {
-	return a.acker.Commit(ctx)
-}
-
-func newActionStoreAcker(acker fleetAcker, store *actionStore) *actionStoreAcker {
-	return &actionStoreAcker{acker: acker, store: store}
-}
-
-func replayActions(
-	log *logger.Logger,
-	dispatcher dispatcher,
-	acker fleetAcker,
-	actions ...action,
-) error {
-	log.Info("restoring current policy from disk")
-
-	if err := dispatcher.Dispatch(acker, actions...); err != nil {
-		return err
-	}
-
-	return nil
-}
