@@ -30873,6 +30873,18 @@ format: bytes
 
 --
 
+*`kubernetes.volume.fs.used.pct`*::
++
+--
+Percentage of used storage
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 
 *`kubernetes.volume.fs.inodes.used`*::
 +
