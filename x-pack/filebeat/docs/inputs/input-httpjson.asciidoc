@@ -346,6 +346,11 @@ The URL of the HTTP API. Required.
 HTTP method to use when making requests. `GET` or `POST` are the options. Default: `GET`.
 
 [float]
+==== `request.encode_as`
+
+ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json`. It is not set by default.
+
+[float]
 ==== `request.body`
 
 An optional HTTP POST body. The configuration value must be an object, and it
@@ -447,6 +452,11 @@ filebeat.inputs:
         target: body.from
         value: '[[now (parseDuration "-1h")]]'
 ----
+
+[float]
+==== `response.decode_as`
+
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json`. It is not set by default.
 
 [[response-transforms]]
 [float]
