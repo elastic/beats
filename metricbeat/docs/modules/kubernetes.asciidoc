@@ -26,7 +26,7 @@ Kubernetes module is a bit complex as its internal metricsets require access to 
 This section highlights and introduces some groups of metricsets with similar endpoint access needs. For more details on the metricsets see `configuration example` and the `metricsets` sections below.
 
 [float]
-==== node / system / pod / container / module
+==== node / system / pod / container / volume
 
 The default metricsets `container`, `node`, `pod`, `system` and `volume` require access to the `kubelet endpoint` in each of the Kubernetes nodes, hence it's recommended to include them as part of a `Metricbeat DaemonSet` or standalone Metricbeats running on the hosts.
 
