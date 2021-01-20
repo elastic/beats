@@ -80,8 +80,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		event.Timestamp = time.Now()
 	}
 
-
-
 	eventext.MergeEventFields(event, common.MapStr{
 		"monitor": common.MapStr{
 			"check_group": je.checkGroup,

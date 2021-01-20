@@ -23,6 +23,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 
 	"github.com/stretchr/testify/require"
@@ -136,31 +138,43 @@ func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
 	return []jobs.Job{j}, nil
 }
 
-func mockPluginBuilder() plugin.PluginFactory {
+func mockPluginBuilder() (p plugin.PluginFactory, built *atomic.Int, closed *atomic.Int) {
 	reg := monitoring.NewRegistry()
 
+	built = atomic.NewInt(0)
+	closed = atomic.NewInt(0)
+
 	return plugin.PluginFactory{
-		"test",
-		[]string{"testAlias"},
-		func(s string, config *common.Config) (plugin.Plugin, error) {
-			// Declare a real config block with a required attr so we can see what happens when it doesn't work
-			unpacked := struct {
-				URLs []string `config:"urls" validate:"required"`
-			}{}
-			err := config.Unpack(&unpacked)
-			if err != nil {
-				return plugin.Plugin{}, err
-			}
-			c := common.Config{}
-			j, err := createMockJob("test", &c)
-			return plugin.Plugin{j, nil, 1}, err
-		}, plugin.NewPluginCountersRecorder("test", reg)}
+			"test",
+			[]string{"testAlias"},
+			func(s string, config *common.Config) (plugin.Plugin, error) {
+				built.Inc()
+				// Declare a real config block with a required attr so we can see what happens when it doesn't work
+				unpacked := struct {
+					URLs []string `config:"urls" validate:"required"`
+				}{}
+				err := config.Unpack(&unpacked)
+				if err != nil {
+					return plugin.Plugin{}, err
+				}
+				c := common.Config{}
+				j, err := createMockJob("test", &c)
+				close := func() error {
+					closed.Inc()
+					return nil
+				}
+				return plugin.Plugin{j, close, 1}, err
+			},
+			plugin.NewPluginCountersRecorder("test", reg)},
+		built,
+		closed
 }
 
-func mockPluginsReg() *plugin.PluginsReg {
+func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
 	reg := plugin.NewPluginsReg()
-	reg.Add(mockPluginBuilder())
-	return reg
+	builder, built, closed := mockPluginBuilder()
+	reg.Add(builder)
+	return reg, built, closed
 }
 
 func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {

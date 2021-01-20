@@ -23,14 +23,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/watcher"
