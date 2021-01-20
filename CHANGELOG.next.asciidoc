@@ -579,6 +579,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
 - Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
 - Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
+- Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
 
 *Auditbeat*
 
