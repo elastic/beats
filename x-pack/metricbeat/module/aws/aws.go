@@ -86,6 +86,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
+	base.Logger().Debug("aws config endpoint = ", config.AWSConfig.Endpoint)
 	metricSet := MetricSet{
 		BaseMetricSet: base,
 		Period:        config.Period,
