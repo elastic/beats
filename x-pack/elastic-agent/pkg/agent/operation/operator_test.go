@@ -100,6 +100,16 @@ func TestConfigurableRun(t *testing.T) {
 		return nil
 	})
 
+	// wait to finish configuring
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if ok && item.Status == state.Configuring {
+			return fmt.Errorf("process still configuring")
+		}
+		return nil
+	})
+
 	items := operator.State()
 	item0, ok := items[p.ID()]
 	if !ok || item0.Status != state.Running {
@@ -423,6 +433,16 @@ func TestConfigurableService(t *testing.T) {
 	waitFor(t, func() error {
 		if s, err := os.Stat(tstFilePath); err != nil || s == nil {
 			return fmt.Errorf("failed to create a file using Config call %s", tstFilePath)
+		}
+		return nil
+	})
+
+	// wait to finish configuring
+	waitFor(t, func() error {
+		items := operator.State()
+		item, ok := items[p.ID()]
+		if ok && item.Status == state.Configuring {
+			return fmt.Errorf("process still configuring")
 		}
 		return nil
 	})
