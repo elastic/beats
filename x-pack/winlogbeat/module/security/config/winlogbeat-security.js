@@ -1209,7 +1209,7 @@ var security = (function () {
         "8448": "Success removed",
         "8449": "Success Added",
         "8450": "Failure removed",
-        "8451": "Failure added",
+        "8451": "Failure Added",
         "8452": "Success include removed",
         "8453": "Success include added",
         "8454": "Success exclude removed",
@@ -2315,18 +2315,12 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
         .Add(addTrustInformation)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     var policyChange = new processor.Chain()
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     var objectPolicyChange = new processor.Chain()
@@ -2335,7 +2329,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
             var oldSd = evt.Get("winlog.event_data.OldSd");
             var newSd = evt.Get("winlog.event_data.NewSd");
             if (oldSd) {
@@ -2349,15 +2342,11 @@ var security = (function () {
 
     var genericAuditChange = new processor.Chain()
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     var event4908 = new processor.Chain()
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
             var sids = evt.Get("winlog.event_data.SidList");
             if (!sids) {
                 return;
@@ -2380,9 +2369,6 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     return {
