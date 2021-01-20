@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package s3
+package awss3
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-const inputName = "s3"
+const inputName = "aws-s3"
 
 func Plugin() v2.Plugin {
 	return v2.Plugin{

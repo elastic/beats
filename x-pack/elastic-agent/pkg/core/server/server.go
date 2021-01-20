@@ -37,7 +37,7 @@ const (
 	InitialCheckinTimeout = 5 * time.Second
 	// CheckinMinimumTimeoutGracePeriod is additional time added to the client.CheckinMinimumTimeout
 	// to ensure the application is checking in correctly.
-	CheckinMinimumTimeoutGracePeriod = 2 * time.Second
+	CheckinMinimumTimeoutGracePeriod = 30 * time.Second
 	// WatchdogCheckLoop is the amount of time that the watchdog will wait between checking for
 	// applications that have not checked in the correct amount of time.
 	WatchdogCheckLoop = 5 * time.Second

@@ -604,7 +604,7 @@ filebeat.modules:
   umbrella:
     enabled: true
 
-    #var.input: s3
+    #var.input: aws-s3
     # AWS SQS queue url
     #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
     # Access ID to authenticate with the S3 input
@@ -1410,7 +1410,7 @@ filebeat.modules:
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    #var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
 
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
@@ -2711,21 +2711,21 @@ filebeat.inputs:
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
-#------------------------------ S3 input --------------------------------
+#------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
-#- type: s3
+#- type: aws-s3
   #enabled: false
 
   # AWS Credentials
   # If access_key_id and secret_access_key are configured, then use them to make api calls.
-  # If not, s3 input will load default AWS config or load with given profile name.
+  # If not, aws-s3 input will load default AWS config or load with given profile name.
   #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   #session_token: '${AWS_SESSION_TOKEN:"”}'
-  #credential_profile_name: test-s3-input
+  #credential_profile_name: test-aws-s3-input
 
   # Queue url (required) to receive queue messages from
-  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.

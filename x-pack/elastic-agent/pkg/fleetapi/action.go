@@ -21,6 +21,8 @@ const (
 	ActionTypePolicyChange = "POLICY_CHANGE"
 	// ActionTypeSettings specifies change of agent settings.
 	ActionTypeSettings = "SETTINGS"
+	// ActionTypeApplication specifies agent action.
+	ActionTypeApplication = "APP_ACTION"
 )
 
 // Action base interface for all the implemented action from the fleet API.
@@ -154,6 +156,16 @@ type ActionSettings struct {
 	LogLevel   string `json:"log_level"`
 }
 
+// ID returns the ID of the Action.
+func (a *ActionSettings) ID() string {
+	return a.ActionID
+}
+
+// Type returns the type of the Action.
+func (a *ActionSettings) Type() string {
+	return a.ActionType
+}
+
 func (a *ActionSettings) String() string {
 	var s strings.Builder
 	s.WriteString("action_id: ")
@@ -165,14 +177,33 @@ func (a *ActionSettings) String() string {
 	return s.String()
 }
 
-// Type returns the type of the Action.
-func (a *ActionSettings) Type() string {
-	return a.ActionType
+// ActionApp is the application action request.
+type ActionApp struct {
+	ActionID    string
+	ActionType  string
+	Application string
+	Data        json.RawMessage
+}
+
+func (a *ActionApp) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	s.WriteString(", application: ")
+	s.WriteString(a.Application)
+	return s.String()
 }
 
 // ID returns the ID of the Action.
-func (a *ActionSettings) ID() string {
+func (a *ActionApp) ID() string {
 	return a.ActionID
+}
+
+// Type returns the type of the Action.
+func (a *ActionApp) Type() string {
+	return a.ActionType
 }
 
 // Actions is a list of Actions to executes and allow to unmarshal heterogenous action type.
@@ -181,9 +212,10 @@ type Actions []Action
 // UnmarshalJSON takes every raw representation of an action and try to decode them.
 func (a *Actions) UnmarshalJSON(data []byte) error {
 	type r struct {
-		ActionType string          `json:"type"`
-		ActionID   string          `json:"id"`
-		Data       json.RawMessage `json:"data"`
+		ActionType  string          `json:"type"`
+		Application string          `json:"application"`
+		ActionID    string          `json:"id"`
+		Data        json.RawMessage `json:"data"`
 	}
 
 	var responses []r
@@ -208,6 +240,13 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				return errors.New(err,
 					"fail to decode POLICY_CHANGE action",
 					errors.TypeConfig)
+			}
+		case ActionTypeApplication:
+			action = &ActionApp{
+				ActionID:    response.ActionID,
+				ActionType:  response.ActionType,
+				Application: response.Application,
+				Data:        response.Data,
 			}
 		case ActionTypeUnenroll:
 			action = &ActionUnenroll{
