@@ -160,11 +160,14 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			}
 
 			opts := x509.VerifyOptions{
-				DNSName:       cs.ServerName,
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
 			}
-			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			if err != nil {
+				return err
+			}
+			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
@@ -203,17 +206,16 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 				return nil
 			}
 
-			err := verifyHostname(cs.PeerCertificates[0], cs.ServerName)
-			if err != nil {
-				return err
-			}
-
 			opts := x509.VerifyOptions{
 				Roots:         cfg.ClientCAs,
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 			}
-			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			if err != nil {
+				return err
+			}
+			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
@@ -244,7 +246,25 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 
 }
 
+func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509.VerifyOptions) error {
+	for _, cert := range certs[1:] {
+		opts.Intermediates.AddCert(cert)
+	}
+	verifiedChains, err := certs[0].Verify(opts)
+	if err != nil {
+		return err
+	}
+
+	if len(casha256) > 0 {
+		return verifyCAPin(casha256, verifiedChains)
+	}
+	return nil
+}
+
 func verifyHostname(cert *x509.Certificate, hostname string) error {
+	if hostname == "" {
+		return nil
+	}
 	// check if the server name is an IP
 	ip := hostname
 	if len(ip) >= 3 && ip[0] == '[' && ip[len(ip)-1] == ']' {
@@ -276,19 +296,4 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 		}
 	}
 	return x509.HostnameError{Certificate: cert, Host: hostname}
-}
-
-func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509.VerifyOptions) error {
-	for _, cert := range certs[1:] {
-		opts.Intermediates.AddCert(cert)
-	}
-	verifiedChains, err := certs[0].Verify(opts)
-	if err != nil {
-		return err
-	}
-
-	if len(casha256) > 0 {
-		return verifyCAPin(casha256, verifiedChains)
-	}
-	return nil
 }
