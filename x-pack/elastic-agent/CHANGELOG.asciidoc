@@ -29,6 +29,7 @@
 - Fix timeout issue stopping service applications {pull}20256[20256]
 - Fix incorrect hash when upgrading agent {pull}22322[22322]
 - Fix refresh of monitoring configuration {pull}23619[23619]
+
 ==== New features
 
 - Change monitoring defaults for agent {pull}18927[18927]
