@@ -144,7 +144,12 @@ func (b *Monitor) Cleanup(spec program.Spec, pipelineID string) error {
 
 // Prepare executes steps in order for monitoring to work correctly
 func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) error {
-	takeOwnership := b.ownLoggingPath(spec)
+	if !b.ownLoggingPath(spec) {
+		// spec file passes a log path; so its up to the application to ensure the
+		// path exists and the write permissions are set so Elastic Agent can read it
+		return nil
+	}
+
 	drops := []string{b.generateLoggingPath(spec, pipelineID)}
 	if drop := b.monitoringDrop(spec, pipelineID); drop != "" {
 		drops = append(drops, drop)
@@ -167,10 +172,8 @@ func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) er
 			}
 		}
 
-		if takeOwnership {
-			if err := changeOwner(drop, uid, gid); err != nil {
-				return err
-			}
+		if err := changeOwner(drop, uid, gid); err != nil {
+			return err
 		}
 	}
 
