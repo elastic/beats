@@ -93,54 +93,58 @@ func TestGroupToEvents(t *testing.T) {
 	assert.NotNil(t, events)
 	assert.Equal(t, 3, len(events))
 
-	ok, err := events[0].MetricSetFields.HasKey("datagrams_sent_per_sec")
-	assert.NoError(t, err)
-	assert.True(t, ok)
+	for _, event := range events {
+		ok, err := event.MetricSetFields.HasKey("datagrams_sent_per_sec")
+		if ok {
+			assert.NoError(t, err)
+			assert.True(t, ok)
+			ok, err = event.MetricSetFields.HasKey("object")
+			assert.NoError(t, err)
+			assert.True(t, ok)
 
-	ok, err = events[0].MetricSetFields.HasKey("object")
-	assert.NoError(t, err)
-	assert.True(t, ok)
+			val, err := event.MetricSetFields.GetValue("datagrams_sent_per_sec")
+			assert.NoError(t, err)
+			assert.Equal(t, val, 23)
 
-	val, err := events[0].MetricSetFields.GetValue("datagrams_sent_per_sec")
-	assert.NoError(t, err)
-	assert.Equal(t, val, 23)
+			val, err = event.MetricSetFields.GetValue("object")
+			assert.NoError(t, err)
+			assert.Equal(t, val, "UDPv4")
+		} else {
+			ok, err := event.MetricSetFields.HasKey("%_processor_time")
+			if ok {
+				assert.NoError(t, err)
+				assert.True(t, ok)
 
-	val, err = events[0].MetricSetFields.GetValue("object")
-	assert.NoError(t, err)
-	assert.Equal(t, val, "UDPv4")
+				ok, err = event.MetricSetFields.HasKey("object")
+				assert.NoError(t, err)
+				assert.True(t, ok)
 
-	ok, err = events[1].MetricSetFields.HasKey("%_processor_time")
-	assert.NoError(t, err)
-	assert.True(t, ok)
+				val, err := event.MetricSetFields.GetValue("%_processor_time")
+				assert.NoError(t, err)
+				assert.Equal(t, val, 11)
 
-	ok, err = events[1].MetricSetFields.HasKey("object")
-	assert.NoError(t, err)
-	assert.True(t, ok)
+				val, err = event.MetricSetFields.GetValue("object")
+				assert.NoError(t, err)
+				assert.Equal(t, val, "Processor Information")
+			} else {
+				ok, err = event.MetricSetFields.HasKey("current_disk_queue_length")
+				assert.NoError(t, err)
+				assert.True(t, ok)
 
-	val, err = events[1].MetricSetFields.GetValue("%_processor_time")
-	assert.NoError(t, err)
-	assert.Equal(t, val, 11)
+				ok, err = event.MetricSetFields.HasKey("object")
+				assert.NoError(t, err)
+				assert.True(t, ok)
 
-	val, err = events[1].MetricSetFields.GetValue("object")
-	assert.NoError(t, err)
-	assert.Equal(t, val, "Processor Information")
+				val, err := event.MetricSetFields.GetValue("current_disk_queue_length")
+				assert.NoError(t, err)
+				assert.Equal(t, val, 20)
 
-	ok, err = events[2].MetricSetFields.HasKey("current_disk_queue_length")
-	assert.NoError(t, err)
-	assert.True(t, ok)
-
-	ok, err = events[2].MetricSetFields.HasKey("object")
-	assert.NoError(t, err)
-	assert.True(t, ok)
-
-	val, err = events[2].MetricSetFields.GetValue("current_disk_queue_length")
-	assert.NoError(t, err)
-	assert.Equal(t, val, 20)
-
-	val, err = events[2].MetricSetFields.GetValue("object")
-	assert.NoError(t, err)
-	assert.Equal(t, val, "PhysicalDisk")
-
+				val, err = event.MetricSetFields.GetValue("object")
+				assert.NoError(t, err)
+				assert.Equal(t, val, "PhysicalDisk")
+			}
+		}
+	}
 }
 
 func TestGroupToSingleEvent(t *testing.T) {
