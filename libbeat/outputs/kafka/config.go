@@ -69,7 +69,7 @@ type kafkaConfig struct {
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
 	Sasl               saslConfig                `config:"sasl"`
-	DisableFAST        bool                      `config:"disable_krb5_fast"`
+	EnableFAST         bool                      `config:"enable_krb5_fast"`
 }
 
 type saslConfig struct {
@@ -245,7 +245,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
-			DisablePAFXFAST:    config.DisableFAST,
+			DisablePAFXFAST:    !config.EnableFAST,
 		}
 
 	case config.Username != "":

@@ -131,9 +131,9 @@
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Disables Kerberos FAST authentication in the Kafka output. This flag
-  # is needed to authenticate with certain Active Directory configurations.
-  #disable_krb5_fast: false
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
