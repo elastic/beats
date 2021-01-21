@@ -225,7 +225,7 @@ func (s *stateStore) Save() error {
 		if apc, ok := s.state.action.(*fleetapi.ActionPolicyChange); ok {
 			serialize.Action = &actionSerializer{apc.ActionID, apc.ActionType, apc.Policy, nil}
 		} else if aun, ok := s.state.action.(*fleetapi.ActionUnenroll); ok {
-			serialize.Action = &actionSerializer{apc.ActionID, apc.ActionType, nil, &aun.IsDetected}
+			serialize.Action = &actionSerializer{aun.ActionID, aun.ActionType, nil, &aun.IsDetected}
 		} else {
 			return fmt.Errorf("incompatible type, expected ActionPolicyChange and received %T", s.state.action)
 		}
