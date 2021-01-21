@@ -119,5 +119,65 @@
         "name": "vagrant"
       }
     }
+  },
+  {
+    "auditd": {
+      "data": {
+        "new_ses": "1172",
+        "old_ses": "4294967295"
+      },
+      "message_type": "login",
+      "result": "unknown",
+      "sequence": 7734,
+      "session": "",
+      "summary": {
+        "actor": {
+          "primary": "4294967295",
+          "secondary": "root"
+        },
+        "object": {
+          "primary": "0",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "changed-login-id-to",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=LOGIN msg=audit(1234877011.799:7734): login pid=26125 uid=0 old auid=4294967295 new auid=0 old ses=4294967295 new ses=1172"
+      ],
+      "outcome": "unknown",
+      "type": [
+        "start"
+      ]
+    },
+    "process": {
+      "pid": 26125
+    },
+    "related": {
+      "user": [
+        "root"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "new_auid": {
+        "id": "0",
+        "name": "root"
+      },
+      "old_auid": {
+        "id": "4294967295"
+      }
+    }
   }
 ]
