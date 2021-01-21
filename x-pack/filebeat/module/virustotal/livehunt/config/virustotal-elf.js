@@ -7,6 +7,11 @@ var elf_symbol_type_lookup = {
     "OBJECT": "object"
 };
 
+function isLetter(c) {
+    return c.toLowerCase() != c.toUpperCase();
+}
+
+
 var vtELF = (function () {
     var processor = require("processor");
     var console = require("console");
@@ -94,11 +99,10 @@ var vtELF = (function () {
                 var new_sect = {
                     "name": old_sect.name,
                     // VT returns this field with a misspelling
-                    "physical_offset": old_sect.phisical_offset,
+                    "physical_offset": "0x" + old_sect.phisical_offset.toString(16).toUpperCase(),
                     "physical_size": old_sect.size,
-                    "virtual_address": old_sect.virtual_address,
-                    "type": old_sect.section_type,
-                    "flags": Array()
+                    "virtual_address": "0x" + old_sect.virtual_address.toString(16).toUpperCase(),
+                    "type": old_sect.section_type
                 }
 
                 // Section flags: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#Section_header
@@ -126,18 +130,24 @@ var vtELF = (function () {
                     "T": "TLS"
                 }
 
+                console.debug("section flags[" + old_sect.flags.length + "]: \n" + old_sect.flags);
+
+                var new_flags = [];
                 for (var j = 0; j < old_sect.flags.length; j++) {
-                    var flag = old_sect.flags[i];
-                    new_sect.flags.push(flag);
-                    continue;
 
-                    if (flag_lookup[flag] != null) {
-                        new_sect.flags.push(flag_lookup[flag]);
+                    var flag = old_sect.flags[j];
+                    console.debug("flag[" + j + "]: " + flag[j]);
+                    if (flag_lookup.hasOwnProperty(flag)) {
+                        new_flags.push(flag_lookup[flag]);
                     } else {
-                        new_sect.flags.push(flag);
+                        new_flags.push(flag);
                     }
-
                 }
+
+                if (new_flags.length > 0) {
+                    new_sect["flags"] = new_flags;
+                }
+
                 // Replace existing section
                 sections[i] = new_sect;
             }

@@ -15,6 +15,10 @@ var:
   - name: limit
     default: 10
 
+  # how often to poll the HTTP API
+  - name: interval
+    default: 1m
+
   # If consuming raw events from Kafka
   - name: kafka_brokers
     default:

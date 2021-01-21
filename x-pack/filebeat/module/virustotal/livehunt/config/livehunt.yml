@@ -1,8 +1,8 @@
 #spellchecker: disable
 {{ if eq .input "httpjson" }}
 type: httpjson
-config_version: 2
-interval: 1m
+config_version: "2"
+interval: {{ .interval }}
 request:
   url: https://www.virustotal.com/api/v3/intelligence/hunting_notification_files?limit={{ .limit }}
   method: GET
@@ -10,6 +10,11 @@ request:
     - set:
         target: header.x-apikey
         value: {{ .api_key }}
+    - set:
+        target: url.params.filter
+        value: 'date:[[.cursor.timefilter]]+'
+        default: ''
+
 response:
   split:
     target: body.data
@@ -18,6 +23,10 @@ response:
     - set:
         target: url.params.cursor
         value: '[[.last_response.body.meta.cursor]]'
+
+cursor:
+  timefilter:
+    value: '[[ .last_event.context_attributes.notification_date ]]'
 {{ end }}
 
 {{ if eq .input "file" }}
