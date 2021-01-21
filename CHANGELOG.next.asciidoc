@@ -585,6 +585,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Deprecate aws_partition config parameter for AWS, use endpoint instead. {pull}23539[23539]
 - Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
 - Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
+- Add the `disable_krb5_fast` flag to the Kafka output, for better Active Directory compatibility. {pull}23629[23629]
 
 *Auditbeat*
 
