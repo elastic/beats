@@ -129,7 +129,8 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	watchLogs := o.monitor.WatchLogs()
 	watchMetrics := o.monitor.WatchMetrics()
 
-	// generate only on change
+	// generate only when monitoring is running (for config refresh) or
+	// state changes (turning on/off)
 	if watchLogs != o.isMonitoringLogs() || watchLogs {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
