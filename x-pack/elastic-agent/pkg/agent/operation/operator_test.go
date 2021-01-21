@@ -389,6 +389,7 @@ func TestConfigurableStartStop(t *testing.T) {
 }
 
 func TestConfigurableService(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/23607")
 	p := getProgram("serviceable", "1.0")
 
 	operator := getTestOperator(t, downloadPath, installPath, p)
