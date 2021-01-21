@@ -461,7 +461,7 @@ func filterRecordType(typ auparse.AuditMessageType) bool {
 	case typ == auparse.AUDIT_REPLACE:
 		return true
 	// Messages from 1300-2999 are valid audit message types.
-	case typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2:
+	case (typ < auparse.AUDIT_USER_AUTH || typ > auparse.AUDIT_LAST_USER_MSG2) && typ != auparse.AUDIT_LOGIN:
 		return true
 	}
 
@@ -563,6 +563,9 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	setECSEntity := func(key string, ent aucoalesce.ECSEntityData, root common.MapStr, set common.StringSet) {
 		if ent.ID == "" && ent.Name == "" {
 			return
+		}
+		if ent.ID == uidUnset {
+			ent.ID = ""
 		}
 		nameField := key + ".name"
 		idField := key + ".id"

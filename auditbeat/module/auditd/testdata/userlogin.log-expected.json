@@ -47,8 +47,7 @@
     },
     "related": {
       "user": [
-        "(unknown)",
-        "unset"
+        "(unknown)"
       ]
     },
     "service": {
@@ -60,8 +59,7 @@
     "user": {
       "effective": {
         "name": "(unknown)"
-      },
-      "name": "unset"
+      }
     }
   },
   {

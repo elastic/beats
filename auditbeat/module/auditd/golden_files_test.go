@@ -202,6 +202,7 @@ func TestGoldenFiles(t *testing.T) {
 			auditMetricSet.client.Close()
 			auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 			mbEvents := runTerminableReporter(fileTimeout, ms, isTestEvent)
+			t.Logf("Received %d events for %d audit records", len(mbEvents), len(lines))
 			assertNoErrors(t, mbEvents)
 			events := normalize(t, mbEvents)
 			goldenPath := file + goldenSuffix
