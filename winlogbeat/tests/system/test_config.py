@@ -36,7 +36,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         )
         self.run_config_tst(exit_code=1)
         assert self.log_contains(
-            "unknown unit  hour in duration 1 hour "
+            "unknown unit \" hour\" in duration \"1 hour\" "
             "accessing 'winlogbeat.event_logs.0.ignore_older'")
 
     def test_invalid_level(self):
