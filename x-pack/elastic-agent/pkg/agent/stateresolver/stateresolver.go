@@ -47,6 +47,10 @@ func (s *StateResolver) Resolve(
 
 	s.l.Infof("New State ID is %s", newStateID)
 	s.l.Infof("Converging state requires execution of %d step(s)", len(steps))
+	for i, step := range steps {
+		// more detailed debug log
+		s.l.Debugf("step %d: %s", i, step.String())
+	}
 
 	// Allow the operator to ack the should state when applying the steps is done correctly.
 	ack := func() {
