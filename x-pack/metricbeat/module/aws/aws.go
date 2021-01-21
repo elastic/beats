@@ -102,6 +102,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Get IAM account name, set region by aws_partition, default is aws global partition
 	// refer https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+	if config.AWSConfig.AWSPartition != "" && config.AWSConfig.Endpoint != "" {
+		base.Logger().Warn("aws_partition is deprecated. Please use endpoint and regions instead.")
+	}
 	switch config.AWSConfig.AWSPartition {
 	case "aws-cn":
 		awsConfig.Region = "cn-north-1"

@@ -109,7 +109,7 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 // Validate checks for deprecated config option
 func (c ConfigAWS) Validate() error {
 	if c.AWSPartition != "" {
-		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint and regions instead.")
+		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint instead.")
 	}
 	return nil
 }
