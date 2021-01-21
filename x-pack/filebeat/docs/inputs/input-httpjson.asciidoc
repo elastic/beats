@@ -34,9 +34,9 @@ filebeat.inputs:
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   processors:
-    - decode_json_fields
-        fields: [message]
-        target: json
+    - decode_json_fields:
+        fields: ["message"]
+        target: "json"
 ----
 
 ["source","yaml",subs="attributes"]
@@ -829,9 +829,9 @@ filebeat.inputs:
     last_requested_at:
       value: '[[now]]'
   processors:
-    - decode_json_fields
-        fields: [message]
-        target: json
+    - decode_json_fields:
+        fields: ["message"]
+        target: "json"
 ----
 
 [float]
