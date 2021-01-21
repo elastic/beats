@@ -45,6 +45,7 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 	}
 }
 
+// WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
 func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
@@ -58,6 +59,9 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 		})
 }
 
+// WrapBrowser is pretty minimal in terms of fields added. The browser monitor
+// type handles most of the fields directly, since it runs multiple jobs in a single
+// run it needs to take this task on in a unique way.
 func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAll(
 		js,
@@ -70,48 +74,55 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			started := time.Now()
 			cont, e := job(event)
-			thisID := stdMonFields.ID
-			thisName := stdMonFields.Name
-			// Allow jobs to override the ID, useful for browser suites
-			// which do this logic on their own
-			if v, _ := event.GetValue("monitor.id"); v != nil {
-				thisID = v.(string)
-			}
-			if v, _ := event.GetValue("monitor.name"); v != nil {
-				thisName = v.(string)
-			}
-			if isMulti {
-				url, err := event.GetValue("url.full")
-				if err != nil {
-					logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
-					url = "n/a"
-				}
-				urlHash, _ := hashstructure.Hash(url, nil)
-				thisID = fmt.Sprintf("%s-%x", stdMonFields.ID, urlHash)
-			}
-
-			fieldsToMerge := common.MapStr{
-				"monitor": common.MapStr{
-					"id":       thisID,
-					"name":     thisName,
-					"type":     stdMonFields.Type,
-					"timespan": timespan(started, stdMonFields.Schedule, stdMonFields.Timeout),
-				},
-			}
-
-			if stdMonFields.Service.Name != "" {
-				fieldsToMerge["service"] = common.MapStr{
-					"name": stdMonFields.Service.Name,
-				}
-			}
-
-			eventext.MergeEventFields(event, fieldsToMerge)
-
+			addMonitorMetaFields(event, time.Now(), stdMonFields, isMulti)
 			return cont, e
 		}
 	}
+}
+
+func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.StdMonitorFields, isMulti bool) {
+	id := sf.ID
+	name := sf.Name
+
+	// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
+	// unique URLs to create unique suffixes for the monitor.
+	if isMulti {
+		url, err := event.GetValue("url.full")
+		if err != nil {
+			logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
+			url = "n/a"
+		}
+		urlHash, _ := hashstructure.Hash(url, nil)
+		id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
+	}
+
+	// Allow jobs to override the ID, useful for browser suites
+	// which do this logic on their own
+	if v, _ := event.GetValue("monitor.id"); v != nil {
+		id = v.(string)
+	}
+	if v, _ := event.GetValue("monitor.name"); v != nil {
+		name = v.(string)
+	}
+
+	fieldsToMerge := common.MapStr{
+		"monitor": common.MapStr{
+			"id":       id,
+			"name":     name,
+			"type":     sf.Type,
+			"timespan": timespan(started, sf.Schedule, sf.Timeout),
+		},
+	}
+
+	// Add service.name for APM interop
+	if sf.Service.Name != "" {
+		fieldsToMerge["service"] = common.MapStr{
+			"name": sf.Service.Name,
+		}
+	}
+
+	eventext.MergeEventFields(event, fieldsToMerge)
 }
 
 func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
