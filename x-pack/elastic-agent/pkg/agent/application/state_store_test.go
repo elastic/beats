@@ -111,7 +111,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			store, err := newStateStore(log, s)
 			require.NoError(t, err)
 			store.SetAckToken(ackToken)
-			
+
 			acker := newStateStoreActionAcker(&testAcker{}, store)
 			require.Equal(t, 0, len(store.Actions()))
 
