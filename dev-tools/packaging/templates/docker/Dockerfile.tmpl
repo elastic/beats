@@ -8,14 +8,6 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
-RUN mkdir -p {{ $beatHome }}/.node \
-    {{ $beatHome }}/.npm \
-    {{ $beatHome }}/.cache \
-    {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites
-{{- end }}
-
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
     find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
@@ -48,6 +40,16 @@ RUN yum -y --setopt=tsflags=nodocs update \
   # See https://access.redhat.com/discussions/3195102 for why rm is needed
 {{- end }}
 
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+ENV NODE_PATH={{ $beatHome }}/.node
+RUN echo \
+    $NODE_PATH \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
+{{- end }}
 
 LABEL \
   org.label-schema.build-date="{{ date }}" \
@@ -98,28 +100,30 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
+{{- if ne .user "root" }}
+RUN groupadd --gid 1000 {{ .BeatName }}
+RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
+RUN chown {{ .user }} $NODE_PATH
+{{- end }}
+{{- end }}
+USER {{ .user }}
+
 {{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_PATH={{ $beatHome }}/.node
-
-# Setup node
-RUN  cd /usr/share/heartbeat/.node \
-      && mkdir node \
-      && curl https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz | tar -xJ --strip 1 -C node
-ENV PATH="/usr/share/heartbeat/.node/node/bin:$PATH"
+ENV NODE_VERSION=12.18.4
+ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
-# cached node_modules, hearbeat then calls the global executable to run test suites
-RUN npm i -g -f @elastic/synthetics
+# cached node_modules, heartbeat then calls the global executable to run test suites
+# Setup node
+RUN cd /usr/share/heartbeat/.node \
+  && mkdir -p node \
+  && curl https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz | tar -xJ --strip 1 -C node \
+  && chmod ug+rwX -R $NODE_PATH \
+  && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
 {{- end }}
-
-
-{{- if ne .user "root" }}
-RUN groupadd --gid 1000 {{ .BeatName }}
-RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
-{{- end }}
-USER {{ .user }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
