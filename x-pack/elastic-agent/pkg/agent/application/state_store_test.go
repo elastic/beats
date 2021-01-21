@@ -101,6 +101,36 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			require.Equal(t, ackToken, store.AckToken())
 		}))
 
+	t.Run("can save to disk unenroll action type",
+		withFile(func(t *testing.T, file string) {
+			action := &fleetapi.ActionUnenroll{
+				ActionID:   "abc123",
+				ActionType: "UNENROLL",
+			}
+
+			s := storage.NewDiskStore(file)
+			store, err := newStateStore(log, s)
+			require.NoError(t, err)
+
+			require.Equal(t, 0, len(store.Actions()))
+			store.Add(action)
+			store.SetAckToken(ackToken)
+			err = store.Save()
+			require.NoError(t, err)
+			require.Equal(t, 1, len(store.Actions()))
+			require.Equal(t, ackToken, store.AckToken())
+
+			s = storage.NewDiskStore(file)
+			store1, err := newStateStore(log, s)
+			require.NoError(t, err)
+
+			actions := store1.Actions()
+			require.Equal(t, 1, len(actions))
+
+			require.Equal(t, action, actions[0])
+			require.Equal(t, ackToken, store.AckToken())
+		}))
+
 	t.Run("when we ACK we save to disk",
 		withFile(func(t *testing.T, file string) {
 			ActionPolicyChange := &fleetapi.ActionPolicyChange{
