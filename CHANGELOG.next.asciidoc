@@ -687,6 +687,11 @@ port. {pull}19209[19209]
 
 *Affecting all Beats*
 
+- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as
+  a hostname when Subject Alternative Name is not present from v8.0.
+  Please update your certificates so it contains at least one DNSName instead of relying on CommonName in the new
+  major version of Beats.
+
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
