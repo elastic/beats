@@ -187,7 +187,7 @@ func newManaged(
 		return nil, err
 	}
 
-	batchedAcker := newLazyAcker(acker)
+	batchedAcker := newLazyAcker(acker, log)
 
 	// Create the state store that will persist the last good policy change on disk.
 	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())

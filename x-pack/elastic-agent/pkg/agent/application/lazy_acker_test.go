@@ -32,7 +32,7 @@ func TestLazyAcker(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	lacker := newLazyAcker(acker)
+	lacker := newLazyAcker(acker, log)
 
 	if acker == nil {
 		t.Fatal("acker not initialized")
