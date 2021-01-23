@@ -1850,7 +1850,7 @@ var security = (function () {
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
                 {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.ClientAddress", to: "related.ip"},
+                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
@@ -2005,7 +2005,7 @@ var security = (function () {
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.ProcessName", to: "process.executable"},
                 {from: "winlog.event_data.IpAddress", to: "source.ip", type: "ip"},
-                {from: "winlog.event_data.ClientAddress", to: "related.ip"},
+                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.IpPort", to: "source.port", type: "long"},
                 {from: "winlog.event_data.WorkstationName", to: "source.domain"},
             ],
@@ -2143,10 +2143,12 @@ var security = (function () {
         .Add(addEventFields)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            var res = /^-$/.test(user);
-                if (!res) {
-                    evt.AppendTo('related.user', user);
-                }
+            if (user) {
+                var res = /^-$/.test(user);
+                    if (!res) {
+                        evt.AppendTo('related.user', user);
+                    }
+            }
         })
         .Build();
 
@@ -2260,9 +2262,11 @@ var security = (function () {
         .Add(addEventFields)
         .Add(function(evt) {
             var ip = evt.Get("source.ip");
-            if (/::ffff:/.test(ip)) {
-                evt.Put("source.ip", ip.replace("::ffff:", ""));
-                evt.Put("related.ip", ip.replace("::ffff:", ""));
+            if (ip) {
+               if (/::ffff:/.test(ip)) {
+                   evt.Put("source.ip", ip.replace("::ffff:", ""));
+                   evt.Put("related.ip", ip.replace("::ffff:", ""));
+               }
             }
         })
         .Build();
