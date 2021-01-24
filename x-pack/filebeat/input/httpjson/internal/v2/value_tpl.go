@@ -73,6 +73,7 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	buf := new(bytes.Buffer)
 	data := tr.Clone()
 	data.Put("cursor", trCtx.cursorMap())
+	data.Put("first_event", trCtx.firstEventClone())
 	data.Put("last_event", trCtx.lastEventClone())
 	data.Put("last_response", trCtx.lastResponseClone().templateValues())
 

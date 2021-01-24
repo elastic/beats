@@ -5,7 +5,7 @@
 // +build integration
 // +build aws
 
-package s3
+package awss3
 
 import (
 	"context"

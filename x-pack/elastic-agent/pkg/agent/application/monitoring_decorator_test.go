@@ -5,6 +5,7 @@
 package application
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -25,6 +26,10 @@ func TestMonitoringInjection(t *testing.T) {
 	programsToRun, err := program.Programs(agentInfo, ast)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if len(programsToRun) != 1 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 1))
 	}
 
 GROUPLOOP:
@@ -102,6 +107,10 @@ func TestMonitoringInjectionDefaults(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if len(programsToRun) != 1 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 1))
+	}
+
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
@@ -177,6 +186,10 @@ func TestMonitoringInjectionDisabled(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if len(programsToRun) != 2 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 2))
+	}
+
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
@@ -203,19 +216,19 @@ GROUPLOOP:
 			}
 
 			// is enabled set
-			settingsObj, found := cm["settings"]
+			agentObj, found := cm["agent"]
 			if !found {
 				t.Errorf("settings not found for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
 			}
 
-			settingsMap, ok := settingsObj.(map[string]interface{})
+			agentMap, ok := agentObj.(map[string]interface{})
 			if !ok {
 				t.Errorf("settings not a map for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
 			}
 
-			monitoringObj, found := settingsMap["monitoring"]
+			monitoringObj, found := agentMap["monitoring"]
 			if !found {
 				t.Errorf("agent.monitoring not found for '%s(%s)': %v", group, p.Spec.Name, cm)
 				continue GROUPLOOP
@@ -244,6 +257,97 @@ GROUPLOOP:
 				continue GROUPLOOP
 			}
 		}
+	}
+}
+
+func TestChangeInMonitoringWithChangeInInput(t *testing.T) {
+	agentInfo, err := info.NewAgentInfo()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	astBefore, err := transpiler.NewAST(inputChange1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	programsToRunBefore, err := program.Programs(agentInfo, astBefore)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(programsToRunBefore) != 1 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 1))
+	}
+
+	astAfter, err := transpiler.NewAST(inputChange2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	programsToRunAfter, err := program.Programs(agentInfo, astAfter)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(programsToRunAfter) != 1 {
+		t.Fatal(fmt.Errorf("programsToRun expected to have %d entries", 1))
+	}
+
+	// inject to both
+	var hashConfigBefore, hashConfigAfter string
+GROUPLOOPBEFORE:
+	for group, ptr := range programsToRunBefore {
+		programsCount := len(ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, astBefore, ptr)
+		if err != nil {
+			t.Error(err)
+			continue GROUPLOOPBEFORE
+		}
+
+		if programsCount+1 != len(newPtr) {
+			t.Errorf("incorrect programs to run count, expected: %d, got %d", programsCount+1, len(newPtr))
+			continue GROUPLOOPBEFORE
+		}
+
+		for _, p := range newPtr {
+			if p.Spec.Name != monitoringName {
+				continue
+			}
+
+			hashConfigBefore = p.Config.HashStr()
+		}
+	}
+
+GROUPLOOPAFTER:
+	for group, ptr := range programsToRunAfter {
+		programsCount := len(ptr)
+		newPtr, err := injectMonitoring(agentInfo, group, astAfter, ptr)
+		if err != nil {
+			t.Error(err)
+			continue GROUPLOOPAFTER
+		}
+
+		if programsCount+1 != len(newPtr) {
+			t.Errorf("incorrect programs to run count, expected: %d, got %d", programsCount+1, len(newPtr))
+			continue GROUPLOOPAFTER
+		}
+
+		for _, p := range newPtr {
+			if p.Spec.Name != monitoringName {
+				continue
+			}
+
+			hashConfigAfter = p.Config.HashStr()
+		}
+	}
+
+	if hashConfigAfter == "" || hashConfigBefore == "" {
+		t.Fatal("hash configs uninitialized")
+	}
+
+	if hashConfigAfter == hashConfigBefore {
+		t.Fatal("hash config equal, expected to be different")
 	}
 }
 
@@ -279,40 +383,33 @@ var inputConfigMap = map[string]interface{}{
 			"username":   "monitoring-uname",
 		},
 	},
-	"datasources": []map[string]interface{}{
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
+	"inputs": []map[string]interface{}{
+		{
+			"type":       "log",
+			"use_output": "infosec1",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+			},
+			"processors": []interface{}{
 				map[string]interface{}{
-					"type": "log",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{"paths": "/xxxx"},
-					},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
-								"tokenizer": "---",
-							},
-						},
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
 					},
 				},
 			},
 		},
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
-				map[string]interface{}{
-					"type": "system/metrics",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{
-							"id":      "system/metrics-system.core",
-							"enabled": true,
-							"dataset": "system.core",
-							"period":  "10s",
-							"metrics": []string{"percentages"},
-						},
-					},
+		{
+			"type":       "system/metrics",
+			"use_output": "infosec1",
+			"streams": []map[string]interface{}{
+				{
+					"id":      "system/metrics-system.core",
+					"enabled": true,
+					"dataset": "system.core",
+					"period":  "10s",
+					"metrics": []string{"percentages"},
 				},
 			},
-			"use_output": "infosec1",
 		},
 	},
 }
@@ -343,40 +440,34 @@ var inputConfigMapDefaults = map[string]interface{}{
 			"username":   "monitoring-uname",
 		},
 	},
-	"datasources": []map[string]interface{}{
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
+
+	"inputs": []map[string]interface{}{
+		{
+			"type":       "log",
+			"use_output": "infosec1",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+			},
+			"processors": []interface{}{
 				map[string]interface{}{
-					"type": "log",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{"paths": "/xxxx"},
-					},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
-								"tokenizer": "---",
-							},
-						},
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
 					},
 				},
 			},
 		},
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
-				map[string]interface{}{
-					"type": "system/metrics",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{
-							"id":      "system/metrics-system.core",
-							"enabled": true,
-							"dataset": "system.core",
-							"period":  "10s",
-							"metrics": []string{"percentages"},
-						},
-					},
+		{
+			"type":       "system/metrics",
+			"use_output": "infosec1",
+			"streams": []map[string]interface{}{
+				{
+					"id":      "system/metrics-system.core",
+					"enabled": true,
+					"dataset": "system.core",
+					"period":  "10s",
+					"metrics": []string{"percentages"},
 				},
 			},
-			"use_output": "infosec1",
 		},
 	},
 }
@@ -410,40 +501,114 @@ var inputConfigMapDisabled = map[string]interface{}{
 			"username":   "monitoring-uname",
 		},
 	},
-	"datasources": []map[string]interface{}{
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
+
+	"inputs": []map[string]interface{}{
+		{
+			"type": "log",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+			},
+			"processors": []interface{}{
 				map[string]interface{}{
-					"type": "log",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{"paths": "/xxxx"},
-					},
-					"processors": []interface{}{
-						map[string]interface{}{
-							"dissect": map[string]interface{}{
-								"tokenizer": "---",
-							},
-						},
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
 					},
 				},
 			},
 		},
-		map[string]interface{}{
-			"inputs": []map[string]interface{}{
+		{
+			"type":       "system/metrics",
+			"use_output": "infosec1",
+			"streams": []map[string]interface{}{
+				{
+					"id":      "system/metrics-system.core",
+					"enabled": true,
+					"dataset": "system.core",
+					"period":  "10s",
+					"metrics": []string{"percentages"},
+				},
+			},
+		},
+	},
+}
+
+var inputChange1 = map[string]interface{}{
+	"agent.monitoring": map[string]interface{}{
+		"enabled":    true,
+		"logs":       true,
+		"metrics":    true,
+		"use_output": "monitoring",
+	},
+	"outputs": map[string]interface{}{
+		"default": map[string]interface{}{
+			"index_name": "general",
+			"pass":       "xxx",
+			"type":       "elasticsearch",
+			"url":        "xxxxx",
+			"username":   "xxx",
+		},
+		"monitoring": map[string]interface{}{
+			"type":       "elasticsearch",
+			"index_name": "general",
+			"pass":       "xxx",
+			"url":        "xxxxx",
+			"username":   "monitoring-uname",
+		},
+	},
+	"inputs": []map[string]interface{}{
+		{
+			"type": "log",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+			},
+			"processors": []interface{}{
 				map[string]interface{}{
-					"type": "system/metrics",
-					"streams": []map[string]interface{}{
-						map[string]interface{}{
-							"id":      "system/metrics-system.core",
-							"enabled": true,
-							"dataset": "system.core",
-							"period":  "10s",
-							"metrics": []string{"percentages"},
-						},
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
 					},
 				},
 			},
-			"use_output": "infosec1",
+		},
+	},
+}
+
+var inputChange2 = map[string]interface{}{
+	"agent.monitoring": map[string]interface{}{
+		"enabled":    true,
+		"logs":       true,
+		"metrics":    true,
+		"use_output": "monitoring",
+	},
+	"outputs": map[string]interface{}{
+		"default": map[string]interface{}{
+			"index_name": "general",
+			"pass":       "xxx",
+			"type":       "elasticsearch",
+			"url":        "xxxxx",
+			"username":   "xxx",
+		},
+		"monitoring": map[string]interface{}{
+			"type":       "elasticsearch",
+			"index_name": "general",
+			"pass":       "xxx",
+			"url":        "xxxxx",
+			"username":   "monitoring-uname",
+		},
+	},
+	"inputs": []map[string]interface{}{
+		{
+			"type": "log",
+			"streams": []map[string]interface{}{
+				{"paths": "/xxxx"},
+				{"paths": "/yyyy"},
+			},
+			"processors": []interface{}{
+				map[string]interface{}{
+					"dissect": map[string]interface{}{
+						"tokenizer": "---",
+					},
+				},
+			},
 		},
 	},
 }

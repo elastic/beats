@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
+- Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
@@ -124,6 +125,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
 - Add new dashboard for VSphere host cluster and virtual machine {pull}14135[14135]
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+- Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
 
 *Packetbeat*
 
@@ -228,6 +230,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix typo in config docs {pull}23185[23185]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
+- Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
+- Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 
 *Auditbeat*
 
@@ -248,6 +252,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
+- Note incompatibility of system/socket on ARM. {pull}23381[23381]
 
 *Filebeat*
 
@@ -262,7 +267,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
+- Fix various processing errors in the Suricata module. {pull}23236[23236]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
+- Change the `event.created` in Netflow events to be the time the event was created by Filebeat
+  to be consistent with ECS. {pull}23094[23094]
+- Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
 
 *Filebeat*
 
@@ -359,6 +368,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
+- Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 
 *Heartbeat*
 
@@ -474,8 +484,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
+- Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
+- Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 
 *Packetbeat*
+
+- Fix SIP parser logic related to line length check. {pull}23411[23411]
 
 
 *Winlogbeat*
@@ -565,6 +580,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added new `rate_limit` processor for enforcing rate limits on event throughput. {pull}22883[22883]
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Honor kube event resysncs to handle missed watch events {pull}22668[22668]
+- Add autodiscover provider and metadata processor for Nomad. {pull}14954[14954] {pull}23324[23324]
+- Add `processors.rate_limit.n.dropped` monitoring counter metric for the `rate_limit` processor. {pull}23330[23330]
+- Deprecate aws_partition config parameter for AWS, use endpoint instead. {pull}23539[23539]
+- Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
+- Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
+- Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
 
 *Auditbeat*
 
@@ -788,12 +809,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Misp improvements: Migration to httpjson v2 config, pagination and deduplication ID {pull}23070[23070]
 - Add Google Workspace module and mark Gsuite module as deprecated {pull}22950[22950]
 - Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
+- Added support for first_event context in filebeat httpjson input {pull}23437[23437]
+- Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
+- Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
+- Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
+- Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
 
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
 - Copy suite directories for synthetic checks to tmp dir before running. {pull}23347[23347]
+- Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 
 *Journalbeat*
 
@@ -936,6 +963,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add basic ECS categorization and `cloud` fields. {pull}19174[19174]
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
+- Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
+- Add support for multiple regions {pull}21065[21065]
 
 *Winlogbeat*
 
@@ -959,6 +988,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as
+  a hostname when Subject Alternative Name is not present from v8.0.
+  Please update your certificates so it contains at least one DNSName instead of relying on CommonName in the new
+  major version of Beats.
+
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
@@ -981,7 +1015,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
 
