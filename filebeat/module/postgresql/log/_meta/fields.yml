@@ -8,9 +8,15 @@
       description: >
         The timestamp from the log line.
     - name: core_id
+      type: alias
+      path: session_line_number
+      description: >
+        Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number)
+      deprecated: 8.0.0
+    - name: session_line_number
       type: long
       description: >
-        Core id
+        Line number inside a session. (%l in `log_line_prefix`)
     - name: database
       example: "mydb"
       description: >

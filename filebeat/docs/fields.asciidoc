@@ -105778,7 +105778,22 @@ The timestamp from the log line.
 *`postgresql.log.core_id`*::
 +
 --
-Core id
+
+deprecated:[8.0.0]
+
+Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number)
+
+
+type: alias
+
+alias to: session_line_number
+
+--
+
+*`postgresql.log.session_line_number`*::
++
+--
+Line number inside a session. (%l in `log_line_prefix`)
 
 
 type: long
