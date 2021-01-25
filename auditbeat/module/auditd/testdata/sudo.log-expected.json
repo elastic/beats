@@ -276,7 +276,7 @@
     "event": {
       "action": "started-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -284,7 +284,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "start"
       ]
     },
     "network": {
@@ -611,7 +611,7 @@
     "event": {
       "action": "started-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -619,7 +619,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "start"
       ]
     },
     "network": {
@@ -983,7 +983,7 @@
     "event": {
       "action": "started-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -991,7 +991,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "start"
       ]
     },
     "network": {
@@ -1121,7 +1121,7 @@
     "event": {
       "action": "ended-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -1129,7 +1129,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "end"
       ]
     },
     "process": {
@@ -1253,7 +1253,7 @@
     "event": {
       "action": "ended-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -1261,7 +1261,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "end"
       ]
     },
     "process": {

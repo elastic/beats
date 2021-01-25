@@ -276,7 +276,7 @@
     "event": {
       "action": "started-session",
       "category": [
-        "authentication"
+        "session"
       ],
       "kind": "event",
       "original": [
@@ -284,7 +284,7 @@
       ],
       "outcome": "success",
       "type": [
-        "info"
+        "start"
       ]
     },
     "network": {
