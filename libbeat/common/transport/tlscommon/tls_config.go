@@ -288,7 +288,7 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 	}
 
 	for _, name := range dnsnames {
-		if len(name) > 0 && len(hostname) > 0 && name == hostname {
+		if matchHostnames(name, hostname) {
 			if !validHostname(name, true) {
 				return fmt.Errorf("invalid hostname in cert")
 			}
