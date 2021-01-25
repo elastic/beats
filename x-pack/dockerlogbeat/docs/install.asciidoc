@@ -80,7 +80,7 @@ example:
 ["source","sh",subs="attributes"]
 ----
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="https://myhost:9200" \
+           --log-opt hosts="https://myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            -it debian:jessie /bin/bash
@@ -98,7 +98,7 @@ example:
 {
   "log-driver" : "elastic/{log-driver-alias}:{version}",
   "log-opts" : {
-    "endpoint" : "https://myhost:9200",
+    "hosts" : "https://myhost:9200",
     "user" : "myusername",
     "password" : "mypassword"
   }

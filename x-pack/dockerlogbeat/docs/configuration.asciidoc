@@ -152,7 +152,7 @@ The local log also supports the `max-file`, `max-size` and `compress` options th
 ["source","sh",subs="attributes"]
 ----
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            --log-opt max-file=10 \
