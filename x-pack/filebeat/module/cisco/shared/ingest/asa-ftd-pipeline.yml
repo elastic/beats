@@ -320,6 +320,7 @@ processors:
   - grok:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
+      patterns:
       - "Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \\(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\\)(\\(%{NOTSPACE:_temp_.cisco.source_username}\\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \\(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\\)( \\(%{NOTSPACE:destination.user.name}\\))?%{GREEDYDATA}"
       description: "302013, 302015"
   - dissect:
