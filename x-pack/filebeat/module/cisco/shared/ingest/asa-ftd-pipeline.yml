@@ -71,7 +71,7 @@ processors:
   # Parse the date included in FTD logs
   #
   - date:
-      if: "ctx.event.timezone == null"
+      if: "ctx.event?.timezone == null && ctx._temp_?.raw_date != null"
       field: "_temp_.raw_date"
       target_field: "@timestamp"
       formats:
@@ -103,7 +103,7 @@ processors:
           },
         ]
   - date:
-      if: "ctx.event.timezone != null"
+      if: "ctx.event?.timezone != null && ctx._temp_?.raw_date != null"
       timezone: "{{ event.timezone }}"
       field: "_temp_.raw_date"
       target_field: "@timestamp"
