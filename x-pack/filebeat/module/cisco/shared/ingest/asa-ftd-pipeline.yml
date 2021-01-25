@@ -297,10 +297,11 @@ processors:
       if: "ctx._temp_.cisco.message_id == '113019'"
       field: "message"
       pattern: "Group = %{}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{message}"
-  - dissect:
+  - grok:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
-      pattern: "Built %{network.direction} %{network.transport} connection %{_temp_.cisco.connection_id} for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})"
+      patterns:
+      - "Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \\(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\\)(\\(%{NOTSPACE:_temp_.cisco.source_username}\\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \\(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\\)( \\(%{NOTSPACE:destination.user.name}\\))?%{GREEDYDATA}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '303002'"
       field: "message"
@@ -1576,6 +1577,13 @@ processors:
           }
         }
 
+  - set:
+      description: copy destination.user.name to user.name if it is not set
+      field: user.name
+      value: "{{destination.user.name}}"
+      ignore_empty_value: true
+      if: ctx?.user?.name == null
+
   # Configures observer fields with a copy from cisco and host fields. Later on these might replace host.hostname.
   - set:
       field: observer.hostname
@@ -1613,6 +1621,11 @@ processors:
       field: related.user
       value: "{{user.name}}"
       if: "ctx?.user?.name != null"
+  - append:
+      field: related.user
+      value: "{{destination.user.name}}"
+      allow_duplicates: false
+      if: "ctx?.destination?.user?.name != null"
   - append:
       field: related.hash
       value: "{{file.hash.sha256}}"
