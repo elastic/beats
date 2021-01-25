@@ -206,3 +206,10 @@ to +{beatname_lc}-customname-*+.
 For more information, see {kibana-ref}/index-patterns.html[Creating an index
 pattern] in the {kib} docs.
 endif::no_dashboards[]
+
+[[madvdontneed-rss]]
+=== High RSS memory usage due to MADV settings
+
+In versions of {beatname_uc} prior to 7.10.2, the go runtime defaults to `MADV_FREE` by default.
+In some cases, this can lead to high RSS memory usage while the kernel waits to reclaim any pages assigned to {beatname_uc}.
+On versions prior to 7.10.2, set the `GODEBUG="madvdontneed=1"` environment variable if you run into RSS usage issues.
