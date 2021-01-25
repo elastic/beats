@@ -189,7 +189,7 @@
       fields:
         - name: shard_id
           type: alias
-          path: elasticsearch.ccr.shard_id
+          path: elasticsearch.ccr.follower.shard.number
         - name: remote_cluster
           type: alias
           path: elasticsearch.ccr.remote_cluster

@@ -59,9 +59,6 @@ class Test(metricbeat.BaseTest):
         elasticsearch metricset tests
         """
 
-        unittest.skip('Skipping this test to check documented fields. We will unskip once we know which fields can be deleted')
-        return
-
         self.check_skip(metricset)
 
         if metricset == "ml_job":
