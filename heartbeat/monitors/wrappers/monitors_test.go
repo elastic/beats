@@ -387,3 +387,41 @@ func TestTimespan(t *testing.T) {
 		})
 	}
 }
+
+func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
+	parsed, err := url.Parse(u)
+	require.NoError(t, err)
+	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.MergeEventFields(event, common.MapStr{"url": URLFields(parsed)})
+		return nil, nil
+	}
+}
+
+// Inline browser jobs function very similarly to lightweight jobs
+// in that they don't override the ID.
+// They do not, however, get a summary field added, nor duration.
+func TestInlineBrowserJob(t *testing.T) {
+	fields := testMonFields
+	testCommonWrap(t, testDef{
+		"simple",
+		fields,
+		[]jobs.Job{makeInlineBrowserJob(t, "http://foo.com")},
+		[]validator.Validator{
+			lookslike.Compose(
+				urlValidator(t, "http://foo.com"),
+				lookslike.MustCompile(map[string]interface{}{
+					"monitor": map[string]interface{}{
+						"duration.us": isdef.IsDuration,
+						"id":          testMonFields.ID,
+						"name":        testMonFields.Name,
+						"type":        testMonFields.Type,
+						"status":      "up",
+						"check_group": isdef.IsString,
+					},
+				}),
+				hbtestllext.MonitorTimespanValidator,
+				summaryValidator(1, 0),
+			)},
+		nil,
+	})
+}
