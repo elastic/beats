@@ -5,10 +5,16 @@
         "auditd.log.sequence": 19600327,
         "auditd.log.ses": "11988",
         "event.action": "user_end",
+        "event.category": [
+            "session"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
+        "event.type": [
+            "end"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0,
@@ -89,10 +95,16 @@
         "auditd.log.sequence": 19600331,
         "auditd.log.ses": "11988",
         "event.action": "user_start",
+        "event.category": [
+            "session"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 803,
