@@ -797,6 +797,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Mark m365 defender, defender atp, okta and google workspace modules as GA {pull}23113[23113]
 - Added support for first_event context in filebeat httpjson input {pull}23437[23437]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
+- Added username parsing from Cisco ASA message 302013. {pull}21196[21196]
 
 *Heartbeat*
 
