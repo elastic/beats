@@ -1312,11 +1312,11 @@ processors:
       ignore_failure: true
   - convert:
       field: "source.bytes"
-      type: long
+      type: integer
       ignore_failure: true
   - convert:
       field: "destination.bytes"
-      type: long
+      type: integer
       ignore_failure: true
   - convert:
       field: "source.packets"
