@@ -19054,7 +19054,7 @@ alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 --
 type: alias
 
-alias to: elasticsearch.ccr.shard_id
+alias to: elasticsearch.ccr.follower.shard.number
 
 --
 
