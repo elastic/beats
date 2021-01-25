@@ -423,6 +423,9 @@ func TestConfiguration(t *testing.T) {
 		"endpoint_unknown_output": {
 			expected: 0,
 		},
+		"endpoint_arm": {
+			expected: 0,
+		},
 	}
 
 	for name, test := range testcases {

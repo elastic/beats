@@ -135,7 +135,7 @@ func (e *tcpConnectResult) Update(s *state) error {
 			pid:      e.Meta.PID,
 			inetType: inetTypeIPv4,
 			proto:    protoTCP,
-			dir:      directionOutbound,
+			dir:      directionEgress,
 			complete: true,
 			lastSeen: kernelTime(call.Meta.Timestamp),
 			local:    newEndpointIPv4(call.LAddr, call.LPort, 0, 0),
@@ -147,7 +147,7 @@ func (e *tcpConnectResult) Update(s *state) error {
 			pid:      e.Meta.PID,
 			inetType: inetTypeIPv6,
 			proto:    protoTCP,
-			dir:      directionOutbound,
+			dir:      directionEgress,
 			complete: true,
 			lastSeen: kernelTime(call.Meta.Timestamp),
 			local:    newEndpointIPv6(call.LAddrA, call.LAddrB, call.LPort, 0, 0),
@@ -193,7 +193,7 @@ func (e *tcpAcceptResult) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetType(e.Af),
 		proto:    protoTCP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		complete: true,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 	}
@@ -237,7 +237,7 @@ func (e *tcpAcceptResult4) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetType(e.Af),
 		proto:    protoTCP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		complete: true,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 	}
@@ -551,7 +551,7 @@ func (e *udpSendMsgCall) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv4,
 		proto:    protoUDP,
-		dir:      directionOutbound,
+		dir:      directionEgress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 1, uint64(e.Size)+minIPv4UdpPacketSize),
 		remote:   newEndpointIPv4(raddr, rport, 0, 0),
@@ -605,7 +605,7 @@ func (e *udpv6SendMsgCall) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv6,
 		proto:    protoUDP,
-		dir:      directionOutbound,
+		dir:      directionEgress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		// In IPv6, udpv6_sendmsg increments local counters as there is no
 		// corresponding ip6_local_out call.
@@ -665,7 +665,7 @@ func (e *udpQueueRcvSkb) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv4,
 		proto:    protoUDP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv4(e.LAddr, e.LPort, 0, 0),
 	}
@@ -739,7 +739,7 @@ func (e *udpv6QueueRcvSkb) asFlow() flow {
 		pid:      e.Meta.PID,
 		inetType: inetTypeIPv6,
 		proto:    protoUDP,
-		dir:      directionInbound,
+		dir:      directionIngress,
 		lastSeen: kernelTime(e.Meta.Timestamp),
 		local:    newEndpointIPv6(e.LAddrA, e.LAddrB, e.LPort, 0, 0),
 	}

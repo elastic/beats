@@ -739,7 +739,8 @@
     {
         "event.action": "TOGGLE_OAUTH_ACCESS_TO_ALL_APIS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -788,7 +789,8 @@
     {
         "event.action": "TOGGLE_ALLOW_ADMIN_PASSWORD_RESET",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -837,7 +839,8 @@
     {
         "event.action": "ENABLE_API_ACCESS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1137,7 +1140,8 @@
     {
         "event.action": "CHANGE_WHITELIST_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1187,7 +1191,8 @@
     {
         "event.action": "COMMUNICATION_PREFERENCES_SETTING_CHANGE",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1288,7 +1293,8 @@
     {
         "event.action": "ENABLE_FEEDBACK_SOLICITATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1338,7 +1344,8 @@
     {
         "event.action": "TOGGLE_CONTACT_SHARING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1435,7 +1442,8 @@
     {
         "event.action": "TOGGLE_USE_CUSTOM_LOGO",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -1582,7 +1590,8 @@
     {
         "event.action": "CHANGE_DATA_LOCALIZATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2172,7 +2181,8 @@
     {
         "event.action": "TOGGLE_ENABLE_OAUTH_CONSUMER_KEY",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2221,7 +2231,8 @@
     {
         "event.action": "TOGGLE_SSO_ENABLED",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2270,7 +2281,8 @@
     {
         "event.action": "TOGGLE_SSL",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2713,7 +2725,8 @@
     {
         "event.action": "TOGGLE_NEW_APP_FEATURES",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2762,7 +2775,8 @@
     {
         "event.action": "TOGGLE_USE_NEXT_GEN_CONTROL_PANEL",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -2907,7 +2921,8 @@
     {
         "event.action": "TOGGLE_OPEN_ID_ENABLED",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -3006,7 +3021,8 @@
     {
         "event.action": "TOGGLE_OUTBOUND_RELAY",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -3207,7 +3223,8 @@
     {
         "event.action": "ENABLE_SERVICE_OR_FEATURE_NOTIFICATIONS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -4040,7 +4057,8 @@
     {
         "event.action": "CHANGE_SSO_SETTINGS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

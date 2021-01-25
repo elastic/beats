@@ -40,7 +40,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	nodeCores := perfMetrics.NodeCoresAllocatable.Get(node.NodeName)
 	nodeMem := perfMetrics.NodeMemAllocatable.Get(node.NodeName)
 	for _, pod := range summary.Pods {
-		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults int64
+		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var coresLimit, memLimit float64
 
 		for _, cont := range pod.Containers {

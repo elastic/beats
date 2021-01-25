@@ -164,92 +164,113 @@ var security = (function () {
 
     // event.category, event.type, event.action
     var eventActionTypes = {
-        "1100": ["process","end","logging-service-shutdown"],
-        "1102": ["iam", "admin", "audit-log-cleared"],
-        "1104": ["iam","admin","logging-full"],
-        "1105": ["iam","admin","auditlog-archieved"],
-        "1108": ["iam","admin","logging-processing-error"],
-        "4624": ["authentication","start","logged-in"],
-        "4625": ["authentication","start","logon-failed"],
-        "4634": ["authentication","end","logged-out"],
-        "4647": ["authentication","end","logged-out"],
-        "4648": ["authentication","start","logged-in-explicit"],
-        "4672": ["iam","admin","logged-in-special"],
-        "4673": ["iam","admin","privileged-service-called"],
-        "4674": ["iam","admin","privileged-operation"],
-        "4688": ["process","start","created-process"],
-        "4689": ["process", "end", "exited-process"],
-        "4697": ["iam","admin","service-installed"],
-        "4698": ["iam","creation","scheduled-task-created"],
-        "4699": ["iam","deletion","scheduled-task-deleted"],
-        "4700": ["iam","change","scheduled-task-enabled"],
-        "4701": ["iam","change","scheduled-task-disabled"],
-        "4702": ["iam","change","scheduled-task-updated"],
-        "4719": ["iam","admin","changed-audit-config"],
-        "4720": ["iam","creation","added-user-account"],
-        "4722": ["iam","creation","enabled-user-account"],
-        "4723": ["iam","change","changed-password"],
-        "4724": ["iam","change","reset-password"],
-        "4725": ["iam","deletion","disabled-user-account"],
-        "4726": ["iam","deletion","deleted-user-account"],
-        "4727": ["iam","creation","added-group-account"],
-        "4728": ["iam","change","added-member-to-group"],
-        "4729": ["iam","change","removed-member-from-group"],
-        "4730": ["iam","deletion","deleted-group-account"],
-        "4731": ["iam","creation","added-group-account"],
-        "4732": ["iam","change","added-member-to-group"],
-        "4733": ["iam","change","removed-member-from-group"],
-        "4734": ["iam","deletion","deleted-group-account"],
-        "4735": ["iam","change","modified-group-account"],
-        "4737": ["iam","change","modified-group-account"],
-        "4738": ["iam","change","modified-user-account"],
-        "4740": ["iam","change","locked-out-user-account"],
-        "4741": ["iam","creation","added-computer-account"],
-        "4742": ["iam","change","changed-computer-account"],
-        "4743": ["iam","deletion","deleted-computer-account"],
-        "4744": ["iam","creation","added-distribution-group-account"],
-        "4745": ["iam","change","changed-distribution-group-account"],
-        "4746": ["iam","change","added-member-to-distribution-group"],
-        "4747": ["iam","change","removed-member-from-distribution-group"],
-        "4748": ["iam","deletion","deleted-distribution-group-account"],
-        "4749": ["iam","creation","added-distribution-group-account"],
-        "4750": ["iam","change","changed-distribution-group-account"],
-        "4751": ["iam","change","added-member-to-distribution-group"],
-        "4752": ["iam","change","removed-member-from-distribution-group"],
-        "4753": ["iam","deletion","deleted-distribution-group-account"],
-        "4754": ["iam","creation","added-group-account"],
-        "4755": ["iam","change","modified-group-account"],
-        "4756": ["iam","change","added-member-to-group"],
-        "4757": ["iam","change","removed-member-from-group"],
-        "4758": ["iam","deletion","deleted-group-account"],
-        "4759": ["iam","creation","added-distribution-group-account"],
-        "4760": ["iam","change","changed-distribution-group-account"],
-        "4761": ["iam","change","added-member-to-distribution-group"],
-        "4762": ["iam","change","removed-member-from-distribution-group"],
-        "4763": ["iam","deletion","deleted-distribution-group-account"],
-        "4764": ["iam","change","type-changed-group-account"],
-        "4767": ["iam","change","unlocked-user-account"],
-        "4768": ["authentication","start","kerberos-authentication-ticket-requested"],
-        "4769": ["authentication","start","kerberos-service-ticket-requested"],
-        "4770": ["authentication","start","kerberos-service-ticket-renewed"],
-        "4771": ["authentication","start","kerberos-preauth-failed"],
-        "4776": ["authentication","start","credential-validated"],
-        "4778": ["authentication","start","session-reconnected"],
-        "4779": ["authentication","end","session-disconnected"],
-        "4781": ["iam","change","renamed-user-account","dummy"],
-        "4798": ["iam","info","group-membership-enumerated"],
-        "4799": ["iam","info","user-member-enumerated","dummy"],
-        "4964": ["iam","admin","logged-in-special"],
-    };
-
-
-    // Audit Policy Changes Table
-    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4719
-    var auditActions = {
-        "8448": "Success Removed",
-        "8450": "Failure Removed",
-        "8449": "Success Added",
-        "8451": "Failure Added",
+        "1100": [["process"], ["end"], "logging-service-shutdown"],
+        "1102": [["iam"], ["admin", "change"], "audit-log-cleared"], // need to recategorize
+        "1104": [["iam"], ["admin"],"logging-full"],
+        "1105": [["iam"], ["admin"],"auditlog-archieved"],
+        "1108": [["iam"], ["admin"],"logging-processing-error"],
+        "4610": [["configuration"], ["access"], "authentication-package-loaded"],
+        "4611": [["configuration"], ["change"], "trusted-logon-process-registered"],
+        "4614": [["configuration"], ["access"], "notification-package-loaded"],
+        "4616": [["configuration"], ["change"], "system-time-changed"],
+        "4622": [["configuration"], ["access"], "security-package-loaded"],
+        "4624": [["authentication"], ["start"], "logged-in"],
+        "4625": [["authentication"], ["start"], "logon-failed"],
+        "4634": [["authentication"], ["end"], "logged-out"],
+        "4647": [["authentication"], ["end"], "logged-out"],
+        "4648": [["authentication"], ["start"], "logged-in-explicit"],
+        "4657": [["configuration"], ["change"], "registry-value-modified"],
+        "4670": [["iam", "configuration"],["admin", "change"],"permissions-changed"],
+        "4672": [["iam"], ["admin"], "logged-in-special"],
+        "4673": [["iam"], ["admin"], "privileged-service-called"],
+        "4674": [["iam"], ["admin"], "privileged-operation"],
+        "4688": [["process"], ["start"], "created-process"],
+        "4689": [["process"], ["end"], "exited-process"],
+        "4697": [["iam", "configuration"], ["admin", "change"],"service-installed"], // remove iam and admin
+        "4698": [["iam", "configuration"], ["creation", "admin"], "scheduled-task-created"], // remove iam and admin
+        "4699": [["iam", "configuration"], ["deletion", "admin"], "scheduled-task-deleted"], // remove iam and admin
+        "4700": [["iam", "configuration"], ["change", "admin"], "scheduled-task-enabled"], // remove iam and admin
+        "4701": [["iam", "configuration"], ["change", "admin"], "scheduled-task-disabled"], // remove iam and admin
+        "4702": [["iam", "configuration"], ["change", "admin"], "scheduled-task-updated"], // remove iam and admin
+        "4706": [["configuration"], ["creation"], "domain-trust-added"],
+        "4707": [["configuration"], ["deletion"], "domain-trust-removed"],
+        "4713": [["configuration"], ["change"], "kerberos-policy-changed"],
+        "4714": [["configuration"], ["change"], "encrypted-data-recovery-policy-changed"],
+        "4715": [["configuration"], ["change"], "object-audit-policy-changed"],
+        "4716": [["configuration"], ["change"], "trusted-domain-information-changed"],
+        "4717": [["iam", "configuration"],["admin", "change"],"system-security-access-granted"],
+        "4718": [["iam", "configuration"],["admin", "deletion"],"system-security-access-removed"],
+        "4719": [["iam", "configuration"], ["admin", "change"], "changed-audit-config"], // remove iam and admin
+        "4720": [["iam"], ["user", "creation"], "added-user-account"],
+        "4722": [["iam"], ["user", "change"], "enabled-user-account"],
+        "4723": [["iam"], ["user", "change"], "changed-password"],
+        "4724": [["iam"], ["user", "change"], "reset-password"],
+        "4725": [["iam"], ["user", "deletion"], "disabled-user-account"],
+        "4726": [["iam"], ["user", "deletion"], "deleted-user-account"],
+        "4727": [["iam"], ["group", "creation"], "added-group-account"],
+        "4728": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4729": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4730": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4731": [["iam"], ["group", "creation"], "added-group-account"],
+        "4732": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4733": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4734": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4735": [["iam"], ["group", "change"], "modified-group-account"],
+        "4737": [["iam"], ["group", "change"], "modified-group-account"],
+        "4738": [["iam"], ["user", "change"], "modified-user-account"],
+        "4739": [["configuration"], ["change"], "domain-policy-changed"],
+        "4740": [["iam"], ["user", "change"], "locked-out-user-account"],
+        "4741": [["iam"], ["creation", "admin"], "added-computer-account"], // remove admin
+        "4742": [["iam"], ["change", "admin"], "changed-computer-account"], // remove admin
+        "4743": [["iam"], ["deletion", "admin"], "deleted-computer-account"], // remove admin
+        "4744": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4745": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4746": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4747": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4748": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4749": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4750": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4751": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4752": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4753": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4754": [["iam"], ["group", "creation"], "added-group-account"],
+        "4755": [["iam"], ["group", "change"], "modified-group-account"],
+        "4756": [["iam"], ["group", "change"], "added-member-to-group"],
+        "4757": [["iam"], ["group", "change"], "removed-member-from-group"],
+        "4758": [["iam"], ["group", "deletion"], "deleted-group-account"],
+        "4759": [["iam"], ["group", "creation"], "added-distribution-group-account"],
+        "4760": [["iam"], ["group", "change"], "changed-distribution-group-account"],
+        "4761": [["iam"], ["group", "change"], "added-member-to-distribution-group"],
+        "4762": [["iam"], ["group", "change"], "removed-member-from-distribution-group"],
+        "4763": [["iam"], ["group", "deletion"], "deleted-distribution-group-account"],
+        "4764": [["iam"], ["group", "change"], "type-changed-group-account"],
+        "4767": [["iam"], ["user", "change"], "unlocked-user-account"],
+        "4768": [["authentication"], ["start"], "kerberos-authentication-ticket-requested"],
+        "4769": [["authentication"], ["start"], "kerberos-service-ticket-requested"],
+        "4770": [["authentication"], ["start"], "kerberos-service-ticket-renewed"],
+        "4771": [["authentication"], ["start"], "kerberos-preauth-failed"],
+        "4776": [["authentication"], ["start"], "credential-validated"],
+        "4778": [["authentication"], ["start"], "session-reconnected"],
+        "4779": [["authentication"], ["end"], "session-disconnected"],
+        "4781": [["iam"], ["user", "change"], "renamed-user-account"],
+        "4798": [["iam"], ["user", "info"], "group-membership-enumerated"], // process enumerates the local groups to which the specified user belongs
+        "4799": [["iam"], ["group", "info"], "user-member-enumerated"], // a process enumerates the members of the specified local group
+        "4817": [["iam", "configuration"], ["admin", "change"],"object-audit-changed"],
+        "4902": [["iam", "configuration"], ["admin", "creation"],"user-audit-policy-created"],
+        "4904": [["iam", "configuration"], ["admin", "change"],"security-event-source-added"],
+        "4905": [["iam", "configuration"], ["admin", "deletion"], "security-event-source-removed"],
+        "4906": [["iam", "configuration"], ["admin", "change"], "crash-on-audit-changed"],
+        "4907": [["iam", "configuration"], ["admin", "change"], "audit-setting-changed"],
+        "4908": [["iam", "configuration"], ["admin", "change"], "special-group-table-changed"],
+        "4912": [["iam", "configuration"], ["admin", "change"], "per-user-audit-policy-changed"],
+        "4950": [["configuration"], ["change"], "windows-firewall-setting-changed"],
+        "4954": [["configuration"], ["change"], "windows-firewall-group-policy-changed"],
+        "4964": [["iam"], ["admin", "group"], "logged-in-special"],
+        "5024": [["process"], ["start"], "windows-firewall-service-started"],
+        "5025": [["process"], ["end"], "windows-firewall-service-stopped"],
+        "5033": [["driver"], ["start"], "windows-firewall-driver-started"],
+        "5034": [["driver"], ["end"], "windows-firewall-driver-stopped"],
+        "5037": [["driver"], ["end"], "windows-firewall-driver-error"],
     };
 
     // Services Types
@@ -1188,7 +1209,7 @@ var security = (function () {
         "8448": "Success removed",
         "8449": "Success Added",
         "8450": "Failure removed",
-        "8451": "Failure added",
+        "8451": "Failure Added",
         "8452": "Success include removed",
         "8453": "Success include added",
         "8454": "Success exclude removed",
@@ -1330,6 +1351,250 @@ var security = (function () {
         "16903": "Publish",
     };
 
+    // Trust Types 
+    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
+    var trustTypes = {
+        "1": "TRUST_TYPE_DOWNLEVEL",
+        "2": "TRUST_TYPE_UPLEVEL",
+        "3": "TRUST_TYPE_MIT",
+        "4": "TRUST_TYPE_DCE"
+    }
+
+    // Trust Direction 
+    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
+    var trustDirection = {
+        "0": "TRUST_DIRECTION_DISABLED",
+        "1": "TRUST_DIRECTION_INBOUND",
+        "2": "TRUST_DIRECTION_OUTBOUND",
+        "3": "TRUST_DIRECTION_BIDIRECTIONAL"
+    }
+
+    // Trust Attributes 
+    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4706
+    var trustAttributes = {
+        "0": "UNDEFINED",
+        "1": "TRUST_ATTRIBUTE_NON_TRANSITIVE",
+        "2": "TRUST_ATTRIBUTE_UPLEVEL_ONLY",
+        "4": "TRUST_ATTRIBUTE_QUARANTINED_DOMAIN",
+        "8": "TRUST_ATTRIBUTE_FOREST_TRANSITIVE",
+        "16": "TRUST_ATTRIBUTE_CROSS_ORGANIZATION",
+        "32": "TRUST_ATTRIBUTE_WITHIN_FOREST",
+        "64": "TRUST_ATTRIBUTE_TREAT_AS_EXTERNAL",
+        "128": "TRUST_ATTRIBUTE_USES_RC4_ENCRYPTION",
+        "512": "TRUST_ATTRIBUTE_CROSS_ORGANIZATION_NO_TGT_DELEGATION",
+        "1024": "TRUST_ATTRIBUTE_PIM_TRUST"
+    }
+
+    // SDDL Ace Types
+    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4715
+    // https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings
+    // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/f4296d69-1c0f-491f-9587-a960b292d070
+    var aceTypes = {
+        "A": "Access Allowed",
+        "D": "Access Denied",
+        "OA": "Object Access Allowed",
+        "OD": "Object Access Denied",
+        "AU": "System Audit",
+        "AL": "System Alarm",
+        "OU": "System Object Audit",
+        "OL": "System Object Alarm",
+        "ML": "System Mandatory Label",
+        "SP": "Central Policy ID"
+    }
+
+    // SDDL Permissions
+    // https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4715
+    // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/f4296d69-1c0f-491f-9587-a960b292d070
+    var permissionDescription = {
+        "GA": "Generic All",
+        "GR": "Generic Read",
+        "GW": "Generic Write",
+        "GX": "Generic Execute",
+        "RC": "Read Permissions",
+        "SD": "Delete",
+        "WD": "Modify Permissions",
+        "WO": "Modify Owner",
+        "RP": "Read All Properties",
+        "WP": "Write All Properties",
+        "CC": "Create All Child Objects",
+        "DC": "Delete All Child Objects",
+        "LC": "List Contents",
+        "SW": "All Validated",
+        "LO": "List Object",
+        "DT": "Delete Subtree",
+        "CR": "All Extended Rights",
+        "FA": "File All Access",
+        "FR": "File Generic Read",
+        "FX": "FILE GENERIC EXECUTE",
+        "FW": "FILE GENERIC WRITE",
+        "KA": "KEY ALL ACCESS",
+        "KR": "KEY READ",
+        "KW": "KEY WRITE",
+        "KX": "KEY EXECUTE"
+    }
+
+    // Known SIDs
+    // https://support.microsoft.com/en-au/help/243330/well-known-security-identifier"S-in-window"S-operating-systems
+    // https://docs.microsoft.com/en-us/windows/win32/secauthz/sid-strings
+    var accountSIDDescription = {
+        "AO": "Account operators",
+        "RU": "Alias to allow previous Windows 2000",
+        "AN": "Anonymous logon",
+        "AU": "Authenticated users",
+        "BA": "Built-in administrators",
+        "BG": "Built-in guests",
+        "BO": "Backup operators",
+        "BU": "Built-in users",
+        "CA": "Certificate server administrators",
+        "CG": "Creator group",
+        "CO": "Creator owner",
+        "DA": "Domain administrators",
+        "DC": "Domain computers",
+        "DD": "Domain controllers",
+        "DG": "Domain guests",
+        "DU": "Domain users",
+        "EA": "Enterprise administrators",
+        "ED": "Enterprise domain controllers",
+        "WD": "Everyone",
+        "PA": "Group Policy administrators",
+        "IU": "Interactively logged-on user",
+        "LA": "Local administrator",
+        "LG": "Local guest",
+        "LS": "Local service account",
+        "SY": "Local system",
+        "NU": "Network logon user",
+        "NO": "Network configuration operators",
+        "NS": "Network service account",
+        "PO": "Printer operators",
+        "PS": "Personal self",
+        "PU": "Power users",
+        "RS": "RAS servers group",
+        "RD": "Terminal server users",
+        "RE": "Replicator",
+        "RC": "Restricted code",
+        "SA": "Schema administrators",
+        "SO": "Server operators",
+        "SU": "Service logon user",
+        "S-1-0": "Null Authority",
+        "S-1-0-0": "Nobody",
+        "S-1-1": "World Authority",
+        "S-1-1-0": "Everyone",
+        "S-1-16-0": "Untrusted Mandatory Level",
+        "S-1-16-12288": "High Mandatory Level",
+        "S-1-16-16384": "System Mandatory Level",
+        "S-1-16-20480": "Protected Process Mandatory Level",
+        "S-1-16-28672": "Secure Process Mandatory Level",
+        "S-1-16-4096": "Low Mandatory Level",
+        "S-1-16-8192": "Medium Mandatory Level",
+        "S-1-16-8448": "Medium Plus Mandatory Level",
+        "S-1-2": "Local Authority",
+        "S-1-2-0": "Local",
+        "S-1-2-1": "Console Logon",
+        "S-1-3": "Creator Authority",
+        "S-1-3-0": "Creator Owner",
+        "S-1-3-1": "Creator Group",
+        "S-1-3-2": "Creator Owner Server",
+        "S-1-3-3": "Creator Group Server",
+        "S-1-3-4": "Owner Rights",
+        "S-1-4": "Non-unique Authority",
+        "S-1-5": "NT Authority",
+        "S-1-5-1": "Dialup",
+        "S-1-5-10": "Principal Self",
+        "S-1-5-11": "Authenticated Users",
+        "S-1-5-12": "Restricted Code",
+        "S-1-5-13": "Terminal Server Users",
+        "S-1-5-14": "Remote Interactive Logon",
+        "S-1-5-15": "This Organization",
+        "S-1-5-17": "This Organization",
+        "S-1-5-18": "Local System",
+        "S-1-5-19": "NT Authority",
+        "S-1-5-2": "Network",
+        "S-1-5-20": "NT Authority",
+        "S-1-5-3": "Batch",
+        "S-1-5-32-544": "Administrators",
+        "S-1-5-32-545": "Users",
+        "S-1-5-32-546": "Guests",
+        "S-1-5-32-547": "Power Users",
+        "S-1-5-32-548": "Account Operators",
+        "S-1-5-32-549": "Server Operators",
+        "S-1-5-32-550": "Print Operators",
+        "S-1-5-32-551": "Backup Operators",
+        "S-1-5-32-552": "Replicators",
+        "S-1-5-32-554": "Builtin\Pre-Windows 2000 Compatible Access",
+        "S-1-5-32-555": "Builtin\Remote Desktop Users",
+        "S-1-5-32-556": "Builtin\Network Configuration Operators",
+        "S-1-5-32-557": "Builtin\Incoming Forest Trust Builders",
+        "S-1-5-32-558": "Builtin\Performance Monitor Users",
+        "S-1-5-32-559": "Builtin\Performance Log Users",
+        "S-1-5-32-560": "Builtin\Windows Authorization Access Group",
+        "S-1-5-32-561": "Builtin\Terminal Server License Servers",
+        "S-1-5-32-562": "Builtin\Distributed COM Users",
+        "S-1-5-32-569": "Builtin\Cryptographic Operators",
+        "S-1-5-32-573": "Builtin\Event Log Readers",
+        "S-1-5-32-574": "Builtin\Certificate Service DCOM Access",
+        "S-1-5-32-575": "Builtin\RDS Remote Access Servers",
+        "S-1-5-32-576": "Builtin\RDS Endpoint Servers",
+        "S-1-5-32-577": "Builtin\RDS Management Servers",
+        "S-1-5-32-578": "Builtin\Hyper-V Administrators",
+        "S-1-5-32-579": "Builtin\Access Control Assistance Operators",
+        "S-1-5-32-580": "Builtin\Remote Management Users",
+        "S-1-5-32-582": "Storage Replica Administrators",
+        "S-1-5-4": "Interactive",
+        "S-1-5-5-X-Y": "Logon Session",
+        "S-1-5-6": "Service",
+        "S-1-5-64-10": "NTLM Authentication",
+        "S-1-5-64-14": "SChannel Authentication",
+        "S-1-5-64-21": "Digest Authentication",
+        "S-1-5-7": "Anonymous",
+        "S-1-5-8": "Proxy",
+        "S-1-5-80": "NT Service",
+        "S-1-5-80-0": "All Services",
+        "S-1-5-83-0": "NT Virtual Machine\Virtual Machines",
+        "S-1-5-9": "Enterprise Domain Controllers",
+        "S-1-5-90-0": "Windows Manager\Windows Manager Group"
+    }
+
+    // Domain-specific SIDs
+    // https://support.microsoft.com/en-au/help/243330/well-known-security-identifiers-in-windows-operating-systems
+    var domainSpecificSID = {
+        "498": "Enterprise Read-only Domain Controllers",
+        "500": "Administrator",
+        "501": "Guest",
+        "502": "KRBTGT",
+        "512": "Domain Admins",
+        "513": "Domain Users",
+        "514": "Domain Guests",
+        "515": "Domain Computers",
+        "516": "Domain Controllers",
+        "517": "Cert Publishers",
+        "518": "Schema Admins",
+        "519": "Enterprise Admins",
+        "520": "Group Policy Creator Owners",
+        "521": "Read-only Domain Controllers",
+        "522": "Cloneable Domain Controllers",
+        "526": "Key Admins",
+        "527": "Enterprise Key Admins",
+        "553": "RAS and IAS Servers",
+        "571": "Allowed RODC Password Replication Group",
+        "572": "Denied RODC Password Replication Group"
+    }
+
+    // Object Permission Flags
+    // https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/7a53f60e-e730-4dfe-bbe9-b21b62eb790b
+    var permsFlags = [
+        [0x80000000, 'Generic Read'],
+        [0x4000000, 'Generic Write'],
+        [0x20000000, 'Generic Execute'],
+        [0x10000000, 'Generic All'],
+        [0x02000000, 'Maximun Allowed'],
+        [0x01000000, 'Access System Security'],
+        [0x00100000, 'Syncronize'],
+        [0x00080000, 'Write Owner'],
+        [0x00040000, 'Write DACL'],
+        [0x00020000, 'Read Control'],
+        [0x00010000, 'Delete']
+    ];
+
     // lookupMessageCode returns the string associated with the code. key should
     // be the name of the field in evt containing the code (e.g. %%2313).
     var lookupMessageCode = function (evt, key) {
@@ -1348,8 +1613,8 @@ var security = (function () {
         }
         var eventActionDescription = eventActionTypes[code][2];
         if (eventActionDescription) {
-            evt.AppendTo("event.category", eventActionTypes[code][0]);
-            evt.AppendTo("event.type", eventActionTypes[code][1]);
+            evt.Put("event.category", eventActionTypes[code][0]);
+            evt.Put("event.type", eventActionTypes[code][1]);
             evt.Put("event.action", eventActionTypes[code][2]);
         }
     };
@@ -1434,7 +1699,7 @@ var security = (function () {
         var actionResults = [];
         for (var j = 0; j < codedActions.length; j++) {
             var actionCode = codedActions[j].replace("%%", '').replace(' ', '');
-            actionResults.push(auditActions[actionCode]);
+            actionResults.push(msobjsMessageTable[actionCode]);
         }
         evt.Put("winlog.event_data.AuditPolicyChangesDescription", actionResults);
     };
@@ -1474,12 +1739,118 @@ var security = (function () {
         evt.Put("winlog.event_data.StatusDescription", kerberosTktStatusCodes[code]);
     };
 
+    var translateSID = function(sid){
+        var translatedSID = accountSIDDescription[sid];
+            if (translatedSID == undefined) {
+                if (/^S\-1\-5\-21/.test(sid)) {
+                    var uid = sid.match(/[0-9]{1,5}$/g);
+                    if (uid) {
+                        translatedSID = domainSpecificSID[uid];
+                    }
+                }
+            }
+            if (translatedSID == undefined) {
+                translatedSID = sid;
+            }
+        return translatedSID;
+    }
+
+    var translatePermissionMask = function(mask) {
+        if (!mask) {
+            return;
+        }
+        var permCode = parseInt(mask);
+        var permResult = [];
+        for (var i = 0; i < permsFlags.length; i++) {
+            if ((permCode | permsFlags[i][0]) === permCode) {
+                permResult.push(permsFlags[i][1]);
+            }
+        }
+        if (permResult) {
+            return permResult;
+        } else {
+            return mask;
+        }
+    };
+
+    var translateACL = function(dacl) {
+        var aceArray = dacl.split(";");
+        var aceResult = [];
+        var aceType = aceArray[0];
+        var acePerm = aceArray[2];
+        var aceTrustedSid = aceArray[5];
+        if (aceTrustedSid) {
+            aceResult['grantee'] = translateSID(aceTrustedSid);
+        }
+        if (aceType) {
+            aceResult['type'] = aceTypes[aceType];
+        }
+        if (acePerm) {
+            if (/^0x/.test(acePerm)) {
+                var perms = translatePermissionMask(acePerm);
+            }
+            else {
+                var perms = []
+                var permPairs = acePerm.match(/.{1,2}/g);
+                for ( var i = 0; i < permPairs.length; i ++) {
+                    perms.push(permissionDescription[permPairs[i]])
+                }
+            }
+            aceResult['perms'] = perms;
+        }
+        return aceResult;
+    };
+
+    var enrichSDDL = function(evt, sddl) {
+        var sddlStr = evt.Get(sddl);
+        if (!sddlStr) {
+            return;
+        }
+        var sdOwner = sddlStr.match(/^O\:[A-Z]{2}/g);
+        var sdGroup = sddlStr.match(/^G\:[A-Z]{2}/g);
+        var sdDacl = sddlStr.match(/(D:([A-Z]*(\(.*\))*))/g);
+        var sdSacl = sddlStr.match(/(S:([A-Z]*(\(.*\))*))?$/g);
+        if (sdOwner) {
+            evt.Put(sddl+"Owner", translateSID(sdOwner));
+        }
+        if (sdGroup) {
+            evt.Put(sddl+"Group", translateSID(sdGroup));
+        }
+        if (sdDacl) {
+            // Split each entry of the DACL
+            var daclList = (sdDacl[0]).match(/\([^*\)]*\)/g);
+            if (daclList) {
+                for (var i = 0; i < daclList.length; i++) {
+                    var newDacl = translateACL(daclList[i].replace("(", '').replace(")", ''));
+                    evt.Put(sddl+"Dacl"+i, newDacl['grantee']+" :"+newDacl['type']+" ("+newDacl['perms']+")");
+                    if ( newDacl['grantee'] === "Administrator" || newDacl['grantee'] === "Guest" || newDacl['grantee'] === "KRBTGT" ) {
+                        evt.AppendTo('related.user', newDacl['grantee']);
+                    }
+                }
+            }
+        }
+        if (sdSacl) {
+            // Split each entry of the SACL
+            var saclList = (sdSacl[0]).match(/\([^*\)]*\)/g);
+            if (saclList) {
+                for (var i = 0; i < saclList.length; i++) {
+                    var newSacl = translateACL(saclList[i].replace("(", '').replace(")", ''));
+                    evt.Put(sddl+"Sacl"+i, newSacl['grantee']+" :"+newSacl['type']+" ("+newSacl['perms']+")");
+                    if ( newSacl['grantee'] === "Administrator" || newSacl['grantee'] === "Guest" || newSacl['grantee'] === "KRBTGT" ) {
+                        evt.AppendTo('related.user', newSacl['grantee']);
+                    }
+                }
+            }
+        }
+    };
+
     var addSessionData = new processor.Chain()
         .Convert({
             fields: [
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
                 {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
+                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
@@ -1508,6 +1879,26 @@ var security = (function () {
         })
         .Build();
 
+    var addTrustInformation = new processor.Chain()
+        .Add(function(evt) {
+            var code = evt.Get("winlog.event_data.TdoType");
+            if (!code) {
+                return;
+            }
+            evt.Put("winlog.trustType", trustTypes[code]);
+            code = evt.Get("winlog.event_data.TdoDirection");
+            if (!code) {
+                return;
+            }
+            evt.Put("winlog.trustDirection", trustDirection[code]);
+            code = evt.Get("winlog.event_data.TdoAttributes");
+            if (!code) {
+                return;
+            }
+            evt.Put("winlog.trustAttribute", trustAttributes[code]);
+
+        })
+        .Build();
     var copyTargetUser = new processor.Chain()
         .Convert({
             fields: [
@@ -1519,11 +1910,13 @@ var security = (function () {
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            if (/.@*/.test(user)) {
-                user = user.split('@')[0];
-                evt.Put('user.name', user);
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.name', user);
+                }
+                evt.AppendTo('related.user', user);
             }
-            evt.AppendTo('related.user', user);
         })
         .Build();
 
@@ -1612,6 +2005,7 @@ var security = (function () {
                 {from: "winlog.event_data.ProcessId", to: "process.pid", type: "long"},
                 {from: "winlog.event_data.ProcessName", to: "process.executable"},
                 {from: "winlog.event_data.IpAddress", to: "source.ip", type: "ip"},
+                {from: "winlog.event_data.ClientAddress", to: "related.ip", type: "ip"},
                 {from: "winlog.event_data.IpPort", to: "source.port", type: "long"},
                 {from: "winlog.event_data.WorkstationName", to: "source.domain"},
             ],
@@ -1749,10 +2143,12 @@ var security = (function () {
         .Add(addEventFields)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
-            var res = /^-$/.test(user);
-                if (!res) {
-                    evt.AppendTo('related.user', user);
-                }
+            if (user) {
+                var res = /^-$/.test(user);
+                    if (!res) {
+                        evt.AppendTo('related.user', user);
+                    }
+            }
         })
         .Build();
 
@@ -1769,9 +2165,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addServiceFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var userMgmtEvts = new processor.Chain()
@@ -1783,7 +2176,6 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             evt.AppendTo('related.user', user);
-            evt.AppendTo("event.type", "user");
         })
         .Build();
 
@@ -1796,7 +2188,6 @@ var security = (function () {
             evt.AppendTo('related.user', userNew);
             var userOld = evt.Get("winlog.event_data.OldTargetUserName");
             evt.AppendTo('related.user', userOld);
-            evt.AppendTo("event.type", "user");
         })
         .Build();
 
@@ -1807,14 +2198,12 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
         .Add(function(evt) {
-            evt.AppendTo("event.type", "group");
             var member = evt.Get("winlog.event_data.MemberName");
             if (!member) {
                 return;
             }
             evt.AppendTo("related.user", member.split(',')[0].replace('CN=', '').replace('cn=', ''));
         })
-
         .Build();
 
     var auditLogCleared = new processor.Chain()
@@ -1822,9 +2211,6 @@ var security = (function () {
         .Add(copySubjectUserLogonIdFromUserData)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var auditChanged = new processor.Chain()
@@ -1833,9 +2219,6 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addAuditInfo)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "change");
-        })
         .Build();
 
     var auditLogMgmt = new processor.Chain()
@@ -1856,7 +2239,6 @@ var security = (function () {
                 return;
             }
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
-            evt.AppendTo("event.type", "admin");
         })
         .Build();
 
@@ -1869,9 +2251,6 @@ var security = (function () {
         .Add(copyTargetUser)
         .Add(copyTargetUserLogonId)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "group");
-        })
         .Build();
 
     var kerberosTktEvts = new processor.Chain()
@@ -1883,8 +2262,11 @@ var security = (function () {
         .Add(addEventFields)
         .Add(function(evt) {
             var ip = evt.Get("source.ip");
-            if (/::ffff:/.test(ip)) {
-                evt.Put("source.ip", ip.replace("::ffff:", ""));
+            if (ip) {
+               if (/::ffff:/.test(ip)) {
+                   evt.Put("source.ip", ip.replace("::ffff:", ""));
+                   evt.Put("related.ip", ip.replace("::ffff:", ""));
+               }
             }
         })
         .Build();
@@ -1899,9 +2281,6 @@ var security = (function () {
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(addEventFields)
-        .Add(function(evt) {
-            evt.AppendTo("event.type", "admin");
-        })
         .Build();
 
     var sensitivePrivilege = new processor.Chain()
@@ -1933,6 +2312,67 @@ var security = (function () {
             }
             evt.Put("winlog.event_data.AccessMaskDescription", maskResults);
         })
+        .Build();
+
+    var trustDomainMgmtEvts = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(addEventFields)
+        .Add(addTrustInformation)
+        .Build();
+
+    var policyChange = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(addEventFields)
+        .Build();
+
+    var objectPolicyChange = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(renameCommonAuthFields)
+        .Add(addEventFields)
+        .Add(function(evt) {
+            var oldSd = evt.Get("winlog.event_data.OldSd");
+            var newSd = evt.Get("winlog.event_data.NewSd");
+            if (oldSd) {
+                enrichSDDL(evt, "winlog.event_data.OldSd");
+            }
+            if (newSd) {
+                enrichSDDL(evt, "winlog.event_data.NewSd");
+            }
+        })
+        .Build();
+
+    var genericAuditChange = new processor.Chain()
+        .Add(addEventFields)
+        .Build();
+
+    var event4908 = new processor.Chain()
+        .Add(addEventFields)
+        .Add(function(evt) {
+            var sids = evt.Get("winlog.event_data.SidList");
+            if (!sids) {
+                return;
+            }
+            var sidList = sids.split(/\s+/);
+            evt.Put("winlog.event_data.SidList", sids.split(/\s+/));
+            var sidListDesc = [];
+            for (var i = 0; i < sidList.length; i++) {
+                var sidTemp = sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ","");
+                if (sidTemp) {
+                    sidListDesc.push(translateSID(sidTemp));
+                }
+            }
+            evt.Put("winlog.event_data.SidListDesc", sidListDesc);
+        })
+        .Build();
+
+    var securityEventSource = new processor.Chain()
+        .Add(copySubjectUser)
+        .Add(copySubjectUserLogonId)
+        .Add(renameCommonAuthFields)
+        .Add(addEventFields)
         .Build();
 
     return {
@@ -1967,6 +2407,9 @@ var security = (function () {
         // 4648 - A logon was attempted using explicit credentials.
         4648: event4648.Run,
 
+        // 4670 - Permissions on an object were changed.
+        4670: objectPolicyChange.Run,
+
         // 4672 - Special privileges assigned to new logon.
         4672: event4672.Run,
 
@@ -1999,6 +2442,24 @@ var security = (function () {
 
         // 4702 - A scheduled task was updated.
         4702: scheduledTask.Run,
+
+        // 4706 - A new trust was created to a domain.
+        4706: trustDomainMgmtEvts.Run,
+
+        // 4707 - A trust to a domain was removed.
+        4707: trustDomainMgmtEvts.Run,
+
+        // 4713 - Kerberos policy was changed.
+        4713: policyChange.Run,
+
+        // 4716 - Trusted domain information was modified.
+        4716: trustDomainMgmtEvts.Run,
+
+        // 4717 - System security access was granted to an account.
+        4717: policyChange.Run,
+
+        // 4718 - System security access was removed from an account.
+        4718: policyChange.Run,
 
         // 4719 -  System audit policy was changed.
         4719: auditChanged.Run,
@@ -2050,6 +2511,9 @@ var security = (function () {
 
         // 4737 - A security-enabled global group was changed.
         4737: groupMgmtEvts.Run,
+
+        // 4739 - A security-enabled global group was changed.
+        4739: policyChange.Run,
 
         // 4738 - An user account was changed.
         4738: userMgmtEvts.Run,
@@ -2161,6 +2625,30 @@ var security = (function () {
 
         // 4799 - A security-enabled local group membership was enumerated.
         4799: groupMgmtEvts.Run,
+
+        // 4817 - Auditing settings on object were changed.
+        4817: objectPolicyChange.Run,
+
+        // 4902 - The Per-user audit policy table was created.
+        4902: genericAuditChange.Run,
+
+        // 4904 - An attempt was made to register a security event source.
+        4904: securityEventSource.Run,
+
+        // 4905 - An attempt was made to unregister a security event source.
+        4905: securityEventSource.Run,
+
+        // 4906 - The CrashOnAuditFail value has changed.
+        4906: genericAuditChange.Run,
+
+        // 4907 - Auditing settings on object were changed.
+        4907: objectPolicyChange.Run,
+
+        // 4908 - Special Groups Logon table modified.
+        4908: event4908.Run,
+
+        // 4912 -   Per User Audit Policy was changed.
+        4912: auditChanged.Run,
 
         // 4964 - Special groups have been assigned to a new logon.
         4964: event4964.Run,

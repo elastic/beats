@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -50,7 +51,8 @@ type Application struct {
 	uid int
 	gid int
 
-	monitor monitoring.Monitor
+	monitor        monitoring.Monitor
+	statusReporter status.Reporter
 
 	processConfig *process.Config
 
@@ -72,7 +74,8 @@ func NewApplication(
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Application, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Application, error) {
 
 	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
@@ -82,20 +85,21 @@ func NewApplication(
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
-		bgContext:     ctx,
-		id:            id,
-		name:          appName,
-		pipelineID:    pipelineID,
-		logLevel:      logLevel,
-		desc:          desc,
-		srv:           srv,
-		processConfig: cfg.ProcessConfig,
-		logger:        logger,
-		limiter:       b,
-		reporter:      reporter,
-		monitor:       monitor,
-		uid:           uid,
-		gid:           gid,
+		bgContext:      ctx,
+		id:             id,
+		name:           appName,
+		pipelineID:     pipelineID,
+		logLevel:       logLevel,
+		desc:           desc,
+		srv:            srv,
+		processConfig:  cfg.ProcessConfig,
+		logger:         logger,
+		limiter:        b,
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
+		statusReporter: statusController.Register(id),
 	}, nil
 }
 
@@ -169,10 +173,10 @@ func (a *Application) Shutdown() {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
+func (a *Application) SetState(s state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg, payload)
+	a.setState(s, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -246,13 +250,22 @@ func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg 
 	a.setState(status, msg, payload)
 }
 
-func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
-	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
-		a.state.Status = status
+func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
+		}
+
+		switch s {
+		case state.Configuring, state.Restarting, state.Starting, state.Stopping, state.Updating:
+			// no action
+		case state.Crashed, state.Failed, state.Degraded:
+			a.statusReporter.Update(status.Degraded)
+		default:
+			a.statusReporter.Update(status.Healthy)
 		}
 	}
 }

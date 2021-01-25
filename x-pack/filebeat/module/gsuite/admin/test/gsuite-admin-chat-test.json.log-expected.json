@@ -98,7 +98,8 @@
     {
         "event.action": "MEET_INTEROP_MODIFY_GATEWAY",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -146,7 +147,8 @@
     {
         "event.action": "CHANGE_CHAT_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

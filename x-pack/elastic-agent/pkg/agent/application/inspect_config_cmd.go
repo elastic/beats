@@ -46,7 +46,7 @@ func (c *InspectConfigCmd) inspectConfig() error {
 		return err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		return printConfig(rawConfig)
 	}
 
@@ -100,12 +100,12 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	as, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
+	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, c := range as.Actions() {
+	for _, c := range stateStore.Actions() {
 		cfgChange, ok := c.(*fleetapi.ActionPolicyChange)
 		if !ok {
 			continue

@@ -6,6 +6,7 @@ package template
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -61,8 +62,8 @@ func ValidateTemplate(t testing.TB, template *Template) bool {
 func AssertFieldsEquals(t testing.TB, expected []FieldTemplate, actual []FieldTemplate) (succeeded bool) {
 	if succeeded = assert.Len(t, actual, len(expected)); succeeded {
 		for idx := range expected {
-			succeeded = assert.Equal(t, expected[idx].Length, actual[idx].Length, string(idx)) && succeeded
-			succeeded = assert.Equal(t, expected[idx].Info, actual[idx].Info, string(idx)) && succeeded
+			succeeded = assert.Equal(t, expected[idx].Length, actual[idx].Length, strconv.Itoa(idx)) && succeeded
+			succeeded = assert.Equal(t, expected[idx].Info, actual[idx].Info, strconv.Itoa(idx)) && succeeded
 		}
 	}
 	return

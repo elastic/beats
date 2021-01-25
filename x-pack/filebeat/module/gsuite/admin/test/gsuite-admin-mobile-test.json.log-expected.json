@@ -558,7 +558,8 @@
     {
         "event.action": "CHANGE_MOBILE_APPLICATION_SETTINGS",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -871,7 +872,8 @@
     {
         "event.action": "CHANGE_MOBILE_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

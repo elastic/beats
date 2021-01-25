@@ -7,6 +7,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -58,6 +59,8 @@ func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 		return errors.New(err, fmt.Sprintf("acknowledge action '%s' for elastic-agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
 	}
 
+	f.log.Debugf("action with id '%s' was just acknowledged", action.ID())
+
 	return nil
 }
 
@@ -65,8 +68,10 @@ func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) e
 	// checkin
 	agentID := f.agentInfo.AgentID()
 	events := make([]fleetapi.AckEvent, 0, len(actions))
+	ids := make([]string, 0, len(actions))
 	for _, action := range actions {
 		events = append(events, constructEvent(action, agentID))
+		ids = append(ids, action.ID())
 	}
 
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
@@ -74,11 +79,12 @@ func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) e
 		Events: events,
 	}
 
+	f.log.Debugf("%d actions with ids '%s' acknowledging", len(ids), strings.Join(ids, ","))
+
 	_, err := cmd.Execute(ctx, req)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' for elastic-agent '%s' failed", len(actions), actions, agentID), errors.TypeNetwork)
 	}
-
 	return nil
 }
 

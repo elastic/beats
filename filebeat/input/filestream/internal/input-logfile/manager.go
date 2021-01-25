@@ -19,6 +19,8 @@ package input_logfile
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -79,6 +81,8 @@ type Source interface {
 var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
+const globalInputID = ".global"
+
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
 	Access() (*statestore.Store, error)
@@ -92,6 +96,7 @@ func (cim *InputManager) init() error {
 		}
 
 		log := cim.Logger.With("input_type", cim.Type)
+
 		var store *store
 		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
 		if cim.initErr != nil {
@@ -117,9 +122,8 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 
 	log := cim.Logger.With("input_type", cim.Type)
 
-	store := cim.store
+	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
-	store.Retain()
 	err := group.Go(func(canceler unison.Canceler) error {
 		defer cim.shutdown()
 		defer store.Release()
@@ -166,34 +170,60 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, errNoInputRunner
 	}
 
+	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	if err != nil {
+		return nil, fmt.Errorf("error while creating source identifier for input: %v", err)
+	}
+
+	pStore := cim.getRetainedStore()
+	defer pStore.Release()
+	prospectorStore := newSourceStore(pStore, sourceIdentifier)
+	err = prospector.Init(prospectorStore)
+	if err != nil {
+		return nil, err
+	}
+
 	return &managedInput{
-		manager:      cim,
-		prospector:   prospector,
-		harvester:    harvester,
-		cleanTimeout: settings.CleanTimeout,
+		manager:          cim,
+		userID:           settings.ID,
+		prospector:       prospector,
+		harvester:        harvester,
+		sourceIdentifier: sourceIdentifier,
+		cleanTimeout:     settings.CleanTimeout,
 	}, nil
 }
 
-// Lock locks a key for exclusive access and returns an resource that can be used to modify
-// the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx input.Context, key string) (*resource, error) {
-	resource := cim.store.Get(key)
-	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
-	if err != nil {
-		resource.Release()
-		return nil, err
-	}
-	return resource, nil
+func (cim *InputManager) getRetainedStore() *store {
+	store := cim.store
+	store.Retain()
+	return store
 }
 
-func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler) error {
-	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
-		err := resource.lock.LockContext(canceler)
-		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
-			return err
-		}
+type sourceIdentifier struct {
+	prefix           string
+	configuredUserID bool
+}
+
+func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
+	if userID == globalInputID {
+		return nil, fmt.Errorf("invalid user ID: .global")
 	}
-	return nil
+
+	configuredUserID := true
+	if userID == "" {
+		configuredUserID = false
+		userID = globalInputID
+	}
+	return &sourceIdentifier{
+		prefix:           pluginName + "::" + userID + "::",
+		configuredUserID: configuredUserID,
+	}, nil
+}
+
+func (i *sourceIdentifier) ID(s Source) string {
+	return i.prefix + s.Name()
+}
+
+func (i *sourceIdentifier) MatchesInput(id string) bool {
+	return strings.HasPrefix(id, i.prefix)
 }
