@@ -43,58 +43,55 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// This file contains code adapted from golang's crypto/tls/handshake_client.go
+// This file contains code adapted from golang's crypto/x509/verify.go
 
 package tlscommon
 
-import (
-	"crypto/x509"
-	"time"
+import "strings"
 
-	"github.com/pkg/errors"
-)
+// validHostname reports whether host is a valid hostname that can be matched or
+// matched against according to RFC 6125 2.2, with some leniency to accommodate
+// legacy values.
+func validHostname(host string, isPattern bool) bool {
+	if !isPattern {
+		host = strings.TrimSuffix(host, ".")
+	}
+	if len(host) == 0 {
+		return false
+	}
 
-// verifyCertificateExceptServerName is a TLS Certificate verification utility method that verifies that the provided
-// certificate chain is valid and is signed by one of the root CAs in the provided tls.Config. It is intended to be
-// as similar as possible to the default verify, but does not verify that the provided certificate matches the
-// ServerName in the tls.Config.
-func verifyCertificateExceptServerName(
-	rawCerts [][]byte,
-	c *TLSConfig,
-) ([]*x509.Certificate, [][]*x509.Certificate, error) {
-	// this is where we're a bit suboptimal, as we have to re-parse the certificates that have been presented
-	// during the handshake.
-	// the verification code here is taken from verifyServerCertificate in crypto/tls/handshake_client.go:824
-	certs := make([]*x509.Certificate, len(rawCerts))
-	for i, asn1Data := range rawCerts {
-		cert, err := x509.ParseCertificate(asn1Data)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "tls: failed to parse certificate from server")
+	for i, part := range strings.Split(host, ".") {
+		if part == "" {
+			// Empty label.
+			return false
 		}
-		certs[i] = cert
+		if isPattern && i == 0 && part == "*" {
+			// Only allow full left-most wildcards, as those are the only ones
+			// we match, and matching literal '*' characters is probably never
+			// the expected behavior.
+			continue
+		}
+		for j, c := range part {
+			if 'a' <= c && c <= 'z' {
+				continue
+			}
+			if '0' <= c && c <= '9' {
+				continue
+			}
+			if 'A' <= c && c <= 'Z' {
+				continue
+			}
+			if c == '-' && j != 0 {
+				continue
+			}
+			if c == '_' {
+				// Not a valid character in hostnames, but commonly
+				// found in deployments outside the WebPKI.
+				continue
+			}
+			return false
+		}
 	}
 
-	var t time.Time
-	if c.time != nil {
-		t = c.time()
-	} else {
-		t = time.Now()
-	}
-
-	// DNSName omitted in VerifyOptions in order to skip ServerName verification
-	opts := x509.VerifyOptions{
-		Roots:         c.RootCAs,
-		CurrentTime:   t,
-		Intermediates: x509.NewCertPool(),
-	}
-
-	for _, cert := range certs[1:] {
-		opts.Intermediates.AddCert(cert)
-	}
-
-	headCert := certs[0]
-
-	// defer to the default verification performed
-	chains, err := headCert.Verify(opts)
-	return certs, chains, err
+	return true
 }

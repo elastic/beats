@@ -68,7 +68,7 @@ func (s *Server) createServer() (net.Listener, error) {
 	var l net.Listener
 	var err error
 	if s.tlsConfig != nil {
-		t := s.tlsConfig.BuildModuleConfig(s.config.Host)
+		t := s.tlsConfig.BuildServerConfig(s.config.Host)
 		l, err = tls.Listen("tcp", s.config.Host, t)
 		if err != nil {
 			return nil, err
