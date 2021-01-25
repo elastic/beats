@@ -79,6 +79,7 @@ type requestConfig struct {
 	URL                    *urlConfig        `config:"url" validate:"required"`
 	Method                 string            `config:"method" validate:"required"`
 	Body                   *common.MapStr    `config:"body"`
+	EncodeAs               string            `config:"encode_as"`
 	Timeout                *time.Duration    `config:"timeout"`
 	SSL                    *tlscommon.Config `config:"ssl"`
 	Retry                  retryConfig       `config:"retry"`
@@ -114,6 +115,12 @@ func (c *requestConfig) Validate() error {
 
 	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace, nil); err != nil {
 		return err
+	}
+
+	if c.EncodeAs != "" {
+		if _, found := registeredEncoders[c.EncodeAs]; !found {
+			return fmt.Errorf("encoder not found for contentType: %v", c.EncodeAs)
+		}
 	}
 
 	return nil

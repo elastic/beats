@@ -9,10 +9,10 @@ package include
 import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/s3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/azure"

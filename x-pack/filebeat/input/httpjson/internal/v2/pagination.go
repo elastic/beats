@@ -6,7 +6,6 @@ package v2
 
 import (
 	"context"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -27,11 +26,18 @@ type pagination struct {
 	log            *logp.Logger
 	httpClient     *httpClient
 	requestFactory *requestFactory
+	decoder        decoderFunc
 }
 
 func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
 	pagination := &pagination{httpClient: httpClient, log: log}
-	if config.Response == nil || len(config.Response.Pagination) == 0 {
+	if config.Response == nil {
+		return pagination
+	}
+
+	pagination.decoder = registeredDecoders[config.Response.DecodeAs]
+
+	if len(config.Response.Pagination) == 0 {
 		return pagination
 	}
 
@@ -47,6 +53,7 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 
 	requestFactory := newPaginationRequestFactory(
 		config.Request.Method,
+		config.Request.EncodeAs,
 		*config.Request.URL.URL,
 		body,
 		append(rts, pts...),
@@ -57,7 +64,7 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 	return pagination
 }
 
-func newPaginationRequestFactory(method string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
+func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *common.MapStr, ts []basicTransform, authConfig *authConfig, log *logp.Logger) *requestFactory {
 	// config validation already checked for errors here
 	rf := &requestFactory{
 		url:        url,
@@ -65,6 +72,7 @@ func newPaginationRequestFactory(method string, url url.URL, body *common.MapStr
 		body:       body,
 		transforms: ts,
 		log:        log,
+		encoder:    registeredEncoders[encodeAs],
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
 		rf.user = authConfig.Basic.User
@@ -160,7 +168,12 @@ func (iter *pageIterator) getPage() (*response, error) {
 	r.page = iter.n
 
 	if len(bodyBytes) > 0 {
-		if err := json.Unmarshal(bodyBytes, &r.body); err != nil {
+		if iter.pagination.decoder != nil {
+			err = iter.pagination.decoder(bodyBytes, &r)
+		} else {
+			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
+		}
+		if err != nil {
 			return nil, err
 		}
 	}

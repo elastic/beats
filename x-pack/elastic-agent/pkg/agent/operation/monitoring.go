@@ -129,8 +129,9 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	watchLogs := o.monitor.WatchLogs()
 	watchMetrics := o.monitor.WatchMetrics()
 
-	// generate only on change
-	if watchLogs != o.isMonitoringLogs() {
+	// generate only when monitoring is running (for config refresh) or
+	// state changes (turning on/off)
+	if watchLogs != o.isMonitoringLogs() || watchLogs {
 		fbConfig, any := o.getMonitoringFilebeatConfig(output)
 		stepID := configrequest.StepRun
 		if !watchLogs || !any {
@@ -151,7 +152,7 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 
 		steps = append(steps, filebeatStep)
 	}
-	if watchMetrics != o.isMonitoringMetrics() {
+	if watchMetrics != o.isMonitoringMetrics() || watchMetrics {
 		mbConfig, any := o.getMonitoringMetricbeatConfig(output)
 		stepID := configrequest.StepRun
 		if !watchMetrics || !any {
@@ -188,7 +189,9 @@ func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]i
 			},
 			"paths": []string{
 				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log*"),
 				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log*"),
 			},
 			"index": "logs-elastic_agent-default",
 			"processors": []map[string]interface{}{
@@ -531,7 +534,10 @@ func (o *Operator) getLogFilePaths() map[string][]string {
 	for _, a := range o.apps {
 		logPath := a.Monitor().LogPath(a.Spec(), o.pipelineID)
 		if logPath != "" {
-			paths[strings.ReplaceAll(a.Name(), "-", "_")] = append(paths[a.Name()], logPath)
+			paths[strings.ReplaceAll(a.Name(), "-", "_")] = []string{
+				logPath,
+				fmt.Sprintf("%s*", logPath),
+			}
 		}
 	}
 
@@ -547,7 +553,19 @@ func (o *Operator) getMetricbeatEndpoints() map[string][]string {
 	for _, a := range o.apps {
 		metricEndpoint := a.Monitor().MetricsPathPrefixed(a.Spec(), o.pipelineID)
 		if metricEndpoint != "" {
-			endpoints[strings.ReplaceAll(a.Name(), "-", "_")] = append(endpoints[a.Name()], metricEndpoint)
+			safeName := strings.ReplaceAll(a.Name(), "-", "_")
+			// prevent duplicates
+			var found bool
+			for _, ep := range endpoints[safeName] {
+				if ep == metricEndpoint {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				endpoints[safeName] = append(endpoints[safeName], metricEndpoint)
+			}
 		}
 	}
 
