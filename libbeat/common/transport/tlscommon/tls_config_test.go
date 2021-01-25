@@ -34,7 +34,10 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 		t.Fatalf("failed to open test certs: %+v", err)
 	}
 
-	testCA, errs := LoadCertificateAuthorities([]string{filepath.Join("testdata", "cacert.crt")})
+	testCA, errs := LoadCertificateAuthorities([]string{
+		filepath.Join("testdata", "ca.crt"),
+		filepath.Join("testdata", "cacert.crt"),
+	})
 	if len(errs) > 0 {
 		t.Fatalf("failed to load test certificate authorities: %+v", errs)
 	}
@@ -80,6 +83,15 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			certAuthorities:  testCA,
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "localhost",
+			expectedCallback: true,
+			expectedError:    nil,
+		},
+		"default verification with certificates when required with correct wildcard cert": {
+			verificationMode: VerifyFull,
+			clientAuth:       tls.RequireAndVerifyClientCert,
+			certAuthorities:  testCA,
+			peerCerts:        []*x509.Certificate{testCerts["wildcard"]},
+			serverName:       "hello.example.com",
 			expectedCallback: true,
 			expectedError:    nil,
 		},
@@ -181,6 +193,7 @@ func openTestCerts() (map[string]*x509.Certificate, error) {
 		"expired":           "tls.crt",
 		"unknown authority": "unsigned_tls.crt",
 		"correct":           "client1.crt",
+		"wildcard":          "server.crt",
 	} {
 
 		certBytes, err := ioutil.ReadFile(filepath.Join("testdata", certname))
