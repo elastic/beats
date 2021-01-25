@@ -3601,7 +3601,6 @@
         "cisco.asa.message_id": "302013",
         "cisco.asa.source_interface": "internet",
         "cisco.asa.source_username": "LOCAL\\username",
-        "client.user.name": "username",
         "destination.address": "1.2.3.4",
         "destination.geo.city_name": "Moscow",
         "destination.geo.continent_name": "Europe",
@@ -3613,6 +3612,7 @@
         "destination.geo.region_name": "Moscow",
         "destination.ip": "1.2.3.4",
         "destination.port": 80,
+        "destination.user.name": "username",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -3644,6 +3644,9 @@
             "10.2.3.4",
             "1.2.3.4"
         ],
+        "related.user": [
+            "username"
+        ],
         "service.type": "cisco",
         "source.address": "10.2.3.4",
         "source.ip": "10.2.3.4",
@@ -3652,6 +3655,7 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "username"
     }
 ]
