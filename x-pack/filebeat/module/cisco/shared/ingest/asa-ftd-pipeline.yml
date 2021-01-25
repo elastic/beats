@@ -599,13 +599,9 @@ processors:
   - grok:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
-<<<<<<< HEAD
-      pattern: "Group %{} User %{source.user.name} IP %{source.address} WebVPN session terminated: %{event.reason}"
-=======
       description: "716002"
       patterns:
         - "Group <%{NOTSPACE:cisco.webvpn.group.name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> WebVPN session terminated: %{GREEDYDATA:event.reason}\."
->>>>>>> Update asa-ftd-pipeline.yml
   - dissect:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"
