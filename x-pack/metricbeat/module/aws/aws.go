@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -16,7 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -78,20 +78,22 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get aws credentials, please check AWS credential in config")
+		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
 
 	_, err = awsConfig.Credentials.Retrieve()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to retrieve aws credentials, please check AWS credential in config")
+		return nil, fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %w", err)
 	}
 
+	base.Logger().Debug("aws config endpoint = ", config.AWSConfig.Endpoint)
 	metricSet := MetricSet{
 		BaseMetricSet: base,
 		Period:        config.Period,
 		Latency:       config.Latency,
 		AwsConfig:     &awsConfig,
 		TagsFilter:    config.TagsFilter,
+		Endpoint:      config.AWSConfig.Endpoint,
 	}
 
 	base.Logger().Debug("Metricset level config for period: ", metricSet.Period)
@@ -100,6 +102,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Get IAM account name, set region by aws_partition, default is aws global partition
 	// refer https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
+	if config.AWSConfig.AWSPartition != "" && config.AWSConfig.Endpoint != "" {
+		base.Logger().Warn("aws_partition is deprecated. Please use endpoint and regions instead.")
+	}
 	switch config.AWSConfig.AWSPartition {
 	case "aws-cn":
 		awsConfig.Region = "cn-north-1"
@@ -107,6 +112,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = "us-gov-east-1"
 	default:
 		awsConfig.Region = "us-east-1"
+	}
+
+	// If regions in config is not empty, then overwrite the awsConfig.Region
+	if len(config.Regions) > 0 {
+		awsConfig.Region = config.Regions[0]
 	}
 
 	// Get IAM account id
@@ -151,7 +161,7 @@ func getRegions(svc ec2iface.ClientAPI) (completeRegionsList []string, err error
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send(context.TODO())
 	if err != nil {
-		err = errors.Wrap(err, "Failed DescribeRegions")
+		err = fmt.Errorf("failed DescribeRegions: %w", err)
 		return
 	}
 	for _, region := range output.Regions {

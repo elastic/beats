@@ -69,6 +69,7 @@ type kafkaConfig struct {
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
 	Sasl               saslConfig                `config:"sasl"`
+	EnableFAST         bool                      `config:"enable_krb5_fast"`
 }
 
 type saslConfig struct {
@@ -227,7 +228,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
 	switch {
@@ -244,6 +245,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !config.EnableFAST,
 		}
 
 	case config.Username != "":

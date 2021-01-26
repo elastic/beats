@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package s3
+package awss3
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-const inputName = "s3"
+const inputName = "aws-s3"
 
 func Plugin() v2.Plugin {
 	return v2.Plugin{
@@ -113,6 +113,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
+	log.Debug("s3 input config endpoint = ", in.config.AwsConfig.Endpoint)
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,

@@ -339,6 +339,7 @@ def triggerE2ETests(String suite) {
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
@@ -346,7 +347,6 @@ def triggerE2ETests(String suite) {
   ]
   if (isPR()) {
     def version = "pr-${env.CHANGE_ID}"
-    parameters.push(booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true))
     parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
     parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
   }
