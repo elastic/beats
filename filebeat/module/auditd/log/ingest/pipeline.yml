@@ -37,8 +37,9 @@ processors:
 - remove:
     field: auditd.log.sub_kv
     ignore_failure: true
-- remove:
+- rename:
     field: message
+    target_field: event.original
     ignore_failure: true
 - date:
     field: auditd.log.epoch
