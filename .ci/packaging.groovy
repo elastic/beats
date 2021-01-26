@@ -40,6 +40,7 @@ pipeline {
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
+    booleanParam(name: 'arm', defaultValue: true, description: 'Allow ARM stages.')
   }
   stages {
     stage('Filter build') {
@@ -143,6 +144,31 @@ pipeline {
                     'windows/amd64',
                     'windows/386',
                     (params.macos ? '' : 'darwin/amd64'),
+                  ].join(' ')
+                }
+                steps {
+                  withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                    deleteDir()
+                    release()
+                    pushCIDockerImages()
+                  }
+                  prepareE2ETestForPackage("${BEATS_FOLDER}")
+                }
+              }
+              stage('Package Docker images for linux/arm64'){
+                agent { label 'arm' }
+                options { skipDefaultCheckout() }
+                when {
+                  beforeAgent true
+                  expression {
+                    return params.linux
+                  }
+                }
+                environment {
+                  HOME = "${env.WORKSPACE}"
+                  PACKAGES = "docker"
+                  PLATFORMS = [
+                    'linux/arm64',
                   ].join(' ')
                 }
                 steps {
