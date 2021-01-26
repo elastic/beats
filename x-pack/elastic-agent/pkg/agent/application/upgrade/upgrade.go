@@ -247,19 +247,26 @@ func rollbackInstall(ctx context.Context, hash string) {
 }
 
 func copyActionStore(newHash string) error {
-	currentActionStorePath := info.AgentActionStoreFile()
+	storePaths := []string{info.AgentActionStoreFile(), info.AgentStateStoreFile()}
 
-	newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
-	newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
+	for _, currentActionStorePath := range storePaths {
 
-	currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
-	if os.IsNotExist(err) {
-		// nothing to copy
-		return nil
+		newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
+		newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
+
+		currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
+		if os.IsNotExist(err) {
+			// nothing to copy
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		if err := ioutil.WriteFile(newActionStorePath, currentActionStore, 0600); err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
 
-	return ioutil.WriteFile(newActionStorePath, currentActionStore, 0600)
+	return nil
 }
