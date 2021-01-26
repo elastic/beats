@@ -250,14 +250,13 @@ func copyActionStore(newHash string) error {
 	storePaths := []string{info.AgentActionStoreFile(), info.AgentStateStoreFile()}
 
 	for _, currentActionStorePath := range storePaths {
-
 		newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
 		newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
 
 		currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
 		if os.IsNotExist(err) {
 			// nothing to copy
-			return nil
+			continue
 		}
 		if err != nil {
 			return err
