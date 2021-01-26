@@ -156,6 +156,10 @@ processors:
     target_field: azure.signinlogs.properties.user_id
     ignore_missing: true
 - rename:
+    field: azure.signinlogs.properties.userType
+    target_field: azure.signinlogs.properties.user_type
+    ignore_missing: true
+- rename:
     field: azure.signinlogs.properties.appId
     target_field: azure.signinlogs.properties.app_id
     ignore_missing: true
@@ -247,6 +251,30 @@ processors:
     field: azure.signinlogs.properties.servicePrincipalId
     target_field: azure.signinlogs.properties.service_principal_id
     ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.resourceTenantId
+    target_field: azure.signinlogs.properties.resource_tenant_id
+    ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.flaggedForReview
+    target_field: azure.signinlogs.properties.flagged_for_review
+    ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.riskEventTypes
+    target_field: azure.signinlogs.properties.risk_event_types
+    ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.riskEventTypes_v2
+    target_field: azure.signinlogs.properties.risk_event_types_v2
+    ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.authenticationRequirement
+    target_field: azure.signinlogs.properties.authentication_requirement
+    ignore_missing: true
+- rename:
+    field: azure.signinlogs.properties.userAgent
+    target_field: user_agent.original
+    ignore_missing: true
 - remove:
     field:
     - azure.signinlogs.properties.location
@@ -308,7 +336,7 @@ processors:
     target_field: source.as.organization.name
     ignore_missing: true
 - user_agent:
-    field: azure.signinlogs.properties.userAgent
+    field: user_agent.original
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "azure-shared-pipeline" >}'

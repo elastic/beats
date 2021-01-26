@@ -3573,6 +3573,124 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.authentication_requirement_policies`*::
++
+--
+Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.applied_conditional_access_policies`*::
++
+--
+Details of the conditional access policies being applied for the sign-in.
+
+
+type: object
+
+--
+
+*`azure.signinlogs.properties.resource_tenant_id`*::
++
+--
+The resource tenantId for B2B(business-to-business) scenarios.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.authentication_details`*::
++
+--
+A record of each step of authentication undertaken in the sign-in.
+
+
+type: object
+
+--
+
+*`azure.signinlogs.properties.authentication_processing_details`*::
++
+--
+Provides the details associated with authentication processor.
+
+
+type: object
+
+--
+
+*`azure.signinlogs.properties.flagged_for_review`*::
++
+--
+Event was flagged for review.
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.network_location_details`*::
++
+--
+Provides the details associated with authentication processor.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types`*::
++
+--
+The list of risk event types associated with the sign-in.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types_v2`*::
++
+--
+The list of risk event types associated with the sign-in.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.authentication_requirement`*::
++
+--
+Type of authentication required for the sign-in. If set to multiFactorAuthentication, an MFA step was required. If set to singleFactorAuthentication, no MFA was required
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resource_id`*::
++
+--
+ID of the resource that the user signed into.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_type`*::
++
+--
+User type.
+
+type: keyword
+
+--
+
 [[exported-fields-barracuda]]
 == Barracuda Web Application Firewall fields
 
