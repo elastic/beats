@@ -22,7 +22,7 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         when:                  ## Override the top-level when.
-            not_changeset_full_match: "^metricbeat/.*" ## Disable the stage if ONLY changes for the OSS beats
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
             branches: true                         ## for all the branches
             tags: true                             ## for all the tags
     cloud:
@@ -55,33 +55,57 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         when:                  ## Override the top-level when.
-            not_changeset_full_match: "^metricbeat/.*" ## Disable the stage if ONLY changes for the OSS beats
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
             branches: true                         ## for all the branches
             tags: true                             ## for all the tags
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
+        when:                  ## Override the top-level when.
+            not_changeset_full_match: "^metricbeat/docs/.*" ## Disable the stage if ONLY DOC changes for the OSS beats
+            branches: true                         ## for all the branches
+            tags: true                             ## for all the tags
 #    windows-7-32:
 #        mage: "mage build unitTest"
 #        platforms:             ## override default labels in this specific stage.
