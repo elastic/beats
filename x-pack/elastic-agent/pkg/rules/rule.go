@@ -7,6 +7,8 @@ package capabilities
 import (
 	"encoding/json"
 	"fmt"
+
+	"gopkg.in/yaml.v2"
 )
 
 type ruler interface {
@@ -15,7 +17,7 @@ type ruler interface {
 
 type ruleDefinitions []ruler
 
-func (r *ruleDefinitions) UnmarshalJSON(p []byte) (resErr error) {
+func (r *ruleDefinitions) UnmarshalJSON(p []byte) error {
 	var tmpArray []json.RawMessage
 
 	err := json.Unmarshal(p, &tmpArray)
@@ -46,6 +48,47 @@ func (r *ruleDefinitions) UnmarshalJSON(p []byte) (resErr error) {
 		} else if _, found = mm["upgrade"]; found {
 			cap := &upgradeCapability{}
 			if err := json.Unmarshal(t, &cap); err != nil {
+				return err
+			}
+			(*r) = append((*r), cap)
+		} else {
+			return fmt.Errorf("unexpected capability type for definition number '%d'", i)
+		}
+	}
+
+	return nil
+}
+
+func (r *ruleDefinitions) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var tmpArray []map[string]interface{}
+
+	err := unmarshal(&tmpArray)
+	if err != nil {
+		return err
+	}
+
+	for i, mm := range tmpArray {
+		partialYaml, err := yaml.Marshal(mm)
+		if err != nil {
+			return err
+		}
+		if _, found := mm["input"]; found {
+			cap := &inputCapability{}
+			if err := yaml.Unmarshal(partialYaml, &cap); err != nil {
+				return err
+			}
+			(*r) = append((*r), cap)
+
+		} else if _, found = mm["output"]; found {
+			cap := &outputCapability{}
+			if err := yaml.Unmarshal(partialYaml, &cap); err != nil {
+				return err
+			}
+			(*r) = append((*r), cap)
+
+		} else if _, found = mm["upgrade"]; found {
+			cap := &upgradeCapability{}
+			if err := yaml.Unmarshal(partialYaml, &cap); err != nil {
 				return err
 			}
 			(*r) = append((*r), cap)

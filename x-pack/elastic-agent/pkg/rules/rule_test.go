@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
 func TestUnmarshal(t *testing.T) {
@@ -29,6 +30,26 @@ func TestUnmarshal(t *testing.T) {
 		var rr ruleDefinitions
 
 		err := json.Unmarshal(jsonDefinitionInvalid, &rr)
+
+		assert.Error(t, err, "error is expected")
+	})
+
+	t.Run("valid yaml", func(t *testing.T) {
+		rr := make(ruleDefinitions, 0, 0)
+
+		err := yaml.Unmarshal(yamlDefinitionValid, &rr)
+
+		assert.Nil(t, err, "no error is expected")
+		assert.Equal(t, 3, len(rr))
+		assert.Equal(t, "*capabilities.upgradeCapability", reflect.TypeOf(rr[0]).String())
+		assert.Equal(t, "*capabilities.inputCapability", reflect.TypeOf(rr[1]).String())
+		assert.Equal(t, "*capabilities.outputCapability", reflect.TypeOf(rr[2]).String())
+	})
+
+	t.Run("invalid yaml", func(t *testing.T) {
+		var rr ruleDefinitions
+
+		err := yaml.Unmarshal(yamlDefinitionInvalid, &rr)
 
 		assert.Error(t, err, "error is expected")
 	})
@@ -65,3 +86,29 @@ var jsonDefinitionInvalid = []byte(`[{
 	"rule": "allow"
 }
 ]`)
+
+var yamlDefinitionValid = []byte(`-
+  rule: "allow"
+  upgrade: "${version} == '8.0.0'"
+-
+  input: "system/metrics"
+  rule: "allow"
+-
+  output: "elasticsearch"
+  rule: "allow"
+`)
+
+var yamlDefinitionInvalid = []byte(`
+-
+  rule: allow
+  upgrade: "${version} == '8.0.0'"
+-
+  input: "system/metrics"
+  rule: allow
+-
+  output: elasticsearch
+  rule: allow
+-
+  ayay: elasticsearch
+  rule: allow
+`)
