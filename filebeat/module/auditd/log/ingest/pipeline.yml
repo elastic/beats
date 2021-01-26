@@ -27,7 +27,7 @@ processors:
     target_field: auditd.log
 - kv:
     field: auditd.log.sub_kv
-    field_split: "\\s+"
+    field_split: "\\s+(?=[^\\s]+=)"
     value_split: "="
     target_field: auditd.log
     ignore_missing: true
