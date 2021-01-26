@@ -1,0 +1,4106 @@
+[
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "System",
+        "CategoryId": "%%8272",
+        "SubCategory": "Security State Change",
+        "SubcategoryGuid": "{0CCE9210-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12288",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15252,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "System",
+        "CategoryId": "%%8272",
+        "SubCategory": "Security System Extension",
+        "SubcategoryGuid": "{0CCE9211-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12289",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15253,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "System",
+        "CategoryId": "%%8272",
+        "SubCategory": "System Integrity",
+        "SubcategoryGuid": "{0CCE9212-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12290",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15254,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "System",
+        "CategoryId": "%%8272",
+        "SubCategory": "IPsec Driver",
+        "SubcategoryGuid": "{0CCE9213-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12291",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15255,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "System",
+        "CategoryId": "%%8272",
+        "SubCategory": "Other System Events",
+        "SubcategoryGuid": "{0CCE9214-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12292",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15256,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Logon",
+        "SubcategoryGuid": "{0CCE9215-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12544",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15257,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Logoff",
+        "SubcategoryGuid": "{0CCE9216-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12545",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15258,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Account Lockout",
+        "SubcategoryGuid": "{0CCE9217-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12546",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15259,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "IPsec Main Mode",
+        "SubcategoryGuid": "{0CCE9218-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12547",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15260,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Special Logon",
+        "SubcategoryGuid": "{0CCE921B-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12548",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15261,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "IPsec Quick Mode",
+        "SubcategoryGuid": "{0CCE9219-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12549",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15262,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "IPsec Extended Mode",
+        "SubcategoryGuid": "{0CCE921A-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12550",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15263,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Other Logon/Logoff Events",
+        "SubcategoryGuid": "{0CCE921C-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12551",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15264,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "Network Policy Server",
+        "SubcategoryGuid": "{0CCE9243-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12552",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15265,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Logon/Logoff",
+        "CategoryId": "%%8273",
+        "SubCategory": "User / Device Claims",
+        "SubcategoryGuid": "{0CCE9247-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12553",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15266,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "File System",
+        "SubcategoryGuid": "{0CCE921D-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12800",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15267,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Registry",
+        "SubcategoryGuid": "{0CCE921E-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12801",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15268,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Kernel Object",
+        "SubcategoryGuid": "{0CCE921F-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12802",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15269,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "SAM",
+        "SubcategoryGuid": "{0CCE9220-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12803",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15270,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Other Object Access Events",
+        "SubcategoryGuid": "{0CCE9227-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12804",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15271,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Certification Services",
+        "SubcategoryGuid": "{0CCE9221-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12805",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15272,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Application Generated",
+        "SubcategoryGuid": "{0CCE9222-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12806",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15273,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Handle Manipulation",
+        "SubcategoryGuid": "{0CCE9223-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12807",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15274,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "File Share",
+        "SubcategoryGuid": "{0CCE9224-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12808",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15275,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Filtering Platform Packet Drop",
+        "SubcategoryGuid": "{0CCE9225-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12809",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15276,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Filtering Platform Connection ",
+        "SubcategoryGuid": "{0CCE9226-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12810",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15277,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Detailed File Share",
+        "SubcategoryGuid": "{0CCE9244-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12811",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15278,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Removable Storage",
+        "SubcategoryGuid": "{0CCE9245-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12812",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15279,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Object Access",
+        "CategoryId": "%%8274",
+        "SubCategory": "Central Policy Staging",
+        "SubcategoryGuid": "{0CCE9246-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%12813",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15280,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Privilege Use",
+        "CategoryId": "%%8275",
+        "SubCategory": "Sensitive Privilege Use",
+        "SubcategoryGuid": "{0CCE9228-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13056",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15281,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Privilege Use",
+        "CategoryId": "%%8275",
+        "SubCategory": "Non Sensitive Privilege Use",
+        "SubcategoryGuid": "{0CCE9229-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13057",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15282,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Privilege Use",
+        "CategoryId": "%%8275",
+        "SubCategory": "Other Privilege Use Events",
+        "SubcategoryGuid": "{0CCE922A-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13058",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15283,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Detailed Tracking",
+        "CategoryId": "%%8276",
+        "SubCategory": "Process Creation",
+        "SubcategoryGuid": "{0CCE922B-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13312",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15284,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Detailed Tracking",
+        "CategoryId": "%%8276",
+        "SubCategory": "Process Termination",
+        "SubcategoryGuid": "{0CCE922C-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13313",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15285,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Detailed Tracking",
+        "CategoryId": "%%8276",
+        "SubCategory": "DPAPI Activity",
+        "SubcategoryGuid": "{0CCE922D-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13314",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15286,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Detailed Tracking",
+        "CategoryId": "%%8276",
+        "SubCategory": "RPC Events",
+        "SubcategoryGuid": "{0CCE922E-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13315",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15287,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Detailed Tracking",
+        "CategoryId": "%%8276",
+        "SubCategory": "Plug and Play Events",
+        "SubcategoryGuid": "{0CCE9248-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13316",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15288,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "Audit Policy Change",
+        "SubcategoryGuid": "{0CCE922F-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13568",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15289,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "Authentication Policy Change",
+        "SubcategoryGuid": "{0CCE9230-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13569",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15290,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "Authorization Policy Change",
+        "SubcategoryGuid": "{0CCE9231-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13570",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15291,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "MPSSVC Rule-Level Policy Change",
+        "SubcategoryGuid": "{0CCE9232-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13571",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15292,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "Filtering Platform Policy Change",
+        "SubcategoryGuid": "{0CCE9233-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13572",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15293,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Policy Change",
+        "CategoryId": "%%8277",
+        "SubCategory": "Other Policy Change Events",
+        "SubcategoryGuid": "{0CCE9234-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13573",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15294,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "User Account Management",
+        "SubcategoryGuid": "{0CCE9235-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13824",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15295,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "Computer Account Management",
+        "SubcategoryGuid": "{0CCE9236-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13825",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15296,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "Security Group Management",
+        "SubcategoryGuid": "{0CCE9237-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13826",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15297,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "Distribution Group Management",
+        "SubcategoryGuid": "{0CCE9238-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13827",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15298,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "Application Group Management",
+        "SubcategoryGuid": "{0CCE9239-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13828",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15299,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8278",
+        "SubCategory": "Other Account Management Events",
+        "SubcategoryGuid": "{0CCE923A-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%13829",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15300,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8279",
+        "SubCategory": "Directory Service Access",
+        "SubcategoryGuid": "{0CCE923B-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14080",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15301,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8279",
+        "SubCategory": "Directory Service Changes",
+        "SubcategoryGuid": "{0CCE923C-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14081",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15302,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8279",
+        "SubCategory": "Directory Service Replication",
+        "SubcategoryGuid": "{0CCE923D-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14082",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15303,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Management",
+        "CategoryId": "%%8279",
+        "SubCategory": "Detailed Directory Service Replication",
+        "SubcategoryGuid": "{0CCE923E-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14083",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15304,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Logon",
+        "CategoryId": "%%8280",
+        "SubCategory": "Credential Validation",
+        "SubcategoryGuid": "{0CCE923F-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14336",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15305,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Logon",
+        "CategoryId": "%%8280",
+        "SubCategory": "Kerberos Service Ticket Operations",
+        "SubcategoryGuid": "{0CCE9240-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14337",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15306,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Logon",
+        "CategoryId": "%%8280",
+        "SubCategory": "Other Account Logon Events",
+        "SubcategoryGuid": "{0CCE9241-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14338",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15307,
+      "task": "Audit Policy Change"
+    }
+  },
+  {
+    "@timestamp": "2021-01-26T15:30:53.5921459Z",
+    "event": {
+      "action": "per-user-audit-policy-changed",
+      "category": [
+        "iam",
+        "configuration"
+      ],
+      "code": 4912,
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "admin",
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": "vagrant"
+    },
+    "user": {
+      "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+      "name": "vagrant"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "AuditPolicyChanges": "%%8455",
+        "AuditPolicyChangesDescription": [
+          "Success exclude added"
+        ],
+        "Category": "Account Logon",
+        "CategoryId": "%%8280",
+        "SubCategory": "Kerberos Authentication Service",
+        "SubcategoryGuid": "{0CCE9242-69AE-11D9-BED3-505054503030}",
+        "SubcategoryId": "%%14339",
+        "SubjectDomainName": "VAGRANT-2012-R2",
+        "SubjectLogonId": "0x1c4f3",
+        "SubjectUserName": "vagrant",
+        "SubjectUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001",
+        "TargetUserSid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+      },
+      "event_id": 4912,
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x1c4f3"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 3032
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 15308,
+      "task": "Audit Policy Change"
+    }
+  }
+]
