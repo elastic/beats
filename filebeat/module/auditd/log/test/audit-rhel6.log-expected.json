@@ -181,9 +181,15 @@
         "auditd.log.old_ses": "6793",
         "auditd.log.sequence": 19623791,
         "event.action": "login",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1524,

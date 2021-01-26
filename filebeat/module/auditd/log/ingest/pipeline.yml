@@ -200,6 +200,11 @@ processors:
           - configuration
         type:
           - change
+      LOGIN:
+        category:
+          - authentication
+        type:
+          - start
       NETFILTER_CFG:
         category:
           - configuration
