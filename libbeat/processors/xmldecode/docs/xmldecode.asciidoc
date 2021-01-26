@@ -1,0 +1,47 @@
+[[urldecode]]
+=== XML Decode
+
+++++
+<titleabbrev>xmldecode</titleabbrev>
+++++
+
+experimental[]
+
+The `xmldecode` processor decodes any valid XML data that is stored under the `fields` key,
+It will output the values as an array of strings:
+
+[source,yaml]
+-------
+processors:
+  - xmldecode:
+      fields: ["field1", "field2"]
+      overwrite_keys: true
+      to_lower: true
+      add_error_key": false
+-------
+
+In the example above:
+
+`target`:: (Optional) The field under which the decoded XML will be written. By
+default the decoded XML object replaces the string field from which it was
+read. To merge the decoded XML fields into the root of the event, specify
+`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
+is treated as if the field was not set at all.
+
+`overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
+exist in the event are overwritten by keys from the decoded XML object. The
+default value is false.
+
+`add_error_key`:: (Optional) If it set to true, in case of error while decoding XML objects
+te `error` field is going to be part of event with error message. If it set to false, there
+will not be any error in event's field. Even error occurs while decoding XML objects. The
+default value is false.
+
+`to_lower`:: (Optional) Converts all key fields to lower case. Accepts either true or false.
+The default value is true.
+
+`document_id`:: (Optional) XML key to use as the document id. If configured,
+the field will be removed from the original XML document and stored in
+`@metadata._id`
+
+See <<conditions>> for a list of supported conditions.
