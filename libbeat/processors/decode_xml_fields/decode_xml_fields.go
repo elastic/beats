@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xmldecode
+package decode_xml_fields
 
 import (
 	"fmt"
@@ -33,9 +33,8 @@ import (
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
-type xmlDecodeConfig struct {
+type decodeXMLFieldsConfig struct {
 	Fields        []string `config:"fields"`
-	ExpandKeys    bool     `config:"expand_keys"`
 	OverwriteKeys bool     `config:"overwrite_keys"`
 	AddErrorKey   bool     `config:"add_error_key"`
 	Target        *string  `config:"target"`
@@ -43,27 +42,27 @@ type xmlDecodeConfig struct {
 	ToLower       bool     `config:"to_lower"`
 }
 
-type xmlDecode struct {
-	config xmlDecodeConfig
+type decodeXMLFields struct {
+	config decodeXMLFieldsConfig
 	logger *logp.Logger
 }
 
 var (
-	defaultConfig = xmlDecodeConfig{
+	defaultConfig = decodeXMLFieldsConfig{
 		Fields:        []string{"message"},
 		OverwriteKeys: false,
-		ExpandKeys:    false,
 		AddErrorKey:   false,
 		ToLower:       true,
 	}
+	errFieldIsNotString string = "The configured field is not a string"
 )
 
 func init() {
-	processors.RegisterPlugin("xmldecode",
+	processors.RegisterPlugin("decode_xml_fields",
 		checks.ConfigChecked(NewDecodeXMLFields,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "overwrite_keys", "add_error_key", "expand_keys", "target", "document_id")))
-	jsprocessor.RegisterPlugin("XMLDecode", NewDecodeXMLFields)
+	jsprocessor.RegisterPlugin("decode_xml_fields", NewDecodeXMLFields)
 }
 
 // NewDecodeXMLFields construct a new decode_xml_fields processor.
@@ -71,17 +70,17 @@ func NewDecodeXMLFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 
 	if err := c.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("fail to unpack the xmldecode configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the decode_xml_fields configuration: %s", err)
 	}
 
-	return &xmlDecode{
+	return &decodeXMLFields{
 		config: config,
-		logger: logp.NewLogger("xmldecode"),
+		logger: logp.NewLogger("decode_xml_fields"),
 	}, nil
 
 }
 
-func (x *xmlDecode) Run(event *beat.Event) (*beat.Event, error) {
+func (x *decodeXMLFields) Run(event *beat.Event) (*beat.Event, error) {
 	var errs []string
 
 	for _, field := range x.config.Fields {
@@ -91,11 +90,15 @@ func (x *xmlDecode) Run(event *beat.Event) (*beat.Event, error) {
 			errs = append(errs, err.Error())
 			continue
 		}
-
-		xmloutput, err := x.decodeField(field, data)
+		text, ok := data.(string)
+		if !ok {
+			errs = append(errs, errFieldIsNotString)
+			continue
+		}
+		xmloutput, err := x.decodeField(field, text)
 		if err != nil {
 			errs = append(errs, err.Error())
-			x.logger.Errorf("failed to decode fields in xmldecode processor: %v", err)
+			x.logger.Errorf("failed to decode fields in decode_xml_fields processor: %v", err)
 		}
 
 		target := field
@@ -116,7 +119,7 @@ func (x *xmlDecode) Run(event *beat.Event) (*beat.Event, error) {
 		if target != "" {
 			_, err = event.PutValue(target, xmloutput)
 		} else {
-			jsontransform.WriteJSONKeys(event, xmloutput, x.config.ExpandKeys, x.config.OverwriteKeys, x.config.AddErrorKey)
+			jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, x.config.AddErrorKey)
 		}
 
 		if err != nil {
@@ -141,9 +144,8 @@ func (x *xmlDecode) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (x *xmlDecode) decodeField(field string, data interface{}) (decodedData map[string]interface{}, err error) {
-	str := fmt.Sprintf("%v", data)
-	decodedData, err = common.UnmarshalXML([]byte(str), false, true)
+func (x *decodeXMLFields) decodeField(field string, data string) (decodedData map[string]interface{}, err error) {
+	decodedData, err = common.UnmarshalXML([]byte(data), false, x.config.ToLower)
 	if err != nil {
 		return nil, fmt.Errorf("error trying to decode XML field %v", err)
 	}
@@ -151,8 +153,8 @@ func (x *xmlDecode) decodeField(field string, data interface{}) (decodedData map
 	return decodedData, nil
 }
 
-func (x *xmlDecode) String() string {
-	return "xmldecode=" + fmt.Sprintf("%+v", x.config.Fields)
+func (x *decodeXMLFields) String() string {
+	return "decode_xml_fields=" + fmt.Sprintf("%+v", x.config.Fields)
 }
 
 func setError(event *beat.Event, errs []string, addErrKey bool) {

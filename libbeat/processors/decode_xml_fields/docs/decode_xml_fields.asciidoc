@@ -1,26 +1,53 @@
-[[urldecode]]
-=== XML Decode
+[[decode_xml_fields]]
+=== Decode XML Fields
 
 ++++
-<titleabbrev>xmldecode</titleabbrev>
+<titleabbrev>decode_xml_fields</titleabbrev>
 ++++
 
 experimental[]
 
-The `xmldecode` processor decodes any valid XML data that is stored under the `fields` key,
-It will output the values as an array of strings:
+The `decode_xml_fields` processor decodes any valid XML data that is stored under the `fields` key,
+It will output the values as an array of strings.
+
+Example that shows how to define which fields include the XML data and allows to overwrite the fields
+if they already exists:
 
 [source,yaml]
 -------
 processors:
-  - xmldecode:
+  - decode_xml_fields:
       fields: ["field1", "field2"]
       overwrite_keys: true
-      to_lower: true
-      add_error_key": false
+      target: ""
 -------
 
-In the example above:
+If you want any potential errors to appear in the resulting document or want the automatically generated document ID to be overwritten by 
+ by a field that exists in the XML object an example like the below can be used:
+
+[source,yaml]
+-------
+processors:
+  - decode_xml_fields:
+      fields: ["field1""]
+      add_error_key: true
+      target: "xml"
+      document_id: "fieldwithid"
+-------
+
+By default all keys converted from XML will have the names converted to lowercase. If there is a need to disable this behavior it is possible to use
+the below example:
+
+[source,yaml]
+-------
+processors:
+  - decode_xml_fields:
+      fields: ["field1""]
+      to_lower: false
+      document_id: "fieldwithid"
+-------
+
+In the examples above:
 
 `target`:: (Optional) The field under which the decoded XML will be written. By
 default the decoded XML object replaces the string field from which it was

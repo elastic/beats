@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_UnmarshalXML(t *testing.T) {
+func TestUnmarshalXML(t *testing.T) {
 	type xml struct {
 		Input  []byte
 		Output map[string]interface{}
@@ -83,7 +83,8 @@ func Test_UnmarshalXML(t *testing.T) {
 						"id":           "bk101",
 						"price":        "44.95",
 						"publish_date": "2000-10-01",
-						"title":        "XML Developer's Guide"},
+						"title":        "XML Developer's Guide",
+					},
 						map[string]interface{}{
 							"author":       "Ralls, Kim",
 							"description":  "A former architect battles corporate zombies, \n\t\t\t\t\tan evil sorceress, and her own childhood to become queen \n\t\t\t\t\tof the world.",
@@ -120,14 +121,15 @@ func Test_UnmarshalXML(t *testing.T) {
 			</catalog>`),
 			Output: map[string]interface{}{
 				"catalog": map[string]interface{}{
-					"book": []interface{}{map[string]interface{}{
-						"author":       "Gambardella, Matthew",
-						"description":  "An in-depth look at creating applications \n\t\t\t\t\twith XML.",
-						"genre":        "Computer",
-						"id":           "bk101",
-						"price":        "44.95",
-						"publish_date": "2000-10-01",
-						"title":        "XML Developer's Guide"},
+					"book": []interface{}{
+						map[string]interface{}{
+							"author":       "Gambardella, Matthew",
+							"description":  "An in-depth look at creating applications \n\t\t\t\t\twith XML.",
+							"genre":        "Computer",
+							"id":           "bk101",
+							"price":        "44.95",
+							"publish_date": "2000-10-01",
+							"title":        "XML Developer's Guide"},
 						map[string]interface{}{
 							"author":       "Ralls, Kim",
 							"description":  "A former architect battles corporate zombies, \n\t\t\t\t\tan evil sorceress, and her own childhood to become queen \n\t\t\t\t\tof the world.",

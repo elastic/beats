@@ -110,8 +110,8 @@ endif::[]
 ifndef::no_urldecode_processor[]
 * <<urldecode, `urldecode`>>
 endif::[]
-ifndef::no_xmldecode_processor[]
-* <<xmldecode, `xmldecode`>>
+ifndef::no_decode_xml_fields_processor[]
+* <<decode_xml_fields, `decode_xml_fields`>>
 endif::[]
 //# end::processors-list[]
 
@@ -228,8 +228,8 @@ endif::[]
 ifndef::no_urldecode_processor[]
 include::{libbeat-processors-dir}/urldecode/docs/urldecode.asciidoc[]
 endif::[]
-ifndef::no_xmldecode_processor[]
-include::{libbeat-processors-dir}/xmldecode/docs/xmldecode.asciidoc[]
+ifndef::no_decode_xml_fields_processor[]
+include::{libbeat-processors-dir}/decode_xml_fields/docs/decode_xml_fields.asciidoc[]
 endif::[]
 
 //# end::processors-include[]

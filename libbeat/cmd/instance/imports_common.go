@@ -30,6 +30,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/communityid"
 	_ "github.com/elastic/beats/v7/libbeat/processors/convert"
+	_ "github.com/elastic/beats/v7/libbeat/processors/decode_xml_fields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/v7/libbeat/processors/dns"
 	_ "github.com/elastic/beats/v7/libbeat/processors/extract_array"
@@ -38,6 +39,5 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/registered_domain"
 	_ "github.com/elastic/beats/v7/libbeat/processors/translate_sid"
 	_ "github.com/elastic/beats/v7/libbeat/processors/urldecode"
-	_ "github.com/elastic/beats/v7/libbeat/processors/xmldecode"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/includes" // Register publisher pipeline modules
 )

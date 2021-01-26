@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xmldecode
+package decode_xml_fields
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -28,13 +29,14 @@ import (
 )
 
 var (
-	targetField = "xml"
+	targetField     = "xml"
+	targetRootField = ""
 )
 
-func TestXMLDecode(t *testing.T) {
+func TestDecodeXMLFields(t *testing.T) {
 	var testCases = []struct {
 		description  string
-		config       xmlDecodeConfig
+		config       decodeXMLFieldsConfig
 		Input        common.MapStr
 		Output       common.MapStr
 		error        bool
@@ -42,7 +44,7 @@ func TestXMLDecode(t *testing.T) {
 	}{
 		{
 			description: "Simple xml decode with target field set",
-			config: xmlDecodeConfig{
+			config: decodeXMLFieldsConfig{
 				Fields: []string{"message"},
 				Target: &targetField,
 			},
@@ -78,8 +80,43 @@ func TestXMLDecode(t *testing.T) {
 			errorMessage: "",
 		},
 		{
+			description: "Test with target set to root",
+			config: decodeXMLFieldsConfig{
+				Fields: []string{"message"},
+				Target: &targetRootField,
+			},
+			Input: common.MapStr{
+				"message": `<catalog>
+					<book seq="1">
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+			},
+			Output: common.MapStr{
+				"catalog": common.MapStr{
+					"book": map[string]interface{}{
+						"author": "William H. Gaddis",
+						"review": "One of the great seminal American novels of the 20th century.",
+						"seq":    "1",
+						"title":  "The Recognitions",
+					},
+				},
+				"message": `<catalog>
+					<book seq="1">
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+					</book>
+				</catalog>`,
+			},
+			error:        false,
+			errorMessage: "",
+		},
+		{
 			description: "Simple xml decode with xml string to same field name when Target is null",
-			config: xmlDecodeConfig{
+			config: decodeXMLFieldsConfig{
 				Fields: []string{"message"},
 			},
 			Input: common.MapStr{
@@ -109,7 +146,7 @@ func TestXMLDecode(t *testing.T) {
 		},
 		{
 			description: "Decoding with array input",
-			config: xmlDecodeConfig{
+			config: decodeXMLFieldsConfig{
 				Fields: []string{"message"},
 			},
 			Input: common.MapStr{
@@ -150,7 +187,7 @@ func TestXMLDecode(t *testing.T) {
 		},
 		{
 			description: "Decoding with multiple xml objects",
-			config: xmlDecodeConfig{
+			config: decodeXMLFieldsConfig{
 				Fields: []string{"message"},
 			},
 			Input: common.MapStr{
@@ -206,7 +243,7 @@ func TestXMLDecode(t *testing.T) {
 		},
 		{
 			description: "Decoding with broken XML format, with AddErrorKey enabled",
-			config: xmlDecodeConfig{
+			config: decodeXMLFieldsConfig{
 				Fields:      []string{"message"},
 				AddErrorKey: true,
 			},
@@ -214,9 +251,9 @@ func TestXMLDecode(t *testing.T) {
 				"message": `<?xml version="1.0"?>
 				<catalog>
 					<book>
-					<author>William H. Gaddis</author>
-					<title>The Recognitions</title>
-					<review>One of the great seminal American novels of the 20th century.</review>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
 				</ook>
 				catalog>`,
 			},
@@ -227,14 +264,64 @@ func TestXMLDecode(t *testing.T) {
 			error:        true,
 			errorMessage: "error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
+		{
+			description: "Decoding with broken XML format, with AddErrorKey disabled",
+			config: decodeXMLFieldsConfig{
+				Fields:      []string{"message"},
+				AddErrorKey: false,
+			},
+			Input: common.MapStr{
+				"message": `<?xml version="1.0"?>
+				<catalog>
+					<book>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+				</ook>
+				catalog>`,
+			},
+			Output: common.MapStr{
+				"message": (map[string]interface{})(nil),
+			},
+			error:        true,
+			errorMessage: "error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
+		},
+		{
+			description: "Test when the XML field is empty",
+			config: decodeXMLFieldsConfig{
+				Fields: []string{"message"},
+			},
+			Input: common.MapStr{
+				"message": "",
+			},
+			Output: common.MapStr{
+				"message": (map[string]interface{})(nil),
+			},
+			error:        true,
+			errorMessage: "error trying to decode XML field EOF",
+		},
+		{
+			description: "Test when the XML field not a string",
+			config: decodeXMLFieldsConfig{
+				Fields: []string{"message"},
+			},
+			Input: common.MapStr{
+				"message": 1,
+			},
+			Output: common.MapStr{
+				"message": 1,
+			},
+			error:        true,
+			errorMessage: "The configured field is not a string",
+		},
 	}
 
 	for _, test := range testCases {
 		test := test
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
-			f := &xmlDecode{
-				logger: logp.NewLogger("xmldecode"),
+			f := &decodeXMLFields{
+				logger: logp.NewLogger("decode_xml_fields"),
 				config: test.config,
 			}
 
@@ -251,5 +338,50 @@ func TestXMLDecode(t *testing.T) {
 			assert.Equal(t, test.Output, newEvent.Fields)
 		})
 	}
+}
 
+func TestXMLToDocumentID(t *testing.T) {
+	log := logp.NewLogger("decode_xml_fields")
+
+	input := common.MapStr{
+		"message": `<catalog>
+						<book seq="10">
+							<author>William H. Gaddis</author>
+							<title>The Recognitions</title>
+							<review>One of the great seminal American novels of the 20th century.</review>
+						</book>
+					</catalog>`,
+	}
+
+	config := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":      []string{"message"},
+		"document_id": "catalog.book.seq",
+	})
+
+	p, err := NewDecodeXMLFields(config)
+	if err != nil {
+		log.Error("Error initializing decode_xml_fields")
+		t.Fatal(err)
+	}
+
+	actual, err := p.Run(&beat.Event{Fields: input})
+	require.NoError(t, err)
+
+	wantFields := common.MapStr{
+		"message": map[string]interface{}{
+			"catalog": map[string]interface{}{
+				"book": map[string]interface{}{
+					"author": "William H. Gaddis",
+					"review": "One of the great seminal American novels of the 20th century.",
+					"title":  "The Recognitions",
+				},
+			},
+		},
+	}
+	wantMeta := common.MapStr{
+		"_id": "10",
+	}
+
+	assert.Equal(t, wantFields, actual.Fields)
+	assert.Equal(t, wantMeta, actual.Meta)
 }
