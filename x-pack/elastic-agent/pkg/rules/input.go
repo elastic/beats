@@ -4,13 +4,19 @@
 
 package capabilities
 
-type inputCapability struct{}
+type inputCapability struct {
+	Type string `json:"rule" yaml:"rule"`
+}
 
 func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 	return false, in
 }
 
+func (c *inputCapability) Rule() string {
+	return c.Type
+}
+
 // NewInputCapability creates capability filter for input.
-func NewInputCapability(r rule) Capability {
+func NewInputCapability(r ruler) Capability {
 	return nil
 }

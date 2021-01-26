@@ -4,13 +4,19 @@
 
 package capabilities
 
-type outputCapability struct{}
+type outputCapability struct {
+	Type string `json:"rule" yaml:"rule"`
+}
 
 func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
 	return false, in
 }
 
+func (c *outputCapability) Rule() string {
+	return c.Type
+}
+
 // NewOutputCapability creates capability filter for output.
-func NewOutputCapability(r rule) Capability {
+func NewOutputCapability(r ruler) Capability {
 	return nil
 }

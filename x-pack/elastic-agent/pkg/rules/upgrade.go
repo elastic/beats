@@ -4,13 +4,24 @@
 
 package capabilities
 
-type upgradeCapability struct{}
+type upgradeCapability struct {
+	Type string `json:"rule" yaml:"rule"`
+	// UpgradeEql is eql expression defining upgrade
+	UpgradeEql string `json:"upgrade" yaml:"upgrade"`
+}
+
+func (c *upgradeCapability) Rule() string {
+	return c.Type
+}
 
 func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 	return false, in
 }
 
 // NewUpgradeCapability creates capability filter for upgrade.
-func NewUpgradeCapability(r rule) Capability {
+// Available variables:
+// - version
+// - source_uri
+func NewUpgradeCapability(u ruler) Capability {
 	return nil
 }

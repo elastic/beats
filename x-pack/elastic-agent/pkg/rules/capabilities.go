@@ -22,21 +22,26 @@ type capabilitiesManager struct {
 
 // LoadCapabilities loads capabilities files and prepares manager.
 func LoadCapabilities() (Capability, error) {
-	handlers := []func(rule) Capability{
+	handlers := []func(ruler) Capability{
 		NewInputCapability,
 		NewOutputCapability,
 		NewUpgradeCapability,
 	}
 
-	var rules []rule
+	var rules ruleDefinitions
 	var caps []Capability
 	// TODO: load capabilities filter
 
 	// make list of handlers out of capabilities definition
 	for _, r := range rules {
 		for _, h := range handlers {
+			var match bool
 			if c := h(r); c != nil {
 				caps = append(caps, c)
+				match = true
+			}
+			if !match {
+				// TODO: log failure in recognizing rule
 			}
 		}
 	}
