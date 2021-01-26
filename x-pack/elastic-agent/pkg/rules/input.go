@@ -18,5 +18,10 @@ func (c *inputCapability) Rule() string {
 
 // NewInputCapability creates capability filter for input.
 func NewInputCapability(r ruler) Capability {
-	return nil
+	cap, ok := r.(*inputCapability)
+	if !ok {
+		return nil
+	}
+
+	return cap
 }

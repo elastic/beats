@@ -18,5 +18,10 @@ func (c *outputCapability) Rule() string {
 
 // NewOutputCapability creates capability filter for output.
 func NewOutputCapability(r ruler) Capability {
-	return nil
+	cap, ok := r.(*outputCapability)
+	if !ok {
+		return nil
+	}
+
+	return cap
 }

@@ -22,6 +22,11 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 // Available variables:
 // - version
 // - source_uri
-func NewUpgradeCapability(u ruler) Capability {
-	return nil
+func NewUpgradeCapability(r ruler) Capability {
+	cap, ok := r.(*upgradeCapability)
+	if !ok {
+		return nil
+	}
+
+	return cap
 }
