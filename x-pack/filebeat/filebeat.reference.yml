@@ -767,7 +767,7 @@ filebeat.modules:
   firewall:
     enabled: true
 
-    # Set which input to use between tcp, udp (default) or file.
+    # Set which input to use between udp (default) or file.
     #var.input: udp
 
     # The interface to listen to syslog traffic. Defaults to
@@ -790,7 +790,7 @@ filebeat.modules:
   clientendpoint:
     enabled: true
 
-    # Set which input to use between udp (default), tcp or file.
+    # Set which input to use between udp (default) or file.
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9510
@@ -809,7 +809,7 @@ filebeat.modules:
   fortimail:
     enabled: true
 
-    # Set which input to use between udp (default), tcp or file.
+    # Set which input to use between udp (default) or file.
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9529
@@ -828,7 +828,7 @@ filebeat.modules:
   fortimanager:
     enabled: true
 
-    # Set which input to use between udp (default), tcp or file.
+    # Set which input to use between udp (default) or file.
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9530

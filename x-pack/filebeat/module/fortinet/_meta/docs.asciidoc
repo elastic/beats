@@ -48,7 +48,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.input`*::
 
-The input to use, can be either the value `tcp`, `udp` or `file`.
+The input to use, can be either the value `udp` or `file`.
 
 *`var.syslog_host`*::
 
@@ -76,11 +76,11 @@ NOTE: This was converted from RSA NetWitness log parser XML "forticlientendpoint
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input to use, can be either the value `udp` or `file`.
 
 *`var.syslog_host`*::
 
-The address to listen to UDP or TCP based syslog traffic.
+The address to listen to for UDP based syslog traffic.
 Defaults to `localhost`.
 Set to `0.0.0.0` to bind to all available interfaces.
 
@@ -121,11 +121,11 @@ NOTE: This was converted from RSA NetWitness log parser XML "fortinetfortimail" 
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input to use, can be either the value `udp` or `file`.
 
 *`var.syslog_host`*::
 
-The address to listen to UDP or TCP based syslog traffic.
+The address to listen to for UDP based syslog traffic.
 Defaults to `localhost`.
 Set to `0.0.0.0` to bind to all available interfaces.
 
@@ -166,11 +166,11 @@ NOTE: This was converted from RSA NetWitness log parser XML "fortinetmgr" device
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input to use, can be either the value `udp` or `file`.
 
 *`var.syslog_host`*::
 
-The address to listen to UDP or TCP based syslog traffic.
+The address to listen to for UDP based syslog traffic.
 Defaults to `localhost`.
 Set to `0.0.0.0` to bind to all available interfaces.
 

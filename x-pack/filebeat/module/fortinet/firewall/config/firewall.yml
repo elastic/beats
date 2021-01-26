@@ -1,9 +1,4 @@
-{{ if eq .input "tcp" }}
-
-type: tcp
-host: "{{.syslog_host}}:{{.syslog_port}}"
-
-{{ else if eq .input "udp" }}
+{{ if eq .input "udp" }}
 
 type: udp
 host: "{{.syslog_host}}:{{.syslog_port}}"
