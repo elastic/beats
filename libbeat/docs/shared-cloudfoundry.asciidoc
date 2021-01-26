@@ -53,6 +53,35 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/cloud
 You need to modify the +{beatname_lc}.yml+ file to set the `api_address`,
 `client_id` and `client_secret`.
 
+==== Load {kib} dashboards
+
+{beatname_uc} comes packaged with various pre-built {kib} dashboards
+that you can use to visualize data in {kib}.
+
+If these dashboards are not already loaded into {kib}, you must run the {beatname_uc} `setup` command.
+To learn how, see <<load-kibana-dashboards,Load {kib} dashboards>>.
+
+ifeval::["{beatname_lc}"=="metricbeat"]
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to <<load-template-manually>> and <<load-kibana-dashboards>>.
+=======================================
+endif::[]
+ifeval::["{beatname_lc}"=="filebeat"]
+The `setup` command does not load the ingest pipelines used to parse log lines. By default, ingest pipelines
+are set up automatically the first time you run {beatname_uc} and connect to {es}.
+
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
+=======================================
+endif::[]
 
 ==== Deploy {beatname_uc}
 
