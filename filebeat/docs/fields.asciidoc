@@ -3589,7 +3589,7 @@ type: keyword
 Details of the conditional access policies being applied for the sign-in.
 
 
-type: object
+type: nested
 
 --
 
@@ -3609,7 +3609,7 @@ type: keyword
 A record of each step of authentication undertaken in the sign-in.
 
 
-type: object
+type: nested
 
 --
 
@@ -3619,7 +3619,7 @@ type: object
 Provides the details associated with authentication processor.
 
 
-type: object
+type: flattened
 
 --
 
