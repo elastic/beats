@@ -18,6 +18,11 @@ stages:
           make -C x-pack/metricbeat check;
           make -C x-pack/metricbeat update;
           make check-no-changes;
+    Lint-OSS:
+        make: |
+          make -C metricbeat check;
+          make -C metricbeat update;
+          make check-no-changes;
     unitTest:
         mage: "mage build unitTest"
     cloud:

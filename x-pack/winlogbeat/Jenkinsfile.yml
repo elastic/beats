@@ -20,6 +20,13 @@ stages:
           make check-no-changes;
         platforms:             ## override default labels in this specific stage.
             - "immutable && ubuntu-18"
+    Lint-OSS:
+        make: |
+          make -C winlogbeat check;
+          make -C winlogbeat update;
+          make check-no-changes;
+        platforms:             ## override default labels in this specific stage.
+            - "immutable && ubuntu-18"
     build:
         mage: "mage build unitTest"
         withModule: true

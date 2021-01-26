@@ -18,6 +18,11 @@ stages:
           make -C x-pack/filebeat check;
           make -C x-pack/filebeat update;
           make check-no-changes;
+    Lint-OSS:
+        make: |
+          make -C filebeat check;
+          make -C filebeat update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
