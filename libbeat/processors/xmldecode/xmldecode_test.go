@@ -41,7 +41,7 @@ func TestXMLDecode(t *testing.T) {
 		errorMessage string
 	}{
 		{
-			description: "Simple xml decode",
+			description: "Simple xml decode with target field set",
 			config: xmlDecodeConfig{
 				Fields: []string{"message"},
 				Target: &targetField,
@@ -205,7 +205,7 @@ func TestXMLDecode(t *testing.T) {
 			errorMessage: "",
 		},
 		{
-			description: "Decoding with broken XML format",
+			description: "Decoding with broken XML format, with AddErrorKey enabled",
 			config: xmlDecodeConfig{
 				Fields:      []string{"message"},
 				AddErrorKey: true,
@@ -221,7 +221,7 @@ func TestXMLDecode(t *testing.T) {
 				catalog>`,
 			},
 			Output: common.MapStr{
-				"message": map[string]interface{}{},
+				"message": (map[string]interface{})(nil),
 				"error":   []string{"error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>"},
 			},
 			error:        true,
@@ -231,7 +231,6 @@ func TestXMLDecode(t *testing.T) {
 
 	for _, test := range testCases {
 		test := test
-		t.Log("testing")
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 			f := &xmlDecode{
