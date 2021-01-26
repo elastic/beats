@@ -1,0 +1,509 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elastic-agent
+  namespace: kube-system
+  labels:
+    app: elastic-agent
+spec:
+  selector:
+    matchLabels:
+      app: elastic-agent
+  template:
+    metadata:
+      labels:
+        app: elastic-agent
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      serviceAccountName: elastic-agent
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: elastic-agent
+          image: docker.elastic.co/beats/elastic-agent:7.11.0-SNAPSHOT
+          args: [
+            "-c", "/etc/agent.yml",
+            "-e", "-d", "*",
+          ]
+          env:
+            - name: ES_USERNAME
+              value: "elastic"
+            - name: ES_PASSWORD
+              value: ""
+            - name: ES_HOST
+              value: ""
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            runAsUser: 0
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: datastreams
+              mountPath: /etc/agent.yml
+              readOnly: true
+              subPath: agent.yml
+      volumes:
+        - name: datastreams
+          configMap:
+            defaultMode: 0640
+            name: agent-node-datastreams
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-node-datastreams
+  namespace: kube-system
+  labels:
+    k8s-app: elastic-agent
+data:
+  agent.yml: |-
+    id: ef9cc740-5bf0-11eb-8b51-39775155c3f5
+    revision: 2
+    outputs:
+      default:
+        type: elasticsearch
+        hosts:
+          - >-
+            ${ES_HOST}
+        username: ${ES_USERNAME}
+        password: ${ES_PASSWORD}
+    agent:
+      monitoring:
+        enabled: true
+        use_output: default
+        logs: true
+        metrics: true
+    providers.kubernetes:
+      node: ${NODE_NAME}
+      scope: node
+    inputs:
+      - id: 934ef8aa-ed19-405b-8160-ebf62e3d32f8
+        name: kubernetes-node-metrics
+        revision: 1
+        type: kubernetes/metrics
+        use_output: default
+        meta:
+          package:
+            name: kubernetes
+            version: 0.2.8
+        data_stream:
+          namespace: default
+        streams:
+          #- id: >-
+          #    kubernetes/metrics-kubernetes.controllermanager-3d50c483-2327-40e7-b3e5-d877d4763fe1
+          #  data_stream:
+          #    dataset: kubernetes.controllermanager
+          #    type: metrics
+          #  metricsets:
+          #    - controllermanager
+          #  hosts:
+          #    - '${kubernetes.pod.ip}:10252'
+          #  period: 10s
+          #  condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
+          #- id: >-
+          #    kubernetes/metrics-kubernetes.scheduler-3d50c483-2327-40e7-b3e5-d877d4763fe1
+          #  data_stream:
+          #    dataset: kubernetes.scheduler
+          #    type: metrics
+          #  metricsets:
+          #    - scheduler
+          #  hosts:
+          #    - '${kubernetes.pod.ip}:10251'
+          #  period: 10s
+          #  condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
+          - id: >-
+              kubernetes/metrics-kubernetes.proxy-3d50c483-2327-40e7-b3e5-d877d4763fe1
+            data_stream:
+              dataset: kubernetes.proxy
+              type: metrics
+            metricsets:
+              - proxy
+            hosts:
+              - 'localhost:10249'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.container-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.container
+              type: metrics
+            metricsets:
+              - container
+            add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${NODE_NAME}:10250'
+            period: 10s
+            ssl.verification_mode: none
+          - id: >-
+              kubernetes/metrics-kubernetes.node-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.node
+              type: metrics
+            metricsets:
+              - node
+            add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${NODE_NAME}:10250'
+            period: 10s
+            ssl.verification_mode: none
+          - id: kubernetes/metrics-kubernetes.pod-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.pod
+              type: metrics
+            metricsets:
+              - pod
+            add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${NODE_NAME}:10250'
+            period: 10s
+            ssl.verification_mode: none
+          - id: >-
+              kubernetes/metrics-kubernetes.system-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.system
+              type: metrics
+            metricsets:
+              - system
+            add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${NODE_NAME}:10250'
+            period: 10s
+            ssl.verification_mode: none
+          - id: >-
+              kubernetes/metrics-kubernetes.volume-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.volume
+              type: metrics
+            metricsets:
+              - volume
+            add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${NODE_NAME}:10250'
+            period: 10s
+            ssl.verification_mode: none
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-agent
+  namespace: kube-system
+  labels:
+    app: elastic-agent
+spec:
+  selector:
+    matchLabels:
+      app: elastic-agent
+  template:
+    metadata:
+      labels:
+        app: elastic-agent
+    spec:
+      serviceAccountName: elastic-agent
+      containers:
+        - name: elastic-agent
+          image: docker.elastic.co/beats/elastic-agent:7.11.0-SNAPSHOT
+          args: [
+            "-c", "/etc/agent.yml",
+            "-e", "-d", "*",
+          ]
+          env:
+            - name: ES_USERNAME
+              value: "elastic"
+            - name: ES_PASSWORD
+              value: ""
+            - name: ES_HOST
+                value: ""
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            # this is needed because we cannot use hostNetwork
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            runAsUser: 0
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: datastreams
+              mountPath: /etc/agent.yml
+              readOnly: true
+              subPath: agent.yml
+      volumes:
+        - name: datastreams
+          configMap:
+            defaultMode: 0640
+            name: agent-deployment-datastreams
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-deployment-datastreams
+  namespace: kube-system
+  labels:
+    k8s-app: elastic-agent
+data:
+  # This part requires `kube-state-metrics` up and running under `kube-system` namespace
+  agent.yml: |-
+    id: ef9cc740-5bf0-11eb-8b51-39775155c3f5
+    revision: 2
+    outputs:
+      default:
+        type: elasticsearch
+        hosts:
+          - >-
+            ${ES_HOST}
+        username: ${ES_USERNAME}
+        password: ${ES_PASSWORD}
+    agent:
+      monitoring:
+        enabled: true
+        use_output: default
+        logs: true
+        metrics: true
+    inputs:
+      - id: 934ef8aa-ed19-405b-8160-ebf62e3d32f9
+        name: kubernetes-cluster-metrics
+        revision: 1
+        type: kubernetes/metrics
+        use_output: default
+        meta:
+          package:
+            name: kubernetes
+            version: 0.2.8
+        data_stream:
+          namespace: default
+        streams:
+          - id: >-
+              kubernetes/metrics-kubernetes.apiserver-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.apiserver
+              type: metrics
+            metricsets:
+              - apiserver
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            hosts:
+              - 'https://${env.KUBERNETES_SERVICE_HOST}:${env.KUBERNETES_SERVICE_PORT}'
+            period: 30s
+            ssl.certificate_authorities:
+              - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          - id: >-
+              kubernetes/metrics-kubernetes.event-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.event
+              type: metrics
+            metricsets:
+              - event
+            period: 10s
+            add_metadata: true
+          - id: >-
+              kubernetes/metrics-kubernetes.state_container-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_container
+              type: metrics
+            metricsets:
+              - state_container
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_cronjob-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_cronjob
+              type: metrics
+            metricsets:
+              - state_cronjob
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_deployment-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_deployment
+              type: metrics
+            metricsets:
+              - state_deployment
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_node-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_node
+              type: metrics
+            metricsets:
+              - state_node
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_persistentvolume-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_persistentvolume
+              type: metrics
+            metricsets:
+              - state_persistentvolume
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_persistentvolumeclaim-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_persistentvolumeclaim
+              type: metrics
+            metricsets:
+              - state_persistentvolumeclaim
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_pod-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_pod
+              type: metrics
+            metricsets:
+              - state_pod
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_replicaset-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_replicaset
+              type: metrics
+            metricsets:
+              - state_replicaset
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_resourcequota-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_resourcequota
+              type: metrics
+            metricsets:
+              - state_resourcequota
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_service-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_service
+              type: metrics
+            metricsets:
+              - state_service
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_statefulset-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_statefulset
+              type: metrics
+            metricsets:
+              - state_statefulset
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.state_storageclass-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.state_storageclass
+              type: metrics
+            metricsets:
+              - state_storageclass
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: elastic-agent
+subjects:
+  - kind: ServiceAccount
+    name: elastic-agent
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: elastic-agent
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: elastic-agent
+  labels:
+    k8s-app: elastic-agent
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - namespaces
+      - events
+      - pods
+      - secrets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["extensions"]
+    resources:
+      - replicasets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources:
+      - statefulsets
+      - deployments
+      - replicasets
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/stats
+    verbs:
+      - get
+  # required for apiserver
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: elastic-agent
+  namespace: kube-system
+  labels:
+    k8s-app: elastic-agent
+---
