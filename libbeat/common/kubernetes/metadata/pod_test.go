@@ -87,7 +87,7 @@ func TestPod_Generate(t *testing.T) {
 		},
 	}
 
-	_, err := client.AppsV1().ReplicaSets(namespace).Create(context.TODO(), rs, metav1.CreateOptions{})
+	_, err := client.AppsV1().ReplicaSets(namespace).Create(context.Background(), rs, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("failed to create k8s deployment: %v", err)
 	}

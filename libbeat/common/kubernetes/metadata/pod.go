@@ -63,8 +63,7 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
 	rsName, _ := out.GetValue("replicaset.name")
-	if rsName != nil {
-		rsName := rsName.(string)
+	if rsName, ok := rsName.(string); ok {
 		dep := p.getRSDeployment(rsName, po.GetNamespace())
 		if dep != "" {
 			out.Put("deployment.name", dep)
@@ -114,6 +113,9 @@ func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr 
 // getRSDeployment return the name of the Deployment object that
 // owns the ReplicaSet with the given name under the given Namespace
 func (p *pod) getRSDeployment(rsName string, ns string) string {
+	if p.client == nil {
+		return ""
+	}
 	rs, err := p.client.AppsV1().ReplicaSets(ns).Get(context.TODO(), rsName, metav1.GetOptions{})
 	if err != nil {
 		return ""
