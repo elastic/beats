@@ -168,7 +168,7 @@
           description: >
             Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user.
         - name: applied_conditional_access_policies
-          type: object
+          type: nested
           description: >
             Details of the conditional access policies being applied for the sign-in.
         - name: resource_tenant_id
@@ -176,11 +176,11 @@
           description: >
             The resource tenantId for B2B(business-to-business) scenarios.
         - name: authentication_details
-          type: object
+          type: nested
           description: >
             A record of each step of authentication undertaken in the sign-in.
         - name: authentication_processing_details
-          type: object
+          type: flattened
           description: >
             Provides the details associated with authentication processor.
         - name: flagged_for_review
