@@ -527,6 +527,54 @@ type: keyword
 
 --
 
+[float]
+=== effective
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+Effective user ID.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Effective user name.
+
+type: keyword
+
+--
+
+[float]
+=== group
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+Effective group ID.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Effective group name.
+
+type: keyword
+
+--
+
 
 *`user.filesystem.id`*::
 +
