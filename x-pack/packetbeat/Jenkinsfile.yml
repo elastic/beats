@@ -15,9 +15,11 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         mage: |
-          mage check;
-          mage update;
-        make: "make check-no-changes"
+          mage -C x-pack/packetbeat check;
+          mage -C x-pack/packetbeat update;
+          make -C packetbeat check;
+          make -C packetbeat update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
