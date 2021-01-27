@@ -61,7 +61,7 @@ func init() {
 	processors.RegisterPlugin("decode_xml_fields",
 		checks.ConfigChecked(NewDecodeXMLFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "overwrite_keys", "add_error_key", "expand_keys", "target", "document_id")))
+			checks.AllowedFields("fields", "overwrite_keys", "add_error_key", "target", "document_id")))
 	jsprocessor.RegisterPlugin("decode_xml_fields", NewDecodeXMLFields)
 }
 
