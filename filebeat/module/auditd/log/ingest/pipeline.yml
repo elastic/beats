@@ -196,26 +196,21 @@ processors:
           - configuration
         type:
           - info
-      USYS_CONFIG:
-        category:
-          - configuration
-        type:
-          - change
-      LOGIN:
-        category:
-          - authentication
-        type:
-          - start
-      NETFILTER_CFG:
-        category:
-          - configuration
-        type:
-          - change
       FEATURE_CHANGE:
         category:
           - configuration
         type:
           - change
+      KERN_MODULE:
+        category:
+          - driver
+        type:
+          - info
+      LOGIN:
+        category:
+          - authentication
+        type:
+          - start
       MAC_CONFIG_CHANGE:
         category:
           - configuration
@@ -231,6 +226,16 @@ processors:
           - configuration
         type:
           - change
+      NETFILTER_CFG:
+        category:
+          - configuration
+        type:
+          - change
+      SOFTWARE_UPDATE:
+        category:
+          - package
+        type:
+          - info
       USER_MAC_CONFIG_CHANGE:
         category:
           - configuration
@@ -256,16 +261,11 @@ processors:
           - session
         type:
           - end
-      KERN_MODULE:
+      USYS_CONFIG:
         category:
-          - driver
+          - configuration
         type:
-          - info
-      SOFTWARE_UPDATE:
-        category:
-          - package
-        type:
-          - info
+          - change
     source: >-
       if (ctx?.auditd?.log.record_type == null) {
         return;
