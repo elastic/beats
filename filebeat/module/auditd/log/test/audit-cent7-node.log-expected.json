@@ -10,11 +10,17 @@
         "auditd.log.subj": "system_u:system_r:auditd_t:s0",
         "auditd.log.ver": "2.8.5",
         "event.action": "daemon_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=DAEMON_START msg=audit(1594053514.588:4686): op=start ver=2.8.5 format=raw kernel=3.10.0-1062.9.1.el7.x86_64 auid=4294967295 pid=1643 uid=0 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=success",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0,
@@ -33,6 +39,7 @@
         "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
         "event.action": "config_change",
         "event.category": [
+            "process",
             "configuration"
         ],
         "event.dataset": "auditd.log",
@@ -59,6 +66,7 @@
         "auditd.log.subj": "system_u:system_r:unconfined_service_t:s0",
         "event.action": "config_change",
         "event.category": [
+            "process",
             "configuration"
         ],
         "event.dataset": "auditd.log",
@@ -83,11 +91,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "auditd",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.709:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=auditd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 606,
@@ -130,11 +144,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-utmp",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.739:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-utmp comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1132,
@@ -153,11 +173,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rngd",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.807:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rngd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1401,
@@ -176,11 +202,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.843:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1655,
@@ -199,11 +231,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "abrtd",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.850:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=abrtd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1916,
@@ -222,11 +260,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "abrt-xorg",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "node=localhost.localdomain type=SERVICE_START msg=audit(1594053514.857:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=abrt-xorg comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2172,

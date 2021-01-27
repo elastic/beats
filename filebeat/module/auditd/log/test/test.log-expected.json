@@ -64,11 +64,17 @@
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
         "event.action": "user_cmd",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=USER_CMD msg=audit(1489519256.192:19600329): user pid=4151 uid=497 auid=700 ses=11988 msg='cwd=\"/\" cmd=2F7573722F6C696236342F6E6167696F732F706C7567696E732F636865636B5F617374657269736B5F7369705F7065657273202D7020323032 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 536,
@@ -99,11 +105,17 @@
         "auditd.log.spid": "1299",
         "auditd.log.subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
         "event.action": "crypto_session",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=CRYPTO_SESSION msg=audit(1481077041.515:406): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=start direction=from-server cipher=chacha20-poly1305@openssh.com ksize=512 mac= pfs=curve25519-sha256@libssh.org spid=1299 suid=74 rport=63927 laddr=10.142.0.2 lport=22  exe=\"/usr/sbin/sshd\" hostname=? addr=96.241.146.97 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 783,
@@ -321,7 +333,7 @@
         "event.module": "auditd",
         "event.original": "type=KERN_MODULE msg=audit(1581371984.206:579397): name=mymodule",
         "event.type": [
-            "info"
+            "start"
         ],
         "fileset.name": "log",
         "input.type": "log",

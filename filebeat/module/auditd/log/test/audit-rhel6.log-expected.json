@@ -32,11 +32,17 @@
         "auditd.log.sequence": 19600328,
         "auditd.log.ses": "11988",
         "event.action": "cred_disp",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=CRED_DISP msg=audit(1489519230.178:19600328): user pid=4121 uid=0 auid=700 ses=11988 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 189,
@@ -52,11 +58,17 @@
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
         "event.action": "user_cmd",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=USER_CMD msg=audit(1489519256.192:19600329): user pid=4151 uid=497 auid=700 ses=11988 msg='cwd=\"/\" cmd=2F7573722F6C696236342F6E6167696F732F706C7567696E732F636865636B5F617374657269736B5F7369705F7065657273202D7020323032 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 373,
@@ -78,11 +90,17 @@
         "auditd.log.sequence": 19600330,
         "auditd.log.ses": "11988",
         "event.action": "cred_acq",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=CRED_ACQ msg=audit(1489519256.193:19600330): user pid=4151 uid=0 auid=700 ses=11988 msg='op=PAM:setcred acct=\"root\" exe=\"/usr/bin/sudo\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 620,
@@ -217,11 +235,17 @@
         "auditd.log.ses": "6793",
         "auditd.log.spid": "28282",
         "event.action": "crypto_key_user",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=CRYPTO_KEY_USER msg=audit(1489636960.070:19623788): user pid=28281 uid=0 auid=700 ses=6793 msg='op=destroy kind=session fp=? direction=both spid=28282 suid=74 rport=58994 laddr=107.170.139.210 lport=50022  exe=\"/usr/sbin/sshd\" hostname=? addr=96.241.146.97 terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1640,
@@ -318,11 +342,17 @@
         "auditd.log.sequence": 19623808,
         "auditd.log.ses": "12286",
         "event.action": "user_acct",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=USER_ACCT msg=audit(1489636977.805:19623808): user pid=28395 uid=0 auid=700 ses=12286 msg='op=PAM:accounting acct=\"root\" exe=\"/bin/su\" hostname=? addr=? terminal=pts/0 res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2312,

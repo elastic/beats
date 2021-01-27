@@ -7,11 +7,17 @@
         "auditd.log.subj": "system_u:system_r:auditd_t:s0",
         "auditd.log.ver": "2.4.1",
         "event.action": "daemon_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=DAEMON_START msg=audit(1481076983.819:7798): auditd start, ver=2.4.1 format=raw kernel=3.10.0-327.36.3.el7.x86_64 auid=4294967295 pid=251 subj=system_u:system_r:auditd_t:s0 res=success",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0,
@@ -26,11 +32,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "auditd",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076983.864:6): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=auditd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 190,
@@ -71,11 +83,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-utmp",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076983.879:8): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-utmp comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 661,
@@ -93,11 +111,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-hwdb-update",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.075:9): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-hwdb-update comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 903,
@@ -115,11 +139,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-done",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.088:10): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-update-done comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1145,
@@ -137,11 +167,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-udev-trigger",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.163:11): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-udev-trigger comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1388,
@@ -159,11 +195,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.212:12): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1632,
@@ -181,11 +223,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "avahi-daemon",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.521:13): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=avahi-daemon comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 1866,
@@ -203,11 +251,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "dbus",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.521:14): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=dbus comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2102,
@@ -225,11 +279,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rsyslog",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.526:15): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rsyslog comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2330,
@@ -247,11 +307,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
         "event.action": "service_stop",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_STOP msg=audit(1481076984.534:16): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=irqbalance comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2561,
@@ -569,11 +635,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "yum-cron",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.939:22): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=yum-cron comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 4785,
@@ -591,11 +663,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rhel-dmesg",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.945:23): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=rhel-dmesg comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5017,
@@ -613,11 +691,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "acpid",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.953:24): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=acpid comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5251,
@@ -635,11 +719,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-user-sessions",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.954:25): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-user-sessions comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5480,
@@ -657,11 +747,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "ntpd",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076984.960:26): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=ntpd comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 5725,
@@ -739,11 +835,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-logind",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.012:28): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-logind comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6353,
@@ -761,11 +863,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "crond",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.031:29): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=crond comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6591,
@@ -783,11 +891,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.043:30): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=expand-root comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 6820,
@@ -805,11 +919,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
         "event.action": "service_stop",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_STOP msg=audit(1481076985.044:31): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=expand-root comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7055,
@@ -887,11 +1007,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "sshd-keygen",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.104:33): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=sshd-keygen comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 7686,
@@ -1029,11 +1155,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.164:36): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 8723,
@@ -1051,11 +1183,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
         "event.action": "service_stop",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_STOP msg=audit(1481076985.166:37): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 8960,
@@ -1073,11 +1211,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.167:38): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-start comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9196,
@@ -1095,11 +1239,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
         "event.action": "service_stop",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_STOP msg=audit(1481076985.168:39): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-start comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9434,
@@ -1117,11 +1267,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.170:40): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit-wait comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9671,
@@ -1139,11 +1295,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
         "event.action": "service_stop",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_STOP msg=audit(1481076985.170:41): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=plymouth-quit-wait comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "stop"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 9913,
@@ -1161,11 +1323,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "serial-getty@ttyS0",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.180:42): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=serial-getty@ttyS0 comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 10154,
@@ -1183,11 +1351,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "getty@tty1",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.187:43): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=getty@tty1 comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 10396,
@@ -1265,11 +1439,17 @@
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "firewalld",
         "event.action": "service_start",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SERVICE_START msg=audit(1481076985.511:45): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=firewalld comm=\"systemd\" exe=\"/usr/lib/systemd/systemd\" hostname=? addr=? terminal=? res=success'",
         "event.outcome": "success",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 11027,
