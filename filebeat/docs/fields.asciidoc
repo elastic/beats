@@ -141262,6 +141262,15 @@ type: keyword
 --
 
 
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
+
 *`suricata.eve.alert.category`*::
 +
 --
