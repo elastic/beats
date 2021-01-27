@@ -61,9 +61,12 @@
     },
     {
         "@timestamp": "2017-03-14T19:20:56.192Z",
+        "auditd.log.record_type": "USER_CMD",
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
-        "event.action": "user_cmd",
+        "event.action": [
+            "ran-command"
+        ],
         "event.category": [
             "process"
         ],
@@ -99,12 +102,15 @@
         "auditd.log.lport": 22,
         "auditd.log.op": "start",
         "auditd.log.pfs": "curve25519-sha256@libssh.org",
+        "auditd.log.record_type": "CRYPTO_SESSION",
         "auditd.log.rport": 63927,
         "auditd.log.sequence": 406,
         "auditd.log.ses": "4294967295",
         "auditd.log.spid": "1299",
         "auditd.log.subj": "system_u:system_r:sshd_t:s0-s0:c0.c1023",
-        "event.action": "crypto_session",
+        "event.action": [
+            "started-crypto-session"
+        ],
         "event.category": [
             "process"
         ],
@@ -143,9 +149,12 @@
         "auditd.log.data": "eh^?^?echo test^Mvim /etc/pam.d/password-auth-ac^Mman pam_tty_audit^Mman pam.d^Mvim /etc^Asudo ^E/pamd.sy^?^?^?^?^?.^?m.d/sy^I-a^Ia^?-a^I^Mman pam^Mt^?grep sys^?^?^?/var/lo^Ig/me^Is^I | grep pam_tty^Mgrep pam_tty /var/log/mes^I^M^[[A^Asudo ^Msudo su^M",
         "auditd.log.major": "136",
         "auditd.log.minor": "0",
+        "auditd.log.record_type": "TTY",
         "auditd.log.sequence": 1065565,
         "auditd.log.ses": "762",
-        "event.action": "tty",
+        "event.action": [
+            "typed"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
@@ -191,13 +200,16 @@
         "@timestamp": "2019-11-15T19:01:24.309Z",
         "auditd.log.gpg_res": "1",
         "auditd.log.key_enforce": "0",
+        "auditd.log.record_type": "SOFTWARE_UPDATE",
         "auditd.log.root_dir": "/",
         "auditd.log.sequence": 785,
         "auditd.log.ses": "3",
         "auditd.log.subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
         "auditd.log.sw": "gcc-4.8.5-39.el7.x86_64",
         "auditd.log.sw_type": "rpm",
-        "event.action": "software_update",
+        "event.action": [
+            "package-updated"
+        ],
         "event.category": [
             "package"
         ],
@@ -221,10 +233,13 @@
     },
     {
         "@timestamp": "2019-11-15T19:00:56.144Z",
+        "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 5,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_boot",
+        "event.action": [
+            "booted-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
@@ -244,10 +259,13 @@
     },
     {
         "@timestamp": "2019-11-15T19:01:57.054Z",
+        "auditd.log.record_type": "SYSTEM_SHUTDOWN",
         "auditd.log.sequence": 1163,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_shutdown",
+        "event.action": [
+            "shutdown-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
@@ -323,8 +341,11 @@
     {
         "@timestamp": "2020-02-10T21:59:44.206Z",
         "auditd.log.name": "mymodule",
+        "auditd.log.record_type": "KERN_MODULE",
         "auditd.log.sequence": 579397,
-        "event.action": "kern_module",
+        "event.action": [
+            "loaded-kernel-module"
+        ],
         "event.category": [
             "driver"
         ],
@@ -344,10 +365,13 @@
         "@timestamp": "2017-12-17T10:44:41.075Z",
         "auditd.log.op": "create",
         "auditd.log.reason": "api",
+        "auditd.log.record_type": "VIRT_CONTROL",
         "auditd.log.sequence": 145,
         "auditd.log.ses": "3",
         "auditd.log.subj": "system_u:system_r:container_runtime_t:s0",
-        "event.action": "virt_control",
+        "event.action": [
+            "issued-vm-control"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
@@ -369,6 +393,7 @@
         "@timestamp": "2016-12-16T15:45:43.572Z",
         "auditd.log.img-ctx": "system_u:object_r:svirt_image_t:s0:c444,c977",
         "auditd.log.model": "selinux",
+        "auditd.log.record_type": "VIRT_MACHINE_ID",
         "auditd.log.sequence": 23118,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:virtd_t:s0-s0:c0.c1023",
@@ -378,7 +403,9 @@
         "auditd.log.vm-ctx": "system_u:system_r:svirt_t:s0:c444,c977",
         "container.name": "rhel-work3",
         "container.runtime": "kvm",
-        "event.action": "virt_machine_id",
+        "event.action": [
+            "assigned-vm-id"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",

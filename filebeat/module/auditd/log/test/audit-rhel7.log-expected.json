@@ -3,10 +3,13 @@
         "@timestamp": "2016-12-07T02:16:23.819Z",
         "auditd.log.format": "raw",
         "auditd.log.kernel": "3.10.0-327.36.3.el7.x86_64",
+        "auditd.log.record_type": "DAEMON_START",
         "auditd.log.sequence": 7798,
         "auditd.log.subj": "system_u:system_r:auditd_t:s0",
         "auditd.log.ver": "2.4.1",
-        "event.action": "daemon_start",
+        "event.action": [
+            "started-audit"
+        ],
         "event.category": [
             "process"
         ],
@@ -27,11 +30,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.864Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 6,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "auditd",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -55,10 +61,13 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.876Z",
+        "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 7,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
-        "event.action": "system_boot",
+        "event.action": [
+            "booted-system"
+        ],
         "event.category": "host",
         "event.dataset": "auditd.log",
         "event.kind": "event",
@@ -78,11 +87,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:23.879Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 8,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-utmp",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -106,11 +118,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.075Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 9,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-hwdb-update",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -134,11 +149,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.088Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 10,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-update-done",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -162,11 +180,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.163Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 11,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-udev-trigger",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -190,11 +211,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.212Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 12,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -218,11 +242,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.521Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 13,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "avahi-daemon",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -246,11 +273,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.521Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 14,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "dbus",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -274,11 +304,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.526Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 15,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rsyslog",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -302,11 +335,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.534Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 16,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "irqbalance",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -332,9 +368,12 @@
         "@timestamp": "2016-12-07T02:16:24.827Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 17,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -392,9 +431,12 @@
         "@timestamp": "2016-12-07T02:16:24.858Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 18,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -452,9 +494,12 @@
         "@timestamp": "2016-12-07T02:16:24.870Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 19,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -512,9 +557,12 @@
         "@timestamp": "2016-12-07T02:16:24.877Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 20,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -572,9 +620,12 @@
         "@timestamp": "2016-12-07T02:16:24.931Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 21,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -630,11 +681,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.939Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 22,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "yum-cron",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -658,11 +712,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.945Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 23,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "rhel-dmesg",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -686,11 +743,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.953Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 24,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "acpid",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -714,11 +774,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.954Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 25,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-user-sessions",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -742,11 +805,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:24.960Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 26,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "ntpd",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -772,9 +838,12 @@
         "@timestamp": "2016-12-07T02:16:24.982Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 27,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -830,11 +899,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.012Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 28,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "systemd-logind",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -858,11 +930,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.031Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 29,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "crond",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -886,11 +961,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.043Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 30,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -914,11 +992,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.044Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 31,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "expand-root",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -944,9 +1025,12 @@
         "@timestamp": "2016-12-07T02:16:25.069Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 32,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1002,11 +1086,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.104Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 33,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "sshd-keygen",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1032,9 +1119,12 @@
         "@timestamp": "2016-12-07T02:16:25.099Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 34,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1092,9 +1182,12 @@
         "@timestamp": "2016-12-07T02:16:25.128Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 35,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1150,11 +1243,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.164Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 36,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1178,11 +1274,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.166Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 37,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1206,11 +1305,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.167Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 38,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1234,11 +1336,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.168Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 39,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-start",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1262,11 +1367,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.170Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 40,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1290,11 +1398,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.170Z",
+        "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 41,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "plymouth-quit-wait",
-        "event.action": "service_stop",
+        "event.action": [
+            "stopped-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1318,11 +1429,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.180Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 42,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "serial-getty@ttyS0",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1346,11 +1460,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.187Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 43,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "getty@tty1",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1376,9 +1493,12 @@
         "@timestamp": "2016-12-07T02:16:25.191Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 44,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1434,11 +1554,14 @@
     },
     {
         "@timestamp": "2016-12-07T02:16:25.511Z",
+        "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 45,
         "auditd.log.ses": "4294967295",
         "auditd.log.subj": "system_u:system_r:init_t:s0",
         "auditd.log.unit": "firewalld",
-        "event.action": "service_start",
+        "event.action": [
+            "started-service"
+        ],
         "event.category": [
             "process"
         ],
@@ -1464,9 +1587,12 @@
         "@timestamp": "2016-12-07T02:16:25.528Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 46,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1524,9 +1650,12 @@
         "@timestamp": "2016-12-07T02:16:25.532Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 47,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1584,9 +1713,12 @@
         "@timestamp": "2016-12-07T02:16:25.534Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 48,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1644,9 +1776,12 @@
         "@timestamp": "2016-12-07T02:16:25.537Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 49,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1704,9 +1839,12 @@
         "@timestamp": "2016-12-07T02:16:25.538Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 50,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1764,9 +1902,12 @@
         "@timestamp": "2016-12-07T02:16:25.542Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 51,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1824,9 +1965,12 @@
         "@timestamp": "2016-12-07T02:16:25.543Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 52,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1884,9 +2028,12 @@
         "@timestamp": "2016-12-07T02:16:25.546Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 53,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -1944,9 +2091,12 @@
         "@timestamp": "2016-12-07T02:16:25.548Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 54,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2004,9 +2154,12 @@
         "@timestamp": "2016-12-07T02:16:25.552Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 55,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2064,9 +2217,12 @@
         "@timestamp": "2016-12-07T02:16:25.553Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 56,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2124,9 +2280,12 @@
         "@timestamp": "2016-12-07T02:16:25.556Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 57,
         "auditd.log.table": "nat",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2184,9 +2343,12 @@
         "@timestamp": "2016-12-07T02:16:25.557Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 58,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2244,9 +2406,12 @@
         "@timestamp": "2016-12-07T02:16:25.560Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 59,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2304,9 +2469,12 @@
         "@timestamp": "2016-12-07T02:16:25.562Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 60,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2364,9 +2532,12 @@
         "@timestamp": "2016-12-07T02:16:25.566Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 61,
         "auditd.log.table": "security",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2424,9 +2595,12 @@
         "@timestamp": "2016-12-07T02:16:25.569Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 62,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2484,9 +2658,12 @@
         "@timestamp": "2016-12-07T02:16:25.573Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 63,
         "auditd.log.table": "raw",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2544,9 +2721,12 @@
         "@timestamp": "2016-12-07T02:16:25.575Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 64,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2604,9 +2784,12 @@
         "@timestamp": "2016-12-07T02:16:25.578Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 65,
         "auditd.log.table": "filter",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2664,9 +2847,12 @@
         "@timestamp": "2016-12-07T02:16:25.580Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 66,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2724,9 +2910,12 @@
         "@timestamp": "2016-12-07T02:16:25.582Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 67,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2784,9 +2973,12 @@
         "@timestamp": "2016-12-07T02:16:25.583Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 68,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2844,9 +3036,12 @@
         "@timestamp": "2016-12-07T02:16:25.585Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 69,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],
@@ -2904,9 +3099,12 @@
         "@timestamp": "2016-12-07T02:16:25.587Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
+        "auditd.log.record_type": "NETFILTER_CFG",
         "auditd.log.sequence": 70,
         "auditd.log.table": "mangle",
-        "event.action": "netfilter_cfg",
+        "event.action": [
+            "loaded-firewall-rule-to"
+        ],
         "event.category": [
             "configuration"
         ],

@@ -2,9 +2,13 @@
     {
         "@timestamp": "2017-03-14T19:20:30.178Z",
         "auditd.log.op": "PAM:session_close",
+        "auditd.log.record_type": "USER_END",
         "auditd.log.sequence": 19600327,
         "auditd.log.ses": "11988",
-        "event.action": "user_end",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "ended-session"
+        ],
         "event.category": [
             "session"
         ],
@@ -23,15 +27,20 @@
         "process.pid": 4121,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root"
     },
     {
         "@timestamp": "2017-03-14T19:20:30.178Z",
         "auditd.log.op": "PAM:setcred",
+        "auditd.log.record_type": "CRED_DISP",
         "auditd.log.sequence": 19600328,
         "auditd.log.ses": "11988",
-        "event.action": "cred_disp",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "disposed-credentials"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -50,14 +59,18 @@
         "process.pid": 4121,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root"
     },
     {
         "@timestamp": "2017-03-14T19:20:56.192Z",
+        "auditd.log.record_type": "USER_CMD",
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
-        "event.action": "user_cmd",
+        "event.action": [
+            "ran-command"
+        ],
         "event.category": [
             "process"
         ],
@@ -87,9 +100,13 @@
     {
         "@timestamp": "2017-03-14T19:20:56.193Z",
         "auditd.log.op": "PAM:setcred",
+        "auditd.log.record_type": "CRED_ACQ",
         "auditd.log.sequence": 19600330,
         "auditd.log.ses": "11988",
-        "event.action": "cred_acq",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "acquired-credentials"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -108,15 +125,20 @@
         "process.pid": 4151,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root"
     },
     {
         "@timestamp": "2017-03-14T19:20:56.193Z",
         "auditd.log.op": "PAM:session_open",
+        "auditd.log.record_type": "USER_START",
         "auditd.log.sequence": 19600331,
         "auditd.log.ses": "11988",
-        "event.action": "user_start",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "started-session"
+        ],
         "event.category": [
             "session"
         ],
@@ -135,7 +157,8 @@
         "process.pid": 4151,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root"
     },
     {
@@ -204,8 +227,12 @@
         "auditd.log.new_ses": "12286",
         "auditd.log.old_auid": "700",
         "auditd.log.old_ses": "6793",
+        "auditd.log.record_type": "LOGIN",
         "auditd.log.sequence": 19623791,
-        "event.action": "login",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "changed-login-id-to"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -221,7 +248,8 @@
         "log.offset": 1524,
         "process.pid": 28281,
         "service.type": "auditd",
-        "user.id": "0"
+        "user.effective.id": "700",
+        "user.id": "700"
     },
     {
         "@timestamp": "2017-03-16T04:02:40.070Z",
@@ -230,11 +258,14 @@
         "auditd.log.laddr": "107.170.139.210",
         "auditd.log.lport": 50022,
         "auditd.log.op": "destroy",
+        "auditd.log.record_type": "CRYPTO_KEY_USER",
         "auditd.log.rport": 58994,
         "auditd.log.sequence": 19623788,
         "auditd.log.ses": "6793",
         "auditd.log.spid": "28282",
-        "event.action": "crypto_key_user",
+        "event.action": [
+            "negotiated-crypto-key"
+        ],
         "event.category": [
             "process"
         ],
@@ -271,9 +302,13 @@
     {
         "@timestamp": "2017-03-16T04:02:40.072Z",
         "auditd.log.op": "success",
+        "auditd.log.record_type": "USER_AUTH",
         "auditd.log.sequence": 19623789,
         "auditd.log.ses": "6793",
-        "event.action": "user_auth",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "authenticated"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -304,16 +339,21 @@
         "source.geo.region_name": "Virginia",
         "source.ip": "96.241.146.97",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "admin",
+        "user.id": "700",
         "user.name": "admin",
         "user.terminal": "ssh"
     },
     {
         "@timestamp": "2017-03-16T04:02:57.804Z",
         "auditd.log.op": "PAM:authentication",
+        "auditd.log.record_type": "USER_AUTH",
         "auditd.log.sequence": 19623807,
         "auditd.log.ses": "12286",
-        "event.action": "user_auth",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "authenticated"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -332,16 +372,21 @@
         "process.pid": 28395,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root",
         "user.terminal": "pts/0"
     },
     {
         "@timestamp": "2017-03-16T04:02:57.805Z",
         "auditd.log.op": "PAM:accounting",
+        "auditd.log.record_type": "USER_ACCT",
         "auditd.log.sequence": 19623808,
         "auditd.log.ses": "12286",
-        "event.action": "user_acct",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "was-authorized"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -360,7 +405,8 @@
         "process.pid": 28395,
         "service.type": "auditd",
         "user.audit.id": "700",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "700",
         "user.name": "root",
         "user.terminal": "pts/0"
     }

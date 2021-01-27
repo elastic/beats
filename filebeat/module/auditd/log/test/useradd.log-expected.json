@@ -4,9 +4,13 @@
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding group to /etc/group",
+        "auditd.log.record_type": "ADD_GROUP",
         "auditd.log.sequence": 584,
         "auditd.log.ses": "14",
-        "event.action": "add_group",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
         "event.category": [
             "iam"
         ],
@@ -20,6 +24,7 @@
             "creation"
         ],
         "fileset.name": "log",
+        "group.target.id": "1004",
         "input.type": "log",
         "log.offset": 0,
         "process.executable": "/usr/sbin/groupadd",
@@ -28,7 +33,8 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000",
         "user.terminal": "pts/2"
     },
     {
@@ -36,9 +42,13 @@
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding group to /etc/gshadow",
+        "auditd.log.record_type": "ADD_GROUP",
         "auditd.log.sequence": 586,
         "auditd.log.ses": "14",
-        "event.action": "add_group",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
         "event.category": [
             "iam"
         ],
@@ -52,6 +62,7 @@
             "creation"
         ],
         "fileset.name": "log",
+        "group.target.id": "1004",
         "input.type": "log",
         "log.offset": 212,
         "process.executable": "/usr/sbin/groupadd",
@@ -60,16 +71,21 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000",
         "user.terminal": "pts/2"
     },
     {
         "@timestamp": "2021-01-17T17:12:33.710Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
+        "auditd.log.record_type": "ADD_GROUP",
         "auditd.log.sequence": 587,
         "auditd.log.ses": "14",
-        "event.action": "add_group",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
         "event.category": [
             "iam"
         ],
@@ -83,6 +99,7 @@
             "creation"
         ],
         "fileset.name": "log",
+        "group.target.id": "1004",
         "input.type": "log",
         "log.offset": 426,
         "process.executable": "/usr/sbin/groupadd",
@@ -91,7 +108,8 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000",
         "user.terminal": "pts/2"
     },
     {
@@ -99,9 +117,13 @@
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding user",
+        "auditd.log.record_type": "ADD_USER",
         "auditd.log.sequence": 591,
         "auditd.log.ses": "14",
-        "event.action": "add_user",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-user-account"
+        ],
         "event.category": [
             "iam"
         ],
@@ -123,16 +145,25 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.target.id": "1004",
         "user.terminal": "pts/2"
     },
     {
         "@timestamp": "2021-01-17T17:12:33.814Z",
         "auditd.log.hostname": "localhost",
+        "auditd.log.record_type": "USER_ACCT",
         "auditd.log.reset": "0",
         "auditd.log.sequence": 593,
         "auditd.log.ses": "14",
-        "event.action": "user_acct",
+        "auditd.log.uid": [
+            "0",
+            "1004"
+        ],
+        "event.action": [
+            "was-authorized"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -153,19 +184,20 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": [
-            "0",
-            "1004"
-        ],
+        "user.id": "1000",
         "user.terminal": "/dev/pts/2"
     },
     {
         "@timestamp": "2021-01-17T17:12:38.174Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:chauthtok",
+        "auditd.log.record_type": "USER_CHAUTHTOK",
         "auditd.log.sequence": 594,
         "auditd.log.ses": "14",
-        "event.action": "user_chauthtok",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "changed-password"
+        ],
         "event.category": [
             "iam"
         ],
@@ -187,17 +219,23 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000",
         "user.name": "charlie",
+        "user.target.name": "charlie",
         "user.terminal": "pts/2"
     },
     {
         "@timestamp": "2021-01-17T17:12:38.178Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:authentication",
+        "auditd.log.record_type": "USER_AUTH",
         "auditd.log.sequence": 595,
         "auditd.log.ses": "14",
-        "event.action": "user_auth",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "authenticated"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -218,7 +256,8 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "1000",
         "user.name": "root",
         "user.terminal": "pts/2"
     },
@@ -226,9 +265,13 @@
         "@timestamp": "2021-01-17T17:12:38.178Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:accounting",
+        "auditd.log.record_type": "USER_ACCT",
         "auditd.log.sequence": 596,
         "auditd.log.ses": "14",
-        "event.action": "user_acct",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "was-authorized"
+        ],
         "event.category": [
             "authentication"
         ],
@@ -249,7 +292,8 @@
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "user.audit.id": "1000",
-        "user.id": "0",
+        "user.effective.name": "root",
+        "user.id": "1000",
         "user.name": "root",
         "user.terminal": "pts/2"
     }
