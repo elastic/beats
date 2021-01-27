@@ -17,11 +17,11 @@ func (c *outputCapability) Rule() string {
 }
 
 // NewOutputCapability creates capability filter for output.
-func NewOutputCapability(r ruler) Capability {
+func NewOutputCapability(r ruler) (Capability, error) {
 	cap, ok := r.(*outputCapability)
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
-	return cap
+	return cap, nil
 }

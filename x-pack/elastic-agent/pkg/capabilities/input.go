@@ -17,11 +17,11 @@ func (c *inputCapability) Rule() string {
 }
 
 // NewInputCapability creates capability filter for input.
-func NewInputCapability(r ruler) Capability {
+func NewInputCapability(r ruler) (Capability, error) {
 	cap, ok := r.(*inputCapability)
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
-	return cap
+	return cap, nil
 }

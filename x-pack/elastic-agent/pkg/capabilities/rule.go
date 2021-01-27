@@ -11,6 +11,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	allowKey = "allow"
+	denyKey  = "deny"
+)
+
 type ruler interface {
 	Rule() string
 }
