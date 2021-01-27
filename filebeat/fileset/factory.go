@@ -116,7 +116,11 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 }
 
 func (f *Factory) CheckConfig(c *common.Config) error {
-	_, err := f.Create(pubpipeline.NewNilPipeline(), c)
+	runner, err := f.Create(pubpipeline.NewNilPipeline(), c)
+	if err == nil {
+		// A fileset runner can contain v1 inputs, that need to be stopped.
+		runner.Stop()
+	}
 	return err
 }
 
