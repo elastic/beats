@@ -47,7 +47,69 @@
 
 package tlscommon
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+)
+
+func matchHostnames(pattern, host string) bool {
+	pattern = toLowerCaseASCII(pattern)
+	host = toLowerCaseASCII(strings.TrimSuffix(host, "."))
+
+	if len(pattern) == 0 || len(host) == 0 {
+		return false
+	}
+
+	patternParts := strings.Split(pattern, ".")
+	hostParts := strings.Split(host, ".")
+
+	if len(patternParts) != len(hostParts) {
+		return false
+	}
+
+	for i, patternPart := range patternParts {
+		if i == 0 && patternPart == "*" {
+			continue
+		}
+		if patternPart != hostParts[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// toLowerCaseASCII returns a lower-case version of in. See RFC 6125 6.4.1. We use
+// an explicitly ASCII function to avoid any sharp corners resulting from
+// performing Unicode operations on DNS labels.
+func toLowerCaseASCII(in string) string {
+	// If the string is already lower-case then there's nothing to do.
+	isAlreadyLowerCase := true
+	for _, c := range in {
+		if c == utf8.RuneError {
+			// If we get a UTF-8 error then there might be
+			// upper-case ASCII bytes in the invalid sequence.
+			isAlreadyLowerCase = false
+			break
+		}
+		if 'A' <= c && c <= 'Z' {
+			isAlreadyLowerCase = false
+			break
+		}
+	}
+
+	if isAlreadyLowerCase {
+		return in
+	}
+
+	out := []byte(in)
+	for i, c := range out {
+		if 'A' <= c && c <= 'Z' {
+			out[i] += 'a' - 'A'
+		}
+	}
+	return string(out)
+}
 
 // validHostname reports whether host is a valid hostname that can be matched or
 // matched against according to RFC 6125 2.2, with some leniency to accommodate

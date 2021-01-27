@@ -31,6 +31,7 @@ if __name__ == "__main__":
                     if "withModule" in doc["stages"][stage]:
                         withModule = doc["stages"][stage]["withModule"]
                     if "when" in doc["stages"][stage]:
-                        when = f"optional"
+                        if "not_changeset_full_match" not in doc["stages"][stage]["when"]:
+                            when = "optional"
                     print("| {} | {} | `{}` | {} | `{}` | {} |".format(
                         module, stage, command, withModule, platforms, when))
