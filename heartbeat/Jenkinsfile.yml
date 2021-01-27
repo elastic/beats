@@ -17,9 +17,6 @@ stages:
         make: |
           make -C heartbeat check;
           make -C heartbeat update;
-          make check-no-changes;
-    Lint-Xpack:
-        make: |
           make -C x-pack/heartbeat check;
           make -C x-pack/heartbeat update;
           make check-no-changes;

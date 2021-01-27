@@ -17,9 +17,6 @@ stages:
         make: |
           make -C filebeat check;
           make -C filebeat update;
-          make check-no-changes;
-    Lint-Xpack:
-        make: |
           make -C x-pack/filebeat check;
           make -C x-pack/filebeat update;
           make check-no-changes;

@@ -17,9 +17,6 @@ stages:
         make: |
           make -C winlogbeat check;
           make -C winlogbeat update;
-          make check-no-changes;
-    Lint-Xpack:
-        make: |
           make -C x-pack/winlogbeat check;
           make -C x-pack/winlogbeat update;
           make check-no-changes;

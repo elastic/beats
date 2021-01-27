@@ -17,9 +17,6 @@ stages:
         mage: |
           mage -C x-pack/packetbeat check;
           mage -C x-pack/packetbeat update;
-          make check-no-changes;
-    Lint-OSS:
-        make: |
           make -C packetbeat check;
           make -C packetbeat update;
           make check-no-changes;

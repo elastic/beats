@@ -17,9 +17,6 @@ stages:
         make: |
           make -C x-pack/auditbeat check;
           make -C x-pack/auditbeat update;
-          make check-no-changes;
-    Lint-OSS:
-        make: |
           make -C auditbeat check;
           make -C auditbeat update;
           make check-no-changes;
