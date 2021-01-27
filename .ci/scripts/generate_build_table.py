@@ -39,14 +39,7 @@ if __name__ == "__main__":
                     if "withModule" in doc["stages"][stage]:
                         withModule = doc["stages"][stage]["withModule"]
                     if "when" in doc["stages"][stage]:
-                        when = f"{when}/:star:"
+                        if "not_changeset_full_match" not in doc["stages"][stage]["when"]:
+                            when = "optional"
                     print("| {} | {} | `{}` | {} | `{}` | {} |".format(
                         module, stage, command, withModule, platforms, when))
-
-print("> :palm_tree: -> Git Branch based")
-print("> :label: -> GitHub Pull Request Label based")
-print("> :file_folder: -> Changeset based")
-print("> :speech_balloon: -> GitHub Pull Request comment based")
-print("> :taco: -> Git tag based")
-print("> :smiley: -> Manual UI interaction based")
-print("> :star: -> More specific cases based")
