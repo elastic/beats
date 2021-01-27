@@ -129,7 +129,7 @@ func NewResourceMetadataEnricher(
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
 	metaGen := metadata.NewResourceMetadataGenerator(cfg)
-	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
+	podMetaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
@@ -213,7 +213,7 @@ func NewContainerMetadataEnricher(
 
 	cfg, _ := common.NewConfigFrom(&metaConfig)
 
-	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, nil, nil)
+	metaGen := metadata.NewPodMetadataGenerator(cfg, nil, watcher.Client(), nil, nil)
 	enricher := buildMetadataEnricher(watcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
