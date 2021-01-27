@@ -67,7 +67,7 @@ func GetPodMetaGen(
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
 		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
 	}
-	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), nodeMetaGen, namespaceMetaGen)
+	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
 
 	return metaGen
 }
