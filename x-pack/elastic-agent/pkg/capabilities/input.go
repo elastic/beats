@@ -90,12 +90,17 @@ func (c *inputCapability) renderInputs(inputs transpiler.Node) (transpiler.Node,
 			continue
 		}
 
-		// TODO: condition instead of removal
-		if c.Type == denyKey {
+		if _, found := inputDict.Find(conditionKey); found {
+			// we already visited
+			nodes = append(nodes, inputDict)
 			continue
 		}
 
-		nodes = append(nodes, inputDict)
+		conditionNode := transpiler.NewKey(conditionKey, transpiler.NewBoolVal(c.Type == allowKey))
+		dctNodes := inputDict.Value().([]transpiler.Node)
+		dctNodes = append(dctNodes, conditionNode)
+
+		nodes = append(nodes, transpiler.NewDict(dctNodes))
 	}
 
 	nInputs := []transpiler.Node{}

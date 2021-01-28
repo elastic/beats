@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	allowKey = "allow"
-	denyKey  = "deny"
+	allowKey     = "allow"
+	denyKey      = "deny"
+	conditionKey = "__condition__"
 )
 
 type ruler interface {

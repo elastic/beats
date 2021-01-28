@@ -143,18 +143,34 @@ func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, ini
 	typesMap := make(map[string]bool)
 	inputNodes := inputsList.Value().([]transpiler.Node)
 	for _, node := range inputNodes {
-		t, ok := node.Find("type")
+		typeNode, ok := node.Find("type")
 		if !ok {
 			continue
 		}
 
-		inputTypeStr, ok := t.Value().(*transpiler.StrVal)
+		inputTypeStr, ok := typeNode.Value().(*transpiler.StrVal)
 		if !ok {
 			continue
 		}
-
 		inputType := inputTypeStr.String()
-		typesMap[inputType] = true
+
+		conditionNode, ok := node.Find(conditionKey)
+		if !ok {
+			// was not allowed nor denied -> allowing
+			typesMap[inputType] = true
+			continue
+		}
+
+		conditionTypeBool, ok := conditionNode.Value().(*transpiler.BoolVal)
+		if !ok {
+			assert.Fail(t, fmt.Sprintf("condition should be bool but it's not for input '%s'", inputType))
+			continue
+		}
+
+		if isAllowed := conditionTypeBool.Value().(bool); isAllowed {
+			inputType := inputTypeStr.String()
+			typesMap[inputType] = true
+		}
 	}
 
 	assert.Equal(t, len(expectedInputs), len(typesMap))
