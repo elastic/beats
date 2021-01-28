@@ -403,10 +403,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.827:17): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=390 pid=391 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -466,10 +472,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.858:18): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=395 pid=396 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -529,10 +541,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.870:19): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=398 pid=399 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -592,10 +610,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.877:20): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=401 pid=402 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -655,10 +679,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.931:21): arch=c000003e syscall=313 success=yes exit=0 a0=3 a1=41a15c a2=0 a3=3 items=0 ppid=406 pid=407 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -873,10 +903,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076984.982:27): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=422 pid=423 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1060,10 +1096,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.069:32): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=439 pid=440 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1154,10 +1196,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.099:34): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=445 pid=446 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1217,10 +1265,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.128:35): arch=c000003e syscall=313 success=yes exit=0 a0=0 a1=41a15c a2=0 a3=0 items=0 ppid=449 pid=450 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1528,10 +1582,16 @@
         "auditd.log.syscall": "313",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.191:44): arch=c000003e syscall=313 success=yes exit=0 a0=1 a1=41a15c a2=0 a3=1 items=0 ppid=452 pid=453 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"modprobe\" exe=\"/usr/bin/kmod\" subj=system_u:system_r:insmod_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1622,10 +1682,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.528:46): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=25be720 items=0 ppid=296 pid=476 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1685,10 +1751,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.532:47): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1819720 items=0 ppid=296 pid=478 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1748,10 +1820,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.534:48): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=13d0850 items=0 ppid=296 pid=479 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1811,10 +1889,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.537:49): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1125850 items=0 ppid=296 pid=481 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1874,10 +1958,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.538:50): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=20a3600 items=0 ppid=296 pid=482 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -1937,10 +2027,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.542:51): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=9f0600 items=0 ppid=296 pid=484 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2000,10 +2096,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.543:52): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=232e4d0 items=0 ppid=296 pid=485 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2063,10 +2165,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.546:53): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=14404d0 items=0 ppid=296 pid=487 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2126,10 +2234,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.548:54): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=c31600 items=0 ppid=296 pid=488 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2189,10 +2303,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.552:55): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=143a600 items=0 ppid=296 pid=490 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2252,10 +2372,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.553:56): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=109b880 items=0 ppid=296 pid=491 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2315,10 +2441,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.556:57): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=b53880 items=0 ppid=296 pid=493 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2378,10 +2510,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.557:58): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=17b09e0 items=0 ppid=296 pid=494 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2441,10 +2579,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.560:59): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=25cc9e0 items=0 ppid=296 pid=496 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2504,10 +2648,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.562:60): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=14db720 items=0 ppid=296 pid=497 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2567,10 +2717,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.566:61): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=9d2720 items=0 ppid=296 pid=499 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2630,10 +2786,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.569:62): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=fae5c0 items=0 ppid=296 pid=500 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2693,10 +2855,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.573:63): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=19545c0 items=0 ppid=296 pid=502 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2756,10 +2924,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.575:64): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=23a3720 items=0 ppid=296 pid=503 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2819,10 +2993,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.578:65): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=29 a2=40 a3=162d720 items=0 ppid=296 pid=505 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"ip6tables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2882,10 +3062,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.580:66): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=14b0850 items=0 ppid=296 pid=506 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -2945,10 +3131,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.582:67): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=2398850 items=0 ppid=296 pid=507 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -3008,10 +3200,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.583:68): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=2679850 items=0 ppid=296 pid=508 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -3071,10 +3269,16 @@
         "auditd.log.syscall": "54",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1481076985.585:69): arch=c000003e syscall=54 success=yes exit=0 a0=4 a1=0 a2=40 a3=1715850 items=0 ppid=296 pid=509 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"iptables\" exe=\"/usr/sbin/xtables-multi\" subj=system_u:system_r:iptables_t:s0 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",

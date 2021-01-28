@@ -34,10 +34,16 @@
         "auditd.log.syscall": "44",
         "auditd.log.tty": "(none)",
         "event.action": "syscall",
+        "event.category": [
+            "process"
+        ],
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
         "event.original": "type=SYSCALL msg=audit(1485893834.891:18877199): arch=c000003e syscall=44 success=yes exit=184 a0=9 a1=7f564b2672a0 a2=b8 a3=0 items=0 ppid=1240 pid=1281 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm=\"charon\" exe=2F7573722F6C6962657865632F7374726F6E677377616E2F636861726F6E202864656C6574656429 key=(null)",
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "host.architecture": "x86_64",
         "input.type": "log",
@@ -305,13 +311,16 @@
         "auditd.log.a2": "0x1fd4640",
         "auditd.log.a3": "0x7ffc6939f360",
         "auditd.log.items": "2",
+        "auditd.log.record_type": "SYSCALL",
         "auditd.log.sequence": 579398,
         "auditd.log.ses": "2",
         "auditd.log.subj": "unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023",
         "auditd.log.success": "yes",
         "auditd.log.syscall": "execve",
         "auditd.log.tty": "pts0",
-        "event.action": "syscall",
+        "event.action": [
+            "executed"
+        ],
         "event.category": "process",
         "event.dataset": "auditd.log",
         "event.kind": "event",
