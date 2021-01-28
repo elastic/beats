@@ -58,15 +58,13 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 		}
 	}
 
-	if svc, ok := obj.(*kubernetes.Service); ok {
-		selectors := svc.Spec.Selector
-		if len(selectors) == 0 {
-			return out
-		}
-		svcMap := GenerateMap(selectors, s.resource.config.LabelsDedot)
-		if len(svcMap) != 0 {
-			safemapstr.Put(out, "selectors", svcMap)
-		}
+	selectors := svc.Spec.Selector
+	if len(selectors) == 0 {
+		return out
+	}
+	svcMap := GenerateMap(selectors, s.resource.config.LabelsDedot)
+	if len(svcMap) != 0 {
+		safemapstr.Put(out, "selectors", svcMap)
 	}
 
 	return out

@@ -61,7 +61,7 @@ func TestService_Generate(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Selector: map[string]string{
-						"app": "istiod",
+						"app":   "istiod",
 						"istio": "pilot",
 					},
 				},
@@ -75,7 +75,7 @@ func TestService_Generate(t *testing.T) {
 					"foo": "bar",
 				},
 				"selectors": common.MapStr{
-					"app": "istiod",
+					"app":   "istiod",
 					"istio": "pilot",
 				},
 				"namespace": "default",
@@ -108,7 +108,7 @@ func TestService_Generate(t *testing.T) {
 				},
 				Spec: v1.ServiceSpec{
 					Selector: map[string]string{
-						"app": "istiod",
+						"app":   "istiod",
 						"istio": "pilot",
 					},
 				},
@@ -122,7 +122,7 @@ func TestService_Generate(t *testing.T) {
 					"foo": "bar",
 				},
 				"selectors": common.MapStr{
-					"app": "istiod",
+					"app":   "istiod",
 					"istio": "pilot",
 				},
 				"namespace": "default",
