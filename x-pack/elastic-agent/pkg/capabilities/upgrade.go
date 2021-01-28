@@ -18,6 +18,52 @@ const (
 	sourceURIKey = "source_uri"
 )
 
+// NewUpgradeCapability creates capability filter for upgrade.
+// Available variables:
+// - version
+// - source_uri
+func newUpgradesCapability(rd ruleDefinitions) (Capability, error) {
+	caps := make([]Capability, 0, len(rd))
+
+	for _, r := range rd {
+		c, err := newUpgradeCapability(r)
+		if err != nil {
+			return nil, err
+		}
+
+		if c != nil {
+			caps = append(caps, c)
+		}
+	}
+
+	return &multiUpgradeCapability{caps: caps}, nil
+}
+
+func newUpgradeCapability(r ruler) (Capability, error) {
+	cap, ok := r.(*upgradeCapability)
+	if !ok {
+		return nil, nil
+	}
+
+	cap.Type = strings.ToLower(cap.Type)
+	if cap.Type != allowKey && cap.Type != denyKey {
+		return nil, fmt.Errorf("'%s' is not a valid type 'allow' and 'deny' are supported", cap.Type)
+	}
+
+	// if eql definition is not supported make a global rule
+	if len(cap.UpgradeEqlDefinition) == 0 {
+		cap.UpgradeEqlDefinition = "true"
+	}
+
+	eqlExp, err := eql.New(cap.UpgradeEqlDefinition)
+	if err != nil {
+		return nil, err
+	}
+
+	cap.upgradeEql = eqlExp
+	return cap, nil
+}
+
 type upgradeCapability struct {
 	Type string `json:"rule" yaml:"rule"`
 	// UpgradeEql is eql expression defining upgrade
@@ -65,33 +111,20 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 	return !isSupported, in
 }
 
-// NewUpgradeCapability creates capability filter for upgrade.
-// Available variables:
-// - version
-// - source_uri
-func NewUpgradeCapability(r ruler) (Capability, error) {
-	cap, ok := r.(*upgradeCapability)
-	if !ok {
-		return nil, nil
+type multiUpgradeCapability struct {
+	caps []Capability
+}
+
+func (c *multiUpgradeCapability) Apply(in interface{}) (bool, interface{}) {
+	for _, cap := range c.caps {
+		// upgrade does not modify incoming action
+		blocking, _ := cap.Apply(in)
+		if blocking {
+			return blocking, in
+		}
 	}
 
-	cap.Type = strings.ToLower(cap.Type)
-	if cap.Type != allowKey && cap.Type != denyKey {
-		return nil, fmt.Errorf("'%s' is not a valid type 'allow' and 'deny' are supported", cap.Type)
-	}
-
-	// if eql definition is not supported make a global rule
-	if len(cap.UpgradeEqlDefinition) == 0 {
-		cap.UpgradeEqlDefinition = "true"
-	}
-
-	eqlExp, err := eql.New(cap.UpgradeEqlDefinition)
-	if err != nil {
-		return nil, err
-	}
-
-	cap.upgradeEql = eqlExp
-	return cap, nil
+	return false, in
 }
 
 func upgradeObject(a interface{}) map[string]interface{} {

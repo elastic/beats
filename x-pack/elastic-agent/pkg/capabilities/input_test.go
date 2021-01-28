@@ -13,10 +13,148 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestMultiInput(t *testing.T) {
+	t.Run("no match", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "allow",
+				Input: "something_else",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{"system/metrics", "system/logs"}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("filters metrics", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "deny",
+				Input: "system/metrics",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{"system/logs"}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("allows metrics only", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "allow",
+				Input: "system/metrics",
+			},
+			&inputCapability{
+				Type:  "deny",
+				Input: "*",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs", "something_else"}
+		expectedInputs := []string{"system/metrics"}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("allows everything", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "allow",
+				Input: "*",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{"system/metrics", "system/logs"}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("deny everything", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "deny",
+				Input: "*",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("deny everything with noise", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "deny",
+				Input: "*",
+			},
+			&inputCapability{
+				Type:  "allow",
+				Input: "something_else",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{}
+		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+	})
+
+	t.Run("keep format", func(t *testing.T) {
+		rd := ruleDefinitions{
+			&inputCapability{
+				Type:  "deny",
+				Input: "system/metrics",
+			},
+		}
+
+		initialInputs := []string{"system/metrics", "system/logs"}
+		expectedInputs := []string{"system/logs"}
+
+		cap, err := newInputsCapability(rd)
+		assert.NoError(t, err, "error not expected, provided eql is valid")
+		assert.NotNil(t, cap, "cap should be created")
+
+		inputs := getInputsMap(initialInputs...)
+		assert.NotNil(t, inputs)
+
+		blocking, res := cap.Apply(inputs)
+		assert.False(t, blocking, "should not be blocking")
+
+		resMap, ok := res.(map[string]interface{})
+		assert.True(t, ok, "expecting a map")
+
+		inputsIface, found := resMap["inputs"]
+		assert.True(t, found, "input  not found")
+
+		inputsList, ok := inputsIface.([]interface{})
+		assert.True(t, ok, "expecting a map for inputs")
+		assert.Equal(t, len(expectedInputs), len(inputsList))
+
+		for _, in := range expectedInputs {
+			var typeFound bool
+			for _, inputItem := range inputsList {
+				inputMap, ok := inputItem.(map[string]interface{})
+				assert.True(t, ok, "expecting a map for inputs")
+
+				inputType, found := inputMap["type"]
+				assert.True(t, found, "input type key not found")
+				if inputType == in {
+					typeFound = true
+					break
+				}
+			}
+
+			assert.True(t, typeFound, fmt.Sprintf("input '%s' type key not found", in))
+		}
+
+	})
+}
+
 func TestInput(t *testing.T) {
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}
-		cap, err := NewInputCapability(r)
+		cap, err := newInputCapability(r)
 		assert.NoError(t, err, "no error expected")
 		assert.Nil(t, cap, "cap should not be created")
 	})
@@ -26,7 +164,7 @@ func TestInput(t *testing.T) {
 			Type:  "allow",
 			Input: "",
 		}
-		cap, err := NewInputCapability(r)
+		cap, err := newInputCapability(r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 	})
@@ -80,7 +218,7 @@ func TestInput(t *testing.T) {
 			Type:  "allow",
 			Input: "system/metrics",
 		}
-		cap, err := NewInputCapability(r)
+		cap, err := newInputCapability(r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -93,6 +231,12 @@ func TestInput(t *testing.T) {
 }
 
 func getInputs(tt ...string) *transpiler.AST {
+	astMap := getInputsMap(tt...)
+	ast, _ := transpiler.NewAST(astMap)
+	return ast
+}
+
+func getInputsMap(tt ...string) map[string]interface{} {
 	astMap := make(map[string]interface{})
 	inputs := make([]map[string]interface{}, 0, len(tt))
 
@@ -116,12 +260,12 @@ func getInputs(tt ...string) *transpiler.AST {
 	}
 
 	astMap["inputs"] = inputs
-	ast, _ := transpiler.NewAST(astMap)
-	return ast
+
+	return astMap
 }
 
 func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, initialInputs []string) {
-	cap, err := NewInputCapability(r)
+	cap, err := newInputCapability(r)
 	assert.NoError(t, err, "error not expected, provided eql is valid")
 	assert.NotNil(t, cap, "cap should be created")
 
@@ -171,6 +315,55 @@ func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, ini
 			inputType := inputTypeStr.String()
 			typesMap[inputType] = true
 		}
+	}
+
+	assert.Equal(t, len(expectedInputs), len(typesMap))
+	for _, ei := range expectedInputs {
+		_, found = typesMap[ei]
+		assert.True(t, found, fmt.Sprintf("'%s' not found", ei))
+		delete(typesMap, ei)
+	}
+
+	for k := range typesMap {
+		assert.Fail(t, fmt.Sprintf("'%s' found but was not expected", k))
+	}
+}
+
+func runMultiInputTest(t *testing.T, rd ruleDefinitions, expectedInputs []string, initialInputs []string) {
+	cap, err := newInputsCapability(rd)
+	assert.NoError(t, err, "error not expected, provided eql is valid")
+	assert.NotNil(t, cap, "cap should be created")
+
+	inputs := getInputs(initialInputs...)
+	assert.NotNil(t, inputs)
+
+	isBlocking, outAfter := cap.Apply(inputs)
+	assert.False(t, isBlocking, "should not be blocking")
+
+	newAST, ok := outAfter.(*transpiler.AST)
+	assert.True(t, ok, "out ast should be AST")
+	assert.NotNil(t, newAST)
+
+	inputsNode, found := transpiler.Lookup(newAST, "inputs")
+	assert.True(t, found, "inputsnot found")
+
+	inputsList, ok := inputsNode.Value().(*transpiler.List)
+	assert.True(t, ok, "inputs not a list")
+
+	typesMap := make(map[string]bool)
+	inputNodes := inputsList.Value().([]transpiler.Node)
+	for _, node := range inputNodes {
+		typeNode, ok := node.Find("type")
+		if !ok {
+			continue
+		}
+
+		inputTypeStr, ok := typeNode.Value().(*transpiler.StrVal)
+		if !ok {
+			continue
+		}
+		inputType := inputTypeStr.String()
+		typesMap[inputType] = true
 	}
 
 	assert.Equal(t, len(expectedInputs), len(typesMap))
