@@ -209,14 +209,17 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106013'"
       field: "message"
+      description: "106013"
       pattern: "Dropping echo request from %{source.address} to PAT address %{destination.address}"
   - set:
       if: "ctx._temp_.cisco.message_id == '106013'"
       field: "network.transport"
+      description: "106013"
       value: icmp
   - set:
       if: "ctx._temp_.cisco.message_id == '106013'"
       field: "network.direction"
+      description: "106013"
       value: inbound
   - grok:
       if: "ctx._temp_.cisco.message_id == '106014'"
@@ -233,33 +236,33 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106016'"
       field: "message"
-      description: "106016"
       pattern: "%{event.outcome} IP spoof from (%{source.address}) to %{destination.address} on interface %{_temp_.cisco.source_interface}"
+      description: "106016"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106017'"
       field: "message"
-      description: "106017"
       pattern: "%{event.outcome} IP due to Land Attack from %{source.address} to %{destination.address}"
+      description: "106017"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106018'"
       field: "message"
-      description: "106018"
       pattern: "%{network.transport} packet type %{_temp_.cisco.icmp_type} %{event.outcome} by %{network.direction} list %{_temp_.cisco.list_id} src %{source.address} dest %{destination.address}"
+      description: "106018"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106020'"
       field: "message"
-      description: "106020"
       pattern: "%{event.outcome} IP teardrop fragment (size = %{}, offset = %{}) from %{source.address} to %{destination.address}"
+      description: "106020"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106021'"
       field: "message"
-      description: "106021"
       pattern: "%{event.outcome} %{network.transport} reverse path check from %{source.address} to %{destination.address} on interface %{_temp_.cisco.source_interface}"
+      description: "106021"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106022'"
       field: "message"
-      description: "106022"
       pattern: "%{event.outcome} %{network.transport} connection spoof from %{source.address} to %{destination.address} on interface %{_temp_.cisco.source_interface}"
+      description: "106022"
   - grok:
       if: "ctx._temp_.cisco.message_id == '106023'"
       field: "message"
@@ -279,18 +282,21 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106102' || ctx._temp_.cisco.message_id == '106103'"
       field: "message"
-      description: "106102, 106103"
+      description: "106103"
       pattern: "access-list %{_temp_.cisco.list_id} %{event.outcome} %{network.transport} for user %{user.name} %{_temp_.cisco.source_interface}/%{source.address}(%{source.port})%{}-> %{_temp_.cisco.destination_interface}/%{destination.address}(%{destination.port})%{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '111004'"
       field: "message"
+      description: "111004"
       pattern: "%{source.address} end configuration: %{_temp_.cisco.cli_outcome}"
   - set:
       field: event.outcome
+      description: "111004"
       value: "success"
       if: "ctx._temp_.cisco.message_id == '111004' && ctx?._temp_?.cisco?.cli_outcome == 'OK'"
   - set:
       field: event.outcome
+      description: "111004"
       value: "failure"
       if: "ctx._temp_.cisco.message_id == '111004' && ctx?._temp_?.cisco?.cli_outcome == 'FAILED'"
   - remove:
@@ -298,12 +304,13 @@ processors:
       ignore_missing: true
   - append:
       field: event.type
+      description: "111004"
       value: "change"
       if: "ctx._temp_.cisco.message_id == '111004'"
   - grok:
       if: "ctx._temp_.cisco.message_id == '111009'"
-      field: "message"
       description: "111009"
+      field: "message"
       patterns:
       - "^%{NOTSPACE} '%{NOTSPACE:host.user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
   - grok:
@@ -320,9 +327,9 @@ processors:
   - grok:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
+      description: "302013, 302015"
       patterns:
       - "Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \\(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\\)(\\(%{NOTSPACE:_temp_.cisco.source_username}\\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \\(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\\)( \\(%{NOTSPACE:destination.user.name}\\))?%{GREEDYDATA}"
-      description: "302013, 302015"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '303002'"
       field: "message"
@@ -338,7 +345,12 @@ processors:
       field: "message"
       description: "302020"
       patterns:
-      - "Built %{NOTSPACE:network.direction} %{NOTSPACE:network.protocol} connection for faddr %{IP:destination.address}/%{NUMBER} (%{DATA})?gaddr %{IP:_temp_.natsrcip}/%{NUMBER} laddr %{IP:source.address}/%{NUMBER}(%{GREEDYDATA})?"
+      - "Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection for faddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSDESTIPORHOST}/%{NUMBER}\\s*(?:\\(%{NOTSPACE:_temp_.cisco.destination_username}\\) )?gaddr (?:%{NOTCOLON}:)?%{MAPPEDSRC}/%{NUMBER} laddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSSOURCEIPORHOST}/%{NUMBER}\\s*(?:\\(%{NOTSPACE:_temp_.cisco.source_username}\\) )?(type %{NUMBER:_temp_.cisco.icmp_type} code %{NUMBER:_temp_.cisco.icmp_code})?"
+      pattern_definitions:
+        NOTCOLON: "[^:]*"
+        ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
+        ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
+        MAPPEDSRC: "(?:%{DATA:_temp_.natsrcip}|%{HOSTNAME})"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302022'"
       field: "message"
@@ -347,15 +359,18 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302023'"
       field: "message"
+      description: "302023"
       pattern: "Teardown stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} duration %{_temp_.duration_hms} forwarded bytes %{network.bytes} %{event.reason}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "message"
+      description: "304001"
       patterns:
       - "%{IP:source.address} %{DATA} (%{NOTSPACE}@)?%{IP:destination.address}:%{GREEDYDATA:url.original}"
   - set:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "event.outcome"
+      description: "304001"
       value: allow
   - dissect:
       if: "ctx._temp_.cisco.message_id == '304002'"
@@ -367,7 +382,7 @@ processors:
       field: "message"
       description: "305011"
       patterns:
-        - "Built %{NOTSPACE} %{NOTSPACE:network.transport} translation from %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port}(\(%{NOTSPACE:source.user.name}\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{IP:destination.address}/%{NUMBER:destination.port}"
+        - Built %{NOTSPACE} %{NOTSPACE:network.transport} translation from %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port}(\(%{NOTSPACE:source.user.name}\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{IP:destination.address}/%{NUMBER:destination.port}
   - dissect:
       if: "ctx._temp_.cisco.message_id == '313001'"
       field: "message"
@@ -401,19 +416,23 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "message"
+      description: "338001"
       pattern: "Dynamic filter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338001'"
       field: "server.domain"
+      description: "338001"
       value: "{{source.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "message"
+      description: "338002"
       pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338002'"
       field: "server.domain"
+      description: "338002"
       value: "{{destination.domain}}"
       ignore_empty_value: true
   - dissect:
@@ -429,19 +448,23 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "message"
+      description: "338005"
       pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338005'"
       field: "server.domain"
+      description: "338005"
       value: "{{source.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "message"
+      description: "338006"
       pattern: "Dynamic %{}ilter %{event.outcome} black%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338006'"
       field: "server.domain"
+      description: "338006"
       value: "{{destination.domain}}"
       ignore_empty_value: true
   - dissect:
@@ -457,19 +480,23 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "message"
+      description: "338101"
       pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338101'"
       field: "server.domain"
+      description: "338101"
       value: "{{source.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "message"
+      description: "338102"
       pattern: "Dynamic %{}ilter %{event.outcome} white%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338102'"
       field: "server.domain"
+      description: "338102"
       value: "{{destination.domain}}"
       ignore_empty_value: true
   - dissect:
@@ -485,76 +512,92 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "message"
+      description: "338201"
       pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338201'"
       field: "server.domain"
+      description: "338201"
       value: "{{source.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "message"
+      description: "338202"
       pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338202'"
       field: "server.domain"
+      description: "338202"
       value: "{{destination.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "message"
+      description: "338203"
       pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}source %{} resolved from %{_temp_.cisco.list_id} list: %{source.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338203'"
       field: "server.domain"
+      description: "338203"
       value: "{{source.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "message"
+      description: "338204"
       pattern: "Dynamic %{}ilter %{event.outcome} grey%{}d %{network.transport} traffic from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})%{}destination %{} resolved from %{_temp_.cisco.list_id} list: %{destination.domain}, threat-level: %{_temp_.cisco.threat_level}, category: %{_temp_.cisco.threat_category}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338204'"
       field: "server.domain"
+      description: "338204"
       value: "{{destination.domain}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "message"
+      description: "338301"
       pattern: "Intercepted DNS reply for domain %{source.domain} from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}, matched %{_temp_.cisco.list_id}"
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.address"
+      description: "338301"
       value: "{{destination.address}}"
       ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "client.port"
+      description: "338301"
       value: "{{destination.port}}"
       ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.address"
+      description: "338301"
       value: "{{source.address}}"
       ignore_empty_value: true
   - set:
       if: "ctx._temp_.cisco.message_id == '338301'"
       field: "server.port"
+      description: "338301"
       value: "{{source.port}}"
       ignore_empty_value: true
   - dissect:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "message"
+      description: "502103"
       pattern: "User priv level changed: Uname: %{host.user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
   - append:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "event.type"
+      description: "502103"
       value:
       - "group"
       - "change"
   - append:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "event.category"
+      description: "502103"
       value: "iam"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '507003'"
@@ -601,12 +644,15 @@ processors:
       field: "message"
       description: "716002"
       patterns:
-        - "Group <%{NOTSPACE:cisco.webvpn.group.name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> WebVPN session terminated: %{GREEDYDATA:event.reason}\."
-  - dissect:
+        - "Group <%{NOTSPACE:_temp_.cisco.webvpn.group_name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> WebVPN session terminated: %{GREEDYDATA:event.reason}."
+        - "Group %{NOTSPACE:_temp_.cisco.webvpn.group_name} User %{NOTSPACE:source.user.name} IP %{IP:source.address} WebVPN session terminated: %{GREEDYDATA:event.reason}."
+  - grok:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"
       description: "722051"
-      pattern: "Group <%{cisco.ftd.webvpn.group.name}> User <%{source.user.name}> IP <%{source.address}> IPv4 Address <%{_temp_.cisco.assigned_ip}> %{}"
+      patterns:
+              - "Group <%{NOTSPACE:_temp_.cisco.webvpn.group_name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> IPv4 Address <%{IP:_temp_.cisco.assigned_ip}> %{GREEDYDATA}"
+              - "Group %{NOTSPACE:_temp_.cisco.webvpn.group_name} User %{NOTSPACE:source.user.name} IP %{IP:source.address} IPv4 Address %{IP:_temp_.cisco.assigned_ip} %{GREEDYDATA}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '733100'"
       field: "message"
@@ -638,20 +684,20 @@ processors:
   - set:
       if: '["302012", "302014", "302016", "302018", "302020", "302021", "302036", "302304", "302306", "609001", "609002"].contains(ctx._temp_.cisco.message_id)'
       field: "event.action"
-      description: "30212, 302014, 302016, 302018, 302020, 302021, 302036, 302304, 302306, 609001, 609002"
       value: "flow-expiration"
+      description: "302012, 302014, 302016, 302018, 302020, 302021, 302036, 302304, 302306, 609001, 609002"
   - grok:
       field: "message"
       if: '["302014", "302016", "302018", "302021", "302036", "302304", "302306"].contains(ctx._temp_.cisco.message_id)'
       description: "302014, 302016, 302018, 302021, 302036, 302304, 302306"
       patterns:
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} from %{NOTCOLON:_temp_.cisco.termination_initiator} \(%{NOTSPACE:_temp_.cisco.termination_user}\)
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} from %{NOTCOLON:_temp_.cisco.termination_initiator}
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} \(%{NOTSPACE:_temp_.cisco.termination_user}\)
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason}
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) \(%{NOTSPACE:_temp_.cisco.termination_user}\)
-        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )? duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes})
-        - Teardown %{NOTSPACE:network.transport} connection for faddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSDESTIPORHOST}/%{NUMBER}\s*(?:\(%{NOTSPACE:_temp_.cisco.destination_username}\) )?gaddr (?:%{NOTCOLON}:)?%{MAPPEDSRC}/%{NUMBER} laddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSSOURCEIPORHOST}/%{NUMBER}\s*(?:\(%{NOTSPACE:_temp_.cisco.source_username}\))? type %{NUMBER:icmp.request.type} code %{NUMBER:icmp.request.code}
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} from %{NOTCOLON:_temp_.cisco.termination_initiator} \(%{NOTSPACE:_temp_.cisco.termination_user}\)
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} from %{NOTCOLON:_temp_.cisco.termination_initiator}
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason} \(%{NOTSPACE:_temp_.cisco.termination_user}\)
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) %{NOTCOLON:event.reason}
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes}) \(%{NOTSPACE:_temp_.cisco.termination_user}\)
+        - Teardown %{NOTSPACE:network.transport} (?:state-bypass )?connection %{NOTSPACE:_temp_.cisco.connection_id} (?:for|from) %{NOTCOLON:_temp_.cisco.source_interface}:%{DATA:source.address}/%{NUMBER:source.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.source_username} )?to %{NOTCOLON:_temp_.cisco.destination_interface}:%{DATA:destination.address}/%{NUMBER:destination.port:int}\s*(?:%{NOTSPACE:_temp_.cisco.destination_username} )?duration (?:%{TIME:_temp_.duration_hms} bytes %{NUMBER:network.bytes})
+        - Teardown %{NOTSPACE:network.transport} connection for faddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSDESTIPORHOST}/%{NUMBER}\s*(?:\(%{NOTSPACE:_temp_.cisco.destination_username}\) )?gaddr (?:%{NOTCOLON}:)?%{MAPPEDSRC}/%{NUMBER} laddr (?:%{NOTCOLON:_temp_.cisco.source_interface}:)?%{ECSSOURCEIPORHOST}/%{NUMBER}\s*(?:\(%{NOTSPACE:_temp_.cisco.source_username}\))?(\s*type %{NUMBER:_temp_.cisco.icmp_type} code %{NUMBER:_temp_.cisco.icmp_code})?
       pattern_definitions:
         NOTCOLON: "[^:]*"
         ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
@@ -668,6 +714,7 @@ processors:
   - kv:
       if: '["430001", "430002", "430003", "430004", "430005", ""].contains(ctx._temp_.cisco.message_id)'
       field: "message"
+      description: "430001, 430002, 430003, 430004, 430005"
       field_split: ",(?=[A-za-z1-9\\s]+:)"
       value_split: ":"
       target_field: "_temp_.orig_security"
