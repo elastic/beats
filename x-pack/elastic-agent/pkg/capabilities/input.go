@@ -5,6 +5,8 @@
 package capabilities
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
 
@@ -17,6 +19,9 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 	ast, err := inputObject(in)
 	if err != nil {
 		// TODO: log error
+		return false, in
+	}
+	if ast == nil {
 		return false, in
 	}
 
@@ -55,32 +60,49 @@ func NewInputCapability(r ruler) (Capability, error) {
 }
 
 func (c *inputCapability) renderInputs(inputs transpiler.Node) (transpiler.Node, error) {
-	return inputs, nil
+	l, ok := inputs.Value().(*transpiler.List)
+	if !ok {
+		return nil, fmt.Errorf("inputs must be an array")
+	}
 
-	// l, ok := inputs.Value().(*transpiler.List)
-	// if !ok {
-	// 	return nil, fmt.Errorf("inputs must be an array")
-	// }
+	nodes := []*transpiler.Dict{}
 
-	// nodes := []*transpiler.Dict{}
+	for _, inputNode := range l.Value().([]transpiler.Node) {
+		inputDict, ok := inputNode.Clone().(*transpiler.Dict)
+		if !ok {
+			continue
+		}
+		typeNode, found := inputDict.Find("type")
+		if !found {
+			nodes = append(nodes, inputDict)
+			continue
+		}
 
-	// for _, inputNode := range l.Value().([]transpiler.Node) {
-	// 	// if input does not match definition continue
-	// 	// TODO: get from input
-	// var inputType = "system/metrics"
+		inputTypeStr, ok := typeNode.Value().(*transpiler.StrVal)
+		if !ok {
+			continue
+		}
 
-	// 	// if condition empty
-	// 	// check if condition key already exists and if it has true/false value continue
-	// 	// mark condition rule==allow
-	// 	// endif condition empty
+		inputType := inputTypeStr.String()
+		// if input does not match definition continue
+		if !matchesExpr(c.Input, inputType) {
+			nodes = append(nodes, inputDict)
+			continue
+		}
 
-	// }
+		// TODO: condition instead of removal
+		if c.Type == denyKey {
+			continue
+		}
 
-	// nInputs := []transpiler.Node{}
-	// for _, node := range nodes {
-	// 	nInputs = append(nInputs, node)
-	// }
-	// return transpiler.NewList(nInputs), nil
+		nodes = append(nodes, inputDict)
+	}
+
+	nInputs := []transpiler.Node{}
+	for _, node := range nodes {
+		nInputs = append(nInputs, node)
+	}
+	return transpiler.NewList(nInputs), nil
 
 }
 
