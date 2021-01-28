@@ -77,7 +77,7 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 
 	// Enable DEP (data execution protection) for Windows binaries.
 	if Platform.GOOS == "windows" {
-		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat")
+		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat", "-w")
 	}
 
 	return args
