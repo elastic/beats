@@ -184,12 +184,20 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 	return CrossBuild(o...)
 }
 
-// buildMage pre-compiles the magefile to a binary using the native GOOS/GOARCH
-// values for Docker. It has the benefit of speeding up the build because the
-// mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
-	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch=amd64",
-		"-compile", CreateDir(filepath.Join("build", "mage-linux-amd64")))
+	return buildMageForArch(runtime.GOARCH)
+}
+
+// buildMageForArch pre-compiles the magefile to a binary using the GOARCH parameter.
+// It has the benefit of speeding up the build because the
+// mage -compile is done only once rather than in each Docker container.
+func buildMageForArch(arch string) error {
+	if arch == "" {
+		return fmt.Errorf("architecture value cannot be empty")
+	}
+
+	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch="+arch,
+		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
 func crossBuildImage(platform string) (string, error) {
@@ -246,9 +254,10 @@ func (b GolangCrossBuilder) Build() error {
 	}
 	workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
 
-	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-amd64"))
+	builderArch := runtime.GOARCH
+	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
 	if err != nil {
-		return errors.Wrap(err, "failed to determine mage-linux-amd64 relative path")
+		return errors.Wrap(err, "failed to determine mage-linux-"+builderArch+" relative path")
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")
