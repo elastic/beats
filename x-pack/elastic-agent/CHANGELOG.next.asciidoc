@@ -64,3 +64,4 @@
 - Log level reloadable from fleet {pull}22690[22690]
 - Push log level downstream {pull}22815[22815]
 - Add metrics collection for Agent {pull}22793[22793]
+- Add support for Fleet Server {pull}
