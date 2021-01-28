@@ -15,41 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+// +build !integration
+
+package udp
 
 import (
-	"net"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	inputtest "github.com/elastic/beats/v7/filebeat/input/testing"
-	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestCreateEvent(t *testing.T) {
-	hello := "hello world"
-	ip := "127.0.0.1"
-	parsedIP := net.ParseIP(ip)
-	addr := &net.IPAddr{IP: parsedIP, Zone: ""}
-
-	message := []byte(hello)
-	mt := inputsource.NetworkMetadata{RemoteAddr: addr}
-
-	event := createEvent(message, mt)
-
-	m, err := event.GetValue("message")
-	assert.NoError(t, err)
-	assert.Equal(t, string(message), m)
-
-	from, _ := event.GetValue("log.source.address")
-	assert.Equal(t, ip, from)
-}
-
 func TestNewInputDone(t *testing.T) {
 	config := common.MapStr{
-		"host": ":0",
+		"hosts": ":0",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
