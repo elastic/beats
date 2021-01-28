@@ -18,9 +18,6 @@ stages:
           make -C journalbeat check;
           make -C journalbeat update;
           make check-no-changes;
-          cd x-pack/journalbeat;
-          mage check;
-          mage update;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
