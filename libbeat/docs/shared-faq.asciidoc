@@ -154,7 +154,7 @@ To resolve this problem, try one of these solutions:
 * Create a DNS entry for the hostname mapping it to the server's IP.
 * Create an entry in `/etc/hosts` for the hostname. Or on Windows add an entry to
 `C:\Windows\System32\drivers\etc\hosts`.
-* Re-create the server certificate and add a SubjectAltName (SAN) for the IP address of the server. This make the
+* Re-create the server certificate and add a SubjectAltName (SAN) for the IP address of the server. This makes the
 server's certificate valid for both the hostname and the IP address.
 
 [[getsockopt-no-route-to-host]]

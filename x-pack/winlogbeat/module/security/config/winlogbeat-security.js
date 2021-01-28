@@ -1500,11 +1500,12 @@ var security = (function () {
             fields: [
                 {from: "winlog.event_data.AccountName", to: "user.name"},
                 {from: "winlog.event_data.AccountDomain", to: "user.domain"},
-                {from: "winlog.event_data.ClientAddress", to: "source.ip"},
+                {from: "winlog.event_data.ClientAddress", to: "source.ip", type: "ip"},
                 {from: "winlog.event_data.ClientName", to: "source.domain"},
                 {from: "winlog.event_data.LogonID", to: "winlog.logon.id"},
             ],
             ignore_missing: true,
+            fail_on_error: false,
         })
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.AccountName");

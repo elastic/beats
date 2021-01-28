@@ -38,7 +38,7 @@ packetbeat.flows:
 
 packetbeat.protocols:
 - type: icmp
-  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
+  # Enable ICMPv4 and ICMPv6 monitoring. The default is true.
   enabled: true
 
 - type: amqp
@@ -47,7 +47,8 @@ packetbeat.protocols:
   ports: [5672]
 
 - type: cassandra
-  #Cassandra port for traffic monitoring.
+  # Configure the ports where to listen for Cassandra traffic. You can disable
+  # the Cassandra protocol by commenting out the list of ports.
   ports: [9042]
 
 - type: dhcpv4
@@ -112,7 +113,8 @@ packetbeat.protocols:
     - 9243  # Elasticsearch
 
 - type: sip
-  # Configure the ports where to listen for SIP traffic. You can disable the SIP protocol by commenting out the list of ports.
+  # Configure the ports where to listen for SIP traffic. You can disable
+  # the SIP protocol by commenting out the list of ports.
   ports: [5060]
 
 # ======================= Elasticsearch template setting =======================

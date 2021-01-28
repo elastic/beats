@@ -9,6 +9,9 @@ beta[]
 The `rate_limit` processor limits the throughput of events based on
 the specified configuration.
 
+In the current implementation, rate-limited events are dropped. Future
+implementations may allow rate-limited events to be handled differently.
+
 [source,yaml]
 -----------------------------------------------------
 processors:
