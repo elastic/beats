@@ -46,9 +46,10 @@
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "192.0.2.134",
         "cisco.asa.message_id": "302021",
-        "cisco.asa.source_username": "type",
         "destination.address": "192.0.2.15",
         "destination.ip": "192.0.2.15",
         "event.action": "flow-expiration",

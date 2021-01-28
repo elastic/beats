@@ -181,3 +181,9 @@
     type: keyword
     description: >
       AAA name of user requesting termination
+
+  - name: webvpn.group_name
+    type: keyword
+    default_field: false
+    description: >
+      The WebVPN group name the user belongs to

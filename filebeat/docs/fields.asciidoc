@@ -21138,6 +21138,16 @@ type: keyword
 
 --
 
+*`cisco.asa.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -21360,6 +21370,16 @@ type: keyword
 +
 --
 AAA name of user requesting termination
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.webvpn.group_name`*::
++
+--
+The WebVPN group name the user belongs to
 
 
 type: keyword
