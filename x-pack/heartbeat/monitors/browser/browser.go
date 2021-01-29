@@ -11,11 +11,9 @@ import (
 	"os/user"
 	"sync"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
@@ -71,5 +69,9 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		}
 	}
 
-	return plugin.Plugin{[]jobs.Job{j}, ss.Close, 1}, nil
+	return plugin.Plugin{
+		Jobs:      []jobs.Job{j},
+		Close:     ss.Close,
+		Endpoints: 1,
+	}, nil
 }

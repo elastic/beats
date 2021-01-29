@@ -17,17 +17,20 @@ type Config struct {
 	RawConfig *common.Config
 	Source    *source.Source `config:"source"`
 	// Name is optional for lightweight checks but required for browsers
-	Name string `config:"id"`
+	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
-	Id string `config:"name"`
+	Id string `config:"id"`
 }
+
+var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")
+var ErrIdRequired = fmt.Errorf("config 'id' must be specified for this monitor")
 
 func (c *Config) Validate() error {
 	if c.Name == "" {
-		return fmt.Errorf("config 'name' must be specified for this moniotr")
+		return ErrNameRequired
 	}
 	if c.Id == "" {
-		return fmt.Errorf("config 'id' must be specified for this monitor")
+		return ErrIdRequired
 	}
 
 	return nil

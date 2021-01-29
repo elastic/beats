@@ -6,9 +6,9 @@ package browser
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
@@ -27,10 +27,14 @@ func NewSuite(rawCfg *common.Config) (*SyntheticSuite, error) {
 	}
 	err := rawCfg.Unpack(ss.suiteCfg)
 	if err != nil {
-		logp.Err("could not parse suite config: %s", err)
+		return nil, ErrBadConfig(err)
 	}
 
-	return ss, err
+	return ss, nil
+}
+
+func ErrBadConfig(err error) error {
+	return fmt.Errorf("could not parse suite config: %w", err)
 }
 
 func (s *SyntheticSuite) String() string {

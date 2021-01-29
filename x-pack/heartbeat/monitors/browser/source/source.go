@@ -28,9 +28,11 @@ func (s *Source) Active() ISource {
 	return s.ActiveMemo
 }
 
+var ErrInvalidSource = fmt.Errorf("no or unknown source type specified for synthetic monitor")
+
 func (s *Source) Validate() error {
 	if s.Active() == nil {
-		return fmt.Errorf("no valid source specified! Choose one of local, github, zip_url")
+		return ErrInvalidSource
 	}
 	return nil
 }
@@ -43,9 +45,4 @@ type ISource interface {
 
 type BaseSource struct {
 	Type string `config:"type"`
-}
-
-type PollingSource struct {
-	CheckEvery int `config:"check_every"`
-	BaseSource
 }
