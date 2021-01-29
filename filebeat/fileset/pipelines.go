@@ -178,6 +178,50 @@ func setECSProcessors(esVersion common.Version, pipelineID string, content map[s
 	return nil
 }
 
+func checkProcessorMinVersion(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	ecsVersion := common.MustNewVersion("7.0.0")
+	if !esVersion.LessThan(ecsVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	minUserAgentVersion := common.MustNewVersion("6.7.0")
+	minURIPartsVersion := common.MustNewVersion("7.12")
+	newProcessors := make([]interface{}, len(processors))
+	for i, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["user_agent"].(map[string]interface{}); ok {
+			if esVersion.LessThan(minUserAgentVersion) {
+				return fmt.Errorf("user_agent processor requires option 'ecs: true', but Elasticsearch %v does not support this option (Elasticsearch %v or newer is required)", esVersion, minUserAgentVersion)
+			}
+			logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
+			options["ecs"] = true
+		}
+		if _, ok := processor["uri_parts"].(map[string]interface{}); ok {
+			if esVersion.LessThan(minURIPartsVersion) {
+				logp.Debug("processors", "Current version of Elasticsearch: %v does not support the uri_parts processor, minimum version is: %v and newer)", esVersion, minURIPartsVersion)
+				continue
+			}
+
+		}
+		newProcessors = append(newProcessors, processors[i])
+
+	}
+	content["processors"] = newProcessors
+	return nil
+}
+
 func deletePipeline(esClient PipelineLoader, pipelineID string) error {
 	path := makeIngestPipelinePath(pipelineID)
 	_, _, err := esClient.Request("DELETE", path, "", nil, nil)
@@ -364,4 +408,8 @@ func modifyAppendProcessor(esVersion common.Version, pipelineID string, content 
 		}
 	}
 	return nil
+}
+
+func removeProcessor(processors []interface{}, processor int) []interface{} {
+	return append(processors[:processor], processors[processor+1:]...)
 }
