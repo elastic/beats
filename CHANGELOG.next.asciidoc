@@ -376,6 +376,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
+- Fix date parsing in GSuite/login fileset. {issue}24694[24694]
+- Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
 
 *Heartbeat*
 
