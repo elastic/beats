@@ -97,7 +97,7 @@ func GolangCrossBuild(params BuildArgs) error {
 
 // Build invokes "go build" to produce a binary.
 func Build(params BuildArgs) error {
-	fmt.Println(">> build: Building", params.Name)
+	fmt.Println(">> build: Building", params.Name, params.LDFlags)
 
 	binaryName := params.Name + binaryExtension(GOOS)
 
@@ -137,6 +137,7 @@ func Build(params BuildArgs) error {
 	if len(ldflags) > 0 {
 		args = append(args, "-ldflags")
 		args = append(args, MustExpand(strings.Join(ldflags, " ")))
+		fmt.Printf("LDFlags of builder: %+v\n", args)
 	}
 
 	if len(params.InputFiles) > 0 {
