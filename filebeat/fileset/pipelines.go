@@ -132,6 +132,11 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		return fmt.Errorf("failed to modify set processor in pipeline: %v", err)
 	}
 
+	err = checkProcessorMinVersion(esClient.GetVersion(), pipelineID, content)
+	if err != nil {
+		return fmt.Errorf("failed to check minimum processor version in pipeline: %v", err)
+	}
+
 	if err := modifyAppendProcessor(esClient.GetVersion(), pipelineID, content); err != nil {
 		return fmt.Errorf("failed to modify append processor in pipeline: %v", err)
 	}
@@ -162,9 +167,7 @@ func setECSProcessors(esVersion common.Version, pipelineID string, content map[s
 	}
 
 	minUserAgentVersion := common.MustNewVersion("6.7.0")
-	minURIPartsVersion := common.MustNewVersion("7.12")
-	newProcessors := make([]interface{}, len(processors))
-	for i, p := range processors {
+	for _, p := range processors {
 		processor, ok := p.(map[string]interface{})
 		if !ok {
 			continue
@@ -176,6 +179,32 @@ func setECSProcessors(esVersion common.Version, pipelineID string, content map[s
 			logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
 			options["ecs"] = true
 		}
+	}
+	return nil
+}
+
+func checkProcessorMinVersion(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	ecsVersion := common.MustNewVersion("7.0.0")
+	if !esVersion.LessThan(ecsVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	minURIPartsVersion := common.MustNewVersion("7.12")
+	newProcessors := make([]interface{}, len(processors))
+	for i, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
 		if _, ok := processor["uri_parts"].(map[string]interface{}); ok {
 			if esVersion.LessThan(minURIPartsVersion) {
 				logp.Debug("processors", "Current version of Elasticsearch: %v does not support the uri_parts processor, minimum version is: %v and newer)", esVersion, minURIPartsVersion)
@@ -184,6 +213,7 @@ func setECSProcessors(esVersion common.Version, pipelineID string, content map[s
 
 		}
 		newProcessors = append(newProcessors, processors[i])
+
 	}
 	content["processors"] = newProcessors
 	return nil
