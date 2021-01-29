@@ -409,7 +409,3 @@ func modifyAppendProcessor(esVersion common.Version, pipelineID string, content 
 	}
 	return nil
 }
-
-func removeProcessor(processors []interface{}, processor int) []interface{} {
-	return append(processors[:processor], processors[processor+1:]...)
-}
