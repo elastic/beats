@@ -7,14 +7,16 @@ package capabilities
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUpgrade(t *testing.T) {
+	l, _ := logger.New("test")
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &inputCapability{}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "no error expected")
 		assert.Nil(t, cap, "cap should not be created")
 	})
@@ -24,7 +26,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 	})
@@ -34,7 +36,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "${version} == '8.0.0'",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -50,7 +52,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "deny",
 			UpgradeEqlDefinition: "${version} == '8.0.0'",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -66,7 +68,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "deny",
 			UpgradeEqlDefinition: "${version} == '8.*.*'",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -82,7 +84,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "${version} == '7.12.0'",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -98,7 +100,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.0.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -114,7 +116,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -130,7 +132,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -146,7 +148,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -167,7 +169,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -186,7 +188,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -205,7 +207,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -224,7 +226,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -243,7 +245,7 @@ func TestUpgrade(t *testing.T) {
 			Type:                 "allow",
 			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
 		}
-		cap, err := newUpgradeCapability(r)
+		cap, err := newUpgradeCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 

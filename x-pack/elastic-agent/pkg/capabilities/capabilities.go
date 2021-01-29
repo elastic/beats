@@ -4,6 +4,8 @@
 
 package capabilities
 
+import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+
 const (
 	capabilitiesFilename = "capabilities.yml"
 )
@@ -21,8 +23,8 @@ type capabilitiesManager struct {
 }
 
 // LoadCapabilities loads capabilities files and prepares manager.
-func LoadCapabilities() (Capability, error) {
-	handlers := []func(ruleDefinitions) (Capability, error){
+func LoadCapabilities(log *logger.Logger) (Capability, error) {
+	handlers := []func(*logger.Logger, ruleDefinitions) (Capability, error){
 		newInputsCapability,
 		newOutputsCapability,
 		newUpgradesCapability,
@@ -35,7 +37,7 @@ func LoadCapabilities() (Capability, error) {
 
 	// make list of handlers out of capabilities definition
 	for _, h := range handlers {
-		cap, err := h(definitions)
+		cap, err := h(log, definitions)
 		if err != nil {
 			return nil, err
 		}

@@ -8,17 +8,18 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 const (
 	inputsKey = "inputs"
 )
 
-func newInputsCapability(rd ruleDefinitions) (Capability, error) {
+func newInputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newInputCapability(r)
+		c, err := newInputCapability(log, r)
 		if err != nil {
 			return nil, err
 		}
@@ -28,19 +29,22 @@ func newInputsCapability(rd ruleDefinitions) (Capability, error) {
 		}
 	}
 
-	return &multiInputsCapability{caps: caps}, nil
+	return &multiInputsCapability{log: log, caps: caps}, nil
 }
 
-func newInputCapability(r ruler) (Capability, error) {
+func newInputCapability(log *logger.Logger, r ruler) (Capability, error) {
 	cap, ok := r.(*inputCapability)
 	if !ok {
 		return nil, nil
 	}
 
+	cap.log = log
 	return cap, nil
 }
 
 type inputCapability struct {
+	log   *logger.Logger
+	Name  string `json:"name,omitempty" yaml:"name,omitempty"`
 	Type  string `json:"rule" yaml:"rule"`
 	Input string `json:"input" yaml:"input"`
 }
@@ -57,7 +61,7 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 		if ok {
 			renderedInputs, err := c.renderInputs(inputs)
 			if err != nil {
-				// TODO: log error
+				c.log.Errorf("marking inputs failed for capability '%s': %v", c.name(), err)
 				return false, in
 			}
 
@@ -73,6 +77,21 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 
 func (c *inputCapability) Rule() string {
 	return c.Type
+}
+
+func (c *inputCapability) name() string {
+	if c.Name != "" {
+		return c.Name
+	}
+
+	t := "A"
+	if c.Type == denyKey {
+		t = "D"
+	}
+
+	// e.g IA(*) or ID(system/*)
+	c.Name = fmt.Sprintf("I%s(%s)", t, c.Input)
+	return c.Name
 }
 
 func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[string]interface{}, error) {
@@ -108,17 +127,17 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 	}
 
 	return newInputs, nil
-
 }
 
 type multiInputsCapability struct {
 	caps []Capability
+	log  *logger.Logger
 }
 
 func (c *multiInputsCapability) Apply(in interface{}) (bool, interface{}) {
 	inputsMap, transform, err := configObject(in)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("constructing config object failed for 'multi-inputs' capability '%s': %v", err)
 		return false, in
 	}
 	if inputsMap == nil {
@@ -134,13 +153,13 @@ func (c *multiInputsCapability) Apply(in interface{}) (bool, interface{}) {
 
 	inputsMap, ok := mapIface.(map[string]interface{})
 	if !ok {
-		// TODO: log failure
+		c.log.Errorf("expecting map config object but got %T for capability 'multi-outputs': %v", mapIface, err)
 		return false, in
 	}
 
 	inputsMap, err = c.cleanupInput(inputsMap)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("cleaning up config object failed for capability 'multi-outputs': %v", err)
 		return false, in
 	}
 
@@ -187,7 +206,6 @@ func (c *multiInputsCapability) cleanupInput(cfgMap map[string]interface{}) (map
 }
 
 func configObject(a interface{}) (map[string]interface{}, func(interface{}) interface{}, error) {
-	// TODO: transform input back to what it was
 	if ast, ok := a.(*transpiler.AST); ok {
 		fn := func(i interface{}) interface{} {
 			mm, ok := i.(map[string]interface{})

@@ -6,6 +6,8 @@ package capabilities
 
 import (
 	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 const (
@@ -13,11 +15,11 @@ const (
 	typeKey   = "type"
 )
 
-func newOutputsCapability(rd ruleDefinitions) (Capability, error) {
+func newOutputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newOutputCapability(r)
+		c, err := newOutputCapability(log, r)
 		if err != nil {
 			return nil, err
 		}
@@ -27,19 +29,22 @@ func newOutputsCapability(rd ruleDefinitions) (Capability, error) {
 		}
 	}
 
-	return &multiOutputsCapability{caps: caps}, nil
+	return &multiOutputsCapability{log: log, caps: caps}, nil
 }
 
-func newOutputCapability(r ruler) (Capability, error) {
+func newOutputCapability(log *logger.Logger, r ruler) (Capability, error) {
 	cap, ok := r.(*outputCapability)
 	if !ok {
 		return nil, nil
 	}
 
+	cap.log = log
 	return cap, nil
 }
 
 type outputCapability struct {
+	log    *logger.Logger
+	Name   string `json:"name,omitempty" yaml:"name,omitempty"`
 	Type   string `json:"rule" yaml:"rule"`
 	Output string `json:"output" yaml:"output"`
 }
@@ -56,7 +61,7 @@ func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
 		if ok {
 			renderedOutputs, err := c.renderOutputs(outputs)
 			if err != nil {
-				// TODO: log error
+				c.log.Errorf("marking outputs failed for capability '%s': %v", c.name(), err)
 				return false, in
 			}
 
@@ -72,6 +77,21 @@ func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
 
 func (c *outputCapability) Rule() string {
 	return c.Type
+}
+
+func (c *outputCapability) name() string {
+	if c.Name != "" {
+		return c.Name
+	}
+
+	t := "A"
+	if c.Type == denyKey {
+		t = "D"
+	}
+
+	// e.g OA(*) or OD(logstash)
+	c.Name = fmt.Sprintf("O%s(%s)", t, c.Output)
+	return c.Name
 }
 
 func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[string]interface{}, error) {
@@ -110,12 +130,13 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 
 type multiOutputsCapability struct {
 	caps []Capability
+	log  *logger.Logger
 }
 
 func (c *multiOutputsCapability) Apply(in interface{}) (bool, interface{}) {
 	configMap, transform, err := configObject(in)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("creating configuration object failed for capability 'multi-outputs': %v", err)
 		return false, in
 	}
 	if configMap == nil {
@@ -131,13 +152,13 @@ func (c *multiOutputsCapability) Apply(in interface{}) (bool, interface{}) {
 
 	configMap, ok := mapIface.(map[string]interface{})
 	if !ok {
-		// TODO: log failure
+		c.log.Errorf("expecting map config object but got %T for capability 'multi-outputs': %v", mapIface, err)
 		return false, in
 	}
 
 	configMap, err = c.cleanupOutput(configMap)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("cleaning up config object failed for capability 'multi-outputs': %v", err)
 		return false, in
 	}
 

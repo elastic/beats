@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -22,11 +23,11 @@ const (
 // Available variables:
 // - version
 // - source_uri
-func newUpgradesCapability(rd ruleDefinitions) (Capability, error) {
+func newUpgradesCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newUpgradeCapability(r)
+		c, err := newUpgradeCapability(log, r)
 		if err != nil {
 			return nil, err
 		}
@@ -39,7 +40,7 @@ func newUpgradesCapability(rd ruleDefinitions) (Capability, error) {
 	return &multiUpgradeCapability{caps: caps}, nil
 }
 
-func newUpgradeCapability(r ruler) (Capability, error) {
+func newUpgradeCapability(log *logger.Logger, r ruler) (Capability, error) {
 	cap, ok := r.(*upgradeCapability)
 	if !ok {
 		return nil, nil
@@ -61,10 +62,13 @@ func newUpgradeCapability(r ruler) (Capability, error) {
 	}
 
 	cap.upgradeEql = eqlExp
+	cap.log = log
 	return cap, nil
 }
 
 type upgradeCapability struct {
+	log  *logger.Logger
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 	Type string `json:"rule" yaml:"rule"`
 	// UpgradeEql is eql expression defining upgrade
 	UpgradeEqlDefinition string `json:"upgrade" yaml:"upgrade"`
@@ -76,6 +80,21 @@ func (c *upgradeCapability) Rule() string {
 	return c.Type
 }
 
+func (c *upgradeCapability) name() string {
+	if c.Name != "" {
+		return c.Name
+	}
+
+	t := "A"
+	if c.Type == denyKey {
+		t = "D"
+	}
+
+	// e.g UA(*) or UD(7.*.*)
+	c.Name = fmt.Sprintf("U%s(%s)", t, c.UpgradeEqlDefinition)
+	return c.Name
+}
+
 // Apply supports upgrade action or fleetapi upgrade action object.
 func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 	// if eql is not parsed or defined skip
@@ -85,7 +104,7 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 
 	upgradeMap := upgradeObject(in)
 	if upgradeMap == nil {
-		// TODO: log warning
+		c.log.Warnf("expecting map config object but got nil for capability 'multi-outputs': %v", c.name())
 		// not an upgrade we don't alter origin
 		return false, in
 	}
@@ -93,13 +112,13 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 	// create VarStore out of map
 	varStore, err := transpiler.NewAST(upgradeMap)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("failed creating a varStore for capability '%s': %v", c.name(), err)
 		return false, in
 	}
 
 	isSupported, err := c.upgradeEql.Eval(varStore)
 	if err != nil {
-		// TODO: log error
+		c.log.Errorf("failed evaluating eql formula for capability '%s': %v", c.name(), err)
 		return false, in
 	}
 

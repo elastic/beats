@@ -9,11 +9,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMultiOutput(t *testing.T) {
+	l, _ := logger.New("test")
 	t.Run("no match", func(t *testing.T) {
 		rd := ruleDefinitions{
 			&outputCapability{
@@ -24,7 +26,7 @@ func TestMultiOutput(t *testing.T) {
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{"elasticsearch", "logstash"}
-		runMultiOutputTest(t, rd, expectedOutputs, initialOutputs)
+		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("filters logstash", func(t *testing.T) {
@@ -37,7 +39,7 @@ func TestMultiOutput(t *testing.T) {
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{"elasticsearch"}
-		runMultiOutputTest(t, rd, expectedOutputs, initialOutputs)
+		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("allows logstash only", func(t *testing.T) {
@@ -54,7 +56,7 @@ func TestMultiOutput(t *testing.T) {
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{"logstash"}
-		runMultiOutputTest(t, rd, expectedOutputs, initialOutputs)
+		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("allows everything", func(t *testing.T) {
@@ -67,7 +69,7 @@ func TestMultiOutput(t *testing.T) {
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{"elasticsearch", "logstash"}
-		runMultiOutputTest(t, rd, expectedOutputs, initialOutputs)
+		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("deny everything", func(t *testing.T) {
@@ -80,7 +82,7 @@ func TestMultiOutput(t *testing.T) {
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{}
-		runMultiOutputTest(t, rd, expectedOutputs, initialOutputs)
+		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("keep format", func(t *testing.T) {
@@ -94,7 +96,7 @@ func TestMultiOutput(t *testing.T) {
 		initialOutputs := []string{"elasticsearch", "logstash"}
 		expectedOutputs := []string{"elasticsearch"}
 
-		cap, err := newOutputsCapability(rd)
+		cap, err := newOutputsCapability(l, rd)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -139,9 +141,10 @@ func TestMultiOutput(t *testing.T) {
 }
 
 func TestOutput(t *testing.T) {
+	l, _ := logger.New("test")
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}
-		cap, err := newOutputCapability(r)
+		cap, err := newOutputCapability(l, r)
 		assert.NoError(t, err, "no error expected")
 		assert.Nil(t, cap, "cap should not be created")
 	})
@@ -151,7 +154,7 @@ func TestOutput(t *testing.T) {
 			Type:   "allow",
 			Output: "",
 		}
-		cap, err := newOutputCapability(r)
+		cap, err := newOutputCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 	})
@@ -164,7 +167,7 @@ func TestOutput(t *testing.T) {
 
 		initialOutputs := []string{"logstash"}
 		expectedOutputs := []string{"logstash"}
-		runOutputTest(t, r, expectedOutputs, initialOutputs)
+		runOutputTest(t, l, r, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("valid action - 0/1 match", func(t *testing.T) {
@@ -175,7 +178,7 @@ func TestOutput(t *testing.T) {
 
 		initialOutputs := []string{"logstash"}
 		expectedOutputs := []string{"logstash"}
-		runOutputTest(t, r, expectedOutputs, initialOutputs)
+		runOutputTest(t, l, r, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("valid action - deny logstash", func(t *testing.T) {
@@ -186,7 +189,7 @@ func TestOutput(t *testing.T) {
 
 		initialOutputs := []string{"logstash", "elasticsearch"}
 		expectedOutputs := []string{"elasticsearch"}
-		runOutputTest(t, r, expectedOutputs, initialOutputs)
+		runOutputTest(t, l, r, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("valid action - multiple outputs 1 explicitely allowed", func(t *testing.T) {
@@ -197,7 +200,7 @@ func TestOutput(t *testing.T) {
 
 		initialOutputs := []string{"logstash", "elasticsearch"}
 		expectedOutputs := []string{"logstash", "elasticsearch"}
-		runOutputTest(t, r, expectedOutputs, initialOutputs)
+		runOutputTest(t, l, r, expectedOutputs, initialOutputs)
 	})
 
 	t.Run("unknown action", func(t *testing.T) {
@@ -206,7 +209,7 @@ func TestOutput(t *testing.T) {
 			Output: "logstash",
 		}
 
-		cap, err := newOutputCapability(r)
+		cap, err := newOutputCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -218,8 +221,8 @@ func TestOutput(t *testing.T) {
 	})
 }
 
-func runMultiOutputTest(t *testing.T, rd ruleDefinitions, expectedOutputs []string, initialOutputs []string) {
-	cap, err := newOutputsCapability(rd)
+func runMultiOutputTest(t *testing.T, l *logger.Logger, rd ruleDefinitions, expectedOutputs []string, initialOutputs []string) {
+	cap, err := newOutputsCapability(l, rd)
 	assert.NoError(t, err, "error not expected, provided eql is valid")
 	assert.NotNil(t, cap, "cap should be created")
 
@@ -270,8 +273,8 @@ func runMultiOutputTest(t *testing.T, rd ruleDefinitions, expectedOutputs []stri
 	}
 }
 
-func runOutputTest(t *testing.T, r *outputCapability, expectedOutputs []string, initialOutputs []string) {
-	cap, err := newOutputCapability(r)
+func runOutputTest(t *testing.T, l *logger.Logger, r *outputCapability, expectedOutputs []string, initialOutputs []string) {
+	cap, err := newOutputCapability(l, r)
 	assert.NoError(t, err, "error not expected, provided eql is valid")
 	assert.NotNil(t, cap, "cap should be created")
 

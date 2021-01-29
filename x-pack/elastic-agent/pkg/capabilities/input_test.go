@@ -9,11 +9,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMultiInput(t *testing.T) {
+	l, _ := logger.New("test")
 	t.Run("no match", func(t *testing.T) {
 
 		rd := ruleDefinitions{
@@ -25,7 +27,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/metrics", "system/logs"}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("filters metrics", func(t *testing.T) {
@@ -38,7 +40,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/logs"}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("allows metrics only", func(t *testing.T) {
@@ -55,7 +57,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs", "something_else"}
 		expectedInputs := []string{"system/metrics"}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("allows everything", func(t *testing.T) {
@@ -68,7 +70,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/metrics", "system/logs"}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("deny everything", func(t *testing.T) {
@@ -81,7 +83,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("deny everything with noise", func(t *testing.T) {
@@ -98,7 +100,7 @@ func TestMultiInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{}
-		runMultiInputTest(t, rd, expectedInputs, initialInputs)
+		runMultiInputTest(t, l, rd, expectedInputs, initialInputs)
 	})
 
 	t.Run("keep format", func(t *testing.T) {
@@ -112,7 +114,7 @@ func TestMultiInput(t *testing.T) {
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/logs"}
 
-		cap, err := newInputsCapability(rd)
+		cap, err := newInputsCapability(l, rd)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -154,9 +156,10 @@ func TestMultiInput(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
+	l, _ := logger.New("test")
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}
-		cap, err := newInputCapability(r)
+		cap, err := newInputCapability(l, r)
 		assert.NoError(t, err, "no error expected")
 		assert.Nil(t, cap, "cap should not be created")
 	})
@@ -166,7 +169,7 @@ func TestInput(t *testing.T) {
 			Type:  "allow",
 			Input: "",
 		}
-		cap, err := newInputCapability(r)
+		cap, err := newInputCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 	})
@@ -179,7 +182,7 @@ func TestInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics"}
 		expectedInputs := []string{"system/metrics"}
-		runInputTest(t, r, expectedInputs, initialInputs)
+		runInputTest(t, l, r, expectedInputs, initialInputs)
 	})
 
 	t.Run("valid action - 0/1 match", func(t *testing.T) {
@@ -190,7 +193,7 @@ func TestInput(t *testing.T) {
 
 		initialInputs := []string{"system/logs"}
 		expectedInputs := []string{"system/logs"}
-		runInputTest(t, r, expectedInputs, initialInputs)
+		runInputTest(t, l, r, expectedInputs, initialInputs)
 	})
 
 	t.Run("valid action - deny metrics", func(t *testing.T) {
@@ -201,7 +204,7 @@ func TestInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/logs"}
-		runInputTest(t, r, expectedInputs, initialInputs)
+		runInputTest(t, l, r, expectedInputs, initialInputs)
 	})
 
 	t.Run("valid action - multiple inputs 1 explicitely allowed", func(t *testing.T) {
@@ -212,7 +215,7 @@ func TestInput(t *testing.T) {
 
 		initialInputs := []string{"system/metrics", "system/logs"}
 		expectedInputs := []string{"system/metrics", "system/logs"}
-		runInputTest(t, r, expectedInputs, initialInputs)
+		runInputTest(t, l, r, expectedInputs, initialInputs)
 	})
 
 	t.Run("unknown action", func(t *testing.T) {
@@ -220,7 +223,7 @@ func TestInput(t *testing.T) {
 			Type:  "allow",
 			Input: "system/metrics",
 		}
-		cap, err := newInputCapability(r)
+		cap, err := newInputCapability(l, r)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -232,8 +235,8 @@ func TestInput(t *testing.T) {
 	})
 }
 
-func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, initialInputs []string) {
-	cap, err := newInputCapability(r)
+func runInputTest(t *testing.T, l *logger.Logger, r *inputCapability, expectedInputs []string, initialInputs []string) {
+	cap, err := newInputCapability(l, r)
 	assert.NoError(t, err, "error not expected, provided eql is valid")
 	assert.NotNil(t, cap, "cap should be created")
 
@@ -294,8 +297,8 @@ func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, ini
 	}
 }
 
-func runMultiInputTest(t *testing.T, rd ruleDefinitions, expectedInputs []string, initialInputs []string) {
-	cap, err := newInputsCapability(rd)
+func runMultiInputTest(t *testing.T, l *logger.Logger, rd ruleDefinitions, expectedInputs []string, initialInputs []string) {
+	cap, err := newInputsCapability(l, rd)
 	assert.NoError(t, err, "error not expected, provided eql is valid")
 	assert.NotNil(t, cap, "cap should be created")
 
