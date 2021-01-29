@@ -37,6 +37,9 @@ func TestValidInline(t *testing.T) {
 	require.Equal(t, script, script, sSrc)
 	require.Equal(t, "", s.Workdir())
 	require.Equal(t, testParams, s.Params())
+
+	e = s.Close()
+	require.NoError(t, e)
 }
 
 func TestNameRequired(t *testing.T) {

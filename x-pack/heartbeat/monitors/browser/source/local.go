@@ -22,13 +22,19 @@ type LocalSource struct {
 	BaseSource
 }
 
+var ErrNoPath = fmt.Errorf("local source defined with no path specified")
+
+func ErrInvalidPath(path string) error {
+	return fmt.Errorf("local source has invalid path '%s'", path)
+}
+
 func (l *LocalSource) Validate() error {
 	if l.OrigPath == "" {
-		return fmt.Errorf("local source defined with no path specified")
+		return ErrNoPath
 	}
 
 	s, err := os.Stat(l.OrigPath)
-	base := fmt.Sprintf("local source has invalid path '%s'", l.OrigPath)
+	base := ErrInvalidPath(l.OrigPath)
 	if err != nil {
 		return fmt.Errorf("%s: %w", base, err)
 	}
