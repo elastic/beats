@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 
-	inputtest "github.com/elastic/beats/v7/filebeat/input/testing"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
