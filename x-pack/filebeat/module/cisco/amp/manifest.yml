@@ -10,6 +10,8 @@ var:
   - name: ssl
   - name: request_timeout
     default: 60s
+  - name: limit
+    default: 100
   - name: client_id
   - name: api_key
   - name: first_interval

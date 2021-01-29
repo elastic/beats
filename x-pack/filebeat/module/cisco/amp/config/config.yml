@@ -18,7 +18,7 @@ request.transforms:
     default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05-07:00" ]]'
 - set:
     target: url.params.limit
-    value: 100
+    value: {{ .limit }}
 request.rate_limit.limit: '[[ .last_response.header.Get "X-RateLimit-Limit" ]]'
 request.rate_limit.reset: '[[ .last_response.header.Get "X-RateLimit-Reset" ]]'
 request.rate_limit.remaining: '[[ .last_response.header.Get "X-RateLimit-Remaining" ]]'
@@ -68,4 +68,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.6.0
+        ecs.version: 1.7.0

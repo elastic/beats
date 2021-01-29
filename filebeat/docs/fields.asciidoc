@@ -20778,16 +20778,6 @@ type: date
 
 --
 
-*`cisco.amp.date`*::
-+
---
-The timestamp in ISO8601 format.
-
-
-type: date
-
---
-
 *`cisco.amp.event_type_id`*::
 +
 --
@@ -21244,7 +21234,7 @@ type: keyword
 When the threat hunt finalized or closed.
 
 
-type: keyword
+type: date
 
 --
 
@@ -21254,7 +21244,7 @@ type: keyword
 When the threat hunt was initiated.
 
 
-type: keyword
+type: date
 
 --
 

@@ -14,7 +14,7 @@ This is a module for Cisco network device's logs and Cisco Umbrella. It includes
 filesets for receiving logs over syslog or read from a file:
 
 - `asa` fileset: supports Cisco ASA firewall logs.
-- `amp` fileset: supports Cisco Umbrella logs.
+- `amp` fileset: supports Cisco AMP API logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
 - `nexus` fileset: supports Cisco Nexus switch logs.
@@ -448,9 +448,9 @@ Maximum duration before AWS API request will be interrupted. Default to be 120 s
 [float]
 ==== `amp` fileset settings
 
-The Cisco AMP fileset focuses on collecting events from your Cisco AMP/Cisco Securi Endpoint API.
+The Cisco AMP fileset focuses on collecting events from your Cisco AMP/Cisco Secure Endpoint API.
 
-To configure the Cisco AMP fileset you will need to retrieve your client_id and client_key from the AMP dashboard.
+To configure the Cisco AMP fileset you will need to retrieve your `client_id` and `api_key` from the AMP dashboard.
 For more information on how to retrieve these credentials, please reference the https://api-docs.amp.cisco.com/api_resources?api_host=api.amp.cisco.com&api_version=v1[Cisco AMP API documentation].
 
 The URL configured for the API depends on which region your AMP is located, currently there is 3 choices:
@@ -488,12 +488,13 @@ It is also possible to select how often Filebeat will check the Cisco AMP API. A
     var.first_interval: 200h
     var.interval: 60m
     var.request_timeout: 120s
+    var.limit: 100
 
 ----
 
 *`var.input`*::
 
-The input from which messages are read. Supports httpjson(default) and file.
+The input from which messages are read. Supports httpjson.
 
 *`var.url`*::
 
@@ -515,6 +516,10 @@ timeout value for each request sent by Filebeat.
 *`var.first_interval`*::
 
 How far back you would want to collect events the first time the Filebeat module starts up. Supports amount in hours.
+
+*`var.limit`*::
+
+This value controls how many events are returned by the Cisco AMP API per page.
 
 :has-dashboards!:
 

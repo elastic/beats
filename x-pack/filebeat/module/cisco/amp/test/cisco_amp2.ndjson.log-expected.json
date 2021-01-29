@@ -46,7 +46,6 @@
                 "name": "Scheduled Task/Job",
                 "permissions": "Administrator, SYSTEM, User",
                 "platforms": "Windows, Linux, macOS",
-                "system_requirements": null,
                 "tactics_names": "Execution, Persistence, Privilege Escalation"
             },
             {
@@ -58,16 +57,15 @@
                 "name": "Scripting",
                 "permissions": "User",
                 "platforms": "Linux, macOS, Windows",
-                "system_requirements": null,
                 "tactics_names": "Defense Evasion, Execution"
             }
         ],
-        "cisco.amp.threat_hunting.incident_end_time": 1592478770,
+        "cisco.amp.threat_hunting.incident_end_time": "2020-06-18T11:12:50.000Z",
         "cisco.amp.threat_hunting.incident_hunt_guid": "4bdbaf20-020f-4bb5-9da9-585da0e07817",
         "cisco.amp.threat_hunting.incident_id": 416,
         "cisco.amp.threat_hunting.incident_remediation": "We recommend the following:\r\n\r\n- Isolation of the affected hosts from the network\r\n- Perform forensic investigation\r\n    - Review all activity performed by the user\r\n    - Upload any suspicious files to ThreatGrid for analysis\r\n    - Search the registry for data \"var config = ( COMMAND_C2\" and remove the key\r\n    - Review scheduled tasks and cancel any involving the execution of WSCRIPT.EXE //E:jscript C:\\Users\\Public\\PowerManagerSpm.jar:LocalZone lqjsxokgowhbxjaetyrifnbigtcxmuj eimljujnv\r\n    - Remove the Alternate Data Stream file located C:\\Users\\Public\\PowerManagerSpm.jar:LocalZone.\r\n- If possible, reimage the affected system to prevent potential unknown persistence methods.",
         "cisco.amp.threat_hunting.incident_report_guid": "6e5292d5-248c-49dc-839d-201bcba64562",
-        "cisco.amp.threat_hunting.incident_start_time": 1610707688,
+        "cisco.amp.threat_hunting.incident_start_time": "2021-01-15T10:48:08.000Z",
         "cisco.amp.threat_hunting.incident_summary": "The host Demo_Threat_Hunting is compromised by a Valak malware variant.  Valak is a multi-stage malware attack that uses screen capture, reconnaissance, geolocation, and fileless execution techniques to infiltrate and exfiltrate sensitive information.  Based on the event details listed and the techniques used, we recommend the host in question be investigated further.",
         "cisco.amp.threat_hunting.incident_title": "Valak Variant",
         "cisco.amp.threat_hunting.severity": "critical",
@@ -102,7 +100,6 @@
                 "name": "Scheduled Task/Job",
                 "permissions": "Administrator, SYSTEM, User",
                 "platforms": "Windows, Linux, macOS",
-                "system_requirements": null,
                 "tactics_names": "Execution, Persistence, Privilege Escalation"
             },
             {
@@ -114,7 +111,6 @@
                 "name": "Scripting",
                 "permissions": "User",
                 "platforms": "Linux, macOS, Windows",
-                "system_requirements": null,
                 "tactics_names": "Defense Evasion, Execution"
             }
         ],
@@ -123,13 +119,17 @@
         "event.dataset": "cisco.amp",
         "event.kind": "alert",
         "event.module": "cisco",
-        "event.severity": 3,
+        "event.severity": 4,
         "fileset.name": "amp",
         "host.hostname": "Demo_Threat_Hunting",
         "host.name": "Demo_Threat_Hunting",
         "input.type": "log",
         "log.offset": 0,
+        "related.hosts": [
+            "Demo_Threat_Hunting"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -192,7 +192,11 @@
             "e2f5dcd966e26d54329e8d79c7201652",
             "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
         ],
+        "related.hosts": [
+            "Demo_Upatre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -258,7 +262,11 @@
             "e2f5dcd966e26d54329e8d79c7201652",
             "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
         ],
+        "related.hosts": [
+            "Demo_Upatre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -314,7 +322,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -347,7 +359,13 @@
             "e1:e5:94:ea:a5:44"
         ],
         "cisco.amp.timestamp_nanoseconds": 978000000,
-        "destination.address": "8.8.4.4",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.4.4",
         "destination.port": 443,
         "event.action": "DFC Threat Detected",
@@ -362,7 +380,7 @@
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 17081,
-        "network.direction": "outbound",
+        "network.direction": "egress",
         "network.transport": "TCP",
         "process.parent.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
         "process.parent.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
@@ -374,16 +392,19 @@
             "b3581f426dc500a51091cdd5bacf0454",
             "8de30174cebc8732f1ba961e7d93fe5549495a80"
         ],
+        "related.hosts": [
+            "Demo_Upatre"
+        ],
         "related.ip": [
             "10.10.0.0",
             "8.8.4.4",
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
             "user@testdomain.com"
         ],
         "service.type": "cisco",
-        "source.address": "10.10.0.0",
         "source.ip": "10.10.0.0",
         "source.port": 55810,
         "tags": [
@@ -435,7 +456,11 @@
             "69d6fff3e0a0c4d77a62b4d71e1e3a8d10d93c46782a1b05f0ec4b8919c384b9",
             "935c1861df1f4018d698e8b65abfa02d7e9037d8f68ca3c2065b6ca165d44ad2"
         ],
+        "related.hosts": [
+            "Demo_Command_Line_Arguments_Meterpreter"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -489,7 +514,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -546,7 +575,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -603,7 +636,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -660,7 +697,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -717,7 +758,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -774,7 +819,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -827,7 +876,11 @@
             "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -881,7 +934,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -936,7 +993,11 @@
             "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -990,7 +1051,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1047,7 +1112,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1104,7 +1173,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1169,7 +1242,11 @@
             "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
             "4312cdb2ead8fd8d2dd6d8d716f3b6e9717b3d7167a2a0495e4391312102170f"
         ],
+        "related.hosts": [
+            "Demo_AMP_Exploit_Prevention"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1223,7 +1300,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1280,7 +1361,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1337,7 +1422,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1394,7 +1483,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1450,7 +1543,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1503,7 +1600,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1556,7 +1657,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1619,7 +1724,11 @@
             "b2e15a06b0cca8a926c94f8a8eae3d88",
             "f9b02ad8d25157eebdb284631ff646316dc606d5"
         ],
+        "related.hosts": [
+            "Demo_Upatre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1676,7 +1785,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -1732,7 +1845,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1782,7 +1899,11 @@
             "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1835,7 +1956,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1888,7 +2013,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1941,7 +2070,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1994,7 +2127,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2047,7 +2184,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2100,7 +2241,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2153,7 +2298,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2216,7 +2365,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -2272,7 +2425,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2325,7 +2482,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2379,7 +2540,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -2435,7 +2600,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2488,7 +2657,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2551,7 +2724,11 @@
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
+        "related.hosts": [
+            "Demo_TeslaCrypt"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -2607,7 +2784,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2660,7 +2841,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2714,7 +2899,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -2771,7 +2960,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -2827,7 +3020,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2880,7 +3077,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2933,7 +3134,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2986,7 +3191,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3039,7 +3248,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3093,7 +3306,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3150,7 +3367,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3206,7 +3427,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3259,7 +3484,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3312,7 +3541,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3365,7 +3598,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3418,7 +3655,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3472,7 +3713,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3528,7 +3773,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3582,7 +3831,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3638,7 +3891,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3691,7 +3948,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3744,7 +4005,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3798,7 +4063,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3855,7 +4124,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -3911,7 +4184,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -3951,7 +4228,11 @@
         "host.name": "Demo_AMP_Exploit_Prevention",
         "input.type": "log",
         "log.offset": 264441,
+        "related.hosts": [
+            "Demo_AMP_Exploit_Prevention"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4004,7 +4285,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4057,7 +4342,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4110,7 +4399,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4163,7 +4456,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4217,7 +4514,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -4273,7 +4574,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4326,7 +4631,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4379,7 +4688,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4432,7 +4745,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4495,7 +4812,11 @@
             "bfcc0861c7fb965c1f7473d3dc42cff6",
             "420da91c3199993c9f245b21ea060b69d7ecfd49"
         ],
+        "related.hosts": [
+            "Demo_TDSS"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -4556,7 +4877,11 @@
             "4a052246c5551e83d2d55f80e72f03eb",
             "bc29f1e8460915596e1dcafd0c92d6309457d149"
         ],
+        "related.hosts": [
+            "Demo_TDSS"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -4612,7 +4937,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4662,7 +4991,11 @@
             "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
             "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5"
         ],
+        "related.hosts": [
+            "Demo_TDSS"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4715,7 +5048,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4769,7 +5106,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -4825,7 +5166,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -4879,7 +5224,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -4945,7 +5294,11 @@
             "e74f1b3fffc4ae61e077bbdec3230e95",
             "e0feb4af86ef2f7a82e01b8704900e1e86c9e7a5"
         ],
+        "related.hosts": [
+            "Demo_Zbot"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5011,7 +5364,11 @@
             "e74f1b3fffc4ae61e077bbdec3230e95",
             "e0feb4af86ef2f7a82e01b8704900e1e86c9e7a5"
         ],
+        "related.hosts": [
+            "Demo_Zbot"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5067,7 +5424,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -5121,7 +5482,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5178,7 +5543,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5244,7 +5613,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5300,7 +5673,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -5353,7 +5730,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -5407,7 +5788,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5473,7 +5858,11 @@
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
         ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Audit"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5529,7 +5918,11 @@
             "e9d8c15e7d18678dd41771f72ed6693c",
             "ec80314ae4a2817be806b7ae27dbdb31a88226a0"
         ],
+        "related.hosts": [
+            "Demo_Dyre"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -5592,7 +5985,11 @@
             "4a052246c5551e83d2d55f80e72f03eb",
             "bc29f1e8460915596e1dcafd0c92d6309457d149"
         ],
+        "related.hosts": [
+            "Demo_TDSS"
+        ],
         "related.ip": [
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
@@ -5628,7 +6025,13 @@
             "5a:ff:4a:a3:8a:2f"
         ],
         "cisco.amp.timestamp_nanoseconds": 706000000,
-        "destination.address": "8.8.4.4",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.4.4",
         "destination.port": 80,
         "event.action": "DFC Threat Detected",
@@ -5643,7 +6046,7 @@
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 324228,
-        "network.direction": "outbound",
+        "network.direction": "egress",
         "network.transport": "TCP",
         "process.parent.hash.md5": "12896823fb95bfb3dc9b46bcaedc9923",
         "process.parent.hash.sha1": "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
@@ -5655,16 +6058,19 @@
             "12896823fb95bfb3dc9b46bcaedc9923",
             "9d2bf84874abc5b6e9a2744b7865c193c08d362f"
         ],
+        "related.hosts": [
+            "Demo_Tinba"
+        ],
         "related.ip": [
             "10.10.0.0",
             "8.8.4.4",
+            "8.8.8.8",
             "10.10.10.10"
         ],
         "related.user": [
             "user@testdomain.com"
         ],
         "service.type": "cisco",
-        "source.address": "10.10.0.0",
         "source.ip": "10.10.0.0",
         "source.port": 1083,
         "tags": [

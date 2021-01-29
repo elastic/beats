@@ -10,11 +10,6 @@
       description: >
         The timestamp in Epoch nanoseconds.
 
-    - name: date
-      type: date
-      description: >
-        The timestamp in ISO8601 format.
-
     - name: event_type_id
       type: keyword
       description: >
@@ -241,12 +236,12 @@
         The id of the related incident for the threat hunting activity.
 
     - name: threat_hunting.incident_end_time
-      type: keyword
+      type: date
       description: >
         When the threat hunt finalized or closed.
 
     - name: threat_hunting.incident_start_time
-      type: keyword
+      type: date
       description: >
         When the threat hunt was initiated.
 

@@ -1,4 +1,4 @@
-description: Pipeline for parsing checkpoint firewall logs
+description: Pipeline for parsing Cisco AMP logs
 processors:
 
 - remove:
@@ -54,7 +54,7 @@ processors:
     if: ctx?.cisco?.amp?.severity == 'High'
 - set:
     field: event.severity
-    value: 3
+    value: 4
     if: ctx?.cisco?.amp?.severity == 'Critical'
 - set:
     field: event.severity
@@ -94,11 +94,11 @@ processors:
     ignore_missing: true
 - set:
     field: network.direction
-    value: outbound
+    value: egress
     if: "ctx?.cisco?.amp?.network_info?.nfm?.direction == 'Outgoing connection from'"
 - set:
     field: network.direction
-    value: outbound
+    value: ingress
     if: "ctx?.cisco?.amp?.network_info?.nfm?.direction != null && ctx?.cisco?.amp?.network_info?.nfm?.direction != 'Outgoing connection from'"
 
 #####################
@@ -114,32 +114,24 @@ processors:
 ########################
 - rename:
     field: cisco.amp.network_info.local_ip
-    target_field: source.address
+    target_field: source.ip
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.local_port
     target_field: source.port
     ignore_missing: true
-- set:
-    field: source.ip
-    value: "{{ source.address }}"
-    if: ctx?.source?.address != null
 
 #############################
 ## ECS Destination Mapping ##
 #############################
 - rename:
     field: cisco.amp.network_info.remote_ip
-    target_field: destination.address
+    target_field: destination.ip
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.remote_port
     target_field: destination.port
     ignore_missing: true
-- set:
-    field: destination.ip
-    value: "{{ destination.address }}"
-    if: ctx?.destination?.address != null
 
 ######################
 ## ECS File Mapping ##
@@ -264,6 +256,10 @@ processors:
     if: ctx?.cisco?.amp?.network_info?.parent?.identity?.sha1 != null
     allow_duplicates: false
 - append:
+    field: related.hosts
+    value: "{{ host.name }}"
+    if: ctx?.host?.name != null
+- append:
     field: related.ip
     value: "{{ source.ip }}"
     if: ctx?.source?.ip != null
@@ -271,6 +267,10 @@ processors:
     field: related.ip
     value: "{{ destination.ip }}"
     if: ctx?.destination?.ip != null
+- append:
+    field: related.ip
+    value: "{{ cisco.amp.computer.external_ip }}"
+    if: ctx?.cisco?.amp?.computer?.external_ip != null
 - foreach:
     field: cisco.amp.computer.network_addresses
     processor:
@@ -294,8 +294,94 @@ processors:
     if: ctx?.cisco?.amp?.vulnerabilities != null
 
 #############
+## GeoIP ##
+#############
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    if: "ctx.source?.geo == null"
+- geoip:
+    field: destination.ip
+    target_field: destination.geo
+    ignore_missing: true
+    if: "ctx.destination?.geo == null"
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: destination.ip
+    target_field: destination.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- rename:
+    field: destination.as.asn
+    target_field: destination.as.number
+    ignore_missing: true
+- rename:
+    field: destination.as.organization_name
+    target_field: destination.as.organization.name
+    ignore_missing: true
+
+#############
 ## Cleanup ##
 #############
+- date:
+    field: cisco.amp.threat_hunting.incident_start_time
+    target_field: cisco.amp.threat_hunting.incident_start_time
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.threat_hunting?.incident_start_time != null
+- date:
+    field: cisco.amp.threat_hunting.incident_end_time
+    target_field: cisco.amp.threat_hunting.incident_end_time
+    formats: 
+      - UNIX
+    ignore_failure: true
+    if: ctx?.cisco?.amp?.threat_hunting?.incident_end_time != null
+
+- script:
+    lang: painless
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+
 - remove:
     field:
     - cisco.amp.timestamp
