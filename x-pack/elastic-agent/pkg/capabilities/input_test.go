@@ -243,7 +243,7 @@ func runInputTest(t *testing.T, r *inputCapability, expectedInputs []string, ini
 	assert.False(t, isBlocking, "should not be blocking")
 
 	newMap, ok := outAfter.(map[string]interface{})
-	assert.True(t, ok, "out ast should be AST")
+	assert.True(t, ok, "out value should be map")
 	assert.NotNil(t, newMap)
 
 	inputsNode, found := newMap["inputs"]

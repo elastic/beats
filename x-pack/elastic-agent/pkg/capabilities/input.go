@@ -10,6 +10,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
 
+const (
+	inputsKey = "inputs"
+)
+
 func newInputsCapability(rd ruleDefinitions) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
@@ -47,7 +51,7 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 		return false, in
 	}
 
-	inputsIface, ok := cfgMap["inputs"]
+	inputsIface, ok := cfgMap[inputsKey]
 	if ok {
 		inputs, ok := inputsIface.([]map[string]interface{})
 		if ok {
@@ -57,7 +61,7 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 				return false, in
 			}
 
-			cfgMap["inputs"] = renderedInputs
+			cfgMap[inputsKey] = renderedInputs
 			return false, cfgMap
 		}
 
@@ -75,7 +79,7 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 	newInputs := make([]map[string]interface{}, 0, len(inputs))
 
 	for _, input := range inputs {
-		inputTypeIface, found := input["type"]
+		inputTypeIface, found := input[typeKey]
 		if !found {
 			newInputs = append(newInputs, input)
 			continue
@@ -112,7 +116,7 @@ type multiInputsCapability struct {
 }
 
 func (c *multiInputsCapability) Apply(in interface{}) (bool, interface{}) {
-	inputsMap, transform, err := inputObject(in)
+	inputsMap, transform, err := configObject(in)
 	if err != nil {
 		// TODO: log error
 		return false, in
@@ -148,7 +152,7 @@ func (c *multiInputsCapability) Apply(in interface{}) (bool, interface{}) {
 }
 
 func (c *multiInputsCapability) cleanupInput(cfgMap map[string]interface{}) (map[string]interface{}, error) {
-	inputsIface, found := cfgMap["inputs"]
+	inputsIface, found := cfgMap[inputsKey]
 	if !found {
 		return cfgMap, nil
 	}
@@ -178,11 +182,11 @@ func (c *multiInputsCapability) cleanupInput(cfgMap map[string]interface{}) (map
 		newInputs = append(newInputs, inputMap)
 	}
 
-	cfgMap["inputs"] = newInputs
+	cfgMap[inputsKey] = newInputs
 	return cfgMap, nil
 }
 
-func inputObject(a interface{}) (map[string]interface{}, func(interface{}) interface{}, error) {
+func configObject(a interface{}) (map[string]interface{}, func(interface{}) interface{}, error) {
 	// TODO: transform input back to what it was
 	if ast, ok := a.(*transpiler.AST); ok {
 		fn := func(i interface{}) interface{} {
