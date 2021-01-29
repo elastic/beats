@@ -4,7 +4,14 @@
 
 package capabilities
 
-import "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+import (
+	"os"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"gopkg.in/yaml.v2"
+)
 
 const (
 	capabilitiesFilename = "capabilities.yml"
@@ -30,10 +37,27 @@ func LoadCapabilities(log *logger.Logger) (Capability, error) {
 		newUpgradesCapability,
 	}
 
-	var caps []Capability
+	cm := &capabilitiesManager{
+		caps: make([]Capability, 0),
+	}
 
-	// TODO: load capabilities filter
+	// load capabilities from file
+	capsFile := filepath.Join(paths.Config(), capabilitiesFilename)
+	fd, err := os.OpenFile(capsFile, os.O_RDONLY, 0644)
+	if err != nil && !os.IsNotExist(err) {
+		return cm, err
+	}
+
+	if os.IsNotExist(err) {
+		return cm, nil
+	}
+	defer fd.Close()
+
 	var definitions ruleDefinitions
+	dec := yaml.NewDecoder(fd)
+	if err := dec.Decode(&definitions); err != nil {
+		return cm, err
+	}
 
 	// make list of handlers out of capabilities definition
 	for _, h := range handlers {
@@ -46,12 +70,10 @@ func LoadCapabilities(log *logger.Logger) (Capability, error) {
 			continue
 		}
 
-		caps = append(caps, cap)
+		cm.caps = append(cm.caps, cap)
 	}
 
-	return &capabilitiesManager{
-		caps: caps,
-	}, nil
+	return cm, nil
 }
 
 func (mgr *capabilitiesManager) Apply(in interface{}) (bool, interface{}) {
