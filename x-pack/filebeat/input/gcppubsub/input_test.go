@@ -18,6 +18,10 @@ func TestNewInputDone(t *testing.T) {
 		"project_id":        "some-project",
 		"topic":             "sometopic",
 		"subscription.name": "subscription",
+
+		// Provide some credentials to avoid trying to query GCP for them,
+		// what creates HTTP-related goroutines.
+		"credentials_json": "{}",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
