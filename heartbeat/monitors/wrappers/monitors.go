@@ -100,7 +100,7 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 	// Allow jobs to override the ID, useful for browser suites
 	// which do this logic on their own
 	if v, _ := event.GetValue("monitor.id"); v != nil {
-		id = fmt.Sprintf("%s - %s", sf.ID, v.(string))
+		id = fmt.Sprintf("%s-%s", sf.ID, v.(string))
 	}
 	if v, _ := event.GetValue("monitor.name"); v != nil {
 		name = fmt.Sprintf("%s - %s", sf.Name, v.(string))
