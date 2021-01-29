@@ -675,6 +675,10 @@ port. {pull}19209[19209]
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 - Add support for multiple regions {pull}21065[21065]
 
+*Heartbeat*
+
+- Add support for script processor. {pull}23229[23229]
+
 *Winlogbeat*
 
 - Set process.command_line and process.parent.command_line from Sysmon Event ID 1. {pull}17327[17327]
