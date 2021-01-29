@@ -122,3 +122,236 @@
               type: long
               description: Duration in microseconds
 
+- key: http
+  title: "HTTP monitor"
+  description:
+  fields:
+    - name: http
+      type: group
+      description: >
+        HTTP related fields.
+      fields:
+        - name: url
+          type: alias
+          path: url.full
+          migration: true
+          description: >
+            Service url used by monitor.
+        - name: response
+          type: group
+          fields:
+            - name: body
+              type: group
+              fields:
+                - name: hash
+                  type: keyword
+                  description: >
+                    Hash of the full response body. Can be used to group responses with identical hashes.
+            - name: redirects
+              type: keyword
+              description: >
+                List of redirects followed to arrive at final content. Last item on the list is the URL for which
+                body content is shown.
+            - name: headers.*
+              type: object
+              enabled: false
+              description: >
+                The canonical headers of the monitored HTTP response.
+        - name: rtt
+          type: group
+          description: >
+            HTTP layer round trip times.
+          fields:
+            - name: validate
+              type: group
+              description: |
+                Duration between first byte of HTTP request being written and
+                response being processed by validator. Duration based on already
+                available network connection.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed
+                      to read the body.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: validate_body
+              type: group
+              description: |
+                Duration of validator required to read and validate the response
+                body.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed
+                      to read the body.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: write_request
+              type: group
+              description:
+                Duration of sending the complete HTTP request. Duration based on
+                already available network connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: response_header
+              type: group
+              description:
+                Time required between sending the start of sending the HTTP
+                request and first byte from HTTP response being read. Duration
+                based on already available network connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: content.us
+              type: long
+              description: Time required to retrieved the content in micro seconds.
+
+            - name: total
+              type: group
+              description: |
+                Duration required to process the HTTP transaction. Starts with
+                the initial TCP connection attempt. Ends with after validator
+                did check the response.
+
+                Note: if validator is not reading body or only a prefix, this
+                      number does not fully represent the total time needed.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+- key: tcp
+  title: "TCP layer"
+  description:
+  fields:
+    - name: tcp
+      type: group
+      description: >
+        TCP network layer related fields.
+      fields:
+        - name: port
+          type: alias
+          path: url.port
+          migration: true
+          description: >
+            Service port number.
+
+        - name: rtt
+          type: group
+          description: >
+            TCP layer round trip times.
+          fields:
+            - name: connect
+              type: group
+              description: >
+                Duration required to establish a TCP connection based on already
+                available IP address.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: validate
+              type: group
+              description: >
+                Duration of validation step based on existing TCP connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+- key: socks5
+  title: "SOCKS5 proxy"
+  description:
+  fields:
+    - name: socks5
+      type: group
+      description: >
+        SOCKS5 proxy related fields:
+      fields:
+        - name: rtt
+          type: group
+          description: >
+            TLS layer round trip times.
+          fields:
+            - name: connect
+              type: group
+              description: >
+                Time required to establish a connection via SOCKS5 to endpoint
+                based on available connection to SOCKS5 proxy.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+- key: tls
+  title: "TLS encryption layer"
+  description:
+  fields:
+    - name: tls
+      type: group
+      description: >
+        TLS layer related fields.
+      fields:
+        - name: certificate_not_valid_before
+          type: date
+          deprecated: 7.8.0
+          description: Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
+        - name: certificate_not_valid_after
+          deprecated: 7.8.0
+          type: date
+          description: Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
+        - name: rtt
+          type: group
+          description: >
+            TLS layer round trip times.
+          fields:
+            - name: handshake
+              type: group
+              description: >
+                Time required to finish TLS handshake based on already available network
+                connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+        - name: server
+          type: group
+          description: Detailed x509 certificate metadata
+          fields:
+              - name: version_number
+                type: keyword
+                ignore_above: 1024
+                description: Version of x509 format.
+                example: 3
+                default_field: false
+
+- key: icmp
+  title: "ICMP"
+  description:
+  fields:
+    - name: icmp
+      type: group
+      description: >
+        IP ping fields.
+      fields:
+        - name: requests
+          type: integer
+          description: >
+            Number if ICMP EchoRequests send.
+
+        - name: rtt
+          type: group
+          description: ICMP Echo Request and Reply round trip time
+          fields:
+            - name: us
+              type: long
+              description: Duration in microseconds

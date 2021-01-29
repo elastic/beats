@@ -104,9 +104,7 @@ func TestRead(t *testing.T) {
 
 	// Publish test messages:
 	for k, m := range messages {
-		if err := writer.Report(m.eventType, k, []string{m.message}); err != nil {
-			t.Fatal(err)
-		}
+		safeWriteEvent(t, writer, m.eventType, k, []string{m.message})
 	}
 
 	// Read messages:
@@ -146,9 +144,7 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 	defer teardown()
 
 	const message = "Hello"
-	if err := writer.Report(eventlog.Info, 1, []string{message}); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Info, 1, []string{message})
 
 	// Messages are received as UTF-16 so we must have enough space in the read
 	// buffer for the message, a windows newline, and a null-terminator.
@@ -184,9 +180,7 @@ func TestReadUnknownEventId(t *testing.T) {
 
 	const eventID uint32 = 1000
 	const msg = "Test Message"
-	if err := writer.Success(eventID, msg); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Success, eventID, []string{msg})
 
 	// Read messages:
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})
@@ -219,9 +213,7 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 
 	const eventID uint32 = 1000
 	const msg = "Test Message"
-	if err := writer.Success(eventID, msg); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Success, eventID, []string{msg})
 
 	// Read messages:
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})
@@ -254,9 +246,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	const eventID uint32 = 1073748860
 	const template = "The %s service entered the %s state."
 	msgs := []string{"Windows Update", "running"}
-	if err := writer.Report(eventlog.Info, eventID, msgs); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Info, eventID, msgs)
 
 	// Read messages:
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})
@@ -298,9 +288,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	const eventID uint32 = 2147489654 // 1<<31 + 6006
 	const template = "The Event log service was stopped."
 	msgs := []string{}
-	if err := writer.Report(eventlog.Info, eventID, msgs); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Info, eventID, msgs)
 
 	// Read messages:
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})
@@ -331,8 +319,8 @@ func TestReadWhileCleared(t *testing.T) {
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer log.Close()
 
-	writer.Info(1, "Message 1")
-	writer.Info(2, "Message 2")
+	safeWriteEvent(t, writer, eventlog.Info, 1, []string{"Message 1"})
+	safeWriteEvent(t, writer, eventlog.Info, 2, []string{"Message 2"})
 	lr, err := log.Read()
 	assert.NoError(t, err, "Expected 2 messages but received error")
 	assert.Len(t, lr, 2, "Expected 2 messages")
@@ -342,7 +330,7 @@ func TestReadWhileCleared(t *testing.T) {
 	assert.NoError(t, err, "Expected 0 messages but received error")
 	assert.Len(t, lr, 0, "Expected 0 message")
 
-	writer.Info(3, "Message 3")
+	safeWriteEvent(t, writer, eventlog.Info, 3, []string{"Message 3"})
 	lr, err = log.Read()
 	assert.NoError(t, err, "Expected 1 message but received error")
 	assert.Len(t, lr, 1, "Expected 1 message")
@@ -362,9 +350,7 @@ func TestReadMissingParameters(t *testing.T) {
 	// Missing parameters will be substituted by "(null)"
 	const template = "The %s service entered the (null) state."
 	msgs := []string{"Windows Update"}
-	if err := writer.Report(eventlog.Info, eventID, msgs); err != nil {
-		t.Fatal(err)
-	}
+	safeWriteEvent(t, writer, eventlog.Info, eventID, msgs)
 
 	// Read messages:
 	log := openEventLogging(t, 0, map[string]interface{}{"name": providerName})

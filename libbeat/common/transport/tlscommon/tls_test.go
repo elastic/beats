@@ -132,12 +132,12 @@ func TestApplyEmptyConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 	assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 	assert.Len(t, cfg.Certificates, 0)
 	assert.Nil(t, cfg.RootCAs)
-	assert.Equal(t, false, cfg.InsecureSkipVerify)
+	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 0)
 	assert.Len(t, cfg.CurvePreferences, 0)
 	assert.Equal(t, tls.RenegotiateNever, cfg.Renegotiation)
@@ -159,7 +159,7 @@ func TestApplyWithConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
 	assert.Len(t, cfg.Certificates, 1)
 	assert.NotNil(t, cfg.RootCAs)
@@ -184,7 +184,7 @@ key: mykey.pem
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
-		cfg := tmp.BuildModuleConfig("")
+		cfg := tmp.BuildModuleClientConfig("")
 
 		assert.NotNil(t, cfg)
 		// values not set by default
@@ -193,7 +193,7 @@ key: mykey.pem
 		assert.Len(t, cfg.CipherSuites, 0)
 		assert.Len(t, cfg.CurvePreferences, 0)
 		// values set by default
-		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, true, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.NoClientCert, cfg.ClientAuth)
@@ -213,7 +213,7 @@ key: mykey.pem
 		tmp, err := LoadTLSServerConfig(&c)
 		require.NoError(t, err)
 
-		cfg := tmp.BuildModuleConfig("")
+		cfg := tmp.BuildModuleClientConfig("")
 
 		assert.NotNil(t, cfg)
 		// values not set by default
@@ -222,7 +222,7 @@ key: mykey.pem
 		assert.Len(t, cfg.CipherSuites, 0)
 		assert.Len(t, cfg.CurvePreferences, 0)
 		// values set by default
-		assert.Equal(t, false, cfg.InsecureSkipVerify)
+		assert.Equal(t, true, cfg.InsecureSkipVerify)
 		assert.Equal(t, int(TLSVersionDefaultMin), int(cfg.MinVersion))
 		assert.Equal(t, int(TLSVersionDefaultMax), int(cfg.MaxVersion))
 		assert.Equal(t, tls.RequireAndVerifyClientCert, cfg.ClientAuth)
@@ -260,7 +260,7 @@ func TestApplyWithServerConfig(t *testing.T) {
 		return
 	}
 
-	cfg := tmp.BuildModuleConfig("")
+	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
 	assert.Len(t, cfg.Certificates, 1)
 	assert.NotNil(t, cfg.ClientCAs)

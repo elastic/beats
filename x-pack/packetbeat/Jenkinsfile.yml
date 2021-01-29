@@ -11,8 +11,43 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-packetbeat"
     tags: true                 ## for all the tags
-platform: "linux && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
+    Lint:
+        mage: |
+          mage -C x-pack/packetbeat check;
+          mage -C x-pack/packetbeat update;
+          make -C packetbeat check;
+          make -C packetbeat update;
+          make check-no-changes;
+    arm:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "arm"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/packetbeat for arm"
+            labels:
+                - "arm"
+            parameters:
+                - "armTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
+    build:
+        mage: "mage build test"
+    macos:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "macosx"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test x-pack/packetbeat for macos"
+            labels:
+                - "macOS"
+            parameters:
+                - "macosTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
     windows:
         mage: "mage build unitTest"
         withModule: true
@@ -22,43 +57,27 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/packetbeat for windows-2016"
-            labels:
-                - "windows-2016"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-2012"
-            labels:
-                - "windows-2012"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/packetbeat for windows-10"
-            labels:
-                - "windows-10"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-2008"
-            labels:
-                - "windows-2008"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
+    windows-8:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-8"
+    windows-7:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7"
+    windows-7-32:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7-32-bit"

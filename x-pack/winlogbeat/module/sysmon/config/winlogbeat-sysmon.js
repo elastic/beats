@@ -357,10 +357,10 @@ var sysmon = (function () {
     var addNetworkDirection = function (evt) {
         switch (evt.Get("winlog.event_data.Initiated")) {
             case "true":
-                evt.Put("network.direction", "outbound");
+                evt.Put("network.direction", "egress");
                 break;
             case "false":
-                evt.Put("network.direction", "inbound");
+                evt.Put("network.direction", "ingress");
                 break;
         }
         evt.Delete("winlog.event_data.Initiated");
@@ -690,8 +690,34 @@ var sysmon = (function () {
                     from: "winlog.event_data.ParentCommandLine",
                     to: "process.parent.command_line",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "process.pe.original_file_name",
+                },
             ],
             mode: "rename",
+            ignore_missing: true,
+            fail_on_error: false,
+        })
+        .Convert({
+            fields: [{
+                    from: "winlog.event_data.Company",
+                    to: "process.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "process.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "process.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "process.pe.product",
+                },
+            ],
+            mode: "copy",
             ignore_missing: true,
             fail_on_error: false,
         })
@@ -964,6 +990,11 @@ var sysmon = (function () {
                     from: "winlog.event_data.ImageLoaded",
                     to: "file.path",
                 },
+                {
+                    from: "winlog.event_data.OriginalFileName",
+                    to: "file.pe.original_file_name",
+                },
+
             ],
             mode: "rename",
             ignore_missing: true,
@@ -978,7 +1009,24 @@ var sysmon = (function () {
                     from: "winlog.event_data.SignatureStatus",
                     to: "file.code_signature.status",
                 },
+                {
+                    from: "winlog.event_data.Company",
+                    to: "file.pe.company",
+                },
+                {
+                    from: "winlog.event_data.Description",
+                    to: "file.pe.description",
+                },
+                {
+                    from: "winlog.event_data.FileVersion",
+                    to: "file.pe.file_version",
+                },
+                {
+                    from: "winlog.event_data.Product",
+                    to: "file.pe.product",
+                },
             ],
+            ignore_missing: true,
             fail_on_error: false,
         })
         .Add(setRuleName)
@@ -1145,6 +1193,13 @@ var sysmon = (function () {
     // Event ID 12 - Registry object added or deleted.
     var event12 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1177,6 +1232,13 @@ var sysmon = (function () {
     // Event ID 13 - Registry value set.
     var event13 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1209,6 +1271,13 @@ var sysmon = (function () {
     // Event ID 14 - Registry object renamed.
     var event14 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1285,6 +1354,13 @@ var sysmon = (function () {
     // Event ID 16 - Sysmon config state changed.
     var event16 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                 from: "winlog.event_data.UtcTime",
@@ -1490,6 +1566,8 @@ var sysmon = (function () {
             ignore_missing: true,
             field: "dns.question.name",
             target_field: "dns.question.registered_domain",
+            target_subdomain_field: "dns.question.subdomain",
+            target_etld_field: "dns.question.top_level_domain",
         })
         .Add(setRuleName)
         .Add(translateDnsQueryStatus)

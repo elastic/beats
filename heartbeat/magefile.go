@@ -80,17 +80,7 @@ func Fields() error {
 
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, Config, Imports)
-}
-
-// Imports generates an include/list.go file containing
-// a import statement for each module and dataset.
-func Imports() error {
-	options := devtools.DefaultIncludeListOptions()
-	options.ModuleDirs = []string{"monitors"}
-	options.Outfile = "monitors/defaults/default.go"
-	options.Pkg = "defaults"
-	return devtools.GenerateIncludeListGo(options)
+	mg.SerialDeps(Fields, Config)
 }
 
 // Config generates both the short/reference/docker configs.

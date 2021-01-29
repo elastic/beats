@@ -18,7 +18,6 @@
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
         "related.hosts": [
-            "<hostname>",
             "<hostname>"
         ],
         "related.user": [

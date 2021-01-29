@@ -14,6 +14,7 @@ import (
 	"unicode"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
@@ -74,25 +75,30 @@ func (b *Monitor) WatchLogs() bool { return b.config.Enabled && b.config.Monitor
 // WatchMetrics returns true if monitoring is enabled and monitor should watch metrics.
 func (b *Monitor) WatchMetrics() bool { return b.config.Enabled && b.config.MonitorMetrics }
 
-func (b *Monitor) generateMonitoringEndpoint(process, pipelineID string) string {
-	return getMonitoringEndpoint(process, b.operatingSystem, pipelineID)
+func (b *Monitor) generateMonitoringEndpoint(spec program.Spec, pipelineID string) string {
+	return getMonitoringEndpoint(spec, b.operatingSystem, pipelineID)
 }
 
-func (b *Monitor) generateLoggingFile(process, pipelineID string) string {
-	return getLoggingFile(process, b.operatingSystem, b.installPath, pipelineID)
+func (b *Monitor) generateLoggingFile(spec program.Spec, pipelineID string) string {
+	return getLoggingFile(spec, b.operatingSystem, b.installPath, pipelineID)
 }
 
-func (b *Monitor) generateLoggingPath(process, pipelineID string) string {
-	return filepath.Dir(b.generateLoggingFile(process, pipelineID))
+func (b *Monitor) generateLoggingPath(spec program.Spec, pipelineID string) string {
+	return filepath.Dir(b.generateLoggingFile(spec, pipelineID))
+}
 
+func (b *Monitor) ownLoggingPath(spec program.Spec) bool {
+	// if the spec file defines a custom log path then agent will not take ownership of the logging path
+	_, ok := spec.LogPaths[b.operatingSystem]
+	return !ok
 }
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSidecar bool) []string {
+func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string, isSidecar bool) []string {
 	appendix := make([]string, 0, 7)
 
-	monitoringEndpoint := b.generateMonitoringEndpoint(process, pipelineID)
+	monitoringEndpoint := b.generateMonitoringEndpoint(spec, pipelineID)
 	if monitoringEndpoint != "" {
 		endpoint := monitoringEndpoint
 		if isSidecar {
@@ -104,15 +110,16 @@ func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSideca
 		)
 	}
 
-	loggingPath := b.generateLoggingPath(process, pipelineID)
+	loggingPath := b.generateLoggingPath(spec, pipelineID)
 	if loggingPath != "" {
-		logFile := process
+		logFile := spec.Cmd
 		if isSidecar {
 			logFile += "_monitor"
 		}
 		logFile = fmt.Sprintf("%s-json.log", logFile)
 		appendix = append(appendix,
 			"-E", "logging.json=true",
+			"-E", "logging.ecs=true",
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
@@ -125,9 +132,9 @@ func (b *Monitor) EnrichArgs(process, pipelineID string, args []string, isSideca
 }
 
 // Cleanup removes
-func (b *Monitor) Cleanup(process, pipelineID string) error {
+func (b *Monitor) Cleanup(spec program.Spec, pipelineID string) error {
 	// do not cleanup logs, they might not be all processed
-	drop := b.monitoringDrop(process, pipelineID)
+	drop := b.monitoringDrop(spec, pipelineID)
 	if drop == "" {
 		return nil
 	}
@@ -136,9 +143,15 @@ func (b *Monitor) Cleanup(process, pipelineID string) error {
 }
 
 // Prepare executes steps in order for monitoring to work correctly
-func (b *Monitor) Prepare(process, pipelineID string, uid, gid int) error {
-	drops := []string{b.generateLoggingPath(process, pipelineID)}
-	if drop := b.monitoringDrop(process, pipelineID); drop != "" {
+func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) error {
+	if !b.ownLoggingPath(spec) {
+		// spec file passes a log path; so its up to the application to ensure the
+		// path exists and the write permissions are set so Elastic Agent can read it
+		return nil
+	}
+
+	drops := []string{b.generateLoggingPath(spec, pipelineID)}
+	if drop := b.monitoringDrop(spec, pipelineID); drop != "" {
 		drops = append(drops, drop)
 	}
 
@@ -169,31 +182,31 @@ func (b *Monitor) Prepare(process, pipelineID string, uid, gid int) error {
 
 // LogPath describes a path where application stores logs. Empty if
 // application is not monitorable
-func (b *Monitor) LogPath(process, pipelineID string) string {
+func (b *Monitor) LogPath(spec program.Spec, pipelineID string) string {
 	if !b.WatchLogs() {
 		return ""
 	}
 
-	return b.generateLoggingFile(process, pipelineID)
+	return b.generateLoggingFile(spec, pipelineID)
 }
 
 // MetricsPath describes a location where application exposes metrics
 // collectable by metricbeat.
-func (b *Monitor) MetricsPath(process, pipelineID string) string {
+func (b *Monitor) MetricsPath(spec program.Spec, pipelineID string) string {
 	if !b.WatchMetrics() {
 		return ""
 	}
 
-	return b.generateMonitoringEndpoint(process, pipelineID)
+	return b.generateMonitoringEndpoint(spec, pipelineID)
 }
 
 // MetricsPathPrefixed return metrics path prefixed with http+ prefix.
-func (b *Monitor) MetricsPathPrefixed(process, pipelineID string) string {
-	return httpPlusPrefix + b.MetricsPath(process, pipelineID)
+func (b *Monitor) MetricsPathPrefixed(spec program.Spec, pipelineID string) string {
+	return httpPlusPrefix + b.MetricsPath(spec, pipelineID)
 }
 
-func (b *Monitor) monitoringDrop(process, pipelineID string) string {
-	return monitoringDrop(b.generateMonitoringEndpoint(process, pipelineID))
+func (b *Monitor) monitoringDrop(spec program.Spec, pipelineID string) string {
+	return monitoringDrop(b.generateMonitoringEndpoint(spec, pipelineID))
 }
 
 func monitoringDrop(path string) (drop string) {

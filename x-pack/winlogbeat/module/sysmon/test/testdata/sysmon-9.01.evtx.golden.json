@@ -2,10 +2,16 @@
   {
     "@timestamp": "2019-03-18T16:57:37.933Z",
     "event": {
+      "category": [
+        "configuration"
+      ],
       "code": 16,
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -76,10 +82,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -129,6 +132,12 @@
         "name": "services.exe",
         "pid": 488
       },
+      "pe": {
+        "company": "Sysinternals - www.sysinternals.com",
+        "description": "System activity monitor",
+        "file_version": "9.01",
+        "product": "Sysinternals Sysmon"
+      },
       "pid": 4860,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -165,10 +174,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 3,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -221,6 +227,12 @@
         "name": "svchost.exe",
         "pid": 560
       },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "Sink to receive asynchronous callbacks for WMI client application",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
+      },
       "pid": 5028,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -257,10 +269,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 4,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -307,10 +316,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 5,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -357,10 +363,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 6,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -413,6 +416,12 @@
         "name": "svchost.exe",
         "pid": 560
       },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "WMI Provider Host",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
+      },
       "pid": 4508,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -449,10 +458,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 7,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -485,7 +491,7 @@
     },
     "network": {
       "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv6"
@@ -526,10 +532,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 8,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -562,7 +565,7 @@
     },
     "network": {
       "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv4"
@@ -604,10 +607,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 9,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -640,7 +640,7 @@
     },
     "network": {
       "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -682,10 +682,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -718,7 +715,7 @@
     },
     "network": {
       "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -760,10 +757,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -796,7 +790,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -841,10 +835,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 12,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -878,7 +869,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -922,10 +913,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 13,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -958,7 +946,7 @@
     },
     "network": {
       "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1000,10 +988,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 14,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1036,7 +1021,7 @@
     },
     "network": {
       "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1077,10 +1062,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 15,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1113,7 +1095,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1157,10 +1139,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 16,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1193,7 +1172,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1237,10 +1216,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 17,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1273,7 +1249,7 @@
     },
     "network": {
       "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1314,10 +1290,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 18,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1350,7 +1323,7 @@
     },
     "network": {
       "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1391,10 +1364,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 19,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1427,7 +1397,7 @@
     },
     "network": {
       "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1472,10 +1442,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 20,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1508,7 +1475,7 @@
     },
     "network": {
       "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1553,10 +1520,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 21,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1589,7 +1553,7 @@
     },
     "network": {
       "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1634,10 +1598,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 22,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1670,7 +1631,7 @@
     },
     "network": {
       "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1715,10 +1676,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 23,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1765,10 +1723,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 24,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1815,10 +1770,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 25,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1874,10 +1826,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 26,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1933,10 +1882,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 27,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1992,10 +1938,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 28,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2051,10 +1994,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 29,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2101,10 +2041,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 30,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -2160,10 +2097,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 31,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2219,10 +2153,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 32,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }

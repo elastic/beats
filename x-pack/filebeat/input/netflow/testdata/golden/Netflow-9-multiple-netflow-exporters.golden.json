@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:06:29Z",
           "kind": "event"
         },
         "netflow": {
@@ -53,7 +52,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:46.141Z",
           "kind": "event",
@@ -133,7 +131,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:46.141Z",
           "kind": "event",
@@ -213,7 +210,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:51.814Z",
           "kind": "event",
@@ -293,7 +289,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 1000000,
           "end": "2015-10-08T19:03:51.814Z",
           "kind": "event",
@@ -373,7 +368,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 0,
           "end": "2015-10-08T19:03:55.958Z",
           "kind": "event",
@@ -453,7 +447,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 0,
           "end": "2015-10-08T19:03:55.958Z",
           "kind": "event",
@@ -531,7 +524,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:04:30Z",
           "duration": 38081000000,
           "end": "2015-10-08T19:04:25.9Z",
           "kind": "event",
@@ -603,7 +595,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-08T19:06:29Z",
           "duration": 5000000,
           "end": "2015-10-08T19:05:55.015Z",
           "kind": "event",

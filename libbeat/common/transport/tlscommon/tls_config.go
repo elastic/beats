@@ -20,7 +20,11 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
+	"net"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -75,8 +79,13 @@ type TLSConfig struct {
 	time func() time.Time
 }
 
-// ToConfig generates a tls.Config object. Note, you must use BuildModuleConfig to generate a config with
+var (
+	MissingPeerCertificate = errors.New("missing peer certificates")
+)
+
+// ToConfig generates a tls.Config object. Note, you must use BuildModuleClientConfig to generate a config with
 // ServerName set, use that method for servers with SNI.
+// By default VerifyConnection is set to client mode.
 func (c *TLSConfig) ToConfig() *tls.Config {
 	if c == nil {
 		return &tls.Config{}
@@ -84,36 +93,37 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 
-	// When we are using the CAsha256 pin to validate the CA used to validate the chain,
-	// or when we are using 'certificate' TLS verification mode, we add a custom callback
-	verifyPeerCertFn := makeVerifyPeerCertificate(c)
-
-	insecure := c.Verification != VerifyFull
+	insecure := c.Verification != VerifyStrict
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
-
 	return &tls.Config{
-		MinVersion:            minVersion,
-		MaxVersion:            maxVersion,
-		Certificates:          c.Certificates,
-		RootCAs:               c.RootCAs,
-		ClientCAs:             c.ClientCAs,
-		InsecureSkipVerify:    insecure,
-		CipherSuites:          c.CipherSuites,
-		CurvePreferences:      c.CurvePreferences,
-		Renegotiation:         c.Renegotiation,
-		ClientAuth:            c.ClientAuth,
-		VerifyPeerCertificate: verifyPeerCertFn,
-		Time:                  c.time,
+		MinVersion:         minVersion,
+		MaxVersion:         maxVersion,
+		Certificates:       c.Certificates,
+		RootCAs:            c.RootCAs,
+		ClientCAs:          c.ClientCAs,
+		InsecureSkipVerify: insecure,
+		CipherSuites:       c.CipherSuites,
+		CurvePreferences:   c.CurvePreferences,
+		Renegotiation:      c.Renegotiation,
+		ClientAuth:         c.ClientAuth,
+		Time:               c.time,
+		VerifyConnection:   makeVerifyConnection(c),
 	}
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
-func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
+func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
-		return &tls.Config{ServerName: host}
+		return &tls.Config{
+			ServerName:         host,
+			InsecureSkipVerify: true,
+			VerifyConnection: makeVerifyConnection(&TLSConfig{
+				Verification: VerifyFull,
+			}),
+		}
 	}
 
 	config := c.ToConfig()
@@ -121,33 +131,169 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	return config
 }
 
-// makeVerifyPeerCertificate creates the verification combination of checking certificate pins and skipping host name validation depending on the config
-func makeVerifyPeerCertificate(cfg *TLSConfig) verifyPeerCertFunc {
-	pin := len(cfg.CASha256) > 0
-	skipHostName := cfg.Verification == VerifyCertificate
-
-	if pin && !skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			return verifyCAPin(cfg.CASha256, verifiedChains)
+// BuildServerConfig takes the TLSConfig and transform it into a `tls.Config` for server side objects.
+func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
+	if c == nil {
+		// use default TLS settings, if config is empty.
+		return &tls.Config{
+			ServerName:         host,
+			InsecureSkipVerify: true,
+			VerifyConnection: makeVerifyServerConnection(&TLSConfig{
+				Verification: VerifyFull,
+			}),
 		}
 	}
 
-	if pin && skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
+	config := c.ToConfig()
+	config.ServerName = host
+	config.VerifyConnection = makeVerifyServerConnection(c)
+	return config
+}
+
+func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+	switch cfg.Verification {
+	case VerifyFull:
+		return func(cs tls.ConnectionState) error {
+			// On the client side, PeerCertificates can't be empty.
+			if len(cs.PeerCertificates) == 0 {
+				return MissingPeerCertificate
+			}
+
+			opts := x509.VerifyOptions{
+				Roots:         cfg.RootCAs,
+				Intermediates: x509.NewCertPool(),
+			}
+			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 			if err != nil {
 				return err
 			}
-			return verifyCAPin(cfg.CASha256, verifiedChains)
+			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
 		}
-	}
+	case VerifyCertificate:
+		return func(cs tls.ConnectionState) error {
+			// On the client side, PeerCertificates can't be empty.
+			if len(cs.PeerCertificates) == 0 {
+				return MissingPeerCertificate
+			}
 
-	if !pin && skipHostName {
-		return func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-			_, _, err := verifyCertificateExceptServerName(rawCerts, cfg)
-			return err
+			opts := x509.VerifyOptions{
+				Roots:         cfg.RootCAs,
+				Intermediates: x509.NewCertPool(),
+			}
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
+	case VerifyStrict:
+		if len(cfg.CASha256) > 0 {
+			return func(cs tls.ConnectionState) error {
+				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
+			}
+		}
+	default:
 	}
 
 	return nil
+
+}
+
+func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
+	switch cfg.Verification {
+	case VerifyFull:
+		return func(cs tls.ConnectionState) error {
+			if len(cs.PeerCertificates) == 0 {
+				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
+					return MissingPeerCertificate
+				}
+				return nil
+			}
+
+			opts := x509.VerifyOptions{
+				Roots:         cfg.ClientCAs,
+				Intermediates: x509.NewCertPool(),
+				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+			}
+			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			if err != nil {
+				return err
+			}
+			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
+		}
+	case VerifyCertificate:
+		return func(cs tls.ConnectionState) error {
+			if len(cs.PeerCertificates) == 0 {
+				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
+					return MissingPeerCertificate
+				}
+				return nil
+			}
+
+			opts := x509.VerifyOptions{
+				Roots:         cfg.ClientCAs,
+				Intermediates: x509.NewCertPool(),
+				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+			}
+			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+		}
+	case VerifyStrict:
+		if len(cfg.CASha256) > 0 {
+			return func(cs tls.ConnectionState) error {
+				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
+			}
+		}
+	default:
+	}
+
+	return nil
+
+}
+
+func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509.VerifyOptions) error {
+	for _, cert := range certs[1:] {
+		opts.Intermediates.AddCert(cert)
+	}
+	verifiedChains, err := certs[0].Verify(opts)
+	if err != nil {
+		return err
+	}
+
+	if len(casha256) > 0 {
+		return verifyCAPin(casha256, verifiedChains)
+	}
+	return nil
+}
+
+func verifyHostname(cert *x509.Certificate, hostname string) error {
+	if hostname == "" {
+		return nil
+	}
+	// check if the server name is an IP
+	ip := hostname
+	if len(ip) >= 3 && ip[0] == '[' && ip[len(ip)-1] == ']' {
+		ip = ip[1 : len(ip)-1]
+	}
+	parsedIP := net.ParseIP(ip)
+	if parsedIP != nil {
+		for _, certIP := range cert.IPAddresses {
+			if parsedIP.Equal(certIP) {
+				return nil
+			}
+		}
+		return x509.HostnameError{Certificate: cert, Host: hostname}
+	}
+
+	dnsnames := cert.DNSNames
+	if len(dnsnames) == 0 || len(dnsnames) == 1 && dnsnames[0] == "" {
+		if cert.Subject.CommonName != "" {
+			dnsnames = []string{cert.Subject.CommonName}
+		}
+	}
+
+	for _, name := range dnsnames {
+		if matchHostnames(name, hostname) {
+			if !validHostname(name, true) {
+				return fmt.Errorf("invalid hostname in cert")
+			}
+			return nil
+		}
+	}
+	return x509.HostnameError{Certificate: cert, Host: hostname}
 }

@@ -7,7 +7,7 @@ var:
   - name: syslog_host
     default: localhost
   - name: syslog_port
-    default: 9523
+    default: 9539
   - name: input
     default: udp
   - name: community_id

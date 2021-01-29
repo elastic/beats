@@ -138,20 +138,16 @@ func (f *logFile) Read(buf []byte) (int, error) {
 }
 
 func (f *logFile) startFileMonitoringIfNeeded() {
-	if f.closeInactive == 0 && f.closeAfterInterval == 0 {
-		return
-	}
-
-	if f.closeInactive > 0 {
+	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
 		f.tg.Go(func(ctx unison.Canceler) error {
-			f.closeIfTimeout(ctx)
+			f.periodicStateCheck(ctx)
 			return nil
 		})
 	}
 
 	if f.closeAfterInterval > 0 {
 		f.tg.Go(func(ctx unison.Canceler) error {
-			f.periodicStateCheck(ctx)
+			f.closeIfTimeout(ctx)
 			return nil
 		})
 	}

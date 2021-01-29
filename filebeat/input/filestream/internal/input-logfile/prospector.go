@@ -19,17 +19,44 @@ package input_logfile
 
 import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 // Prospector is responsible for starting, stopping harvesters
 // based on the retrieved information about the configured paths.
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
+	// Init runs the cleanup processes before starting the prospector.
+	Init(c ProspectorCleaner) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
-	Run(input.Context, *statestore.Store, HarvesterGroup)
+	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
 	// Test checks if the Prospector is able to run the configuration
 	// specified by the user.
 	Test() error
+}
+
+// StateMetadataUpdater updates and removes the state information for a given Source.
+type StateMetadataUpdater interface {
+	// FindCursorMeta retrieves and unpacks the cursor metadata of an entry of the given Source.
+	FindCursorMeta(s Source, v interface{}) error
+	// UpdateMetadata updates the source metadata of a registry entry of a given Source.
+	UpdateMetadata(s Source, v interface{}) error
+	// Remove marks a state for deletion of a given Source.
+	Remove(s Source) error
+}
+
+// ProspectorCleaner cleans the state store before it starts running.
+type ProspectorCleaner interface {
+	// CleanIf removes an entry if the function returns true
+	CleanIf(func(v Value) bool)
+	// UpdateIdentifiers updates ID in the registry.
+	// The function passed to UpdateIdentifiers must return an empty string if the key
+	// remains the same.
+	UpdateIdentifiers(func(v Value) (string, interface{}))
+}
+
+// Value contains the cursor metadata.
+type Value interface {
+	// UnpackCursorMeta returns the cursor metadata required by the prospector.
+	UnpackCursorMeta(to interface{}) error
 }

@@ -2,7 +2,8 @@
     {
         "event.action": "CHANGE_CONTACTS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

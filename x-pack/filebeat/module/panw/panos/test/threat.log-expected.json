@@ -75,7 +75,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -99,7 +100,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -177,7 +180,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -201,7 +205,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -279,7 +285,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -303,7 +310,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -381,7 +390,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -405,7 +415,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -483,7 +495,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -507,7 +520,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -585,7 +600,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -609,7 +625,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -687,7 +705,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -711,7 +730,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -789,7 +810,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -813,7 +835,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -891,7 +915,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -915,7 +940,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -993,7 +1020,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1017,7 +1045,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1095,7 +1125,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1119,7 +1150,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1197,7 +1230,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1221,7 +1255,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1299,7 +1335,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1323,7 +1360,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1401,7 +1440,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1425,7 +1465,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:36.000-02:00",
@@ -1503,7 +1545,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1527,7 +1570,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1605,7 +1650,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1629,7 +1675,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1707,7 +1755,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1731,7 +1780,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1809,7 +1860,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1833,7 +1885,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:37.000-02:00",
@@ -1911,7 +1965,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -1935,7 +1990,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -2013,7 +2070,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2037,7 +2095,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -2115,7 +2175,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "b.scorecardresearch.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2139,7 +2200,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "b.scorecardresearch.com/"
+        "url.domain": "b.scorecardresearch.com",
+        "url.original": "b.scorecardresearch.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:38.000-02:00",
@@ -2217,7 +2280,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2241,7 +2305,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2319,7 +2385,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2343,7 +2410,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2421,7 +2490,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2445,7 +2515,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2523,7 +2595,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2547,7 +2620,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2625,7 +2700,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2649,7 +2725,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2727,7 +2805,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2751,7 +2830,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2829,7 +2910,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2853,7 +2935,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -2931,7 +3015,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -2955,7 +3040,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3033,7 +3120,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3057,7 +3145,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3135,7 +3225,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3159,7 +3250,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3237,7 +3330,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3261,7 +3355,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3339,7 +3435,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3363,7 +3460,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3441,7 +3540,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3465,7 +3565,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:46.000-02:00",
@@ -3543,7 +3645,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "consent.cmp.oath.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3567,7 +3670,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "consent.cmp.oath.com/"
+        "url.domain": "consent.cmp.oath.com",
+        "url.original": "consent.cmp.oath.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:53.000-02:00",
@@ -3645,7 +3750,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "cdn.taboola.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3669,7 +3775,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "cdn.taboola.com/"
+        "url.domain": "cdn.taboola.com",
+        "url.original": "cdn.taboola.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:54.000-02:00",
@@ -3750,7 +3858,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "rules.quantcount.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3774,7 +3883,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "rules.quantcount.com/"
+        "url.domain": "rules.quantcount.com",
+        "url.original": "rules.quantcount.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3855,7 +3966,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3879,7 +3991,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -3960,7 +4074,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -3984,7 +4099,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -4065,7 +4182,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4089,7 +4207,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:58.000-02:00",
@@ -4170,7 +4290,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4194,7 +4315,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4275,7 +4398,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4299,7 +4423,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4380,7 +4506,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4404,7 +4531,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:44:59.000-02:00",
@@ -4485,7 +4614,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4509,7 +4639,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4590,7 +4722,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4614,7 +4747,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4695,7 +4830,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4719,7 +4855,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4800,7 +4938,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4824,7 +4963,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -4905,7 +5046,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -4929,7 +5071,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:00.000-02:00",
@@ -5010,7 +5154,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5034,7 +5179,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "srv-2018-11-30-22.config.parsely.com/"
+        "url.domain": "srv-2018-11-30-22.config.parsely.com",
+        "url.original": "srv-2018-11-30-22.config.parsely.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:13.000-02:00",
@@ -5115,7 +5262,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "www.googleadservices.com"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5139,7 +5287,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "www.googleadservices.com/"
+        "url.domain": "www.googleadservices.com",
+        "url.original": "www.googleadservices.com/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5217,7 +5367,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5241,7 +5392,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5319,7 +5472,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5343,7 +5497,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5421,7 +5577,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5445,7 +5602,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:15.000-02:00",
@@ -5523,7 +5682,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5547,7 +5707,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5625,7 +5787,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5649,7 +5812,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5727,7 +5892,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5751,7 +5917,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5829,7 +5997,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5853,7 +6022,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -5931,7 +6102,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -5955,7 +6127,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -6033,7 +6207,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6057,7 +6232,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:16.000-02:00",
@@ -6135,7 +6312,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "service.maxymiser.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6159,7 +6337,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "service.maxymiser.net/"
+        "url.domain": "service.maxymiser.net",
+        "url.original": "service.maxymiser.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6240,7 +6420,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6264,7 +6445,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6345,7 +6528,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6369,7 +6553,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6450,7 +6636,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6474,7 +6661,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6555,7 +6744,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6579,7 +6769,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:26.000-02:00",
@@ -6660,7 +6852,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6684,7 +6877,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6765,7 +6960,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6789,7 +6985,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6870,7 +7068,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6894,7 +7093,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -6975,7 +7176,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -6999,7 +7201,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -7080,7 +7284,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7104,7 +7309,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -7185,7 +7392,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7209,7 +7417,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -7290,7 +7500,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7314,7 +7525,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:27.000-02:00",
@@ -7395,7 +7608,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7419,7 +7633,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7500,7 +7716,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7524,7 +7741,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7605,7 +7824,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7629,7 +7849,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:28.000-02:00",
@@ -7710,7 +7932,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7734,7 +7957,9 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     },
     {
         "@timestamp": "2018-11-30T16:45:29.000-02:00",
@@ -7815,7 +8040,8 @@
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
         "related.hosts": [
-            "PA-220"
+            "PA-220",
+            "segment-data.zqtk.net"
         ],
         "related.ip": [
             "192.168.15.224",
@@ -7839,6 +8065,8 @@
             "pan-os",
             "forwarded"
         ],
-        "url.original": "segment-data.zqtk.net/"
+        "url.domain": "segment-data.zqtk.net",
+        "url.original": "segment-data.zqtk.net/",
+        "url.path": "/"
     }
 ]

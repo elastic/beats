@@ -13,6 +13,14 @@ The `elasticsearch` module collects metrics about {es}.
 The `elasticsearch` module works with {es} 6.7.0 and later.
 
 [float]
+=== Usage for Stack Monitoring
+
+The `elasticsearch` module can be used to collect metrics shown in our {stack} {monitor-features}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
+`metricbeat modules enable elasticsearch-xpack`.
+
+[float]
 === Module-specific configuration notes
 
 Like other {beatname_uc} modules, the `elasticsearch` module accepts a `hosts` configuration setting.
@@ -23,11 +31,6 @@ the `hosts` list is interpreted by the module.
   {es} cluster.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct
   {es} cluster (for example, a load-balancing proxy fronting the cluster).
-
-The `elasticsearch` module can be used to collect metrics shown in our {stack} {monitor-features}
-UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
-from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
-`metricbeat modules enable elasticsearch-xpack`.
 
 
 [float]

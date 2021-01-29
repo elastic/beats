@@ -18,6 +18,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+// ContainerPriority is the priority that container mappings are added to the provider.
+const ContainerPriority = 0
+
 func init() {
 	composable.Providers.AddDynamicProvider("docker", DynamicProviderBuilder)
 }
@@ -76,7 +79,7 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 					delete(stoppers, data.container.ID)
 					return
 				}
-				comm.AddOrUpdate(data.container.ID, data.mapping, data.processors)
+				comm.AddOrUpdate(data.container.ID, ContainerPriority, data.mapping, data.processors)
 			case event := <-stopListener.Events():
 				data, err := generateData(event)
 				if err != nil {

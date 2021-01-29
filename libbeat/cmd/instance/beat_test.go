@@ -31,7 +31,7 @@ import (
 )
 
 func TestNewInstance(t *testing.T) {
-	b, err := NewBeat("testbeat", "testidx", "0.9")
+	b, err := NewBeat("testbeat", "testidx", "0.9", false)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +45,7 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, 36, len(b.Info.ID.String()))
 
 	// indexPrefix set to name if empty
-	b, err = NewBeat("testbeat", "", "0.9")
+	b, err = NewBeat("testbeat", "", "0.9", false)
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func TestNewInstance(t *testing.T) {
 }
 
 func TestNewInstanceUUID(t *testing.T) {
-	b, err := NewBeat("testbeat", "", "0.9")
+	b, err := NewBeat("testbeat", "", "0.9", false)
 	if err != nil {
 		panic(err)
 	}
@@ -69,7 +69,7 @@ func TestNewInstanceUUID(t *testing.T) {
 }
 
 func TestInitKibanaConfig(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9")
+	b, err := NewBeat("filebeat", "testidx", "0.9", false)
 	if err != nil {
 		panic(err)
 	}
@@ -96,7 +96,7 @@ func TestInitKibanaConfig(t *testing.T) {
 }
 
 func TestEmptyMetaJson(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9")
+	b, err := NewBeat("filebeat", "testidx", "0.9", false)
 	if err != nil {
 		panic(err)
 	}

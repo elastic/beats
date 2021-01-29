@@ -103,7 +103,7 @@ import (
 const inetSockDumpSize = 8 * 256
 
 func init() {
-	if err := Registry.AddGuess(&guessInetSockIPv6{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInetSockIPv6{} }); err != nil {
 		panic(err)
 	}
 }

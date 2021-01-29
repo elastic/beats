@@ -1,0 +1,10 @@
+["appendix",role="exclude",id="redirects"]
+= Deleted pages
+
+The following pages have moved or been deleted.
+
+[role="exclude",id="filebeat-module-googlecloud"]
+== Google Cloud module
+
+See <<filebeat-module-gcp>>.
+

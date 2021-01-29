@@ -16,6 +16,18 @@ functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
 # Configure which S3 bucket we should upload the lambda artifact.
 functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
+# Configure credentials of Functionbeat while deploying to AWS.
+# Available options:
+# * access_key_id, secret_access_key and/or session_token
+#functionbeat.provider.aws.access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+#functionbeat.provider.aws.secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+#functionbeat.provider.aws.session_token: '${AWS_SESSION_TOKEN:""}'
+# * role_arn
+#functionbeat.provider.aws.role_arn: arn:aws:iam::123456789012:role/test-fnb
+# * credential_profile_name and/or shared_credential_file
+#functionbeat.provider.aws.credential_profile_name: fnb-aws
+#functionbeat.provider.aws.shared_credential_file: /etc/functionbeat/aws_credentials
+
 functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
   # Create a function that accepts events coming from cloudwatchlogs.
@@ -196,7 +208,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -205,6 +217,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
 
     # Set to true to publish fields with null values in events.
     #keep_null: false
@@ -263,7 +279,7 @@ functionbeat.provider.aws.functions:
     # List of Kinesis streams.
     triggers:
         # Arn for the Kinesis stream.
-      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+      - event_source_arn: arn:aws:kinesis:us-east-1:xxxxx:myevents
 
         # batch_size is the number of events read in a batch.
         # Default is 10.
@@ -272,6 +288,10 @@ functionbeat.provider.aws.functions:
         # Starting position is where to start reading events from the Kinesis stream.
         # Default is trim_horizon.
         #starting_position: "trim_horizon"
+
+        # parallelization_factor is the number of batches to process from each shard concurrently.
+        # Default is 1.
+        #parallelization_factor: 1
 
     # Set to true to publish fields with null values in events.
     #keep_null: false
@@ -427,6 +447,41 @@ functionbeat.provider.gcp.functions:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
+  
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+    
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
@@ -758,6 +813,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -885,6 +944,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1076,6 +1139,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of functionbeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
@@ -1158,6 +1223,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1211,7 +1280,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
@@ -1355,6 +1424,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

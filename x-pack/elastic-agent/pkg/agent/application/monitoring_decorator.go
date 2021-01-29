@@ -5,6 +5,7 @@
 package application
 
 import (
+	"crypto/md5"
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -15,6 +16,7 @@ import (
 const (
 	monitoringName            = "FLEET_MONITORING"
 	programsKey               = "programs"
+	monitoringChecksumKey     = "monitoring_checksum"
 	monitoringKey             = "agent.monitoring"
 	monitoringUseOutputKey    = "agent.monitoring.use_output"
 	monitoringOutputFormatKey = "outputs.%s"
@@ -74,12 +76,15 @@ func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 	}
 
 	programList := make([]string, 0, len(programsToRun))
+	cfgHash := md5.New()
 	for _, p := range programsToRun {
 		programList = append(programList, p.Spec.Cmd)
+		cfgHash.Write(p.Config.Hash())
 	}
-	// making program list part of the config
+	// making program list and their hashes part of the config
 	// so it will get regenerated with every change
 	config[programsKey] = programList
+	config[monitoringChecksumKey] = fmt.Sprintf("%x", cfgHash.Sum(nil))
 
 	monitoringProgram.Config, err = transpiler.NewAST(config)
 	if err != nil {

@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -29,6 +30,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -108,9 +110,9 @@ func urlChecks(urlStr string) validator.Validator {
 	})
 }
 
-func respondingHTTPChecks(url string, statusCode int) validator.Validator {
+func respondingHTTPChecks(url, mimeType string, statusCode int) validator.Validator {
 	return lookslike.Compose(
-		minimalRespondingHTTPChecks(url, statusCode),
+		minimalRespondingHTTPChecks(url, mimeType, statusCode),
 		respondingHTTPStatusAndTimingChecks(statusCode),
 		respondingHTTPHeaderChecks(),
 	)
@@ -129,12 +131,13 @@ func respondingHTTPStatusAndTimingChecks(statusCode int) validator.Validator {
 	})
 }
 
-func minimalRespondingHTTPChecks(url string, statusCode int) validator.Validator {
+func minimalRespondingHTTPChecks(url, mimeType string, statusCode int) validator.Validator {
 	return lookslike.Compose(
 		urlChecks(url),
 		httpBodyChecks(),
 		lookslike.MustCompile(map[string]interface{}{
 			"http": map[string]interface{}{
+				"response.mime_type":   mimeType,
 				"response.status_code": statusCode,
 				"rtt.total.us":         isdef.IsDuration,
 			},
@@ -257,7 +260,7 @@ func TestUpStatuses(t *testing.T) {
 						hbtest.BaseChecks("127.0.0.1", "up", "http"),
 						hbtest.RespondingTCPChecks(),
 						hbtest.SummaryChecks(1, 0),
-						respondingHTTPChecks(server.URL, status),
+						respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					)),
 					event.Fields,
 				)
@@ -274,7 +277,7 @@ func TestHeadersDisabled(t *testing.T) {
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, 200),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
 	)
@@ -292,7 +295,7 @@ func TestDownStatuses(t *testing.T) {
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
 					hbtest.SummaryChecks(0, 1),
-					respondingHTTPChecks(server.URL, status),
+					respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
 					respondingHTTPBodyChecks("hello, world!"),
 				)),
@@ -331,7 +334,7 @@ func TestLargeResponse(t *testing.T) {
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, 200),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 		)),
 		event.Fields,
 	)
@@ -367,6 +370,24 @@ func runHTTPSServerCheck(
 		time.Sleep(time.Millisecond * 500)
 	}
 
+	// When connecting through a proxy, the following fields are missing.
+	if _, isProxy := reqExtraConfig["proxy_url"]; isProxy {
+		missing := map[string]interface{}{
+			"http.rtt.response_header.us": time.Duration(0),
+			"http.rtt.content.us":         time.Duration(0),
+			"monitor.ip":                  "127.0.0.1",
+			"tcp.rtt.connect.us":          time.Duration(0),
+			"http.rtt.validate.us":        time.Duration(0),
+			"http.rtt.write_request.us":   time.Duration(0),
+			"tls.rtt.handshake.us":        time.Duration(0),
+		}
+		for k, v := range missing {
+			if found, err := event.Fields.HasKey(k); !found || err != nil {
+				event.Fields.Put(k, v)
+			}
+		}
+	}
+
 	testslike.Test(
 		t,
 		lookslike.Strict(lookslike.Compose(
@@ -374,7 +395,7 @@ func runHTTPSServerCheck(
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.SummaryChecks(1, 0),
-			respondingHTTPChecks(server.URL, http.StatusOK),
+			respondingHTTPChecks(server.URL, "text/plain; charset=utf-8", http.StatusOK),
 		)),
 		event.Fields,
 	)
@@ -529,7 +550,7 @@ func TestRedirect(t *testing.T) {
 			lookslike.Strict(lookslike.Compose(
 				hbtest.BaseChecks("", "up", "http"),
 				hbtest.SummaryChecks(1, 0),
-				minimalRespondingHTTPChecks(testURL, 200),
+				minimalRespondingHTTPChecks(testURL, "text/plain; charset=utf-8", 200),
 				respondingHTTPHeaderChecks(),
 				lookslike.MustCompile(map[string]interface{}{
 					// For redirects that are followed we shouldn't record this header because there's no sensible
@@ -575,7 +596,7 @@ func TestNoHeaders(t *testing.T) {
 			hbtest.SummaryChecks(1, 0),
 			hbtest.RespondingTCPChecks(),
 			respondingHTTPStatusAndTimingChecks(200),
-			minimalRespondingHTTPChecks(server.URL, 200),
+			minimalRespondingHTTPChecks(server.URL, "text/plain; charset=utf-8", 200),
 			lookslike.MustCompile(map[string]interface{}{
 				"http.response.headers": isdef.KeyMissing,
 			}),
@@ -605,9 +626,68 @@ func TestNewRoundTripper(t *testing.T) {
 			require.NotNil(t, transp.Dial)
 			require.NotNil(t, transport.TLSDialer)
 
-			require.Equal(t, (&tlscommon.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			expected := (&tlscommon.TLSConfig{}).ToConfig()
+			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
+			// When we remove support for the legacy common name treatment
+			// this test has to be adjusted, as we will not depend on our
+			// VerifyConnection callback.
+			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
 			require.True(t, transp.DisableKeepAlives)
 		})
 	}
 
+}
+
+func TestProxy(t *testing.T) {
+	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
+	proxy := httptest.NewServer(http.HandlerFunc(httpConnectTunnel))
+	runHTTPSServerCheck(t, server, map[string]interface{}{
+		"proxy_url": proxy.URL,
+	})
+}
+
+func TestTLSProxy(t *testing.T) {
+	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
+	proxy := httptest.NewTLSServer(http.HandlerFunc(httpConnectTunnel))
+	runHTTPSServerCheck(t, server, map[string]interface{}{
+		"proxy_url": proxy.URL,
+	})
+}
+
+func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
+	// This method is adapted from code by Michał Łowicki @mlowicki (CC BY 4.0)
+	// See https://medium.com/@mlowicki/http-s-proxy-in-golang-in-less-than-100-lines-of-code-6a51c2f2c38c
+	if request.Method != http.MethodConnect {
+		http.Error(writer, "Only CONNECT method is supported", http.StatusMethodNotAllowed)
+		return
+	}
+	destConn, err := net.DialTimeout("tcp", request.Host, 10*time.Second)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusServiceUnavailable)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+	hijacker, ok := writer.(http.Hijacker)
+	if !ok {
+		http.Error(writer, "Hijacking not supported", http.StatusInternalServerError)
+		return
+	}
+	clientConn, clientReadWriter, err := hijacker.Hijack()
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusServiceUnavailable)
+	}
+	defer destConn.Close()
+	defer clientConn.Close()
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		io.Copy(destConn, clientReadWriter)
+		wg.Done()
+	}()
+	go func() {
+		io.Copy(clientConn, destConn)
+		wg.Done()
+	}()
+	wg.Wait()
 }

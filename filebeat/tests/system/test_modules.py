@@ -257,6 +257,7 @@ def clean_keys(obj):
         "imperva.securesphere",
         "infoblox.nios",
         "iptables.log",
+        "juniper.junos",
         "juniper.netscreen",
         "netscout.sightline",
         "proofpoint.emailsecurity",
@@ -277,6 +278,7 @@ def clean_keys(obj):
         "gsuite.saml",
         "gsuite.user_accounts",
         "zoom.webhook",
+        "snyk.vulnerabilities",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {

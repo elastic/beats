@@ -95,7 +95,7 @@ func LoadWithSettings(
 
 	name := beatInfo.Name
 
-	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
+	queueBuilder, err := createQueueBuilder(config.Queue, monitors, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +169,7 @@ func loadOutput(
 func createQueueBuilder(
 	config common.ConfigNamespace,
 	monitors Monitors,
+	inQueueSize int,
 ) (func(queue.ACKListener) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
@@ -191,6 +192,6 @@ func createQueueBuilder(
 	}
 
 	return func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return queueFactory(ackListener, monitors.Logger, queueConfig)
+		return queueFactory(ackListener, monitors.Logger, queueConfig, inQueueSize)
 	}, nil
 }

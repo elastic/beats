@@ -211,6 +211,10 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
+func (w *fileWatcher) GetFiles() map[string]os.FileInfo {
+	return w.scanner.GetFiles()
+}
+
 type fileScannerConfig struct {
 	ExcludedFiles []match.Matcher `config:"exclude_files"`
 	Symlinks      bool            `config:"symlinks"`

@@ -249,11 +249,15 @@ func execPing(
 		return start, time.Now(), errReason
 	}
 
-	bodyFields, errReason := processBody(resp, responseConfig, validator)
+	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
+	}
+
+	if mimeType != "" {
+		responseFields["mime_type"] = mimeType
 	}
 
 	if responseConfig.IncludeHeaders {
@@ -274,6 +278,14 @@ func execPing(
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
+
+	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
+	// a proxy.
+	if resp.TLS != nil {
+		tlsFields := common.MapStr{}
+		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
+		eventext.MergeEventFields(event, tlsFields)
+	}
 
 	// Add total HTTP RTT
 	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{

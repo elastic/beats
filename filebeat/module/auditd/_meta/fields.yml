@@ -38,24 +38,24 @@
 
         - name: effective
           type: group
+          description: Effective user information.
           fields:
+          - name: id
+            type: keyword
+            description: Effective user ID.
+          - name: name
+            type: keyword
+            description: Effective user name.
+          - name: group
+            type: group
+            description: Effective group information.
+            fields:
             - name: id
               type: keyword
-              description: >
-                One or multiple unique identifiers of the user.
+              description: Effective group ID.
             - name: name
               type: keyword
-              example: albert
-              description: >
-                Short name or login of the user.
-            - name: group.id
-              type: keyword
-              description: >
-                Unique identifier for the group on the system/platform.
-            - name: group.name
-              type: keyword
-              description: >
-                    Name of the group.
+              description: Effective group name.
 
         - name: filesystem
           type: group

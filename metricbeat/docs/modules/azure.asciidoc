@@ -70,7 +70,26 @@ Required credentials for the `azure` module:
 `tenant_id`:: The unique identifier of the Azure Active Directory instance
 
 
-Users can use the azure credentials keys if configured `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+The azure credentials keys can be used if configured `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+
+`resource_manager_endpoint` ::
+_string_
+Optional, by default the azure public environment will be used, to override, users can provide a specific resource manager endpoint in order to use a different azure environment.
+Ex:
+https://management.chinacloudapi.cn for azure ChinaCloud
+https://management.microsoftazure.de for azure GermanCloud
+https://management.azure.com for azure PublicCloud
+https://management.usgovcloudapi.net for azure USGovernmentCloud
+
+`active_directory_endpoint` ::
+_string_
+Optional, by default the associated active directory endpoint to the resource manager endpoint will be used, to override, users can provide a specific active directory endpoint in order to use a different azure environment.
+Ex:
+https://login.microsoftonline.com for azure ChinaCloud
+https://login.microsoftonline.us for azure GermanCloud
+https://login.chinacloudapi.cn for azure PublicCloud
+https://login.microsoftonline.de for azure USGovernmentCloud
+
 
 [float]
 == Metricsets
@@ -78,7 +97,7 @@ Users can use the azure credentials keys if configured `AZURE_CLIENT_ID`, `AZURE
 [float]
 === `monitor`
 This metricset allows users to retrieve metrics from specified resources. Added filters can apply here as the interval of retrieving these metrics, metric names,
-aggregation list, namespaces and metric dimensions.
+aggregation list, namespaces and metric dimensions. The monitor metrics will have a minimum timegrain of 5 minutes, so the `period` for `monitor` metricset should be `300s` or multiples of `300s`.
 
 [float]
 === `compute_vm`

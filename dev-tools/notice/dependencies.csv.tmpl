@@ -1,6 +1,6 @@
 {{- define "depInfo" -}}
 {{- range $i, $dep := . }}
-{{ $dep.Name }},{{ $dep.URL }},{{ $dep.Version | canonicalVersion }},{{ $dep.Version | revision }},{{ $dep.LicenceType }},{{ $dep.URL }}
+{{ $dep.Name }},{{ $dep.URL }},{{ $dep.Version | canonicalVersion }},{{ $dep.Version | revision }},{{ $dep.LicenceType }},
 {{- end -}}
 {{- end -}}
 

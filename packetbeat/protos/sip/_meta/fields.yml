@@ -6,9 +6,6 @@
       type: group
       description: Information about SIP traffic.
       fields:
-      - name: timestamp
-        type: date_nanos
-        description: Timestamp with nano second precision.
       - name: code
         type: keyword
         description: Response status code.
@@ -30,7 +27,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: uri.scheme
         type: keyword
         description: The URI scheme.
@@ -66,14 +63,14 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: private.uri.original
         type: keyword
         description: Private original URI.
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: private.uri.scheme
         type: keyword
         description: Private URI scheme.
@@ -98,7 +95,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: to.display_info
         type: keyword
         description: "To display info"
@@ -108,7 +105,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: to.uri.scheme
         type: keyword
         description: "To URI scheme"
@@ -133,7 +130,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: from.uri.scheme
         type: keyword
         description: "From URI scheme"
@@ -158,7 +155,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: contact.uri.scheme
         type: keyword
         description: "Contat URI scheme"
@@ -195,7 +192,7 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false
       - name: auth.uri.scheme
         type: keyword
         description: "Auth URI scheme"
@@ -235,4 +232,4 @@
         multi_fields:
           - name: text
             type: text
-            analyzer: simple
+            norms: false

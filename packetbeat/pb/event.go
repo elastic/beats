@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/ecs/code/go/ecs"
 )
 
@@ -42,6 +43,10 @@ const (
 	Inbound  = "inbound"
 	Outbound = "outbound"
 	Internal = "internal"
+	External = "external"
+	Egress   = "egress"
+	Ingress  = "ingress"
+	Unknown  = "unknown"
 )
 
 // Fields contains common fields used in Packetbeat events. Protocol
@@ -216,7 +221,7 @@ func makeProcess(p *common.Process) *ecs.Process {
 }
 
 // ComputeValues computes derived values like network.bytes and writes them to f.
-func (f *Fields) ComputeValues(localIPs []net.IP) error {
+func (f *Fields) ComputeValues(localIPs []net.IP, internalNetworks []string) error {
 	var flow flowhash.Flow
 
 	// network.bytes
@@ -266,27 +271,16 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	// network.direction
-	if len(localIPs) > 0 && f.Network.Direction == "" {
-		if flow.SourceIP != nil {
-			for _, ip := range localIPs {
-				if flow.SourceIP.Equal(ip) {
-					f.Network.Direction = Outbound
-					break
-				}
+	if f.Network.Direction == "" {
+		direction := hostBasedDirection(flow.SourceIP, flow.DestinationIP, localIPs)
+		if len(internalNetworks) > 0 && direction == Unknown {
+			var err error
+			direction, err = perimeterBasedDirection(flow.SourceIP, flow.DestinationIP, internalNetworks)
+			if err != nil {
+				return err
 			}
 		}
-		if flow.DestinationIP != nil {
-			for _, ip := range localIPs {
-				if flow.DestinationIP.Equal(ip) {
-					if f.Network.Direction == Outbound {
-						f.Network.Direction = Internal
-					} else {
-						f.Network.Direction = Inbound
-					}
-					break
-				}
-			}
-		}
+		f.Network.Direction = direction
 	}
 
 	// process (dest process will take priority)
@@ -321,6 +315,51 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	return nil
+}
+
+func hostBasedDirection(source, destination net.IP, ips []net.IP) string {
+	if destination != nil {
+		if destination.IsLoopback() || destination.IsLinkLocalUnicast() || destination.IsLinkLocalMulticast() {
+			return Ingress
+		}
+		for _, ip := range ips {
+			if destination.Equal(ip) {
+				return Ingress
+			}
+		}
+	}
+	if source != nil {
+		if source.IsLoopback() || source.IsLinkLocalUnicast() || source.IsLinkLocalMulticast() {
+			return Egress
+		}
+		for _, ip := range ips {
+			if source.Equal(ip) {
+				return Egress
+			}
+		}
+	}
+	return Unknown
+}
+
+func perimeterBasedDirection(source, destination net.IP, internalNetworks []string) (string, error) {
+	sourceInternal, err := conditions.NetworkContains(source, internalNetworks...)
+	if err != nil {
+		return Unknown, err
+	}
+	destinationInternal, err := conditions.NetworkContains(destination, internalNetworks...)
+	if err != nil {
+		return Unknown, err
+	}
+	if sourceInternal && destinationInternal {
+		return Internal, nil
+	}
+	if sourceInternal {
+		return Outbound, nil
+	}
+	if destinationInternal {
+		return Inbound, nil
+	}
+	return External, nil
 }
 
 // MarshalMapStr marshals the fields into MapStr. It returns an error if there

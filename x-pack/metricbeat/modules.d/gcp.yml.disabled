@@ -1,0 +1,56 @@
+# Module: gcp
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.x/metricbeat-module-gcp.html
+
+- module: gcp
+  metricsets:
+    - compute
+  region: "us-"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+
+- module: gcp
+  metricsets:
+    - pubsub
+    - loadbalancing
+  zone: "us-central1-a"
+  region: "us-central1"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+
+- module: gcp
+  metricsets:
+    - storage
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 5m
+
+- module: gcp
+  metricsets:
+    - metrics
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  metrics:
+    - aligner: ALIGN_NONE
+      service: compute
+      metric_types:
+        - "instance/cpu/reserved_cores"
+        - "instance/cpu/usage_time"
+        - "instance/cpu/utilization"
+        - "instance/uptime"
+
+- module: gcp
+  metricsets:
+    - billing
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"
+  cost_type: "regular"

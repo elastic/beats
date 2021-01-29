@@ -1,9 +1,11 @@
-{{ if eq .input "s3" }}
+{{ if eq .input "aws-s3" }}
 
-type: s3
+type: aws-s3
 queue_url: {{ .queue_url }}
 access_key_id: {{ .access_key_id }}
 secret_access_key: {{ .secret_access_key }}
+visibility_timeout: {{ .visibility_timeout }}
+api_timeout: {{ .api_timeout }}
 
 {{ else if eq .input "file" }}
 
@@ -20,4 +22,4 @@ processors:
 - add_fields:
     target: ''
     fields:
-      ecs.version: 1.6.0
+      ecs.version: 1.7.0

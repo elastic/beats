@@ -1,0 +1,50 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability"
+        },
+        "provider": "gcp"
+    },
+    "event": {
+        "dataset": "gcp.loadbalancing",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {
+            "metrics": {
+                "client_network": "UNKNOWN",
+                "client_subnetwork": "REMOTE_IS_EXTERNAL",
+                "client_zone": "UNKNOWN"
+            },
+            "resource": {
+                "backend_name": "ocp-be-c5kjr-master-us-central1-c",
+                "backend_scope": "us-central1-c",
+                "backend_scope_type": "ZONE",
+                "backend_subnetwork_name": "ocp-be-c5kjr-master-subnet",
+                "backend_target_name": "ocp-be-c5kjr-api-internal",
+                "backend_target_type": "BACKEND_SERVICE",
+                "backend_type": "INSTANCE_GROUP",
+                "forwarding_rule_name": "ocp-be-c5kjr-api-internal",
+                "load_balancer_name": "ocp-be-c5kjr-api-internal",
+                "network_name": "ocp-be-c5kjr-network",
+                "region": "us-central1"
+            }
+        },
+        "loadbalancing": {
+            "l3": {
+                "internal": {
+                    "egress_packets_count": 394
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "loadbalancing",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}
