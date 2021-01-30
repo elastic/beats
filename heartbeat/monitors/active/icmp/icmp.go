@@ -113,7 +113,7 @@ func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 		j = append(j, wrappers.WithURLField(u, job))
 	}
 
-	return plugin.Plugin{j, nil, len(jf.config.Hosts)}, nil
+	return plugin.Plugin{Jobs: j, Close: nil, Endpoints: len(jf.config.Hosts)}, nil
 }
 
 func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {

@@ -127,7 +127,7 @@ func mockEventCustomFields() map[string]interface{} {
 	return common.MapStr{"foo": "bar"}
 }
 
-func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
+func createMockJob() ([]jobs.Job, error) {
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
@@ -143,9 +143,9 @@ func mockPluginBuilder() (p plugin.PluginFactory, built *atomic.Int, closed *ato
 	closed = atomic.NewInt(0)
 
 	return plugin.PluginFactory{
-			"test",
-			[]string{"testAlias"},
-			func(s string, config *common.Config) (plugin.Plugin, error) {
+			Name:    "test",
+			Aliases: []string{"testAlias"},
+			Builder: func(s string, config *common.Config) (plugin.Plugin, error) {
 				built.Inc()
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -155,15 +155,14 @@ func mockPluginBuilder() (p plugin.PluginFactory, built *atomic.Int, closed *ato
 				if err != nil {
 					return plugin.Plugin{}, err
 				}
-				c := common.Config{}
-				j, err := createMockJob("test", &c)
-				close := func() error {
+				j, err := createMockJob()
+				closer := func() error {
 					closed.Inc()
 					return nil
 				}
-				return plugin.Plugin{j, close, 1}, err
+				return plugin.Plugin{Jobs: j, Close: closer, Endpoints: 1}, err
 			},
-			plugin.NewPluginCountersRecorder("test", reg)},
+			Stats: plugin.NewPluginCountersRecorder("test", reg)},
 		built,
 		closed
 }
