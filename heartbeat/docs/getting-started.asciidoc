@@ -62,8 +62,8 @@ Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see
 
 You configure each monitor individually. In +{beatname_lc}.yml+, specify the
 list of monitors that you want to enable. Each item in the list begins with a
-dash (-). The following example configures Heartbeat to use two monitors, an
-`icmp` monitor and a `tcp` monitor:
+dash (-). The following example configures Heartbeat to use three monitors: an
+`icmp` monitor, a `tcp` monitor, and an `http` monitor.
 
 [source,yaml]
 ----------------------------------------------------------------------

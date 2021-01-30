@@ -29,7 +29,6 @@
         "crowdstrike.event.PatternDispositionFlags.Rooting": false,
         "crowdstrike.event.PatternDispositionFlags.SensorOnly": false,
         "crowdstrike.event.PatternDispositionValue": 16,
-        "crowdstrike.event.ProcessEndTime": 0,
         "crowdstrike.event.ProcessId": 38684386611,
         "crowdstrike.event.ProcessStartTime": "2018-09-13T13:45:39.000Z",
         "crowdstrike.event.SHA256String": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
