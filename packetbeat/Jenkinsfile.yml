@@ -17,8 +17,6 @@ stages:
         make: |
           make -C packetbeat check;
           make -C packetbeat update;
-          make -C x-pack/packetbeat check;
-          make -C x-pack/packetbeat update;
           make check-no-changes;
     arm:
         mage: "mage build unitTest"
