@@ -253,8 +253,6 @@ github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a h1
 github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a/go.mod h1:uh/Gj9a0XEbYoM4NYz4LvaBVARz3QXLmlNjsrKY9fTc=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
-github.com/elastic/go-concert v0.0.4 h1:pzgYCmJ/xMJsW8PSk33inAWZ065hrwSeP79TpwAbsLE=
-github.com/elastic/go-concert v0.0.4/go.mod h1:9MtFarjXroUgmm0m6HY3NSe1XiKhdktiNRRj9hWvIaM=
 github.com/elastic/go-concert v0.1.0 h1:gz/yvA3bseuHzoF/lNMltkL30XdPqMo+bg5o2mBx2EE=
 github.com/elastic/go-concert v0.1.0/go.mod h1:9MtFarjXroUgmm0m6HY3NSe1XiKhdktiNRRj9hWvIaM=
 github.com/elastic/go-libaudit/v2 v2.1.0 h1:yWSKoGaoWLGFPjqWrQ4gwtuM77pTk7K4CsPxXss8he4=
