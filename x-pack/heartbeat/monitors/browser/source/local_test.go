@@ -47,18 +47,13 @@ func TestLocalSourceLifeCycle(t *testing.T) {
 	// Don't run the NPM commands in unit tests
 	// We can leave that for E2E tests
 	origOffline := os.Getenv(offlineEnvVar)
-	require.NoError(t, os.Setenv(offlineEnvVar, "true"))
-	defer require.NoError(t, os.Setenv(offlineEnvVar, origOffline))
+	os.Setenv(offlineEnvVar, "true")
+	defer os.Setenv(offlineEnvVar, origOffline)
 	require.NoError(t, ls.Fetch())
 
 	require.NotEmpty(t, ls.workingPath)
 	expected := []string{
-		"Dockerfile",
 		"package.json",
-		"build-offline-dockerfile.sh",
-		".npmrc",
-		"heartbeat.docker.yml",
-		"README.md",
 		"helpers.ts",
 		"add-remove.journey.ts",
 		"basics.journey.ts",
