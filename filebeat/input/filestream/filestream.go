@@ -248,5 +248,7 @@ func (f *logFile) handleEOF() error {
 // Close
 func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
-	return f.file.Close()
+	err := f.file.Close()
+	f.tg.Stop() // Wait until all resources are released for sure.
+	return err
 }
