@@ -45,6 +45,12 @@ func (l *LocalSource) Validate() error {
 	return nil
 }
 
+var offlineEnvVar = "ELASTIC_SYNTHETICS_OFFLINE"
+
+func offline() bool {
+	return os.Getenv(offlineEnvVar) == "true"
+}
+
 func (l *LocalSource) Fetch() (err error) {
 	if l.workingPath != "" {
 		return nil
@@ -53,6 +59,11 @@ func (l *LocalSource) Fetch() (err error) {
 	if err != nil {
 		return fmt.Errorf("could not create tmp dir: %w", err)
 	}
+	defer func() {
+		if err != nil {
+			l.Close() // cleanup the dir if this function returns an err
+		}
+	}()
 
 	err = copy.Copy(l.OrigPath, l.workingPath)
 	if err != nil {
@@ -64,7 +75,7 @@ func (l *LocalSource) Fetch() (err error) {
 		return err
 	}
 
-	if os.Getenv("ELASTIC_SYNTHETICS_OFFLINE") != "true" {
+	if !offline() {
 		// Ensure all deps installed
 		err = runSimpleCommand(exec.Command("npm", "install"), dir)
 		if err != nil {

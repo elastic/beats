@@ -5,8 +5,13 @@
 package source
 
 import (
+	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,4 +36,40 @@ func TestLocalSourceValidate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLocalSourceLifeCycle(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	origPath := path.Join(filepath.Dir(filename), "fixtures/todos")
+	ls := LocalSource{OrigPath: origPath}
+	require.NoError(t, ls.Validate())
+
+	// Don't run the NPM commands in unit tests
+	// We can leave that for E2E tests
+	origOffline := os.Getenv(offlineEnvVar)
+	require.NoError(t, os.Setenv(offlineEnvVar, "true"))
+	defer require.NoError(t, os.Setenv(offlineEnvVar, origOffline))
+	require.NoError(t, ls.Fetch())
+
+	require.NotEmpty(t, ls.workingPath)
+	expected := []string{
+		"Dockerfile",
+		"package.json",
+		"build-offline-dockerfile.sh",
+		".npmrc",
+		"heartbeat.docker.yml",
+		"README.md",
+		"helpers.ts",
+		"add-remove.journey.ts",
+		"basics.journey.ts",
+	}
+	for _, file := range expected {
+		_, err := os.Stat(path.Join(ls.Workdir(), file))
+		// assert, not require, because we want to proceed to the close bit
+		assert.NoError(t, err)
+	}
+
+	require.NoError(t, ls.Close())
+	_, err := os.Stat(ls.Workdir())
+	require.True(t, os.IsNotExist(err), "Workdir %s should have been deleted", ls.Workdir())
 }
