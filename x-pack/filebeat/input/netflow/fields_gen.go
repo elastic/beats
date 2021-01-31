@@ -26,6 +26,7 @@ var (
 	typeCol    = flag.Int("column-type", 0, "Index of column with field type")
 	indent     = flag.Int("indent", 0, "Number of spaces to indent")
 	header     = flag.String("header", "fields.header.yml", "File with header fields to prepend")
+	append     = flag.Bool("append", false, "append to existing output file")
 )
 
 // Mapping from NetFlow datatypes to Elasticsearch datatypes
@@ -116,26 +117,33 @@ func main() {
 	}
 	defer fHandle.Close()
 
-	outHandle, err := os.Create(*outputFile)
+	var outHandle *os.File
+	if *append {
+		outHandle, err = os.OpenFile(*outputFile, os.O_RDWR|os.O_APPEND, 0644)
+	} else {
+		outHandle, err = os.Create(*outputFile)
+	}
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create %s: %v\n", *outputFile, err)
+		fmt.Fprintf(os.Stderr, "Failed to open %s: %v\n", *outputFile, err)
 		os.Exit(3)
 	}
 	defer outHandle.Close()
 
-	headerHandle, err := os.Open(*header)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to open %s: %v\n", *header, err)
-		os.Exit(2)
-	}
-	defer headerHandle.Close()
+	if !*append {
+		headerHandle, err := os.Open(*header)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to open %s: %v\n", *header, err)
+			os.Exit(2)
+		}
+		defer headerHandle.Close()
 
-	fileHeader, err := ioutil.ReadAll(headerHandle)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read %s: %v\n", *header, err)
-		os.Exit(2)
+		fileHeader, err := ioutil.ReadAll(headerHandle)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to read %s: %v\n", *header, err)
+			os.Exit(2)
+		}
+		write(outHandle, string(fileHeader))
 	}
-	write(outHandle, string(fileHeader))
 
 	filtered := bytes.NewBuffer(nil)
 	scanner := bufio.NewScanner(fHandle)
@@ -145,6 +153,11 @@ func main() {
 			filtered.WriteByte('\n')
 		}
 	}
+	if scanner.Err() != nil {
+		fmt.Fprintf(os.Stderr, "Failed reading from %s: %v\n", *header, err)
+		os.Exit(2)
+	}
+
 	reader := csv.NewReader(filtered)
 	for lineNum := 1; ; lineNum++ {
 		record, err := reader.Read()

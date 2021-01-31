@@ -1381,3 +1381,2670 @@
         - name: vpn_identifier
           type: short
 
+        - name: initial_tcp_flags
+          type: short
+
+        - name: union_tcp_flags
+          type: short
+
+        - name: payload
+          type: keyword
+
+        - name: reverse_flow_delta_milliseconds
+          type: long
+
+        - name: silk_app_label
+          type: integer
+
+        - name: payload_entropy
+          type: short
+
+        - name: os_name
+          type: keyword
+
+        - name: os_version
+          type: keyword
+
+        - name: first_packet_banner
+          type: keyword
+
+        - name: second_packet_banner
+          type: keyword
+
+        - name: flow_attributes
+          type: integer
+
+        - name: expired_fragment_count
+          type: long
+
+        - name: assembled_fragment_count
+          type: long
+
+        - name: mean_flow_rate
+          type: long
+
+        - name: mean_packet_rate
+          type: long
+
+        - name: flow_table_flush_event_count
+          type: long
+
+        - name: flow_table_peak_count
+          type: long
+
+        - name: os_finger_print
+          type: keyword
+
+        - name: tftp_filename
+          type: keyword
+
+        - name: tftp_mode
+          type: keyword
+
+        - name: dns_query_response
+          type: short
+
+        - name: dns_qr_type
+          type: integer
+
+        - name: dns_authoritative
+          type: short
+
+        - name: dns_nx_domain
+          type: short
+
+        - name: dns_rr_section
+          type: short
+
+        - name: dns_qname
+          type: keyword
+
+        - name: dns_cname
+          type: keyword
+
+        - name: dns_mx_preference
+          type: integer
+
+        - name: dns_mx_exchange
+          type: keyword
+
+        - name: dns_nsd_name
+          type: keyword
+
+        - name: dns_ptrd_name
+          type: keyword
+
+        - name: ssl_cipher
+          type: keyword
+
+        - name: ssl_client_version
+          type: short
+
+        - name: ssl_server_cipher
+          type: long
+
+        - name: ssl_compression_method
+          type: short
+
+        - name: ssl_cert_version
+          type: short
+
+        - name: ssl_cert_signature
+          type: keyword
+
+        - name: dns_ttl
+          type: long
+
+        - name: dns_txt_data
+          type: keyword
+
+        - name: dns_soa_serial
+          type: long
+
+        - name: dns_soa_refresh
+          type: long
+
+        - name: dns_soa_retry
+          type: long
+
+        - name: dns_soa_expire
+          type: long
+
+        - name: dns_soa_minimum
+          type: long
+
+        - name: dns_soam_name
+          type: keyword
+
+        - name: dns_soar_name
+          type: keyword
+
+        - name: dns_srv_priority
+          type: integer
+
+        - name: dns_srv_weight
+          type: integer
+
+        - name: dns_srv_port
+          type: integer
+
+        - name: dns_srv_target
+          type: integer
+
+        - name: tcp_urg_total_count
+          type: long
+
+        - name: dns_id
+          type: integer
+
+        - name: ssl_cert_serial_number
+          type: keyword
+
+        - name: ssl_object_type
+          type: keyword
+
+        - name: ssl_object_value
+          type: keyword
+
+        - name: ssl_cert_validity_not_before
+          type: keyword
+
+        - name: ssl_cert_validity_not_after
+          type: keyword
+
+        - name: ssl_public_key_algorithm
+          type: keyword
+
+        - name: ssl_public_key_length
+          type: keyword
+
+        - name: rtp_payload_type
+          type: short
+
+        - name: reverse_rtp_payload_type
+          type: short
+
+        - name: mptcp_initial_data_sequence_number
+          type: long
+
+        - name: mptcp_receiver_token
+          type: long
+
+        - name: mptcp_maximum_segment_size
+          type: integer
+
+        - name: mptcp_address_id
+          type: short
+
+        - name: mptcp_flags
+          type: short
+
+        - name: ssl_server_name
+          type: keyword
+
+        - name: ssl_certificate_hash
+          type: keyword
+
+        - name: small_packet_count
+          type: long
+
+        - name: non_empty_packet_count
+          type: long
+
+        - name: data_byte_count
+          type: long
+
+        - name: average_interarrival_time
+          type: long
+
+        - name: standard_deviation_interarrival_time
+          type: long
+
+        - name: first_non_empty_packet_size
+          type: integer
+
+        - name: max_packet_size
+          type: integer
+
+        - name: first_eight_non_empty_packet_directions
+          type: short
+
+        - name: standard_deviation_payload_length
+          type: short
+
+        - name: large_packet_count
+          type: long
+
+        - name: reverse_initial_tcp_flags
+          type: short
+
+        - name: reverse_union_tcp_flags
+          type: short
+
+        - name: reverse_payload
+          type: keyword
+
+        - name: reverse_payload_entropy
+          type: short
+
+        - name: reverse_os_name
+          type: keyword
+
+        - name: reverse_os_version
+          type: keyword
+
+        - name: reverse_first_packet_banner
+          type: keyword
+
+        - name: reverse_second_packet_banner
+          type: keyword
+
+        - name: reverse_flow_attributes
+          type: integer
+
+        - name: reverse_os_finger_print
+          type: keyword
+
+        - name: reverse_rtp_payload_type
+          type: short
+
+        - name: reverse_small_packet_count
+          type: long
+
+        - name: reverse_non_empty_packet_count
+          type: long
+
+        - name: reverse_data_byte_count
+          type: long
+
+        - name: reverse_average_interarrival_time
+          type: long
+
+        - name: reverse_standard_deviation_interarrival_time
+          type: long
+
+        - name: reverse_first_non_empty_packet_size
+          type: integer
+
+        - name: reverse_max_packet_size
+          type: integer
+
+        - name: reverse_standard_deviation_payload_length
+          type: integer
+
+        - name: reverse_large_packet_count
+          type: long
+
+        - name: policy_qos_classification_hierarchy
+          type: long
+
+        - name: waasoptimization_segment
+          type: short
+
+        - name: art_clientpackets
+          type: long
+
+        - name: art_serverpackets
+          type: long
+
+        - name: art_count_retransmissions
+          type: long
+
+        - name: art_count_transactions
+          type: long
+
+        - name: art_total_transaction_time_sum
+          type: long
+
+        - name: art_total_transaction_time_maximum
+          type: long
+
+        - name: art_total_transaction_time_minimum
+          type: long
+
+        - name: art_count_new_connections
+          type: long
+
+        - name: art_count_responses
+          type: long
+
+        - name: art_count_responses_histogram_bucket1
+          type: long
+
+        - name: art_count_responses_histogram_bucket2
+          type: long
+
+        - name: art_count_responses_histogram_bucket3
+          type: long
+
+        - name: art_count_responses_histogram_bucket4
+          type: long
+
+        - name: art_count_responses_histogram_bucket5
+          type: long
+
+        - name: art_count_responses_histogram_bucket6
+          type: long
+
+        - name: art_count_responses_histogram_bucket7
+          type: long
+
+        - name: art_count_late_responses
+          type: long
+
+        - name: art_response_time_sum
+          type: long
+
+        - name: art_response_time_maximum
+          type: long
+
+        - name: art_response_time_minimum
+          type: long
+
+        - name: art_server_response_time_sum
+          type: long
+
+        - name: art_server_response_time_maximum
+          type: long
+
+        - name: art_server_response_time_minimum
+          type: long
+
+        - name: art_total_response_time_sum
+          type: long
+
+        - name: art_total_response_time_maximum
+          type: long
+
+        - name: art_total_response_time_minimum
+          type: long
+
+        - name: art_network_time_sum
+          type: long
+
+        - name: art_network_time_maximum
+          type: long
+
+        - name: art_network_time_minimum
+          type: long
+
+        - name: art_client_network_time_sum
+          type: long
+
+        - name: art_client_network_time_maximum
+          type: long
+
+        - name: art_client_network_time_minimum
+          type: long
+
+        - name: art_server_network_time_sum
+          type: long
+
+        - name: art_server_network_time_maximum
+          type: long
+
+        - name: art_server_network_time_minimum
+          type: long
+
+        - name: application_http_uri_statistics
+          type: short
+
+        - name: policy_qos_queueindex
+          type: long
+
+        - name: policy_qos_queue_index
+          type: long
+
+        - name: policy_qos_queuedrops
+          type: long
+
+        - name: application_category_name
+          type: long
+
+        - name: application_sub_category_name
+          type: long
+
+        - name: application_group_name
+          type: long
+
+        - name: application_http_user-agent
+          type: short
+
+        - name: application_traffic-class
+          type: long
+
+        - name: application_business-relevance
+          type: long
+
+        - name: timestamp_absolute_monitoring-interval
+          type: long
+
+        - name: netscaler_round_trip_time
+          type: long
+
+        - name: netscaler_transaction_id
+          type: long
+
+        - name: netscaler_http_req_url
+          type: keyword
+
+        - name: netscaler_http_req_cookie
+          type: keyword
+
+        - name: netscaler_flow_flags
+          type: long
+
+        - name: netscaler_connection_id
+          type: long
+
+        - name: netscaler_syslog_priority
+          type: short
+
+        - name: netscaler_syslog_message
+          type: keyword
+
+        - name: netscaler_syslog_timestamp
+          type: long
+
+        - name: netscaler_http_req_referer
+          type: keyword
+
+        - name: netscaler_http_req_method
+          type: keyword
+
+        - name: netscaler_http_req_host
+          type: keyword
+
+        - name: netscaler_http_req_user_agent
+          type: keyword
+
+        - name: netscaler_http_rsp_status
+          type: integer
+
+        - name: netscaler_http_rsp_len
+          type: long
+
+        - name: netscaler_server_ttfb
+          type: long
+
+        - name: netscaler_server_ttlb
+          type: long
+
+        - name: netscaler_app_name_incarnation_number
+          type: long
+
+        - name: netscaler_app_name_app_id
+          type: long
+
+        - name: netscaler_app_name
+          type: keyword
+
+        - name: netscaler_http_req_rcv_fb
+          type: long
+
+        - name: netscaler_http_req_forw_fb
+          type: long
+
+        - name: netscaler_http_res_rcv_fb
+          type: long
+
+        - name: netscaler_http_res_forw_fb
+          type: long
+
+        - name: netscaler_http_req_rcv_lb
+          type: long
+
+        - name: netscaler_http_req_forw_lb
+          type: long
+
+        - name: netscaler_main_page_id
+          type: long
+
+        - name: netscaler_main_page_core_id
+          type: long
+
+        - name: netscaler_http_client_interaction_start_time
+          type: keyword
+
+        - name: netscaler_http_client_render_end_time
+          type: keyword
+
+        - name: netscaler_http_client_render_start_time
+          type: keyword
+
+        - name: netscaler_app_template_name
+          type: keyword
+
+        - name: netscaler_http_client_interaction_end_time
+          type: keyword
+
+        - name: netscaler_http_res_rcv_lb
+          type: long
+
+        - name: netscaler_http_res_forw_lb
+          type: long
+
+        - name: netscaler_app_unit_name_app_id
+          type: long
+
+        - name: netscaler_db_login_flags
+          type: long
+
+        - name: netscaler_db_req_type
+          type: short
+
+        - name: netscaler_db_protocol_name
+          type: short
+
+        - name: netscaler_db_user_name
+          type: keyword
+
+        - name: netscaler_db_database_name
+          type: keyword
+
+        - name: netscaler_db_clt_host_name
+          type: keyword
+
+        - name: netscaler_db_req_string
+          type: keyword
+
+        - name: netscaler_db_resp_status_string
+          type: keyword
+
+        - name: netscaler_db_resp_status
+          type: long
+
+        - name: netscaler_db_resp_length
+          type: long
+
+        - name: netscaler_client_rtt
+          type: long
+
+        - name: netscaler_http_content_type
+          type: keyword
+
+        - name: netscaler_http_req_authorization
+          type: keyword
+
+        - name: netscaler_http_req_via
+          type: keyword
+
+        - name: netscaler_http_res_location
+          type: keyword
+
+        - name: netscaler_http_res_set_cookie
+          type: keyword
+
+        - name: netscaler_http_res_set_cookie2
+          type: keyword
+
+        - name: netscaler_http_req_xforwarded_for
+          type: keyword
+
+        - name: netscaler_connection_chain_id
+          type: short
+
+        - name: netscaler_connection_chain_hop_count
+          type: long
+
+        - name: netscaler_ica_session_guid
+          type: short
+
+        - name: netscale_ica_client_version
+          type: keyword
+
+        - name: netscaler_ica_client_type
+          type: integer
+
+        - name: netscaler_ica_client_ip
+          type: ip
+
+        - name: netscaler_ica_client_host_name
+          type: keyword
+
+        - name: netscaler_aaa_username
+          type: keyword
+
+        - name: netscaler_ica_domain_name
+          type: keyword
+
+        - name: netscaler_ica_client_launcher
+          type: integer
+
+        - name: netscaler_ica_session_setup_time
+          type: long
+
+        - name: netscaler_ica_server_name
+          type: keyword
+
+        - name: netscaler_ica_session_reconnects
+          type: short
+
+        - name: netscaler_ica_rtt
+          type: long
+
+        - name: netscaler_ica_clientside_rx_bytes
+          type: long
+
+        - name: netscaler_ica_clientside_tx_bytes
+          type: long
+
+        - name: netscaler_ica_clientside_packets_retransmit
+          type: integer
+
+        - name: netscaler_ica_serverside_packets_retransmit
+          type: integer
+
+        - name: netscaler_ica_clientside_rtt
+          type: long
+
+        - name: netscaler_ica_serverside_rtt
+          type: long
+
+        - name: netscaler_ica_session_update_begin_sec
+          type: long
+
+        - name: netscaler_ica_session_update_end_sec
+          type: long
+
+        - name: netscaler_ica_channel_id1
+          type: long
+
+        - name: netscaler_ica_channel_id1_bytes
+          type: long
+
+        - name: netscaler_ica_channel_id2
+          type: long
+
+        - name: netscaler_ica_channel_id2_bytes
+          type: long
+
+        - name: netscaler_ica_channel_id3
+          type: long
+
+        - name: netscaler_ica_channel_id3_bytes
+          type: long
+
+        - name: netscaler_ica_channel_id4
+          type: long
+
+        - name: netscaler_ica_channel_id4_bytes
+          type: long
+
+        - name: netscaler_ica_channel_id5
+          type: long
+
+        - name: netscaler_ica_channel_id5_bytes
+          type: long
+
+        - name: netscaler_ica_connection_priority
+          type: integer
+
+        - name: netscaler_application_startup_duration
+          type: long
+
+        - name: netscaler_ica_launch_mechanism
+          type: integer
+
+        - name: netscaler_ica_application_name
+          type: keyword
+
+        - name: netscaler_application_startup_time
+          type: long
+
+        - name: netscaler_ica_application_termination_type
+          type: integer
+
+        - name: netscaler_ica_application_termination_time
+          type: long
+
+        - name: netscaler_ica_session_end_time
+          type: long
+
+        - name: netscaler_ica_clientside_jitter
+          type: long
+
+        - name: netscaler_ica_serverside_jitter
+          type: long
+
+        - name: netscaler_ica_app_process_id
+          type: long
+
+        - name: netscaler_ica_app_module_path
+          type: keyword
+
+        - name: netscaler_ica_device_serial_no
+          type: long
+
+        - name: netscaler_msi_client_cookie
+          type: short
+
+        - name: netscaler_ica_flags
+          type: long
+
+        - name: netscaler_ica_username
+          type: keyword
+
+        - name: netscaler_license_type
+          type: short
+
+        - name: netscaler_max_license_count
+          type: long
+
+        - name: netscaler_current_license_consumed
+          type: long
+
+        - name: netscaler_ica_network_update_start_time
+          type: long
+
+        - name: netscaler_ica_network_update_end_time
+          type: long
+
+        - name: netscaler_ica_clientside_srtt
+          type: long
+
+        - name: netscaler_ica_serverside_srtt
+          type: long
+
+        - name: netscaler_ica_clientside_delay
+          type: long
+
+        - name: netscaler_ica_serverside_delay
+          type: long
+
+        - name: netscaler_ica_host_delay
+          type: long
+
+        - name: netscaler_ica_client_side_window_size
+          type: integer
+
+        - name: netscaler_ica_server_side_window_size
+          type: integer
+
+        - name: netscaler_ica_client_side_rto_count
+          type: integer
+
+        - name: netscaler_ica_server_side_rto_count
+          type: integer
+
+        - name: netscaler_ica_l7_client_latency
+          type: long
+
+        - name: netscaler_ica_l7_server_latency
+          type: long
+
+        - name: netscaler_http_domain_name
+          type: keyword
+
+        - name: netscaler_cache_redir_client_connection_core_id
+          type: long
+
+        - name: netscaler_cache_redir_client_connection_transaction_id
+          type: long
+
+        - name: netscaler_unknown270
+          type: long
+
+        - name: netscaler_unknown271
+          type: long
+
+        - name: netscaler_unknown272
+          type: long
+
+        - name: netscaler_unknown273
+          type: long
+
+        - name: netscaler_unknown274
+          type: long
+
+        - name: netscaler_unknown275
+          type: long
+
+        - name: netscaler_unknown276
+          type: long
+
+        - name: netscaler_unknown277
+          type: long
+
+        - name: netscaler_unknown278
+          type: long
+
+        - name: netscaler_unknown279
+          type: long
+
+        - name: netscaler_unknown280
+          type: long
+
+        - name: netscaler_unknown281
+          type: long
+
+        - name: netscaler_unknown282
+          type: long
+
+        - name: netscaler_unknown283
+          type: long
+
+        - name: netscaler_unknown284
+          type: long
+
+        - name: netscaler_unknown285
+          type: long
+
+        - name: netscaler_unknown286
+          type: long
+
+        - name: netscaler_unknown287
+          type: long
+
+        - name: netscaler_unknown288
+          type: long
+
+        - name: netscaler_unknown289
+          type: long
+
+        - name: netscaler_unknown290
+          type: long
+
+        - name: netscaler_unknown291
+          type: long
+
+        - name: netscaler_unknown292
+          type: long
+
+        - name: netscaler_unknown293
+          type: long
+
+        - name: netscaler_unknown294
+          type: long
+
+        - name: netscaler_unknown295
+          type: long
+
+        - name: netscaler_unknown296
+          type: long
+
+        - name: netscaler_unknown297
+          type: long
+
+        - name: netscaler_unknown298
+          type: long
+
+        - name: netscaler_unknown299
+          type: long
+
+        - name: netscaler_unknown300
+          type: long
+
+        - name: netscaler_unknown301
+          type: long
+
+        - name: netscaler_unknown302
+          type: long
+
+        - name: netscaler_unknown303
+          type: long
+
+        - name: netscaler_unknown304
+          type: long
+
+        - name: netscaler_unknown305
+          type: long
+
+        - name: netscaler_unknown306
+          type: long
+
+        - name: netscaler_unknown307
+          type: long
+
+        - name: netscaler_unknown308
+          type: long
+
+        - name: netscaler_unknown309
+          type: long
+
+        - name: netscaler_unknown310
+          type: long
+
+        - name: netscaler_unknown311
+          type: long
+
+        - name: netscaler_unknown312
+          type: long
+
+        - name: netscaler_unknown313
+          type: long
+
+        - name: netscaler_unknown314
+          type: long
+
+        - name: netscaler_unknown315
+          type: long
+
+        - name: netscaler_unknown316
+          type: keyword
+
+        - name: netscaler_unknown317
+          type: long
+
+        - name: netscaler_unknown318
+          type: long
+
+        - name: netscaler_unknown319
+          type: keyword
+
+        - name: netscaler_unknown320
+          type: integer
+
+        - name: netscaler_unknown321
+          type: long
+
+        - name: netscaler_unknown322
+          type: long
+
+        - name: netscaler_unknown323
+          type: integer
+
+        - name: netscaler_unknown324
+          type: integer
+
+        - name: netscaler_unknown325
+          type: integer
+
+        - name: netscaler_unknown326
+          type: integer
+
+        - name: netscaler_unknown327
+          type: long
+
+        - name: netscaler_unknown328
+          type: integer
+
+        - name: netscaler_unknown329
+          type: integer
+
+        - name: netscaler_unknown330
+          type: integer
+
+        - name: netscaler_unknown331
+          type: integer
+
+        - name: netscaler_unknown332
+          type: long
+
+        - name: netscaler_unknown333
+          type: keyword
+
+        - name: netscaler_unknown334
+          type: keyword
+
+        - name: netscaler_unknown335
+          type: long
+
+        - name: netscaler_unknown336
+          type: long
+
+        - name: netscaler_unknown337
+          type: long
+
+        - name: netscaler_unknown338
+          type: long
+
+        - name: netscaler_unknown339
+          type: long
+
+        - name: netscaler_unknown340
+          type: long
+
+        - name: netscaler_unknown341
+          type: long
+
+        - name: netscaler_unknown342
+          type: long
+
+        - name: netscaler_unknown343
+          type: long
+
+        - name: netscaler_unknown344
+          type: long
+
+        - name: netscaler_unknown345
+          type: long
+
+        - name: netscaler_unknown346
+          type: long
+
+        - name: netscaler_unknown347
+          type: long
+
+        - name: netscaler_unknown348
+          type: integer
+
+        - name: netscaler_unknown349
+          type: keyword
+
+        - name: netscaler_unknown350
+          type: keyword
+
+        - name: netscaler_unknown351
+          type: keyword
+
+        - name: netscaler_unknown352
+          type: integer
+
+        - name: netscaler_unknown353
+          type: long
+
+        - name: netscaler_unknown354
+          type: long
+
+        - name: netscaler_unknown355
+          type: long
+
+        - name: netscaler_unknown356
+          type: long
+
+        - name: netscaler_unknown357
+          type: long
+
+        - name: netscaler_unknown363
+          type: short
+
+        - name: netscaler_unknown383
+          type: short
+
+        - name: netscaler_unknown391
+          type: long
+
+        - name: netscaler_unknown398
+          type: long
+
+        - name: netscaler_unknown404
+          type: long
+
+        - name: netscaler_unknown405
+          type: long
+
+        - name: netscaler_unknown427
+          type: long
+
+        - name: netscaler_unknown429
+          type: short
+
+        - name: netscaler_unknown432
+          type: short
+
+        - name: netscaler_unknown433
+          type: short
+
+        - name: netscaler_unknown453
+          type: long
+
+        - name: netscaler_unknown465
+          type: long
+
+        - name: fw_ext_event
+          type: integer
+
+        - name: fw_event_level
+          type: long
+
+        - name: fw_event_level_id
+          type: long
+
+        - name: fw_configured_value
+          type: long
+
+        - name: fw_cts_src_sgt
+          type: long
+
+        - name: fw_ext_event_alt
+          type: long
+
+        - name: fw_blackout_secs
+          type: long
+
+        - name: fw_half_open_high
+          type: long
+
+        - name: fw_half_open_rate
+          type: long
+
+        - name: fw_zone_pair_id
+          type: long
+
+        - name: fw_max_sessions
+          type: long
+
+        - name: fw_zone_pair_name
+          type: long
+
+        - name: fw_ext_event_desc
+          type: keyword
+
+        - name: fw_summary_pkt_count
+          type: long
+
+        - name: fw_half_open_count
+          type: long
+
+        - name: username
+          type: keyword
+
+        - name: xlate_source_address_ip_v4
+          type: ip
+
+        - name: xlate_destination_address_ip_v4
+          type: ip
+
+        - name: xlate_source_port
+          type: integer
+
+        - name: xlate_destination_port
+          type: integer
+
+        - name: firewall_event
+          type: short
+
+        - name: nat_inside_svcid
+          type: integer
+
+        - name: nat_outside_svcid
+          type: integer
+
+        - name: nat_sub_string
+          type: keyword
+
+        - name: ixia_l7_app_id
+          type: long
+
+        - name: ixia_l7_app_name
+          type: keyword
+
+        - name: ixia_src_country_code
+          type: keyword
+
+        - name: ixia_src_country_name
+          type: keyword
+
+        - name: ixia_src_region_code
+          type: keyword
+
+        - name: ixia_src_region_name
+          type: keyword
+
+        - name: ixia_src_city_name
+          type: keyword
+
+        - name: ixia_src_latitude
+          type: float
+
+        - name: ixia_src_longitude
+          type: float
+
+        - name: ixia_dst_country_code
+          type: keyword
+
+        - name: ixia_dst_country_name
+          type: keyword
+
+        - name: ixia_dst_region_code
+          type: keyword
+
+        - name: ixia_dst_region_node
+          type: keyword
+
+        - name: ixia_dst_city_name
+          type: keyword
+
+        - name: ixia_dst_latitude
+          type: float
+
+        - name: ixia_dst_longitude
+          type: float
+
+        - name: ixia_device_id
+          type: short
+
+        - name: ixia_device_name
+          type: keyword
+
+        - name: ixia_browser_id
+          type: short
+
+        - name: ixia_browser_name
+          type: keyword
+
+        - name: ixia_rev_octet_delta_count
+          type: long
+
+        - name: ixia_rev_packet_delta_count
+          type: long
+
+        - name: ixia_encrypt_type
+          type: keyword
+
+        - name: ixia_encrypt_cipher
+          type: keyword
+
+        - name: ixia_encrypt_key_length
+          type: integer
+
+        - name: ixia_imsi_subscriber
+          type: keyword
+
+        - name: ixia_http_user_agent
+          type: keyword
+
+        - name: ixia_http_host_name
+          type: keyword
+
+        - name: ixia_http_uri
+          type: keyword
+
+        - name: ixia_dns_record_txt
+          type: keyword
+
+        - name: ixia_src_as_name
+          type: keyword
+
+        - name: ixia_dst_as_name
+          type: keyword
+
+        - name: ixia_latency
+          type: long
+
+        - name: ixia_dns_query
+          type: keyword
+
+        - name: ixia_dns_answer
+          type: keyword
+
+        - name: ixia_dns_classes
+          type: keyword
+
+        - name: ixia_threat_type
+          type: keyword
+
+        - name: ixia_threat_ipv4
+          type: ip
+
+        - name: ixia_threat_ipv6
+          type: ip
+
+        - name: vmware_tenant_protocol
+          type: short
+
+        - name: vmware_tenant_source_ipv4
+          type: ip
+
+        - name: vmware_tenant_dest_ipv4
+          type: ip
+
+        - name: vmware_tenant_source_ipv6
+          type: ip
+
+        - name: vmware_tenant_dest_ipv6
+          type: ip
+
+        - name: vmware_tenant_source_port
+          type: integer
+
+        - name: vmware_tenant_dest_port
+          type: integer
+
+        - name: vmware_egress_interface_attr
+          type: integer
+
+        - name: vmware_vxlan_export_role
+          type: short
+
+        - name: vmware_ingress_interface_attr
+          type: integer
+
+        - name: afc_protocol
+          type: integer
+
+        - name: afc_protocol_name
+          type: keyword
+
+        - name: flow_direction
+          type: short
+
+        - name: timestamp
+          type: long
+
+        - name: log_op
+          type: short
+
+        - name: traffic_type
+          type: short
+
+        - name: fw_rule
+          type: keyword
+
+        - name: service_name
+          type: keyword
+
+        - name: reason
+          type: long
+
+        - name: reason_text
+          type: keyword
+
+        - name: bind_ipv4_address
+          type: ip
+
+        - name: bind_transport_port
+          type: integer
+
+        - name: conn_ipv4_address
+          type: ip
+
+        - name: conn_transport_port
+          type: integer
+
+        - name: audit_counter
+          type: long
+
+        - name: timestamp
+          type: long
+
+        - name: log_op
+          type: short
+
+        - name: traffic_type
+          type: short
+
+        - name: fw_rule
+          type: keyword
+
+        - name: service_name
+          type: keyword
+
+        - name: reason
+          type: long
+
+        - name: reason_text
+          type: keyword
+
+        - name: bind_ipv4_address
+          type: ip
+
+        - name: bind_transport_port
+          type: integer
+
+        - name: conn_ipv4_address
+          type: ip
+
+        - name: conn_transport_port
+          type: integer
+
+        - name: audit_counter
+          type: long
+
+        - name: procera_service
+          type: keyword
+
+        - name: procera_base_service
+          type: keyword
+
+        - name: procera_incoming_octets
+          type: long
+
+        - name: procera_outgoing_octets
+          type: long
+
+        - name: procera_incoming_packets
+          type: long
+
+        - name: procera_outgoing_packets
+          type: long
+
+        - name: procera_incoming_shaping_latency
+          type: integer
+
+        - name: procera_outgoing_shaping_latency
+          type: integer
+
+        - name: procera_incoming_shaping_drops
+          type: long
+
+        - name: procera_outgoing_shaping_drops
+          type: long
+
+        - name: procera_internal_rtt
+          type: integer
+
+        - name: procera_external_rtt
+          type: integer
+
+        - name: procera_flow_behavior
+          type: keyword
+
+        - name: procera_content_categories
+          type: keyword
+
+        - name: procera_property
+          type: keyword
+
+        - name: procera_server_hostname
+          type: keyword
+
+        - name: procera_http_request_method
+          type: keyword
+
+        - name: procera_http_user_agent
+          type: keyword
+
+        - name: procera_http_content_type
+          type: keyword
+
+        - name: procera_http_url
+          type: keyword
+
+        - name: procera_http_referer
+          type: keyword
+
+        - name: procera_http_response_status
+          type: integer
+
+        - name: procera_http_file_length
+          type: long
+
+        - name: procera_http_location
+          type: keyword
+
+        - name: procera_http_language
+          type: keyword
+
+        - name: procera_subscriber_identifier
+          type: keyword
+
+        - name: procera_msisdn
+          type: long
+
+        - name: procera_imsi
+          type: long
+
+        - name: procera_rat
+          type: keyword
+
+        - name: procera_device_id
+          type: long
+
+        - name: procera_sgsn
+          type: keyword
+
+        - name: procera_rnc
+          type: integer
+
+        - name: procera_apn
+          type: keyword
+
+        - name: procera_user_location_information
+          type: keyword
+
+        - name: procera_ggsn
+          type: keyword
+
+        - name: procera_qoe_incoming_internal
+          type: float
+
+        - name: procera_qoe_incoming_external
+          type: float
+
+        - name: procera_qoe_outgoing_internal
+          type: float
+
+        - name: procera_qoe_outgoing_external
+          type: float
+
+        - name: procera_local_ipv4_host
+          type: ip
+
+        - name: procera_local_ipv6_host
+          type: ip
+
+        - name: procera_remote_ipv4_host
+          type: ip
+
+        - name: procera_remote_ipv6_host
+          type: ip
+
+        - name: procera_http_request_version
+          type: keyword
+
+        - name: procera_template_name
+          type: keyword
+
+        - name: mark
+          type: long
+
+        - name: conntrack_id
+          type: long
+
+        - name: reverse_octet_delta_count
+          type: long
+
+        - name: reverse_packet_delta_count
+          type: long
+
+        - name: reverse_delta_flow_count
+          type: long
+
+        - name: reverse_protocol_identifier
+          type: short
+
+        - name: reverse_ip_class_of_service
+          type: short
+
+        - name: reverse_tcp_control_bits
+          type: integer
+
+        - name: reverse_source_transport_port
+          type: integer
+
+        - name: reverse_source_ipv4_address
+          type: ip
+
+        - name: reverse_source_ipv4_prefix_length
+          type: short
+
+        - name: reverse_ingress_interface
+          type: long
+
+        - name: reverse_destination_transport_port
+          type: integer
+
+        - name: reverse_destination_ipv4_address
+          type: ip
+
+        - name: reverse_destination_ipv4_prefix_length
+          type: short
+
+        - name: reverse_egress_interface
+          type: long
+
+        - name: reverse_ip_next_hop_ipv4_address
+          type: ip
+
+        - name: reverse_bgp_source_as_number
+          type: long
+
+        - name: reverse_bgp_destination_as_number
+          type: long
+
+        - name: reverse_bgp_next_hop_ipv4_address
+          type: ip
+
+        - name: reverse_post_mcast_packet_delta_count
+          type: long
+
+        - name: reverse_post_mcast_octet_delta_count
+          type: long
+
+        - name: reverse_flow_end_sys_up_time
+          type: long
+
+        - name: reverse_flow_start_sys_up_time
+          type: long
+
+        - name: reverse_post_octet_delta_count
+          type: long
+
+        - name: reverse_post_packet_delta_count
+          type: long
+
+        - name: reverse_minimum_ip_total_length
+          type: long
+
+        - name: reverse_maximum_ip_total_length
+          type: long
+
+        - name: reverse_source_ipv6_address
+          type: ip
+
+        - name: reverse_destination_ipv6_address
+          type: ip
+
+        - name: reverse_source_ipv6_prefix_length
+          type: short
+
+        - name: reverse_destination_ipv6_prefix_length
+          type: short
+
+        - name: reverse_flow_label_ipv6
+          type: long
+
+        - name: reverse_icmp_type_code_ipv4
+          type: integer
+
+        - name: reverse_igmp_type
+          type: short
+
+        - name: reverse_sampling_interval
+          type: long
+
+        - name: reverse_sampling_algorithm
+          type: short
+
+        - name: reverse_flow_active_timeout
+          type: integer
+
+        - name: reverse_flow_idle_timeout
+          type: integer
+
+        - name: reverse_engine_type
+          type: short
+
+        - name: reverse_engine_id
+          type: short
+
+        - name: reverse_ipv4_router_sc
+          type: ip
+
+        - name: reverse_source_ipv4_prefix
+          type: ip
+
+        - name: reverse_destination_ipv4_prefix
+          type: ip
+
+        - name: reverse_mpls_top_label_type
+          type: short
+
+        - name: reverse_mpls_top_label_ipv4_address
+          type: ip
+
+        - name: reverse_sampler_id
+          type: short
+
+        - name: reverse_sampler_mode
+          type: short
+
+        - name: reverse_sampler_random_interval
+          type: long
+
+        - name: reverse_class_id
+          type: short
+
+        - name: reverse_minimum_ttl
+          type: short
+
+        - name: reverse_maximum_ttl
+          type: short
+
+        - name: reverse_fragment_identification
+          type: long
+
+        - name: reverse_post_ip_class_of_service
+          type: short
+
+        - name: reverse_source_mac_address
+          type: keyword
+
+        - name: reverse_post_destination_mac_address
+          type: keyword
+
+        - name: reverse_vlan_id
+          type: integer
+
+        - name: reverse_post_vlan_id
+          type: integer
+
+        - name: reverse_ip_version
+          type: short
+
+        - name: reverse_flow_direction
+          type: short
+
+        - name: reverse_ip_next_hop_ipv6_address
+          type: ip
+
+        - name: reverse_bgp_next_hop_ipv6_address
+          type: ip
+
+        - name: reverse_ipv6_extension_headers
+          type: long
+
+        - name: reverse_mpls_top_label_stack_section
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section2
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section3
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section4
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section5
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section6
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section7
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section8
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section9
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section10
+          type: keyword
+
+        - name: reverse_destination_mac_address
+          type: keyword
+
+        - name: reverse_post_source_mac_address
+          type: keyword
+
+        - name: reverse_interface_name
+          type: keyword
+
+        - name: reverse_interface_description
+          type: keyword
+
+        - name: reverse_sampler_name
+          type: keyword
+
+        - name: reverse_octet_total_count
+          type: long
+
+        - name: reverse_packet_total_count
+          type: long
+
+        - name: reverse_flags_and_sampler_id
+          type: long
+
+        - name: reverse_fragment_offset
+          type: integer
+
+        - name: reverse_forwarding_status
+          type: long
+
+        - name: reverse_mpls_vpn_route_distinguisher
+          type: keyword
+
+        - name: reverse_mpls_top_label_prefix_length
+          type: short
+
+        - name: reverse_src_traffic_index
+          type: long
+
+        - name: reverse_dst_traffic_index
+          type: long
+
+        - name: reverse_application_description
+          type: keyword
+
+        - name: reverse_application_id
+          type: keyword
+
+        - name: reverse_application_name
+          type: keyword
+
+        - name: reverse_post_ip_diff_serv_code_point
+          type: short
+
+        - name: reverse_multicast_replication_factor
+          type: long
+
+        - name: reverse_class_name
+          type: keyword
+
+        - name: reverse_classification_engine_id
+          type: short
+
+        - name: reverse_layer2packet_section_offset
+          type: integer
+
+        - name: reverse_layer2packet_section_size
+          type: integer
+
+        - name: reverse_layer2packet_section_data
+          type: keyword
+
+        - name: reverse_bgp_next_adjacent_as_number
+          type: long
+
+        - name: reverse_bgp_prev_adjacent_as_number
+          type: long
+
+        - name: reverse_dropped_octet_delta_count
+          type: long
+
+        - name: reverse_dropped_packet_delta_count
+          type: long
+
+        - name: reverse_dropped_octet_total_count
+          type: long
+
+        - name: reverse_dropped_packet_total_count
+          type: long
+
+        - name: reverse_flow_end_reason
+          type: short
+
+        - name: reverse_observation_point_id
+          type: long
+
+        - name: reverse_icmp_type_code_ipv6
+          type: integer
+
+        - name: reverse_mpls_top_label_ipv6_address
+          type: ip
+
+        - name: reverse_line_card_id
+          type: long
+
+        - name: reverse_port_id
+          type: long
+
+        - name: reverse_metering_process_id
+          type: long
+
+        - name: reverse_exporting_process_id
+          type: long
+
+        - name: reverse_wlan_channel_id
+          type: short
+
+        - name: reverse_wlan_ssid
+          type: keyword
+
+        - name: reverse_flow_start_seconds
+          type: long
+
+        - name: reverse_flow_end_seconds
+          type: long
+
+        - name: reverse_flow_start_milliseconds
+          type: long
+
+        - name: reverse_flow_end_milliseconds
+          type: long
+
+        - name: reverse_flow_start_microseconds
+          type: long
+
+        - name: reverse_flow_end_microseconds
+          type: long
+
+        - name: reverse_flow_start_nanoseconds
+          type: long
+
+        - name: reverse_flow_end_nanoseconds
+          type: long
+
+        - name: reverse_flow_start_delta_microseconds
+          type: long
+
+        - name: reverse_flow_end_delta_microseconds
+          type: long
+
+        - name: reverse_system_init_time_milliseconds
+          type: long
+
+        - name: reverse_flow_duration_milliseconds
+          type: long
+
+        - name: reverse_flow_duration_microseconds
+          type: long
+
+        - name: reverse_destination_ipv6_prefix
+          type: ip
+
+        - name: reverse_source_ipv6_prefix
+          type: ip
+
+        - name: reverse_post_octet_total_count
+          type: long
+
+        - name: reverse_post_packet_total_count
+          type: long
+
+        - name: reverse_post_mcast_packet_total_count
+          type: long
+
+        - name: reverse_post_mcast_octet_total_count
+          type: long
+
+        - name: reverse_icmp_type_ipv4
+          type: short
+
+        - name: reverse_icmp_code_ipv4
+          type: short
+
+        - name: reverse_icmp_type_ipv6
+          type: short
+
+        - name: reverse_icmp_code_ipv6
+          type: short
+
+        - name: reverse_udp_source_port
+          type: integer
+
+        - name: reverse_udp_destination_port
+          type: integer
+
+        - name: reverse_tcp_source_port
+          type: integer
+
+        - name: reverse_tcp_destination_port
+          type: integer
+
+        - name: reverse_tcp_sequence_number
+          type: long
+
+        - name: reverse_tcp_acknowledgement_number
+          type: long
+
+        - name: reverse_tcp_window_size
+          type: integer
+
+        - name: reverse_tcp_urgent_pointer
+          type: integer
+
+        - name: reverse_tcp_header_length
+          type: short
+
+        - name: reverse_ip_header_length
+          type: short
+
+        - name: reverse_total_length_ipv4
+          type: integer
+
+        - name: reverse_payload_length_ipv6
+          type: integer
+
+        - name: reverse_ip_ttl
+          type: short
+
+        - name: reverse_next_header_ipv6
+          type: short
+
+        - name: reverse_mpls_payload_length
+          type: long
+
+        - name: reverse_ip_diff_serv_code_point
+          type: short
+
+        - name: reverse_ip_precedence
+          type: short
+
+        - name: reverse_fragment_flags
+          type: short
+
+        - name: reverse_octet_delta_sum_of_squares
+          type: long
+
+        - name: reverse_octet_total_sum_of_squares
+          type: long
+
+        - name: reverse_mpls_top_label_ttl
+          type: short
+
+        - name: reverse_mpls_label_stack_length
+          type: long
+
+        - name: reverse_mpls_label_stack_depth
+          type: long
+
+        - name: reverse_mpls_top_label_exp
+          type: short
+
+        - name: reverse_ip_payload_length
+          type: long
+
+        - name: reverse_udp_message_length
+          type: integer
+
+        - name: reverse_is_multicast
+          type: short
+
+        - name: reverse_ipv4_ihl
+          type: short
+
+        - name: reverse_ipv4_options
+          type: long
+
+        - name: reverse_tcp_options
+          type: long
+
+        - name: reverse_tcp_syn_total_count
+          type: long
+
+        - name: reverse_tcp_fin_total_count
+          type: long
+
+        - name: reverse_tcp_rst_total_count
+          type: long
+
+        - name: reverse_tcp_psh_total_count
+          type: long
+
+        - name: reverse_tcp_ack_total_count
+          type: long
+
+        - name: reverse_tcp_urg_total_count
+          type: long
+
+        - name: reverse_ip_total_length
+          type: long
+
+        - name: reverse_post_nat_source_ipv4_address
+          type: ip
+
+        - name: reverse_post_nat_destination_ipv4_address
+          type: ip
+
+        - name: reverse_post_napt_source_transport_port
+          type: integer
+
+        - name: reverse_post_napt_destination_transport_port
+          type: integer
+
+        - name: reverse_nat_originating_address_realm
+          type: short
+
+        - name: reverse_nat_event
+          type: short
+
+        - name: reverse_initiator_octets
+          type: long
+
+        - name: reverse_responder_octets
+          type: long
+
+        - name: reverse_firewall_event
+          type: short
+
+        - name: reverse_ingress_vrfid
+          type: long
+
+        - name: reverse_egress_vrfid
+          type: long
+
+        - name: reverse_vr_fname
+          type: keyword
+
+        - name: reverse_post_mpls_top_label_exp
+          type: short
+
+        - name: reverse_tcp_window_scale
+          type: integer
+
+        - name: reverse_ethernet_header_length
+          type: short
+
+        - name: reverse_ethernet_payload_length
+          type: integer
+
+        - name: reverse_ethernet_total_length
+          type: integer
+
+        - name: reverse_dot1q_vlan_id
+          type: integer
+
+        - name: reverse_dot1q_priority
+          type: short
+
+        - name: reverse_dot1q_customer_vlan_id
+          type: integer
+
+        - name: reverse_dot1q_customer_priority
+          type: short
+
+        - name: reverse_metro_evc_id
+          type: keyword
+
+        - name: reverse_metro_evc_type
+          type: short
+
+        - name: reverse_pseudo_wire_id
+          type: long
+
+        - name: reverse_pseudo_wire_type
+          type: integer
+
+        - name: reverse_pseudo_wire_control_word
+          type: long
+
+        - name: reverse_ingress_physical_interface
+          type: long
+
+        - name: reverse_egress_physical_interface
+          type: long
+
+        - name: reverse_post_dot1q_vlan_id
+          type: integer
+
+        - name: reverse_post_dot1q_customer_vlan_id
+          type: integer
+
+        - name: reverse_ethernet_type
+          type: integer
+
+        - name: reverse_post_ip_precedence
+          type: short
+
+        - name: reverse_collection_time_milliseconds
+          type: long
+
+        - name: reverse_export_sctp_stream_id
+          type: integer
+
+        - name: reverse_max_export_seconds
+          type: long
+
+        - name: reverse_max_flow_end_seconds
+          type: long
+
+        - name: reverse_message_md5_checksum
+          type: keyword
+
+        - name: reverse_message_scope
+          type: short
+
+        - name: reverse_min_export_seconds
+          type: long
+
+        - name: reverse_min_flow_start_seconds
+          type: long
+
+        - name: reverse_opaque_octets
+          type: keyword
+
+        - name: reverse_session_scope
+          type: short
+
+        - name: reverse_max_flow_end_microseconds
+          type: long
+
+        - name: reverse_max_flow_end_milliseconds
+          type: long
+
+        - name: reverse_max_flow_end_nanoseconds
+          type: long
+
+        - name: reverse_min_flow_start_microseconds
+          type: long
+
+        - name: reverse_min_flow_start_milliseconds
+          type: long
+
+        - name: reverse_min_flow_start_nanoseconds
+          type: long
+
+        - name: reverse_collector_certificate
+          type: keyword
+
+        - name: reverse_exporter_certificate
+          type: keyword
+
+        - name: reverse_data_records_reliability
+          type: short
+
+        - name: reverse_observation_point_type
+          type: short
+
+        - name: reverse_new_connection_delta_count
+          type: long
+
+        - name: reverse_connection_sum_duration_seconds
+          type: long
+
+        - name: reverse_connection_transaction_id
+          type: long
+
+        - name: reverse_post_nat_source_ipv6_address
+          type: ip
+
+        - name: reverse_post_nat_destination_ipv6_address
+          type: ip
+
+        - name: reverse_nat_pool_id
+          type: long
+
+        - name: reverse_nat_pool_name
+          type: keyword
+
+        - name: reverse_anonymization_flags
+          type: integer
+
+        - name: reverse_anonymization_technique
+          type: integer
+
+        - name: reverse_information_element_index
+          type: integer
+
+        - name: reverse_p2p_technology
+          type: keyword
+
+        - name: reverse_tunnel_technology
+          type: keyword
+
+        - name: reverse_encrypted_technology
+          type: keyword
+
+        - name: reverse_bgp_validity_state
+          type: short
+
+        - name: reverse_ip_sec_spi
+          type: long
+
+        - name: reverse_gre_key
+          type: long
+
+        - name: reverse_nat_type
+          type: short
+
+        - name: reverse_initiator_packets
+          type: long
+
+        - name: reverse_responder_packets
+          type: long
+
+        - name: reverse_observation_domain_name
+          type: keyword
+
+        - name: reverse_selection_sequence_id
+          type: long
+
+        - name: reverse_selector_id
+          type: long
+
+        - name: reverse_information_element_id
+          type: integer
+
+        - name: reverse_selector_algorithm
+          type: integer
+
+        - name: reverse_sampling_packet_interval
+          type: long
+
+        - name: reverse_sampling_packet_space
+          type: long
+
+        - name: reverse_sampling_time_interval
+          type: long
+
+        - name: reverse_sampling_time_space
+          type: long
+
+        - name: reverse_sampling_size
+          type: long
+
+        - name: reverse_sampling_population
+          type: long
+
+        - name: reverse_sampling_probability
+          type: double
+
+        - name: reverse_data_link_frame_size
+          type: integer
+
+        - name: reverse_ip_header_packet_section
+          type: keyword
+
+        - name: reverse_ip_payload_packet_section
+          type: keyword
+
+        - name: reverse_data_link_frame_section
+          type: keyword
+
+        - name: reverse_mpls_label_stack_section
+          type: keyword
+
+        - name: reverse_mpls_payload_packet_section
+          type: keyword
+
+        - name: reverse_selector_id_total_pkts_observed
+          type: long
+
+        - name: reverse_selector_id_total_pkts_selected
+          type: long
+
+        - name: reverse_absolute_error
+          type: double
+
+        - name: reverse_relative_error
+          type: double
+
+        - name: reverse_observation_time_seconds
+          type: long
+
+        - name: reverse_observation_time_milliseconds
+          type: long
+
+        - name: reverse_observation_time_microseconds
+          type: long
+
+        - name: reverse_observation_time_nanoseconds
+          type: long
+
+        - name: reverse_digest_hash_value
+          type: long
+
+        - name: reverse_hash_ip_payload_offset
+          type: long
+
+        - name: reverse_hash_ip_payload_size
+          type: long
+
+        - name: reverse_hash_output_range_min
+          type: long
+
+        - name: reverse_hash_output_range_max
+          type: long
+
+        - name: reverse_hash_selected_range_min
+          type: long
+
+        - name: reverse_hash_selected_range_max
+          type: long
+
+        - name: reverse_hash_digest_output
+          type: short
+
+        - name: reverse_hash_initialiser_value
+          type: long
+
+        - name: reverse_selector_name
+          type: keyword
+
+        - name: reverse_upper_ci_limit
+          type: double
+
+        - name: reverse_lower_ci_limit
+          type: double
+
+        - name: reverse_confidence_level
+          type: double
+
+        - name: reverse_information_element_data_type
+          type: short
+
+        - name: reverse_information_element_description
+          type: keyword
+
+        - name: reverse_information_element_name
+          type: keyword
+
+        - name: reverse_information_element_range_begin
+          type: long
+
+        - name: reverse_information_element_range_end
+          type: long
+
+        - name: reverse_information_element_semantics
+          type: short
+
+        - name: reverse_information_element_units
+          type: integer
+
+        - name: reverse_private_enterprise_number
+          type: long
+
+        - name: reverse_virtual_station_interface_id
+          type: keyword
+
+        - name: reverse_virtual_station_interface_name
+          type: keyword
+
+        - name: reverse_virtual_station_uuid
+          type: keyword
+
+        - name: reverse_virtual_station_name
+          type: keyword
+
+        - name: reverse_layer2_segment_id
+          type: long
+
+        - name: reverse_layer2_octet_delta_count
+          type: long
+
+        - name: reverse_layer2_octet_total_count
+          type: long
+
+        - name: reverse_ingress_unicast_packet_total_count
+          type: long
+
+        - name: reverse_ingress_multicast_packet_total_count
+          type: long
+
+        - name: reverse_ingress_broadcast_packet_total_count
+          type: long
+
+        - name: reverse_egress_unicast_packet_total_count
+          type: long
+
+        - name: reverse_egress_broadcast_packet_total_count
+          type: long
+
+        - name: reverse_monitoring_interval_start_milli_seconds
+          type: long
+
+        - name: reverse_monitoring_interval_end_milli_seconds
+          type: long
+
+        - name: reverse_port_range_start
+          type: integer
+
+        - name: reverse_port_range_end
+          type: integer
+
+        - name: reverse_port_range_step_size
+          type: integer
+
+        - name: reverse_port_range_num_ports
+          type: integer
+
+        - name: reverse_sta_mac_address
+          type: keyword
+
+        - name: reverse_sta_ipv4_address
+          type: ip
+
+        - name: reverse_wtp_mac_address
+          type: keyword
+
+        - name: reverse_ingress_interface_type
+          type: long
+
+        - name: reverse_egress_interface_type
+          type: long
+
+        - name: reverse_rtp_sequence_number
+          type: integer
+
+        - name: reverse_user_name
+          type: keyword
+
+        - name: reverse_application_category_name
+          type: keyword
+
+        - name: reverse_application_sub_category_name
+          type: keyword
+
+        - name: reverse_application_group_name
+          type: keyword
+
+        - name: reverse_original_flows_present
+          type: long
+
+        - name: reverse_original_flows_initiated
+          type: long
+
+        - name: reverse_original_flows_completed
+          type: long
+
+        - name: reverse_distinct_count_of_source_ip_address
+          type: long
+
+        - name: reverse_distinct_count_of_destination_ip_address
+          type: long
+
+        - name: reverse_distinct_count_of_source_ipv4_address
+          type: long
+
+        - name: reverse_distinct_count_of_destination_ipv4_address
+          type: long
+
+        - name: reverse_distinct_count_of_source_ipv6_address
+          type: long
+
+        - name: reverse_distinct_count_of_destination_ipv6_address
+          type: long
+
+        - name: reverse_value_distribution_method
+          type: short
+
+        - name: reverse_rfc3550_jitter_milliseconds
+          type: long
+
+        - name: reverse_rfc3550_jitter_microseconds
+          type: long
+
+        - name: reverse_rfc3550_jitter_nanoseconds
+          type: long
+
+        - name: reverse_dot1q_dei
+          type: short
+
+        - name: reverse_dot1q_customer_dei
+          type: short
+
+        - name: reverse_flow_selector_algorithm
+          type: integer
+
+        - name: reverse_flow_selected_octet_delta_count
+          type: long
+
+        - name: reverse_flow_selected_packet_delta_count
+          type: long
+
+        - name: reverse_flow_selected_flow_delta_count
+          type: long
+
+        - name: reverse_selector_id_total_flows_observed
+          type: long
+
+        - name: reverse_selector_id_total_flows_selected
+          type: long
+
+        - name: reverse_sampling_flow_interval
+          type: long
+
+        - name: reverse_sampling_flow_spacing
+          type: long
+
+        - name: reverse_flow_sampling_time_interval
+          type: long
+
+        - name: reverse_flow_sampling_time_spacing
+          type: long
+
+        - name: reverse_hash_flow_domain
+          type: integer
+
+        - name: reverse_transport_octet_delta_count
+          type: long
+
+        - name: reverse_transport_packet_delta_count
+          type: long
+
+        - name: reverse_original_exporter_ipv4_address
+          type: ip
+
+        - name: reverse_original_exporter_ipv6_address
+          type: ip
+
+        - name: reverse_original_observation_domain_id
+          type: long
+
+        - name: reverse_intermediate_process_id
+          type: long
+
+        - name: reverse_ignored_data_record_total_count
+          type: long
+
+        - name: reverse_data_link_frame_type
+          type: integer
+
+        - name: reverse_section_offset
+          type: integer
+
+        - name: reverse_section_exported_octets
+          type: integer
+
+        - name: reverse_dot1q_service_instance_tag
+          type: keyword
+
+        - name: reverse_dot1q_service_instance_id
+          type: long
+
+        - name: reverse_dot1q_service_instance_priority
+          type: short
+
+        - name: reverse_dot1q_customer_source_mac_address
+          type: keyword
+
+        - name: reverse_dot1q_customer_destination_mac_address
+          type: keyword
+
+        - name: reverse_post_layer2_octet_delta_count
+          type: long
+
+        - name: reverse_post_mcast_layer2_octet_delta_count
+          type: long
+
+        - name: reverse_post_layer2_octet_total_count
+          type: long
+
+        - name: reverse_post_mcast_layer2_octet_total_count
+          type: long
+
+        - name: reverse_minimum_layer2_total_length
+          type: long
+
+        - name: reverse_maximum_layer2_total_length
+          type: long
+
+        - name: reverse_dropped_layer2_octet_delta_count
+          type: long
+
+        - name: reverse_dropped_layer2_octet_total_count
+          type: long
+
+        - name: reverse_ignored_layer2_octet_total_count
+          type: long
+
+        - name: reverse_not_sent_layer2_octet_total_count
+          type: long
+
+        - name: reverse_layer2_octet_delta_sum_of_squares
+          type: long
+
+        - name: reverse_layer2_octet_total_sum_of_squares
+          type: long
+
+        - name: reverse_layer2_frame_delta_count
+          type: long
+
+        - name: reverse_layer2_frame_total_count
+          type: long
+
+        - name: reverse_pseudo_wire_destination_ipv4_address
+          type: ip
+
+        - name: reverse_ignored_layer2_frame_total_count
+          type: long
+
+        - name: viptela_vpn_id
+          type: long
+
