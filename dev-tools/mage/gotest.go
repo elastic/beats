@@ -69,6 +69,10 @@ func makeGoTestArgs(name string) GoTestArgs {
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
 	}
+	if runtime.GOOS == "windows" {
+		fmt.Println("hallo")
+		params.ExtraFlags = append(params.ExtraFlags, "-ldflags=-w")
+	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
 	}
