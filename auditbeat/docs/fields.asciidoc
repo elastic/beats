@@ -51,15 +51,6 @@ alias to: user.id
 
 --
 
-*`user.euid`*::
-+
---
-type: alias
-
-alias to: user.effective.id
-
---
-
 *`user.fsuid`*::
 +
 --
@@ -84,15 +75,6 @@ alias to: user.saved.id
 type: alias
 
 alias to: user.group.id
-
---
-
-*`user.egid`*::
-+
---
-type: alias
-
-alias to: user.effective.group.id
 
 --
 
@@ -139,15 +121,6 @@ alias to: user.name
 
 --
 
-*`user.name_map.euid`*::
-+
---
-type: alias
-
-alias to: user.effective.name
-
---
-
 *`user.name_map.fsuid`*::
 +
 --
@@ -172,15 +145,6 @@ alias to: user.saved.name
 type: alias
 
 alias to: user.group.name
-
---
-
-*`user.name_map.egid`*::
-+
---
-type: alias
-
-alias to: user.effective.group.name
 
 --
 
@@ -2717,54 +2681,6 @@ type: keyword
 +
 --
 Audit user name.
-
-type: keyword
-
---
-
-[float]
-=== effective
-
-Effective user information.
-
-
-*`user.effective.id`*::
-+
---
-Effective user ID.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Effective user name.
-
-type: keyword
-
---
-
-[float]
-=== group
-
-Effective group information.
-
-
-*`user.effective.group.id`*::
-+
---
-Effective group ID.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Effective group name.
 
 type: keyword
 
