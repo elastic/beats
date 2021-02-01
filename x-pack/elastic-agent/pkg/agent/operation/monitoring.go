@@ -410,7 +410,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 							},
 							// Cgroup reporting
 							{
-								"from": "http.agent.beat.cgrgit loup",
+								"from": "http.agent.beat.cgroup",
 								"to":   "system.process.cgroup",
 							},
 						},
