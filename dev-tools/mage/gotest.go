@@ -27,6 +27,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -344,6 +345,9 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
+	}
+	if runtime.GOOS == "windows" {
+		args = append(args, "-w")
 	}
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
