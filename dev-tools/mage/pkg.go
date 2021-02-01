@@ -60,6 +60,11 @@ func Package() error {
 					continue
 				}
 
+				if target.Name == "linux/arm64" && pkgType == Docker && runtime.GOARCH != "arm" {
+					log.Printf("Skipping Docker package type because build host isn't arm")
+					continue
+				}
+
 				packageArch, err := getOSArchName(target, pkgType)
 				if err != nil {
 					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
