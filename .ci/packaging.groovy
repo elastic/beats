@@ -172,7 +172,7 @@ pipeline {
                   ].join(' ')
                 }
                 steps {
-                  withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
+                  withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
                     pushCIDockerImages()
