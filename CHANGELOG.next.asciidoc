@@ -689,6 +689,7 @@ port. {pull}19209[19209]
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
+- Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
 
 *Elastic Log Driver*
 
