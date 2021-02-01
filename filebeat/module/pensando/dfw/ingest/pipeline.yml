@@ -101,12 +101,11 @@ processors:
     type: integer
     ignore_failure: true
     ignore_missing: true
-- convert:
-    field: pensando.dfw.destination_address
-    target_field: destination.address
-    type: ip
+- set:
+    field: destination.address
+    value: "{{pensando.dfw.destination_address}}"
     ignore_failure: true
-    ignore_missing: true
+    ignore_empty_value: true
 - convert:
     field: pensando.dfw.destination_port
     target_field: destination.port
