@@ -145,13 +145,14 @@ ENV PATH="$NODE_PATH/node/bin:$PATH"
 # cached node_modules, heartbeat then calls the global executable to run test suites
 # Setup node
 RUN cd /usr/share/heartbeat/.node \
+  && NODE_VERSION="v12.18.4" \
   && NODE_DOWNLOAD_URL="" \
   && case "$(arch)" in \
        x86_64) \
-           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz \
            ;; \
        aarch64) \
-           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-arm64.tar.xz \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-arm64.tar.xz \
            ;; \
        *) \
            echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
