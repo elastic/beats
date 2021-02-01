@@ -30,11 +30,24 @@ RUN microdnf -y --setopt=tsflags=nodocs update && \
 {{- else }}
 RUN yum -y --setopt=tsflags=nodocs update \
   {{- if (eq .BeatName "heartbeat") }}
+    && PACKAGES_TO_INSTALL="atk cups gtk gdk xrandr ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
+xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc" \
+    && case "$(arch)" in \
+         x86_64) \
+            PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL pango.x86_64 libXcomposite.x86_64 libXcursor.x86_64 libXdamage.x86_64 \
+libXext.x86_64 libXi.x86_64 libXtst.x86_64 cups-libs.x86_64 libXScrnSaver.x86_64 libXrandr.x86_64 GConf2.x86_64 \
+alsa-lib.x86_64 atk.x86_64 gtk3.x86_64" \
+             ;; \
+         aarch64) \
+            PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL pango libXcomposite libXcursor libXdamage \
+libXext libXi libXtst cups-libs libXScrnSaver libXrandr GConf2 alsa-lib gtk3" \
+             ;; \
+         *) \
+             echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+             ;; \
+       esac \
     && yum -y install epel-release \
-    && yum -y install atk cups gtk gdk xrandr pango.x86_64 libXcomposite.x86_64 libXcursor.x86_64 libXdamage.x86_64 \
-	  libXext.x86_64 libXi.x86_64 libXtst.x86_64 cups-libs.x86_64 libXScrnSaver.x86_64 libXrandr.x86_64 GConf2.x86_64 \
-	  alsa-lib.x86_64 atk.x86_64 gtk3.x86_64 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
-	  xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
+    && yum -y install ${PACKAGES_TO_INSTALL} \
   {{- end }}
   && yum clean all && rm -rf /var/cache/yum
   # See https://access.redhat.com/discussions/3195102 for why rm is needed
@@ -132,8 +145,20 @@ ENV PATH="$NODE_PATH/node/bin:$PATH"
 # cached node_modules, heartbeat then calls the global executable to run test suites
 # Setup node
 RUN cd /usr/share/heartbeat/.node \
+  && NODE_DOWNLOAD_URL="" \
+  && case "$(arch)" in \
+       x86_64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz \
+           ;; \
+       aarch64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v14.15.4/node-v14.15.4-linux-arm64.tar.xz \
+           ;; \
+       *) \
+           echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+           ;; \
+     esac \
   && mkdir -p node \
-  && curl https://nodejs.org/dist/v12.18.4/node-v12.18.4-linux-x64.tar.xz | tar -xJ --strip 1 -C node \
+  && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
   && chmod ug+rwX -R $NODE_PATH \
   && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
 {{- end }}

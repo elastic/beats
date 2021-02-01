@@ -189,10 +189,6 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 // mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
 	arch := runtime.GOARCH
-	if arch == "" {
-		return fmt.Errorf("architecture value cannot be empty")
-	}
-
 	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch="+arch,
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
