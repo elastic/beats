@@ -22,6 +22,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"runtime"
 	"testing"
@@ -172,6 +173,18 @@ func TestDiffEvents(t *testing.T) {
 }
 
 func TestHashFile(t *testing.T) {
+	f, err := ioutil.TempFile("", "input.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+
+	const data = "hello world!\n"
+	const dataLen = uint64(len(data))
+	f.WriteString(data)
+	f.Sync()
+	f.Close()
+
 	t.Run("valid hashes", func(t *testing.T) {
 		// Computed externally.
 		expectedHashes := map[HashType]Digest{
@@ -193,21 +206,11 @@ func TestHashFile(t *testing.T) {
 			XXH64:       mustDecodeHex("d3e8573b7abf279a"),
 		}
 
-		f, err := ioutil.TempFile("", "input.txt")
+		hashes, size, err := hashFile(f.Name(), dataLen, validHashes...)
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer os.Remove(f.Name())
-
-		f.WriteString("hello world!\n")
-		f.Sync()
-		f.Close()
-
-		hashes, err := hashFile(f.Name(), validHashes...)
-		if err != nil {
-			t.Fatal(err)
-		}
-
+		assert.Equal(t, dataLen, size)
 		for _, hashType := range validHashes {
 			if hash, found := hashes[hashType]; !found {
 				t.Errorf("%v not found", hashType)
@@ -228,21 +231,107 @@ func TestHashFile(t *testing.T) {
 	})
 
 	t.Run("no hashes", func(t *testing.T) {
-		hashes, err := hashFile("anyfile.txt")
+		hashes, size, err := hashFile("anyfile.txt", 1234)
 		assert.Nil(t, hashes)
 		assert.NoError(t, err)
+		assert.Zero(t, size)
 	})
 
 	t.Run("invalid hash", func(t *testing.T) {
-		hashes, err := hashFile("anyfile.txt", "md4")
+		hashes, size, err := hashFile("anyfile.txt", 1234, "md4")
 		assert.Nil(t, hashes)
 		assert.Error(t, err)
+		assert.Zero(t, size)
 	})
 
 	t.Run("invalid file", func(t *testing.T) {
-		hashes, err := hashFile("anyfile.txt", "md5")
+		hashes, size, err := hashFile("anyfile.txt", 1234, "md5")
 		assert.Nil(t, hashes)
 		assert.Error(t, err)
+		assert.Zero(t, size)
+	})
+
+	t.Run("size over hash limit", func(t *testing.T) {
+		hashes, size, err := hashFile(f.Name(), dataLen-1, SHA1)
+		assert.Nil(t, hashes)
+		assert.Zero(t, size)
+		assert.NoError(t, err)
+	})
+	t.Run("size at hash limit", func(t *testing.T) {
+		hashes, size, err := hashFile(f.Name(), dataLen, SHA1)
+		assert.NotNil(t, hashes)
+		assert.Equal(t, dataLen, size)
+		assert.NoError(t, err)
+	})
+	t.Run("size below hash limit", func(t *testing.T) {
+		hashes, size, err := hashFile(f.Name(), dataLen+1, SHA1)
+		assert.NotNil(t, hashes)
+		assert.Equal(t, dataLen, size)
+		assert.NoError(t, err)
+	})
+	t.Run("no size limit", func(t *testing.T) {
+		hashes, size, err := hashFile(f.Name(), math.MaxInt64, SHA1)
+		assert.NotNil(t, hashes)
+		assert.Equal(t, dataLen, size)
+		assert.NoError(t, err)
+	})
+}
+
+func TestNewEventFromFileInfoHash(t *testing.T) {
+	f, err := ioutil.TempFile("", "input.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+
+	const data = "hello world!\n"
+	const dataLen = uint64(len(data))
+	f.WriteString(data)
+	f.Sync()
+	defer f.Close()
+
+	info, err := os.Stat(f.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("file stays the same", func(t *testing.T) {
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		if !assert.NotNil(t, ev) {
+			t.Fatal("nil event")
+		}
+		assert.Equal(t, dataLen, ev.Info.Size)
+		assert.NotNil(t, ev.Hashes)
+		digest := Digest(mustDecodeHex("f951b101989b2c3b7471710b4e78fc4dbdfa0ca6"))
+		assert.Equal(t, digest, ev.Hashes[SHA1])
+	})
+	t.Run("file grows before hashing", func(t *testing.T) {
+		f.WriteString(data)
+		f.Sync()
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		if !assert.NotNil(t, ev) {
+			t.Fatal("nil event")
+		}
+		assert.Equal(t, dataLen*2, ev.Info.Size)
+		assert.NotNil(t, ev.Hashes)
+		digest := Digest(mustDecodeHex("62e8a0ef77ed7596347a065cae28a860f87e382f"))
+		assert.Equal(t, digest, ev.Hashes[SHA1])
+	})
+	t.Run("file shrinks before hashing", func(t *testing.T) {
+		err = f.Truncate(0)
+		if !assert.NoError(t, err) {
+			t.Fatal(err)
+		}
+		f.Sync()
+		assert.NoError(t, err)
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		if !assert.NotNil(t, ev) {
+			t.Fatal("nil event")
+		}
+		assert.Zero(t, ev.Info.Size)
+		assert.NotNil(t, ev.Hashes)
+		digest := Digest(mustDecodeHex("da39a3ee5e6b4b0d3255bfef95601890afd80709"))
+		assert.Equal(t, digest, ev.Hashes[SHA1])
 	})
 }
 
@@ -254,13 +343,14 @@ func BenchmarkHashFile(b *testing.B) {
 	defer os.Remove(f.Name())
 
 	zeros := make([]byte, 100)
-	iterations := 1024 * 1024 // 100 MiB
+	const iterations = 1024 * 1024 // 100 MiB
 	for i := 0; i < iterations; i++ {
 		if _, err = f.Write(zeros); err != nil {
 			b.Fatal(err)
 		}
 	}
-	b.Logf("file size: %v bytes", len(zeros)*iterations)
+	size := uint64(iterations * len(zeros))
+	b.Logf("file size: %v bytes", size)
 	f.Sync()
 	f.Close()
 	b.ResetTimer()
@@ -268,10 +358,11 @@ func BenchmarkHashFile(b *testing.B) {
 	for _, hashType := range validHashes {
 		b.Run(string(hashType), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, err = hashFile(f.Name(), hashType)
+				_, nbytes, err := hashFile(f.Name(), size+1, hashType)
 				if err != nil {
 					b.Fatal(err)
 				}
+				assert.Equal(b, size, nbytes)
 			}
 		})
 	}
