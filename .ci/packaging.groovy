@@ -161,7 +161,7 @@ pipeline {
                 when {
                   beforeAgent true
                   expression {
-                    return params.linux
+                    return params.arm
                   }
                 }
                 environment {
