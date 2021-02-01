@@ -140,6 +140,8 @@ func injectLogLevel(logLevel string, args []string) []string {
 		level = "info"
 	case "debug":
 		level = "debug"
+	case "warning":
+		level = "warning"
 	case "error":
 		level = "error"
 	}
