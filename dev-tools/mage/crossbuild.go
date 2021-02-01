@@ -184,14 +184,11 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 	return CrossBuild(o...)
 }
 
-func buildMage() error {
-	return buildMageForArch(runtime.GOARCH)
-}
-
-// buildMageForArch pre-compiles the magefile to a binary using the GOARCH parameter.
+// buildMage pre-compiles the magefile to a binary using the GOARCH parameter.
 // It has the benefit of speeding up the build because the
 // mage -compile is done only once rather than in each Docker container.
-func buildMageForArch(arch string) error {
+func buildMage() error {
+	arch := runtime.GOARH
 	if arch == "" {
 		return fmt.Errorf("architecture value cannot be empty")
 	}
@@ -208,7 +205,6 @@ func crossBuildImage(platform string) (string, error) {
 		tagSuffix = "darwin"
 	case strings.HasPrefix(platform, "linux/arm"):
 		tagSuffix = "arm"
-		fmt.Println(runtime.GOARCH)
 		if runtime.GOARCH == "arm64" {
 			tagSuffix = "base-arm-debian9"
 		}

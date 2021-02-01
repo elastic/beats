@@ -49,7 +49,6 @@ func Package() error {
 				continue
 			}
 
-			fmt.Println(SelectedPackageTypes)
 			for _, pkgType := range pkg.Types {
 				if !isPackageTypeSelected(pkgType) {
 					log.Printf("Skipping %s package type because it is not selected", pkgType)
