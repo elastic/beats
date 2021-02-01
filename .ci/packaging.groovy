@@ -177,7 +177,6 @@ pipeline {
                     release()
                     pushCIDockerImages()
                   }
-                  prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
               }
               stage('Package Mac OS'){
