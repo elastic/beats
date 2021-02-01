@@ -129,7 +129,7 @@ log output, see <<configuration-filebeat-options,configure the input>> manually.
 
 [float]
 [[setup-assets]]
-=== Step 5: Set up assets
+=== Step 4: Set up assets
 
 {beatname_uc} comes with predefined assets for parsing, indexing, and
 visualizing your data. To load these assets:
