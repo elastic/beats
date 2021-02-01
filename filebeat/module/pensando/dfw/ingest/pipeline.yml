@@ -90,12 +90,11 @@ processors:
     field: network.transport
     ignore_missing: true
     ignore_failure: true
-- convert:
-    field: pensando.dfw.source_address
-    target_field: source.address
-    type: ip
+- set:
+    field: source.address
+    value: "{{pensando.dfw.source_address}}"
     ignore_failure: true
-    ignore_missing: true
+    ignore_empty_value: true
 - convert:
     field: pensando.dfw.source_port
     target_field: source.port
