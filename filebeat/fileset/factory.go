@@ -79,7 +79,7 @@ func NewFactory(
 func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
 	m, pConfigs, err := f.createRegistry(c)
 	if err != nil {
-		return nil, fmt.Errorf("create module registry for filesets: %w", err)
+		return nil, fmt.Errorf("could not create module registry for filesets: %w", err)
 	}
 
 	// Hash module ID
@@ -112,7 +112,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 func (f *Factory) CheckConfig(c *common.Config) error {
 	_, pConfigs, err := f.createRegistry(c)
 	if err != nil {
-		return fmt.Errorf("create module registry for filesets: %w", err)
+		return fmt.Errorf("could not create module registry for filesets: %w", err)
 	}
 
 	for _, pConfig := range pConfigs {
