@@ -210,7 +210,7 @@ func crossBuildImage(platform string) (string, error) {
 		tagSuffix = "arm"
 		fmt.Println(runtime.GOARCH)
 		if runtime.GOARCH == "arm64" {
-			tagSuffix = "main-arm-debian9"
+			tagSuffix = "base-arm-debian9"
 		}
 	case strings.HasPrefix(platform, "linux/mips"):
 		tagSuffix = "mips"
