@@ -15,7 +15,7 @@ processors:
     field: payload_raw
     target_field: json
 - remove:
-    field: syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host
+    field: [syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host]
     ignore_missing: true
 - date:
     field: json.timestamp
