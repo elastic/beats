@@ -1,6 +1,9 @@
 ---
 description: Pipeline for parsing Penando DFW logs
 processors:
+- set:
+    field: event.ingested
+    value: "{{_ingest.timestamp}}"
 - rename:
     field: message
     target_field: event.original
