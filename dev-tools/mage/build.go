@@ -59,6 +59,11 @@ func DefaultBuildArgs() BuildArgs {
 		},
 		WinMetadata: true,
 	}
+
+	if Platform.GOOS == "windows" {
+		args.LDFlags = append(args.LDFlags, "-w")
+	}
+
 	if versionQualified {
 		args.Vars[elasticBeatsModulePath+"/libbeat/version.qualifier"] = "{{ .Qualifier }}"
 	}
