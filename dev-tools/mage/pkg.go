@@ -49,6 +49,7 @@ func Package() error {
 				continue
 			}
 
+			fmt.Println(SelectedPackageTypes)
 			for _, pkgType := range pkg.Types {
 				if !isPackageTypeSelected(pkgType) {
 					log.Printf("Skipping %s package type because it is not selected", pkgType)
@@ -60,7 +61,7 @@ func Package() error {
 					continue
 				}
 
-				if target.Name == "linux/arm64" && pkgType == Docker && runtime.GOARCH != "arm" {
+				if target.Name == "linux/arm64" && pkgType == Docker && runtime.GOARCH != "arm64" {
 					log.Printf("Skipping Docker package type because build host isn't arm")
 					continue
 				}
