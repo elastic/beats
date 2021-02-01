@@ -53,6 +53,8 @@ rules:
         key: access_api_key
     - remove_key:
         key: kibana
+    - remove_key:
+        key: server
 
 - filter:
     selectors:
