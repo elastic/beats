@@ -63,7 +63,7 @@ There are three ways to collect log data with {beatname_uc}:
 
 * Data collection modules -- simplify the collection, parsing,
 and visualization of common log formats
-* {ecs-logging-ref}/intro.html[ECS loggers] -- plugins that structure and format
+* ECS loggers -- plugins that structure and format
 application logs into ECS-compatible JSON
 * Manual {beatname_uc} configuration
 
