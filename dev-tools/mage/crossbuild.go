@@ -188,7 +188,7 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 // It has the benefit of speeding up the build because the
 // mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
-	arch := runtime.GOARH
+	arch := runtime.GOARCH
 	if arch == "" {
 		return fmt.Errorf("architecture value cannot be empty")
 	}
