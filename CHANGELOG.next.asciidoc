@@ -378,6 +378,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
+- Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 
 *Heartbeat*
 
