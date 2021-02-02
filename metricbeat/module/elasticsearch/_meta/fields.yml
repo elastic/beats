@@ -6,6 +6,27 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: stack_stats
+      type: group
+      fields:
+        - name: apm.found
+          type: alias
+          path: elasticsearch.cluster.stats.stack.apm.found
+        - name: xpack.ccr.enabled
+          type: alias
+          path: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
+        - name: xpack.ccr.available
+          type: alias
+          path: elasticsearch.cluster.stats.stack.xpack.ccr.available
+    - name: license
+      type: group
+      fields:
+        - name: status
+          type: alias
+          path: elasticsearch.cluster.stats.license.status
+        - name: type
+          type: alias
+          path: elasticsearch.cluster.stats.license.type
     - name: shard
       type: group
       fields:
@@ -21,6 +42,36 @@
         - name: node
           type: alias
           path: elasticsearch.node.name
+    - name: cluster_stats
+      type: group
+      fields:
+        - name: indices
+          type: group
+          fields:
+            - name: count
+              type: alias
+              path: elasticsearch.cluster.stats.indices.total
+            - name: shards.total
+              type: alias
+              path: elasticsearch.cluster.stats.indices.shards.count
+        - name: nodes
+          type: group
+          fields:
+            - name: count.total
+              type: alias
+              path: elasticsearch.cluster.stats.nodes.count
+            - name: jvm
+              type: group
+              fields:
+                - name: max_uptime_in_millis
+                  type: alias
+                  path: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
+                - name: mem.heap_used_in_bytes
+                  type: alias
+                  path: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
+                - name: mem.heap_max_in_bytes
+                  type: alias
+                  path: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
     - name: cluster_state
       type: group
       fields:
@@ -38,7 +89,7 @@
           path: elasticsearch.cluster.stats.state.state_uuid
         - name: status
           type: alias
-          path: elasticsearch.cluster.stats.state.status
+          path: elasticsearch.cluster.stats.status
     - name: timestamp
       type: alias
       path: "@timestamp"
