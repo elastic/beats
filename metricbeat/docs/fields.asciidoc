@@ -18606,6 +18606,53 @@ Elasticsearch module
 
 
 
+*`stack_stats.apm.found`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.apm.found
+
+--
+
+*`stack_stats.xpack.ccr.enabled`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
+
+--
+
+*`stack_stats.xpack.ccr.available`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
+
+--
+
+
+*`license.status`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.status
+
+--
+
+*`license.type`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.type
+
+--
+
+
 *`shard.primary`*::
 +
 --
@@ -18639,6 +18686,64 @@ alias to: elasticsearch.index.name
 type: alias
 
 alias to: elasticsearch.node.name
+
+--
+
+
+
+*`cluster_stats.indices.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.total
+
+--
+
+*`cluster_stats.indices.shards.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.shards.count
+
+--
+
+
+*`cluster_stats.nodes.count.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.count
+
+--
+
+
+*`cluster_stats.nodes.jvm.max_uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
 
 --
 
@@ -18684,7 +18789,7 @@ alias to: elasticsearch.cluster.stats.state.state_uuid
 --
 type: alias
 
-alias to: elasticsearch.cluster.stats.state.status
+alias to: elasticsearch.cluster.stats.status
 
 --
 
@@ -20195,18 +20300,10 @@ type: keyword
 
 --
 
-*`elasticsearch.cluster.stats.state.status`*::
-+
---
-type: keyword
-
---
-
 *`elasticsearch.cluster.stats.status`*::
 +
 --
 Cluster status (green, yellow, red).
-
 
 type: keyword
 
@@ -20218,21 +20315,10 @@ type: keyword
 Nodes statistics.
 
 
-
 *`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
-type: alias
-
-alias to: elasticsearch.cluster.stats.nodes.stats.count
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.count`*::
-+
---
 Total number of nodes in cluster.
-
 
 type: long
 
@@ -20252,7 +20338,6 @@ alias to: elasticsearch.cluster.stats.nodes.stats.master
 --
 Number of master-eligible nodes in cluster.
 
-
 type: long
 
 --
@@ -20271,7 +20356,28 @@ alias to: elasticsearch.cluster.stats.nodes.stats.data
 --
 Number of data nodes in cluster.
 
+type: long
 
+--
+
+
+*`elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes`*::
++
+--
 type: long
 
 --
@@ -20283,7 +20389,7 @@ Indices statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.count`*::
+*`elasticsearch.cluster.stats.indices.total`*::
 +
 --
 Total number of indices in cluster.
@@ -20327,6 +20433,36 @@ Memory used for fielddata.
 
 
 type: long
+
+--
+
+
+*`elasticsearch.cluster.stats.license.status`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.license.type`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.available`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.enabled`*::
++
+--
+type: boolean
 
 --
 

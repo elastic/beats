@@ -83,6 +83,6 @@
       type: group
       fields:
         - name: xpack.ccr.available
-          type: bool
+          type: boolean
         - name: xpack.ccr.enabled
-          type: bool
+          type: boolean
