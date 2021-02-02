@@ -350,7 +350,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		"-o", binArgs.Name + ".test",
 	}
 	if runtime.GOOS == "windows" {
-		args = append(args, "-w")
+		args = append(args, "-ldflags=-w")
 	}
 	if TestCoverage && runtime.GOOS != "windows" {
 		args = append(args, "-coverpkg", "./...")
