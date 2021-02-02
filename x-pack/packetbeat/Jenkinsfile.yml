@@ -17,7 +17,10 @@ stages:
         mage: |
           mage check;
           mage update;
-        make: "make check-no-changes"
+        make: |
+          make -C packetbeat check;
+          make -C packetbeat update;
+          make check-no-changes;
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

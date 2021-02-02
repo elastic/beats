@@ -100,5 +100,10 @@ USER {{ .user }}
 EXPOSE {{ $port }}
 {{- end }}
 
+# When running under Docker, we must ensure libbeat monitoring pulls cgroup
+# metrics from /sys/fs/cgroup/<subsystem>/, ignoring any paths found in
+# /proc/self/cgroup.
+ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
+
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]

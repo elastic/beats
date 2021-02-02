@@ -1497,7 +1497,7 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
