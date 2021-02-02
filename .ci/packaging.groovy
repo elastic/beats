@@ -157,7 +157,7 @@ pipeline {
                 }
               }
               stage('Package Docker images for linux/arm64'){
-                agent { label 'worker-0eaeecf32aca4fe3a' } // TODO: use 'arm' once the problem has been fixed in all the ARM workers.
+                agent { label 'arm' }
                 options { skipDefaultCheckout() }
                 when {
                   beforeAgent true
