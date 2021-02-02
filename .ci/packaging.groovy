@@ -179,6 +179,12 @@ pipeline {
                     pushCIDockerImages()
                   }
                 }
+                post {
+                  always {
+                    // static workers require this
+                    deleteDir()
+                  }
+                }
               }
               stage('Package Mac OS'){
                 agent { label 'macosx-10.12' }
@@ -202,6 +208,12 @@ pipeline {
                     withMacOSEnv(){
                       release()
                     }
+                  }
+                }
+                post {
+                  always {
+                    // static workers require this
+                    deleteDir()
                   }
                 }
               }
