@@ -8767,6 +8767,16 @@ type: object
 
 --
 
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
+
+
+type: object
+
+--
+
 *`kubernetes.replicaset.name`*::
 +
 --
