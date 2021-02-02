@@ -174,7 +174,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
-                    deleteDir()
+                    deleteWorkspace()
                     release()
                     pushCIDockerImages()
                   }
@@ -182,7 +182,7 @@ pipeline {
                 post {
                   always {
                     // static workers require this
-                    deleteDir()
+                    deleteWorkspace()
                   }
                 }
               }
@@ -204,7 +204,7 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-                    deleteDir()
+                    deleteWorkspace()
                     withMacOSEnv(){
                       release()
                     }
@@ -213,7 +213,7 @@ pipeline {
                 post {
                   always {
                     // static workers require this
-                    deleteDir()
+                    deleteWorkspace()
                   }
                 }
               }
@@ -454,6 +454,24 @@ def withBeatsEnv(Closure body) {
       dir("${env.BASE_DIR}"){
         body()
       }
+    }
+  }
+}
+
+/**
+* This method fixes the filesystem permissions after the build has happenend. The reason is to
+* ensure any non-ephemeral workers don't have any leftovers that could cause some environmental
+* issues.
+*/
+def deleteWorkspace() {
+  if(isUnix()) {
+    catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+      sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+        set +x
+        source ./dev-tools/common.bash
+        docker_setup
+        script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
+      deleteDir()
     }
   }
 }
