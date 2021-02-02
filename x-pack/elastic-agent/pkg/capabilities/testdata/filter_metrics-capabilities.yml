@@ -1,0 +1,2 @@
+- rule: allow
+  input: system/metrics
