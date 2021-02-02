@@ -53,6 +53,7 @@ func TestLocalSourceLifeCycle(t *testing.T) {
 
 	require.NotEmpty(t, ls.workingPath)
 	expected := []string{
+		"node_modules",
 		"package.json",
 		"helpers.ts",
 		"add-remove.journey.ts",

@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -61,7 +62,10 @@ func (l *LocalSource) Fetch() (err error) {
 	}
 	defer func() {
 		if err != nil {
-			l.Close() // cleanup the dir if this function returns an err
+			err := l.Close() // cleanup the dir if this function returns an err
+			if err != nil {
+				logp.Warn("could not cleanup dir: %s", err)
+			}
 		}
 	}()
 
@@ -70,27 +74,40 @@ func (l *LocalSource) Fetch() (err error) {
 		return fmt.Errorf("could not copy suite: %w", err)
 	}
 
-	dir, err := getSuiteDir(l.workingPath)
+	dir, err := getAbsoluteSuiteDir(l.workingPath)
 	if err != nil {
 		return err
 	}
 
 	if !offline() {
-		// Ensure all deps installed
-		err = runSimpleCommand(exec.Command("npm", "install"), dir)
-		if err != nil {
-			return err
-		}
-
-		// Update playwright, needs to run separately to ensure post-install hook is run that downloads
-		// chrome. See https://github.com/microsoft/playwright/issues/3712
-		err = runSimpleCommand(exec.Command("npm", "install", "playwright-chromium"), dir)
-		if err != nil {
-			return err
-		}
+		err = setupOnlineDir(dir)
+		return err
 	}
 
 	return nil
+}
+
+// setupOnlineDir is run in environments with internet access and attempts to make sure the node env
+// is setup correctly.
+func setupOnlineDir(dir string) (err error) {
+	// If we're not offline remove the node_modules folder so we can do a fresh install, this minimizes
+	// issues with dependencies being broken.
+	modDir := path.Join(dir, "node_modules")
+	_, statErr := os.Stat(modDir)
+	if os.IsExist(statErr) {
+		err := os.RemoveAll(modDir)
+		if err != nil {
+			return fmt.Errorf("could not remove node_modules from '%s': %w", dir, err)
+		}
+	}
+
+	// Ensure all deps installed
+	err = runSimpleCommand(exec.Command("npm", "install"), dir)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 func (l *LocalSource) Workdir() string {
@@ -105,12 +122,12 @@ func (l *LocalSource) Close() error {
 	return nil
 }
 
-func getSuiteDir(suiteFile string) (string, error) {
-	path, err := filepath.Abs(suiteFile)
+func getAbsoluteSuiteDir(suiteFile string) (string, error) {
+	absPath, err := filepath.Abs(suiteFile)
 	if err != nil {
 		return "", err
 	}
-	stat, err := os.Stat(path)
+	stat, err := os.Stat(absPath)
 	if err != nil {
 		return "", err
 	}
