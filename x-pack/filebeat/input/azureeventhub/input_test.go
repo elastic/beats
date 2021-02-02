@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -107,6 +108,16 @@ func TestParseMultipleMessages(t *testing.T) {
 	for _, ms := range messages {
 		assert.Contains(t, msgs, ms)
 	}
+}
+
+func TestNewInputDone(t *testing.T) {
+	config := common.MapStr{
+		"connection_string":   "Endpoint=sb://something",
+		"eventhub":            "insights-operational-logs",
+		"storage_account":     "someaccount",
+		"storage_account_key": "secret",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
 
 type stubOutleter struct {
