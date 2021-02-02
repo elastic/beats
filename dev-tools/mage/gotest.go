@@ -70,7 +70,6 @@ func makeGoTestArgs(name string) GoTestArgs {
 		Tags:            testTagsFromEnv(),
 	}
 	if runtime.GOOS == "windows" {
-		fmt.Println("hallo")
 		params.ExtraFlags = append(params.ExtraFlags, "-ldflags=-w")
 	}
 	if TestCoverage {
