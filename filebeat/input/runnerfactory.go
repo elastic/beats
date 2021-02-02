@@ -58,10 +58,14 @@ func (r *RunnerFactory) Create(
 }
 
 func (r *RunnerFactory) CheckConfig(cfg *common.Config) error {
-	_, err := r.Create(pipeline.NewNilPipeline(), cfg)
+	runner, err := r.Create(pipeline.NewNilPipeline(), cfg)
 	if _, ok := err.(*common.ErrInputNotFinished); ok {
 		// error is related to state, and hence config can be considered valid
 		return nil
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	runner.Stop()
+	return nil
 }
