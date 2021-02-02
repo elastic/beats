@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename googlecloud module to gcp module. {pull}22246[22246]
 - Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
 - Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
+- Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
 
 *Packetbeat*
 
@@ -188,6 +189,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
+- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
@@ -262,6 +264,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Change the `event.created` in Netflow events to be the time the event was created by Filebeat
   to be consistent with ECS. {pull}23094[23094]
+- Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
+- Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 
 *Heartbeat*
 
@@ -411,6 +415,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
 - Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
 - Add deployment name in pod's meta. {pull}23610[23610]
+- Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
 
 *Auditbeat*
 
@@ -421,6 +426,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 - Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
+- Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
 
 *Filebeat*
 
@@ -565,7 +571,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added support for first_event context in filebeat httpjson input {pull}23437[23437]
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
+- Added username parsing from Cisco ASA message 302013. {pull}21196[21196]
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
+- Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 
 *Heartbeat*
 
@@ -659,6 +667,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
+- Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
 
 *Packetbeat*
 
@@ -688,6 +697,7 @@ port. {pull}19209[19209]
 - Add dns.question.subdomain fields for sysmon DNS events. {pull}22999[22999]
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
+- Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
 
 *Elastic Log Driver*
 
