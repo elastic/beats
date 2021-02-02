@@ -466,11 +466,13 @@ def withBeatsEnv(Closure body) {
 def deleteWorkspace() {
   if(isUnix()) {
     catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-      sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
-        set +x
-        source ./dev-tools/common.bash
-        docker_setup
-        script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
+      dir("${env.BASE_DIR}") {
+        sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+          set +x
+          source ./dev-tools/common.bash
+          docker_setup
+          script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
+      }
       deleteDir()
     }
   }
