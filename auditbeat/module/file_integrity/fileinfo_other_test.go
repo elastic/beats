@@ -15,33 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tcp
+// +build !windows
+
+package file_integrity
 
 import (
-	"time"
-
-	"github.com/dustin/go-humanize"
-
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
+	"os"
+	"testing"
 )
 
-type config struct {
-	tcp.Config                `config:",inline"`
-	harvester.ForwarderConfig `config:",inline"`
-
-	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
-	Framing       streaming.FramingType `config:"framing"`
-}
-
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "tcp",
-	},
-	Config: tcp.Config{
-		Timeout:        time.Minute * 5,
-		MaxMessageSize: 20 * humanize.MiByte,
-	},
-	LineDelimiter: "\n",
+func makeFileNonReadable(t testing.TB, path string) {
+	if err := os.Chmod(path, 0); err != nil {
+		t.Fatal(err)
+	}
 }

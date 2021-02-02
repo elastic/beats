@@ -377,6 +377,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
+- Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
+- Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 
 *Heartbeat*
 
@@ -619,6 +621,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 - Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
+- Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
 - system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
 
 *Filebeat*
@@ -831,6 +834,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
 - Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
+- Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 
 *Heartbeat*
 
