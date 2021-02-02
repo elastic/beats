@@ -23,14 +23,13 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain"
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"

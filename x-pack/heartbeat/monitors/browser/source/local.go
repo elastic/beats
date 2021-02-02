@@ -46,12 +46,6 @@ func (l *LocalSource) Validate() error {
 	return nil
 }
 
-var offlineEnvVar = "ELASTIC_SYNTHETICS_OFFLINE"
-
-func offline() bool {
-	return os.Getenv(offlineEnvVar) == "true"
-}
-
 func (l *LocalSource) Fetch() (err error) {
 	if l.workingPath != "" {
 		return nil
@@ -79,7 +73,7 @@ func (l *LocalSource) Fetch() (err error) {
 		return err
 	}
 
-	if !offline() {
+	if !Offline() {
 		err = setupOnlineDir(dir)
 		return err
 	}

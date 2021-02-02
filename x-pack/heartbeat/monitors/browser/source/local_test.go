@@ -46,9 +46,8 @@ func TestLocalSourceLifeCycle(t *testing.T) {
 
 	// Don't run the NPM commands in unit tests
 	// We can leave that for E2E tests
-	origOffline := os.Getenv(offlineEnvVar)
-	os.Setenv(offlineEnvVar, "true")
-	defer os.Setenv(offlineEnvVar, origOffline)
+	GoOffline()
+	defer GoOnline()
 	require.NoError(t, ls.Fetch())
 
 	require.NotEmpty(t, ls.workingPath)

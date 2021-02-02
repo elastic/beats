@@ -29,6 +29,7 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 
 	if se.Type == "journey/start" {
 		e.currentJourney.Store(true)
+		e.eventCounter.Store(-1)
 	}
 	hasCurrentJourney := e.currentJourney.Load()
 	if se.Type == "journey/end" {
