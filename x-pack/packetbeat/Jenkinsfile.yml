@@ -15,8 +15,9 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     Lint:
         mage: |
-          mage -C x-pack/packetbeat check;
-          mage -C x-pack/packetbeat update;
+          mage check;
+          mage update;
+        make: |
           make -C packetbeat check;
           make -C packetbeat update;
           make check-no-changes;
