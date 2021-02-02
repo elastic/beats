@@ -599,6 +599,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
 - Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
 - Add deployment name in pod's meta. {pull}23610[23610]
+- Added ECS 1.8 `host.os.type` field to `add_host_metadata` processor. {pull}23513[23513]
 
 *Auditbeat*
 
@@ -618,6 +619,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add ECS categorization info for auditd module {pull}18596[18596]
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 - Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
+- system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
 
 *Filebeat*
 

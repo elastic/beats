@@ -12340,6 +12340,16 @@ type: keyword
 
 --
 
+*`system.audit.host.os.type`*::
++
+--
+OS type (see ECS os.type).
+
+
+type: keyword
+
+--
+
 [float]
 === package
 
