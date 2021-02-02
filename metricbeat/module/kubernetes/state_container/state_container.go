@@ -161,7 +161,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 		}
 
-
 		var moduleFieldsMapStr common.MapStr
 		moduleFields, ok := event[mb.ModuleDataKey]
 		if ok {
