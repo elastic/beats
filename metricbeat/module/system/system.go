@@ -26,6 +26,7 @@ import (
 )
 
 var (
+	// TODO: remove this flag in 8.0 since it should be replaced by system.hostfs configuration option (config.HostFS)
 	// HostFS is an alternate mountpoint for the filesytem root, for when metricbeat is running inside a container.
 	HostFS = flag.String("system.hostfs", "", "mountpoint of the host's filesystem for use in monitoring a host from within a container")
 )
@@ -37,6 +38,11 @@ func init() {
 	if err := mb.Registry.AddModule("system", NewModule); err != nil {
 		panic(err)
 	}
+}
+
+// Config for the system module.
+type Config struct {
+	HostFS string `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
 }
 
 // Module represents the system module
@@ -53,5 +59,16 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		initModule()
 	})
 
-	return &Module{BaseModule: base, HostFS: *HostFS, IsAgent: fleetmode.Enabled()}, nil
+	config := Config{
+		HostFS: "",
+	}
+	err := base.UnpackConfig(&config)
+	if err != nil {
+		return nil, err
+	}
+	if *HostFS != "" {
+		config.HostFS = *HostFS
+	}
+
+	return &Module{BaseModule: base, HostFS: config.HostFS, IsAgent: fleetmode.Enabled()}, nil
 }
