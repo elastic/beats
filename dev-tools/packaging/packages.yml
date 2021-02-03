@@ -736,7 +736,7 @@ specs:
         <<: *elastic_license_for_binaries
 
     - os: linux
-      arch: '!arm64'
+      arch: amd64
       types: [docker]
       spec:
         <<: *docker_spec
@@ -838,7 +838,7 @@ specs:
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
-      arch: '!arm64'
+      arch: amd64
       types: [docker]
       spec:
         <<: *docker_spec
@@ -930,7 +930,7 @@ specs:
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
-      arch: '!arm64'
+      arch: amd64
       types: [docker]
       spec:
         <<: *agent_docker_spec
