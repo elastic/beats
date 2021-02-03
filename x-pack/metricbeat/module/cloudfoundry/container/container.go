@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -41,5 +42,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	m.mod.RunContainerReporter(reporter)
+	m.mod.RunContainerReporter(&containerReporter{reporter, m.Logger()})
+}
+
+type containerReporter struct {
+	mb.PushReporterV2
+
+	logger *logp.Logger
+}
+
+func (r *containerReporter) Event(event mb.Event) bool {
+	cpuPctKey := "cloudfoundry.container.cpu.pct"
+	found, err := cloudfoundry.HasNonNumericFloat(event.RootFields, cpuPctKey)
+	if err != nil {
+		r.logger.Debugf("Unexpected failure while checking for non-numeric values: %v", err)
+	}
+	if found {
+		event.RootFields.Delete(cpuPctKey)
+	}
+	return r.PushReporterV2.Event(event)
 }

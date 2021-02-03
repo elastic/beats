@@ -5,7 +5,6 @@
 package application
 
 import (
-	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -83,22 +82,5 @@ func TestActionStore(t *testing.T) {
 			require.Equal(t, 1, len(actions))
 
 			require.Equal(t, ActionPolicyChange, actions[0])
-		}))
-
-	t.Run("when we ACK we save to disk",
-		withFile(func(t *testing.T, file string) {
-			ActionPolicyChange := &fleetapi.ActionPolicyChange{
-				ActionID: "abc123",
-			}
-
-			s := storage.NewDiskStore(file)
-			store, err := newActionStore(log, s)
-			require.NoError(t, err)
-
-			acker := newActionStoreAcker(&testAcker{}, store)
-			require.Equal(t, 0, len(store.Actions()))
-
-			require.NoError(t, acker.Ack(context.Background(), ActionPolicyChange))
-			require.Equal(t, 1, len(store.Actions()))
 		}))
 }

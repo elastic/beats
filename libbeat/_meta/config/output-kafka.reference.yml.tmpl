@@ -33,6 +33,10 @@
   #username: ''
   #password: ''
 
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
+
   # Kafka version {{.BeatName | title}} is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
@@ -126,6 +130,10 @@
   # The configurable ClientID used for logging, debugging, and auditing
   # purposes.  The default is "beats".
   #client_id: beats
+
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.

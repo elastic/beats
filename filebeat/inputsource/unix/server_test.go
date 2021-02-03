@@ -18,7 +18,6 @@
 package unix
 
 import (
-	"bufio"
 	"fmt"
 	"math/rand"
 	"net"
@@ -36,15 +35,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	netcommon "github.com/elastic/beats/v7/filebeat/inputsource/common"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var defaultConfig = Config{
-	Timeout:        time.Minute * 5,
-	MaxMessageSize: 20 * humanize.MiByte,
+func defaultConfig() Config {
+	return Config{
+		Timeout:        time.Minute * 5,
+		MaxMessageSize: 20 * humanize.MiByte,
+		SocketType:     StreamSocket,
+	}
 }
 
 type info struct {
@@ -52,10 +53,20 @@ type info struct {
 	mt      inputsource.NetworkMetadata
 }
 
+func TestErrorOnInvalidSocketType(t *testing.T) {
+	config := &Config{
+		SocketType: SocketType(7),
+	}
+	_, err := New(logp.L(), config, nil)
+	assert.Error(t, err)
+}
+
 func TestErrorOnEmptyLineDelimiter(t *testing.T) {
-	c := common.NewConfig()
-	config := defaultConfig
-	err := c.Unpack(&config)
+	config := &Config{
+		SocketType:    StreamSocket,
+		LineDelimiter: "",
+	}
+	_, err := New(logp.L(), config, nil)
 	assert.Error(t, err)
 }
 
@@ -72,93 +83,82 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 	tests := []struct {
 		name             string
 		cfg              map[string]interface{}
-		splitFunc        bufio.SplitFunc
 		expectedMessages []string
 		messageSent      string
 	}{
 		{
 			name:             "NewLine",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\n"),
 		},
 		{
 			name:             "NewLineWithCR",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\r\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\r\n"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "\r\n"),
 		},
 		{
 			name:             "CustomDelimiter",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, ";"),
 		},
 		{
 			name:             "MultipleCharsCustomDelimiter",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
 			expectedMessages: expectedMessages,
 			messageSent:      strings.Join(expectedMessages, "<END>"),
 		},
 		{
 			name:             "SingleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "MultipleCharCustomDelimiterMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("<END>")),
+			cfg:              map[string]interface{}{"line_delimiter": "<END>"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineMessageWithoutBoundaries",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: []string{"hello"},
 			messageSent:      "hello",
 		},
 		{
 			name:             "NewLineLargeMessagePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, "\n"),
 		},
 		{
 			name:             "CustomLargeMessagePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte(";")),
+			cfg:              map[string]interface{}{"line_delimiter": ";"},
 			expectedMessages: largeMessages,
 			messageSent:      strings.Join(largeMessages, ";"),
 		},
 		{
 			name:             "ReadRandomLargePayload",
-			cfg:              map[string]interface{}{},
-			splitFunc:        netcommon.SplitFunc([]byte("\n")),
+			cfg:              map[string]interface{}{"line_delimiter": "\n"},
 			expectedMessages: []string{randomGeneratedText},
 			messageSent:      randomGeneratedText,
 		},
 		{
-			name:      "MaxReadBufferReachedUserConfigured",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			name: "MaxReadBufferReachedUserConfigured",
 			cfg: map[string]interface{}{
+				"line_delimiter":   "\n",
 				"max_message_size": 50000,
 			},
 			expectedMessages: []string{},
 			messageSent:      randomGeneratedText,
 		},
 		{
-			name:      "MaxBufferSizeSet",
-			splitFunc: netcommon.SplitFunc([]byte("\n")),
+			name: "MaxBufferSizeSet",
 			cfg: map[string]interface{}{
+				"line_delimiter":   "\n",
 				"max_message_size": 66 * 1024,
 			},
 			expectedMessages: extraLargeMessages,
@@ -176,14 +176,13 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			path := filepath.Join(os.TempDir(), "test.sock")
 			test.cfg["path"] = path
 			cfg, _ := common.NewConfigFrom(test.cfg)
-			config := defaultConfig
+			config := defaultConfig()
 			err := cfg.Unpack(&config)
 			if !assert.NoError(t, err) {
 				return
 			}
 
-			factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, test.splitFunc)
-			server, err := New(&config, factory)
+			server, err := New(logp.L(), &config, to)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -234,16 +233,16 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 
 	path := filepath.Join(os.TempDir(), "test.sock")
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path":  path,
-		"group": group.Name,
-		"mode":  "0740",
+		"path":           path,
+		"group":          group.Name,
+		"mode":           "0740",
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	err = cfg.Unpack(&config)
 	require.NoError(t, err)
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -269,12 +268,12 @@ func TestSocketCleanup(t *testing.T) {
 	defer mockStaleSocket.Close()
 
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path": path,
+		"path":           path,
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -293,12 +292,12 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	defer os.Remove(path)
 
 	cfg, _ := common.NewConfigFrom(map[string]interface{}{
-		"path": path,
+		"path":           path,
+		"line_delimiter": "\n",
 	})
-	config := defaultConfig
+	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, nil, netcommon.SplitFunc([]byte("\n")))
-	server, err := New(&config, factory)
+	server, err := New(logp.L(), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.Error(t, err)
@@ -310,55 +309,87 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 		t.Skip("test is only supported on non-windows. See https://github.com/elastic/beats/issues/21757")
 		return
 	}
-	workers := 4
-	eventsCount := 100
-	path := filepath.Join(os.TempDir(), "test.sock")
-	ch := make(chan *info, eventsCount*workers)
-	defer close(ch)
-	to := func(message []byte, mt inputsource.NetworkMetadata) {
-		ch <- &info{message: string(message), mt: mt}
-	}
-	cfg, err := common.NewConfigFrom(map[string]interface{}{"path": path})
-	if !assert.NoError(t, err) {
-		return
-	}
-	config := defaultConfig
-	err = cfg.Unpack(&config)
-	if !assert.NoError(t, err) {
-		return
-	}
 
-	factory := netcommon.SplitHandlerFactory(netcommon.FamilyUnix, logp.NewLogger("test"), MetadataCallback, to, bufio.ScanLines)
-
-	server, err := New(&config, factory)
-	if !assert.NoError(t, err) {
-		return
-	}
-	err = server.Start()
-	if !assert.NoError(t, err) {
-		return
-	}
-	defer server.Stop()
-
-	samples := generateMessages(eventsCount, 1024)
-	for w := 0; w < workers; w++ {
-		go func() {
-			conn, err := net.Dial("unix", path)
-			defer conn.Close()
-			assert.NoError(t, err)
-			for _, sample := range samples {
-				fmt.Fprintln(conn, sample)
-			}
-		}()
-	}
-
-	var events []*info
-	for len(events) < eventsCount*workers {
-		select {
-		case event := <-ch:
-			events = append(events, event)
-		default:
+	for socketType, _ := range socketTypes {
+		if runtime.GOOS == "darwin" && socketType == "datagram" {
+			t.Skip("test is only supported on linux. See https://github.com/elastic/beats/issues/22775")
+			return
 		}
+
+		t.Run("socket_type "+socketType, func(t *testing.T) {
+			workers := 1
+			eventsCount := 100
+			path := filepath.Join(os.TempDir(), "test.sock")
+			ch := make(chan *info, eventsCount*workers)
+			defer close(ch)
+			to := func(message []byte, mt inputsource.NetworkMetadata) {
+				ch <- &info{message: string(message), mt: mt}
+			}
+			cfg, err := common.NewConfigFrom(map[string]interface{}{
+				"path":           path,
+				"line_delimiter": "\n",
+				"socket_type":    socketType,
+			})
+			if !assert.NoError(t, err) {
+				return
+			}
+			config := defaultConfig()
+			err = cfg.Unpack(&config)
+			if !assert.NoError(t, err) {
+				return
+			}
+
+			server, err := New(logp.L(), &config, to)
+			if !assert.NoError(t, err) {
+				return
+			}
+			err = server.Start()
+			if !assert.NoError(t, err) {
+				return
+			}
+			defer server.Stop()
+
+			samples := generateMessages(eventsCount, 1024)
+			for w := 0; w < workers; w++ {
+				if socketType == "stream" {
+					go sendOverUnixStream(t, path, samples)
+				} else if socketType == "datagram" {
+					go sendOverUnixDatagram(t, path, samples)
+				}
+			}
+
+			var events []*info
+			for len(events) < eventsCount*workers {
+				select {
+				case event := <-ch:
+					events = append(events, event)
+				default:
+				}
+			}
+		})
+	}
+}
+
+func sendOverUnixStream(t *testing.T, path string, samples []string) {
+	conn, err := net.Dial("unix", path)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer conn.Close()
+
+	for _, sample := range samples {
+		fmt.Fprintln(conn, sample)
+	}
+}
+
+func sendOverUnixDatagram(t *testing.T, path string, samples []string) {
+	conn, err := net.Dial("unixgram", path)
+	if !assert.NoError(t, err) {
+		return
+	}
+	defer conn.Close()
+	for _, sample := range samples {
+		fmt.Fprintln(conn, sample)
 	}
 }
 
@@ -374,7 +405,7 @@ func randomString(l int) string {
 func generateMessages(c int, l int) []string {
 	messages := make([]string, c)
 	for i := range messages {
-		messages[i] = randomString(l)
+		messages[i] = randomString(l) + "-" + strconv.Itoa(i)
 	}
 	return messages
 }

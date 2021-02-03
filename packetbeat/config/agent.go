@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -94,6 +95,25 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 	return cfg, nil
 }
 
+func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
+	maxProcReadFreq := one.MaxProcReadFreq
+	if two.MaxProcReadFreq > maxProcReadFreq {
+		maxProcReadFreq = two.MaxProcReadFreq
+	}
+
+	refreshPidsFreq := one.RefreshPidsFreq
+	if two.RefreshPidsFreq < refreshPidsFreq {
+		refreshPidsFreq = two.RefreshPidsFreq
+	}
+
+	return procs.ProcsConfig{
+		Enabled:         true,
+		MaxProcReadFreq: maxProcReadFreq,
+		RefreshPidsFreq: refreshPidsFreq,
+		Monitored:       append(one.Monitored, two.Monitored...),
+	}
+}
+
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
 func NewAgentConfig(cfg *common.Config) (Config, error) {
@@ -111,6 +131,28 @@ func NewAgentConfig(cfg *common.Config) (Config, error) {
 
 	logp.Debug("agent", fmt.Sprintf("Found %d inputs", len(input.Streams)))
 	for _, stream := range input.Streams {
+		if interfaceOverride, ok := stream["interface"]; ok {
+			cfg, err := common.NewConfigFrom(interfaceOverride)
+			if err != nil {
+				return config, err
+			}
+			if err := cfg.Unpack(&config.Interfaces); err != nil {
+				return config, err
+			}
+		}
+
+		if procsOverride, ok := stream["procs"]; ok {
+			cfg, err := common.NewConfigFrom(procsOverride)
+			if err != nil {
+				return config, err
+			}
+			var newProcsConfig procs.ProcsConfig
+			if err := cfg.Unpack(&newProcsConfig); err != nil {
+				return config, err
+			}
+			config.Procs = mergeProcsConfig(config.Procs, newProcsConfig)
+		}
+
 		if rawStreamType, ok := stream["type"]; ok {
 			streamType, ok := rawStreamType.(string)
 			if !ok {

@@ -18,8 +18,8 @@ type ModuleV2 struct {
 
 	log *logp.Logger
 
-	hub          *cfcommon.Hub
-	listener     *cfcommon.RlpListener
+	hub          CloudfoundryHub
+	listener     RlpListener
 	listenerLock sync.Mutex
 
 	counterReporter   mb.PushReporterV2
@@ -27,7 +27,7 @@ type ModuleV2 struct {
 	containerReporter mb.PushReporterV2
 }
 
-func newModuleV2(base mb.BaseModule, hub *cfcommon.Hub, log *logp.Logger) (mb.Module, error) {
+func newModuleV2(base mb.BaseModule, hub CloudfoundryHub, log *logp.Logger) (mb.Module, error) {
 	// early check that listener can be created
 	_, err := hub.RlpListener(cfcommon.RlpListenerCallbacks{})
 	if err != nil {

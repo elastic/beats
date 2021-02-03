@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:46:56Z",
           "kind": "event"
         },
         "netflow": {
@@ -54,7 +53,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -122,7 +120,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -190,7 +187,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -258,7 +254,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -326,7 +321,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -394,7 +388,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -462,7 +455,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -530,7 +522,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -598,7 +589,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -666,7 +656,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -734,7 +723,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -802,7 +790,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -870,7 +857,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -938,7 +924,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1006,7 +991,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1074,7 +1058,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1142,7 +1125,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1210,7 +1192,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1278,7 +1259,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1346,7 +1326,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1414,7 +1393,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1482,7 +1460,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1550,7 +1527,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1618,7 +1594,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1686,7 +1661,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1754,7 +1728,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1822,7 +1795,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1890,7 +1862,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1958,7 +1929,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-10T08:47:01Z",
           "kind": "event",
           "type": [
             "connection"

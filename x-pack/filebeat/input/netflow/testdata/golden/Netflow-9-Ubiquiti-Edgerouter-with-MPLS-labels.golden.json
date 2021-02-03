@@ -17,7 +17,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 0,
           "end": "2016-09-10T16:17:25.825Z",
           "kind": "event",
@@ -105,7 +104,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 0,
           "end": "2016-09-10T16:17:25.825Z",
           "kind": "event",
@@ -193,7 +191,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 140227000000,
           "end": "2016-09-10T15:22:30.891Z",
           "kind": "event",
@@ -281,7 +278,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 140227000000,
           "end": "2016-09-10T15:22:30.891Z",
           "kind": "event",
@@ -369,7 +365,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 177102000000,
           "end": "2016-09-10T16:20:32.763Z",
           "kind": "event",
@@ -457,7 +452,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 176903000000,
           "end": "2016-09-10T16:20:32.666Z",
           "kind": "event",
@@ -545,7 +539,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 0,
           "end": "2016-09-10T15:22:36.207Z",
           "kind": "event",
@@ -633,7 +626,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:23:30Z",
           "duration": 0,
           "end": "2016-09-10T16:17:35.661Z",
           "kind": "event",
@@ -720,7 +712,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 116000000,
           "end": "2016-09-10T15:23:38.951Z",
           "kind": "event",
@@ -806,7 +797,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -892,7 +882,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -978,7 +967,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -1064,7 +1052,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -1150,7 +1137,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -1236,7 +1222,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 0,
           "end": "2016-09-10T16:18:39.443Z",
           "kind": "event",
@@ -1322,7 +1307,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-09-10T16:24:08Z",
           "duration": 1250988000000,
           "end": "2016-09-10T15:23:44.363Z",
           "kind": "event",

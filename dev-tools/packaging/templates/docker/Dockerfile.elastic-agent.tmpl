@@ -65,6 +65,17 @@ LABEL \
 
 ENV ELASTIC_CONTAINER "true"
 ENV PATH={{ $beatHome }}:$PATH
+ENV GODEBUG="madvdontneed=1"
+
+# Add an init process, check the checksum to make sure it's a match
+RUN set -e ; \
+  TINI_VERSION='v0.19.0' ; \
+  TINI_BIN='tini-amd64' ; \
+  TINI_SHA256='93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c' ; \
+  curl --retry 8 -S -L -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BIN}" ; \
+  echo "${TINI_SHA256} ${TINI_BIN}" | sha256sum -c - ; \
+  mv "${TINI_BIN}" /usr/bin/tini ; \
+  chmod +x /usr/bin/tini
 
 COPY docker-entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod 755 /usr/local/bin/docker-entrypoint
@@ -89,5 +100,10 @@ USER {{ .user }}
 EXPOSE {{ $port }}
 {{- end }}
 
+# When running under Docker, we must ensure libbeat monitoring pulls cgroup
+# metrics from /sys/fs/cgroup/<subsystem>/, ignoring any paths found in
+# /proc/self/cgroup.
+ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
+
 WORKDIR {{ $beatHome }}
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]

@@ -27,7 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetSecurityInfo(t *testing.T) {
+func TestGetNamedSecurityInfo(t *testing.T) {
 	// Create a temp file that we will use in checking the owner.
 	file, err := ioutil.TempFile("", "go")
 	if err != nil {
@@ -36,10 +36,15 @@ func TestGetSecurityInfo(t *testing.T) {
 	defer os.Remove(file.Name())
 	defer file.Close()
 
+	name, err := syscall.UTF16PtrFromString(file.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Get the file owner.
 	var securityID *syscall.SID
 	var securityDescriptor *SecurityDescriptor
-	if err = GetSecurityInfo(syscall.Handle(file.Fd()), FileObject,
+	if err = GetNamedSecurityInfo(name, FileObject,
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		t.Fatal(err)
 	}

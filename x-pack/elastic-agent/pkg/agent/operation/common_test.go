@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
@@ -69,17 +70,17 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor(), status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	operator.config.DownloadConfig.OperatingSystem = "darwin"
-	operator.config.DownloadConfig.Architecture = "32"
+	operator.config.DownloadConfig.Architecture = "64"
 
 	// make the download path so the `operation_verify` can ensure the path exists
 	downloadConfig := operator.config.DownloadConfig
-	fullPath, err := artifact.GetArtifactPath(p.BinaryName(), p.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
+	fullPath, err := artifact.GetArtifactPath(p.Spec(), p.Version(), downloadConfig.OS(), downloadConfig.Arch(), downloadConfig.TargetDirectory)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func getProgram(binary, version string) *app.Descriptor {
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
-		Architecture:    "32",
+		Architecture:    "64",
 	}
 	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }
@@ -137,7 +138,7 @@ func waitFor(t *testing.T, check func() error) {
 
 type DummyDownloader struct{}
 
-func (*DummyDownloader) Download(_ context.Context, p, a, v string) (string, error) {
+func (*DummyDownloader) Download(_ context.Context, _ program.Spec, _ string) (string, error) {
 	return "", nil
 }
 
@@ -145,7 +146,7 @@ var _ download.Downloader = &DummyDownloader{}
 
 type DummyVerifier struct{}
 
-func (*DummyVerifier) Verify(p, v, _ string, _ bool) (bool, error) {
+func (*DummyVerifier) Verify(_ program.Spec, _ string, _ bool) (bool, error) {
 	return true, nil
 }
 
@@ -153,11 +154,11 @@ var _ download.Verifier = &DummyVerifier{}
 
 type DummyInstallerChecker struct{}
 
-func (*DummyInstallerChecker) Check(_ context.Context, p, v, _ string) error {
+func (*DummyInstallerChecker) Check(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 
-func (*DummyInstallerChecker) Install(_ context.Context, p, v, _ string) error {
+func (*DummyInstallerChecker) Install(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 
@@ -165,7 +166,7 @@ var _ install.InstallerChecker = &DummyInstallerChecker{}
 
 type DummyUninstaller struct{}
 
-func (*DummyUninstaller) Uninstall(_ context.Context, p, v, _ string) error {
+func (*DummyUninstaller) Uninstall(_ context.Context, _ program.Spec, _, _ string) error {
 	return nil
 }
 

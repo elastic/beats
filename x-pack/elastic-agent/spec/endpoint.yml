@@ -2,6 +2,10 @@ name: Endpoint Security
 cmd: endpoint-security
 artifact: endpoint-dev
 service: 6788
+log_paths:
+  darwin: "/Library/Elastic/Endpoint/state/log/endpoint-*.log"
+  linux: "/opt/Elastic/Endpoint/state/log/endpoint-*.log"
+  windows: "C:\\Program Files\\Elastic\\Endpoint\\state\\log\\endpoint-*.log"
 check_install:
 - exec_file:
     path: "endpoint-security"
@@ -49,6 +53,8 @@ rules:
         key: access_api_key
     - remove_key:
         key: kibana
+    - remove_key:
+        key: server
 
 - filter:
     selectors:
@@ -58,3 +64,4 @@ rules:
     - revision
 
 when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+constraints: ${runtime.arch} != 'arm64'

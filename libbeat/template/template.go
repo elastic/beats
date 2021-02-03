@@ -46,22 +46,24 @@ var (
 // Template holds information for the ES template.
 type Template struct {
 	sync.Mutex
-	name         string
-	pattern      string
-	beatVersion  common.Version
-	beatName     string
-	esVersion    common.Version
-	config       TemplateConfig
-	migration    bool
-	templateType IndexTemplateType
-	order        int
-	priority     int
+	name            string
+	pattern         string
+	elasticLicensed bool
+	beatVersion     common.Version
+	beatName        string
+	esVersion       common.Version
+	config          TemplateConfig
+	migration       bool
+	templateType    IndexTemplateType
+	order           int
+	priority        int
 }
 
 // New creates a new template instance
 func New(
 	beatVersion string,
 	beatName string,
+	elasticLicensed bool,
 	esVersion common.Version,
 	config TemplateConfig,
 	migration bool,
@@ -125,16 +127,17 @@ func New(
 	}
 
 	return &Template{
-		pattern:      pattern,
-		name:         name,
-		beatVersion:  *bV,
-		esVersion:    esVersion,
-		beatName:     beatName,
-		config:       config,
-		migration:    migration,
-		templateType: config.Type,
-		order:        config.Order,
-		priority:     config.Priority,
+		pattern:         pattern,
+		name:            name,
+		elasticLicensed: elasticLicensed,
+		beatVersion:     *bV,
+		esVersion:       esVersion,
+		beatName:        beatName,
+		config:          config,
+		migration:       migration,
+		templateType:    config.Type,
+		order:           config.Order,
+		priority:        config.Priority,
 	}, nil
 }
 
@@ -157,7 +160,7 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	processor := Processor{EsVersion: t.esVersion, Migration: t.migration}
+	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: t.elasticLicensed, Migration: t.migration}
 	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
@@ -232,9 +235,8 @@ func (t *Template) loadMinimalComponent() common.MapStr {
 }
 
 func (t *Template) loadMinimalIndex() common.MapStr {
-	m := t.loadMinimalLegacy()
+	m := t.loadMinimalComponent()
 	m["priority"] = t.priority
-	delete(m, "order")
 	return m
 }
 
@@ -301,9 +303,10 @@ func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
 }
 
 func (t *Template) generateIndex(properties common.MapStr) common.MapStr {
-	tmpl := t.generateLegacy(properties)
+	tmpl := t.generateComponent(properties)
 	tmpl["priority"] = t.priority
-	delete(tmpl, "order")
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
+	tmpl[keyPattern] = patterns
 	return tmpl
 }
 

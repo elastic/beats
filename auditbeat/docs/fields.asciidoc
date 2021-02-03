@@ -3325,6 +3325,18 @@ example: example.com
 
 --
 
+*`client.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`client.top_level_domain`*::
 +
 --
@@ -3698,8 +3710,8 @@ example: docker
 [float]
 === destination
 
-Destination fields describe details about the destination of a packet/event.
-Destination fields are usually populated in conjunction with source fields.
+Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Destination fields are usually populated in conjunction with source fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`destination.address`*::
@@ -3925,6 +3937,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`destination.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -4342,7 +4366,7 @@ Expected values are: AA, TC, RD, RA, AD, CD, DO.
 
 type: keyword
 
-example: ['RD', 'RA']
+example: ["RD", "RA"]
 
 --
 
@@ -4447,7 +4471,7 @@ The `answers` array can be difficult to use, because of the variety of data form
 
 type: ip
 
-example: ['10.10.10.10', '10.10.10.11']
+example: ["10.10.10.10", "10.10.10.11"]
 
 --
 
@@ -5007,7 +5031,8 @@ example: C
 *`file.extension`*::
 +
 --
-File extension.
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -6166,6 +6191,18 @@ example: GET, POST, PUT, PoST
 
 --
 
+*`http.request.mime_type`*::
++
+--
+Mime type of the body of the request.
+This value must only be populated based on the content of the request body, not on the `Content-Type` header. Comparing the mime type of a request with the request's Content-Type header can be helpful in detecting threats or misconfigured clients.
+
+type: keyword
+
+example: image/gif
+
+--
+
 *`http.request.referrer`*::
 +
 --
@@ -6218,6 +6255,18 @@ type: long
 example: 1437
 
 format: bytes
+
+--
+
+*`http.response.mime_type`*::
++
+--
+Mime type of the body of the response.
+This value must only be populated based on the content of the response body, not on the `Content-Type` header. Comparing the mime type of a response with the response's Content-Type header can be helpful in detecting misconfigured servers.
+
+type: keyword
+
+example: image/gif
 
 --
 
@@ -6499,14 +6548,17 @@ example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
 --
 Direction of the network traffic.
 Recommended values are:
+  * ingress
+  * egress
   * inbound
   * outbound
   * internal
   * external
   * unknown
 
-When mapping events from a host-based monitoring context, populate this field from the host's point of view.
-When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+When mapping events from a host-based monitoring context, populate this field from the host's point of view, using the values "ingress" or "egress".
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of the network perimeter, using the values "inbound", "outbound", "internal" or "external".
+Note that "internal" is not crossing perimeter boundaries, and is meant to describe communication between two hosts within the perimeter. Note also that "external" is meant to describe traffic between two hosts that are external to the perimeter. This could for example be useful for ISPs or VPN service providers.
 
 type: keyword
 
@@ -6539,7 +6591,7 @@ example: 6
 *`network.inner`*::
 +
 --
-Network.inner fields are added in addition to network.vlan fields to describe  the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include  vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+Network.inner fields are added in addition to network.vlan fields to describe the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
 
 type: object
 
@@ -7436,7 +7488,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -7635,7 +7687,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -8361,7 +8413,7 @@ Name, organization, or pseudonym of the author or authors who created the rule u
 
 type: keyword
 
-example: ['Star-Lord']
+example: ["Star-Lord"]
 
 --
 
@@ -8699,6 +8751,18 @@ example: example.com
 
 --
 
+*`server.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`server.top_level_domain`*::
 +
 --
@@ -8919,8 +8983,8 @@ example: 3.2.4
 [float]
 === source
 
-Source fields describe details about the source of a packet/event.
-Source fields are usually populated in conjunction with destination fields.
+Source fields capture details about the sender of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Source fields are usually populated in conjunction with destination fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`source.address`*::
@@ -9149,6 +9213,18 @@ example: example.com
 
 --
 
+*`source.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`source.top_level_domain`*::
 +
 --
@@ -9295,55 +9371,55 @@ example: MITRE ATT&CK
 *`threat.tactic.id`*::
 +
 --
-The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: TA0040
+example: TA0002
 
 --
 
 *`threat.tactic.name`*::
 +
 --
-Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/)
+Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/)
 
 type: keyword
 
-example: impact
+example: Execution
 
 --
 
 *`threat.tactic.reference`*::
 +
 --
-The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: https://attack.mitre.org/tactics/TA0040/
+example: https://attack.mitre.org/tactics/TA0002/
 
 --
 
 *`threat.technique.id`*::
 +
 --
-The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: T1499
+example: T1059
 
 --
 
 *`threat.technique.name`*::
 +
 --
-The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: Endpoint Denial of Service
+example: Command and Scripting Interpreter
 
 --
 
@@ -9357,11 +9433,51 @@ type: text
 *`threat.technique.reference`*::
 +
 --
-The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: https://attack.mitre.org/techniques/T1499/
+example: https://attack.mitre.org/techniques/T1059/
+
+--
+
+*`threat.technique.subtechnique.id`*::
++
+--
+The full id of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: T1059.001
+
+--
+
+*`threat.technique.subtechnique.name`*::
++
+--
+The name of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: PowerShell
+
+--
+
+*`threat.technique.subtechnique.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.technique.subtechnique.reference`*::
++
+--
+The reference url of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: https://attack.mitre.org/techniques/T1059/001/
 
 --
 
@@ -9400,7 +9516,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -9510,7 +9626,7 @@ Array of ciphers offered by the client during the client hello.
 
 type: keyword
 
-example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+example: ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "..."]
 
 --
 
@@ -9836,7 +9952,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -10214,13 +10330,7 @@ example: tls
 
 --
 
-[float]
-=== tracing
-
-Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
-
-
-*`tracing.span.id`*::
+*`span.id`*::
 +
 --
 Unique identifier of the span within the scope of its trace.
@@ -10232,7 +10342,7 @@ example: 3ff9a8981b7ccd5a
 
 --
 
-*`tracing.trace.id`*::
+*`trace.id`*::
 +
 --
 Unique identifier of the trace.
@@ -10244,7 +10354,7 @@ example: 4bf92f3577b34da6a3ce929d0e0e4736
 
 --
 
-*`tracing.transaction.id`*::
+*`transaction.id`*::
 +
 --
 Unique identifier of the transaction within the scope of its trace.
@@ -10277,9 +10387,10 @@ example: www.elastic.co
 *`url.extension`*::
 +
 --
-The field contains the file extension from the original request url.
+The field contains the file extension from the original request url, excluding the leading dot.
 The file extension is only set if it exists, as not every url has a file extension.
 The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -10398,6 +10509,18 @@ Note: The `:` is not part of the scheme.
 type: keyword
 
 example: https
+
+--
+
+*`url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -10873,7 +10996,9 @@ example: Critical
 [float]
 === x509
 
-This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk. When only a single certificate is logged in an event, it should be nested under `file`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`). For events that contain certificate information for both sides of the connection, the x509 object could be nested under the respective side of the connection information (e.g. `tls.server.x509`).
+This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk.
+When the certificate relates to a file, use the fields at `file.x509`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`).
+Events that contain certificate information about network connections, should use the x509 fields under the relevant TLS fields: `tls.server.x509` and/or `tls.client.x509`.
 
 
 *`x509.alternative_names`*::
@@ -11464,6 +11589,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
@@ -11478,6 +11613,16 @@ type: object
 +
 --
 Kubernetes annotations map
+
+
+type: object
+
+--
+
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
 
 
 type: object
