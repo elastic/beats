@@ -251,7 +251,7 @@ required: False
 
 --
 
-*`journald.object.cmd`*::
+*`journald.object.process.command_line`*::
 +
 --
 The command line of the process.
@@ -265,7 +265,7 @@ required: False
 
 --
 
-*`journald.object.name`*::
+*`journald.object.process.name`*::
 +
 --
 Name of the executable.
@@ -279,7 +279,7 @@ required: False
 
 --
 
-*`journald.object.executable`*::
+*`journald.object.process.executable`*::
 +
 --
 Path to the the executable.
@@ -542,7 +542,7 @@ required: False
 
 --
 
-*`journald.process.cmd`*::
+*`journald.process.command_line`*::
 +
 --
 The command line of the process.
