@@ -156,36 +156,6 @@ pipeline {
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
               }
-              stage('Package Docker images for linux/arm64'){
-                agent { label 'arm' }
-                options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.arm
-                  }
-                }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PACKAGES = "docker"
-                  PLATFORMS = [
-                    'linux/arm64',
-                  ].join(' ')
-                }
-                steps {
-                  withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
-                    deleteWorkspace()
-                    release()
-                    pushCIDockerImages()
-                  }
-                }
-                post {
-                  always {
-                    // static workers require this
-                    deleteWorkspace()
-                  }
-                }
-              }
               stage('Package Mac OS'){
                 agent { label 'macosx-10.12' }
                 options { skipDefaultCheckout() }
@@ -208,6 +178,62 @@ pipeline {
                     withMacOSEnv(){
                       release()
                     }
+                  }
+                }
+                post {
+                  always {
+                    // static workers require this
+                    deleteWorkspace()
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Build Packages ARM'){
+          matrix {
+            axes {
+              axis {
+                name 'BEATS_FOLDER'
+                values (
+                  'auditbeat',
+                  'filebeat',
+                  'heartbeat',
+                  'journalbeat',
+                  'metricbeat',
+                  'packetbeat',
+                  'x-pack/auditbeat',
+                  'x-pack/elastic-agent',
+                  'x-pack/dockerlogbeat',
+                  'x-pack/filebeat',
+                  'x-pack/heartbeat',
+                  'x-pack/metricbeat',
+                  'x-pack/packetbeat'
+                )
+              }
+            }
+            stages {
+              stage('Package Docker images for linux/arm64'){
+                agent { label 'arm' }
+                options { skipDefaultCheckout() }
+                when {
+                  beforeAgent true
+                  expression {
+                    return params.arm
+                  }
+                }
+                environment {
+                  HOME = "${env.WORKSPACE}"
+                  PACKAGES = "docker"
+                  PLATFORMS = [
+                    'linux/arm64',
+                  ].join(' ')
+                }
+                steps {
+                  withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
+                    deleteWorkspace()
+                    release()
+                    pushCIDockerImages()
                   }
                 }
                 post {
