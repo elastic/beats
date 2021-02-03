@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 // InspectOutputCmd is an inspect subcommand that shows configurations of the agent.
@@ -208,7 +209,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		modifiers.Filters = append(modifiers.Filters, injectFleet(cfg, sysInfo.Info(), agentInfo))
 	}
 
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log)
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, status.NewController(log))
 	if err != nil {
 		return nil, err
 	}

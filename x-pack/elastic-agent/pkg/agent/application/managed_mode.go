@@ -65,9 +65,13 @@ func newManaged(
 	rawConfig *config.Config,
 	reexec reexecManager,
 	agentInfo *info.AgentInfo,
-	caps capabilities.Capability,
 ) (*Managed, error) {
 	statusController := status.NewController(log)
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusController)
+	if err != nil {
+		return nil, err
+	}
+
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)

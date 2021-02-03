@@ -38,8 +38,8 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 		reporter: sc.Register("capabilities"),
 	}
 
-	// load capabilities from file
-	fd, err := os.OpenFile(capsFile, os.O_RDONLY, 0644)
+	// load capabilities from filen()
+	fd, err := os.Open(capsFile)
 	if err != nil && !os.IsNotExist(err) {
 		return cm, err
 	}

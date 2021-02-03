@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -137,12 +136,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	}
 	defer control.Stop()
 
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), logger)
-	if err != nil {
-		return err
-	}
-
-	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo, caps)
+	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo)
 	if err != nil {
 		return err
 	}

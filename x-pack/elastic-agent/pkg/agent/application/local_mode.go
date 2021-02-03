@@ -65,9 +65,13 @@ func newLocal(
 	reexec reexecManager,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
-	caps capabilities.Capability,
 ) (*Local, error) {
 	statusController := &noopController{}
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusController)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
