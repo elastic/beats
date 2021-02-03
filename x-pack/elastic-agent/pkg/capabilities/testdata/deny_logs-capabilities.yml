@@ -1,0 +1,2 @@
+- rule: deny
+  input: system/logs

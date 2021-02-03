@@ -1,0 +1,4 @@
+- rule: allow
+  input: system/metrics
+- rule: deny
+  input: "*"
