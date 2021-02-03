@@ -89,9 +89,9 @@ func testPulsarPublishMessage(t *testing.T, cfg map[string]interface{}) {
 		{
 			"test single events",
 			map[string]interface{}{
-				"url":                       "pulsar://localhost:6650",
-				"topic":                     "my-topic1",
-				"name":                      "test",
+				"url":   "pulsar://localhost:6650",
+				"topic": "my-topic1",
+				"name":  "test",
 			},
 			"my-topic1",
 			single(common.MapStr{
