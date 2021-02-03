@@ -835,6 +835,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
 - Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
+- Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 
 *Heartbeat*
