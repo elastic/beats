@@ -20,6 +20,7 @@ package util
 import (
 	"testing"
 
+	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/stretchr/testify/assert"
@@ -155,5 +156,9 @@ func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 }
 
 func (m *mockWatcher) Store() cache.Store {
+	return nil
+}
+
+func (m *mockWatcher) Client() k8s.Interface {
 	return nil
 }

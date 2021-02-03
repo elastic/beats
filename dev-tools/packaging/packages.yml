@@ -118,6 +118,18 @@ shared:
         source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
 
 
@@ -222,6 +234,18 @@ shared:
         source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
   - &agent_binary_files
     '{{.BeatName}}{{.BinaryExt}}':
@@ -314,6 +338,18 @@ shared:
         source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
 
   # Binary package spec (zip for windows) for community beats.
@@ -373,6 +409,18 @@ shared:
         skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
         source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
         skip_on_missing: true
 

@@ -583,8 +583,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -716,8 +714,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -923,8 +919,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1085,8 +1079,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1387,8 +1379,6 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1590,8 +1580,6 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative

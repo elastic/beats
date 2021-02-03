@@ -30,6 +30,7 @@
 - Fix incorrect hash when upgrading agent {pull}22322[22322]
 - Fix refresh of monitoring configuration {pull}23619[23619]
 - Fixed nil pointer during unenroll {pull}23609[23609]
+- Fixed reenroll scenario {pull}23686[23686]
 
 ==== New features
 
