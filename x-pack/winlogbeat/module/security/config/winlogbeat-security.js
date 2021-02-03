@@ -1941,10 +1941,16 @@ var security = (function () {
         .Convert({
             fields: [
                 {from: "winlog.event_data.TargetUserSid", to: "group.id"},
+                {from: "winlog.event_data.TargetSid", to: "group.id"},
                 {from: "winlog.event_data.TargetUserName", to: "group.name"},
                 {from: "winlog.event_data.TargetDomainName", to: "group.domain"},
             ],
             ignore_missing: true,
+        }).Add(function(evt) {
+            if (!evt.Get("user.target")) return;
+            evt.Put("user.target.group.id", evt.Get("group.id"));
+            evt.Put("user.target.group.name", evt.Get("group.name"));
+            evt.Put("user.target.group.domain", evt.Get("group.domain"));
         })
         .Build();
 
