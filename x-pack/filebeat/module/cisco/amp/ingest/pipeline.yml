@@ -8,12 +8,6 @@ processors:
 #########################
 ## ECS General Mapping ##
 #########################
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- set:
-    field: event.kind
-    value: alert
 - rename:
     field: json.data
     target_field: cisco.amp
@@ -32,10 +26,24 @@ processors:
 #######################
 ## ECS Event Mapping ##
 #######################
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    field: event.kind
+    value: alert
 - rename:
     field: cisco.amp.id
     target_field: event.id
     ignore_missing: true
+- append:
+    field: event.category
+    value: file
+    if: ctx?.cisco?.amp?.file?.file_name != null
+- append:
+    field: event.category
+    value: malware
+    if: 'ctx?.cisco?.amp?.file?.disposition == "Malicious"'
 - rename:
     field: cisco.amp.event_type
     target_field: event.action
@@ -60,7 +68,6 @@ processors:
     field: event.severity
     value: 0
     if: ctx?.cisco?.amp?.severity == null
-
 - date:
     field: cisco.amp.start_timestamp
     target_field: event.start
@@ -104,9 +111,15 @@ processors:
 #####################
 ## ECS URL Mapping ##
 #####################
+- uri_parts:
+    field: cisco.amp.network_info.dirty_url
+    target_field: url
+    keep_original: true
+    remove_if_successful: true
+    if: ctx?.cisco?.amp?.network_info?.dirty_url != null
 - rename:
     field: cisco.amp.network_info.dirty_url
-    target_field: url.full
+    target_field: url.original
     ignore_missing: true
 
 ########################
@@ -157,49 +170,61 @@ processors:
     target_field: file.hash.md5
     ignore_missing: true
 
+#####################
+## ECS OS Mapping ##
+#####################
+- set:
+    field: host.os.family
+    value: windows
+    if: 'ctx?.file?.path != null && ctx?.file?.path.contains("\\\\")'
+- set:
+    field: host.os.platform
+    value: windows
+    if: 'ctx?.file?.path != null && ctx?.file?.path.contains("\\\\")'
+
 #########################
 ## ECS Process Mapping ##
 #########################
 - rename:
     field: cisco.amp.file.parent.process_id
-    target_field: process.parent.pid
+    target_field: process.pid
     ignore_missing: true
 - rename:
     field: cisco.amp.file.parent.file_name
-    target_field: process.parent.name
+    target_field: process.name
     ignore_missing: true
 - rename:
     field: cisco.amp.file.parent.identity.sha256
-    target_field: process.parent.hash.sha256
+    target_field: process.hash.sha256
     ignore_missing: true
 - rename:
     field: cisco.amp.file.parent.identity.sha1
-    target_field: process.parent.hash.sha1
+    target_field: process.hash.sha1
     ignore_missing: true
 - rename:
     field: cisco.amp.file.parent.identity.md5
-    target_field: process.parent.hash.md5
+    target_field: process.hash.md5
     ignore_missing: true
 
 - rename:
     field: cisco.amp.network_info.parent.process_id
-    target_field: process.parent.pid
+    target_field: process.pid
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.parent.file_name
-    target_field: process.parent.name
+    target_field: process.name
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.parent.identity.sha256
-    target_field: process.parent.hash.sha256
+    target_field: process.hash.sha256
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.parent.identity.sha1
-    target_field: process.parent.hash.sha1
+    target_field: process.hash.sha1
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.parent.identity.md5
-    target_field: process.parent.hash.md5
+    target_field: process.hash.md5
     ignore_missing: true
 
 #########################
@@ -212,17 +237,17 @@ processors:
     allow_duplicates: false
 - append:
     field: related.hash
-    value: "{{ process.parent.hash.sha256 }}"
+    value: "{{ process.hash.sha256 }}"
     if: ctx?.process?.parent?.hash?.sha256 != null
     allow_duplicates: false
 - append:
     field: related.hash
-    value: "{{ process.parent.hash.md5 }}"
+    value: "{{ process.hash.md5 }}"
     if: ctx?.process?.parent?.hash?.md5 != null
     allow_duplicates: false
 - append:
     field: related.hash
-    value: "{{ process.parent.hash.sha1 }}"
+    value: "{{ process.hash.sha1 }}"
     if: ctx?.process?.parent?.hash?.sha1 != null
     allow_duplicates: false
 - append:

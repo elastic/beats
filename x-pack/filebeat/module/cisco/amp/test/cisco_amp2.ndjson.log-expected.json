@@ -163,6 +163,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 279000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6180352115244794000,
         "event.kind": "alert",
@@ -176,18 +180,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 12475,
-        "process.parent.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
-        "process.parent.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
-        "process.parent.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-        "process.parent.name": "iexplore.exe",
-        "process.parent.pid": 4040,
+        "process.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
+        "process.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
+        "process.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
+        "process.name": "iexplore.exe",
+        "process.pid": 4040,
         "related.hash": [
-            "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-            "b3581f426dc500a51091cdd5bacf0454",
-            "8de30174cebc8732f1ba961e7d93fe5549495a80",
             "b630e72639cc7340620adb0cfc26332ec52fe8867b769695f2d25718d68b1b40",
             "e2f5dcd966e26d54329e8d79c7201652",
             "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
@@ -233,6 +236,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 548000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6180351977805840000,
         "event.kind": "alert",
@@ -246,18 +253,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 14116,
-        "process.parent.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
-        "process.parent.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
-        "process.parent.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-        "process.parent.name": "iexplore.exe",
-        "process.parent.pid": 4040,
+        "process.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
+        "process.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
+        "process.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
+        "process.name": "iexplore.exe",
+        "process.pid": 4040,
         "related.hash": [
-            "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-            "b3581f426dc500a51091cdd5bacf0454",
-            "8de30174cebc8732f1ba961e7d93fe5549495a80",
             "b630e72639cc7340620adb0cfc26332ec52fe8867b769695f2d25718d68b1b40",
             "e2f5dcd966e26d54329e8d79c7201652",
             "70aef829bec17195e6c8ec0e6cba0ed39f97ba48"
@@ -302,6 +308,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 525000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159258594551267000,
         "event.kind": "alert",
@@ -315,6 +325,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 15757,
         "related.hash": [
@@ -382,16 +394,11 @@
         "log.offset": 17081,
         "network.direction": "egress",
         "network.transport": "TCP",
-        "process.parent.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
-        "process.parent.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
-        "process.parent.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-        "process.parent.name": "iexplore.exe",
-        "process.parent.pid": 3136,
-        "related.hash": [
-            "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
-            "b3581f426dc500a51091cdd5bacf0454",
-            "8de30174cebc8732f1ba961e7d93fe5549495a80"
-        ],
+        "process.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
+        "process.hash.sha1": "8de30174cebc8732f1ba961e7d93fe5549495a80",
+        "process.hash.sha256": "b4e5c2775de098946b4e11aba138b89d42b88c1dbd4d5ec879ef6919bf018132",
+        "process.name": "iexplore.exe",
+        "process.pid": 3136,
         "related.hosts": [
             "Demo_Upatre"
         ],
@@ -437,6 +444,9 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 322000000,
         "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 1476910664322001000,
         "event.kind": "alert",
@@ -451,9 +461,8 @@
         "host.name": "Demo_Command_Line_Arguments_Meterpreter",
         "input.type": "log",
         "log.offset": 25799,
-        "process.parent.hash.sha256": "69d6fff3e0a0c4d77a62b4d71e1e3a8d10d93c46782a1b05f0ec4b8919c384b9",
+        "process.hash.sha256": "69d6fff3e0a0c4d77a62b4d71e1e3a8d10d93c46782a1b05f0ec4b8919c384b9",
         "related.hash": [
-            "69d6fff3e0a0c4d77a62b4d71e1e3a8d10d93c46782a1b05f0ec4b8919c384b9",
             "935c1861df1f4018d698e8b65abfa02d7e9037d8f68ca3c2065b6ca165d44ad2"
         ],
         "related.hosts": [
@@ -493,6 +502,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 25000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533671385032557000,
         "event.kind": "alert",
@@ -506,6 +519,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 27431,
@@ -554,6 +569,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 605000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533671380737589000,
         "event.kind": "alert",
@@ -615,6 +634,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 81000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533671123039551000,
         "event.kind": "alert",
@@ -628,6 +651,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 31393,
@@ -676,6 +701,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 666000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533671118744584000,
         "event.kind": "alert",
@@ -737,6 +766,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 293000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533670861046546000,
         "event.kind": "alert",
@@ -750,6 +783,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 35355,
@@ -798,6 +833,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 880000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533670856751579000,
         "event.kind": "alert",
@@ -859,6 +898,9 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 329000000,
         "event.action": "Multiple Infected Files",
+        "event.category": [
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 1489955900329000200,
         "event.kind": "alert",
@@ -871,9 +913,8 @@
         "host.name": "Demo_TeslaCrypt",
         "input.type": "log",
         "log.offset": 39319,
-        "process.parent.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
+        "process.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
         "related.hash": [
-            "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370"
         ],
         "related.hosts": [
@@ -913,6 +954,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 947000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533670191031648000,
         "event.kind": "alert",
@@ -926,6 +971,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 40618,
@@ -974,6 +1021,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 0,
         "event.action": "Executed malware",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 15212386047828,
         "event.kind": "alert",
@@ -988,9 +1039,8 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "input.type": "log",
         "log.offset": 44582,
-        "process.parent.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
+        "process.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
         "related.hash": [
-            "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967"
         ],
         "related.hosts": [
@@ -1030,6 +1080,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 973000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669929038643000,
         "event.kind": "alert",
@@ -1043,6 +1097,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 45938,
@@ -1091,6 +1147,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 333000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669671340605000,
         "event.kind": "alert",
@@ -1104,6 +1164,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 49902,
@@ -1152,6 +1214,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 779000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669667045638000,
         "event.kind": "alert",
@@ -1224,6 +1290,9 @@
             }
         ],
         "event.action": "Vulnerable Application Detected",
+        "event.category": [
+            "file"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 15210587194928,
         "event.kind": "alert",
@@ -1237,9 +1306,8 @@
         "host.name": "Demo_AMP_Exploit_Prevention",
         "input.type": "log",
         "log.offset": 55192,
-        "process.parent.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
+        "process.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
         "related.hash": [
-            "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
             "4312cdb2ead8fd8d2dd6d8d716f3b6e9717b3d7167a2a0495e4391312102170f"
         ],
         "related.hosts": [
@@ -1279,6 +1347,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 257000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669409347600000,
         "event.kind": "alert",
@@ -1292,6 +1364,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 56650,
@@ -1340,6 +1414,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 847000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669405052633000,
         "event.kind": "alert",
@@ -1401,6 +1479,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 375000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669147354595000,
         "event.kind": "alert",
@@ -1414,6 +1496,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 60614,
@@ -1462,6 +1546,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 968000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533669143059628000,
         "event.kind": "alert",
@@ -1523,6 +1611,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 669000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259286289613000,
         "event.kind": "alert",
@@ -1580,6 +1672,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 657000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259234750005000,
         "event.kind": "alert",
@@ -1637,6 +1733,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 645000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259183210398000,
         "event.kind": "alert",
@@ -1695,6 +1795,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 875000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6180335966167761000,
         "event.kind": "alert",
@@ -1708,18 +1812,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 68535,
-        "process.parent.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
-        "process.parent.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
-        "process.parent.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-        "process.parent.name": "explorer.exe",
-        "process.parent.pid": 3164,
+        "process.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
+        "process.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
+        "process.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
+        "process.name": "explorer.exe",
+        "process.pid": 3164,
         "related.hash": [
-            "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-            "8b88ebbb05a0e56b7dcc708498c02b3e",
-            "cea0890d4b99bae3f635a16dae71f69d137027b9",
             "fa1789236d05d88dd10365660defd6ddc8a09fcddb3691812379438874390ddc",
             "b2e15a06b0cca8a926c94f8a8eae3d88",
             "f9b02ad8d25157eebdb284631ff646316dc606d5"
@@ -1764,6 +1867,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 672000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668885361590000,
         "event.kind": "alert",
@@ -1777,6 +1884,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 70133,
@@ -1825,6 +1934,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 8000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259135965757000,
         "event.kind": "alert",
@@ -1882,6 +1995,9 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 291000000,
         "event.action": "Executed malware",
+        "event.category": [
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 1489955900291000600,
         "event.kind": "alert",
@@ -1894,9 +2010,8 @@
         "host.name": "Demo_TeslaCrypt",
         "input.type": "log",
         "log.offset": 75414,
-        "process.parent.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
+        "process.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
         "related.hash": [
-            "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370"
         ],
         "related.hosts": [
@@ -1936,6 +2051,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 3000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251520740131000,
         "event.kind": "alert",
@@ -1949,6 +2068,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 76706,
         "related.hash": [
@@ -1993,6 +2114,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 988000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251516445164000,
         "event.kind": "alert",
@@ -2006,6 +2131,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 78028,
         "related.hash": [
@@ -2050,6 +2177,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 942000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251512150196000,
         "event.kind": "alert",
@@ -2063,6 +2194,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 152159,
         "related.hash": [
@@ -2107,6 +2240,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 996000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259080131183000,
         "event.kind": "alert",
@@ -2164,6 +2301,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 944000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251507855229000,
         "event.kind": "alert",
@@ -2177,6 +2318,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 189236,
         "related.hash": [
@@ -2221,6 +2364,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 821000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251503560262000,
         "event.kind": "alert",
@@ -2234,6 +2381,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "input.type": "log",
         "log.offset": 198516,
         "related.hash": [
@@ -2278,6 +2427,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 984000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176259028591575000,
         "event.kind": "alert",
@@ -2336,6 +2489,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 455000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251439135752000,
         "event.kind": "alert",
@@ -2349,18 +2506,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 208474,
-        "process.parent.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
-        "process.parent.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
-        "process.parent.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-        "process.parent.name": "explorer.exe",
-        "process.parent.pid": 3164,
+        "process.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
+        "process.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
+        "process.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
+        "process.name": "explorer.exe",
+        "process.pid": 3164,
         "related.hash": [
-            "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-            "8b88ebbb05a0e56b7dcc708498c02b3e",
-            "cea0890d4b99bae3f635a16dae71f69d137027b9",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
@@ -2405,6 +2561,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 346000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258981346935000,
         "event.kind": "alert",
@@ -2462,6 +2622,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 334000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258929807327000,
         "event.kind": "alert",
@@ -2519,6 +2683,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 753000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668623368585000,
         "event.kind": "alert",
@@ -2580,6 +2748,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 322000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258878267720000,
         "event.kind": "alert",
@@ -2637,6 +2809,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 310000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258826728112000,
         "event.kind": "alert",
@@ -2695,6 +2871,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 262000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6159251202912551000,
         "event.kind": "alert",
@@ -2708,18 +2888,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TeslaCrypt",
         "host.name": "Demo_TeslaCrypt",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 219281,
-        "process.parent.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
-        "process.parent.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
-        "process.parent.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-        "process.parent.name": "explorer.exe",
-        "process.parent.pid": 3164,
+        "process.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
+        "process.hash.sha1": "cea0890d4b99bae3f635a16dae71f69d137027b9",
+        "process.hash.sha256": "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
+        "process.name": "explorer.exe",
+        "process.pid": 3164,
         "related.hash": [
-            "9e1ec8b43a88e68767fd8fed2f38e7984357b3f4186d0f907e62f8b6c9ff56ad",
-            "8b88ebbb05a0e56b7dcc708498c02b3e",
-            "cea0890d4b99bae3f635a16dae71f69d137027b9",
             "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
@@ -2764,6 +2943,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 292000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258706469028000,
         "event.kind": "alert",
@@ -2821,6 +3004,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 286000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258680699224000,
         "event.kind": "alert",
@@ -2878,6 +3065,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 428000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668365670547000,
         "event.kind": "alert",
@@ -2891,6 +3082,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 223505,
@@ -2939,6 +3132,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 616000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668361375580000,
         "event.kind": "alert",
@@ -3000,6 +3197,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 649000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258629159617000,
         "event.kind": "alert",
@@ -3057,6 +3258,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 637000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258577620009000,
         "event.kind": "alert",
@@ -3114,6 +3319,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 609000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258526080401000,
         "event.kind": "alert",
@@ -3171,6 +3380,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 987000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258474540794000,
         "event.kind": "alert",
@@ -3228,6 +3441,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 959000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258423001186000,
         "event.kind": "alert",
@@ -3285,6 +3502,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 470000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668103677542000,
         "event.kind": "alert",
@@ -3298,6 +3519,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 235387,
@@ -3346,6 +3569,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 696000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533668099382575000,
         "event.kind": "alert",
@@ -3407,6 +3634,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 947000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258371461579000,
         "event.kind": "alert",
@@ -3464,6 +3695,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 403000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258324216938000,
         "event.kind": "alert",
@@ -3521,6 +3756,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 298000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258272677331000,
         "event.kind": "alert",
@@ -3578,6 +3817,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 270000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258221137723000,
         "event.kind": "alert",
@@ -3635,6 +3878,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 648000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258169598116000,
         "event.kind": "alert",
@@ -3692,6 +3939,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 532000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667841684537000,
         "event.kind": "alert",
@@ -3705,6 +3956,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 247271,
@@ -3753,6 +4006,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 636000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258118058508000,
         "event.kind": "alert",
@@ -3810,6 +4067,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 689000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667837389570000,
         "event.kind": "alert",
@@ -3871,6 +4132,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 608000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258066518901000,
         "event.kind": "alert",
@@ -3928,6 +4193,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 581000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176258014979293000,
         "event.kind": "alert",
@@ -3985,6 +4254,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 569000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257963439686000,
         "event.kind": "alert",
@@ -4042,6 +4315,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 778000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667579691532000,
         "event.kind": "alert",
@@ -4055,6 +4332,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 257835,
@@ -4103,6 +4382,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 971000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667575396565000,
         "event.kind": "alert",
@@ -4164,6 +4447,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 536000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257843180601000,
         "event.kind": "alert",
@@ -4265,6 +4552,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 898000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257791640994000,
         "event.kind": "alert",
@@ -4322,6 +4613,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 901000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257740101386000,
         "event.kind": "alert",
@@ -4379,6 +4674,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 874000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257688561779000,
         "event.kind": "alert",
@@ -4436,6 +4735,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 236000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257641317138000,
         "event.kind": "alert",
@@ -4493,6 +4796,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 641000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667317698527000,
         "event.kind": "alert",
@@ -4554,6 +4861,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 224000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257589777531000,
         "event.kind": "alert",
@@ -4611,6 +4922,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 218000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257564007727000,
         "event.kind": "alert",
@@ -4668,6 +4983,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 581000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257512468120000,
         "event.kind": "alert",
@@ -4725,6 +5044,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 569000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257460928512000,
         "event.kind": "alert",
@@ -4783,6 +5106,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 875000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 5825617812646789000,
         "event.kind": "alert",
@@ -4796,18 +5123,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TDSS",
         "host.name": "Demo_TDSS",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 279864,
-        "process.parent.hash.md5": "60784f891563fb1b767f70117fc2428f",
-        "process.parent.hash.sha1": "e6e904b84332191d44de729deb7bfed9bcef2ce9",
-        "process.parent.hash.sha256": "e0b07f08e60ffbad36c2e58180f4b2a16dca47716044cbe0213df7b74d742f1f",
-        "process.parent.name": "spoolsv.exe",
-        "process.parent.pid": 1480,
+        "process.hash.md5": "60784f891563fb1b767f70117fc2428f",
+        "process.hash.sha1": "e6e904b84332191d44de729deb7bfed9bcef2ce9",
+        "process.hash.sha256": "e0b07f08e60ffbad36c2e58180f4b2a16dca47716044cbe0213df7b74d742f1f",
+        "process.name": "spoolsv.exe",
+        "process.pid": 1480,
         "related.hash": [
-            "e0b07f08e60ffbad36c2e58180f4b2a16dca47716044cbe0213df7b74d742f1f",
-            "60784f891563fb1b767f70117fc2428f",
-            "e6e904b84332191d44de729deb7bfed9bcef2ce9",
             "aaa33c484a7728c49009afeaea27f0f87d7bdf27a46b61e4d0030f9d66cb6f33",
             "bfcc0861c7fb965c1f7473d3dc42cff6",
             "420da91c3199993c9f245b21ea060b69d7ecfd49"
@@ -4853,6 +5179,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 812000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 5825617808351822000,
         "event.kind": "alert",
@@ -4866,12 +5196,14 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TDSS",
         "host.name": "Demo_TDSS",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 287092,
-        "process.parent.hash.sha256": "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5",
-        "process.parent.name": "tdss.exe",
-        "process.parent.pid": 3728,
+        "process.hash.sha256": "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5",
+        "process.name": "tdss.exe",
+        "process.pid": 3728,
         "related.hash": [
             "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5",
             "4a052246c5551e83d2d55f80e72f03eb",
@@ -4917,6 +5249,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 56000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257413683872000,
         "event.kind": "alert",
@@ -4974,6 +5310,9 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 267000000,
         "event.action": "Executed malware",
+        "event.category": [
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 1489955900267000300,
         "event.kind": "alert",
@@ -4986,9 +5325,8 @@
         "host.name": "Demo_TDSS",
         "input.type": "log",
         "log.offset": 296255,
-        "process.parent.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
+        "process.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
         "related.hash": [
-            "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
             "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5"
         ],
         "related.hosts": [
@@ -5028,6 +5366,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 607000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257357849297000,
         "event.kind": "alert",
@@ -5085,6 +5427,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 478000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667064295457000,
         "event.kind": "alert",
@@ -5098,6 +5444,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 298855,
@@ -5146,6 +5494,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 988000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257340669428000,
         "event.kind": "alert",
@@ -5203,6 +5555,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 565000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533667055705522000,
         "event.kind": "alert",
@@ -5216,6 +5572,8 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 301500,
@@ -5265,6 +5623,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 13000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 5832268414885822000,
         "event.kind": "alert",
@@ -5278,18 +5640,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Zbot",
         "host.name": "Demo_Zbot",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 302825,
-        "process.parent.hash.md5": "9a2e18cb348feb772d02fb8f8728ab82",
-        "process.parent.hash.sha1": "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
-        "process.parent.hash.sha256": "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
-        "process.parent.name": "a.exe",
-        "process.parent.pid": 3020,
+        "process.hash.md5": "9a2e18cb348feb772d02fb8f8728ab82",
+        "process.hash.sha1": "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
+        "process.hash.sha256": "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
+        "process.name": "a.exe",
+        "process.pid": 3020,
         "related.hash": [
-            "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
-            "9a2e18cb348feb772d02fb8f8728ab82",
-            "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
             "8db0d7f3a27291f197173a1e3a3a7242fc49deb2d06f90598475c919417a1c7a",
             "e74f1b3fffc4ae61e077bbdec3230e95",
             "e0feb4af86ef2f7a82e01b8704900e1e86c9e7a5"
@@ -5335,6 +5696,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 810000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 5832268410590855000,
         "event.kind": "alert",
@@ -5348,18 +5713,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Zbot",
         "host.name": "Demo_Zbot",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 304431,
-        "process.parent.hash.md5": "9a2e18cb348feb772d02fb8f8728ab82",
-        "process.parent.hash.sha1": "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
-        "process.parent.hash.sha256": "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
-        "process.parent.name": "a.exe",
-        "process.parent.pid": 3020,
+        "process.hash.md5": "9a2e18cb348feb772d02fb8f8728ab82",
+        "process.hash.sha1": "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
+        "process.hash.sha256": "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
+        "process.name": "a.exe",
+        "process.pid": 3020,
         "related.hash": [
-            "0723932d68702a59c4c8bf6a670a098cd55c39f4a3037fa8c2e6d2641fbfe85f",
-            "9a2e18cb348feb772d02fb8f8728ab82",
-            "5df10f3387f7ff512e420240f81bde68a2b4c7aa",
             "8db0d7f3a27291f197173a1e3a3a7242fc49deb2d06f90598475c919417a1c7a",
             "e74f1b3fffc4ae61e077bbdec3230e95",
             "e0feb4af86ef2f7a82e01b8704900e1e86c9e7a5"
@@ -5404,6 +5768,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 942000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257087266357000,
         "event.kind": "alert",
@@ -5461,6 +5829,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 469000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533666798007484000,
         "event.kind": "alert",
@@ -5522,6 +5894,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 948000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533666793712517000,
         "event.kind": "alert",
@@ -5584,6 +5960,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 372000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533666785122583000,
         "event.kind": "alert",
@@ -5597,18 +5977,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 312869,
-        "process.parent.hash.md5": "51138beea3e2c21ec44d0932c71762a8",
-        "process.parent.hash.sha1": "8939cf35447b22dd2c6e6f443446acc1bf986d58",
-        "process.parent.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
-        "process.parent.name": "rundll32.exe",
-        "process.parent.pid": 596,
+        "process.hash.md5": "51138beea3e2c21ec44d0932c71762a8",
+        "process.hash.sha1": "8939cf35447b22dd2c6e6f443446acc1bf986d58",
+        "process.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
+        "process.name": "rundll32.exe",
+        "process.pid": 596,
         "related.hash": [
-            "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
-            "51138beea3e2c21ec44d0932c71762a8",
-            "8939cf35447b22dd2c6e6f443446acc1bf986d58",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
@@ -5653,6 +6032,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 304000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176257040021717000,
         "event.kind": "alert",
@@ -5710,6 +6093,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 292000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176256988482109000,
         "event.kind": "alert",
@@ -5767,6 +6154,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 782000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533666703518204000,
         "event.kind": "alert",
@@ -5829,6 +6220,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 80000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6533666694928269000,
         "event.kind": "alert",
@@ -5842,18 +6237,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 319725,
-        "process.parent.hash.md5": "51138beea3e2c21ec44d0932c71762a8",
-        "process.parent.hash.sha1": "8939cf35447b22dd2c6e6f443446acc1bf986d58",
-        "process.parent.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
-        "process.parent.name": "rundll32.exe",
-        "process.parent.pid": 2204,
+        "process.hash.md5": "51138beea3e2c21ec44d0932c71762a8",
+        "process.hash.sha1": "8939cf35447b22dd2c6e6f443446acc1bf986d58",
+        "process.hash.sha256": "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
+        "process.name": "rundll32.exe",
+        "process.pid": 2204,
         "related.hash": [
-            "5ad3c37e6f2b9db3ee8b5aeedc474645de90c66e3d95f8620c48102f1eba4124",
-            "51138beea3e2c21ec44d0932c71762a8",
-            "8939cf35447b22dd2c6e6f443446acc1bf986d58",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
             "b99e0a8c56f963246b6464b9fffbf7a2",
             "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
@@ -5898,6 +6292,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 286000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 6176256962712306000,
         "event.kind": "alert",
@@ -5956,6 +6354,10 @@
         ],
         "cisco.amp.timestamp_nanoseconds": 296000000,
         "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
         "event.dataset": "cisco.amp",
         "event.id": 5825617250006073000,
         "event.kind": "alert",
@@ -5969,18 +6371,17 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_TDSS",
         "host.name": "Demo_TDSS",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 322626,
-        "process.parent.hash.md5": "12896823fb95bfb3dc9b46bcaedc9923",
-        "process.parent.hash.sha1": "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
-        "process.parent.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
-        "process.parent.name": "explorer.exe",
-        "process.parent.pid": 1892,
+        "process.hash.md5": "12896823fb95bfb3dc9b46bcaedc9923",
+        "process.hash.sha1": "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
+        "process.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
+        "process.name": "explorer.exe",
+        "process.pid": 1892,
         "related.hash": [
-            "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
-            "12896823fb95bfb3dc9b46bcaedc9923",
-            "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
             "b75fd580c29736abd11327eef949e449f6d466a05fb6fd343d3957684c8036e5",
             "4a052246c5551e83d2d55f80e72f03eb",
             "bc29f1e8460915596e1dcafd0c92d6309457d149"
@@ -6048,16 +6449,11 @@
         "log.offset": 324228,
         "network.direction": "egress",
         "network.transport": "TCP",
-        "process.parent.hash.md5": "12896823fb95bfb3dc9b46bcaedc9923",
-        "process.parent.hash.sha1": "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
-        "process.parent.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
-        "process.parent.name": "Explorer.EXE",
-        "process.parent.pid": 1600,
-        "related.hash": [
-            "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
-            "12896823fb95bfb3dc9b46bcaedc9923",
-            "9d2bf84874abc5b6e9a2744b7865c193c08d362f"
-        ],
+        "process.hash.md5": "12896823fb95bfb3dc9b46bcaedc9923",
+        "process.hash.sha1": "9d2bf84874abc5b6e9a2744b7865c193c08d362f",
+        "process.hash.sha256": "1e675cb7df214172f7eb0497f7275556038a0d09c6e5a3e6862c5e26885ef455",
+        "process.name": "Explorer.EXE",
+        "process.pid": 1600,
         "related.hosts": [
             "Demo_Tinba"
         ],
@@ -6077,6 +6473,10 @@
             "cisco-amp",
             "forwarded"
         ],
-        "url.full": "http://dak1otavola1ndos.com/h/index.php"
+        "url.domain": "dak1otavola1ndos.com",
+        "url.extension": "php",
+        "url.original": "http://dak1otavola1ndos.com/h/index.php",
+        "url.path": "/h/index.php",
+        "url.scheme": "http"
     }
 ]
