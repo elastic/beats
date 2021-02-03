@@ -45,7 +45,7 @@ func Package() error {
 	var tasks []interface{}
 	for _, target := range Platforms {
 		for _, pkg := range Packages {
-			if pkg.OS != target.GOOS() {
+			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
 

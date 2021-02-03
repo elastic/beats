@@ -68,6 +68,7 @@ const (
 // system using the contained PackageSpec.
 type OSPackageArgs struct {
 	OS    string        `yaml:"os"`
+	Arch  string        `yaml:"arch",omitempty`
 	Types []PackageType `yaml:"types"`
 	Spec  PackageSpec   `yaml:"spec"`
 }

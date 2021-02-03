@@ -402,6 +402,12 @@ shared:
           {{ commit }}
         mode: 0644
 
+  - &agent_docker_arm_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      from: 'arm64v8/centos:7'
+      buildFrom: 'arm64v8/centos:7'
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -556,6 +562,12 @@ shared:
         mode: 0600
         config: true
 
+  - &docker_arm_spec
+    <<: *docker_spec
+    extra_vars:
+      from: 'arm64v8/centos:7'
+      buildFrom: 'arm64v8/centos:7'
+
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
@@ -564,7 +576,7 @@ shared:
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
-      from: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
+      buildFrom: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
 
   - &elastic_docker_spec
     extra_vars:
@@ -729,13 +741,6 @@ specs:
         <<: *elastic_license_for_deb_rpm
 
     - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-
-    - os: linux
       arch: amd64
       types: [docker]
       spec:
@@ -748,7 +753,7 @@ specs:
       arch: arm64
       types: [docker]
       spec:
-        <<: *docker_spec
+        <<: *docker_arm_spec
         <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
@@ -828,16 +833,6 @@ specs:
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
       arch: amd64
       types: [docker]
       spec:
@@ -853,7 +848,7 @@ specs:
       arch: arm64
       types: [docker]
       spec:
-        <<: *docker_spec
+        <<: *docker_arm_spec
         <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
@@ -920,16 +915,6 @@ specs:
             mode: 0755
 
     - os: linux
-      types: [docker]
-      spec:
-        <<: *agent_docker_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
       arch: amd64
       types: [docker]
       spec:
@@ -945,7 +930,7 @@ specs:
       arch: arm64
       types: [docker]
       spec:
-        <<: *agent_docker_spec
+        <<: *agent_docker_arm_spec
         <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
