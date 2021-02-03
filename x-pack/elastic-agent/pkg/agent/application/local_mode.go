@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -64,6 +65,7 @@ func newLocal(
 	reexec reexecManager,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
+	caps capabilities.Capability,
 ) (*Local, error) {
 	statusController := &noopController{}
 	cfg, err := configuration.NewFromConfig(rawConfig)
@@ -120,6 +122,7 @@ func newLocal(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -145,7 +148,8 @@ func newLocal(
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
 		newNoopAcker(),
-		reporter)
+		reporter,
+		caps)
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil

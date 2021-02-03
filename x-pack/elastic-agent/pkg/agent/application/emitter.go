@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -42,6 +43,7 @@ type emitterController struct {
 	router      programsDispatcher
 	modifiers   *configModifiers
 	reloadables []reloadable
+	caps        capabilities.Capability
 
 	// state
 	lock       sync.RWMutex
@@ -65,6 +67,13 @@ func (e *emitterController) Update(c *config.Config) error {
 	if err != nil {
 		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
+
+	_, updatedAst := e.caps.Apply(rawAst)
+	rawAst, ok := updatedAst.(*transpiler.AST)
+	if !ok {
+		return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
+	}
+
 	for _, filter := range e.modifiers.Filters {
 		if err := filter(e.logger, rawAst); err != nil {
 			return errors.New(err, "failed to filter configuration", errors.TypeConfig)
@@ -142,7 +151,7 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, reloadables ...reloadable) (emitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, caps capabilities.Capability, reloadables ...reloadable) (emitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
 	init, _ := transpiler.NewVars(map[string]interface{}{})
@@ -154,6 +163,7 @@ func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo,
 		modifiers:   modifiers,
 		reloadables: reloadables,
 		vars:        []*transpiler.Vars{init},
+		caps:        caps,
 	}
 	err := controller.Run(ctx, func(vars []*transpiler.Vars) {
 		ctrl.Set(vars)

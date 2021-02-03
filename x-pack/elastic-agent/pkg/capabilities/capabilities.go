@@ -6,9 +6,7 @@ package capabilities
 
 import (
 	"os"
-	"path/filepath"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"gopkg.in/yaml.v2"
 )
@@ -25,8 +23,8 @@ type capabilitiesManager struct {
 	caps []Capability
 }
 
-// LoadCapabilities loads capabilities files and prepares manager.
-func LoadCapabilities(capabilitiesFilename string, log *logger.Logger) (Capability, error) {
+// Load loads capabilities files and prepares manager.
+func Load(capsFile string, log *logger.Logger) (Capability, error) {
 	handlers := []func(*logger.Logger, ruleDefinitions) (Capability, error){
 		newInputsCapability,
 		newOutputsCapability,
@@ -38,13 +36,13 @@ func LoadCapabilities(capabilitiesFilename string, log *logger.Logger) (Capabili
 	}
 
 	// load capabilities from file
-	capsFile := filepath.Join(paths.Config(), capabilitiesFilename)
 	fd, err := os.OpenFile(capsFile, os.O_RDONLY, 0644)
 	if err != nil && !os.IsNotExist(err) {
 		return cm, err
 	}
 
 	if os.IsNotExist(err) {
+		log.Infof("capabilities file not found in %s", capsFile)
 		return cm, nil
 	}
 	defer fd.Close()

@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -64,6 +65,7 @@ func newManaged(
 	rawConfig *config.Config,
 	reexec reexecManager,
 	agentInfo *info.AgentInfo,
+	caps capabilities.Capability,
 ) (*Managed, error) {
 	statusController := status.NewController(log)
 	path := info.AgentConfigFile()
@@ -173,6 +175,7 @@ func newManaged(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info(), agentInfo)},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -205,7 +208,8 @@ func newManaged(
 		[]context.CancelFunc{managedApplication.cancelCtxFn},
 		reexec,
 		acker,
-		combinedReporter)
+		combinedReporter,
+		caps)
 
 	policyChanger := &handlerPolicyChange{
 		log:       log,

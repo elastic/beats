@@ -21,6 +21,7 @@ func TestLoadCapabilities(t *testing.T) {
 		"filter_metrics",
 		"allow_metrics",
 		"deny_logs",
+		"no_caps",
 	}
 
 	l, _ := logger.New("test")
@@ -28,7 +29,7 @@ func TestLoadCapabilities(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
 			filename := filepath.Join("testdata", fmt.Sprintf("%s-capabilities.yml", tc))
-			caps, err := LoadCapabilities(filename, l)
+			caps, err := Load(filename, l)
 			assert.NoError(t, err)
 			assert.NotNil(t, caps)
 
