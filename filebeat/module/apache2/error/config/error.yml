@@ -4,3 +4,6 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+
+processors:
+- add_locale: ~

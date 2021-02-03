@@ -35,6 +35,26 @@
       }
     },
     {
+      "date": {
+        "if": "ctx.event.timezone != null",
+        "field": "apache2.error.timestamp",
+        "target_field": "@timestamp",
+        "formats": [
+          "EEE MMM dd H:m:s yyyy",
+          "EEE MMM dd H:m:s.SSSSSS yyyy"
+        ],
+        "timezone": "{{ beat.timezone }}",
+        "on_failure": [
+          {
+            "append": {
+              "field": "error.message",
+              "value": "{{ _ingest.on_failure_message }}"
+            }
+          }
+        ]
+      }
+    },
+    {
       "remove": {
         "field": "apache2.error.timestamp",
         "ignore_failure": true
