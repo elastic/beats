@@ -42,7 +42,7 @@ func init() {
 
 // Config for the system module.
 type Config struct {
-	HostFS string `config:"system.hostfs"`      // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	HostFS string `config:"system.hostfs"` // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
 }
 
 // Module represents the system module
