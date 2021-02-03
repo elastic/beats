@@ -20,6 +20,7 @@ import (
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
+const defaultAgentCapabilitiesFile = "capabilities.yml"
 const defaultAgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent"
 
@@ -41,6 +42,11 @@ type ioStore interface {
 
 // AgentConfigFile is a name of file used to store agent information
 func AgentConfigFile() string {
+	return filepath.Join(paths.Config(), defaultAgentConfigFile)
+}
+
+// AgentCapabilitiesPath is a name of file used to store agent capabilities
+func AgentCapabilitiesPath() string {
 	return filepath.Join(paths.Config(), defaultAgentConfigFile)
 }
 

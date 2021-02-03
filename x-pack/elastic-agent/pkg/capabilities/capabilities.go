@@ -13,10 +13,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	capabilitiesFilename = "capabilities.yml"
-)
-
 // Capability provides a way of applying predefined filter to object.
 // It's up to capability to determine if capability is applicable on object.
 type Capability interface {
@@ -30,7 +26,7 @@ type capabilitiesManager struct {
 }
 
 // LoadCapabilities loads capabilities files and prepares manager.
-func LoadCapabilities(log *logger.Logger) (Capability, error) {
+func LoadCapabilities(capabilitiesFilename string, log *logger.Logger) (Capability, error) {
 	handlers := []func(*logger.Logger, ruleDefinitions) (Capability, error){
 		newInputsCapability,
 		newOutputsCapability,

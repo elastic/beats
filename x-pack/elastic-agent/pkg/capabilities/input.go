@@ -57,8 +57,7 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 
 	inputsIface, ok := cfgMap[inputsKey]
 	if ok {
-		inputs, ok := inputsIface.([]map[string]interface{})
-		if ok {
+		if inputs := inputsMap(inputsIface, c.log); inputs != nil {
 			renderedInputs, err := c.renderInputs(inputs)
 			if err != nil {
 				c.log.Errorf("marking inputs failed for capability '%s': %v", c.name(), err)
@@ -73,6 +72,29 @@ func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
 	}
 
 	return false, in
+}
+
+func inputsMap(cfgInputs interface{}, l *logger.Logger) []map[string]interface{} {
+	if inputs, ok := cfgInputs.([]map[string]interface{}); ok {
+		return inputs
+	}
+
+	inputsSet, ok := cfgInputs.([]interface{})
+	if !ok {
+		l.Warn("inputs is not an array")
+		return nil
+	}
+
+	inputsMap := make([]map[string]interface{}, 0, len(inputsSet))
+	for _, s := range inputsSet {
+		mm, ok := s.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		inputsMap = append(inputsMap, mm)
+	}
+
+	return inputsMap
 }
 
 func (c *inputCapability) Rule() string {

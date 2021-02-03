@@ -5,10 +5,95 @@
 package capabilities
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestLoadCapabilities(t *testing.T) {
+	testCases := []string{
+		"filter_metrics",
+		"allow_metrics",
+		"deny_logs",
+	}
+
+	l, _ := logger.New("test")
+
+	for _, tc := range testCases {
+		t.Run(tc, func(t *testing.T) {
+			filename := filepath.Join("testdata", fmt.Sprintf("%s-capabilities.yml", tc))
+			caps, err := LoadCapabilities(filename, l)
+			assert.NoError(t, err)
+			assert.NotNil(t, caps)
+
+			cfgFile := filepath.Join("testdata", fmt.Sprintf("%s-config.yml", tc))
+			configFile, err := os.Open(cfgFile)
+			if err != nil {
+				assert.Fail(t, err.Error())
+				return
+			}
+			defer configFile.Close()
+
+			cfg, err := config.NewConfigFrom(configFile)
+			assert.NoError(t, err)
+			assert.NotNil(t, cfg)
+
+			mm, err := cfg.ToMapStr()
+			assert.NoError(t, err)
+			assert.NotNil(t, mm)
+
+			isBlocked, out := caps.Apply(mm)
+			assert.False(t, isBlocked)
+
+			resultConfig, ok := out.(map[string]interface{})
+			assert.True(t, ok)
+
+			resultFileName := filepath.Join("testdata", fmt.Sprintf("%s-result.yml", tc))
+			configResultFile, err := os.Open(resultFileName)
+			if err != nil {
+				assert.Fail(t, err.Error())
+				return
+			}
+			defer configFile.Close()
+
+			expectedConfig, err := config.NewConfigFrom(configResultFile)
+			assert.NoError(t, err)
+			assert.NotNil(t, cfg)
+
+			expectedMap, err := expectedConfig.ToMapStr()
+			fixInputsType(expectedMap)
+			fixInputsType(resultConfig)
+
+			if !assert.True(t, cmp.Equal(expectedMap, resultConfig)) {
+				diff := cmp.Diff(expectedMap, resultConfig)
+				if diff != "" {
+					t.Errorf("%s mismatch (-want +got):\n%s", tc, diff)
+				}
+			}
+		})
+	}
+}
+
+func fixInputsType(mm map[string]interface{}) {
+	if i, found := mm[inputsKey]; found {
+		var inputs []interface{}
+
+		if im, ok := i.([]map[string]interface{}); ok {
+			for _, val := range im {
+				inputs = append(inputs, val)
+			}
+		} else if im, ok := i.([]interface{}); ok {
+			inputs = im
+		}
+		mm[inputsKey] = inputs
+	}
+}
 
 func TestCapabilityManager(t *testing.T) {
 
