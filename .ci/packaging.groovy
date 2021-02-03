@@ -472,6 +472,7 @@ def getBeatsName(baseDir) {
 
 def withBeatsEnv(Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  fixPermissions()
   withMageEnv(){
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
@@ -489,6 +490,13 @@ def withBeatsEnv(Closure body) {
 * issues.
 */
 def deleteWorkspace() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    fixPermissions()
+    deleteDir()
+  }
+}
+
+def fixPermissions() {
   if(isUnix()) {
     catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
       dir("${env.BASE_DIR}") {
@@ -500,7 +508,6 @@ def deleteWorkspace() {
             script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
         }
       }
-      deleteDir()
     }
   }
 }
