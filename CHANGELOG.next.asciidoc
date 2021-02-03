@@ -834,7 +834,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
-- Copy suite directories for synthetic checks to tmp dir before running. {pull}23347[23347]
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 
 *Journalbeat*
