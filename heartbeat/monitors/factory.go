@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -52,7 +53,14 @@ type publishSettings struct {
 	// Output meta data settings
 	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
 	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
+	DataStream *datastream `config:"data_stream"`
 	DataSet  string                   `config:"dataset"`
+}
+
+type datastream struct {
+	Namespace string `config:"namespace"`
+	Dataset   string `config:"dataset"`
+	Type      string `config:"type"`
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -84,8 +92,22 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	}
 
 	var indexProcessor processors.Processor
+	if settings.DataStream != nil {
+		index := fmt.Sprintf("%s-%s-%s",
+			settings.DataStream.Type,
+			settings.DataStream.Dataset,
+			settings.DataStream.Namespace)
+		compiled, err := fmtstr.CompileEvent(index)
+		if err != nil {
+			return nil, fmt.Errorf("could not compile datastream: '%s', this should never happen: %w", index, err)
+		} else {
+			settings.Index = *compiled
+		}
+	}
+
 	if !settings.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
+
 		timestampFormat, err :=
 			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
 		if err != nil {
