@@ -119,8 +119,10 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 				"running under control of the systems supervisor")
 	}
 
-	if isBlocking, _ := u.caps.Apply(a); isBlocking {
-		return nil
+	if u.caps != nil {
+		if isBlocking, _ := u.caps.Apply(a); isBlocking {
+			return nil
+		}
 	}
 
 	u.reportUpdating(a.Version())

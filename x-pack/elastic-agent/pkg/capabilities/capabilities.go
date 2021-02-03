@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,19 +21,21 @@ type Capability interface {
 }
 
 type capabilitiesManager struct {
-	caps []Capability
+	caps     []Capability
+	reporter status.Reporter
 }
 
 // Load loads capabilities files and prepares manager.
-func Load(capsFile string, log *logger.Logger) (Capability, error) {
-	handlers := []func(*logger.Logger, ruleDefinitions) (Capability, error){
+func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability, error) {
+	handlers := []func(*logger.Logger, ruleDefinitions, status.Reporter) (Capability, error){
 		newInputsCapability,
 		newOutputsCapability,
 		newUpgradesCapability,
 	}
 
 	cm := &capabilitiesManager{
-		caps: make([]Capability, 0),
+		caps:     make([]Capability, 0),
+		reporter: sc.Register("capabilities"),
 	}
 
 	// load capabilities from file
@@ -55,7 +58,7 @@ func Load(capsFile string, log *logger.Logger) (Capability, error) {
 
 	// make list of handlers out of capabilities definition
 	for _, h := range handlers {
-		cap, err := h(log, definitions)
+		cap, err := h(log, definitions, cm.reporter)
 		if err != nil {
 			return nil, err
 		}

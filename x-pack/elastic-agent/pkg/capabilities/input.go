@@ -9,17 +9,18 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 const (
 	inputsKey = "inputs"
 )
 
-func newInputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
+func newInputsCapability(log *logger.Logger, rd ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newInputCapability(log, r)
+		c, err := newInputCapability(log, r, reporter)
 		if err != nil {
 			return nil, err
 		}
@@ -32,21 +33,23 @@ func newInputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, er
 	return &multiInputsCapability{log: log, caps: caps}, nil
 }
 
-func newInputCapability(log *logger.Logger, r ruler) (Capability, error) {
+func newInputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
 	cap, ok := r.(*inputCapability)
 	if !ok {
 		return nil, nil
 	}
 
 	cap.log = log
+	cap.reporter = reporter
 	return cap, nil
 }
 
 type inputCapability struct {
-	log   *logger.Logger
-	Name  string `json:"name,omitempty" yaml:"name,omitempty"`
-	Type  string `json:"rule" yaml:"rule"`
-	Input string `json:"input" yaml:"input"`
+	log      *logger.Logger
+	reporter status.Reporter
+	Name     string `json:"name,omitempty" yaml:"name,omitempty"`
+	Type     string `json:"rule" yaml:"rule"`
+	Input    string `json:"input" yaml:"input"`
 }
 
 func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
@@ -144,7 +147,14 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 			continue
 		}
 
-		input[conditionKey] = c.Type == allowKey
+		isSupported := c.Type == allowKey
+
+		input[conditionKey] = isSupported
+		if !isSupported {
+			c.log.Errorf("input '%s' is left out due to capability restriction '%s'", inputType, c.name())
+			c.reporter.Update(status.Degraded)
+		}
+
 		newInputs = append(newInputs, input)
 	}
 

@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 const (
@@ -15,11 +16,11 @@ const (
 	typeKey   = "type"
 )
 
-func newOutputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
+func newOutputsCapability(log *logger.Logger, rd ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newOutputCapability(log, r)
+		c, err := newOutputCapability(log, r, reporter)
 		if err != nil {
 			return nil, err
 		}
@@ -32,21 +33,23 @@ func newOutputsCapability(log *logger.Logger, rd ruleDefinitions) (Capability, e
 	return &multiOutputsCapability{log: log, caps: caps}, nil
 }
 
-func newOutputCapability(log *logger.Logger, r ruler) (Capability, error) {
+func newOutputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
 	cap, ok := r.(*outputCapability)
 	if !ok {
 		return nil, nil
 	}
 
 	cap.log = log
+	cap.reporter = reporter
 	return cap, nil
 }
 
 type outputCapability struct {
-	log    *logger.Logger
-	Name   string `json:"name,omitempty" yaml:"name,omitempty"`
-	Type   string `json:"rule" yaml:"rule"`
-	Output string `json:"output" yaml:"output"`
+	log      *logger.Logger
+	reporter status.Reporter
+	Name     string `json:"name,omitempty" yaml:"name,omitempty"`
+	Type     string `json:"rule" yaml:"rule"`
+	Output   string `json:"output" yaml:"output"`
 }
 
 func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
@@ -121,8 +124,14 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 			continue
 		}
 
-		output[conditionKey] = c.Type == allowKey
+		isSupported := c.Type == allowKey
+		output[conditionKey] = isSupported
 		outputs[outputName] = output
+
+		if !isSupported {
+			c.log.Errorf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
+			c.reporter.Update(status.Degraded)
+		}
 	}
 
 	return outputs, nil

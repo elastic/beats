@@ -68,10 +68,13 @@ func (e *emitterController) Update(c *config.Config) error {
 		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
 
-	_, updatedAst := e.caps.Apply(rawAst)
-	rawAst, ok := updatedAst.(*transpiler.AST)
-	if !ok {
-		return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
+	if e.caps != nil {
+		var ok bool
+		_, updatedAst := e.caps.Apply(rawAst)
+		rawAst, ok = updatedAst.(*transpiler.AST)
+		if !ok {
+			return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
+		}
 	}
 
 	for _, filter := range e.modifiers.Filters {

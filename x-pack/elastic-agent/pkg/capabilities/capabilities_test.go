@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
@@ -29,7 +30,8 @@ func TestLoadCapabilities(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc, func(t *testing.T) {
 			filename := filepath.Join("testdata", fmt.Sprintf("%s-capabilities.yml", tc))
-			caps, err := Load(filename, l)
+			controller := status.NewController(l)
+			caps, err := Load(filename, l, controller)
 			assert.NoError(t, err)
 			assert.NotNil(t, caps)
 

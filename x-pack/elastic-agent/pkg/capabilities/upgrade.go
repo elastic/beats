@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -23,11 +24,11 @@ const (
 // Available variables:
 // - version
 // - source_uri
-func newUpgradesCapability(log *logger.Logger, rd ruleDefinitions) (Capability, error) {
+func newUpgradesCapability(log *logger.Logger, rd ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	caps := make([]Capability, 0, len(rd))
 
 	for _, r := range rd {
-		c, err := newUpgradeCapability(log, r)
+		c, err := newUpgradeCapability(log, r, reporter)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +41,7 @@ func newUpgradesCapability(log *logger.Logger, rd ruleDefinitions) (Capability, 
 	return &multiUpgradeCapability{caps: caps}, nil
 }
 
-func newUpgradeCapability(log *logger.Logger, r ruler) (Capability, error) {
+func newUpgradeCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
 	cap, ok := r.(*upgradeCapability)
 	if !ok {
 		return nil, nil
@@ -63,13 +64,15 @@ func newUpgradeCapability(log *logger.Logger, r ruler) (Capability, error) {
 
 	cap.upgradeEql = eqlExp
 	cap.log = log
+	cap.reporter = reporter
 	return cap, nil
 }
 
 type upgradeCapability struct {
-	log  *logger.Logger
-	Name string `json:"name,omitempty" yaml:"name,omitempty"`
-	Type string `json:"rule" yaml:"rule"`
+	log      *logger.Logger
+	reporter status.Reporter
+	Name     string `json:"name,omitempty" yaml:"name,omitempty"`
+	Type     string `json:"rule" yaml:"rule"`
 	// UpgradeEql is eql expression defining upgrade
 	UpgradeEqlDefinition string `json:"upgrade" yaml:"upgrade"`
 
@@ -125,6 +128,8 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 	// if deny switch the logic
 	if c.Type == denyKey {
 		isSupported = !isSupported
+		c.log.Errorf("upgrade is blocked out due to capability restriction '%s'", c.name())
+		c.reporter.Update(status.Degraded)
 	}
 
 	return !isSupported, in
