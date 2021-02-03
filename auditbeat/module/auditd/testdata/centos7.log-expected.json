@@ -114,10 +114,8 @@
       ]
     },
     "group": {
-      "target": {
-        "id": "9999",
-        "name": "bob"
-      }
+      "id": "9999",
+      "name": "bob"
     },
     "process": {
       "executable": "/usr/sbin/useradd",

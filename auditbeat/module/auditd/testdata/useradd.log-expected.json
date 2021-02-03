@@ -40,10 +40,8 @@
       ]
     },
     "group": {
-      "target": {
-        "id": "1004",
-        "name": "testgroup"
-      }
+      "id": "1004",
+      "name": "testgroup"
     },
     "process": {
       "executable": "/usr/sbin/groupadd",
@@ -112,10 +110,8 @@
       ]
     },
     "group": {
-      "target": {
-        "id": "1004",
-        "name": "testgroup"
-      }
+      "id": "1004",
+      "name": "testgroup"
     },
     "process": {
       "executable": "/usr/sbin/groupadd",
@@ -183,10 +179,8 @@
       ]
     },
     "group": {
-      "target": {
-        "id": "1004",
-        "name": "testgroup"
-      }
+      "id": "1004",
+      "name": "testgroup"
     },
     "process": {
       "executable": "/usr/sbin/groupadd",

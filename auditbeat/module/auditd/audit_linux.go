@@ -588,10 +588,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	setECSEntity("user.effective", auditEvent.ECS.User.Effective, out.RootFields, userSet)
 	setECSEntity("user.target", auditEvent.ECS.User.Target, out.RootFields, userSet)
 	setECSEntity("user.changes", auditEvent.ECS.User.Changes, out.RootFields, userSet)
-	setECSEntity("group", auditEvent.ECS.Group.ECSEntityData, out.RootFields, nil)
-	setECSEntity("group.effective", auditEvent.ECS.Group.Effective, out.RootFields, nil)
-	setECSEntity("group.target", auditEvent.ECS.Group.Target, out.RootFields, nil)
-	setECSEntity("group.changes", auditEvent.ECS.Group.Changes, out.RootFields, nil)
+	setECSEntity("group", auditEvent.ECS.Group, out.RootFields, nil)
 
 	if userSet != nil {
 		if userSet.Count() != 0 {
