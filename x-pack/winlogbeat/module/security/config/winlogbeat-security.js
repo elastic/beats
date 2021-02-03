@@ -250,8 +250,8 @@ var security = (function () {
         "4770": [["authentication"], ["start"], "kerberos-service-ticket-renewed"],
         "4771": [["authentication"], ["start"], "kerberos-preauth-failed"],
         "4776": [["authentication"], ["start"], "credential-validated"],
-        "4778": [["authentication"], ["start"], "session-reconnected"],
-        "4779": [["authentication"], ["end"], "session-disconnected"],
+        "4778": [["authentication", "session"], ["start"], "session-reconnected"],
+        "4779": [["authentication", "session"], ["end"], "session-disconnected"],
         "4781": [["iam"], ["user", "change"], "renamed-user-account"],
         "4798": [["iam"], ["user", "info"], "group-membership-enumerated"], // process enumerates the local groups to which the specified user belongs
         "4799": [["iam"], ["group", "info"], "user-member-enumerated"], // a process enumerates the members of the specified local group
