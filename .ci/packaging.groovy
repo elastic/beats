@@ -204,7 +204,6 @@ pipeline {
                   'packetbeat',
                   'x-pack/auditbeat',
                   'x-pack/elastic-agent',
-                  'x-pack/dockerlogbeat',
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
