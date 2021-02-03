@@ -39,6 +39,7 @@
         "destination.bytes": 145,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -77,11 +78,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -144,6 +150,7 @@
         "destination.bytes": 193,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -182,11 +189,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -247,6 +259,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -285,11 +298,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -352,6 +370,7 @@
         "destination.bytes": 200,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -390,11 +409,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -456,6 +480,7 @@
         "destination.bytes": 193,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -494,11 +519,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -559,6 +589,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -597,11 +628,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -665,6 +701,7 @@
         "destination.bytes": 199,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -703,11 +740,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -768,6 +810,7 @@
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -806,11 +849,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -872,6 +920,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -910,11 +959,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -977,6 +1031,7 @@
         "destination.bytes": 722,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1015,11 +1070,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1081,6 +1141,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6109,
         "destination.geo.location.lon": -122.3303,
         "destination.geo.region_iso_code": "US-WA",
@@ -1121,11 +1182,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "205.251.196.144"
@@ -1184,6 +1250,7 @@
         "destination.bytes": 313,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1220,11 +1287,16 @@
         "network.protocol": "dns",
         "network.transport": "tcp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1286,6 +1358,7 @@
         "destination.bytes": 180,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "FR",
+        "destination.geo.country_name": "France",
         "destination.geo.location.lat": 48.8582,
         "destination.geo.location.lon": 2.3387,
         "destination.ip": "9.9.9.9",
@@ -1324,11 +1397,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1389,6 +1467,7 @@
         "destination.bytes": 108,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "FR",
+        "destination.geo.country_name": "France",
         "destination.geo.location.lat": 48.8582,
         "destination.geo.location.lon": 2.3387,
         "destination.ip": "9.9.9.9",
@@ -1427,11 +1506,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1493,6 +1577,7 @@
         "destination.bytes": 162,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "FR",
+        "destination.geo.country_name": "France",
         "destination.geo.location.lat": 48.8582,
         "destination.geo.location.lon": 2.3387,
         "destination.ip": "9.9.9.9",
@@ -1531,11 +1616,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "9.9.9.9"
@@ -1598,6 +1688,7 @@
         "destination.bytes": 199,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1636,11 +1727,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1701,6 +1797,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1739,11 +1836,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1804,6 +1906,7 @@
         "destination.bytes": 166,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1842,11 +1945,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -1907,6 +2015,7 @@
         "destination.bytes": 221,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1945,11 +2054,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -2009,6 +2123,7 @@
         "destination.bytes": 131,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2046,11 +2161,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -2113,6 +2233,7 @@
         "destination.bytes": 722,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -2151,11 +2272,16 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
         "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"

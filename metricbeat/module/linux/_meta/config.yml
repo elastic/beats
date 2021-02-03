@@ -2,8 +2,10 @@
   period: 10s
   metricsets:
     - "pageinfo"
+    - "memory"
     # - ksm
     # - conntrack
+    # - iostat
   enabled: true
   #hostfs: /hostfs
 

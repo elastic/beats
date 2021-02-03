@@ -1,0 +1,107 @@
+[
+    {
+        "event.action": "chat_message.sent",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "creation"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "zfdgdfgdfgfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPsdvdsgfdgxHMA",
+        "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
+        "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",
+        "zoom.chat_message.id": "EwwwwA-87F4-222222-8CD9-FA00000E6B9",
+        "zoom.chat_message.message": "asd",
+        "zoom.chat_message.session_id": "fcffdgfgffghfghgfhghgb10",
+        "zoom.chat_message.type": "to_channel",
+        "zoom.operator": "someoperatoremail@somekindofmailservice123.com",
+        "zoom.operator_id": "zfdgdfgdfgfp8uQ"
+    },
+    {
+        "event.action": "chat_message.updated",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 434,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "zfdgdfgdfgfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPsdvdsgfdgxHMA",
+        "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
+        "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",
+        "zoom.chat_message.id": "Ell123-87F4-222222-8CD9-FA00000E6B9",
+        "zoom.chat_message.message": "gfd",
+        "zoom.chat_message.session_id": "fcffdgfgffghfghgfhghgb10",
+        "zoom.chat_message.type": "to_channel",
+        "zoom.operator": "someoperatoremail@somekindofmailservice123.com",
+        "zoom.operator_id": "zfdgdfgdfgfp8uQ"
+    },
+    {
+        "event.action": "chat_message.updated",
+        "event.dataset": "zoom.webhook",
+        "event.kind": [
+            "event"
+        ],
+        "event.module": "zoom",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info",
+            "change"
+        ],
+        "fileset.name": "webhook",
+        "input.type": "log",
+        "log.offset": 871,
+        "observer.product": "Webhook",
+        "observer.vendor": "Zoom",
+        "related.user": [
+            "zfdgdfgdfgfp8uQ"
+        ],
+        "service.type": "zoom",
+        "tags": [
+            "zoom-webhook",
+            "forwarded"
+        ],
+        "zoom.account_id": "EPsdvdsgfdgxHMA",
+        "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
+        "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",
+        "zoom.chat_message.id": "Ell123-87F4-222222-8CD9-FA00000E6B9",
+        "zoom.chat_message.message": null,
+        "zoom.chat_message.session_id": "fcffdgfgffghfghgfhghgb10",
+        "zoom.chat_message.type": "to_channel",
+        "zoom.operator": "someoperatoremail@somekindofmailservice123.com",
+        "zoom.operator_id": "zfdgdfgdfgfp8uQ"
+    }
+]

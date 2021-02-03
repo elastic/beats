@@ -20,14 +20,9 @@ func TestAck(t *testing.T) {
 
 	t.Run("Test ack roundtrip", withServerWithAuthClient(
 		func(t *testing.T) *http.ServeMux {
-			raw := `
-{
-    "action": "ack",
-    "success": true
-}
-`
+			raw := `{"action": "ack"}`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/acks", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/acks", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 
@@ -51,10 +46,10 @@ func TestAck(t *testing.T) {
 			return mux
 		}, withAPIKey,
 		func(t *testing.T, client clienter) {
-			action := &ActionConfigChange{
+			action := &ActionPolicyChange{
 				ActionID:   "my-id",
-				ActionType: "CONFIG_CHANGE",
-				Config: map[string]interface{}{
+				ActionType: "POLICY_CHANGE",
+				Policy: map[string]interface{}{
 					"id": "config_id",
 				},
 			}
@@ -63,7 +58,7 @@ func TestAck(t *testing.T) {
 
 			request := AckRequest{
 				Events: []AckEvent{
-					AckEvent{
+					{
 						EventType: "ACTION_RESULT",
 						SubType:   "ACKNOWLEDGED",
 						ActionID:  action.ID(),
@@ -73,7 +68,6 @@ func TestAck(t *testing.T) {
 
 			r, err := cmd.Execute(context.Background(), &request)
 			require.NoError(t, err)
-			require.True(t, r.Success)
 			require.Equal(t, "ack", r.Action)
 		},
 	))

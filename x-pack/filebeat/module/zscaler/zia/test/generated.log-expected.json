@@ -22,9 +22,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "rci737.www5.example"
+        ],
         "related.ip": [
-            "10.206.191.17",
-            "10.176.10.114"
+            "10.176.10.114",
+            "10.206.191.17"
         ],
         "related.user": [
             "sumdo"
@@ -93,9 +96,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "eosquir5191.www.example"
+        ],
         "related.ip": [
-            "10.173.22.152",
-            "10.26.46.95"
+            "10.26.46.95",
+            "10.173.22.152"
         ],
         "related.user": [
             "eataevi"
@@ -166,9 +172,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "orsitame3262.domain"
+        ],
         "related.ip": [
-            "10.254.146.57",
-            "10.204.86.149"
+            "10.204.86.149",
+            "10.254.146.57"
         ],
         "related.user": [
             "tenima"
@@ -182,8 +191,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uptassi",
         "rsa.misc.action": [
-            "giatq",
-            "Blocked"
+            "Blocked",
+            "giatq"
         ],
         "rsa.misc.category": "llu",
         "rsa.misc.filter": "tconsec",
@@ -239,6 +248,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tempor4496.www.localdomain"
+        ],
         "related.ip": [
             "10.252.125.53",
             "10.103.246.190"
@@ -255,8 +267,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ima",
         "rsa.misc.action": [
-            "llam",
-            "Allowed"
+            "Allowed",
+            "llam"
         ],
         "rsa.misc.category": "aboris",
         "rsa.misc.filter": "atatnonp",
@@ -312,6 +324,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ore2933.www.test"
+        ],
         "related.ip": [
             "10.136.153.149",
             "10.61.78.108"
@@ -385,9 +400,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ollit4105.mail.localdomain"
+        ],
         "related.ip": [
-            "10.66.250.92",
-            "10.183.16.166"
+            "10.183.16.166",
+            "10.66.250.92"
         ],
         "related.user": [
             "tessec"
@@ -458,9 +476,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "cup1793.local"
+        ],
         "related.ip": [
-            "10.123.104.59",
-            "10.243.224.205"
+            "10.243.224.205",
+            "10.123.104.59"
         ],
         "related.user": [
             "xercitat"
@@ -474,8 +495,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lupt",
         "rsa.misc.action": [
-            "Blocked",
-            "dun"
+            "dun",
+            "Blocked"
         ],
         "rsa.misc.category": "rsitamet",
         "rsa.misc.filter": "usmod",
@@ -531,6 +552,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "icab4668.local"
+        ],
         "related.ip": [
             "10.119.185.63",
             "10.74.17.5"
@@ -604,9 +628,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "aperia4409.www5.invalid"
+        ],
         "related.ip": [
-            "10.25.192.202",
-            "10.78.151.178"
+            "10.78.151.178",
+            "10.25.192.202"
         ],
         "related.user": [
             "quip"
@@ -677,6 +704,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "sitvolup368.internal.host"
+        ],
         "related.ip": [
             "10.135.225.244",
             "10.71.170.37"
@@ -693,8 +723,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ihilm",
         "rsa.misc.action": [
-            "Allowed",
-            "psaquae"
+            "psaquae",
+            "Allowed"
         ],
         "rsa.misc.category": "eFinib",
         "rsa.misc.filter": "inesci",
@@ -750,6 +780,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ite2026.www.invalid"
+        ],
         "related.ip": [
             "10.19.145.131",
             "10.223.247.86"
@@ -823,9 +856,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "radipisc7020.home"
+        ],
         "related.ip": [
-            "10.2.53.125",
-            "10.181.80.139"
+            "10.181.80.139",
+            "10.2.53.125"
         ],
         "related.user": [
             "ihilmo"
@@ -896,6 +932,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "uamei2493.www.test"
+        ],
         "related.ip": [
             "10.167.98.76",
             "10.31.240.6"
@@ -912,8 +951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "catc",
         "rsa.misc.action": [
-            "Allowed",
-            "veni"
+            "veni",
+            "Allowed"
         ],
         "rsa.misc.category": "sBono",
         "rsa.misc.filter": "isnisiu",
@@ -969,9 +1008,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "piscin6866.internal.host"
+        ],
         "related.ip": [
-            "10.0.55.9",
-            "10.135.160.125"
+            "10.135.160.125",
+            "10.0.55.9"
         ],
         "related.user": [
             "volupta"
@@ -1042,9 +1084,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "spi3544.www.host"
+        ],
         "related.ip": [
-            "10.63.250.128",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.63.250.128"
         ],
         "related.user": [
             "saute"
@@ -1115,6 +1160,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tlab5981.www.host"
+        ],
         "related.ip": [
             "10.252.124.150",
             "10.5.126.127"
@@ -1131,8 +1179,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mod",
         "rsa.misc.action": [
-            "Allowed",
-            "xeacomm"
+            "xeacomm",
+            "Allowed"
         ],
         "rsa.misc.category": "sauteiru",
         "rsa.misc.filter": "antiu",
@@ -1188,6 +1236,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "upida508.example"
+        ],
         "related.ip": [
             "10.201.171.120",
             "10.91.126.231"
@@ -1204,8 +1255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "umdo",
         "rsa.misc.action": [
-            "Blocked",
-            "orumSe"
+            "orumSe",
+            "Blocked"
         ],
         "rsa.misc.category": "tanimid",
         "rsa.misc.filter": "itam",
@@ -1261,6 +1312,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "oditem5255.api.localdomain"
+        ],
         "related.ip": [
             "10.107.251.87",
             "10.135.82.97"
@@ -1277,8 +1331,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quid",
         "rsa.misc.action": [
-            "Allowed",
-            "itecto"
+            "itecto",
+            "Allowed"
         ],
         "rsa.misc.category": "quam",
         "rsa.misc.filter": "adeser",
@@ -1334,6 +1388,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "uamei2389.internal.example"
+        ],
         "related.ip": [
             "10.215.205.216",
             "10.31.198.58"
@@ -1407,6 +1464,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "eacommod1930.internal.lan"
+        ],
         "related.ip": [
             "10.229.83.165",
             "10.29.155.171"
@@ -1480,9 +1540,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tem6984.www5.domain"
+        ],
         "related.ip": [
-            "10.161.148.64",
-            "10.129.192.145"
+            "10.129.192.145",
+            "10.161.148.64"
         ],
         "related.user": [
             "lor"
@@ -1553,9 +1616,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "lapariat7287.internal.host"
+        ],
         "related.ip": [
-            "10.203.65.161",
-            "10.7.200.140"
+            "10.7.200.140",
+            "10.203.65.161"
         ],
         "related.user": [
             "snost"
@@ -1569,8 +1635,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdol",
         "rsa.misc.action": [
-            "nte",
-            "Allowed"
+            "Allowed",
+            "nte"
         ],
         "rsa.misc.category": "adeseru",
         "rsa.misc.filter": "mac",
@@ -1626,9 +1692,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "licabo1493.api.corp"
+        ],
         "related.ip": [
-            "10.218.98.29",
-            "10.86.22.67"
+            "10.86.22.67",
+            "10.218.98.29"
         ],
         "related.user": [
             "olori"
@@ -1642,8 +1711,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iutali",
         "rsa.misc.action": [
-            "atcupi",
-            "Blocked"
+            "Blocked",
+            "atcupi"
         ],
         "rsa.misc.category": "isetq",
         "rsa.misc.filter": "equinesc",
@@ -1699,9 +1768,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "stenatu4844.www.invalid"
+        ],
         "related.ip": [
-            "10.39.31.115",
-            "10.24.111.229"
+            "10.24.111.229",
+            "10.39.31.115"
         ],
         "related.user": [
             "fugi"
@@ -1715,8 +1787,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ulpa",
         "rsa.misc.action": [
-            "gnaal",
-            "Allowed"
+            "Allowed",
+            "gnaal"
         ],
         "rsa.misc.category": "nte",
         "rsa.misc.filter": "pid",
@@ -1772,6 +1844,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "sitam5077.internal.host"
+        ],
         "related.ip": [
             "10.32.39.220",
             "10.179.210.218"
@@ -1788,8 +1863,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "riss",
         "rsa.misc.action": [
-            "risnis",
-            "Blocked"
+            "Blocked",
+            "risnis"
         ],
         "rsa.misc.category": "emqu",
         "rsa.misc.filter": "oluptas",
@@ -1845,9 +1920,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "dquia107.www.test"
+        ],
         "related.ip": [
-            "10.88.172.34",
-            "10.128.173.19"
+            "10.128.173.19",
+            "10.88.172.34"
         ],
         "related.user": [
             "agnaaliq"
@@ -1861,8 +1939,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntNeq",
         "rsa.misc.action": [
-            "Blocked",
-            "dtempo"
+            "dtempo",
+            "Blocked"
         ],
         "rsa.misc.category": "ipsu",
         "rsa.misc.filter": "iqu",
@@ -1918,6 +1996,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "lloin4019.www.localhost"
+        ],
         "related.ip": [
             "10.238.224.49",
             "10.130.241.232"
@@ -1934,8 +2015,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mnisiut",
         "rsa.misc.action": [
-            "Allowed",
-            "mod"
+            "mod",
+            "Allowed"
         ],
         "rsa.misc.category": "uiinea",
         "rsa.misc.filter": "aturQu",
@@ -1991,6 +2072,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tamet6317.www.host"
+        ],
         "related.ip": [
             "10.115.53.31",
             "10.2.67.127"
@@ -2064,6 +2148,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "saquaea6344.www.invalid"
+        ],
         "related.ip": [
             "10.204.214.251",
             "10.101.38.213"
@@ -2137,9 +2224,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "utaliqu4248.www.localhost"
+        ],
         "related.ip": [
-            "10.101.85.169",
-            "10.18.226.72"
+            "10.18.226.72",
+            "10.101.85.169"
         ],
         "related.user": [
             "rroqu"
@@ -2210,9 +2300,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "mdolore473.internal.test"
+        ],
         "related.ip": [
-            "10.242.182.193",
-            "10.87.100.240"
+            "10.87.100.240",
+            "10.242.182.193"
         ],
         "related.user": [
             "stenatus"
@@ -2226,8 +2319,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mag",
         "rsa.misc.action": [
-            "tali",
-            "Allowed"
+            "Allowed",
+            "tali"
         ],
         "rsa.misc.category": "oconse",
         "rsa.misc.filter": "npr",
@@ -2283,6 +2376,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tatio6513.www.invalid"
+        ],
         "related.ip": [
             "10.229.242.223",
             "10.80.57.247"
@@ -2299,8 +2395,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdolore",
         "rsa.misc.action": [
-            "onproide",
-            "Blocked"
+            "Blocked",
+            "onproide"
         ],
         "rsa.misc.category": "tvolup",
         "rsa.misc.filter": "niam",
@@ -2356,9 +2452,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "lapar1599.www.lan"
+        ],
         "related.ip": [
-            "10.193.66.155",
-            "10.106.77.138"
+            "10.106.77.138",
+            "10.193.66.155"
         ],
         "related.user": [
             "iusmodt"
@@ -2372,8 +2471,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uteir",
         "rsa.misc.action": [
-            "Section",
-            "Allowed"
+            "Allowed",
+            "Section"
         ],
         "rsa.misc.category": "cididu",
         "rsa.misc.filter": "Utenima",
@@ -2429,9 +2528,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "aquioff3853.www.localdomain"
+        ],
         "related.ip": [
-            "10.54.159.1",
-            "10.236.230.136"
+            "10.236.230.136",
+            "10.54.159.1"
         ],
         "related.user": [
             "mUteni"
@@ -2502,6 +2604,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ura675.mail.localdomain"
+        ],
         "related.ip": [
             "10.131.246.134",
             "10.49.242.174"
@@ -2575,6 +2680,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "iamea478.www5.host"
+        ],
         "related.ip": [
             "10.142.120.198",
             "10.166.10.42"
@@ -2648,6 +2756,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "eaque6543.api.domain"
+        ],
         "related.ip": [
             "10.138.188.201",
             "10.128.184.241"
@@ -2721,9 +2832,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "eufug1756.mail.corp"
+        ],
         "related.ip": [
-            "10.53.101.131",
-            "10.213.57.165"
+            "10.213.57.165",
+            "10.53.101.131"
         ],
         "related.user": [
             "isau"
@@ -2737,8 +2851,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ese",
         "rsa.misc.action": [
-            "litanim",
-            "Allowed"
+            "Allowed",
+            "litanim"
         ],
         "rsa.misc.category": "idata",
         "rsa.misc.filter": "urerepre",
@@ -2794,6 +2908,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "orp5697.www.invalid"
+        ],
         "related.ip": [
             "10.55.81.14",
             "10.243.6.41"
@@ -2867,9 +2984,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "pariatur7238.www5.invalid"
+        ],
         "related.ip": [
-            "10.202.224.79",
-            "10.33.144.10"
+            "10.33.144.10",
+            "10.202.224.79"
         ],
         "related.user": [
             "rios"
@@ -2883,8 +3003,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lit",
         "rsa.misc.action": [
-            "quu",
-            "Blocked"
+            "Blocked",
+            "quu"
         ],
         "rsa.misc.category": "oluptate",
         "rsa.misc.filter": "exercita",
@@ -2940,6 +3060,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "fficia2304.www5.home"
+        ],
         "related.ip": [
             "10.20.124.138",
             "10.158.18.51"
@@ -3013,6 +3136,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "mquisnos7453.home"
+        ],
         "related.ip": [
             "10.134.128.27",
             "10.118.177.136"
@@ -3029,8 +3155,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "voluptas",
         "rsa.misc.action": [
-            "Allowed",
-            "olor"
+            "olor",
+            "Allowed"
         ],
         "rsa.misc.category": "ataevita",
         "rsa.misc.filter": "nderi",
@@ -3086,9 +3212,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "aquio748.www.localhost"
+        ],
         "related.ip": [
-            "10.125.120.97",
-            "10.68.8.143"
+            "10.68.8.143",
+            "10.125.120.97"
         ],
         "related.user": [
             "reet"
@@ -3102,8 +3231,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "amni",
         "rsa.misc.action": [
-            "edutp",
-            "Allowed"
+            "Allowed",
+            "edutp"
         ],
         "rsa.misc.category": "ames",
         "rsa.misc.filter": "dmi",
@@ -3159,6 +3288,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "remagnam796.mail.corp"
+        ],
         "related.ip": [
             "10.143.0.78",
             "10.137.164.122"
@@ -3232,9 +3364,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "etdolore4227.internal.corp"
+        ],
         "related.ip": [
-            "10.156.177.53",
-            "10.30.87.51"
+            "10.30.87.51",
+            "10.156.177.53"
         ],
         "related.user": [
             "psaquaea"
@@ -3305,9 +3440,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "rors1935.api.domain"
+        ],
         "related.ip": [
-            "10.111.249.184",
-            "10.83.138.34"
+            "10.83.138.34",
+            "10.111.249.184"
         ],
         "related.user": [
             "dentsunt"
@@ -3321,8 +3459,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "Blocked",
-            "upta"
+            "upta",
+            "Blocked"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3378,6 +3516,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "idexeac1655.internal.test"
+        ],
         "related.ip": [
             "10.180.150.47",
             "10.141.195.13"
@@ -3394,8 +3535,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itesse",
         "rsa.misc.action": [
-            "uip",
-            "Allowed"
+            "Allowed",
+            "uip"
         ],
         "rsa.misc.category": "teturad",
         "rsa.misc.filter": "roquisqu",
@@ -3451,9 +3592,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "laboree3880.api.invalid"
+        ],
         "related.ip": [
-            "10.166.195.20",
-            "10.255.40.12"
+            "10.255.40.12",
+            "10.166.195.20"
         ],
         "related.user": [
             "lamcolab"
@@ -3522,6 +3666,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tecto708.www5.example"
+        ],
         "related.ip": [
             "10.22.122.43",
             "10.100.143.226"
@@ -3538,8 +3685,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ento",
         "rsa.misc.action": [
-            "Bonoru",
-            "Blocked"
+            "Blocked",
+            "Bonoru"
         ],
         "rsa.misc.category": "luptasnu",
         "rsa.misc.filter": "quamni",
@@ -3595,9 +3742,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ine3181.www.invalid"
+        ],
         "related.ip": [
-            "10.119.53.68",
-            "10.121.9.5"
+            "10.121.9.5",
+            "10.119.53.68"
         ],
         "related.user": [
             "ssec"
@@ -3611,8 +3761,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dexea",
         "rsa.misc.action": [
-            "Blocked",
-            "tinvolup"
+            "tinvolup",
+            "Blocked"
         ],
         "rsa.misc.category": "ende",
         "rsa.misc.filter": "onse",
@@ -3668,9 +3818,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tsunt3403.www5.test"
+        ],
         "related.ip": [
-            "10.237.0.173",
-            "10.31.153.177"
+            "10.31.153.177",
+            "10.237.0.173"
         ],
         "related.user": [
             "sci"
@@ -3684,8 +3837,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "eritqui",
         "rsa.misc.action": [
-            "Blocked",
-            "dolor"
+            "dolor",
+            "Blocked"
         ],
         "rsa.misc.category": "taspe",
         "rsa.misc.filter": "oremipsu",
@@ -3739,6 +3892,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "pitl6126.www.localdomain"
+        ],
         "related.ip": [
             "10.243.182.229",
             "10.229.102.140"
@@ -3755,8 +3911,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "epor",
         "rsa.misc.action": [
-            "Allowed",
-            "etquasia"
+            "etquasia",
+            "Allowed"
         ],
         "rsa.misc.category": "iaturE",
         "rsa.misc.filter": "rep",
@@ -3808,9 +3964,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "remaper3297.internal.test"
+        ],
         "related.ip": [
-            "10.120.138.109",
-            "10.39.46.155"
+            "10.39.46.155",
+            "10.120.138.109"
         ],
         "related.user": [
             "picia"
@@ -3824,8 +3983,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "adipisc",
         "rsa.misc.action": [
-            "Blocked",
-            "exer"
+            "exer",
+            "Blocked"
         ],
         "rsa.misc.category": "remagna",
         "rsa.misc.filter": "emvel",
@@ -3881,6 +4040,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tamr1693.api.home"
+        ],
         "related.ip": [
             "10.53.191.49",
             "10.133.102.57"
@@ -3954,6 +4116,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "cia5990.api.localdomain"
+        ],
         "related.ip": [
             "10.89.41.97",
             "10.91.2.225"
@@ -4027,9 +4192,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "riatu2467.lan"
+        ],
         "related.ip": [
-            "10.221.20.165",
-            "10.7.18.226"
+            "10.7.18.226",
+            "10.221.20.165"
         ],
         "related.user": [
             "uasiarch"
@@ -4043,8 +4211,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "iadeseru",
         "rsa.misc.action": [
-            "epreh",
-            "Allowed"
+            "Allowed",
+            "epreh"
         ],
         "rsa.misc.category": "ruredol",
         "rsa.misc.filter": "atquo",
@@ -4100,9 +4268,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "pici1525.www5.corp"
+        ],
         "related.ip": [
-            "10.178.148.188",
-            "10.155.252.123"
+            "10.155.252.123",
+            "10.178.148.188"
         ],
         "related.user": [
             "inrepreh"
@@ -4116,8 +4287,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inimve",
         "rsa.misc.action": [
-            "Allowed",
-            "niam"
+            "niam",
+            "Allowed"
         ],
         "rsa.misc.category": "perspici",
         "rsa.misc.filter": "uipe",
@@ -4173,6 +4344,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "dolo6418.internal.host"
+        ],
         "related.ip": [
             "10.220.1.249",
             "10.190.42.245"
@@ -4189,8 +4363,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uamquaer",
         "rsa.misc.action": [
-            "aerat",
-            "Blocked"
+            "Blocked",
+            "aerat"
         ],
         "rsa.misc.category": "quela",
         "rsa.misc.filter": "qui",
@@ -4244,9 +4418,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "imveni193.www5.host"
+        ],
         "related.ip": [
-            "10.112.190.154",
-            "10.55.38.153"
+            "10.55.38.153",
+            "10.112.190.154"
         ],
         "related.user": [
             "oremeu"
@@ -4260,8 +4437,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tin",
         "rsa.misc.action": [
-            "urau",
-            "Allowed"
+            "Allowed",
+            "urau"
         ],
         "rsa.misc.category": "isiut",
         "rsa.misc.filter": "cons",
@@ -4317,9 +4494,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ionu3320.api.localhost"
+        ],
         "related.ip": [
-            "10.195.153.42",
-            "10.250.48.82"
+            "10.250.48.82",
+            "10.195.153.42"
         ],
         "related.user": [
             "tsedquia"
@@ -4333,8 +4513,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tDuisaut",
         "rsa.misc.action": [
-            "Allowed",
-            "upidatat"
+            "upidatat",
+            "Allowed"
         ],
         "rsa.misc.category": "aliquide",
         "rsa.misc.filter": "deriti",
@@ -4390,9 +4570,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "remips1499.www.local"
+        ],
         "related.ip": [
-            "10.252.164.230",
-            "10.60.52.219"
+            "10.60.52.219",
+            "10.252.164.230"
         ],
         "related.user": [
             "gnamali"
@@ -4459,9 +4642,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "mdoloree96.domain"
+        ],
         "related.ip": [
-            "10.122.102.156",
-            "10.187.16.73"
+            "10.187.16.73",
+            "10.122.102.156"
         ],
         "related.user": [
             "emoen"
@@ -4475,8 +4661,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dipisc",
         "rsa.misc.action": [
-            "Allowed",
-            "turad"
+            "turad",
+            "Allowed"
         ],
         "rsa.misc.category": "ulpaquio",
         "rsa.misc.filter": "ngelits",
@@ -4532,9 +4718,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "iatnulap7662.internal.local"
+        ],
         "related.ip": [
-            "10.120.215.174",
-            "10.248.108.55"
+            "10.248.108.55",
+            "10.120.215.174"
         ],
         "related.user": [
             "prehend"
@@ -4548,8 +4737,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "rema",
         "rsa.misc.action": [
-            "Allowed",
-            "uatDu"
+            "uatDu",
+            "Allowed"
         ],
         "rsa.misc.category": "ent",
         "rsa.misc.filter": "iscivel",
@@ -4603,9 +4792,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "sBonoru1929.example"
+        ],
         "related.ip": [
-            "10.15.254.181",
-            "10.51.161.245"
+            "10.51.161.245",
+            "10.15.254.181"
         ],
         "related.user": [
             "abo"
@@ -4676,6 +4868,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "onorumet4871.lan"
+        ],
         "related.ip": [
             "10.129.66.196",
             "10.7.152.238"
@@ -4692,8 +4887,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vento",
         "rsa.misc.action": [
-            "Blocked",
-            "reh"
+            "reh",
+            "Blocked"
         ],
         "rsa.misc.category": "atev",
         "rsa.misc.filter": "umq",
@@ -4749,9 +4944,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "onproi4354.www5.invalid"
+        ],
         "related.ip": [
-            "10.29.162.157",
-            "10.185.107.27"
+            "10.185.107.27",
+            "10.29.162.157"
         ],
         "related.user": [
             "evelite"
@@ -4822,6 +5020,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "beataevi7552.api.test"
+        ],
         "related.ip": [
             "10.138.0.214",
             "10.215.63.248"
@@ -4838,8 +5039,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "Blocked",
-            "dqu"
+            "dqu",
+            "Blocked"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -4895,6 +5096,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "rvelill1981.www.invalid"
+        ],
         "related.ip": [
             "10.26.115.88",
             "10.12.130.224"
@@ -4911,8 +5115,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tNequepo",
         "rsa.misc.action": [
-            "rmagnido",
-            "Allowed"
+            "Allowed",
+            "rmagnido"
         ],
         "rsa.misc.category": "luptatem",
         "rsa.misc.filter": "deritq",
@@ -4968,6 +5172,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "quia7214.example"
+        ],
         "related.ip": [
             "10.91.20.27",
             "10.193.152.42"
@@ -4984,8 +5191,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "plicab",
         "rsa.misc.action": [
-            "Blocked",
-            "umq"
+            "umq",
+            "Blocked"
         ],
         "rsa.misc.category": "eruntmol",
         "rsa.misc.filter": "labore",
@@ -5041,6 +5248,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "aturExc7343.invalid"
+        ],
         "related.ip": [
             "10.146.69.38",
             "10.55.192.102"
@@ -5057,8 +5267,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnisi",
         "rsa.misc.action": [
-            "Allowed",
-            "userro"
+            "userro",
+            "Allowed"
         ],
         "rsa.misc.category": "etd",
         "rsa.misc.filter": "loremeum",
@@ -5114,6 +5324,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "olo7317.www5.localhost"
+        ],
         "related.ip": [
             "10.124.177.226",
             "10.249.1.143"
@@ -5187,6 +5400,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "uiin1342.mail.invalid"
+        ],
         "related.ip": [
             "10.167.176.220",
             "10.146.228.249"
@@ -5260,6 +5476,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "agna5654.www.corp"
+        ],
         "related.ip": [
             "10.200.74.101",
             "10.203.47.23"
@@ -5276,8 +5495,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nde",
         "rsa.misc.action": [
-            "Allowed",
-            "iqu"
+            "iqu",
+            "Allowed"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "ntincul",
@@ -5333,9 +5552,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ites5711.internal.host"
+        ],
         "related.ip": [
-            "10.162.78.48",
-            "10.24.23.209"
+            "10.24.23.209",
+            "10.162.78.48"
         ],
         "related.user": [
             "ntore"
@@ -5406,9 +5628,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "oluptat2848.api.home"
+        ],
         "related.ip": [
-            "10.211.66.68",
-            "10.55.151.53"
+            "10.55.151.53",
+            "10.211.66.68"
         ],
         "related.user": [
             "squir"
@@ -5479,6 +5704,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ngelitse7535.internal.lan"
+        ],
         "related.ip": [
             "10.209.203.156",
             "10.110.16.169"
@@ -5552,9 +5780,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tiumtot3611.internal.localdomain"
+        ],
         "related.ip": [
-            "10.84.9.150",
-            "10.107.68.114"
+            "10.107.68.114",
+            "10.84.9.150"
         ],
         "related.user": [
             "sequatDu"
@@ -5625,6 +5856,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "gnaa4656.api.example"
+        ],
         "related.ip": [
             "10.26.222.144",
             "10.124.119.48"
@@ -5641,8 +5875,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lloin",
         "rsa.misc.action": [
-            "ici",
-            "Blocked"
+            "Blocked",
+            "ici"
         ],
         "rsa.misc.category": "quidolor",
         "rsa.misc.filter": "nonproi",
@@ -5698,6 +5932,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "psaqu6066.www5.localhost"
+        ],
         "related.ip": [
             "10.164.190.2",
             "10.223.11.164"
@@ -5714,8 +5951,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "antium",
-            "Allowed"
+            "Allowed",
+            "antium"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -5771,6 +6008,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "iavol5202.api.example"
+        ],
         "related.ip": [
             "10.14.37.8",
             "10.121.181.243"
@@ -5787,8 +6027,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedic",
         "rsa.misc.action": [
-            "Blocked",
-            "rinc"
+            "rinc",
+            "Blocked"
         ],
         "rsa.misc.category": "prehende",
         "rsa.misc.filter": "rume",
@@ -5844,6 +6084,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "uame1361.api.local"
+        ],
         "related.ip": [
             "10.10.93.133",
             "10.90.20.202"
@@ -5917,6 +6160,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "rsitame4049.internal.corp"
+        ],
         "related.ip": [
             "10.77.102.206",
             "10.34.98.144"
@@ -5933,8 +6179,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Exce",
         "rsa.misc.action": [
-            "ulapa",
-            "Allowed"
+            "Allowed",
+            "ulapa"
         ],
         "rsa.misc.category": "reprehen",
         "rsa.misc.filter": "itsedqui",
@@ -5990,6 +6236,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "elit912.www5.test"
+        ],
         "related.ip": [
             "10.176.233.249",
             "10.75.144.118"
@@ -6006,8 +6255,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "essequa",
         "rsa.misc.action": [
-            "odic",
-            "Blocked"
+            "Blocked",
+            "odic"
         ],
         "rsa.misc.category": "cto",
         "rsa.misc.filter": "odite",
@@ -6063,9 +6312,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "tat6671.www.local"
+        ],
         "related.ip": [
-            "10.149.6.107",
-            "10.236.55.236"
+            "10.236.55.236",
+            "10.149.6.107"
         ],
         "related.user": [
             "redolo"
@@ -6136,9 +6388,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "uis5050.www.local"
+        ],
         "related.ip": [
-            "10.97.202.149",
-            "10.13.125.101"
+            "10.13.125.101",
+            "10.97.202.149"
         ],
         "related.user": [
             "colab"
@@ -6152,8 +6407,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atcupi",
         "rsa.misc.action": [
-            "uaUten",
-            "Blocked"
+            "Blocked",
+            "uaUten"
         ],
         "rsa.misc.category": "modt",
         "rsa.misc.filter": "magnidol",
@@ -6209,9 +6464,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ficiad1312.api.host"
+        ],
         "related.ip": [
-            "10.230.61.102",
-            "10.141.66.163"
+            "10.141.66.163",
+            "10.230.61.102"
         ],
         "related.user": [
             "umdolo"
@@ -6225,8 +6483,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itautf",
         "rsa.misc.action": [
-            "mini",
-            "Blocked"
+            "Blocked",
+            "mini"
         ],
         "rsa.misc.category": "gna",
         "rsa.misc.filter": "usmo",
@@ -6282,6 +6540,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "itaspe921.mail.invalid"
+        ],
         "related.ip": [
             "10.224.249.228",
             "10.10.25.145"
@@ -6355,9 +6616,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "archite4407.mail.invalid"
+        ],
         "related.ip": [
-            "10.247.255.107",
-            "10.234.34.40"
+            "10.234.34.40",
+            "10.247.255.107"
         ],
         "related.user": [
             "aeabillo"
@@ -6428,6 +6692,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "aria1424.mail.home"
+        ],
         "related.ip": [
             "10.250.102.42",
             "10.124.81.20"
@@ -6444,8 +6711,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ilmoles",
         "rsa.misc.action": [
-            "tatisetq",
-            "Blocked"
+            "Blocked",
+            "tatisetq"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "liquide",
@@ -6501,9 +6768,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "Bonoru7444.www5.example"
+        ],
         "related.ip": [
-            "10.166.205.159",
-            "10.154.188.132"
+            "10.154.188.132",
+            "10.166.205.159"
         ],
         "related.user": [
             "uptat"
@@ -6517,8 +6787,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "proid",
         "rsa.misc.action": [
-            "Allowed",
-            "onevolu"
+            "onevolu",
+            "Allowed"
         ],
         "rsa.misc.category": "iratio",
         "rsa.misc.filter": "odita",
@@ -6570,6 +6840,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "icero1297.internal.domain"
+        ],
         "related.ip": [
             "10.138.193.38",
             "10.46.71.46"
@@ -6586,8 +6859,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "upta",
         "rsa.misc.action": [
-            "Allowed",
-            "uovolup"
+            "uovolup",
+            "Allowed"
         ],
         "rsa.misc.category": "todit",
         "rsa.misc.filter": "atisetq",
@@ -6639,6 +6912,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "oloremeu5047.www5.invalid"
+        ],
         "related.ip": [
             "10.254.119.31",
             "10.172.159.251"
@@ -6655,8 +6931,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "imadmi",
         "rsa.misc.action": [
-            "Blocked",
-            "tatemacc"
+            "tatemacc",
+            "Blocked"
         ],
         "rsa.misc.category": "tutlabor",
         "rsa.misc.filter": "eturad",
@@ -6712,9 +6988,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "edutpe1255.internal.lan"
+        ],
         "related.ip": [
-            "10.195.62.230",
-            "10.98.126.206"
+            "10.98.126.206",
+            "10.195.62.230"
         ],
         "related.user": [
             "ptassit"
@@ -6785,9 +7064,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "nderit1171.www5.domain"
+        ],
         "related.ip": [
-            "10.84.140.5",
-            "10.144.93.186"
+            "10.144.93.186",
+            "10.84.140.5"
         ],
         "related.user": [
             "eroi"
@@ -6858,6 +7140,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "nos4114.api.lan"
+        ],
         "related.ip": [
             "10.31.58.6",
             "10.198.84.190"
@@ -6931,6 +7216,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "oremeum4231.internal.host"
+        ],
         "related.ip": [
             "10.139.90.218",
             "10.131.81.172"
@@ -7004,6 +7292,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "ueip6097.api.host"
+        ],
         "related.ip": [
             "10.128.43.71",
             "10.152.217.174"
@@ -7077,6 +7368,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "fugiatqu7793.www.localdomain"
+        ],
         "related.ip": [
             "10.26.149.221",
             "10.217.193.148"
@@ -7150,6 +7444,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "onsequ3168.www.corp"
+        ],
         "related.ip": [
             "10.172.17.6",
             "10.109.192.53"
@@ -7223,9 +7520,12 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "oremquel3120.internal.localhost"
+        ],
         "related.ip": [
-            "10.135.38.213",
-            "10.119.106.108"
+            "10.119.106.108",
+            "10.135.38.213"
         ],
         "related.user": [
             "ore"
@@ -7239,8 +7539,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "exeacomm",
         "rsa.misc.action": [
-            "Blocked",
-            "volup"
+            "volup",
+            "Blocked"
         ],
         "rsa.misc.category": "ten",
         "rsa.misc.filter": "ssecil",

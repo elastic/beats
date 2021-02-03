@@ -7,6 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"net/url"
+	"text/template"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -22,13 +23,12 @@ type dateCursor struct {
 	initialInterval time.Duration
 	dateFormat      string
 
-	value    string
-	valueTpl *Template
+	valueTpl *template.Template
 }
 
 func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 	c := &dateCursor{
-		enabled: config.DateCursor.IsEnabled(),
+		enabled: config.DateCursor.isEnabled(),
 		url:     *config.URL.URL,
 	}
 
@@ -40,23 +40,25 @@ func newDateCursorFromConfig(config config, log *logp.Logger) *dateCursor {
 	c.field = config.DateCursor.Field
 	c.urlField = config.DateCursor.URLField
 	c.initialInterval = config.DateCursor.InitialInterval
-	c.dateFormat = config.DateCursor.GetDateFormat()
-	c.valueTpl = config.DateCursor.ValueTemplate
+	c.dateFormat = config.DateCursor.getDateFormat()
+	if config.DateCursor.ValueTemplate != nil {
+		c.valueTpl = config.DateCursor.ValueTemplate.Template
+	}
 
 	return c
 }
 
-func (c *dateCursor) getURL() string {
+func (c *dateCursor) getURL(prevValue string) string {
 	if !c.enabled {
 		return c.url.String()
 	}
 
 	var dateStr string
-	if c.value == "" {
+	if prevValue == "" {
 		t := timeNow().UTC().Add(-c.initialInterval)
 		dateStr = t.Format(c.dateFormat)
 	} else {
-		dateStr = c.value
+		dateStr = prevValue
 	}
 
 	q := c.url.Query()
@@ -66,7 +68,7 @@ func (c *dateCursor) getURL() string {
 		value = dateStr
 	} else {
 		buf := new(bytes.Buffer)
-		if err := c.valueTpl.Template.Execute(buf, dateStr); err != nil {
+		if err := c.valueTpl.Execute(buf, dateStr); err != nil {
 			return c.url.String()
 		}
 		value = buf.String()
@@ -74,32 +76,33 @@ func (c *dateCursor) getURL() string {
 
 	q.Set(c.urlField, value)
 
-	c.url.RawQuery = q.Encode()
+	url := c.url
+	url.RawQuery = q.Encode()
 
-	return c.url.String()
+	return url.String()
 }
 
-func (c *dateCursor) advance(m common.MapStr) {
+func (c *dateCursor) getNextValue(m common.MapStr) string {
 	if c.field == "" {
-		c.value = time.Now().UTC().Format(c.dateFormat)
-		return
+		return time.Now().UTC().Format(c.dateFormat)
 	}
 
 	v, err := m.GetValue(c.field)
 	if err != nil {
 		c.log.Warnf("date_cursor field: %q", err)
-		return
+		return ""
 	}
+
 	switch t := v.(type) {
 	case string:
 		_, err := time.Parse(c.dateFormat, t)
 		if err != nil {
 			c.log.Warn("date_cursor field does not have the expected layout")
-			return
+			return ""
 		}
-		c.value = t
-	default:
-		c.log.Warn("date_cursor field must be a string, cursor will not advance")
-		return
+		return t
 	}
+
+	c.log.Warn("date_cursor field must be a string, cursor will not advance")
+	return ""
 }

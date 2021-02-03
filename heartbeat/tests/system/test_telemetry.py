@@ -63,7 +63,7 @@ class Test(BaseTest):
                     "Start job 'tcp-tcp@{}".format(tcp_host)))
 
             init_lines = self.output_lines()
-            self.wait_until(lambda: self.output_has(lines=init_lines+2))
+            self.wait_until(lambda: self.output_has(lines=init_lines + 2))
 
             self.assert_stats({
                 "http": {

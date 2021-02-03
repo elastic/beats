@@ -9,10 +9,12 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
@@ -59,7 +61,11 @@ func newLocal(
 	log *logger.Logger,
 	pathConfigFile string,
 	rawConfig *config.Config,
+	reexec reexecManager,
+	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (*Local, error) {
+	statusController := &noopController{}
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
@@ -70,10 +76,6 @@ func newLocal(
 		if err != nil {
 			return nil, err
 		}
-	}
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
 	}
 
 	logR := logreporter.NewReporter(log)
@@ -96,22 +98,33 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, cfg.Settings, localApplication.srv, reporter, monitor))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusController))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
 	localApplication.router = router
 
+	composableCtrl, err := composable.New(log, rawConfig)
+	if err != nil {
+		return nil, errors.New(err, "failed to initialize composable controller")
+	}
+
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	emit := emitter(
+	emit, err := emitter(
+		localApplication.bgContext,
 		log,
+		agentInfo,
+		composableCtrl,
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, filters.ConstraintFilter},
+			Filters:    []filterFunc{filters.StreamChecker},
 		},
 		monitor,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {
@@ -123,6 +136,17 @@ func newLocal(
 	}
 
 	localApplication.source = cfgSource
+
+	// create a upgrader to use in local mode
+	upgrader := upgrade.NewUpgrader(
+		agentInfo,
+		cfg.Settings.DownloadConfig,
+		log,
+		[]context.CancelFunc{localApplication.cancelCtxFn},
+		reexec,
+		newNoopAcker(),
+		reporter)
+	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil
 }

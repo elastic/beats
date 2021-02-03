@@ -280,6 +280,7 @@ processors:
 - geoip:
     field: source.ip
     target_field: source.geo
+    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip

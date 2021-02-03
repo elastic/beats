@@ -10,13 +10,15 @@ This file is generated! See scripts/docs_collector.py
 
 == Cisco module
 
-This is a module for Cisco network device's logs. It includes the following
+This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
 filesets for receiving logs over syslog or read from a file:
 
 - `asa` fileset: supports Cisco ASA firewall logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
 - `nexus` fileset: supports Cisco Nexus switch logs.
+- `meraki` fileset: supports Cisco Meraki logs.
+- `umbrella` fileset: supports Cisco Umbrella logs.
 
 Cisco ASA devices also support exporting flow records using NetFlow, which is
 supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
@@ -31,6 +33,8 @@ include::../include/configuring-intro.asciidoc[]
 The module is by default configured to run via syslog on port 9001 for ASA and
 port 9002 for IOS. However it can also be configured to read from a file path.
 See the following example.
+
+Cisco Umbrella publishes its logs in a compressed CSV format to a S3 bucket.
 
 ["source","yaml",subs="attributes"]
 -----
@@ -323,12 +327,118 @@ offset so that datetimes are correctly parsed. Valid values are in the form
 *`var.rsa_fields`*::
 
 Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
+which causes both ECS and custom fields under `rsa` to be added.
 
 *`var.keep_raw_fields`*::
 
 Flag to control the addition of the raw parser fields to the event. This fields
 will be found under `rsa.raw`. The default is false.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `meraki` fileset settings
+
+experimental[]
+
+NOTE: This was converted from RSA NetWitness log parser XML "ciscomeraki" device revision 118.
+
+*`var.input`*::
+
+The input from which messages are read. One of `file`, `tcp` or `udp`.
+
+*`var.syslog_host`*::
+
+The address to listen to UDP or TCP based syslog traffic.
+Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to `9525`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+*`var.tz_offset`*::
+
+By default, datetimes in the logs will be interpreted as relative to
+the timezone configured in the host where {beatname_uc} is running. If ingesting
+logs from a host on a different timezone, use this field to set the timezone
+offset so that datetimes are correctly parsed. Valid values are in the form
+±HH:mm, for example, `-07:00` for `UTC-7`.
+
+*`var.rsa_fields`*::
+
+Flag to control the addition of non-ECS fields to the event. Defaults to true,
+which causes both ECS and custom fields under `rsa` to be added.
+
+*`var.keep_raw_fields`*::
+
+Flag to control the addition of the raw parser fields to the event. This fields
+will be found under `rsa.raw`. The default is false.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `umbrella` fileset settings
+
+The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
+
+To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-aws-s3.html[AWS S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
+
+This fileset supports all 4 log types:
+- Proxy
+- Cloud Firewall
+- IP Logs
+- DNS logs
+
+The Cisco Umbrella fileset depends on the original file path structure being followed. This structure is documented https://docs.umbrella.com/deployment-umbrella/docs/log-formats-and-versioning[Umbrella Log Formats and Versioning]:
+
+<subfolder>/<YYYY>-<MM>-<DD>/<YYYY>-<MM>-<DD>-<hh>-<mm>-<xxxx>.csv.gz
+dnslogs/<year>-<month>-<day>/<year>-<month>-<day>-<hour>-<minute>.csv.gz
+
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  umbrella:
+    enabled: true
+    var.input: aws-s3
+    var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    var.access_key_id: 123456
+    var.secret_access_key: PASSWORD
+----
+
+*`var.input`*::
+
+The input from which messages are read. Can be S3 or file.
+
+*`var.queue_url`*::
+
+The URL to the SQS queue if the input type is S3.
+
+*`var.access_key_id`*::
+
+The ID for the access key used to read from the SQS queue.
+
+*`var.secret_access_key`*::
+
+The secret token used for authenticating to the SQS queue.
+
+*`var.visibility_timeout`*::
+
+The duration that the received messages are hidden from ReceiveMessage request.
+Default to be 300 seconds.
+
+*`var.api_timeout`*::
+
+Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
 
 :has-dashboards!:
 

@@ -5,8 +5,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-metricset-prometheus-remote_write]]
 === Prometheus remote_write metricset
 
-beta[]
-
 include::../../../module/prometheus/remote_write/_meta/docs.asciidoc[]
 
 

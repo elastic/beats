@@ -51,17 +51,19 @@ type result struct {
 }
 
 var cloudMetaProviders = map[string]provider{
-	"alibaba":      alibabaCloudMetadataFetcher,
-	"ecs":          alibabaCloudMetadataFetcher,
-	"azure":        azureVMMetadataFetcher,
-	"digitalocean": doMetadataFetcher,
-	"aws":          ec2MetadataFetcher,
-	"ec2":          ec2MetadataFetcher,
-	"gcp":          gceMetadataFetcher,
-	"openstack":    openstackNovaMetadataFetcher,
-	"nova":         openstackNovaMetadataFetcher,
-	"qcloud":       qcloudMetadataFetcher,
-	"tencent":      qcloudMetadataFetcher,
+	"alibaba":       alibabaCloudMetadataFetcher,
+	"ecs":           alibabaCloudMetadataFetcher,
+	"azure":         azureVMMetadataFetcher,
+	"digitalocean":  doMetadataFetcher,
+	"aws":           ec2MetadataFetcher,
+	"ec2":           ec2MetadataFetcher,
+	"gcp":           gceMetadataFetcher,
+	"openstack":     openstackNovaMetadataFetcher,
+	"nova":          openstackNovaMetadataFetcher,
+	"openstack-ssl": openstackNovaSSLMetadataFetcher,
+	"nova-ssl":      openstackNovaSSLMetadataFetcher,
+	"qcloud":        qcloudMetadataFetcher,
+	"tencent":       qcloudMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -138,6 +140,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 				Timeout:   p.initData.timeout,
 				KeepAlive: 0,
 			}).DialContext,
+			TLSClientConfig: p.initData.tlsConfig.ToConfig(),
 		},
 	}
 

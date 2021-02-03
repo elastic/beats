@@ -29,8 +29,7 @@ import (
 */
 
 func init() {
-	if err := Registry.AddGuess(
-		&guessSockaddrIn{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSockaddrIn{} }); err != nil {
 		panic(err)
 	}
 }

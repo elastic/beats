@@ -39,9 +39,19 @@
           type: keyword
           description: >
             The subscription ID
+        - name: application_id
+          type: keyword
+          description: >
+            The application ID
         - name: dimensions.*
           type: object
           object_type: keyword
           object_type_mapping_type: "*"
           description: >
             Azure metric dimensions.
+        - name: metrics.*.*
+          type: object
+          object_type: float
+          object_type_mapping_type: "*"
+          description: >
+            Metrics returned.

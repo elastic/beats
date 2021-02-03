@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  SubnetID:
+    Type: String
+  CloudIDArn:
+    Type: String
+  CloudAuthArn:
+    Type: String
+  ClusterName:
+    Type: String
+  RoleName:
+    Type: String
+  TaskName:
+    Type: String
+  ServiceName:
+    Type: String
+  LogGroupName:
+    Type: String
+Resources:
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref ClusterName
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Ref LogGroupName
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: !Sub 'EcsTaskExecutionRole-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource:
+                  - !Ref CloudIDArn
+                  - !Ref CloudAuthArn
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref TaskName
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: metricbeat-container
+          Image: docker.elastic.co/beats/metricbeat:7.11.0-SNAPSHOT
+          Secrets:
+            - Name: ELASTIC_CLOUD_ID
+              ValueFrom: !Ref CloudIDArn
+            - Name: ELASTIC_CLOUD_AUTH
+              ValueFrom: !Ref CloudAuthArn
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: ecs
+          EntryPoint:
+            - sh
+            - -c
+          Command:
+            - ./metricbeat setup -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+        - Name: stress-test
+          Image: containerstack/alpine-stress
+          Essential: false
+          DependsOn:
+            - ContainerName: metricbeat-container
+              Condition: START
+          EntryPoint:
+            - sh
+            - -c
+          Command:
+            - stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 6000s
+      RequiresCompatibilities:
+        - EC2
+        - FARGATE
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref SubnetID

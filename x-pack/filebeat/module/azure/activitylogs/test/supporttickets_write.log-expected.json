@@ -45,12 +45,14 @@
         "event.duration": -1468967296,
         "event.kind": "event",
         "event.module": "azure",
+        "event.outcome": "success",
         "event.type": [
             "change"
         ],
         "fileset.name": "activitylogs",
         "geo.continent_name": "Asia",
         "geo.country_iso_code": "JP",
+        "geo.country_name": "Japan",
         "geo.location.lat": 35.69,
         "geo.location.lon": 139.69,
         "input.type": "log",
@@ -61,6 +63,7 @@
         "source.as.organization.name": "KDDI CORPORATION",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "JP",
+        "source.geo.country_name": "Japan",
         "source.geo.location.lat": 35.69,
         "source.geo.location.lon": 139.69,
         "source.ip": "111.111.111.11",

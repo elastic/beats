@@ -10,16 +10,16 @@
         "crowdstrike.event.HostName": "TESTDEVICE01",
         "crowdstrike.event.Ipv": "ipv4",
         "crowdstrike.event.LocalAddress": "10.37.60.194",
-        "crowdstrike.event.LocalPort": "445",
+        "crowdstrike.event.LocalPort": 445,
         "crowdstrike.event.MatchCount": 1,
         "crowdstrike.event.MatchCountSinceLastReport": 1,
         "crowdstrike.event.NetworkProfile": "2",
-        "crowdstrike.event.PID": "206158879910",
+        "crowdstrike.event.PID": 206158879910,
         "crowdstrike.event.PolicyID": "74e7f1552a3a4d90a6d65578642c8584",
         "crowdstrike.event.PolicyName": "PROD-FW-Workstations-General",
         "crowdstrike.event.Protocol": "6",
         "crowdstrike.event.RemoteAddress": "10.37.60.21",
-        "crowdstrike.event.RemotePort": "54952",
+        "crowdstrike.event.RemotePort": 54952,
         "crowdstrike.event.RuleAction": "2",
         "crowdstrike.event.RuleFamilyID": "fec73e96a1bf4481be582c3f89b234fa",
         "crowdstrike.event.RuleGroupName": "SMB Rules",
@@ -32,7 +32,7 @@
         "crowdstrike.metadata.offset": 70689,
         "crowdstrike.metadata.version": "1.0",
         "destination.ip": "10.37.60.194",
-        "destination.port": "445",
+        "destination.port": 445,
         "event.action": "firewall_match_event",
         "event.category": [
             "network"
@@ -56,9 +56,9 @@
         ],
         "log.offset": 0,
         "message": "Firewall Rule 'Inbound SMB Block & Log Private' triggered",
-        "network.direction": "inbound",
+        "network.direction": "ingress",
         "network.type": "ipv4",
-        "process.pid": "206158879910",
+        "process.pid": 206158879910,
         "related.ip": [
             "10.37.60.21",
             "10.37.60.194"
@@ -70,7 +70,7 @@
         "rule.ruleset": "SMB Rules",
         "service.type": "crowdstrike",
         "source.ip": "10.37.60.21",
-        "source.port": "54952",
+        "source.port": 54952,
         "tags": [
             "forwarded"
         ]

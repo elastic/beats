@@ -63,6 +63,7 @@
         "source.as.organization.name": "CHINA UNICOM China169 Backbone",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
+        "source.geo.country_name": "China",
         "source.geo.location.lat": 29.5569,
         "source.geo.location.lon": 106.5531,
         "source.geo.region_iso_code": "CN-CQ",

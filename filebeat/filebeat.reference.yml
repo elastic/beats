@@ -203,8 +203,16 @@ filebeat.modules:
 
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
-  # All logs
+  # Server logs
   log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Audit logs
+  audit:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -398,6 +406,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
+# * filestream: Improved version of log input. Experimental.
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -504,6 +513,11 @@ filebeat.inputs:
   # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
   # in case of conflicts.
   #json.overwrite_keys: false
+
+  # If this setting is enabled, then keys in the decoded JSON object will be recursively
+  # de-dotted, and expanded into a hierarchical object structure.
+  # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+  #json.expand_keys: false
 
   # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
@@ -617,6 +631,145 @@ filebeat.inputs:
 
   # Defines if inputs is enabled
   #enabled: true
+
+#--------------------------- Filestream input ----------------------------
+- type: filestream
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  # To fetch all ".log" files from a specific level of subdirectories
+  # /var/log/*/*.log can be used.
+  # For each file found under this path, a harvester is started.
+  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Configure the file encoding for reading files with international characters
+  # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+  # Some sample encodings:
+  #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+  #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
+  #encoding: plain
+
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, no lines are dropped.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, all the lines are exported.
+  #include_lines: ['^ERR', '^WARN']
+
+  ### Prospector options
+
+  # How often the input checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
+  #prospector.scanner.check_interval: 10s
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Expand "**" patterns into regular glob patterns.
+  #prospector.scanner.recursive_glob: true
+
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
+  # original for harvesting but will report the symlink name as source.
+  #prospector.scanner.symlinks: false
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: true
+
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
+  # By default, all events contain `host.name`. This option can be set to true
+  # to disable the addition of this field to all events. The default value is
+  # false.
+  #publisher_pipeline.disable_host: false
+
+  # Ignore files which were modified more then the defined timespan in the past.
+  # ignore_older is disabled by default, so no files are ignored by setting it to 0.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #ignore_older: 0
+
+  # Defines the buffer size every harvester uses when fetching the file
+  #harvester_buffer_size: 16384
+
+  # Maximum number of bytes a single log event can have
+  # All bytes after max_bytes are discarded and not sent. The default is 10MB.
+  # This is especially useful for multiline log messages which can get large.
+  #message_max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # Backoff values define how aggressively filebeat crawls new files for updates
+  # The default values can be used in most cases. Backoff defines how long it is waited
+  # to check a file again after EOF is reached. Default is 1s which means the file
+  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # Every time a new line appears, backoff is reset to the initial value.
+  #backoff.init: 1s
+
+  # Max backoff defines what the maximum backoff time is. After having backed off multiple times
+  # from checking the files, the waiting time will never exceed max_backoff independent of the
+  # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
+  # file after having backed off multiple times, it takes a maximum of 10s to read the new line
+  #backoff.max: 10s
+
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close.on_state_change.inactive: 5m
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.on_state_change.renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  #close.on_state_change.removed: true
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.eof: false
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.after_interval: 0
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -888,6 +1041,41 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
+  
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+    
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
@@ -1219,6 +1407,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1346,6 +1538,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1437,6 +1633,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Filebeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
@@ -1532,6 +1732,10 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1539,6 +1743,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1695,6 +1903,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1870,6 +2082,11 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default filebeat uses the legacy index templates.
+#setup.template.type: legacy
+
 # Template name. By default the template name is "filebeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "filebeat-%{[agent.version]}"
@@ -1898,6 +2115,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of filebeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
@@ -1984,6 +2203,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2037,7 +2260,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
@@ -2181,6 +2404,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

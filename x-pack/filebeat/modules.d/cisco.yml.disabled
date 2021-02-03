@@ -20,6 +20,14 @@
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
+
   ftd:
     enabled: true
 
@@ -37,6 +45,14 @@
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
   ios:
     enabled: true
@@ -73,3 +89,37 @@
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+  meraki:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9525
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  umbrella:
+    enabled: true
+
+    #var.input: aws-s3
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    # Access ID to authenticate with the S3 input
+    #var.access_key_id: 123456
+    # Access key to authenticate with the S3 input
+    #var.secret_access_key: PASSWORD
+    # The duration that the received messages are hidden from ReceiveMessage request
+    #var.visibility_timeout: 300s
+    # Maximum duration before AWS API request will be interrupted
+    #var.api_timeout: 120s

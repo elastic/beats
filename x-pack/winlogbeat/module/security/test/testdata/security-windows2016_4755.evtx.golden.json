@@ -3,15 +3,17 @@
     "@timestamp": "2019-10-22T11:35:09.0701134Z",
     "event": {
       "action": "modified-group-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4755,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "change",
-        "group"
+        "group",
+        "change"
       ]
     },
     "group": {

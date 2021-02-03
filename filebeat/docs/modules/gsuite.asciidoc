@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 beta[]
 
+deprecated::[7.12]
+
 This is a module for ingesting data from the different GSuite audit reports API's.
 
 include::../include/gs-link.asciidoc[]
@@ -32,12 +34,15 @@ It is compatible with a subset of applications under the https://developers.goog
 | Groups https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups[api docs] https://support.google.com/a/answer/6270454?hl=en&ref_topic=9027054[help]                    | Track changes to groups, group memberships and group messages.                                                                                                                |
 |===========================================================================================================================================================================================================================
 
+[float]
 === Configure the module
 
-In order for filebeat to ingest data from the Google Reports API you must https://support.google.com/gsuitemigrate/answer/9222993?hl=en[set up a ServiceAccount] that https://support.google.com/gsuitemigrate/answer/9222865?hl=en[has access to the Admin SDK API].
+In order for Filebeat to ingest data from the Google Reports API you must:
 
-
-Additionally https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Domain-Wide Delegation] is required for your application to work properly.
+- Have an *administrator account*.
+- https://support.google.com/gsuitemigrate/answer/9222993?hl=en[Set up a ServiceAccount] using the administrator account.
+- https://support.google.com/gsuitemigrate/answer/9222865?hl=en[Set up access to the Admin SDK API] for the ServiceAccount.
+- https://developers.google.com/admin-sdk/reports/v1/guides/delegation[Enable Domain-Wide Delegation] for your ServiceAccount.
 
 This module will make use of the following *oauth2 scope*:
 

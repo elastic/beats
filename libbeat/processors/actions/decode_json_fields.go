@@ -38,6 +38,7 @@ import (
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
+	expandKeys    bool
 	overwriteKeys bool
 	addErrorKey   bool
 	processArray  bool
@@ -49,6 +50,7 @@ type decodeJSONFields struct {
 type config struct {
 	Fields        []string `config:"fields"`
 	MaxDepth      int      `config:"max_depth" validate:"min=1"`
+	ExpandKeys    bool     `config:"expand_keys"`
 	OverwriteKeys bool     `config:"overwrite_keys"`
 	AddErrorKey   bool     `config:"add_error_key"`
 	ProcessArray  bool     `config:"process_array"`
@@ -87,6 +89,7 @@ func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	f := &decodeJSONFields{
 		fields:        config.Fields,
 		maxDepth:      config.MaxDepth,
+		expandKeys:    config.ExpandKeys,
 		overwriteKeys: config.OverwriteKeys,
 		addErrorKey:   config.AddErrorKey,
 		processArray:  config.ProcessArray,
@@ -144,7 +147,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		} else {
 			switch t := output.(type) {
 			case map[string]interface{}:
-				jsontransform.WriteJSONKeys(event, t, f.overwriteKeys, f.addErrorKey)
+				jsontransform.WriteJSONKeys(event, t, f.expandKeys, f.overwriteKeys, f.addErrorKey)
 			default:
 				errs = append(errs, "failed to add target to root")
 			}

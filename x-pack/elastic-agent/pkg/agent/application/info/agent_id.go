@@ -25,9 +25,13 @@ const agentInfoKey = "agent"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
+const defaultAgentStateStoreFile = "state.yml"
+
+const defaultLogLevel = "info"
 
 type persistentAgentInfo struct {
-	ID string `json:"id" yaml:"id" config:"id"`
+	ID       string `json:"id" yaml:"id" config:"id"`
+	LogLevel string `json:"logging.level,omitempty" yaml:"logging.level,omitempty" config:"logging.level,omitempty"`
 }
 
 type ioStore interface {
@@ -40,9 +44,33 @@ func AgentConfigFile() string {
 	return filepath.Join(paths.Config(), defaultAgentConfigFile)
 }
 
-// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+// AgentActionStoreFile is the file that contains the action that can be replayed after restart.
 func AgentActionStoreFile() string {
 	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
+}
+
+// AgentStateStoreFile is the file that contains the persisted state of the agent including the action that can be replayed after restart.
+func AgentStateStoreFile() string {
+	return filepath.Join(paths.Home(), defaultAgentStateStoreFile)
+}
+
+// updateLogLevel updates log level and persists it to disk.
+func updateLogLevel(level string) error {
+	ai, err := loadAgentInfo(false, defaultLogLevel)
+	if err != nil {
+		return err
+	}
+
+	if ai.LogLevel == level {
+		// no action needed
+		return nil
+	}
+
+	agentConfigFile := AgentConfigFile()
+	s := storage.NewDiskStore(agentConfigFile)
+
+	ai.LogLevel = level
+	return updateAgentInfo(s, ai)
 }
 
 func generateAgentID() (string, error) {
@@ -54,11 +82,11 @@ func generateAgentID() (string, error) {
 	return uid.String(), nil
 }
 
-func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
+func loadAgentInfo(forceUpdate bool, logLevel string) (*persistentAgentInfo, error) {
 	agentConfigFile := AgentConfigFile()
 	s := storage.NewDiskStore(agentConfigFile)
 
-	agentinfo, err := getInfoFromStore(s)
+	agentinfo, err := getInfoFromStore(s, logLevel)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +107,7 @@ func loadAgentInfo(forceUpdate bool) (*persistentAgentInfo, error) {
 	return agentinfo, nil
 }
 
-func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
+func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) {
 	agentConfigFile := AgentConfigFile()
 	reader, err := s.Load()
 	if err != nil {
@@ -104,7 +132,9 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 
 	agentInfoSubMap, found := configMap[agentInfoKey]
 	if !found {
-		return &persistentAgentInfo{}, nil
+		return &persistentAgentInfo{
+			LogLevel: logLevel,
+		}, nil
 	}
 
 	cc, err := config.NewConfigFrom(agentInfoSubMap)
@@ -112,7 +142,9 @@ func getInfoFromStore(s ioStore) (*persistentAgentInfo, error) {
 		return nil, errors.New(err, "failed to create config from agent info submap")
 	}
 
-	pid := &persistentAgentInfo{}
+	pid := &persistentAgentInfo{
+		LogLevel: logLevel,
+	}
 	if err := cc.Unpack(&pid); err != nil {
 		return nil, errors.New(err, "failed to unpack stored config to map")
 	}

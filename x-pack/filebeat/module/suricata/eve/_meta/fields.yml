@@ -176,10 +176,6 @@
       - name: http_content_type
         type: keyword
 
-    - name: timestamp
-      type: alias
-      path: '@timestamp'
-
     - name: in_iface
       type: keyword
 
@@ -717,9 +713,6 @@
       - name: pkts_toserver
         type: alias
         path: source.packets
-
-      - name: end
-        type: date
 
       - name: alerted
         type: boolean

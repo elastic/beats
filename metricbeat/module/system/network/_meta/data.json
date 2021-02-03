@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.network",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "network"
+        "name": "network",
+        "period": 10000
     },
     "service": {
         "type": "system"
@@ -18,17 +15,17 @@
     "system": {
         "network": {
             "in": {
-                "bytes": 37904869172,
-                "dropped": 32,
-                "errors": 0,
-                "packets": 32143403
-            },
-            "name": "wlp4s0",
-            "out": {
-                "bytes": 6299331926,
+                "bytes": 0,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 13362703
+                "packets": 0
+            },
+            "name": "br-18285ad7f418",
+            "out": {
+                "bytes": 0,
+                "dropped": 0,
+                "errors": 0,
+                "packets": 0
             }
         }
     }

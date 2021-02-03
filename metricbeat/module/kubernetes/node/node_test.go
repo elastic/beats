@@ -42,11 +42,11 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	testCases := map[string]interface{}{
-		"cpu.usage.core.ns":   4189523881380,
+		"cpu.usage.core.ns":   int64(4189523881380),
 		"cpu.usage.nanocores": 18691146,
 
 		"memory.available.bytes":  1768316928,
-		"memory.usage.bytes":      2764943360,
+		"memory.usage.bytes":      int64(2764943360),
 		"memory.rss.bytes":        2150400,
 		"memory.workingset.bytes": 2111090688,
 		"memory.pagefaults":       131567,
@@ -54,11 +54,11 @@ func TestEventMapping(t *testing.T) {
 
 		"name": "gke-beats-default-pool-a5b33e2e-hdww",
 
-		"fs.available.bytes": 98727014400,
-		"fs.capacity.bytes":  101258067968,
-		"fs.used.bytes":      2514276352,
+		"fs.available.bytes": int64(98727014400),
+		"fs.capacity.bytes":  int64(101258067968),
+		"fs.used.bytes":      int64(2514276352),
 		"fs.inodes.used":     138624,
-		"fs.inodes.free":     6120096,
+		"fs.inodes.free":     uint64(18446744073709551615),
 		"fs.inodes.count":    6258720,
 
 		"network.rx.bytes":  1115133198,
@@ -66,8 +66,8 @@ func TestEventMapping(t *testing.T) {
 		"network.tx.bytes":  812729002,
 		"network.tx.errors": 0,
 
-		"runtime.imagefs.available.bytes": 98727014400,
-		"runtime.imagefs.capacity.bytes":  101258067968,
+		"runtime.imagefs.available.bytes": int64(98727014400),
+		"runtime.imagefs.capacity.bytes":  int64(101258067968),
 		"runtime.imagefs.used.bytes":      860204379,
 	}
 

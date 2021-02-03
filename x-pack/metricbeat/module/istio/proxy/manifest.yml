@@ -1,0 +1,11 @@
+default: false
+input:
+  module: prometheus
+  metricset: collector
+  defaults:
+    metrics_path: /stats/prometheus
+    metrics_filters:
+      include: ["istio_*"]
+      exclude: ["^up$"]
+    use_types: true
+    rate_counters: true

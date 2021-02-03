@@ -3,15 +3,17 @@
     "@timestamp": "2019-10-22T11:26:12.4955445Z",
     "event": {
       "action": "added-group-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4727,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "group"
+        "group",
+        "creation"
       ]
     },
     "group": {

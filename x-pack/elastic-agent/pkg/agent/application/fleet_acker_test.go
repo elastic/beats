@@ -48,7 +48,7 @@ func TestAcker(t *testing.T) {
 		assert.EqualValues(t, 1, len(cr.Events))
 		assert.EqualValues(t, testID, cr.Events[0].ActionID)
 
-		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+		resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 		return resp, nil
 	})
 

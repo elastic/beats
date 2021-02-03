@@ -1,0 +1,87 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "8358623250631840944",
+            "name": "rhodes-spacetime-1"
+        },
+        "machine": {
+            "type": "e2-micro"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 72
+                },
+                "dropped_packets_count": {
+                    "value": 1
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 0.5
+                    },
+                    "usage_time": {
+                        "value": 1.851312024924482
+                    },
+                    "utilization": {
+                        "value": 0.06171040083081607
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 2092478464
+                        },
+                        "ram_used": {
+                            "value": 1155657728
+                        },
+                        "swap_in_bytes_count": {
+                            "value": 0
+                        },
+                        "swap_out_bytes_count": {
+                            "value": 0
+                        }
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {
+            "user": {
+                "created-by": "ks"
+            }
+        }
+    },
+    "host": {
+        "cpu": {
+            "pct": 0.06171040083081607
+        },
+        "id": "8358623250631840944",
+        "name": "rhodes-spacetime-1"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}
