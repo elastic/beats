@@ -48062,6 +48062,70 @@ type: keyword
 
 --
 
+[[exported-fields-email]]
+== Office 365 fields
+
+Module for handling logs from Office 365.
+
+
+
+[float]
+=== email
+
+Fields from Office 365 Mailtrace logs
+
+
+
+*`email.size`*::
++
+--
+Size of the email body.
+
+
+type: long
+
+--
+
+*`email.message_id`*::
++
+--
+Unique ID for the email message
+
+
+type: keyword
+
+--
+
+*`email.recipients.addresses`*::
++
+--
+An array of recipient email addresses
+
+
+type: keyword
+
+--
+
+*`email.sender.address`*::
++
+--
+The senders email address
+
+
+type: keyword
+
+--
+
+*`email.subject`*::
++
+--
+The email subject text
+
+
+type: keyword
+
+--
+
 [[exported-fields-envoyproxy]]
 == Envoyproxy fields
 
@@ -53178,79 +53242,10 @@ type: keyword
 
 --
 
-
-[[exported-fields-email]]
-== Office 365 fields
-
-Module for handling logs from Office 365.
-
-
-
-[float]
-=== email
-
-Fields from Office 365 Mailtrace logs
-
-
-
-*`email.size`*::
-+
---
-Size of the email body.
-
-
-type: long
-
---
-
-*`email.message_id`*::
-+
---
-Unique ID for the email message
-
-
-type: keyword
-
---
-
-*`email.recipients.addresses`*::
-+
---
-An array of recipient email addresses
-
-
-type: keyword
-
---
-
-*`email.sender.address`*::
-+
---
-The senders email address
-
-
-type: keyword
-
---
-
-*`email.subject`*::
-+
---
-The email subject text
-
-
-type: keyword
-
---
-
-[[exported-fields-envoyproxy]]
-== Envoyproxy fields
-
 *`rsa.crypto.cipher_src`*::
 +
 --
 This key is for Source (Client) Cipher
-
 
 type: keyword
 
@@ -99094,72 +99089,7 @@ type: keyword
 
 --
 
-
-[float]
-=== o365.mailtrace
-
-Fields from Office 365 Mailtrace logs
-
-
-
-*`o365.mailtrace.index`*::
-+
---
-Index number from the API request
-
-
-type: keyword
-
---
-
-*`o365.mailtrace.message_trace_id`*::
-+
---
-An identifier used to get the detailed message transfer trace information.
-
-
-type: keyword
-
---
-
-*`o365.mailtrace.status`*::
-+
---
-The status of the message in the Office 365 email system. This corresponds to the Detail field of the last processing step recorded for the message.
-
-
-type: keyword
-
---
-
-*`o365.mailtrace.organization`*::
-+
---
-The fully qualified domain name that was processing the email
-
-
-type: keyword
-
---
-
-[[exported-fields-okta]]
-== Okta fields
-
-Module for handling system logs from Okta.
-
-
-
-[float]
-=== okta
-
-Fields from Okta.
-
-
-
-*`okta.uuid`*::
-
 *`rsa.misc.type`*::
-
 +
 --
 type: keyword
@@ -104347,6 +104277,53 @@ type: keyword
 *`o365.audit.YammerNetworkId`*::
 +
 --
+type: keyword
+
+--
+
+[float]
+=== o365.mailtrace
+
+Fields from Office 365 Mailtrace logs
+
+
+
+*`o365.mailtrace.index`*::
++
+--
+Index number from the API request
+
+
+type: keyword
+
+--
+
+*`o365.mailtrace.message_trace_id`*::
++
+--
+An identifier used to get the detailed message transfer trace information.
+
+
+type: keyword
+
+--
+
+*`o365.mailtrace.status`*::
++
+--
+The status of the message in the Office 365 email system. This corresponds to the Detail field of the last processing step recorded for the message.
+
+
+type: keyword
+
+--
+
+*`o365.mailtrace.organization`*::
++
+--
+The fully qualified domain name that was processing the email
+
+
 type: keyword
 
 --
