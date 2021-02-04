@@ -10,11 +10,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLoadCapabilities(t *testing.T) {
@@ -99,6 +101,7 @@ func fixInputsType(mm map[string]interface{}) {
 }
 
 func TestCapabilityManager(t *testing.T) {
+	l := newErrorLogger(t)
 
 	t.Run("filter", func(t *testing.T) {
 		m := getConfig()
@@ -106,6 +109,7 @@ func TestCapabilityManager(t *testing.T) {
 			caps: []Capability{
 				filterKeywordCap{keyWord: "filter"},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -129,6 +133,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -152,6 +157,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -175,6 +181,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -198,6 +205,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -221,6 +229,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				filterKeywordCap{keyWord: "key"},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -242,6 +251,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "key"},
 				filterKeywordCap{keyWord: "filter"},
 			},
+			reporter: status.NewController(l).Register("test"),
 		}
 
 		blocked, newIn := mgr.Apply(m)
@@ -289,4 +299,15 @@ func getConfig() map[string]string {
 		"filter": "f_val",
 		"key":    "val",
 	}
+}
+
+func newErrorLogger(t *testing.T) *logger.Logger {
+	t.Helper()
+
+	loggerCfg := logger.DefaultLoggingConfig()
+	loggerCfg.Level = logp.ErrorLevel
+
+	log, err := logger.NewFromConfig("", loggerCfg)
+	require.NoError(t, err)
+	return log
 }
