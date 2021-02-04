@@ -199,7 +199,7 @@ var azureADConversion = {
         copy: [
             {
                 from: 'o365audit.ObjectId',
-                to: 'user.target.name',
+                to: 'user.target.id',
             }
         ],
     },
@@ -621,6 +621,22 @@ function securityComplianceAlertsSchema(debug) {
     return builder.Build();
 }
 
+function splitEmailUserID(prefix) {
+    var idField = prefix + ".id",
+        nameField = prefix + ".name",
+        domainField = prefix + ".domain",
+        emailField = prefix + ".email";
+    return function(evt) {
+        var email = evt.Get(idField);
+        if (email == null) return;
+        var pos = email.indexOf('@');
+        if (pos === -1) return;
+        evt.Put(emailField, email);
+        evt.Put(nameField, email.substr(0, pos));
+        evt.Put(domainField, email.substr(pos+1));
+    }
+}
+
 function AuditProcessor(tenant_names, debug) {
     var builder = new PipelineBuilder("o365.audit", debug);
 
@@ -831,12 +847,14 @@ function AuditProcessor(tenant_names, debug) {
         fail_on_error: false
     }));
 
-    builder.Add("setUserFieldsFromId", new processor.Dissect({
-        tokenizer: "%{name}@%{domain}",
-        field: "user.id",
-        target_prefix: "user",
-        'when.contains.user.id': '@',
-    }));
+    [
+      'user',
+      'user.target',
+      'source.user',
+      'destination.user',
+    ].forEach(function (prefix) {
+        builder.Add('setFromID' + prefix, splitEmailUserID(prefix));
+    })
 
     builder.Add("setNetworkType", function(event) {
         var ip = event.Get("client.ip");
@@ -855,6 +873,7 @@ function AuditProcessor(tenant_names, debug) {
     builder.Add("setRelatedUser", appendFields({
         fields: [
             "user.name",
+            "user.target.name",
             "file.owner",
         ],
         to: 'related.user'
