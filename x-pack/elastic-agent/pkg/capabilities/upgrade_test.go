@@ -7,9 +7,10 @@ package capabilities
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUpgrade(t *testing.T) {

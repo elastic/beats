@@ -7,9 +7,10 @@ package capabilities
 import (
 	"os"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-	"gopkg.in/yaml.v2"
 )
 
 // Capability provides a way of applying predefined filter to object.
