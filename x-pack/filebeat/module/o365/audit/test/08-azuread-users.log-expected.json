@@ -100,8 +100,8 @@
     },
     {
         "@timestamp": "2021-02-04T16:00:05.000Z",
-        "event.action": "Add user.",
-        "event.category": "web",
+        "event.action": "added-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "2584fb28-a111-475e-ac4a-06e315585d80",
@@ -109,7 +109,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "creation"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -205,7 +208,8 @@
         ],
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
-        "user.name": "root"
+        "user.name": "root",
+        "user.target.name": "eve@testsiem4.onmicrosoft.com"
     },
     {
         "@timestamp": "2021-02-04T16:00:19.000Z",

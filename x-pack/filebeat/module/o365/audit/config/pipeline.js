@@ -191,8 +191,49 @@ function exchangeAdminSchema(debug) {
     return builder.Build();
 }
 
-function azureADLogonSchema(debug) {
+var azureADConversion = {
+    'Add user.': {
+        action: "added-user-account",
+        category: 'iam',
+        type: ['user', 'creation'],
+        copy: [
+            {
+                from: 'o365audit.ObjectId',
+                to: 'user.target.name',
+            }
+        ],
+    },
+    /*'Update user.': {
+        category: 'iam',
+        type: 'user',
+    },
+    'Delete user.': {
+        category: 'iam',
+        type: 'user',
+    },*/
+};
+
+function azureADSchema(debug) {
     var builder = new PipelineBuilder("o365.audit.AzureActiveDirectory", debug);
+    builder.Add("setIAMFields", function(evt){
+        var action = evt.Get("event.action");
+        if (action != null && azureADConversion.hasOwnProperty(action)) {
+            var conv = azureADConversion[action];
+            evt.Put("event.action", conv.action);
+            evt.Put("event.category", conv.category);
+            evt.Put("event.type", conv.type);
+            for (var i=0; i<conv.copy.length; i++) {
+                var value = evt.Get(conv.copy[i].from);
+                if (value != null)
+                    evt.Put(conv.copy[i].to, value);
+            }
+        }
+    });
+    return builder.Build();
+}
+
+function azureADLogonSchema(debug) {
+    var builder = new PipelineBuilder("o365.audit.AzureActiveDirectoryLogon", debug);
     builder.Add("setEventAuthFields", function(evt){
        evt.Put("event.category", "authentication");
        var outcome = evt.Get("event.outcome");
@@ -733,6 +774,7 @@ function AuditProcessor(tenant_names, debug) {
         },
         'ExchangeAdmin': exchangeAdminSchema(debug).Run,
         'ExchangeItem': exchangeMailboxSchema(debug).Run,
+        'AzureActiveDirectory': azureADSchema(debug).Run,
         'AzureActiveDirectoryStsLogon': azureADLogonSchema(debug).Run,
         'SharePointFileOperation': sharePointFileOperationSchema(debug).Run,
         'SecurityComplianceAlerts': securityComplianceAlertsSchema(debug).Run,
