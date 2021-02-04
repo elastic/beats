@@ -590,7 +590,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Dir = pwd
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
-				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on", "PACKAGES=targz")
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
