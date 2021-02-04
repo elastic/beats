@@ -66,7 +66,7 @@ func TestTypes(t *testing.T) {
 			StatusMessage: "Healthy",
 			EventType:     EventTypeState,
 			EventSubType:  EventSubTypeRunning,
-			EventMessage:  "Application: a-running[id]: State changed to RUNNING: Healthy",
+			EventMessage:  "Application: a-healthy[id]: State changed to RUNNING: Healthy",
 		},
 		{
 			Status:        state.Degraded,

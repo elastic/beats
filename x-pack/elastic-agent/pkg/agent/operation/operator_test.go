@@ -167,7 +167,7 @@ func TestConfigurableFailed(t *testing.T) {
 	}
 	assert.Equal(t, map[string]interface{}{
 		"status":  float64(proto.StateObserved_HEALTHY),
-		"message": "Healthy",
+		"message": "Running",
 	}, item.Payload)
 
 	// try to configure (with failed status)
