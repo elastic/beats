@@ -51,7 +51,7 @@ type Managed struct {
 	Config      configuration.FleetAgentConfig
 	api         apiClient
 	agentInfo   *info.AgentInfo
-	gateway     *fleetGateway
+	gateway     FleetGateway
 	router      *router
 	srv         *server.Server
 	stateStore  *stateStore
@@ -61,53 +61,13 @@ type Managed struct {
 func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
+	store storage.Store,
+	cfg *configuration.Configuration,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	statusController := status.NewController(log)
-	path := info.AgentConfigFile()
-
-	store := storage.NewDiskStore(path)
-	reader, err := store.Load()
-	if err != nil {
-		return nil, errors.New(err, "could not initialize config store",
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
-	config, err := config.NewConfigFrom(reader)
-	if err != nil {
-		return nil, errors.New(err,
-			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
-	// merge local configuration and configuration persisted from fleet.
-	err = rawConfig.Merge(config)
-	if err != nil {
-		return nil, errors.New(err,
-			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
-			errors.TypeConfig,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
-	cfg, err := configuration.NewFromConfig(rawConfig)
-	if err != nil {
-		return nil, errors.New(err,
-			fmt.Sprintf("fail to unpack configuration from %s", path),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
-	if err := cfg.Fleet.Valid(); err != nil {
-		return nil, errors.New(err,
-			"fleet configuration is invalid",
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, path))
-	}
-
 	client, err := fleetapi.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
@@ -152,7 +112,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusController))
+	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -171,7 +131,7 @@ func newManaged(
 		router,
 		&configModifiers{
 			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info(), agentInfo)},
+			Filters:    []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		monitor,
 	)
@@ -279,9 +239,13 @@ func newManaged(
 		actionDispatcher,
 		fleetR,
 		actionAcker,
-		statusController,
+		statusCtrl,
 		stateStore,
 	)
+	if err != nil {
+		return nil, err
+	}
+	gateway, err = wrapLocalFleetServer(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
 	if err != nil {
 		return nil, err
 	}
@@ -301,11 +265,15 @@ func (m *Managed) Start() error {
 		return nil
 	}
 
-	if err := m.upgrader.Ack(m.bgContext); err != nil {
+	err := m.upgrader.Ack(m.bgContext)
+	if err != nil {
 		m.log.Warnf("failed to ack update %v", err)
 	}
 
-	m.gateway.Start()
+	err = m.gateway.Start()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
