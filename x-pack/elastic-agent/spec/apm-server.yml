@@ -3,6 +3,10 @@ cmd: apm-server
 artifact: apm-server
 args: ["-E", "management.enabled=true", "-E", "management.mode=x-pack-fleet", "-E", "apm-server.data_streams.enabled=true"]
 rules:
+  - copy_to_list:
+      item: fleet
+      to: inputs
+      on_conflict: noop
   - fix_stream: {}
   - filter_values:
       selector: inputs
@@ -13,4 +17,5 @@ rules:
       selectors:
         - inputs
         - output
+        - fleet
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
