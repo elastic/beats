@@ -80,7 +80,7 @@ func NewCommandWithArgs(streams *cli.IOStreams) *cobra.Command {
 					Daemon: daemon,
 				})
 				if err != nil {
-					return fmt.Errorf("failed to render YAML: %s\n", err)
+					return fmt.Errorf("failed to render YAML: %w", err)
 				}
 				fmt.Fprintf(streams.Out, "%s", out)
 				return returnErr
