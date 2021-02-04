@@ -128,6 +128,9 @@ func PythonTest(params PythonTestArgs) error {
 	for k, v := range params.Env {
 		pytestEnv[k] = v
 	}
+	if runtime.GOOS == "windows" {
+		pytestEnv["TEST_COVERAGE"] = "false"
+	}
 
 	pytestOptions := []string{
 		"--timeout=90",
