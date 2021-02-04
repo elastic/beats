@@ -54,10 +54,6 @@ type Module struct {
 
 // NewModule instatiates the system module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	// This only needs to be configured once for all system modules.
-	once.Do(func() {
-		initModule()
-	})
 
 	config := Config{
 		HostFS: "",
@@ -69,6 +65,11 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	if *HostFS != "" {
 		config.HostFS = *HostFS
 	}
+
+	// This only needs to be configured once for all system modules.
+	once.Do(func() {
+		initModule(config)
+	})
 
 	return &Module{BaseModule: base, HostFS: config.HostFS, IsAgent: fleetmode.Enabled()}, nil
 }
