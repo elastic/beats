@@ -83,3 +83,6 @@ stages:
     #            - "windows-7"
     #        branches: true     ## for all the branches
     #        tags: true         ## for all the tags
+    packaging-linux:
+        packaging-linux: "mage package"
+        isE2E: false

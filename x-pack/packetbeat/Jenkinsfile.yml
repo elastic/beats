@@ -82,3 +82,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7-32-bit"
+    packaging-linux:
+        packaging-linux: "mage package"
+        isE2E: false

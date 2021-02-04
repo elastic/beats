@@ -33,3 +33,6 @@ stages:
             tags: true         ## for all the tags
     unitTest:
         mage: "mage build unitTest"
+    packaging-linux:
+        packaging-linux: "mage package"
+        isE2E: false

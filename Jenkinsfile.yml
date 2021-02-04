@@ -14,13 +14,13 @@ projects:
     - "x-pack/elastic-agent"
     - "x-pack/filebeat"
     - "x-pack/functionbeat"
+    - "x-pack/heartbeat"
     - "x-pack/libbeat"
     - "x-pack/metricbeat"
     - "x-pack/packetbeat"
     - "x-pack/winlogbeat"
     - "dev-tools"
-    ##- "x-pack/heartbeat"    It's not yet in the 1.0 pipeline.
-    ##- "x-pack/journalbeat"  It's not yet in the 1.0 pipeline.
+    ##- "x-pack/journalbeat"  It is not yet in the 1.0 pipeline.
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:
