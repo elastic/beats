@@ -284,6 +284,36 @@ def packagingLinux(Map args = [:]) {
   }
 }
 
+def e2e(Map args = [:]) {
+  def suite = args.get('suite', '')
+  def tags = args.get('tags', '')
+  def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
+  dir('.e2e') {
+    gitCheckout(
+      branch: "master",  // TBC with the target branch if running on a PR basis.
+      repo: "https://github.com/elastic/e2e-testing.git",
+      credentialsId: "${JOB_GIT_CREDENTIALS}"
+    )
+    try {
+      if(isInstalled(tool: 'docker', flag: '--version')) {
+        dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      }
+      retry(3){
+        sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
+      }
+      filebeat(output: "docker_logs_${suite}_${tags}.log", workdir: "${env.WORKSPACE}"){
+        // TBC with the suite to be used
+        sh script: """SUITE=metricbeat DEVELOPER_MODE=false TIMEOUT_FACTOR=3 LOG_LEVEL=TRACE make -C e2e functional-test""", label: "Run functional tests for ${suite}:${tags}"
+      }
+    } catch(e) {
+      error(e.toString())
+    } finally {
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+        archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+    }
+  }
+}
+
 /**
 * This method runs the given command supporting two kind of scenarios:
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
@@ -295,6 +325,7 @@ def target(Map args = [:]) {
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
+  def isE2E = args.get('isE2E', false)
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -303,6 +334,9 @@ def target(Map args = [:]) {
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+        }
+        if(isE2E) {
+          e2e(suite: directory)
         }
       }
     }
@@ -733,6 +767,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   }
   public run(Map args = [:]){
     def withModule = args.content.get('withModule', false)
+    def isE2E = args.content.get('isE2E', false)
     if(args?.content?.containsKey('make')) {
       steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
     }
@@ -740,7 +775,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
     }
     if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context, command: args.content.mage, directory: args.project, label: args.label, isMage: true, id: args.id)
+      steps.packagingLinux(context: args.context, command: args.content.mage, directory: args.project, label: args.label, isMage: true, id: args.id, isE2E: isE2E)
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
