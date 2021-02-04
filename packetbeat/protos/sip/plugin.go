@@ -160,7 +160,7 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error)
 
 	var sipFields ProtocolFields
 	if m.isRequest {
-		populateRequestFields(m, evt, pbf, &sipFields)
+		populateRequestFields(m, pbf, &sipFields)
 	} else {
 		populateResponseFields(m, &sipFields)
 	}
@@ -191,7 +191,7 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error)
 	return &evt, nil
 }
 
-func populateRequestFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
+func populateRequestFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 	fields.Type = "request"
 	fields.Method = bytes.ToUpper(m.method)
 	fields.URIOriginal = m.requestURI
