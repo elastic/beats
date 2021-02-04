@@ -78,7 +78,7 @@ func (r *controller) UpdateStateID(stateID string) {
 		}
 
 		rep.lock.Lock()
-		if !rep.isPersistant {
+		if !rep.isPersistent {
 			rep.status = Healthy
 		}
 		rep.lock.Unlock()
@@ -93,7 +93,7 @@ func (r *controller) Register(componentIdentifier string) Reporter {
 	return r.RegisterWithPersistance(componentIdentifier, false)
 }
 
-func (r *controller) RegisterWithPersistance(componentIdentifier string, persistant bool) Reporter {
+func (r *controller) RegisterWithPersistance(componentIdentifier string, persistent bool) Reporter {
 	id := componentIdentifier + "-" + uuid.New().String()[:8]
 	rep := &reporter{
 		isRegistered: true,
@@ -103,7 +103,7 @@ func (r *controller) RegisterWithPersistance(componentIdentifier string, persist
 			r.lock.Unlock()
 		},
 		notifyChangeFunc: r.updateStatus,
-		isPersistant:     persistant,
+		isPersistent:     persistent,
 	}
 
 	r.lock.Lock()
@@ -167,7 +167,7 @@ type Reporter interface {
 
 type reporter struct {
 	lock             sync.Mutex
-	isPersistant     bool
+	isPersistent     bool
 	isRegistered     bool
 	status           AgentStatus
 	unregisterFunc   func()
