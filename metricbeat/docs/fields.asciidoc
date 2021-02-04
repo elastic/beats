@@ -20580,92 +20580,8 @@ index
 
 
 
-*`elasticsearch.index.created`*::
-+
---
-type: date
-
---
-
-*`elasticsearch.index.hidden`*::
-+
---
-type: boolean
-
---
-
-
-*`elasticsearch.index.shards.initializing`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_replicas`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_replicas`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_total`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.index.shards.total`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.relocating`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_total`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.replicas`*::
 +
 --
 type: long
@@ -20712,20 +20628,6 @@ type: long
 
 --
 
-*`elasticsearch.index.primaries.fielddata.memory_size_in_bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.primaries.fielddata.evictions`*::
-+
---
-type: long
-
---
-
 
 *`elasticsearch.index.primaries.request_cache.memory_size_in_bytes`*::
 +
@@ -20757,13 +20659,6 @@ type: long
 
 
 *`elasticsearch.index.primaries.query_cache.memory_size_in_bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.primaries.query_cache.evictions`*::
 +
 --
 type: long
