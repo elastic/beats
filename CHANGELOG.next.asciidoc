@@ -836,6 +836,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Upgrade Cisco ASA/FTD/Umbrella to ECS 1.8.0. {pull}23819[23819]
+- Add new ECS user and categories features to google_workspace/gsuite {issue}23118[23118] {pull}23709[23709]
 
 *Heartbeat*
 
@@ -1043,6 +1044,5 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
 
 
