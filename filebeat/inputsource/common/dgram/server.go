@@ -115,6 +115,8 @@ func (l *Listener) Start() error {
 }
 
 func (l *Listener) connectAndRun(ctx context.Context, conn net.PacketConn) error {
+	defer l.log.Recover("Panic handling datagram")
+
 	handler := l.connect(*l.config)
 	for ctx.Err() == nil {
 		err := handler(ctx, conn)
