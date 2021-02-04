@@ -6,29 +6,29 @@
             "name": "docker-cluster"
         },
         "index": {
-            "created": 1605705397185,
+            "created": 1605705395485,
             "hidden": false,
-            "name": ".apm-custom-link",
+            "name": ".kibana-event-log-8.0.0-000001",
             "primaries": {
                 "docs": {
-                    "count": 0
+                    "count": 2
                 },
                 "indexing": {
-                    "index_time_in_millis": 0,
-                    "index_total": 0,
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
                     "throttle_time_in_millis": 0
                 },
                 "merges": {
                     "total_size_in_bytes": 0
                 },
                 "refresh": {
-                    "total_time_in_millis": 0
+                    "total_time_in_millis": 366
                 },
                 "segments": {
-                    "count": 0
+                    "count": 2
                 },
                 "store": {
-                    "size_in_bytes": 208
+                    "size_in_bytes": 11301
                 }
             },
             "shards": {
@@ -37,44 +37,44 @@
             "status": "green",
             "total": {
                 "docs": {
-                    "count": 0
+                    "count": 2
                 },
                 "fielddata": {
                     "memory_size_in_bytes": 0
                 },
                 "indexing": {
-                    "index_time_in_millis": 0,
-                    "index_total": 0,
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
                     "throttle_time_in_millis": 0
                 },
                 "merges": {
                     "total_size_in_bytes": 0
                 },
                 "refresh": {
-                    "total_time_in_millis": 0
+                    "total_time_in_millis": 366
                 },
                 "search": {
                     "query_time_in_millis": 0,
-                    "query_total": 0
+                    "query_total": 1
                 },
                 "segments": {
-                    "count": 0,
-                    "doc_values_memory_in_bytes": 0,
-                    "fixed_bit_set_memory_in_bytes": 0,
+                    "count": 2,
+                    "doc_values_memory_in_bytes": 152,
+                    "fixed_bit_set_memory_in_bytes": 96,
                     "index_writer_memory_in_bytes": 0,
-                    "memory_in_bytes": 0,
+                    "memory_in_bytes": 4392,
                     "norms_memory_in_bytes": 0,
                     "points_memory_in_bytes": 0,
-                    "stored_fields_memory_in_bytes": 0,
+                    "stored_fields_memory_in_bytes": 976,
                     "term_vectors_memory_in_bytes": 0,
-                    "terms_memory_in_bytes": 0,
+                    "terms_memory_in_bytes": 3264,
                     "version_map_memory_in_bytes": 0
                 },
                 "store": {
-                    "size_in_bytes": 208
+                    "size_in_bytes": 11301
                 }
             },
-            "uuid": "DKcQUD1-SMSTt77luUpcBA"
+            "uuid": "3765e_aCRh28_UoF-iWnuQ"
         }
     },
     "event": {
@@ -87,7 +87,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:38013",
+        "address": "127.0.0.1:35043",
         "type": "elasticsearch"
     }
 }
