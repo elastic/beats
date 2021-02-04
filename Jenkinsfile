@@ -260,6 +260,31 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
+* This method runs the packaging
+*/
+def packagingLinux(Map args = [:]) {
+  def PLATFORMS = [ '+all',
+                'linux/amd64',
+                'linux/386',
+                'linux/arm64',
+                'linux/armv7',
+                // The platforms above are disabled temporarly as crossbuild images are
+                // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+                //'linux/ppc64le',
+                //'linux/mips64',
+                //'linux/s390x',
+                'windows/amd64',
+                'windows/386',
+                (params.macos ? '' : 'darwin/amd64'),
+              ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}"
+  ]) {
+    target(args)
+  }
+}
+
+/**
 * This method runs the given command supporting two kind of scenarios:
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
@@ -713,6 +738,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     }
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+    }
+    if(args?.content?.containsKey('packaging-linux')) {
+      steps.packagingLinux(context: args.context, command: args.content.mage, directory: args.project, label: args.label, isMage: true, id: args.id)
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
