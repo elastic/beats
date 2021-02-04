@@ -35,7 +35,7 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 
 	cm := &capabilitiesManager{
 		caps:     make([]Capability, 0),
-		reporter: sc.Register("capabilities"),
+		reporter: sc.RegisterWithPersistance("capabilities", true),
 	}
 
 	// load capabilities from filen()
@@ -75,6 +75,8 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 
 func (mgr *capabilitiesManager) Apply(in interface{}) (bool, interface{}) {
 	var blocked bool
+	// reset health on start, child caps will update to fail if needed
+	mgr.reporter.Update(status.Healthy)
 	for _, cap := range mgr.caps {
 		blocked, in = cap.Apply(in)
 		if blocked {

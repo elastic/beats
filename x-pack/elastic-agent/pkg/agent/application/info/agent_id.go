@@ -47,7 +47,7 @@ func AgentConfigFile() string {
 
 // AgentCapabilitiesPath is a name of file used to store agent capabilities
 func AgentCapabilitiesPath() string {
-	return filepath.Join(paths.Config(), defaultAgentConfigFile)
+	return filepath.Join(paths.Config(), defaultAgentCapabilitiesFile)
 }
 
 // AgentActionStoreFile is the file that contains the action that can be replayed after restart.
