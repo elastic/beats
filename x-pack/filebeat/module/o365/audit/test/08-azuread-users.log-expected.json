@@ -220,8 +220,8 @@
     },
     {
         "@timestamp": "2021-02-04T16:00:19.000Z",
-        "event.action": "Update user.",
-        "event.category": "web",
+        "event.action": "modified-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "8de563f4-6388-4526-9447-422181f8dd55",
@@ -229,7 +229,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -312,7 +315,11 @@
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
-        "user.name": "root"
+        "user.name": "root",
+        "user.target.domain": "testsiem4.onmicrosoft.com",
+        "user.target.email": "root@testsiem4.onmicrosoft.com",
+        "user.target.id": "root@testsiem4.onmicrosoft.com",
+        "user.target.name": "root"
     },
     {
         "@timestamp": "2021-02-04T16:31:54.000Z",
@@ -752,8 +759,8 @@
         "@timestamp": "2021-02-04T16:32:42.000Z",
         "client.address": "52.109.68.40",
         "client.ip": "52.109.68.40",
-        "event.action": "Update user.",
-        "event.category": "web",
+        "event.action": "modified-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "fa3a0492-4781-412a-b27e-2c23c15e542e",
@@ -761,7 +768,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -852,7 +862,10 @@
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "related.ip": "52.109.68.40",
-        "related.user": "root",
+        "related.user": [
+            "root",
+            "newuser"
+        ],
         "service.type": "o365",
         "source.as.number": 8075,
         "source.as.organization.name": "Microsoft Corporation",
@@ -871,7 +884,11 @@
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
-        "user.name": "root"
+        "user.name": "root",
+        "user.target.domain": "testsiem4.onmicrosoft.com",
+        "user.target.email": "newuser@testsiem4.onmicrosoft.com",
+        "user.target.id": "newuser@testsiem4.onmicrosoft.com",
+        "user.target.name": "newuser"
     },
     {
         "@timestamp": "2021-02-04T16:32:42.000Z",
@@ -998,8 +1015,8 @@
     },
     {
         "@timestamp": "2021-02-04T16:33:17.000Z",
-        "event.action": "Delete user.",
-        "event.category": "web",
+        "event.action": "deleted-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "1947bd7a-5b96-4bd5-931b-c12cc6ffdfcd",
@@ -1007,7 +1024,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "deletion"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -1080,7 +1100,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
-        "related.user": "root",
+        "related.user": [
+            "root",
+            "6d4ca534c337474d8c766c715b31bc52newuser"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
@@ -1088,7 +1111,11 @@
         "user.domain": "testsiem4.onmicrosoft.com",
         "user.email": "root@testsiem4.onmicrosoft.com",
         "user.id": "root@testsiem4.onmicrosoft.com",
-        "user.name": "root"
+        "user.name": "root",
+        "user.target.domain": "testsiem4.onmicrosoft.com",
+        "user.target.email": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
+        "user.target.id": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
+        "user.target.name": "6d4ca534c337474d8c766c715b31bc52newuser"
     },
     {
         "@timestamp": "2021-02-04T16:33:14.000Z",

@@ -5552,8 +5552,8 @@
     },
     {
         "@timestamp": "2020-02-10T15:15:04.000Z",
-        "event.action": "Update user.",
-        "event.category": "web",
+        "event.action": "modified-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "83c924c1-f2e2-4b39-8eda-b80c3823a875",
@@ -5561,7 +5561,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "host.name": "support.onmicrosoft.com",
@@ -5672,7 +5675,10 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
-        "related.user": "fim_password_service",
+        "related.user": [
+            "fim_password_service",
+            "asr"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
@@ -5680,7 +5686,11 @@
         "user.domain": "support.onmicrosoft.com",
         "user.email": "fim_password_service@support.onmicrosoft.com",
         "user.id": "fim_password_service@support.onmicrosoft.com",
-        "user.name": "fim_password_service"
+        "user.name": "fim_password_service",
+        "user.target.domain": "testsiem.onmicrosoft.com",
+        "user.target.email": "asr@testsiem.onmicrosoft.com",
+        "user.target.id": "asr@testsiem.onmicrosoft.com",
+        "user.target.name": "asr"
     },
     {
         "@timestamp": "2020-02-10T15:16:18.000Z",

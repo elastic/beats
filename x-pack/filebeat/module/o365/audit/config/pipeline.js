@@ -203,14 +203,28 @@ var azureADConversion = {
             }
         ],
     },
-    /*'Update user.': {
+    'Update user.': {
+        action: "modified-user-account",
         category: 'iam',
-        type: 'user',
+        type: ['user', 'change'],
+        copy: [
+            {
+                from: 'o365audit.ObjectId',
+                to: 'user.target.id',
+            }
+        ],
     },
     'Delete user.': {
+        action: "deleted-user-account",
         category: 'iam',
-        type: 'user',
-    },*/
+        type: ['user', 'deletion'],
+        copy: [
+            {
+                from: 'o365audit.ObjectId',
+                to: 'user.target.id',
+            }
+        ],
+    },
 };
 
 function azureADSchema(debug) {
