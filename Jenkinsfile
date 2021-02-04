@@ -292,11 +292,8 @@ def e2e(Map args = [:]) {
   def tags = args.get('tags', '')
   def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
   dir('.e2e') {
-    gitCheckout(
-      branch: "master",  // TBC with the target branch if running on a PR basis.
-      repo: "https://github.com/elastic/e2e-testing.git",
-      credentialsId: "${JOB_GIT_CREDENTIALS}"
-    )
+    // TBC with the target branch if running on a PR basis.
+    gitCheckout(repo: "https://github.com/elastic/e2e-testing.git", branch: "master")
     try {
       if(isInstalled(tool: 'docker', flag: '--version')) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
@@ -312,7 +309,7 @@ def e2e(Map args = [:]) {
       error(e.toString())
     } finally {
       junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-        archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
     }
   }
 }
