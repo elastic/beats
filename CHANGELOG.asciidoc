@@ -31,10 +31,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
 
-*Journalbeat*
-
-
-
 *Metricbeat*
 
 - Change cloud.provider from googlecloud to gcp. {pull}21775[21775]
@@ -49,9 +45,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 *Winlogbeat*
 
 - Use ECS 1.7 ingress/egress instead of inbound/outbound network.direction in sysmon. {pull}22997[22997]
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -90,12 +83,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 - Fixed missing `tls` fields when connecting to https via proxy. {issue}15797[15797] {pull}22190[22190]
 
-*Heartbeat*
-
-
-*Journalbeat*
-
-
 *Metricbeat*
 
 - Change Session ID type from int to string {pull}22359[22359]
@@ -115,9 +102,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
-
-*Functionbeat*
-
 
 ==== Added
 
@@ -199,10 +183,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 - Add mime type detection for http responses. {pull}22976[22976]
 
-*Heartbeat*
-
-*Journalbeat*
-
 *Metricbeat*
 
 - Move s3_daily_storage and s3_request metricsets to use cloudwatch input. {pull}21703[21703]
@@ -227,10 +207,6 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 - Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
 - Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 
-
-*Functionbeat*
-
-
 *Winlogbeat*
 
 - Add file.pe and process.pe fields to ProcessCreate & LoadImage events in Sysmon module. {issue}17335[17335] {pull}22217[22217]
@@ -244,28 +220,11 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 ==== Deprecated
 
-*Affecting all Beats*
-
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
 
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
 ==== Known Issue
-
-*Journalbeat*
 
 
 
