@@ -54,7 +54,7 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix FileVersion contained in Windows exe files. {pull}22581[22581]
 - Log debug message if the Kibana dashboard can not be imported from the archive because of the invalid archive directory structure {issue}12211[12211], {pull}13387[13387]
-- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
+- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss` as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
 - Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
 - Fix typo in config docs {pull}23185[23185]
