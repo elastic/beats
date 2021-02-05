@@ -256,6 +256,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
+- Fix various processing errors in the Suricata module. {pull}23236[23236]
 
 *Heartbeat*
 
