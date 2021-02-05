@@ -98,7 +98,7 @@ func PythonUnitTest() error {
 	mg.Deps(BuildSystemTestBinary)
 
 	args := devtools.DefaultPythonTestUnitArgs()
-	// On Windows 7 32-bit we run out of memory if we enable DWARF
+	// On Windows 32-bit converage is not enabled.
 	if isWindows32bitRunner() {
 		args.Env["TEST_COVERAGE"] = "false"
 	}
@@ -234,7 +234,7 @@ func PythonIntegTest(ctx context.Context) error {
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
-		// On Windows 7 32-bit coverage is not included
+		// On Windows 32-bit converage is not enabled.
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"
 		}
@@ -243,5 +243,5 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func isWindows32bitRunner() bool {
-	return runtime.GOOS == "windows" && runtime.GOARCH != "amd64"
+	return runtime.GOOS == "windows" && runtime.GOARCH == "386"
 }
