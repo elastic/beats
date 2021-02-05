@@ -21,9 +21,13 @@ type ruler interface {
 	Rule() string
 }
 
-type ruleDefinitions []ruler
+type capabilitiesList []ruler
 
-func (r *ruleDefinitions) UnmarshalJSON(p []byte) error {
+type ruleDefinitions struct {
+	Capabilities capabilitiesList `yaml:"capabilities" json:"capabilities"`
+}
+
+func (r *capabilitiesList) UnmarshalJSON(p []byte) error {
 	var tmpArray []json.RawMessage
 
 	err := json.Unmarshal(p, &tmpArray)
@@ -65,7 +69,7 @@ func (r *ruleDefinitions) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-func (r *ruleDefinitions) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (r *capabilitiesList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var tmpArray []map[string]interface{}
 
 	err := unmarshal(&tmpArray)

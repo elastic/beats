@@ -21,11 +21,11 @@ func TestMultiInput(t *testing.T) {
 	l, _ := logger.New("test")
 	t.Run("no match", func(t *testing.T) {
 
-		rd := ruleDefinitions{
-			&inputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
 				Type:  "allow",
 				Input: "something_else",
-			},
+			}},
 		}
 
 		initialInputs := []string{"system/metrics", "system/logs"}
@@ -34,11 +34,11 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("filters metrics", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
 				Type:  "deny",
 				Input: "system/metrics",
-			},
+			}},
 		}
 
 		initialInputs := []string{"system/metrics", "system/logs"}
@@ -47,14 +47,16 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("allows metrics only", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
-				Type:  "allow",
-				Input: "system/metrics",
-			},
-			&inputCapability{
-				Type:  "deny",
-				Input: "*",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&inputCapability{
+					Type:  "allow",
+					Input: "system/metrics",
+				},
+				&inputCapability{
+					Type:  "deny",
+					Input: "*",
+				},
 			},
 		}
 
@@ -64,11 +66,11 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("allows everything", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
 				Type:  "allow",
 				Input: "*",
-			},
+			}},
 		}
 
 		initialInputs := []string{"system/metrics", "system/logs"}
@@ -77,11 +79,11 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("deny everything", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
 				Type:  "deny",
 				Input: "*",
-			},
+			}},
 		}
 
 		initialInputs := []string{"system/metrics", "system/logs"}
@@ -90,14 +92,16 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("deny everything with noise", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
-				Type:  "deny",
-				Input: "*",
-			},
-			&inputCapability{
-				Type:  "allow",
-				Input: "something_else",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&inputCapability{
+					Type:  "deny",
+					Input: "*",
+				},
+				&inputCapability{
+					Type:  "allow",
+					Input: "something_else",
+				},
 			},
 		}
 
@@ -107,11 +111,11 @@ func TestMultiInput(t *testing.T) {
 	})
 
 	t.Run("keep format", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&inputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
 				Type:  "deny",
 				Input: "system/metrics",
-			},
+			}},
 		}
 
 		initialInputs := []string{"system/metrics", "system/logs"}
@@ -302,7 +306,7 @@ func runInputTest(t *testing.T, l *logger.Logger, r *inputCapability, expectedIn
 	}
 }
 
-func runMultiInputTest(t *testing.T, l *logger.Logger, rd ruleDefinitions, expectedInputs []string, initialInputs []string) {
+func runMultiInputTest(t *testing.T, l *logger.Logger, rd *ruleDefinitions, expectedInputs []string, initialInputs []string) {
 	tr := &testReporter{}
 	cap, err := newInputsCapability(l, rd, tr)
 	assert.NoError(t, err, "error not expected, provided eql is valid")

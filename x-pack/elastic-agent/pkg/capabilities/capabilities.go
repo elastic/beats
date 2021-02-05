@@ -28,7 +28,7 @@ type capabilitiesManager struct {
 
 // Load loads capabilities files and prepares manager.
 func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability, error) {
-	handlers := []func(*logger.Logger, ruleDefinitions, status.Reporter) (Capability, error){
+	handlers := []func(*logger.Logger, *ruleDefinitions, status.Reporter) (Capability, error){
 		newInputsCapability,
 		newOutputsCapability,
 		newUpgradesCapability,
@@ -51,7 +51,7 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 	}
 	defer fd.Close()
 
-	var definitions ruleDefinitions
+	definitions := &ruleDefinitions{Capabilities: make([]ruler, 0)}
 	dec := yaml.NewDecoder(fd)
 	if err := dec.Decode(&definitions); err != nil {
 		return cm, err

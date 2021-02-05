@@ -19,11 +19,11 @@ func TestMultiOutput(t *testing.T) {
 	tr := &testReporter{}
 	l, _ := logger.New("test")
 	t.Run("no match", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
 				Type:   "allow",
 				Output: "something_else",
-			},
+			}},
 		}
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
@@ -32,11 +32,11 @@ func TestMultiOutput(t *testing.T) {
 	})
 
 	t.Run("filters logstash", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
 				Type:   "deny",
 				Output: "logstash",
-			},
+			}},
 		}
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
@@ -45,14 +45,16 @@ func TestMultiOutput(t *testing.T) {
 	})
 
 	t.Run("allows logstash only", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
-				Type:   "allow",
-				Output: "logstash",
-			},
-			&outputCapability{
-				Type:   "deny",
-				Output: "*",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&outputCapability{
+					Type:   "allow",
+					Output: "logstash",
+				},
+				&outputCapability{
+					Type:   "deny",
+					Output: "*",
+				},
 			},
 		}
 
@@ -62,11 +64,11 @@ func TestMultiOutput(t *testing.T) {
 	})
 
 	t.Run("allows everything", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
 				Type:   "allow",
 				Output: "*",
-			},
+			}},
 		}
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
@@ -75,11 +77,11 @@ func TestMultiOutput(t *testing.T) {
 	})
 
 	t.Run("deny everything", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
 				Type:   "deny",
 				Output: "*",
-			},
+			}},
 		}
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
@@ -88,11 +90,11 @@ func TestMultiOutput(t *testing.T) {
 	})
 
 	t.Run("keep format", func(t *testing.T) {
-		rd := ruleDefinitions{
-			&outputCapability{
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
 				Type:   "deny",
 				Output: "logstash",
-			},
+			}},
 		}
 
 		initialOutputs := []string{"elasticsearch", "logstash"}
@@ -224,7 +226,7 @@ func TestOutput(t *testing.T) {
 	})
 }
 
-func runMultiOutputTest(t *testing.T, l *logger.Logger, rd ruleDefinitions, expectedOutputs []string, initialOutputs []string) {
+func runMultiOutputTest(t *testing.T, l *logger.Logger, rd *ruleDefinitions, expectedOutputs []string, initialOutputs []string) {
 	tr := &testReporter{}
 	cap, err := newOutputsCapability(l, rd, tr)
 	assert.NoError(t, err, "error not expected, provided eql is valid")

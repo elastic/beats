@@ -1,2 +1,3 @@
+capabilities:
 - rule: deny
   input: system/logs

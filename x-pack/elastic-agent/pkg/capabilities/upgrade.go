@@ -24,10 +24,14 @@ const (
 // Available variables:
 // - version
 // - source_uri
-func newUpgradesCapability(log *logger.Logger, rd ruleDefinitions, reporter status.Reporter) (Capability, error) {
-	caps := make([]Capability, 0, len(rd))
+func newUpgradesCapability(log *logger.Logger, rd *ruleDefinitions, reporter status.Reporter) (Capability, error) {
+	if rd == nil {
+		return &multiInputsCapability{log: log, caps: []Capability{}}, nil
+	}
 
-	for _, r := range rd {
+	caps := make([]Capability, 0, len(rd.Capabilities))
+
+	for _, r := range rd.Capabilities {
 		c, err := newUpgradeCapability(log, r, reporter)
 		if err != nil {
 			return nil, err

@@ -16,10 +16,14 @@ const (
 	inputsKey = "inputs"
 )
 
-func newInputsCapability(log *logger.Logger, rd ruleDefinitions, reporter status.Reporter) (Capability, error) {
-	caps := make([]Capability, 0, len(rd))
+func newInputsCapability(log *logger.Logger, rd *ruleDefinitions, reporter status.Reporter) (Capability, error) {
+	if rd == nil {
+		return &multiInputsCapability{log: log, caps: []Capability{}}, nil
+	}
 
-	for _, r := range rd {
+	caps := make([]Capability, 0, len(rd.Capabilities))
+
+	for _, r := range rd.Capabilities {
 		c, err := newInputCapability(log, r, reporter)
 		if err != nil {
 			return nil, err

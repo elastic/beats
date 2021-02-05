@@ -1,3 +1,4 @@
+capabilities:
 - rule: allow
   input: system/metrics
 - rule: deny
