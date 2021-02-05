@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
-	"github.com/elastic/go-ucfg/yaml"
+	"gopkg.in/yaml.v2"
 )
 
 // DefaultOptions defaults options used to read the configuration
@@ -24,18 +25,6 @@ var DefaultOptions = []ucfg.Option{
 // Config custom type over a ucfg.Config to add new methods on the object.
 type Config ucfg.Config
 
-// LoadYAML takes YAML configuration and return a concrete Config or any errors.
-func LoadYAML(path string, opts ...ucfg.Option) (*Config, error) {
-	if len(opts) == 0 {
-		opts = DefaultOptions
-	}
-	config, err := yaml.NewConfigWithFile(path, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return newConfigFrom(config), nil
-}
-
 // New creates a new empty config.
 func New() *Config {
 	return newConfigFrom(ucfg.New())
@@ -47,26 +36,42 @@ func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
 		opts = DefaultOptions
 	}
 
-	if str, ok := from.(string); ok {
-		c, err := yaml.NewConfig([]byte(str), opts...)
-		return newConfigFrom(c), err
-	}
-
-	if in, ok := from.(io.Reader); ok {
+	var data []byte
+	var err error
+	if bytes, ok := from.([]byte); ok {
+		data = bytes
+	} else if str, ok := from.(string); ok {
+		data = []byte(str)
+	} else if in, ok := from.(io.Reader); ok {
 		if closer, ok := from.(io.Closer); ok {
 			defer closer.Close()
 		}
-
-		content, err := ioutil.ReadAll(in)
+		data, err = ioutil.ReadAll(in)
 		if err != nil {
 			return nil, err
 		}
-		c, err := yaml.NewConfig(content, opts...)
+	} else {
+		c, err := ucfg.NewFrom(from, opts...)
 		return newConfigFrom(c), err
 	}
 
-	c, err := ucfg.NewFrom(from, opts...)
-	return newConfigFrom(c), err
+	var c map[string]interface{}
+	err = yaml.Unmarshal(data, &c)
+	if err != nil {
+		return nil, err
+	}
+	inputs, ok := c["inputs"]
+	delete(c, "inputs")
+	cfg, err := NewConfigFrom(c, DefaultOptions...)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		err = cfg.access().Merge(map[string]interface{}{
+			"inputs": inputs,
+		})
+	}
+	return cfg, err
 }
 
 // MustNewConfigFrom try to create a configuration based on the type passed as arguments and panic
@@ -127,18 +132,16 @@ func (c *Config) Enabled() bool {
 
 // LoadFile take a path and load the file and return a new configuration.
 func LoadFile(path string) (*Config, error) {
-	c, err := yaml.NewConfigWithFile(path, DefaultOptions...)
+	fp, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-
-	cfg := newConfigFrom(c)
-	return cfg, err
+	return NewConfigFrom(fp)
 }
 
 // LoadFiles takes multiples files, load and merge all of them in a single one.
 func LoadFiles(paths ...string) (*Config, error) {
-	merger := cfgutil.NewCollector(nil, DefaultOptions...)
+	merger := cfgutil.NewCollector(nil)
 	for _, path := range paths {
 		cfg, err := LoadFile(path)
 		if err := merger.Add(cfg.access(), err); err != nil {
