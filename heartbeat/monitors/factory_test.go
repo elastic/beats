@@ -71,11 +71,9 @@ func TestSetupIndexProcessor(t *testing.T) {
 		{
 			"data stream should use defaults",
 			publishSettings{
-				DataStream: &datastream{
-					Dataset: "myDataset",
-				},
+				DataStream: &datastream{},
 			},
-			"generic-myDataset-default",
+			"synthetics-generic-default",
 			true,
 			false,
 		},

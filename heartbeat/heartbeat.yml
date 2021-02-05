@@ -30,6 +30,10 @@ heartbeat.monitors:
   urls: ["http://localhost:9200"]
   # Configure task schedule
   schedule: '@every 10s'
+  data_stream:
+    type: synthetics
+    dataset: http
+    namespace: pouncer
   # Total test connection and data exchange timeout
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
@@ -102,8 +106,8 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:

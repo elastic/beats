@@ -105,7 +105,7 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	// TODO: Remove this logic in the 8.0/master branch, preserve only in 7.x
 	dataset := settings.DataSet
 	if dataset == "" {
-		if settings.DataStream.Dataset != "" {
+		if settings.DataStream != nil && settings.DataStream.Dataset != "" {
 			dataset = settings.DataStream.Dataset
 		} else {
 			dataset = "uptime"
@@ -158,13 +158,20 @@ func setupIndexProcessor(info beat.Info, settings publishSettings) (processors.P
 		}
 		typ := settings.DataStream.Type
 		if typ == "" {
-			typ = "generic"
+			typ = "synthetics"
 		}
 
-		index := fmt.Sprintf("%s-%s-%s",
+		dataset := settings.DataStream.Dataset
+		if dataset == "" {
+			dataset = "generic"
+		}
+
+		index := fmt.Sprintf(
+			"%s-%s-%s",
 			typ,
-			settings.DataStream.Dataset,
-			namespace)
+			dataset,
+			namespace,
+		)
 		compiled, err := fmtstr.CompileEvent(index)
 		if err != nil {
 			return nil, fmt.Errorf("could not compile datastream: '%s', this should never happen: %w", index, err)
