@@ -6,6 +6,15 @@
   settings: ["ssl", "http"]
   short_config: false
   fields:
+    - name: index_recovery
+      type: group
+      field:
+        - name: shards.start_time_in_millis
+          type: alias
+          path: elasticsearch.index.recovery.start_time.ms
+        - name: shards.stop_time_in_millis
+          type: alias
+          path: elasticsearch.index.recovery.stop_time.ms
     - name: stack_stats
       type: group
       fields:
