@@ -8,4 +8,13 @@ var:
     default: [forwarded]
 
 input: config/falcon.yml
-ingest_pipeline: ingest/pipeline.yml
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/auth_activity_audit.yml
+  - ingest/detection_summary.yml
+  - ingest/firewall_match.yml
+  - ingest/incident_summary.yml
+  - ingest/remote_response_session_end.yml
+  - ingest/remote_response_session_start.yml
+  - ingest/user_activity_audit.yml
