@@ -302,12 +302,15 @@ def e2e(Map args = [:]) {
       if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       }
-      retryWithSleep(retries: 3, seconds: 5){
-        sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
-      }
-      filebeat(output: "docker_logs_${suite}_${tags}.log", workdir: "${env.WORKSPACE}"){
-        // TBC with the suite to be used
-        sh script: """SUITE=metricbeat DEVELOPER_MODE=false TIMEOUT_FACTOR=3 LOG_LEVEL=TRACE make -C e2e functional-test""", label: "Run functional tests for ${suite}:${tags}"
+      // Temporary fix to force the version instead picking up the env vironment variable.
+      withEnv(['GO_VERSION=1.14.12']) {
+        retryWithSleep(retries: 3, seconds: 5){
+          sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
+        }
+        filebeat(output: "docker_logs_${suite}_${tags}.log", workdir: "${env.WORKSPACE}"){
+          // TBC with the suite to be used
+          sh script: """SUITE=${suite} DEVELOPER_MODE=false TIMEOUT_FACTOR=3 LOG_LEVEL=TRACE make -C e2e functional-test""", label: "Run functional tests for ${suite}:${tags}"
+        }
       }
     } catch(e) {
       error(e.toString())
