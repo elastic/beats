@@ -1,32 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-log()
-{
-    echo \[$(date +%d%m%Y-%H:%M:%S)\] "$1"
-    echo \[$(date +%d%m%Y-%H:%M:%S)\] "$1" >> /var/log/es-agent-install.log
-}
-
-
-checkShasum ()
-{
-  local archive_file_name="${1}"
-  local authentic_checksum_file="${2}"
-  echo  --check <(grep "\s${archive_file_name}$" "${authentic_checksum_file}")
-
-  if $(which sha256sum >/dev/null 2>&1); then
-    sha256sum \
-      --check <(grep "\s${archive_file_name}$" "${authentic_checksum_file}")
-  elif $(which shasum >/dev/null 2>&1); then
-    shasum \
-      -a 256 \
-      --check <(grep "\s${archive_file_name}$" "${authentic_checksum_file}")
-  else
-    echo "sha256sum or shasum is not available for use" >&2
-    return 1
-  fi
-}
-
 DISTRO_OS=""
 
 checkOS()
@@ -55,31 +29,31 @@ install_es_ag_deb()
     local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
     local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
 
-    log "[install_es_ag_deb] installing Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_deb] installing Elastic Agent $STACK_VERSION" "INFO"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
+        log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum" "ERROR"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_deb] download location - $DOWNLOAD_URL"
+    log "[install_es_ag_deb] download location - $DOWNLOAD_URL" "INFO"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION" "ERROR"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_deb] downloaded Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_deb] downloaded Elastic Agent $STACK_VERSION" "INFO"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_deb] error validating checksum for Elastic Agent $STACK_VERSION"
+        log "[install_es_ag_deb] error validating checksum for Elastic Agent $STACK_VERSION" "ERROR"
         exit $EXIT_CODE
     fi
 
     sudo dpkg -i $PACKAGE
-    log "[install_es_ag_deb] installed Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_deb] installed Elastic Agent $STACK_VERSION" "INFO"
 }
 
 install_es_ag_rpm()
@@ -91,31 +65,31 @@ install_es_ag_rpm()
     local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
     local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
 
-    log "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION" "INFO"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
+        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum" "ERROR"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_rpm] download location - $DOWNLOAD_URL"
+    log "[install_es_ag_rpm] download location - $DOWNLOAD_URL" "INFO"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION"
+        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION" "ERROR"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_rpm] downloaded Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_rpm] downloaded Elastic Agent $STACK_VERSION" "INFO"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error validating checksum for Elastic Agent $STACK_VERSION"
+        log "[install_es_ag_rpm] error validating checksum for Elastic Agent $STACK_VERSION" "ERROR"
         exit $EXIT_CODE
     fi
 
     sudo rpm -vi $PACKAGE
-    log "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION"
+    log "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION" "INFO"
 }
 
 checkOS
