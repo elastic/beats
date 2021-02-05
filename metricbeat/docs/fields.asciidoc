@@ -2326,7 +2326,7 @@ type: scaled_float
 
 --
 
-*`aws.ec2.diskio.read.count`*::
+*`aws.ec2.diskio.read.ops`*::
 +
 --
 Total completed read operations from all instance store volumes available to the instance in collection period.
