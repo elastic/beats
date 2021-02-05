@@ -208,6 +208,7 @@ function typeMapEnrich(conversions) {
         }
     }
 }
+
 function azureADSchema(debug) {
     var azureADConversion = {
         'Add user.': {
@@ -247,6 +248,51 @@ function azureADSchema(debug) {
 
     var builder = new PipelineBuilder("o365.audit.AzureActiveDirectory", debug);
     builder.Add("setIAMFields", typeMapEnrich(azureADConversion));
+    return builder.Build();
+}
+
+function teamsSchema(debug) {
+    var teamsConversion = {
+        'TeamCreated': {
+            action: "added-group-account-to",
+            category: 'iam',
+            type: ['group', 'creation'],
+            copy: [
+                {
+                    from: 'o365audit.TeamName',
+                    to: 'group.name',
+                }
+            ],
+        },
+        'MemberAdded': {
+            action: "added-users-to-group",
+            category: 'iam',
+            type: ['group', 'change'],
+        },
+
+        'Delete user.': {
+            action: "deleted-user-account",
+            category: 'iam',
+            type: ['user', 'deletion'],
+            copy: [
+                {
+                    from: 'o365audit.ObjectId',
+                    to: 'user.target.id',
+                }
+            ],
+        },
+    };
+
+    var builder = new PipelineBuilder("o365.audit.MicrosoftTeams", debug);
+    builder.Add("setIAMFields", typeMapEnrich(teamsConversion));
+    builder.Add("groupMembersToRelatedUser", function (evt) {
+        var m = evt.Get("o365audit.Members");
+        if (m == null || m.forEach == null) return;
+        m.forEach(function (obj) {
+            if (obj != null && obj.hasOwnProperty('UPN'))
+                evt.AppendTo('related.user', obj.UPN);
+        })
+    })
     return builder.Build();
 }
 
@@ -545,7 +591,7 @@ function yammerSchema(debug) {
         // User creates a group.
         GroupCreation: {
             category: "iam",
-            type: ["group", "creation"]
+            type: ["group", "creation"],
         },
         // A group is deleted from Yammer.
         GroupDeletion: {
@@ -850,6 +896,7 @@ function AuditProcessor(tenant_names, debug) {
         'ComplianceDLPSharePoint': dlp.Run,
         'ComplianceDLPExchange': dlp.Run,
         'Yammer': yammerSchema(debug).Run,
+        'MicrosoftTeams': teamsSchema(debug).Run,
     }));
 
     builder.Add("extractClientIPPortBrackets", new processor.Dissect({

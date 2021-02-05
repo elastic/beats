@@ -1,8 +1,8 @@
 [
     {
         "@timestamp": "2021-02-05T09:08:00.000Z",
-        "event.action": "TeamCreated",
-        "event.category": "web",
+        "event.action": "added-group-account-to",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "9b9e973b-64c3-4607-bc79-bf743c985051",
@@ -10,8 +10,12 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "audit",
+        "group.name": "users",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
         "input.type": "log",
@@ -41,8 +45,8 @@
     },
     {
         "@timestamp": "2021-02-05T09:07:58.000Z",
-        "event.action": "MemberAdded",
-        "event.category": "web",
+        "event.action": "added-users-to-group",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "f16cc0cc-2a18-580e-83c5-04d3c385ebb8",
@@ -50,7 +54,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -84,7 +91,11 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
-        "related.user": "root",
+        "related.user": [
+            "admin@testsiem4.onmicrosoft.com",
+            "eve@testsiem4.onmicrosoft.com",
+            "root"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
@@ -1288,8 +1299,8 @@
     },
     {
         "@timestamp": "2021-02-05T09:08:00.000Z",
-        "event.action": "TeamCreated",
-        "event.category": "web",
+        "event.action": "added-group-account-to",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "9b9e973b-64c3-4607-bc79-bf743c985051",
@@ -1297,8 +1308,12 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "creation"
+        ],
         "fileset.name": "audit",
+        "group.name": "users",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
         "input.type": "log",
@@ -1328,8 +1343,8 @@
     },
     {
         "@timestamp": "2021-02-05T09:07:58.000Z",
-        "event.action": "MemberAdded",
-        "event.category": "web",
+        "event.action": "added-users-to-group",
+        "event.category": "iam",
         "event.code": "MicrosoftTeams",
         "event.dataset": "o365.audit",
         "event.id": "f16cc0cc-2a18-580e-83c5-04d3c385ebb8",
@@ -1337,7 +1352,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
-        "event.type": "info",
+        "event.type": [
+            "group",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "host.name": "testsiem4.onmicrosoft.com",
@@ -1371,7 +1389,11 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
-        "related.user": "root",
+        "related.user": [
+            "admin@testsiem4.onmicrosoft.com",
+            "eve@testsiem4.onmicrosoft.com",
+            "root"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
