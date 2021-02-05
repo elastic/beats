@@ -19400,6 +19400,34 @@ alias to: elasticsearch.node.stats.fs.summary.available.bytes
 
 --
 
+*`node_stats.fs.total.total_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
+
+*`node_stats.fs.summary.available.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.available.bytes
+
+--
+
+*`node_stats.fs.summary.total.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
 
 
 *`node_stats.fs.io_stats.total.operations`*::
@@ -19429,6 +19457,34 @@ alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
 
 --
 
+
+
+*`node_stats.indices.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.store.size.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.docs.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.docs.count
+
+--
 
 
 *`node_stats.indices.indexing.index_time_in_millis`*::

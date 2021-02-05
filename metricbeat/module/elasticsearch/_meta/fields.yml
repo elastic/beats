@@ -338,6 +338,18 @@
                 - name: available_in_bytes
                   path: elasticsearch.node.stats.fs.summary.available.bytes
                   type: alias
+                - name: total_in_bytes
+                  path: elasticsearch.node.stats.fs.summary.total.bytes
+                  type: alias
+            - name: summary
+              type: group
+              fields:
+                - name: available.bytes
+                  path: elasticsearch.node.stats.fs.summary.available.bytes
+                  type: alias
+                - name: total.bytes
+                  path: elasticsearch.node.stats.fs.summary.total.bytes
+                  type: alias
             - name: io_stats
               type: group
               fields:
@@ -356,6 +368,18 @@
         - name: indices
           type: group
           fields:
+            - name: store
+              type: group
+              fields:
+                - name: size_in_bytes
+                  type: alias
+                  path: elasticsearch.node.stats.indices.store.size.bytes
+                - name: size.bytes
+                  type: alias
+                  path: elasticsearch.node.stats.indices.store.size.bytes
+            - name: docs.count
+              type: alias
+              path: elasticsearch.node.stats.indices.docs.count
             - name: indexing
               type: group
               fields:
