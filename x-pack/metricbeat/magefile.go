@@ -21,20 +21,18 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
-	unittest.RegisterPythonTestDeps(Fields)
 	test.RegisterDeps(IntegTest)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
@@ -81,21 +79,20 @@ func CrossBuildGoDaemon() error {
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
-	mg.SerialCtxDeps(ctx, goTestDeps...)
 	args := devtools.DefaultGoTestUnitArgs()
 	// On Windows 7 32-bit we run out of memory if we enable DWARF
 	if isWindows32bitRunner() {
-		args.ExtraFlags = append(params.ExtraFlags, "-ldflags=-w")
+		args.ExtraFlags = append(args.ExtraFlags, "-ldflags=-w")
 	}
 	return devtools.GoTest(ctx, args)
 }
 
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
-	mg.SerialDeps(pythonTestDeps...)
+	mg.SerialDeps(Fields)
 	mg.Deps(BuildSystemTestBinary)
 
-	args := DefaultPythonTestUnitArgs()
+	args := devtools.DefaultPythonTestUnitArgs()
 	// On Windows 7 32-bit we run out of memory if we enable DWARF
 	if isWindows32bitRunner() {
 		args.Env["TEST_COVERAGE"] = "false"
@@ -104,7 +101,8 @@ func PythonUnitTest() error {
 }
 
 // BuildSystemTestBinary build a system test binary depending on the runner.
-func BuildSystemTestBinary() {
+func BuildSystemTestBinary() error {
+	binArgs := devtools.DefaultTestBinaryArgs()
 	args := []string{
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
@@ -115,11 +113,10 @@ func BuildSystemTestBinary() {
 	if isWin32Runner {
 		args = append(args, "-ldflags=-w")
 	}
-	if TestCoverage && !isWin32Runner {
+	if devtools.TestCoverage && !isWin32Runner {
 		args = append(args, "-coverpkg", "./...")
 	}
 
-	binArgs := devtools.DefaultTestBinaryArgs()
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}
