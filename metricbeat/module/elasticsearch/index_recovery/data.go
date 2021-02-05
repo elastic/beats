@@ -52,54 +52,6 @@ var (
 			"host": c.Str("host", s.Optional),
 			"name": c.Str("name", s.Optional),
 		}),
-
-		"start_time": s.Object{
-			"ms": c.Int("start_time_in_millis"),
-		},
-		"stop_time": s.Object{
-			"ms": c.Int("stop_time_in_millis"),
-		},
-		"total_time": s.Object{
-			"ms": c.Int("total_time_in_millis"),
-		},
-
-		"index": c.Dict("index", s.Schema{
-			"size": c.Dict("size", s.Schema{
-				"total":     s.Object{"bytes": c.Int("total_in_bytes")},
-				"reused":    s.Object{"bytes": c.Int("reused_in_bytes")},
-				"recovered": s.Object{"bytes": c.Int("recovered_in_bytes")},
-			}),
-			"files": c.Dict("files", s.Schema{
-				"count":     c.Int("total"),
-				"reused":    c.Int("reused"),
-				"recovered": c.Int("recovered"),
-			}),
-			"total_time": s.Object{
-				"ms": c.Int("total_time_in_millis"),
-			},
-			"throttle_time": s.Object{
-				"source": s.Object{
-					"ms": c.Int("source_throttle_time_in_millis"),
-				},
-				"target": s.Object{
-					"ms": c.Int("target_throttle_time_in_millis"),
-				},
-			},
-		}),
-
-		"translog": c.Dict("translog", s.Schema{
-			"recovered":      c.Int("recovered"),
-			"count":          c.Int("total"),
-			"total_on_start": c.Int("total_on_start"),
-			"total_time": s.Object{
-				"ms": c.Int("total_time_in_millis"),
-			},
-		}),
-
-		"verify_index": c.Dict("verify_index", s.Schema{
-			"check_index_time": s.Object{"ms": c.Int("check_index_time_in_millis")},
-			"total_time":       s.Object{"ms": c.Int("total_time_in_millis")},
-		}),
 	}
 )
 

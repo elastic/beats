@@ -6,72 +6,18 @@
             "name": "docker-cluster"
         },
         "index": {
-            "name": ".kibana-event-log-8.0.0-000001",
+            "name": ".apm-custom-link",
             "recovery": {
                 "id": 0,
-                "index": {
-                    "files": {
-                        "count": 0,
-                        "recovered": 0,
-                        "reused": 0
-                    },
-                    "size": {
-                        "recovered": {
-                            "bytes": 0
-                        },
-                        "reused": {
-                            "bytes": 0
-                        },
-                        "total": {
-                            "bytes": 0
-                        }
-                    },
-                    "throttle_time": {
-                        "source": {
-                            "ms": 0
-                        },
-                        "target": {
-                            "ms": 0
-                        }
-                    },
-                    "total_time": {
-                        "ms": 1600
-                    }
-                },
                 "primary": true,
                 "source": {},
                 "stage": "DONE",
-                "start_time": {
-                    "ms": 1605819056123
-                },
-                "stop_time": {
-                    "ms": 1605819058696
-                },
                 "target": {
                     "host": "127.0.0.1",
                     "id": "Fkj12lAFQOex0DwK0HMwHw",
                     "name": "082618b4bb36"
                 },
-                "total_time": {
-                    "ms": 2573
-                },
-                "translog": {
-                    "count": 0,
-                    "recovered": 0,
-                    "total_on_start": 0,
-                    "total_time": {
-                        "ms": 951
-                    }
-                },
-                "type": "EMPTY_STORE",
-                "verify_index": {
-                    "check_index_time": {
-                        "ms": 0
-                    },
-                    "total_time": {
-                        "ms": 0
-                    }
-                }
+                "type": "EMPTY_STORE"
             }
         }
     },
@@ -85,7 +31,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:50581",
+        "address": "127.0.0.1:33785",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }
