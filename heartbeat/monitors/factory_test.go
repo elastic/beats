@@ -34,29 +34,25 @@ func TestSetupIndexProcessor(t *testing.T) {
 		IndexPrefix: "heartbeat",
 		Version:     "8.0.0",
 	}
-	tests := []struct {
-		name          string
+	tests := map[string]struct {
 		settings      publishSettings
 		expectedIndex string
 		wantProc      bool
 		wantErr       bool
 	}{
-		{
-			"no settings should yield no processor",
+		"no settings should yield no processor": {
 			publishSettings{},
 			"",
 			false,
 			false,
 		},
-		{
-			"exact index should be used exactly",
+		"exact index should be used exactly": {
 			publishSettings{Index: *fmtstr.MustCompileEvent("test")},
 			"test",
 			true,
 			false,
 		},
-		{
-			"data stream should be type-namespace-dataset",
+		"data stream should be type-namespace-dataset": {
 			publishSettings{
 				DataStream: &datastream{
 					Type:      "myType",
@@ -68,8 +64,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 			true,
 			false,
 		},
-		{
-			"data stream should use defaults",
+		"data stream should use defaults": {
 			publishSettings{
 				DataStream: &datastream{},
 			},
@@ -79,8 +74,8 @@ func TestSetupIndexProcessor(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
 			e := beat.Event{Meta: common.MapStr{}, Fields: common.MapStr{}}
 			proc, err := setupIndexProcessor(binfo, tt.settings)
 			if tt.wantErr == true {
