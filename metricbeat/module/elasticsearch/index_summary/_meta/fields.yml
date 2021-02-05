@@ -33,17 +33,9 @@
           type: group
           fields:
             - name: index.count
-              description: TODO
               type: long
             - name: index.time.ms
-              description: TODO
               type: long
-            - name: is_throttled
-              type: boolean
-              description: TODO
-            - name: throttle_time.ms
-              type: long
-              description: TODO
         - name: search
           type: group
           fields:
@@ -52,31 +44,24 @@
               fields:
                 - name: count
                   type: long
-                  description: TODO
                 - name: time.ms
                   type: long
-                  description: TODO
         - name: bulk
           type: group
           fields:
             - name: operations.count
               type: long
-              description: TODO
             - name: size.bytes
               type: long
-              description: TODO
             - name: time
               type: group
               fields:
                 - name: count.ms
                   type: long
-                  description: TODO
                 - name: avg.ms
                   type: long
-                  description: TODO
                 - name: avg.bytes
                   type: long
-                  description: TODO
     - name: total
       type: group
       fields:
@@ -106,17 +91,13 @@
           type: group
           fields:
             - name: index.count
-              description: TODO
-              type: long
-            - name: index.time.ms
-              description: TODO
               type: long
             - name: is_throttled
               type: boolean
-              description: TODO
             - name: throttle_time.ms
               type: long
-              description: TODO
+            - name: index.time.ms
+              type: long
         - name: search
           type: group
           fields:
@@ -125,28 +106,19 @@
               fields:
                 - name: count
                   type: long
-                  description: TODO
                 - name: time.ms
                   type: long
-                  description: TODO
         - name: bulk
           type: group
           fields:
             - name: operations.count
               type: long
-              description: TODO
             - name: size.bytes
               type: long
-              description: TODO
             - name: time
               type: group
               fields:
-                - name: count.ms
-                  type: long
-                  description: TODO
                 - name: avg.ms
                   type: long
-                  description: TODO
                 - name: avg.bytes
                   type: long
-                  description: TODO

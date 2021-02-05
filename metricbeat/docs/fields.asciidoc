@@ -20928,8 +20928,6 @@ format: bytes
 *`elasticsearch.index.summary.primaries.indexing.index.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -20937,26 +20935,6 @@ type: long
 *`elasticsearch.index.summary.primaries.indexing.index.time.ms`*::
 +
 --
-TODO
-
-type: long
-
---
-
-*`elasticsearch.index.summary.primaries.indexing.is_throttled`*::
-+
---
-TODO
-
-type: boolean
-
---
-
-*`elasticsearch.index.summary.primaries.indexing.throttle_time.ms`*::
-+
---
-TODO
-
 type: long
 
 --
@@ -20966,8 +20944,6 @@ type: long
 *`elasticsearch.index.summary.primaries.search.query.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -20975,8 +20951,6 @@ type: long
 *`elasticsearch.index.summary.primaries.search.query.time.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -20985,8 +20959,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.operations.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -20994,8 +20966,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.size.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21004,8 +20974,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.count.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21013,8 +20981,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.avg.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21022,8 +20988,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.avg.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21087,17 +21051,6 @@ format: bytes
 *`elasticsearch.index.summary.total.indexing.index.count`*::
 +
 --
-TODO
-
-type: long
-
---
-
-*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
-+
---
-TODO
-
 type: long
 
 --
@@ -21105,8 +21058,6 @@ type: long
 *`elasticsearch.index.summary.total.indexing.is_throttled`*::
 +
 --
-TODO
-
 type: boolean
 
 --
@@ -21114,8 +21065,13 @@ type: boolean
 *`elasticsearch.index.summary.total.indexing.throttle_time.ms`*::
 +
 --
-TODO
+type: long
 
+--
+
+*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
++
+--
 type: long
 
 --
@@ -21125,8 +21081,6 @@ type: long
 *`elasticsearch.index.summary.total.search.query.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21134,8 +21088,6 @@ type: long
 *`elasticsearch.index.summary.total.search.query.time.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21144,8 +21096,6 @@ type: long
 *`elasticsearch.index.summary.total.bulk.operations.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21153,27 +21103,14 @@ type: long
 *`elasticsearch.index.summary.total.bulk.size.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
 
-
-*`elasticsearch.index.summary.total.bulk.time.count.ms`*::
-+
---
-TODO
-
-type: long
-
---
 
 *`elasticsearch.index.summary.total.bulk.time.avg.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21181,8 +21118,6 @@ type: long
 *`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --

@@ -60,13 +60,6 @@ var indexSummaryDict = s.Schema{
 var indexingDict = c.Dict("indexing", s.Schema{
 	"index": s.Object{
 		"count": c.Int("index_total"),
-		"time": s.Object{
-			"ms": c.Int("index_time_in_millis"),
-		},
-	},
-	"is_throttled": c.Bool("is_throttled"),
-	"throttle_time": s.Object{
-		"ms": c.Int("throttle_time_in_millis"),
 	},
 })
 
@@ -84,11 +77,7 @@ var bulkStatsDict = c.Dict("bulk", s.Schema{
 		"count": c.Int("total_operations"),
 	},
 	"time": s.Object{
-		"count": s.Object{
-			"ms": c.Int("total_time_in_millis"),
-		},
 		"avg": s.Object{
-			"ms":    c.Int("avg_time_in_millis"),
 			"bytes": c.Int("avg_size_in_bytes"),
 		},
 	},

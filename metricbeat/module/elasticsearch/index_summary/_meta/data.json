@@ -1,153 +1,87 @@
 {
-    "@timestamp": "2020-08-26T20:27:04.201Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "elasticsearch": {
+        "cluster": {
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
+        },
+        "index": {
+            "summary": {
+                "primaries": {
+                    "docs": {
+                        "count": 1257,
+                        "deleted": 11
+                    },
+                    "indexing": {
+                        "index": {
+                            "count": 1885
+                        }
+                    },
+                    "search": {
+                        "query": {
+                            "count": 81,
+                            "time": {
+                                "ms": 39
+                            }
+                        }
+                    },
+                    "segments": {
+                        "count": 20,
+                        "memory": {
+                            "bytes": 190357
+                        }
+                    },
+                    "store": {
+                        "size": {
+                            "bytes": 1686190
+                        }
+                    }
+                },
+                "total": {
+                    "docs": {
+                        "count": 1257,
+                        "deleted": 11
+                    },
+                    "indexing": {
+                        "index": {
+                            "count": 1885
+                        }
+                    },
+                    "search": {
+                        "query": {
+                            "count": 81,
+                            "time": {
+                                "ms": 39
+                            }
+                        }
+                    },
+                    "segments": {
+                        "count": 20,
+                        "memory": {
+                            "bytes": 190357
+                        }
+                    },
+                    "store": {
+                        "size": {
+                            "bytes": 1686190
+                        }
+                    }
+                }
+            }
+        }
     },
     "event": {
         "dataset": "elasticsearch.index.summary",
-        "module": "elasticsearch",
-        "duration": 143822781
+        "duration": 115000,
+        "module": "elasticsearch"
     },
     "metricset": {
         "name": "index_summary",
         "period": 10000
     },
-    "elasticsearch": {
-        "index": {
-            "summary": {
-                "total": {
-                    "store": {
-                        "size": {
-                            "bytes": 12088959
-                        }
-                    },
-                    "segments": {
-                        "memory": {
-                            "bytes": 111208
-                        },
-                        "count": 18
-                    },
-                    "indexing": {
-                        "is_throttled": false,
-                        "throttle_time": {
-                            "ms": 0
-                        },
-                        "index": {
-                            "count": 0,
-                            "time": {
-                                "ms": 0
-                            }
-                        }
-                    },
-                    "bulk": {
-                        "time": {
-                            "count": {
-                                "ms": 0
-                            },
-                            "avg": {
-                                "ms": 0,
-                                "bytes": 0
-                            }
-                        },
-                        "size": {
-                            "bytes": 0
-                        },
-                        "operations": {
-                            "count": 0
-                        }
-                    },
-                    "search": {
-                        "query": {
-                            "count": 0,
-                            "time": {
-                                "ms": 0
-                            }
-                        }
-                    },
-                    "docs": {
-                        "count": 1297,
-                        "deleted": 418
-                    }
-                },
-                "primaries": {
-                    "docs": {
-                        "count": 1297,
-                        "deleted": 418
-                    },
-                    "store": {
-                        "size": {
-                            "bytes": 12088959
-                        }
-                    },
-                    "segments": {
-                        "memory": {
-                            "bytes": 111208
-                        },
-                        "count": 18
-                    },
-                    "indexing": {
-                        "index": {
-                            "time": {
-                                "ms": 0
-                            },
-                            "count": 0
-                        },
-                        "is_throttled": false,
-                        "throttle_time": {
-                            "ms": 0
-                        }
-                    },
-                    "bulk": {
-                        "time": {
-                            "avg": {
-                                "bytes": 0,
-                                "ms": 0
-                            },
-                            "count": {
-                                "ms": 0
-                            }
-                        },
-                        "size": {
-                            "bytes": 0
-                        },
-                        "operations": {
-                            "count": 0
-                        }
-                    },
-                    "search": {
-                        "query": {
-                            "time": {
-                                "ms": 0
-                            },
-                            "count": 0
-                        }
-                    }
-                }
-            }
-        },
-        "cluster": {
-            "name": "docker-cluster",
-            "id": "giRKn5pZQ0afY0YrRiXdxQ"
-        }
-    },
-    "ecs": {
-        "version": "1.5.0"
-    },
-    "host": {
-        "name": "mcastro"
-    },
-    "agent": {
-        "name": "mcastro",
-        "type": "metricbeat",
-        "version": "8.0.0",
-        "ephemeral_id": "7cca1b46-be04-4e3b-aa72-048c9e91fa6e",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d"
-    },
     "service": {
-        "type": "elasticsearch",
+        "address": "127.0.0.1:32943",
         "name": "elasticsearch",
-        "address": "localhost:9200"
+        "type": "elasticsearch"
     }
 }
