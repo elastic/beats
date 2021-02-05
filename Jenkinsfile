@@ -21,6 +21,7 @@ pipeline {
     SLACK_CHANNEL = "#beats-build"
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    GITHUB_CHECK = 'true'
   }
   options {
     timeout(time: 3, unit: 'HOURS')
