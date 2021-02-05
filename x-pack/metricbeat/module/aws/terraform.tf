@@ -49,7 +49,7 @@ resource "aws_s3_bucket_object" "test" {
 
 resource "aws_instance" "test" {
   ami           = data.aws_ami.latest-amzn.id
-  monitoring = true
+  monitoring    = true
   instance_type = "t1.micro"
   tags = {
     Name = "metricbeat-test"
@@ -58,9 +58,10 @@ resource "aws_instance" "test" {
 
 data "aws_ami" "latest-amzn" {
   most_recent = true
-  owners = [ "amazon" ] # AWS
+  owners      = ["amazon"]
   filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*"]
+    name = "name"
+    values = [
+    "amzn2-ami-hvm-*"]
   }
 }
