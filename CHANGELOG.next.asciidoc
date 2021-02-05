@@ -101,9 +101,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
-- Disable the option of running --machine-learning on its own. {pull}20241[20241]
-- Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
-- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 
 *Heartbeat*
 
@@ -178,10 +175,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix k8s pods labels broken schema. {pull}16480[16480]
 - Fix k8s pods annotations broken schema. {pull}16554[16554]
 - Upgrade go-ucfg to latest v0.8.3. {pull}16450[16450]
-- Remove superfluous use of number_of_routing_shards setting from the default template. {pull}16038[16038]
-- Fix index names for indexing not always guaranteed to be lower case. {pull}16081[16081]
-- Fix loading processors from annotation hints. {pull}16348[16348]
-- Add `ssl.ca_sha256` option to the supported TLS option, this allow to check that a specific certificate is used as part of the verified chain. {issue}15717[15717]
 - Fix `NewContainerMetadataEnricher` to use default config for kubernetes module. {pull}16857[16857]
 - Improve some logging messages for add_kubernetes_metadata processor {pull}16866[16866]
 - Fix k8s metadata issue regarding node labels not shown up on root level of metadata. {pull}16834[16834]
@@ -236,7 +229,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add FAQ entry for madvdontneed variable {pull}23429[23429]
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
-- The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 
 *Auditbeat*
 
@@ -837,12 +829,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add mime type detection for http responses. {pull}22976[22976]
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 
-*Heartbeat*
-
-
-*Heartbeat*
-
 *Journalbeat*
+
 
 *Metricbeat*
 
@@ -946,7 +934,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Sanitize `event.host`. {pull}21022[21022]
 - Add support for different Azure Cloud environments in the metricbeat azure module. {pull}21044[21044] {issue}20988[20988]
 - Add overview and platform health dashboards to Cloud Foundry module. {pull}21124[21124]
-- Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
 - Move Prometheus query & remote_write to GA. {pull}21507[21507]
 - Expand unsupported option from namespace to metrics in the azure module. {pull}21486[21486]
@@ -978,12 +965,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change build process for x-pack distribution {pull}21979[21979]
 - Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
 - Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
-- Add billing metricset into googlecloud module. {pull}20812[20812] {issue}20738[20738]
-- Release lambda metricset in aws module as GA. {issue}21251[21251] {pull}21255[21255]
-- Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
-
-*Packetbeat*
-
 
 *Functionbeat*
 
