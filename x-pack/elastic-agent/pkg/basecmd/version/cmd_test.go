@@ -25,7 +25,8 @@ func TestCmdBinaryOnly(t *testing.T) {
 	streams, _, out, _ := cli.NewTestingIOStreams()
 	cmd := NewCommandWithArgs(streams)
 	cmd.Flags().Set("binary-only", "true")
-	cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 	version, err := ioutil.ReadAll(out)
 
 	require.NoError(t, err)
@@ -38,7 +39,8 @@ func TestCmdBinaryOnlyYAML(t *testing.T) {
 	cmd := NewCommandWithArgs(streams)
 	cmd.Flags().Set("binary-only", "true")
 	cmd.Flags().Set("yaml", "true")
-	cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 	version, err := ioutil.ReadAll(out)
 
 	require.NoError(t, err)
@@ -58,7 +60,8 @@ func TestCmdDaemon(t *testing.T) {
 
 	streams, _, out, _ := cli.NewTestingIOStreams()
 	cmd := NewCommandWithArgs(streams)
-	cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 	version, err := ioutil.ReadAll(out)
 
 	require.NoError(t, err)
@@ -74,7 +77,8 @@ func TestCmdDaemonYAML(t *testing.T) {
 	streams, _, out, _ := cli.NewTestingIOStreams()
 	cmd := NewCommandWithArgs(streams)
 	cmd.Flags().Set("yaml", "true")
-	cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 	version, err := ioutil.ReadAll(out)
 
 	require.NoError(t, err)
@@ -84,6 +88,37 @@ func TestCmdDaemonYAML(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, release.Info(), *output.Daemon)
+	assert.Equal(t, release.Info(), *output.Binary)
+}
+
+func TestCmdDaemonErr(t *testing.T) {
+	// srv not started
+	streams, _, out, _ := cli.NewTestingIOStreams()
+	cmd := NewCommandWithArgs(streams)
+	err := cmd.Execute()
+	require.Error(t, err)
+	version, err := ioutil.ReadAll(out)
+	require.NoError(t, err)
+
+	assert.True(t, strings.Contains(string(version), "Binary: "))
+	assert.True(t, strings.Contains(string(version), "Daemon: "))
+}
+
+func TestCmdDaemonErrYAML(t *testing.T) {
+	// srv not started
+	streams, _, out, _ := cli.NewTestingIOStreams()
+	cmd := NewCommandWithArgs(streams)
+	cmd.Flags().Set("yaml", "true")
+	err := cmd.Execute()
+	require.Error(t, err)
+	version, err := ioutil.ReadAll(out)
+
+	require.NoError(t, err)
+	var output Output
+	err = yaml.Unmarshal(version, &output)
+	require.NoError(t, err)
+
+	assert.Nil(t, output.Daemon)
 	assert.Equal(t, release.Info(), *output.Binary)
 }
 
