@@ -21487,27 +21487,6 @@ type: keyword
 --
 
 
-*`elasticsearch.ml.job.model_size.result_type`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.ml.job.model_size.model.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.bucket_allocation_failures.count`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.ml.job.model_size.memory_status`*::
 +
 --
@@ -21515,108 +21494,8 @@ type: long
 
 --
 
-*`elasticsearch.ml.job.model_size.log_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.timestamp.ms`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.model_size.total.field.by.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.total.field.over.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.total.field.partition.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.field.processed.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.input.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.input.field.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.missing_field.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.out_of_order.timestamp.count`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.ml.job.data_counts.invalid_date_count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.last_data_time`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.bucket.empty.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.bucket.sparse.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.bucket.count`*::
 +
 --
 type: long
@@ -21628,28 +21507,6 @@ type: long
 --
 Processed data events.
 
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.record.earliest.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.record.latest.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.record.input.count`*::
-+
---
 type: long
 
 --

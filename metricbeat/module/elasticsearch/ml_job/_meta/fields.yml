@@ -15,65 +15,16 @@
     - name: model_size
       type: group
       fields:
-        - name: result_type
-          type: keyword
-        - name: model.bytes
-          type: long
-        - name: bucket_allocation_failures.count
-          type: long
         - name: memory_status
           type: long
-        - name: log_time.ms
-          type: long
-        - name: timestamp.ms
-          type: long
-        - name: total.field
-          type: group
-          fields:
-            - name: by.count
-              type: long
-            - name: over.count
-              type: long
-            - name: partition.count
-              type: long
     - name: data_counts
       type: group
       fields:
-        - name: field.processed.count
-          type: long
-        - name: input.bytes
-          type: long
-        - name: input.field.count
-          type: long
-        - name: missing_field.count
-          type: long
-        - name: out_of_order.timestamp.count
-          type: long
         - name: invalid_date_count
           type: long
-        - name: last_data_time
-          type: long
-        - name: bucket
-          type: group
-          fields:
-            - name: empty.count
-              type: long
-            - name: sparse.count
-              type: long
-            - name: count
-              type: long
         - name: processed_record_count
           type: long
           description: Processed data events.
-        - name: record
-          type: group
-          fields:
-            - name: earliest.ms
-              type: long
-            - name: latest.ms
-              type: long
-            - name: input.count
-              type: long
     - name: data.invalid_date.count
       type: long
       description: >
