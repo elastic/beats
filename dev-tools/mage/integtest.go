@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 
 	"github.com/joeshaw/multierror"
@@ -248,7 +247,7 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 		env["MAGEFILE_VERBOSE"] = "1"
 	}
 
-	if runtime.GOOS == "windows" {
+	if isWindows32bitRunner() {
 		env["TEST_COVERAGE"] = "false"
 	}
 

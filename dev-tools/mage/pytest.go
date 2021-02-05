@@ -128,7 +128,7 @@ func PythonTest(params PythonTestArgs) error {
 	for k, v := range params.Env {
 		pytestEnv[k] = v
 	}
-	if runtime.GOOS == "windows" {
+	if isWindows32bitRunner() {
 		pytestEnv["TEST_COVERAGE"] = "false"
 	}
 
