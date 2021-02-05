@@ -10,9 +10,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
-	"gopkg.in/yaml.v2"
 )
 
 // DefaultOptions defaults options used to read the configuration
