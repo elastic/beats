@@ -31,6 +31,7 @@
 - Fix refresh of monitoring configuration {pull}23619[23619]
 - Fixed nil pointer during unenroll {pull}23609[23609]
 - Fixed reenroll scenario {pull}23686[23686]
+- Fixed make status readable in the log. {pull}23849[23849]
 
 ==== New features
 
