@@ -128,9 +128,6 @@ func PythonTest(params PythonTestArgs) error {
 	for k, v := range params.Env {
 		pytestEnv[k] = v
 	}
-	if isWindows32bitRunner() {
-		pytestEnv["TEST_COVERAGE"] = "false"
-	}
 
 	pytestOptions := []string{
 		"--timeout=90",

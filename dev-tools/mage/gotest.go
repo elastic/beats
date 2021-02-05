@@ -68,11 +68,6 @@ func makeGoTestArgs(name string) GoTestArgs {
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
 	}
-
-	// On Windows 7 32-bit we run out of memory if we enable DWARF
-	if isWindows32bitRunner() {
-		params.ExtraFlags = append(params.ExtraFlags, "-ldflags=-w")
-	}
 	if TestCoverage {
 		params.CoverageProfileFile = fileName + ".cov"
 	}
@@ -350,13 +345,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
 	}
-
-	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
-	isWin32Runner := isWindows32bitRunner()
-	if isWin32Runner {
-		args = append(args, "-ldflags=-w")
-	}
-	if TestCoverage && !isWin32Runner {
+	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}
 	if len(binArgs.InputFiles) > 0 {

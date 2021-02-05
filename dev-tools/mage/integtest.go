@@ -247,10 +247,6 @@ func initRunner(tester IntegrationTester, dir string, passInEnv map[string]strin
 		env["MAGEFILE_VERBOSE"] = "1"
 	}
 
-	if isWindows32bitRunner() {
-		env["TEST_COVERAGE"] = "false"
-	}
-
 	runner := &IntegrationRunner{
 		steps:  runnerSteps,
 		tester: tester,

@@ -23,7 +23,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/josephspurrier/goversioninfo"
@@ -60,12 +59,6 @@ func DefaultBuildArgs() BuildArgs {
 		},
 		WinMetadata: true,
 	}
-
-	// On Windows 7 32-bit we run out of memory if we enable DWARF
-	if isWindows32bitRunner() {
-		args.LDFlags = append(args.LDFlags, "-w")
-	}
-
 	if versionQualified {
 		args.Vars[elasticBeatsModulePath+"/libbeat/version.qualifier"] = "{{ .Qualifier }}"
 	}
@@ -84,10 +77,7 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 
 	// Enable DEP (data execution protection) for Windows binaries.
 	if Platform.GOOS == "windows" {
-		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat", "-w")
-		if isWindows32bitRunner() {
-			args.LDFlags = append(args.LDFlags, "-w")
-		}
+		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--nxcompat")
 	}
 
 	return args
@@ -213,8 +203,4 @@ func MakeWindowsSysoFile() (string, error) {
 		return "", errors.Wrap(err, "failed to generate syso file with Windows metadata")
 	}
 	return sysoFile, nil
-}
-
-func isWindows32bitRunner() bool {
-	return runtime.GOOS == "windows" && runtime.GOARCH != "amd64"
 }
