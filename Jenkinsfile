@@ -9,7 +9,7 @@ pipeline {
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
@@ -287,6 +287,10 @@ def packagingLinux(Map args = [:]) {
   }
 }
 
+/**
+* This method runs the end 2 end testing in the same worker where the packages have been
+* generated, this should help to speed up the things
+*/
 def e2e(Map args = [:]) {
   def suite = args.get('suite', '')
   def tags = args.get('tags', '')
@@ -295,10 +299,10 @@ def e2e(Map args = [:]) {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
     try {
-      if(isInstalled(tool: 'docker', flag: '--version')) {
+      if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       }
-      retry(3){
+      retryWithSleep(retries: 3, seconds: 5){
         sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
       }
       filebeat(output: "docker_logs_${suite}_${tags}.log", workdir: "${env.WORKSPACE}"){
@@ -413,7 +417,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
       installTools(args)
