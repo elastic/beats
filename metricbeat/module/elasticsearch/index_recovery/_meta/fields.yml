@@ -48,48 +48,6 @@
       type: keyword
       description: >
         Source node name.
-    - name: stop_time.ms
-      type: long
-    - name: start_time.ms
-      type: long
-    - name: index
-      type: group
-      fields:
-        - name: total_time.ms
-          type: long
-        - name: throttle_time.source.ms
-          type: long  
-        - name: throttle_time.target.ms
-          type: long
-        - name: files
-          type: group
-          fields:
-            - name: count
-              type: long
-            - name: reused
-              type: long
-            - name: recovered
-              type: long
-        - name: size
-          type: group
-          fields:
-            - name: recovered.bytes
-              type: long
-            - name: total.bytes
-              type: long
-            - name: reused.bytes
-              type: long
-    - name: translog
-      type: group
-      fields:
-        - name: total_time.ms
-          type: long
-        - name: count
-          type: long
-        - name: total_on_start
-          type: long
-        - name: recovered
-          type: long
     - name: verify_index
       type: group
       fields:
