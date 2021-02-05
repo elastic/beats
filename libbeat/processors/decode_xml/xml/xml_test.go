@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package common
+package xml
 
 import (
 	"testing"

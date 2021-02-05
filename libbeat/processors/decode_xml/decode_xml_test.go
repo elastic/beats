@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package decode_xml_fields
+package decode_xml
 
 import (
 	"testing"
@@ -33,10 +33,10 @@ var (
 	targetRootField = ""
 )
 
-func TestDecodeXMLFields(t *testing.T) {
+func TestDecodeXML(t *testing.T) {
 	var testCases = []struct {
 		description  string
-		config       decodeXMLFieldsConfig
+		config       decodeXMLConfig
 		Input        common.MapStr
 		Output       common.MapStr
 		error        bool
@@ -44,9 +44,9 @@ func TestDecodeXMLFields(t *testing.T) {
 	}{
 		{
 			description: "Simple xml decode with target field set",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
-				Target: &targetField,
+			config: decodeXMLConfig{
+				Field:  "message",
+				Target: targetField,
 			},
 			Input: common.MapStr{
 				"message": `<catalog>
@@ -81,9 +81,9 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Test with target set to root",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
-				Target: &targetRootField,
+			config: decodeXMLConfig{
+				Field:  "message",
+				Target: targetRootField,
 			},
 			Input: common.MapStr{
 				"message": `<catalog>
@@ -116,8 +116,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Simple xml decode with xml string to same field name when Target is null",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
+			config: decodeXMLConfig{
+				Field: "message",
 			},
 			Input: common.MapStr{
 				"message": `<?xml version="1.0"?>
@@ -146,8 +146,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Decoding with array input",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
+			config: decodeXMLConfig{
+				Field: "message",
 			},
 			Input: common.MapStr{
 				"message": `<?xml version="1.0"?>
@@ -187,8 +187,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Decoding with multiple xml objects",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
+			config: decodeXMLConfig{
+				Field: "message",
 			},
 			Input: common.MapStr{
 				"message": `<?xml version="1.0"?>
@@ -243,8 +243,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Decoding with broken XML format, with AddErrorKey enabled",
-			config: decodeXMLFieldsConfig{
-				Fields:      []string{"message"},
+			config: decodeXMLConfig{
+				Field:       "message",
 				AddErrorKey: true,
 			},
 			Input: common.MapStr{
@@ -266,8 +266,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Decoding with broken XML format, with AddErrorKey disabled",
-			config: decodeXMLFieldsConfig{
-				Fields:      []string{"message"},
+			config: decodeXMLConfig{
+				Field:       "message",
 				AddErrorKey: false,
 			},
 			Input: common.MapStr{
@@ -288,8 +288,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Test when the XML field is empty",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
+			config: decodeXMLConfig{
+				Field: "message",
 			},
 			Input: common.MapStr{
 				"message": "",
@@ -302,8 +302,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		},
 		{
 			description: "Test when the XML field not a string",
-			config: decodeXMLFieldsConfig{
-				Fields: []string{"message"},
+			config: decodeXMLConfig{
+				Field: "message",
 			},
 			Input: common.MapStr{
 				"message": 1,
@@ -320,8 +320,8 @@ func TestDecodeXMLFields(t *testing.T) {
 		test := test
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
-			f := &decodeXMLFields{
-				logger: logp.NewLogger("decode_xml_fields"),
+			f := &decodeXML{
+				log:    logp.NewLogger("decode_xml"),
 				config: test.config,
 			}
 
@@ -341,7 +341,7 @@ func TestDecodeXMLFields(t *testing.T) {
 }
 
 func TestXMLToDocumentID(t *testing.T) {
-	log := logp.NewLogger("decode_xml_fields")
+	log := logp.NewLogger("decode_xml")
 
 	input := common.MapStr{
 		"message": `<catalog>
@@ -358,9 +358,9 @@ func TestXMLToDocumentID(t *testing.T) {
 		"document_id": "catalog.book.seq",
 	})
 
-	p, err := NewDecodeXMLFields(config)
+	p, err := New(config)
 	if err != nil {
-		log.Error("Error initializing decode_xml_fields")
+		log.Error("Error initializing decode_xml")
 		t.Fatal(err)
 	}
 
