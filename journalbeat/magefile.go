@@ -145,7 +145,7 @@ func selectImage(platform string) (string, error) {
 	case platform == "linux/s390x":
 		tagSuffix = "s390x"
 	case strings.HasPrefix(platform, "linux"):
-		tagSuffix = "debian9"
+		tagSuffix = "main-debian9"
 	}
 
 	goVersion, err := devtools.GoVersion()
