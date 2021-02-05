@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -63,6 +64,9 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 	if *HostFS != "" {
+		if config.HostFS != "" {
+			logp.Warn("-system.hostfs flag is set and will override configuration setting")
+		}
 		config.HostFS = *HostFS
 	}
 
