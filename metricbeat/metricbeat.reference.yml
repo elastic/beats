@@ -329,7 +329,13 @@ metricbeat.modules:
 - module: haproxy
   metricsets: ["info", "stat"]
   period: 10s
+  # TCP socket, UNIX socket, or HTTP address where HAProxy stats are reported
+  # TCP socket
   hosts: ["tcp://127.0.0.1:14567"]
+  # UNIX socket
+  #hosts: ["unix:///path/to/haproxy.sock"]
+  # Stats page
+  #hosts: ["http://127.0.0.1:14567"]
   username : "admin"
   password : "admin"
   enabled: true
@@ -419,6 +425,9 @@ metricbeat.modules:
 
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
+
+  # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
+  #ssl.key_passphrase: "yourKeyPassphrase"
 
   # SASL authentication
   #username: ""
@@ -1304,8 +1313,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1437,8 +1444,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1633,6 +1638,10 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1640,8 +1649,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -1802,8 +1809,6 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -2104,8 +2109,6 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative
@@ -2307,8 +2310,6 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
-  # * certificate, which verifies that the provided certificate is signed by a
-  # trusted authority (CA), but does not perform any hostname verification.
   # * strict, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate. If the Subject Alternative

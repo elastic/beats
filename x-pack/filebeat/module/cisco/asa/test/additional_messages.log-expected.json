@@ -1604,17 +1604,26 @@
         ]
     },
     {
+        "cisco.asa.destination_interface": "net",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for fw111:10.10.10.10/39210 to net:192.168.2.2/10051 duration 0:00:00 forwarded bytes 0 Cluster flow with CLU closed on owner",
+        "event.reason": "Cluster flow with CLU closed on owner",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1624,31 +1633,52 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4949,
+        "network.bytes": "0",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
         ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 39210,
         "tags": [
             "cisco-asa",
             "forwarded"
         ]
     },
     {
+        "cisco.asa.destination_interface": "unknown",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "net",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 39222,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for net:10.10.10.10/10051 to unknown:192.168.2.2/39222 duration 0:00:00 forwarded bytes 0 Forwarding or redirect flow removed to create director or backup flow",
+        "event.reason": "Forwarding or redirect flow removed to create director or backup flow",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1658,14 +1688,26 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5142,
+        "network.bytes": "0",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "unknown",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
         ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 10051,
         "tags": [
             "cisco-asa",
             "forwarded"
