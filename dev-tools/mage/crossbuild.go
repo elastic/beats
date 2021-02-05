@@ -194,7 +194,7 @@ func crossBuildImage(platform string) (string, error) {
 	case strings.HasPrefix(platform, "linux"):
 		// Use an older version of libc to gain greater OS compatibility.
 		// Debian 8 uses glibc 2.19.
-		tagSuffix = "debian8"
+		tagSuffix = "main-debian8"
 	}
 
 	goVersion, err := GoVersion()
