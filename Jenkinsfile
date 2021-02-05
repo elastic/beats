@@ -293,7 +293,7 @@ def e2e(Map args = [:]) {
   def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
   dir('.e2e') {
     // TBC with the target branch if running on a PR basis.
-    gitCheckout(repo: "https://github.com/elastic/e2e-testing.git", branch: "master")
+    git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
     try {
       if(isInstalled(tool: 'docker', flag: '--version')) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
