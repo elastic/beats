@@ -445,8 +445,6 @@ as gauges (rather than counters). {pull}22877[22877]
 
 *Filebeat*
 
-As we continue to expand our coverage of common security data sources, we may consider supporting
-Citrix Netscaler and Symantec Endpoint Protection in a future release. {issue}23129[23129] {pull}23130[23130]
 
 *Heartbeat*
 
@@ -464,6 +462,5 @@ Citrix Netscaler and Symantec Endpoint Protection in a future release. {issue}23
 ==== Known Issue
 
 *Journalbeat*
-
 
 

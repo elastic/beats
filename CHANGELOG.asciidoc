@@ -223,6 +223,8 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 *Filebeat*
 
 - The experimental modules for Citrix Netscaler and Symantec Endpoint Protection have been removed.
+  As we continue to expand our coverage of common security data sources, we may consider supporting
+  Citrix Netscaler and Symantec Endpoint Protection in a future release. {issue}23129[23129] {pull}23130[23130]
 
 ==== Known Issue
 
