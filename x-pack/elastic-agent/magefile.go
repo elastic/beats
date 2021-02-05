@@ -590,7 +590,10 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Dir = pwd
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
-				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on", "PACKAGES=targz")
+				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				if len(devtools.SelectedPackageTypes) == 1 && devtools.SelectedPackageTypes[0] == devtools.Docker {
+					cmd.Env = append(cmd.Env, "PACKAGES=targz")
+				}
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
