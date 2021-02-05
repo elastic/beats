@@ -21191,6 +21191,20 @@ node
 
 
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.node.version`*::
 +
 --

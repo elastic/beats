@@ -4,6 +4,10 @@
     node
   release: ga
   fields:
+    - name: id
+      type: keyword
+    - name: name
+      type: keyword
     - name: version
       type: keyword
       description: >
