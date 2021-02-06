@@ -741,7 +741,7 @@ def dumpVariables(){
 def isDockerInstalled(){
   if (isUnix()) {
     // TODO: some issues with macosx if(isInstalled(tool: 'docker', flag: '--version')) {
-    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
   } else {
     return false
   }
