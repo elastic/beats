@@ -1014,7 +1014,7 @@ processors:
               - from:
                   - id
                   - acct
-                to: group.target
+                to: group
             event:
               action:
                 - added-group-account-to
@@ -1301,7 +1301,7 @@ processors:
               - from:
                   - id
                   - acct
-                to: group.target
+                to: group
             event:
               action:
                 - deleted-group-account-from
@@ -1369,7 +1369,7 @@ processors:
                   - acct
                   - id
                   - uid
-                to: group.target
+                to: group
             event:
               action:
                 - changed-group-password
@@ -1385,7 +1385,7 @@ processors:
                 to: user
               - from:
                   - uid
-                to: group.target
+                to: group
               - from:
                   - uid
                 to: user.effective

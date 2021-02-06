@@ -148,7 +148,7 @@ if __name__ == '__main__':
             if 'record_types' in entry:
                 types.append(entry['record_types'], proto)
 
-if types['SYSCALL']:
+if 'SYSCALL' in types:
     raise Exception('SYSCALL cannot be specified in record_types')
 
 print('# Auditd record type to ECS mappings')

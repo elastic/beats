@@ -24,7 +24,7 @@
             "creation"
         ],
         "fileset.name": "log",
-        "group.target.id": "1004",
+        "group.id": "1004",
         "input.type": "log",
         "log.offset": 0,
         "process.executable": "/usr/sbin/groupadd",
@@ -62,7 +62,7 @@
             "creation"
         ],
         "fileset.name": "log",
-        "group.target.id": "1004",
+        "group.id": "1004",
         "input.type": "log",
         "log.offset": 212,
         "process.executable": "/usr/sbin/groupadd",
@@ -99,7 +99,7 @@
             "creation"
         ],
         "fileset.name": "log",
-        "group.target.id": "1004",
+        "group.id": "1004",
         "input.type": "log",
         "log.offset": 426,
         "process.executable": "/usr/sbin/groupadd",
