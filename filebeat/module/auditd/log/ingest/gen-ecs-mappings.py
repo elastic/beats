@@ -18,7 +18,7 @@ def extract_object(name: str, source: dict) -> dict:
     r = {}
     for k, v in source.items():
         if k == 'primary' or k == 'secondary':
-          r[name + '.' + k] = v
+            r[name + '.' + k] = v
         elif k == 'what' or k == 'path_index' or k == 'how':
             pass
         else:
@@ -40,7 +40,7 @@ def convert_mappings(m: dict) -> dict:
         'subject.primary': ['auid'],
         'subject.secondary': ['uid'],
     }
-    extra = {} # TODO: Unused (sets client.ip)
+    extra = {}  # TODO: Unused (sets client.ip)
     mappings = []
     has_fields = []
 
@@ -145,7 +145,8 @@ if __name__ == '__main__':
     norms_path = repo_path + "/aucoalesce/normalizations.yaml"
     if not os.path.isfile(norms_path):
         raise Exception('go-libaudit repository doesn\'t contain the normalizations file: ' + norms_path)
-    revision = check_output('git --work-tree={} --git-dir={} describe --tags'.format(quote(repo_path), quote(git_path)), shell=True).decode('utf8').strip()
+    revision = check_output('git --work-tree={} --git-dir={} describe --tags'.format(quote(repo_path),
+                                                                                     quote(git_path)), shell=True).decode('utf8').strip()
     with open(norms_path, 'r') as f:
         norms = yaml.full_load(f)
         types = DefaultDict(list)
