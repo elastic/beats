@@ -103914,6 +103914,13 @@ Fields from Office 365 Management API audit logs.
 
 
 
+*`o365.audit.AADGroupId`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.Actor`*::
 +
 --
@@ -104054,6 +104061,13 @@ type: text
 
 --
 
+*`o365.audit.CommunicationType`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.CorrelationId`*::
 +
 --
@@ -104089,7 +104103,21 @@ type: keyword
 
 --
 
+*`o365.audit.DoNotDistributeEvent`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ErrorNumber`*::
 +
 --
 type: keyword
@@ -104128,6 +104156,13 @@ type: object
 +
 --
 type: keyword
+
+--
+
+*`o365.audit.FromApp`*::
++
+--
+type: boolean
 
 --
 
@@ -104180,6 +104215,13 @@ type: keyword
 
 --
 
+*`o365.audit.IsDocLib`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.Item.*`*::
 +
 --
@@ -104191,6 +104233,13 @@ type: object
 +
 --
 type: object
+
+--
+
+*`o365.audit.ItemCount`*::
++
+--
+type: long
 
 --
 
@@ -104208,7 +104257,42 @@ type: keyword
 
 --
 
+*`o365.audit.ListBaseTemplateType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListBaseType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListColor`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListIcon`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListTitle`*::
 +
 --
 type: keyword
@@ -104489,6 +104573,13 @@ type: keyword
 --
 
 *`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TemplateTypeId`*::
 +
 --
 type: keyword
