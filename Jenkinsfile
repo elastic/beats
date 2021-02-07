@@ -304,9 +304,6 @@ def e2e(Map args = [:]) {
       }
       // Temporary fix to force the version instead picking up the env vironment variable.
       withEnv(['GO_VERSION=1.14.12']) {
-        retryWithSleep(retries: 3, seconds: 5){
-          sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
-        }
         filebeat(output: "docker_logs_${suite}.log", workdir: "${env.WORKSPACE}"){
           sh script: ".ci/scripts/${suite}-test.sh", label: "Run functional tests for ${suite}"
         }
