@@ -1,15 +1,15 @@
 [
     {
         "event.action": "user.created",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
         ],
         "event.module": "zoom",
         "event.timezone": "-02:00",
-        "event.type": [
-            "iam"
-        ],
         "fileset.name": "webhook",
         "input.type": "log",
         "log.offset": 0,
@@ -34,6 +34,9 @@
     },
     {
         "event.action": "user.invitation_accepted",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -41,7 +44,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation"
         ],
         "fileset.name": "webhook",
@@ -66,6 +68,9 @@
     },
     {
         "event.action": "user.updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -73,7 +78,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -104,7 +108,8 @@
     {
         "event.action": "user.settings_updated",
         "event.category": [
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -113,7 +118,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -144,7 +148,8 @@
     {
         "event.action": "user.settings_updated",
         "event.category": [
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -153,7 +158,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -183,6 +187,9 @@
     },
     {
         "event.action": "user.deactivated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -190,7 +197,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -221,6 +227,9 @@
     },
     {
         "event.action": "user.activated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -228,7 +237,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -259,6 +267,9 @@
     },
     {
         "event.action": "user.disassociated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -266,7 +277,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -297,6 +307,9 @@
     },
     {
         "event.action": "user.deleted",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -304,7 +317,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "deletion"
         ],
@@ -335,6 +347,9 @@
     },
     {
         "event.action": "user.presence_status_updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -342,7 +357,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -366,6 +380,9 @@
     },
     {
         "event.action": "user.personal_notes_updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -373,7 +390,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -398,6 +414,9 @@
     },
     {
         "event.action": "user.signed_in",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -405,7 +424,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication",
             "creation",
             "start"
         ],
@@ -430,6 +448,9 @@
     },
     {
         "event.action": "user.signed_out",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -437,7 +458,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication",
             "creation",
             "end"
         ],

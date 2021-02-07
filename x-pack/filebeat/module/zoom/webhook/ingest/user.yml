@@ -5,11 +5,11 @@ processors:
     value: configuration
     if: "['user.settings_updated'].contains(ctx?.event?.action)"
 - append:
-    field: event.type
+    field: event.category
     value: iam
     if: "!['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
 - append:
-    field: event.type
+    field: event.category
     value: authentication
     if: "['user.signed_in', 'user.signed_out'].contains(ctx?.event?.action)"
 - append:
