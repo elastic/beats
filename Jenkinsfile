@@ -297,7 +297,7 @@ def e2e(Map args = [:]) {
   def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
-    git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
+    git(branch: 'feature/metricbeat-goal', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
     try {
       if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
@@ -307,16 +307,15 @@ def e2e(Map args = [:]) {
         retryWithSleep(retries: 3, seconds: 5){
           sh script: """.ci/scripts/install-test-dependencies.sh "${suite}" """, label: "Install test dependencies for ${suite}:${tags}"
         }
-        filebeat(output: "docker_logs_${suite}_${tags}.log", workdir: "${env.WORKSPACE}"){
-          // TBC with the suite to be used
-          sh script: """FORMAT=junit:TEST-${suite}.xml SUITE=${suite} DEVELOPER_MODE=false TIMEOUT_FACTOR=3 LOG_LEVEL=TRACE make -C e2e functional-test""", label: "Run functional tests for ${suite}:${tags}"
+        filebeat(output: "docker_logs_${suite}.log", workdir: "${env.WORKSPACE}"){
+          sh script: ".ci/scripts/${suite}-test.sh", label: "Run functional tests for ${suite}"
         }
       }
     } catch(e) {
       error(e.toString())
     } finally {
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "TEST-*.xml"
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
     }
   }
 }
