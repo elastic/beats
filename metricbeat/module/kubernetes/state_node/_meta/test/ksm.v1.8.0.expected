@@ -29,6 +29,9 @@
 				}
 			},
 			"status": {
+				"diskpressure": "false",
+				"memorypressure": "false",
+				"pidpressure": "false",
 				"ready": "true",
 				"unschedulable": false
 			}
