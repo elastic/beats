@@ -302,8 +302,8 @@ def e2e(Map args = [:]) {
       if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       }
-      // Temporary fix to force the version instead picking up the env vironment variable.
-      withEnv(['GO_VERSION=1.14.12']) {
+      def goVersionForE2E = readFile(".go-version").trim()
+      withEnv(["GO_VERSION=${goVersionForE2E}"]) {
         filebeat(output: "docker_logs_${suite}.log", workdir: "${env.WORKSPACE}"){
           sh script: ".ci/scripts/${suite}-test.sh", label: "Run functional tests for ${suite}"
         }
