@@ -25,6 +25,7 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -62,6 +63,7 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -99,6 +101,7 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -137,6 +140,7 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 8,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -175,6 +179,7 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_email": "somemeail@someemailservice.fjdjf",
@@ -253,6 +258,7 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -291,6 +297,7 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -329,6 +336,7 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -367,6 +375,7 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/recording/share/aaaaaannnnnldglrkgmrmhh",
+        "user.id": "uLobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 1,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -397,13 +406,17 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
+            "uLobbbbbbbbbb_qQsQ",
+            "U0BBBBBBBBBBfrUz1Q"
         ],
         "service.type": "zoom",
         "tags": [
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "coolemail@email.com",
+        "user.full_name": "Cool Person",
+        "user.id": "U0BBBBBBBBBBfrUz1Q",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 120,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -436,13 +449,17 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
+            "uLobbbbbbbbbb_qQsQ",
+            "U0BBBBBBBBBBfrUz1Q"
         ],
         "service.type": "zoom",
         "tags": [
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "coolemail@email.com",
+        "user.full_name": "Cool Person",
+        "user.id": "U0BBBBBBBBBBfrUz1Q",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 120,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
@@ -475,13 +492,17 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "uLobbbbbbbbbb_qQsQ"
+            "uLobbbbbbbbbb_qQsQ",
+            "U0BBBBBBBBBBfrUz1Q"
         ],
         "service.type": "zoom",
         "tags": [
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "coolemail@email.com",
+        "user.full_name": "Cool Person",
+        "user.id": "U0BBBBBBBBBBfrUz1Q",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.recording.duration": 120,
         "zoom.recording.host_id": "uLobbbbbbbbbb_qQsQ",
