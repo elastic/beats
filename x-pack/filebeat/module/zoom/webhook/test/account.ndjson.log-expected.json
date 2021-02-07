@@ -28,6 +28,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "youramazingemailhere@somemail.com",
+        "user.id": "uLohghhRgfgrbTayCX6r2Q_qQsQ",
         "zoom.account.owner_email": "thesubaccountowneremail@somemail.com",
         "zoom.account.owner_id": "e2ZHO5RSGqyfrmFnElxw",
         "zoom.master_account_id": "lq8KK_EoRCq6ByEyA73qCA",
@@ -63,6 +65,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "theoperatoremail@someemail.com",
+        "user.id": "iKoRgfbaTazDX6r2Q_eQsQL",
         "zoom.account.account_alias": "MH",
         "zoom.account.account_name": "Michael Harris",
         "zoom.master_account_id": "abKKcd_IGRCq63yEy673lCA",
@@ -102,6 +106,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "youremail@someemail.com",
+        "user.id": "gdjfdhjLsuhfvhjd",
         "zoom.account.owner_email": "theowneremail@someemail.com",
         "zoom.account.owner_id": "eZbcHO5RSGqyKAUmFnElxw",
         "zoom.master_account_id": "aBcd_dgfoeq6ByEyA73qCA",

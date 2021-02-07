@@ -60,6 +60,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someemail@email.com",
+        "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
         "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
         "zoom.meeting.host_id": "uLoRgfbbTayCX6r2Q_qQsQ",
         "zoom.meeting.id": 111111111,
@@ -98,6 +100,8 @@
             "forwarded"
         ],
         "url.full": "https://zoom.us/j/00000000",
+        "user.email": "someemail@email.com",
+        "user.id": "BBBBBBBBBB",
         "zoom.account_id": "AAAAAAAAAAA",
         "zoom.meeting.id": 155184668,
         "zoom.meeting.start_time": "2019-07-11T20:00:00Z",
@@ -141,6 +145,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someemail@email.com",
+        "user.id": "BBBBBBBBBB",
         "zoom.account_id": "AAAAAAAAAA",
         "zoom.meeting.host_id": "BBBBBBBBBB",
         "zoom.meeting.id": 809321987,
@@ -302,6 +308,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "somemail@email.com",
+        "user.id": "Lobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.meeting.host_id": "uLobbbbbbbbbb_qQsQ",
         "zoom.meeting.id": 150000008,

@@ -25,6 +25,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someemail@email.com",
+        "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
         "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
         "zoom.operator": "someemail@email.com",
         "zoom.operator_id": "uLoRgfbbTayCX6r2Q_qQsQ",
@@ -62,6 +64,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someemail@email.com",
+        "user.id": "BBBBBBBBBB",
         "zoom.account_id": "AAAAAAAAAAA",
         "zoom.old_values.id": 155184668,
         "zoom.old_values.join_url": "https://zoom.us/j/00000000",
@@ -105,6 +109,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someemail@email.com",
+        "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
         "zoom.account_id": "o8KK_AAACq6BBEyA70CA",
         "zoom.operator": "someemail@email.com",
         "zoom.operator_id": "uLoRgfbbTayCX6r2Q_qQsQ",
@@ -390,6 +396,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "somemail@email.com",
+        "user.id": "Lobbbbbbbbbb_qQsQ",
         "zoom.account_id": "lAAAAAAAAAAAAA",
         "zoom.operator": "somemail@email.com",
         "zoom.operator_id": "Lobbbbbbbbbb_qQsQ",
