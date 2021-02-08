@@ -287,28 +287,121 @@ def packagingLinux(Map args = [:]) {
   }
 }
 
-def publishPackages(baseDir){
+
+/**
+* Upload the packages to their snapshot or pull request buckets
+* @param beatsFolder beats folder
+*/
+def publishPackages(beatsFolder){
   def bucketUri = "gs://beats-ci-artifacts/snapshots"
   if (isPR()) {
     bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
   }
-  def beatsFolderName = getBeatsName(baseDir)
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+  def beatsFolderName = getBeatsName(beatsFolder)
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
 
   // Copy those files to another location with the sha commit to test them
   // afterward.
   bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
 }
 
-def uploadPackages(bucketUri, baseDir){
+/**
+* Upload the distribution files to google cloud.
+* TODO: There is a known issue with Google Storage plugin.
+* @param bucketUri the buckets URI.
+* @param beatsFolder the beats folder.
+*/
+def uploadPackages(bucketUri, beatsFolder){
   googleStorageUpload(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
+    pathPrefix: "${beatsFolder}/build/distributions/",
+    pattern: "${beatsFolder}/build/distributions/**/*",
     sharedPublicly: true,
     showInline: true
   )
+}
+
+/**
+* Push the docker images for the given beat.
+* @param beatsFolder beats folder
+*/
+def pushCIDockerImages(beatsFolder){
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    if (beatsFolder.endsWith('auditbeat')) {
+      tagAndPush('auditbeat')
+    } else if (beatsFolder.endsWith('filebeat')) {
+      tagAndPush('filebeat')
+    } else if (beatsFolder.endsWith('heartbeat')) {
+      tagAndPush('heartbeat')
+    } else if ("${beatsFolder}" == "journalbeat"){
+      tagAndPush('journalbeat')
+    } else if (beatsFolder.endsWith('metricbeat')) {
+      tagAndPush('metricbeat')
+    } else if ("${beatsFolder}" == "packetbeat"){
+      tagAndPush('packetbeat')
+    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
+      tagAndPush('elastic-agent')
+    }
+  }
+}
+
+/**
+* Tag and push all the docker images for the given beat.
+* @param beatName name of the Beat
+*/
+def tagAndPush(beatName){
+  def libbetaVer = env.VERSION
+  def aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+
+  libbetaVer += "-SNAPSHOT"
+  aliasVersion += "-SNAPSHOT"
+
+  def tagName = "${libbetaVer}"
+  if (isPR()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    doTagAndPush(beatName, variant, libbetaVer, tagName)
+    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
+
+    if (!isPR() && aliasVersion != "") {
+      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    }
+  }
+}
+
+/**
+* Tag and push the given sourceTag docker image with the tag name targetTag.
+* @param beatName name of the Beat
+* @param variant name of the variant used to build the docker image name
+* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
+* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
+*/
+def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+
+  def iterations = 0
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    iterations++
+    def status = sh(label: "Change tag and push ${targetName}", script: """
+      if docker image inspect "${sourceName}" &> /dev/null ; then
+        docker tag ${sourceName} ${targetName}
+        docker push ${targetName}
+      else
+        echo 'docker image ${sourceName} does not exist'
+      fi
+    """, returnStatus: true)
+    if ( status > 0 && iterations < 3) {
+      error("tag and push failed for ${beatName}, retry")
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+    }
+  }
 }
 
 /**
@@ -378,8 +471,9 @@ def target(Map args = [:]) {
         }
         if(isE2E) {
           e2e(args)
-          publishPackages("${directory}")
         }
+        publishPackages("${directory}")
+        pushCIDockerImages("${directory}")
       }
     }
   }
