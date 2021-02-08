@@ -34,7 +34,7 @@ response.split:
 
 cursor:
   timestamp:
-    value: '[[ .last_response.header.X-TAXII-Date-Added-Last ]]'
+    value: '[[ .last_response.header.Get "X-TAXII-Date-Added-Last" ]]'
 
 {{ else if eq .input "file" }}
 
