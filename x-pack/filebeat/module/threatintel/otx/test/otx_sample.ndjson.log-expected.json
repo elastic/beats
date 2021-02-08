@@ -15,9 +15,7 @@
         ],
         "threatintel.indicator.ip": "86.104.194.30",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -55,9 +53,7 @@
         ],
         "threatintel.indicator.type": "unknown",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.indicator": "ip.anysrc.net",
-        "threatintel.otx.title": null
+        "threatintel.otx.indicator": "ip.anysrc.net"
     },
     {
         "event.category": "threat",
@@ -75,9 +71,7 @@
         ],
         "threatintel.indicator.ip": "107.173.58.176",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -95,9 +89,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "d8c70ca70fd3555a0828fede6cc1f59e2c320ede80157039b6a2f09c336d5f7a",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -116,8 +108,7 @@
         "threatintel.indicator.file.hash.md5": "f8e58af3ffefd4037fef246e93a55dc8",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": "MD5 of df9b37477a83189cd4541674e64ce29bf7bf98338ed0d635276660e0c6419d09",
-        "threatintel.otx.title": null
+        "threatintel.otx.description": "MD5 of df9b37477a83189cd4541674e64ce29bf7bf98338ed0d635276660e0c6419d09"
     },
     {
         "event.category": "threat",
@@ -135,9 +126,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "1c62f004d0c9b91d3467b1b8106772e667e7e2075470c2ec7982b63573c90c54",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -156,7 +145,6 @@
         "threatintel.indicator.file.hash.sha256": "8d24a14f2600482d0231396b6350cf21773335ec2f0b8919763317fdab78baae",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -175,9 +163,7 @@
         ],
         "threatintel.indicator.ip": "213.252.244.38",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -195,9 +181,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "c758ec922b173820374e552c2f015ac53cc5d9f99cc92080e608652aaa63695b",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -215,9 +199,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -236,8 +218,7 @@
         "threatintel.indicator.file.hash.md5": "aeb08b0651bc8a13dcf5e5f6c0d482f8",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": "MD5 of 0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6",
-        "threatintel.otx.title": null
+        "threatintel.otx.description": "MD5 of 0df586aa0334dcbe047d24ce859d00e537fdb5e0ca41886dab27479b6fc61ba6"
     },
     {
         "event.category": "threat",
@@ -255,9 +236,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "6df5e1a017dff52020c7ff6ad92fdd37494e31769e1be242f6b23d1ea2d60140",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -275,9 +254,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "c72fef3835f65cb380f6920b22c3488554d1af6d298562ccee92284f265c9619",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -295,9 +272,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "e711fcd0f182b214c6ec74011a395f4c853068d59eb7c57f90c4a3e1de64434a",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -315,9 +290,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "d3ec8f4a46b21fb189fc3d58f3d87bf9897653ecdf90b7952dcc71f3b4023b4e",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -335,9 +308,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "70447996722e5c04514d20b7a429d162b46546002fb0c87f512b40f16bac99bb",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -436,7 +407,6 @@
         "threatintel.indicator.file.hash.sha256": "29ff1903832827e328ad9ec05fdf268eadd6db8b613597cf65f8740c211be413",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "vad_contains_network_strings"
     },
     {
@@ -455,9 +425,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "b105891f90b2a8730bbadf02b5adeccbba539883bf75dec2ff7a5a97625dd222",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -475,9 +443,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "e4db5405ac7ab517d43722e1ca8d653ea4a32802bc8a5410d032275eedc7b7ee",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -496,7 +462,6 @@
         "threatintel.indicator.file.hash.sha256": "465e7c1e36899284da5c4425dfd687af2496f397fe60c85ea2b4d85dff5a08aa",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win.Malware.TrickbotSystemInfo-6335590-0"
     },
     {
@@ -515,9 +480,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "5051906d6ed1b2ae9c9a9f070ef73c9be8f591d2e41d144649a0dc96e28d0400",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -575,9 +538,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "8d3f68b16f0710f858d8c1d2c699260e6f43161a5510abb0e7ba567bd72c965b",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -635,9 +596,7 @@
         ],
         "threatintel.indicator.ip": "185.25.50.167",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -655,9 +614,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "d35a30264c0698709ad554489004e0077e263d354ced0c54552a0b500f91ecc0",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -675,9 +632,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "5264b455f453820be629a324196131492ff03c80491e823ac06657c9387250dd",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -696,7 +651,6 @@
         "threatintel.indicator.file.hash.sha256": "1455091954ecf9ccd6fe60cb8e982d9cfb4b3dc8414443ccfdfc444079829d56",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Trojan:Win32/Occamy.B"
     },
     {
@@ -716,7 +670,6 @@
         "threatintel.indicator.file.hash.sha256": "3012f472969327d5f8c9dac63b8ea9c5cb0de002d16c120a6bba4685120f58b4",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -735,9 +688,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "b8e463789a076b16a90d1aae73cea9d3880ac0ead1fd16587b8cd79e37a1a3d8",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -756,7 +707,6 @@
         "threatintel.indicator.file.hash.sha256": "113af75f13547be184822f1268f984b79f35965a1b1f963d23b50a09741b0aec",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -776,7 +726,6 @@
         "threatintel.indicator.file.hash.sha256": "9b86a50b36aea5cc4cb60573a3660cf799a9ec1f69a3d4572d3dc277361a0ad2",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -795,9 +744,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "c51024bb119211c335f95e731cfa9a744fcdb645a57d35fb379d01b7dbdd098e",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -895,9 +842,7 @@
         ],
         "threatintel.indicator.domain": "maper.info",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -915,9 +860,7 @@
         ],
         "threatintel.indicator.ip": "213.252.244.126",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -935,9 +878,7 @@
         ],
         "threatintel.indicator.ip": "78.129.139.131",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -956,7 +897,6 @@
         "threatintel.indicator.file.hash.sha256": "9af8a93519d22ed04ffb9ccf6861c9df1b77dc5d22e0aeaff4a582dbf8660ba6",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -976,7 +916,6 @@
         "threatintel.indicator.file.hash.sha256": "be9fb556a3c7aef0329e768d7f903e7dd42a821abc663e11fb637ce33b007087",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -996,7 +935,6 @@
         "threatintel.indicator.file.hash.sha256": "3bfec096c4837d1e6485fe0ae0ea6f1c0b44edc611d4f2204cc9cf73c985cbc2",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -1016,7 +954,6 @@
         "threatintel.indicator.file.hash.sha256": "dff2e39b2e008ea89a3d6b36dcd9b8c927fb501d60c1ad5a52ed1ffe225da2e2",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -1036,7 +973,6 @@
         "threatintel.indicator.file.hash.sha256": "6b4d271a48d118843aee3dee4481fa2930732ed7075db3241a8991418f00d92b",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -1056,7 +992,6 @@
         "threatintel.indicator.file.hash.sha256": "26de4265303491bed1424d85b263481ac153c2b3513f9ee48ffb42c12312ac43",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -1076,7 +1011,6 @@
         "threatintel.indicator.file.hash.sha256": "02f54da6c6f2f87ff7b713d46e058dedac1cedabd693643bb7f6dfe994b2105d",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "xor_0x20_xord_javascript"
     },
     {
@@ -1095,9 +1029,7 @@
         ],
         "threatintel.indicator.ip": "103.13.67.4",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1115,9 +1047,7 @@
         ],
         "threatintel.indicator.ip": "80.90.87.201",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1135,9 +1065,7 @@
         ],
         "threatintel.indicator.ip": "80.80.163.182",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1155,9 +1083,7 @@
         ],
         "threatintel.indicator.ip": "91.187.114.210",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1175,9 +1101,7 @@
         ],
         "threatintel.indicator.ip": "170.238.117.187",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1195,9 +1119,7 @@
         ],
         "threatintel.indicator.file.hash.sha256": "e999b83629355ec7ff3b6fda465ef53ce6992c9327344fbf124f7eb37808389d",
         "threatintel.indicator.type": "file",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1215,9 +1137,7 @@
         ],
         "threatintel.indicator.ip": "103.84.238.3",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1235,9 +1155,7 @@
         ],
         "threatintel.indicator.ip": "179.43.158.171",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1255,9 +1173,7 @@
         ],
         "threatintel.indicator.ip": "198.211.116.199",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1276,7 +1192,6 @@
         "threatintel.indicator.ip": "203.176.135.102",
         "threatintel.indicator.type": "ipv4-addr",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Trickbot"
     },
     {
@@ -1295,9 +1210,7 @@
         ],
         "threatintel.indicator.domain": "fotmailz.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1315,9 +1228,7 @@
         ],
         "threatintel.indicator.domain": "pori89g5jqo3v8.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1335,9 +1246,7 @@
         ],
         "threatintel.indicator.domain": "sebco.co.ke",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1356,7 +1265,6 @@
         "threatintel.indicator.ip": "177.74.232.124",
         "threatintel.indicator.type": "ipv4-addr",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Trickbot"
     },
     {
@@ -1375,9 +1283,7 @@
         ],
         "threatintel.indicator.domain": "chishir.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1395,9 +1301,7 @@
         ],
         "threatintel.indicator.domain": "kostunivo.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1415,9 +1319,7 @@
         ],
         "threatintel.indicator.domain": "mangoclone.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1435,9 +1337,7 @@
         ],
         "threatintel.indicator.domain": "onixcellent.com",
         "threatintel.indicator.type": "domain-name",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1456,7 +1356,6 @@
         "threatintel.indicator.file.hash.sha1": "fc0efd612ad528795472e99cae5944b68b8e26dc",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -1476,7 +1375,6 @@
         "threatintel.indicator.file.hash.sha1": "24d4bbc982a6a561f0426a683b9617de1a96a74a",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Sf:ShellCode-DZ\\ [Trj]"
     },
     {
@@ -1496,7 +1394,6 @@
         "threatintel.indicator.file.hash.sha1": "fa98074dc18ad7e2d357b5d168c00a91256d87d1",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -1516,7 +1413,6 @@
         "threatintel.indicator.file.hash.sha1": "e5dc7c8bfa285b61dda1618f0ade9c256be75d1a",
         "threatintel.indicator.type": "file",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Win64:Malware-gen"
     },
     {
@@ -1536,7 +1432,6 @@
         "threatintel.indicator.ip": "96.9.77.142",
         "threatintel.indicator.type": "ipv4-addr",
         "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
         "threatintel.otx.title": "Trickbot"
     },
     {
@@ -1555,9 +1450,7 @@
         ],
         "threatintel.indicator.ip": "36.89.106.69",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
@@ -1575,9 +1468,7 @@
         ],
         "threatintel.indicator.ip": "96.9.73.73",
         "threatintel.indicator.type": "ipv4-addr",
-        "threatintel.otx.content": "",
-        "threatintel.otx.description": null,
-        "threatintel.otx.title": null
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
