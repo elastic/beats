@@ -89,5 +89,4 @@ rules:
     - output
     - keystore
 
-when: length(${metricbeat.modules}) > 0 and hasKey(${output}, 'elasticsearch',
-  'redis', 'kafka', 'logstash')
+when: length(${metricbeat.modules}) > 0 and hasKey(${output}, 'elasticsearch', 'redis', 'kafka')

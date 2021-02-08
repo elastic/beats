@@ -18,5 +18,4 @@ rules:
     - journalbeat
     - output
     - keystore
-when: HasItems(%{[journalbeat.inputs]}) && HasNamespace('output', 'elasticsearch',
-  'redis', 'kafka', 'logstash')
+when: HasItems(%{[journalbeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis', 'kafka')

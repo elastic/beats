@@ -31,4 +31,4 @@ rules:
     - output
     - keystore
 when: HasItems(%{[auditbeat.modules]}) && HasNamespace('output', 'elasticsearch',
-  'redis', 'kafka', 'logstash')
+  'redis', 'kafka')

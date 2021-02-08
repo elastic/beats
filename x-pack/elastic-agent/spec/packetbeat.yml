@@ -16,6 +16,5 @@ rules:
         - inputs
         - output
 
-when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
-  'kafka', 'logstash')
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis', 'kafka')
 
