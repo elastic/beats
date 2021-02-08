@@ -724,6 +724,14 @@ processors:
       value: '{{aws.cloudtrail.flattened.response_elements.user.userId}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "CreateUser"'
+  #
+  # DeleteAccessKey
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "DeleteAccessKey"'
 
   - remove:
       field:
