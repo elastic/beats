@@ -225,28 +225,16 @@ processors:
       field: "json.vpcEndpointId"
       target_field: "aws.cloudtrail.vpc_endpoint_id"
       ignore_failure: true
-  - script:
-      lang: painless
-      ignore_failure: true
-      source: >-
-        void addRelatedUser(def ctx, String userName) {
-          if (ctx.related == null) {
-            Map map = new HashMap();
-            ctx.put("related", map);
-          }
-          if (ctx.related.user == null) {
-            ArrayList al = new ArrayList();
-            ctx.related.put("user", al);
-          }
-          ctx.related.user.add(userName);
-        }
-        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.userName != null) {
-          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.userName);
-        }
-        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.newUserName != null) {
-          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.newUserName);
-        }
-
+  - append:
+      field: related.user
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      allow_duplicates: false
+      if: 'ctx.aws?.cloudtrail?.flattened?.request_parameters?.userName != null'
+  - append:
+      field: related.user
+      value: '{{aws.cloudtrail.flattened.request_parameters.newUserName}}'
+      allow_duplicates: false
+      if: 'ctx.aws?.cloudtrail?.flattened?.request_parameters?.newUserName != null'
   - script:
       lang: painless
       ignore_failure: true
