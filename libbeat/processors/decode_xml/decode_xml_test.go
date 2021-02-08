@@ -287,23 +287,23 @@ func TestDecodeXML(t *testing.T) {
 			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
-			description: "Test when the XML field is empty, ignore mising false",
+			description: "Test when the XML field is empty, IgnoreMissing false",
 			config: decodeXMLConfig{
-				Field:         "message",
+				Field:         "message2",
 				IgnoreMissing: false,
 			},
 			Input: common.MapStr{
-				"message": "",
+				"message": "testing message",
 			},
 			Output: common.MapStr{
-				"message": (map[string]interface{})(nil),
-				"error":   "failed to decode fields in decode_xml processor: error decoding XML field: EOF",
+				"message": "testing message",
+				"error":   "key not found; field value is not a string",
 			},
 			error:        true,
-			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: EOF",
+			errorMessage: "key not found; field value is not a string",
 		},
 		{
-			description: "Test when the XML field is empty ignore missing true",
+			description: "Test when the XML field is empty IgnoreMissing true",
 			config: decodeXMLConfig{
 				Field:         "message2",
 				IgnoreMissing: true,
