@@ -27,6 +27,11 @@ processors:
       field: "json.userIdentity.type"
       target_field: "aws.cloudtrail.user_identity.type"
       ignore_failure: true
+  - append:
+      field: related.user
+      value: '{{json.userIdentity.userName}}'
+      allow_duplicates: false
+      if: 'ctx.json?.userIdentity?.userName != null'
   - rename:
       field: "json.userIdentity.userName"
       target_field: "user.name"
