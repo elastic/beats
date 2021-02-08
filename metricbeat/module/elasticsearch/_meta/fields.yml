@@ -51,6 +51,9 @@
         - name: node
           type: alias
           path: elasticsearch.node.name
+        - name: shard
+          type: alias
+          path: elasticsearch.shard.number
     - name: cluster_stats
       type: group
       fields:
