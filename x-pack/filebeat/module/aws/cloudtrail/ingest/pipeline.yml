@@ -742,6 +742,24 @@ processors:
       ignore_empty_value: true
       if: 'ctx.event?.action == "DeleteGroup"'
 
+  #
+  # DeleteSSHPublicKey
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "DeleteSSHPublicKey"'
+
+  #
+  # DeleteUser
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "DeleteUser"'
+
   - remove:
       field:
         - "json"
