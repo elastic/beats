@@ -29,8 +29,18 @@ FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
 RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
-RUN curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && \
-    chmod +x /usr/local/bin/jq
+RUN case "$(arch)" in \
+    x86_64) \
+        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && \
+        chmod +x /usr/local/bin/jq \
+        ;; \
+    aarch64) \
+        microdnf install -y jq ; \
+        ;; \
+    *) \
+        echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+        ;; \
+  esac ;
 {{- else }}
 # Installing jq needs to be installed after epel-release and cannot be in the same yum install command.
 RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y && yum install --setopt=tsflags=nodocs -y epel-release &&  yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
