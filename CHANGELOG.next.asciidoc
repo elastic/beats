@@ -380,6 +380,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - Fix various processing errors in the Suricata module. {pull}23236[23236]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
+- Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 
 *Heartbeat*
 
@@ -841,6 +842,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update aws/s3access to ECS 1.8. {issue}23118[23118] {pull}23920[23920]
 - Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
 - Updated aws/cloudtrail fileset to ECS 1.8. {issue}23118[23118] {pull}23911[23911]
+- Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 
 *Heartbeat*
 
