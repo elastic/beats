@@ -242,10 +242,10 @@ func TestDecodeXML(t *testing.T) {
 			errorMessage: "",
 		},
 		{
-			description: "Decoding with broken XML format, with AddErrorKey enabled",
+			description: "Decoding with broken XML format, with IgnoreFailure false",
 			config: decodeXMLConfig{
-				Field:       "message",
-				AddErrorKey: true,
+				Field:         "message",
+				IgnoreFailure: false,
 			},
 			Input: common.MapStr{
 				"message": `<?xml version="1.0"?>
@@ -265,10 +265,10 @@ func TestDecodeXML(t *testing.T) {
 			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
-			description: "Decoding with broken XML format, with AddErrorKey disabled",
+			description: "Decoding with broken XML format, with IgnoreFailure true",
 			config: decodeXMLConfig{
-				Field:       "message",
-				AddErrorKey: false,
+				Field:         "message",
+				IgnoreFailure: true,
 			},
 			Input: common.MapStr{
 				"message": `<?xml version="1.0"?>
@@ -287,23 +287,57 @@ func TestDecodeXML(t *testing.T) {
 			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
-			description: "Test when the XML field is empty",
+			description: "Test when the XML field is empty, ignore mising false",
 			config: decodeXMLConfig{
-				Field: "message",
+				Field:         "message",
+				IgnoreMissing: false,
 			},
 			Input: common.MapStr{
 				"message": "",
 			},
 			Output: common.MapStr{
 				"message": (map[string]interface{})(nil),
+				"error":   "failed to decode fields in decode_xml processor: error decoding XML field: EOF",
 			},
 			error:        true,
 			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: EOF",
 		},
 		{
-			description: "Test when the XML field not a string",
+			description: "Test when the XML field is empty ignore missing true",
 			config: decodeXMLConfig{
-				Field: "message",
+				Field:         "message2",
+				IgnoreMissing: true,
+			},
+			Input: common.MapStr{
+				"message": "testing message",
+			},
+			Output: common.MapStr{
+				"message": "testing message",
+			},
+			error:        false,
+			errorMessage: "",
+		},
+		{
+			description: "Test when the XML field not a string, Ignorefailure false",
+			config: decodeXMLConfig{
+				Field:         "message",
+				IgnoreFailure: false,
+			},
+			Input: common.MapStr{
+				"message": 1,
+			},
+			Output: common.MapStr{
+				"message": 1,
+				"error":   "field value is not a string",
+			},
+			error:        true,
+			errorMessage: "field value is not a string",
+		},
+		{
+			description: "Test when the XML field not a string, IgnoreFailure true",
+			config: decodeXMLConfig{
+				Field:         "message",
+				IgnoreFailure: true,
 			},
 			Input: common.MapStr{
 				"message": 1,

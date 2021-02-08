@@ -82,7 +82,10 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 	var errs []error
 	var field = x.config.Field
 	data, err := event.GetValue(field)
-	if err != nil && errors.Cause(err) != common.ErrKeyNotFound {
+	if err != nil {
+		if x.config.IgnoreMissing && err == common.ErrKeyNotFound {
+			return event, nil
+		}
 		errs = append(errs, err)
 	}
 	text, ok := data.(string)
@@ -112,7 +115,12 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 		if target != "" {
 			_, err = event.PutValue(target, xmloutput)
 		} else {
-			jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, x.config.AddErrorKey)
+			if x.config.IgnoreFailure {
+				jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, false)
+			} else {
+				jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, true)
+			}
+
 		}
 
 		if err != nil {
@@ -125,7 +133,7 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 	// If error has not already been set, add errors if ignore_failure is false.
 	if len(errs) > 0 {
 		var combinedErrors = multierr.Combine(errs...)
-		if x.config.AddErrorKey {
+		if !x.config.IgnoreFailure {
 			event.Fields["error"] = combinedErrors.Error()
 		}
 		return event, combinedErrors
