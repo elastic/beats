@@ -271,6 +271,9 @@ def clean_keys(obj):
         "gsuite.user_accounts",
         "zoom.webhook",
         "threatintel.otx",
+        "threatintel.abuseurl",
+        "threatintel.abusemalware",
+        "threatintel.anomali",
         "snyk.vulnerabilities"
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
