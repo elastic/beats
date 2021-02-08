@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package xml
+package mxj
 
 import (
 	"github.com/clbanning/mxj/v2"
@@ -23,6 +23,8 @@ import (
 
 // UnmarshalXML takes a slice of bytes, and returns a map[string]interface{}.
 // If the slice is not valid XML, it will return an error.
+// This uses the MXJ library compared to the built-in encoding/xml since the latter does not
+// support unmarshalling XML to an unknown or empty struct/interface.
 func UnmarshalXML(body []byte, prepend bool, toLower bool) (obj map[string]interface{}, err error) {
 	var xmlobj mxj.Map
 	// Disables attribute prefixes and forces all lines to lowercase to meet ECS standards

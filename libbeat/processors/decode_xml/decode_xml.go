@@ -27,11 +27,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/enc/mxj"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	"github.com/elastic/beats/v7/libbeat/processors/decode_xml/xml"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
@@ -133,7 +133,7 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (x *decodeXML) decodeField(data string) (decodedData map[string]interface{}, err error) {
-	decodedData, err = xml.UnmarshalXML([]byte(data), false, x.config.ToLower)
+	decodedData, err = mxj.UnmarshalXML([]byte(data), false, x.config.ToLower)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding XML field: %w", err)
 	}

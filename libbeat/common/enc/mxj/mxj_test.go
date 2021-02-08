@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package xml
+package mxj
 
 import (
 	"testing"
