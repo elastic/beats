@@ -130,11 +130,17 @@ processors:
     field: threatintel.indicator.type
     value: url
     if: "ctx?.threatintel?.indicator?.type == null && ['url', 'link', 'uri'].contains(ctx?.threatintel?.misp?.attribute?.type)"
+- uri_parts:
+    field: threatintel.misp.attribute.value
+    target_field: threatintel.indicator.url
+    keep_original: true
+    remove_if_successful: true
+    if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'
 - rename:
     field: threatintel.misp.attribute.value
     target_field: threatintel.indicator.url.full
     ignore_missing: true
-    if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
+    if: "ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null && ctx?.threatintel?.misp?.attribute?.type != 'uri'"
 
 ## Regkey indicator operations
 - set:

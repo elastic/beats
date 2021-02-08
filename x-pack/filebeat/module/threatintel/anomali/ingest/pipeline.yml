@@ -58,7 +58,7 @@ processors:
 - grok:
     field: threatintel.anomali.pattern
     patterns: 
-      - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}%{QUOTEDSTRING:_tmp.threatvalue}\\]"
+      - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}'%{DATA:_tmp.threatvalue}'\\]"
 - rename:
     field: _tmp.threattype
     target_field: threatintel.indicator.type
@@ -68,11 +68,17 @@ processors:
     target_field: threatintel.indicator.ip
     ignore_missing: true
     if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threatintel?.indicator?.type)"
+- uri_parts:
+    field: _tmp.threatvalue
+    target_field: threatintel.indicator.url
+    keep_original: true
+    remove_if_successful: true
+    if: ctx?.threatintel?.indicator?.type == 'url'
 - rename:
     field: _tmp.threatvalue
     target_field: threatintel.indicator.url.full
     ignore_missing: true
-    if: ctx?.threatintel?.indicator?.type == 'url'
+    if: ctx?.threatintel?.indicator?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null
 - rename:
     field: _tmp.threatvalue
     target_field: threatintel.indicator.email.address
