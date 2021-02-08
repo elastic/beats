@@ -7,6 +7,26 @@
     type: keyword
     description: >
       The ID of the indicator.
+  - name: name
+    type: keyword
+    description: >
+      The name of the indicator.
+  - name: pattern
+    type: keyword
+    description: >
+      The pattern ID of the indicator.
+  - name: valid_from
+    type: date
+    description: >
+      When the indicator was first found or is considered valid.
+  - name: modified
+    type: date
+    description: >
+      When the indicator was last modified
+  - name: labels
+    type: keyword
+    description: >
+      The labels related to the indicator
   - name: indicator
     type: keyword
     description: >
@@ -27,3 +47,7 @@
     type: keyword
     description: >
       The indicator type, can for example be "domain, email, FileHash-SHA256".
+  - name: object_marking_refs
+    type: keyword
+    description: >
+      The STIX reference object.

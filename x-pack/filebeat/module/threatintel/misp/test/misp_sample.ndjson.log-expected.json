@@ -11,21 +11,16 @@
         "log.offset": 0,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:ransomware=Dharma Ransomware",
             "type:OSINT",
             "tlp:white",
             "malware_classification:malware-category=Ransomware",
             "osint:source-type=blog - post"
         ],
-        "threat.indicator.file.hash.md5": "f2679bdabe46e10edc6352fff3c829bc",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "file",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Payload delivery",
         "threatintel.misp.attribute.comment": "- Xchecked via VT: a683494fc0d017fd3b4638f8b84caaaac145cc28bc211bd7361723368b4bb21e",
         "threatintel.misp.attribute.deleted": false,
@@ -71,25 +66,16 @@
         "log.offset": 8248,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:ransomware=Dharma Ransomware",
             "type:OSINT",
             "tlp:white",
             "malware_classification:malware-category=Ransomware",
             "osint:source-type=blog - post"
         ],
-        "threat.indicator.domain": "your-ip.getmyip.com",
-        "threat.indicator.ip": "178.128.103.74",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": [
-            "domain-name",
-            "ipv4-addr"
-        ],
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "1st stage",
         "threatintel.misp.attribute.deleted": false,
@@ -136,18 +122,13 @@
         "log.offset": 16434,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:tool=Turla",
             "tlp:white"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "url",
-        "threat.indicator.url.full": "https://www.virustotal.com/file/7fa4482bfbca550ce296d8e791b1091d60d733ea8042167fd0eb853530584452/analysis/1486030116/",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "Carbon sample - Xchecked via VT: a08b8371ead1919500a4759c2f46553620d5a9d9",
         "threatintel.misp.attribute.deleted": false,
@@ -193,18 +174,13 @@
         "log.offset": 20139,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.file.hash.sha256": "0a1103bc90725d4665b932f88e81d39eafa5823b0de3ab146e2d4548b7da79a0",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": "file",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -250,19 +226,13 @@
         "log.offset": 21711,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": [
-            "ipv4-addr"
-        ],
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -309,17 +279,13 @@
         "log.offset": 23232,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": "unknown",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -366,17 +332,13 @@
         "log.offset": 24759,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": "unknown",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -423,18 +385,13 @@
         "log.offset": 26271,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.file.hash.sha1": "0ea76f1586c008932d90c991dfdd5042f3aac8ea",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": "file",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "External analysis",
         "threatintel.misp.attribute.comment": "Automatically added (via 7915aabb2e66ff14841e4ef0fbff7486)",
         "threatintel.misp.attribute.deleted": false,
@@ -480,19 +437,13 @@
         "log.offset": 27875,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "type:OSINT",
             "tlp:green"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "green"
         ],
-        "threat.indicator.type": [
-            "domain-name"
-        ],
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -539,19 +490,14 @@
         "log.offset": 29397,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:threat-actor=Turla Group",
             "Turla",
             "tlp:white"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 0,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "url",
-        "threat.indicator.url.full": "http://get.adobe.com/stats/AbfFcBebD/?q=",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "Fake adobe URL",
         "threatintel.misp.attribute.deleted": false,
@@ -597,19 +543,14 @@
         "log.offset": 31486,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:threat-actor=Turla Group",
             "Turla",
             "tlp:white"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 0,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "url",
-        "threat.indicator.url.path": "/scripts/m/query.php?id=",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "Win32 backdoor C&C URI",
         "threatintel.misp.attribute.deleted": false,
@@ -622,6 +563,7 @@
         "threatintel.misp.attribute.timestamp": "1515429089",
         "threatintel.misp.attribute.to_ids": false,
         "threatintel.misp.attribute.type": "uri",
+        "threatintel.misp.attribute.value": "/scripts/m/query.php?id=",
         "threatintel.misp.attribute_count": "61",
         "threatintel.misp.date": "2018-01-08",
         "threatintel.misp.disable_correlation": false,
@@ -655,19 +597,14 @@
         "log.offset": 33567,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "misp-galaxy:threat-actor=Turla Group",
             "Turla",
             "tlp:white"
         ],
-        "threat.indicator.file.name": "google_update_checker.js|c51d288469df9f25e2fb7ac491918b3e579282ea",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 0,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "file",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Artifacts dropped",
         "threatintel.misp.attribute.comment": "JavaScript backdoor",
         "threatintel.misp.attribute.deleted": false,
@@ -713,17 +650,12 @@
         "log.offset": 35697,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "tlp:white"
         ],
-        "threat.indicator.email.address": "claudiobonadio88@gmail.com",
-        "threat.indicator.provider": "misp",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "email-addr",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Payload delivery",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -769,17 +701,12 @@
         "log.offset": 37011,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-misp",
-            "forwarded",
             "tlp:white"
         ],
-        "threat.indicator.provider": "misp",
-        "threat.indicator.registry.key": "HKLM\\SOFTWARE\\Microsoft\\Active",
-        "threat.indicator.scanner_stats": 2,
-        "threat.indicator.tlp": [
+        "threatintel.indicator.marking.tlp": [
             "white"
         ],
-        "threat.indicator.type": "windows-registry-key",
+        "threatintel.indicator.type": "unknown",
         "threatintel.misp.attribute.category": "Artifacts dropped",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,

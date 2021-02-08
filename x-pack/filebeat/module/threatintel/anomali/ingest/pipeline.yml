@@ -29,42 +29,72 @@ processors:
 # Threat ECS Fields #
 #####################
 ## File indicator operations
+- date:
+    field: threatintel.anomali.created
+    formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    if: "ctx?.threatintel?.anomali?.created != null"
+- date:
+    field: threatintel.anomali.modified
+    target_field: threatintel.anomali.modified
+    formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    if: "ctx?.threatintel?.anomali?.created != null"
+- date:
+    field: threatintel.anomali.valid_from
+    target_field: threatintel.anomali.valid_from
+    formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    if: "ctx?.threatintel?.anomali?.created != null"
 - grok:
     field: threatintel.anomali.pattern
     patterns: 
       - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}%{QUOTEDSTRING:_tmp.threatvalue}\\]"
 - rename:
     field: _tmp.threattype
-    target_field: threat.indicator.type
+    target_field: threatintel.indicator.type
     ignore_missing: true
 - rename:
     field: _tmp.threatvalue
-    target_field: threat.indicator.ip
+    target_field: threatintel.indicator.ip
     ignore_missing: true
-    if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threat?.indicator?.type)"
+    if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threatintel?.indicator?.type)"
 - rename:
     field: _tmp.threatvalue
-    target_field: threat.indicator.url.full
+    target_field: threatintel.indicator.url.full
     ignore_missing: true
-    if: ctx?.threat?.indicator?.type == 'url'
+    if: ctx?.threatintel?.indicator?.type == 'url'
 - rename:
     field: _tmp.threatvalue
-    target_field: threat.indicator.email.address
+    target_field: threatintel.indicator.email.address
     ignore_missing: true
-    if: ctx?.threat?.indicator?.type == 'email-addr'
+    if: ctx?.threatintel?.indicator?.type == 'email-addr'
 - rename:
     field: _tmp.threatvalue
-    target_field: threat.indicator.domain
+    target_field: threatintel.indicator.domain
     ignore_missing: true
-    if: ctx?.threat?.indicator?.type == 'domain-name'
+    if: ctx?.threatintel?.indicator?.type == 'domain-name'
 - set:
-    field: ctx.threat.indicator.type
+    field: threatintel.indicator.type
     value: unknown
-    if: ctx?.threat?.indicator?.type == null
+    if: ctx?.threatintel?.indicator?.type == null
 ######################
 # Cleanup processors #
 ######################
-
+- remove:
+    field:
+    - threatintel.anomali.created
+    - message
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message
