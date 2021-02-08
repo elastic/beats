@@ -724,6 +724,7 @@ processors:
       value: '{{aws.cloudtrail.flattened.response_elements.user.userId}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "CreateUser"'
+
   #
   # DeleteAccessKey
   #
@@ -782,6 +783,43 @@ processors:
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "RemoveUserFromGroup"'
+  #
+  # UpdateAccessKey
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "UpdateAccessKey"'
+
+  #
+  # UpdateGroup
+  # TODO: This can be updated when/if group.target.* and group.changes.*
+  #       fields are added to ECS.
+  #
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "UpdateGroup"'
+
+  #
+  # UpdateLoginProfile
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "UpdateLoginProfile"'
+
+  #
+  # UpdateSSHPublicKey
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "UpdateSSHPublicKey"'
 
   - remove:
       field:

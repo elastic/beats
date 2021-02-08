@@ -28,6 +28,7 @@
             "change"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
@@ -74,6 +75,7 @@
             "change"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP2",
         "input.type": "log",
         "log.offset": 683,
         "service.type": "aws",
