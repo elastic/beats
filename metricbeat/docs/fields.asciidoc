@@ -20536,6 +20536,13 @@ type: keyword
 --
 
 
+*`elasticsearch.cluster.stats.stack.apm.found`*::
++
+--
+type: boolean
+
+--
+
 *`elasticsearch.cluster.stats.stack.xpack.ccr.available`*::
 +
 --
@@ -21182,6 +21189,20 @@ type: long
 
 --
 
+*`elasticsearch.index.recovery.stop_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.start_time.ms`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.recovery.id`*::
 +
 --
@@ -21625,20 +21646,6 @@ type: long
 node
 
 
-
-*`elasticsearch.node.id`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.node.name`*::
-+
---
-type: keyword
-
---
 
 *`elasticsearch.node.version`*::
 +
@@ -34538,10 +34545,124 @@ alias to: logstash.node.stats.logstash.version
 
 --
 
-*`logstash_stats.pipelines`*::
+
+*`logstash_stats.pipelines.id`*::
 +
 --
-type: nested
+type: alias
+
+alias to: logstash.node.stats.pipelines.id
+
+--
+
+*`logstash_stats.pipelines.hash`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.hash
+
+--
+
+
+*`logstash_stats.pipelines.queue.type`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.type
+
+--
+
+*`logstash_stats.pipelines.queue.queue_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.queue_size_in_bytes
+
+--
+
+*`logstash_stats.pipelines.queue.max_queue_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.max_queue_size_in_bytes
+
+--
+
+
+*`logstash_stats.pipelines.events.out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.events.out
+
+--
+
+*`logstash_stats.pipelines.events.duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.events.duration_in_millis
+
+--
+
+
+*`logstash_stats.pipelines.vertices.duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.duration_in_millis
+
+--
+
+*`logstash_stats.pipelines.vertices.events_in`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.events_in
+
+--
+
+*`logstash_stats.pipelines.vertices.pipeline_ephemeral_id`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.pipeline_ephemeral_id
+
+--
+
+*`logstash_stats.pipelines.vertices.events_out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.events_out
+
+--
+
+*`logstash_stats.pipelines.vertices.id`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.id
+
+--
+
+*`logstash_stats.pipelines.vertices.queue_push_duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.queue_push_duration_in_millis
 
 --
 
@@ -34873,9 +34994,6 @@ type: long
 *`logstash.node.stats.process.cpu.percent`*::
 +
 --
-TODO
-
-
 type: double
 
 --
