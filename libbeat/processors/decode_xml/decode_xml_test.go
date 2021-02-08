@@ -374,8 +374,8 @@ func TestDecodeXML(t *testing.T) {
 	}
 }
 
-//BenchmarkProcessor_Run/single_object-4            104070            11351 ns/op
-//BenchmarkProcessor_Run/nested_and_array_object-4  41202             28762 ns/op
+// BenchmarkProcessor_Run/single_object-4             96710             11232 ns/op            8594 B/op        158 allocs/op
+// BenchmarkProcessor_Run/nested_and_array_object-4   42454             28094 ns/op           20296 B/op        376 allocs/op
 func BenchmarkProcessor_Run(b *testing.B) {
 	c := defaultConfig()
 	p, err := newDecodeXML(c)
