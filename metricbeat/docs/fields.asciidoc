@@ -18352,6 +18352,15 @@ alias to: elasticsearch.node.name
 
 --
 
+*`shard.shard`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.number
+
+--
+
 
 
 *`cluster_stats.indices.count`*::
