@@ -317,7 +317,6 @@ func TestProcessor(t *testing.T) {
 }
 
 func TestDynamicTemplates(t *testing.T) {
-	p := &Processor{}
 	tests := []struct {
 		field    mapping.Field
 		expected []common.MapStr
@@ -493,9 +492,10 @@ func TestDynamicTemplates(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		dynamicTemplates = nil
+		p := &Processor{}
 		p.object(&test.field)
-		assert.Equal(t, test.expected, dynamicTemplates)
+		p.object(&test.field) // should not be added twice
+		assert.Equal(t, test.expected, p.dynamicTemplates)
 	}
 }
 
