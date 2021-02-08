@@ -564,7 +564,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "metricbeat"}
+		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
 
 		for _, b := range packedBeats {
 			pwd, err := filepath.Abs(filepath.Join("..", b))
