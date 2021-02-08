@@ -100,6 +100,38 @@ several hours. By querying from AWS/Billing namespace every 300 seconds,
 additional costs will occur.
 
 [float]
+==== Example 3
+Depends on the configuration and number of services in the AWS account, the number
+of API calls may get too big to cause high API cost. In order to reduce the number
+of API calls, we recommend users to use this configuration below as an example.
+
+* *metrics.name*: Only collect a sub list of metrics that are useful to your use case.
+* *metrics.statistic*: By default, cloudwatch metricset will make API calls to
+get all stats like average, max, min, sum and etc. If the user knows which
+statistics method is most useful, specify it in the configuration.
+* *metrics.dimensions*: Different AWS services report different dimensions in their
+CloudWatch metrics. For example, https://docs.aws.amazon.com/emr/latest/ManagementGuide/UsingEMR_ViewingMetrics.html[EMR metrics]
+can have either `JobFlowId` dimension or `JobId` dimension. If user knows which
+specific dimension is useful, it can be specified in this configuration option.
+
+[source,yaml]
+----
+- module: aws
+  period: 5m
+  metricsets:
+    - cloudwatch
+  regions: us-east-1
+  metrics:
+    - namespace: AWS/ElasticMapReduce
+      name: ["S3BytesWritten", "S3BytesRead", "HDFSUtilization", "TotalLoad"]
+      resource_type: elasticmapreduce
+      statistic: ["Average"]
+      dimensions:
+        - name: JobId
+          value: "*"
+----
+
+[float]
 === More examples
 With the configuration below, users will be able to collect cloudwatch metrics
 from EBS, ELB and EC2 without tag information.
