@@ -52,6 +52,11 @@ processors:
     keep_original: true
     remove_if_successful: true
 - rename:
+    field: threatintel.abuseurl.url
+    target_field: threatintel.indicator.url
+    ignore_missing: true
+    if: ctx?.threatintel?.indicator?.url == null && ctx?.threatintel.abuseurl.url != null
+- rename:
     field: threatintel.abuseurl.host
     target_field: threatintel.indicator.domain
     ignore_missing: true
