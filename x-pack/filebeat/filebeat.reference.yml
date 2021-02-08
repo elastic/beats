@@ -1991,7 +1991,7 @@ filebeat.modules:
     var.url: https://SERVER/events/restSearch
 
     # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
-    var.api_token: xVfaM3DSt8QEwO2J1ix00V4ZHJs14nq5GMsHcK6Z
+    var.api_token: API_KEY
 
     # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
     # For examples please reference the filebeat module documentation.
@@ -2015,8 +2015,8 @@ filebeat.modules:
     # The URL used for OTX Threat Intel API calls.
     var.url: https://otx.alienvault.com/api/v1/indicators/export
 
-    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
-    var.api_token: xVfaM3DSt8QEwO2J1ix00V4ZHJs14nq5GMsHcK6Z
+    # The authentication token used to contact the OTX API, can be found on the OTX UI.
+    var.api_token: API_KEY
 
     # Optional filters that can be applied to retrieve only specific indicators.
     #var.types: "domain,IPv4,hostname,url,FileHash-SHA256"
@@ -2039,10 +2039,10 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
 
-    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
+    # The Username used by anomali Limo, defaults to guest.
     #var.username: guest
 
-    # Optional filters that can be applied to retrieve only specific indicators.
+    # The password used by anomali Limo, defaults to guest.
     #var.password: guest
 
     # How far back to look once the beat starts up for the first time, the value has to be in hours.
