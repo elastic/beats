@@ -20411,15 +20411,6 @@ type: long
 *`elasticsearch.cluster.stats.nodes.master`*::
 +
 --
-type: alias
-
-alias to: elasticsearch.cluster.stats.nodes.stats.master
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.master`*::
-+
---
 Number of master-eligible nodes in cluster.
 
 type: long
@@ -20430,8 +20421,6 @@ type: long
 +
 --
 type: long
-
-alias to: elasticsearch.cluster.stats.nodes.stats.data
 
 --
 
