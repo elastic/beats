@@ -997,6 +997,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Elastic Log Driver*
 
 - Add support for `docker logs` command {pull}19531[19531]
+- Fixed docs for hosts {pull}23644[23644]
 
 ==== Deprecated
 
