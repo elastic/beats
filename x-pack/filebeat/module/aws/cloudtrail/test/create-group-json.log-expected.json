@@ -36,6 +36,8 @@
             "creation"
         ],
         "fileset.name": "cloudtrail",
+        "group.id": "EXAMPLE_ID",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
@@ -80,6 +82,7 @@
             "creation"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 903,
         "service.type": "aws",

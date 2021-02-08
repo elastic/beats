@@ -688,6 +688,29 @@ processors:
       ignore_empty_value: true
       if: 'ctx.event?.action == "AddUserToGroup"'
 
+  #
+  # CreateAccessKey
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "CreateAccessKey"'
+
+  #
+  # CreateGroup
+  #
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "CreateGroup"'
+  - set:
+      field: group.id
+      value: '{{aws.cloudtrail.flattened.response_elements.group.groupId}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "CreateGroup"'
+
   - remove:
       field:
         - "json"
