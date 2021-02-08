@@ -497,6 +497,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
+- Add system.hostfs configuration option for system module. {pull}23831[23831]
 
 *Packetbeat*
 
@@ -821,6 +822,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
 - Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
+- Move aws-s3 input to GA. {pull}23631[23631]
 - Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 

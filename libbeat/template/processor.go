@@ -31,6 +31,11 @@ type Processor struct {
 	EsVersion       common.Version
 	Migration       bool
 	ElasticLicensed bool
+
+	// dynamicTemplatesMap records which dynamic templates have been added, to prevent duplicates.
+	dynamicTemplatesMap map[dynamicTemplateKey]common.MapStr
+	// dynamicTemplates records the dynamic templates in the order they were added.
+	dynamicTemplates []common.MapStr
 }
 
 var (
@@ -420,7 +425,7 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 		if len(otParams) > 1 {
 			path = fmt.Sprintf("%s_%s", path, matchingType)
 		}
-		addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
+		p.addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
 	}
 
 	properties := getDefaultProperties(f)
@@ -436,8 +441,27 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
-	template := common.MapStr{
+type dynamicTemplateKey struct {
+	path      string
+	pathMatch string
+	matchType string
+}
+
+func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
+	key := dynamicTemplateKey{
+		path:      path,
+		pathMatch: pathMatch,
+		matchType: matchType,
+	}
+	if p.dynamicTemplatesMap == nil {
+		p.dynamicTemplatesMap = make(map[dynamicTemplateKey]common.MapStr)
+	} else {
+		if _, ok := p.dynamicTemplatesMap[key]; ok {
+			// Dynamic template already added.
+			return
+		}
+	}
+	dynamicTemplate := common.MapStr{
 		// Set the path of the field as name
 		path: common.MapStr{
 			"mapping":            properties,
@@ -445,8 +469,8 @@ func addDynamicTemplate(path string, pathMatch string, properties common.MapStr,
 			"path_match":         pathMatch,
 		},
 	}
-
-	dynamicTemplates = append(dynamicTemplates, template)
+	p.dynamicTemplatesMap[key] = dynamicTemplate
+	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
 }
 
 func getDefaultProperties(f *mapping.Field) common.MapStr {
