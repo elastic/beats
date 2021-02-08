@@ -841,6 +841,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Upgrade Cisco ASA/FTD/Umbrella to ECS 1.8.0. {pull}23819[23819]
 - Add new ECS user and categories features to google_workspace/gsuite {issue}23118[23118] {pull}23709[23709]
+- Move crowdstrike JS processor to ingest pipelines and upgrade to ECS 1.8.0 {issue}23118[23118] {pull}23875[23875]
+- Update Filebeat auditd dataset to ECS 1.8.0. {pull}23723[23723] {issue}23118[23118]
+- Updated microsoft defender_atp and m365_defender to ECS 1.8. {pull}23897[23897] {issue}23118[23118]
 - Updated o365 module to ECS 1.8. {issue}23118[23118] {pull}23896[23896]
 
 *Heartbeat*
