@@ -423,11 +423,10 @@ def getBeatsName(baseDir) {
 def e2e(Map args = [:]) {
   def enabled = args.e2e?.get('enabled', false)
   def entrypoint = args.e2e?.get('entrypoint')
-  def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
   if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
-    git(branch: 'feature/metricbeat-goal', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
+    git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
     try {
       if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
