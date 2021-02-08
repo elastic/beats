@@ -35,4 +35,5 @@ stages:
         mage: "mage build unitTest"
     packaging-linux:
         packaging-linux: "mage package"
-        isE2E: false
+        e2e:
+            enabled: false

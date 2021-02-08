@@ -84,4 +84,5 @@ stages:
             - "windows-7-32-bit"
     packaging-linux:
         packaging-linux: "mage package"
-        isE2E: false
+        e2e:
+            enabled: false

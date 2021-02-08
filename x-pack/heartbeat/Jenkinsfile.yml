@@ -15,4 +15,5 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     packaging-linux:
         packaging-linux: "mage package"
-        isE2E: false
+        e2e:
+            enabled: false

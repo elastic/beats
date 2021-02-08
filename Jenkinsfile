@@ -292,9 +292,10 @@ def packagingLinux(Map args = [:]) {
 * generated, this should help to speed up the things
 */
 def e2e(Map args = [:]) {
-  def suite = args.get('suite', '')
-  def tags = args.get('tags', '')
+  def enabled = args.e2e?.get('enabled', false)
+  def entrypoint = args.e2e?.get('entrypoint')
   def stackVersion = args.get('stackVersion', '8.0.0-SNAPSHOT')  // TBC with the version defined somewhere...
+  if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'feature/metricbeat-goal', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -302,10 +303,11 @@ def e2e(Map args = [:]) {
       if(isDockerInstalled()) {
         dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       }
-      def goVersionForE2E = readFile(".go-version").trim()
-      withEnv(["GO_VERSION=${goVersionForE2E}"]) {
-        filebeat(output: "docker_logs_${suite}.log", workdir: "${env.WORKSPACE}"){
-          sh script: ".ci/scripts/${suite}-test.sh", label: "Run functional tests for ${suite}"
+      def goVersionForE2E = readFile('.go-version').trim()
+      withEnv(["GO_VERSION=${goVersionForE2E}",
+               "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}"]) {
+        filebeat(output: "docker_logs_${entrypoint}.log", workdir: "${env.WORKSPACE}"){
+          sh script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}"
         }
       }
     } catch(e) {
@@ -338,8 +340,9 @@ def target(Map args = [:]) {
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
+        // If package then upload artifacts
         if(isE2E) {
-          e2e(suite: directory)
+          e2e(args)
         }
       }
     }
@@ -770,7 +773,6 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   }
   public run(Map args = [:]){
     def withModule = args.content.get('withModule', false)
-    def isE2E = args.content.get('isE2E', false)
     /*if(args?.content?.containsKey('make')) {
       steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
     }
@@ -778,7 +780,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
     }*/
     if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, isE2E: isE2E)
+      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'))
     }/*
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)

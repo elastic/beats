@@ -90,4 +90,5 @@ stages:
     #        tags: true         ## for all the tags
     packaging-linux:
         packaging-linux: "mage package"
-        isE2E: false
+        e2e:
+            enabled: false

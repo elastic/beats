@@ -77,4 +77,6 @@ stages:
             - "windows-7-32-bit"
     packaging-linux:
         packaging-linux: "mage package"
-        isE2E: true
+        e2e:
+            enabled: true
+            entrypoint: 'metricbeat-test.sh'
