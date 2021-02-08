@@ -8,11 +8,6 @@
       description: >
         Fields from the threatintel Filebeat module.
       fields:
-        - name: indicator.domain
-          type: keyword
-          ignore_above: 1024
-          description: >
-            Identifies a threat indicator as a domain (irrespective of direction).
         - name: indicator.first_seen
           type: keyword
           description: >
