@@ -733,6 +733,15 @@ processors:
       ignore_empty_value: true
       if: 'ctx.event?.action == "DeleteAccessKey"'
 
+  #
+  # DeleteGroup
+  #
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "DeleteGroup"'
+
   - remove:
       field:
         - "json"

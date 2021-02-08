@@ -30,6 +30,7 @@
             "deletion"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "aws",
@@ -74,6 +75,7 @@
             "deletion"
         ],
         "fileset.name": "cloudtrail",
+        "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 747,
         "service.type": "aws",
