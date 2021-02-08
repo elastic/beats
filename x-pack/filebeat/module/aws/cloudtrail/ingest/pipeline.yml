@@ -673,6 +673,21 @@ processors:
       field: "json.insightDetails"
       target_field: "aws.cloudtrail.insight_details"
       ignore_failure: true
+
+  #
+  # AddUserToGroup
+  #
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "AddUserToGroup"'
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "AddUserToGroup"'
+
   - remove:
       field:
         - "json"
