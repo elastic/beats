@@ -760,6 +760,15 @@ processors:
       ignore_empty_value: true
       if: 'ctx.event?.action == "DeleteUser"'
 
+  #
+  # EnableMFADevice
+  #
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: 'ctx.event?.action == "EnableMFADevice"'
+
   - remove:
       field:
         - "json"
