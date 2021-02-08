@@ -678,11 +678,6 @@ processors:
   # AddUserToGroup
   #
   - set:
-      field: group.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "AddUserToGroup"'
-  - set:
       field: user.target.name
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
@@ -700,11 +695,6 @@ processors:
   #
   # CreateGroup
   #
-  - set:
-      field: group.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "CreateGroup"'
   - set:
       field: group.id
       value: '{{aws.cloudtrail.flattened.response_elements.group.groupId}}'
@@ -733,15 +723,6 @@ processors:
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "DeleteAccessKey"'
-
-  #
-  # DeleteGroup
-  #
-  - set:
-      field: group.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "DeleteGroup"'
 
   #
   # DeleteSSHPublicKey
@@ -774,11 +755,6 @@ processors:
   # RemoveUserFromGroup
   #
   - set:
-      field: group.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "RemoveUserFromGroup"'
-  - set:
       field: user.target.name
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
@@ -791,17 +767,6 @@ processors:
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "UpdateAccessKey"'
-
-  #
-  # UpdateGroup
-  # TODO: This can be updated when/if group.target.* and group.changes.*
-  #       fields are added to ECS.
-  #
-  - set:
-      field: group.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UpdateGroup"'
 
   #
   # UpdateLoginProfile
@@ -842,7 +807,13 @@ processors:
       value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "UploadSSHPublicKey"'
-  #
+
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      if: '["AddUserToGroup", "CreateGroup", "DeleteGroup", "RemoveUserFromGroup", "UpdateGroup"].contains(ctx.event?.action)'
+
   - remove:
       field:
         - "json"
