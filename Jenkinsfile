@@ -287,6 +287,42 @@ def packagingLinux(Map args = [:]) {
   }
 }
 
+def publishPackages(baseDir){
+  def bucketUri = "gs://beats-ci-artifacts/snapshots"
+  if (isPR()) {
+    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
+  }
+  def beatsFolderName = getBeatsName(baseDir)
+  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+
+  // Copy those files to another location with the sha commit to test them
+  // afterward.
+  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
+  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
+}
+
+def uploadPackages(bucketUri, baseDir){
+  googleStorageUpload(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pathPrefix: "${baseDir}/build/distributions/",
+    pattern: "${baseDir}/build/distributions/**/*",
+    sharedPublicly: true,
+    showInline: true
+  )
+}
+
+/**
+* There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
+* therefore the storage bucket in GCP should follow the same folder structure.
+* This is required by https://github.com/elastic/beats-tester
+* e.g.
+* baseDir=name -> return name
+* baseDir=name1/name2/name3-> return name2
+*/
+def getBeatsName(baseDir) {
+  return baseDir.replace('x-pack/', '')
+}
+
 /**
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
@@ -325,12 +361,12 @@ def e2e(Map args = [:]) {
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def target(Map args = [:]) {
-  def context = args.context
   def command = args.command
+  def context = args.context
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
-  def isE2E = args.get('isE2E', false)
+  def isE2E = args.e2e?.get('enabled', false)
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -340,9 +376,9 @@ def target(Map args = [:]) {
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
-        // If package then upload artifacts
         if(isE2E) {
           e2e(args)
+          publishPackages("${directory}")
         }
       }
     }
