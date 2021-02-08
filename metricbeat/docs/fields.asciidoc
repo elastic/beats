@@ -18606,6 +18606,25 @@ Elasticsearch module
 
 
 
+*`index_recovery.shards.start_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.start_time.ms
+
+--
+
+*`index_recovery.shards.stop_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.stop_time.ms
+
+--
+
+
 *`stack_stats.apm.found`*::
 +
 --
@@ -20644,6 +20663,20 @@ type: long
 index
 
 
+
+*`elasticsearch.index.created`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.hidden`*::
++
+--
+type: boolean
+
+--
 
 
 *`elasticsearch.index.shards.total`*::

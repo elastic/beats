@@ -8,7 +8,7 @@
   fields:
     - name: index_recovery
       type: group
-      field:
+      fields:
         - name: shards.start_time_in_millis
           type: alias
           path: elasticsearch.index.recovery.start_time.ms
