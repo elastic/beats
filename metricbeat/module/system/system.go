@@ -22,10 +22,12 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
+	// TODO: remove this flag in 8.0 since it should be replaced by system.hostfs configuration option (config.HostFS)
 	// HostFS is an alternate mountpoint for the filesytem root, for when metricbeat is running inside a container.
 	HostFS = flag.String("system.hostfs", "", "mountpoint of the host's filesystem for use in monitoring a host from within a container")
 )
@@ -39,6 +41,11 @@ func init() {
 	}
 }
 
+// Config for the system module.
+type Config struct {
+	HostFS string `config:"system.hostfs"` // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+}
+
 // Module represents the system module
 type Module struct {
 	mb.BaseModule
@@ -48,10 +55,25 @@ type Module struct {
 
 // NewModule instatiates the system module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+
+	config := Config{
+		HostFS: "",
+	}
+	err := base.UnpackConfig(&config)
+	if err != nil {
+		return nil, err
+	}
+	if *HostFS != "" {
+		if config.HostFS != "" {
+			logp.Warn("-system.hostfs flag is set and will override configuration setting")
+		}
+		config.HostFS = *HostFS
+	}
+
 	// This only needs to be configured once for all system modules.
 	once.Do(func() {
-		initModule()
+		initModule(config)
 	})
 
-	return &Module{BaseModule: base, HostFS: *HostFS, IsAgent: fleetmode.Enabled()}, nil
+	return &Module{BaseModule: base, HostFS: config.HostFS, IsAgent: fleetmode.Enabled()}, nil
 }

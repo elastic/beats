@@ -591,6 +591,9 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				if envVar := selectedPackageTypes(); envVar != "" {
+					cmd.Env = append(cmd.Env, envVar)
+				}
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
@@ -611,6 +614,22 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+func selectedPackageTypes() string {
+	if len(devtools.SelectedPackageTypes) == 0 {
+		return ""
+	}
+
+	envVar := "PACKAGES="
+	for _, p := range devtools.SelectedPackageTypes {
+		if p == devtools.Docker {
+			envVar += "targz,"
+		} else {
+			envVar += p.String() + ","
+		}
+	}
+	return envVar[:len(envVar)-1]
 }
 
 func copyAll(from, to string) error {
