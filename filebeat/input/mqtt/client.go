@@ -40,7 +40,7 @@ func createClientOptions(config mqttInputConfig, onConnectHandler func(client li
 		if err != nil {
 			return nil, err
 		}
-		clientOptions.SetTLSConfig(tlsConfig.BuildModuleConfig(""))
+		clientOptions.SetTLSConfig(tlsConfig.BuildModuleClientConfig(""))
 	}
 	return clientOptions, nil
 }

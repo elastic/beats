@@ -6,11 +6,21 @@ processors:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
 
+  - rename:
+      field: suricata.eve.ether.dest_mac
+      target_field: destination.mac
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.ether.src_mac
+      target_field: source.mac
+      ignore_missing: true
+
   # Handle the different Suricata event types.
   - lowercase:
       field: suricata.eve.event_type
       ignore_missing: true
   - script:
+      tag: suricata_ecs_categorize
       lang: painless
       ignore_failure: true
       params:
@@ -95,6 +105,8 @@ processors:
                 } else {
                     ctx.network.protocol = v;
                 }
+            } else if (v instanceof List) {
+                ctx.event[k] = new ArrayList(v);
             } else {
                 ctx.event[k] = v;
             }
@@ -118,11 +130,17 @@ processors:
       ignore_empty_value: true
   ## HTTP
   - set:
-      if: ctx?.suricata?.eve?.event_type == "http" && ctx?.suricata?.eve?.http?.status < 400
+      if: >-
+        ctx?.suricata?.eve?.event_type == "http" &&
+        ctx?.suricata?.eve?.http?.status != null &&
+        ctx?.suricata?.eve?.http?.status < 400
       field: event.outcome
       value: success
   - set:
-      if: ctx?.suricata?.eve?.event_type == "http" && ctx?.suricata?.eve?.http?.status >= 400
+      if: >-
+        ctx?.suricata?.eve?.event_type == "http" &&
+        ctx?.suricata?.eve?.http?.status != null &&
+        ctx?.suricata?.eve?.http?.status >= 400
       field: event.outcome
       value: failure
   ## DNS
@@ -177,7 +195,7 @@ processors:
         }
       ignore_failure: true
   - set:
-      if: "ctx?.network?.protocol == 'http'"
+      if: ctx?.network?.protocol == 'http'
       field: url.domain
       value: '{{destination.domain}}'
       ignore_empty_value: true
@@ -193,6 +211,10 @@ processors:
   - rename:
       field: suricata.eve.http.url
       target_field: url.original
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.http_port
+      target_field: url.port
       ignore_missing: true
   - rename:
       field: suricata.eve.http.http_refer
@@ -231,13 +253,13 @@ processors:
       value: "{{suricata.eve.alert.signature}}"
       ignore_empty_value: true
   - set:
+      if:  ctx?.suricata?.eve?.alert?.action == 'blocked'
       field: suricata.eve.alert.action
       value: denied
-      if:  "ctx?.suricata?.eve?.alert?.action == 'blocked'"
   - append:
+      if: ctx?.suricata?.eve?.alert?.action != null
       field: event.type
       value: "{{suricata.eve.alert.action}}"
-      if: "ctx?.suricata?.eve?.alert?.action != null"
   - remove:
       field: suricata.eve.alert.action
       ignore_failure: true
@@ -262,6 +284,7 @@ processors:
       target_field: source.bytes
       ignore_missing: true
   - script:
+      tag: suricata_network_bytes_packets
       lang: painless
       source: >
         long getOrZero(def map, def key) {
@@ -297,6 +320,7 @@ processors:
         - ISO8601
       ignore_failure: true
   - script:
+      tag: suricata_event_duration
       lang: painless
       source: >
         Instant ins(def d) {
@@ -322,12 +346,12 @@ processors:
       field: suricata.eve.http.http_user_agent
       ignore_missing: true
   - geoip:
-      if: ctx.source?.geo == null
+      if: ctx?.source?.geo == null
       field: source.ip
       target_field: source.geo
       ignore_missing: true
   - geoip:
-      if: ctx.destination?.geo == null
+      if: ctx?.destination?.geo == null
       field: destination.ip
       target_field: destination.geo
       ignore_missing: true
@@ -364,9 +388,9 @@ processors:
       target_field: destination.as.organization.name
       ignore_missing: true
   - append:
+      if: ctx?.url?.domain != null && ctx.url.domain != ''
       field: related.hosts
       value: '{{url.domain}}'
-      if: ctx.url?.domain != null && ctx.url?.domain != ''
       allow_duplicates: false
   - append:
       if: ctx?.source?.ip != null
@@ -387,6 +411,35 @@ processors:
         - suricata.eve.http.http_user_agent
       ignore_missing: true
 on_failure:
-  - set:
+  - append:
       field: error.message
-      value: '{{ _ingest.on_failure_message }}'
+      value: >-
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}
+  - remove:
+      field:
+        # Remove all alias fields to ensure indexing succeeds.
+        - suricata.eve.alert.action
+        - suricata.eve.alert.severity
+        - suricata.eve.app_proto
+        - suricata.eve.dest_ip
+        - suricata.eve.dest_port
+        - suricata.eve.fileinfo.filename
+        - suricata.eve.fileinfo.size
+        - suricata.eve.flow.bytes_toclient
+        - suricata.eve.flow.bytes_toserver
+        - suricata.eve.flow.pkts_toclient
+        - suricata.eve.flow.pkts_toserver
+        - suricata.eve.flow.start
+        - suricata.eve.http.hostname
+        - suricata.eve.http.http_method
+        - suricata.eve.http.http_refer
+        - suricata.eve.http.http_user_agent
+        - suricata.eve.http.length
+        - suricata.eve.http.status
+        - suricata.eve.http.url
+        - suricata.eve.proto
+        - suricata.eve.src_ip
+        - suricata.eve.src_port
+      ignore_missing: true

@@ -16,6 +16,18 @@ functionbeat.provider.aws.endpoint: "s3.amazonaws.com"
 # Configure which S3 bucket we should upload the lambda artifact.
 functionbeat.provider.aws.deploy_bucket: "functionbeat-deploy"
 
+# Configure credentials of Functionbeat while deploying to AWS.
+# Available options:
+# * access_key_id, secret_access_key and/or session_token
+#functionbeat.provider.aws.access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+#functionbeat.provider.aws.secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+#functionbeat.provider.aws.session_token: '${AWS_SESSION_TOKEN:""}'
+# * role_arn
+#functionbeat.provider.aws.role_arn: arn:aws:iam::123456789012:role/test-fnb
+# * credential_profile_name and/or shared_credential_file
+#functionbeat.provider.aws.credential_profile_name: fnb-aws
+#functionbeat.provider.aws.shared_credential_file: /etc/functionbeat/aws_credentials
+
 functionbeat.provider.aws.functions:
   # Define the list of function availables, each function required to have a unique name.
   # Create a function that accepts events coming from cloudwatchlogs.
@@ -801,6 +813,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -928,6 +944,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1207,6 +1227,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1404,6 +1428,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

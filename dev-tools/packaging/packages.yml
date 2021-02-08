@@ -96,6 +96,30 @@ shared:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
 
 
@@ -177,6 +201,30 @@ shared:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
 
   - &agent_binary_files
     '{{.BeatName}}{{.BinaryExt}}':
@@ -247,6 +295,31 @@ shared:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
+
 
   # Binary package spec (zip for windows) for community beats.
   - &agent_windows_binary_spec
@@ -285,6 +358,30 @@ shared:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
         skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/apm-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
 
   - &agent_docker_spec
     <<: *agent_binary_spec
@@ -304,6 +401,12 @@ shared:
         content: >
           {{ commit }}
         mode: 0644
+
+  - &agent_docker_arm_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      from: 'arm64v8/centos:7'
+      buildFrom: 'arm64v8/centos:7'
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -459,10 +562,21 @@ shared:
         mode: 0600
         config: true
 
+  - &docker_arm_spec
+    <<: *docker_spec
+    extra_vars:
+      from: 'arm64v8/centos:7'
+      buildFrom: 'arm64v8/centos:7'
+
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
       from: 'docker.elastic.co/ubi8/ubi-minimal'
+
+  - &docker_arm_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi8'
+      from: 'registry.access.redhat.com/ubi8/ubi-minimal:8.2'
 
   - &elastic_docker_spec
     extra_vars:
@@ -627,17 +741,20 @@ specs:
         <<: *elastic_license_for_deb_rpm
 
     - os: linux
-      types: [docker]
-      spec:
-        <<: *docker_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-
-    - os: linux
+      arch: amd64
       types: [docker]
       spec:
         <<: *docker_spec
         <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
@@ -716,9 +833,11 @@ specs:
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
+      arch: amd64
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *docker_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
@@ -726,10 +845,11 @@ specs:
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
+      arch: arm64
       types: [docker]
       spec:
-        <<: *docker_spec
-        <<: *docker_ubi_spec
+        <<: *docker_arm_spec
+        <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
@@ -795,9 +915,11 @@ specs:
             mode: 0755
 
     - os: linux
+      arch: amd64
       types: [docker]
       spec:
         <<: *agent_docker_spec
+        <<: *docker_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
@@ -805,10 +927,11 @@ specs:
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
+      arch: arm64
       types: [docker]
       spec:
-        <<: *agent_docker_spec
-        <<: *docker_ubi_spec
+        <<: *agent_docker_arm_spec
+        <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:

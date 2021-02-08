@@ -29,7 +29,7 @@
         "source.ip": "192.168.86.85",
         "source.port": 55406,
         "suricata.eve.event_type": "ssh",
-        "suricata.eve.flow_id": 298824096901438,
+        "suricata.eve.flow_id": "298824096901438",
         "suricata.eve.in_iface": "en0",
         "suricata.eve.ssh.client.proto_version": "2.0",
         "suricata.eve.ssh.client.software_version": "OpenSSH_7.6",
@@ -88,7 +88,7 @@
         "suricata.eve.alert.signature": "ET POLICY Observed IP Lookup Domain (l2 .io in TLS SNI)",
         "suricata.eve.alert.signature_id": 2024833,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 904992230150281,
+        "suricata.eve.flow_id": "904992230150281",
         "suricata.eve.in_iface": "en0",
         "suricata.eve.tls.session_resumed": true,
         "suricata.eve.tls.sni": "l2.io",
@@ -142,7 +142,7 @@
         "source.ip": "192.168.86.85",
         "source.port": 56119,
         "suricata.eve.event_type": "http",
-        "suricata.eve.flow_id": 2115002772430095,
+        "suricata.eve.flow_id": "2115002772430095",
         "suricata.eve.http.http_content_type": "text/xml",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "en0",
@@ -204,7 +204,7 @@
         "suricata.eve.fileinfo.state": "CLOSED",
         "suricata.eve.fileinfo.stored": false,
         "suricata.eve.fileinfo.tx_id": 0,
-        "suricata.eve.flow_id": 2211411903323127,
+        "suricata.eve.flow_id": "2211411903323127",
         "suricata.eve.http.http_content_type": "application/xml",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "en0",
@@ -274,7 +274,7 @@
         "suricata.eve.dns.ttl": 299,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1684780223079543,
+        "suricata.eve.flow_id": "1684780223079543",
         "suricata.eve.in_iface": "en0",
         "tags": [
             "suricata"
@@ -455,7 +455,7 @@
         "source.ip": "192.168.86.85",
         "source.port": 56187,
         "suricata.eve.event_type": "tls",
-        "suricata.eve.flow_id": 89751777876473,
+        "suricata.eve.flow_id": "89751777876473",
         "suricata.eve.in_iface": "en0",
         "suricata.eve.tls.fingerprint": "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47",
         "suricata.eve.tls.issuerdn": "CN=Apple IST CA 2 - G1, OU=Certification Authority, O=Apple Inc., C=US",
@@ -508,8 +508,6 @@
         "event.start": "2018-07-05T19:51:23.453Z",
         "event.type": [
             "connection",
-            "start",
-            "start",
             "start"
         ],
         "fileset.name": "eve",
@@ -534,9 +532,226 @@
         "suricata.eve.flow.alerted": false,
         "suricata.eve.flow.reason": "timeout",
         "suricata.eve.flow.state": "new",
-        "suricata.eve.flow_id": 1828507008887644,
+        "suricata.eve.flow_id": "1828507008887644",
         "tags": [
             "suricata"
         ]
+    },
+    {
+        "@timestamp": "2020-12-09T16:02:43.000Z",
+        "destination.address": "192.168.50.1",
+        "destination.domain": "ctldl.windowsupdate.com",
+        "destination.ip": "192.168.50.1",
+        "destination.port": 8080,
+        "event.category": [
+            "network",
+            "web"
+        ],
+        "event.dataset": "suricata.eve",
+        "event.kind": "event",
+        "event.module": "suricata",
+        "event.original": "{\"timestamp\":\"2020-12-09T16:02:43.000505+0000\",\"flow_id\":913701662641234,\"in_iface\":\"eno6\",\"event_type\":\"http\",\"src_ip\":\"192.168.50.1\",\"src_port\":57134,\"dest_ip\":\"192.168.50.1\",\"dest_port\":8080,\"proto\":\"TCP\",\"tx_id\":0,\"http\":{\"hostname\":\"ctldl.windowsupdate.com\",\"url\":\"http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?111111111111\",\"http_user_agent\":\"Microsoft-CryptoAPI/10.0\",\"http_method\":\"GET\",\"protocol\":\"HTTP/1.1\",\"length\":0}}",
+        "event.type": [
+            "access",
+            "protocol"
+        ],
+        "fileset.name": "eve",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 0,
+        "input.type": "log",
+        "log.offset": 5796,
+        "network.community_id": "1:Y8m38aDR9cy/emlD86XGhosniqY=",
+        "network.protocol": "http",
+        "network.transport": "tcp",
+        "related.hosts": [
+            "ctldl.windowsupdate.com"
+        ],
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "suricata",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.port": 57134,
+        "suricata.eve.event_type": "http",
+        "suricata.eve.flow_id": "913701662641234",
+        "suricata.eve.http.protocol": "HTTP/1.1",
+        "suricata.eve.in_iface": "eno6",
+        "suricata.eve.tx_id": 0,
+        "tags": [
+            "suricata"
+        ],
+        "url.domain": "ctldl.windowsupdate.com",
+        "url.original": "http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?111111111111",
+        "url.path": "http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab",
+        "url.query": "111111111111",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Microsoft-CryptoAPI",
+        "user_agent.original": "Microsoft-CryptoAPI/10.0",
+        "user_agent.version": "10.0"
+    },
+    {
+        "@timestamp": "2020-12-09T16:02:58.005Z",
+        "destination.address": "192.168.50.1",
+        "destination.ip": "192.168.50.1",
+        "destination.port": 443,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "suricata.eve",
+        "event.kind": "event",
+        "event.module": "suricata",
+        "event.original": "{\"timestamp\":\"2020-12-09T16:02:58.005716+0000\",\"flow_id\":1298574590709840,\"in_iface\":\"eno6\",\"event_type\":\"tls\",\"src_ip\":\"192.168.50.1\",\"src_port\":60614,\"dest_ip\":\"192.168.50.1\",\"dest_port\":443,\"proto\":\"TCP\",\"tls\":{\"subject\":\"C=US, ST=New York, L=New York City, O=Acme U.S.A., INC., CN=update.acme.com\",\"issuerdn\":\"C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018\",\"serial\":\"0D:CE:DC:BC:AF:92:56:B4:C5:41:40:71:26:5B:1D:53\",\"fingerprint\":\"18:3c:11:45:46:e9:26:c7:87:64:0f:ed:47:86:1b:31:bf:0f:84:25\",\"version\":\"TLS 1.2\",\"notbefore\":\"2020-11-24T00:00:00\",\"notafter\":\"2021-12-25T23:59:59\",\"ja3\":{},\"ja3s\":{\"hash\":\"adc06261ef82c2e4688b3cf08c1b2f24\",\"string\":\"771,159,65281\"}}}",
+        "event.type": [
+            "protocol"
+        ],
+        "fileset.name": "eve",
+        "input.type": "log",
+        "log.offset": 6267,
+        "network.community_id": "1:SKXuhLNyv4gfe01gqILs5v+qx40=",
+        "network.protocol": "tls",
+        "network.transport": "tcp",
+        "related.hash": [
+            "183C114546E926C787640FED47861B31BF0F8425"
+        ],
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "suricata",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.port": 60614,
+        "suricata.eve.event_type": "tls",
+        "suricata.eve.flow_id": "1298574590709840",
+        "suricata.eve.in_iface": "eno6",
+        "suricata.eve.tls.fingerprint": "18:3c:11:45:46:e9:26:c7:87:64:0f:ed:47:86:1b:31:bf:0f:84:25",
+        "suricata.eve.tls.issuerdn": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018",
+        "suricata.eve.tls.ja3s.hash": "adc06261ef82c2e4688b3cf08c1b2f24",
+        "suricata.eve.tls.ja3s.string": "771,159,65281",
+        "suricata.eve.tls.notafter": "2021-12-25T23:59:59",
+        "suricata.eve.tls.notbefore": "2020-11-24T00:00:00",
+        "suricata.eve.tls.serial": "0D:CE:DC:BC:AF:92:56:B4:C5:41:40:71:26:5B:1D:53",
+        "suricata.eve.tls.subject": "C=US, ST=New York, L=New York City, O=Acme U.S.A., INC., CN=update.acme.com",
+        "suricata.eve.tls.version": "TLS 1.2",
+        "tags": [
+            "suricata"
+        ],
+        "tls.server.hash.sha1": "183C114546E926C787640FED47861B31BF0F8425",
+        "tls.server.issuer": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018",
+        "tls.server.ja3s": "adc06261ef82c2e4688b3cf08c1b2f24",
+        "tls.server.not_after": "2021-12-25T23:59:59.000Z",
+        "tls.server.not_before": "2020-11-24T00:00:00.000Z",
+        "tls.server.subject": "C=US, ST=New York, L=New York City, O=Acme U.S.A., INC., CN=update.acme.com",
+        "tls.server.x509.issuer.common_name": "GeoTrust RSA CA 2018",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.organization": "DigiCert Inc",
+        "tls.server.x509.issuer.organizational_unit": "www.digicert.com",
+        "tls.server.x509.not_after": "2021-12-25T23:59:59.000Z",
+        "tls.server.x509.not_before": "2020-11-24T00:00:00.000Z",
+        "tls.server.x509.serial_number": "0DCEDCBCAF9256B4C5414071265B1D53",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.locality": "New York City",
+        "tls.server.x509.subject.organization": "Acme U.S.A.",
+        "tls.server.x509.subject.state_or_province": "New York",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls"
+    },
+    {
+        "@timestamp": "2020-12-09T16:03:00.179Z",
+        "destination.address": "192.168.50.1",
+        "destination.domain": "192.168.50.1",
+        "destination.ip": "192.168.50.1",
+        "destination.port": 8081,
+        "event.category": [
+            "network",
+            "web"
+        ],
+        "event.dataset": "suricata.eve",
+        "event.kind": "event",
+        "event.module": "suricata",
+        "event.original": "{\"timestamp\":\"2020-12-09T16:03:00.179037+0000\",\"flow_id\":1097935193623328,\"in_iface\":\"eno6\",\"event_type\":\"http\",\"src_ip\":\"192.168.50.1\",\"src_port\":50898,\"dest_ip\":\"192.168.50.1\",\"dest_port\":8081,\"proto\":\"TCP\",\"tx_id\":0,\"http\":{\"hostname\":\"192.168.50.1\",\"http_port\":8081,\"url\":\"/uuid\",\"http_user_agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:84.0) Gecko/20100101 Firefox/84.0\",\"http_method\":\"POST\",\"protocol\":\"HTTP/1.1\",\"length\":0}}",
+        "event.type": [
+            "access",
+            "protocol"
+        ],
+        "fileset.name": "eve",
+        "http.request.method": "POST",
+        "http.response.body.bytes": 0,
+        "input.type": "log",
+        "log.offset": 6958,
+        "network.community_id": "1:UHWPAQmxXu8t7EWZzPx9jl6b6TM=",
+        "network.protocol": "http",
+        "network.transport": "tcp",
+        "related.hosts": [
+            "192.168.50.1"
+        ],
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "suricata",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.port": 50898,
+        "suricata.eve.event_type": "http",
+        "suricata.eve.flow_id": "1097935193623328",
+        "suricata.eve.http.protocol": "HTTP/1.1",
+        "suricata.eve.in_iface": "eno6",
+        "suricata.eve.tx_id": 0,
+        "tags": [
+            "suricata"
+        ],
+        "url.domain": "192.168.50.1",
+        "url.original": "/uuid",
+        "url.path": "/uuid",
+        "url.port": 8081,
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:84.0) Gecko/20100101 Firefox/84.0",
+        "user_agent.os.full": "Mac OS X 10.14",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14",
+        "user_agent.version": "84.0."
+    },
+    {
+        "@timestamp": "2020-12-09T16:03:50.083Z",
+        "destination.address": "192.168.50.1",
+        "destination.domain": "www.example.com",
+        "destination.ip": "192.168.50.1",
+        "destination.port": 443,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "suricata.eve",
+        "event.kind": "event",
+        "event.module": "suricata",
+        "event.original": "{\"timestamp\":\"2020-12-09T16:03:50.083307+0000\",\"flow_id\":289459143040794,\"in_iface\":\"eno6\",\"event_type\":\"tls\",\"src_ip\":\"192.168.50.1\",\"src_port\":12509,\"dest_ip\":\"192.168.50.1\",\"dest_port\":443,\"proto\":\"TCP\",\"tls\":{\"sni\":\"www.example.com\",\"version\":\"UNDETERMINED\",\"ja3\":{\"hash\":\"44d502d471cfdb99c59bdfb0f220e5a8\",\"string\":\"771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-23-65281-10-11-35-16-5-13-18-51-45-43-27-41,29-23-24,0\"},\"ja3s\":{}}}",
+        "event.type": [
+            "protocol"
+        ],
+        "fileset.name": "eve",
+        "input.type": "log",
+        "log.offset": 7401,
+        "network.community_id": "1:0dSnqQKCiJXvy6HxZlV+50/b68k=",
+        "network.protocol": "tls",
+        "network.transport": "tcp",
+        "related.ip": [
+            "192.168.50.1"
+        ],
+        "service.type": "suricata",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.port": 12509,
+        "suricata.eve.event_type": "tls",
+        "suricata.eve.flow_id": "289459143040794",
+        "suricata.eve.in_iface": "eno6",
+        "suricata.eve.tls.ja3.hash": "44d502d471cfdb99c59bdfb0f220e5a8",
+        "suricata.eve.tls.ja3.string": "771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-23-65281-10-11-35-16-5-13-18-51-45-43-27-41,29-23-24,0",
+        "suricata.eve.tls.sni": "www.example.com",
+        "suricata.eve.tls.version": "UNDETERMINED",
+        "tags": [
+            "suricata"
+        ],
+        "tls.client.ja3": "44d502d471cfdb99c59bdfb0f220e5a8",
+        "tls.client.server_name": "www.example.com"
     }
 ]

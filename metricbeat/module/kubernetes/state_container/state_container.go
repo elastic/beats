@@ -134,18 +134,30 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
+		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		var rootFields common.MapStr
+		containerFields := common.MapStr{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				rootFields = common.MapStr{
-					"container": common.MapStr{
-						"runtime": cID[:split],
-						"id":      cID[split+3:],
-					}}
+				containerFields.Put("runtime", cID[:split])
+				containerFields.Put("id", cID[split+3:])
+			}
+		}
+		if containerImage, ok := event["image"]; ok {
+			cImage := (containerImage).(string)
+			containerFields.Put("image.name", cImage)
+		}
+		if containerName, ok := event["name"]; ok {
+			cName := (containerName).(string)
+			containerFields.Put("name", cName)
+		}
+		if len(containerFields) > 0 {
+			rootFields = common.MapStr{
+				"container": containerFields,
 			}
 		}
 
