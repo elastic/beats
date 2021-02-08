@@ -674,23 +674,6 @@ processors:
       target_field: "aws.cloudtrail.insight_details"
       ignore_failure: true
 
-  #
-  # AddUserToGroup
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "AddUserToGroup"'
-
-  #
-  # CreateAccessKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "CreateAccessKey"'
 
   #
   # CreateGroup
@@ -701,118 +684,30 @@ processors:
       ignore_empty_value: true
       if: 'ctx.event?.action == "CreateGroup"'
 
-  #
-  # CreateUser
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "CreateUser"'
+
   - set:
       field: user.target.id
       value: '{{aws.cloudtrail.flattened.response_elements.user.userId}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "CreateUser"'
 
-  #
-  # DeleteAccessKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "DeleteAccessKey"'
-
-  #
-  # DeleteSSHPublicKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "DeleteSSHPublicKey"'
-
-  #
-  # DeleteUser
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "DeleteUser"'
-
-  #
-  # EnableMFADevice
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "EnableMFADevice"'
-
-  #
-  # RemoveUserFromGroup
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "RemoveUserFromGroup"'
-  #
-  # UpdateAccessKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UpdateAccessKey"'
-
-  #
-  # UpdateLoginProfile
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UpdateLoginProfile"'
-
-  #
-  # UpdateSSHPublicKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UpdateSSHPublicKey"'
-  #
-  # UpdateUser
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UpdateUser"'
   - set:
       field: user.changes.name
       value: '{{aws.cloudtrail.flattened.request_parameters.newUserName}}'
       ignore_empty_value: true
       if: 'ctx.event?.action == "UpdateUser"'
 
-  #
-  # UploadSSHPublicKey
-  #
-  - set:
-      field: user.target.name
-      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
-      ignore_empty_value: true
-      if: 'ctx.event?.action == "UploadSSHPublicKey"'
-
   - set:
       field: group.name
       value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
       ignore_empty_value: true
       if: '["AddUserToGroup", "CreateGroup", "DeleteGroup", "RemoveUserFromGroup", "UpdateGroup"].contains(ctx.event?.action)'
+
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      if: '["AddUserToGroup", "CreateAccessKey", "CreateUser", "DeleteAccessKey", "DeleteSSHPublicKey", "DeleteUser", "EnableMFADevice", "RemoveUserFromGroup", "UpdateAccessKey", "UpdateLoginProfile", "UpdateSSHPublicKey", "UpdateUser", "UploadSSHPublicKey"].contains(ctx.event?.action)'
 
   - remove:
       field:
