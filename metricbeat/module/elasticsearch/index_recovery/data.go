@@ -52,6 +52,14 @@ var (
 			"host": c.Str("host", s.Optional),
 			"name": c.Str("name", s.Optional),
 		}),
+
+		"stop_time": s.Object{
+			"ms": c.Int("stop_time_in_millis"),
+		},
+
+		"start_time": s.Object{
+			"ms": c.Int("start_time_in_millis"),
+		},
 	}
 )
 

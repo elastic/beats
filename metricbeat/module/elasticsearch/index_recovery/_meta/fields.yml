@@ -6,6 +6,10 @@
   fields:
     - name: total_time.ms
       type: long
+    - name: stop_time.ms
+      type: long
+    - name: start_time.ms
+      type: long
     - name: id
       type: long
       description: >

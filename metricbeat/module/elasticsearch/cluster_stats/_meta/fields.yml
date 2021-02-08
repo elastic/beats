@@ -82,6 +82,8 @@
     - name: stack
       type: group
       fields:
+        - name: apm.found
+          type: boolean
         - name: xpack.ccr.available
           type: boolean
         - name: xpack.ccr.enabled
