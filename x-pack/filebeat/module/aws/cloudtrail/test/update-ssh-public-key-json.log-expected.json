@@ -35,6 +35,7 @@
         "input.type": "log",
         "log.offset": 0,
         "related.user": [
+            "Alice",
             "Bob"
         ],
         "service.type": "aws",
@@ -86,6 +87,7 @@
         "input.type": "log",
         "log.offset": 800,
         "related.user": [
+            "Alice",
             "Bob"
         ],
         "service.type": "aws",

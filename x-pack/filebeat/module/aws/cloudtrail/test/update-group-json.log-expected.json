@@ -31,6 +31,9 @@
         "group.name": "TEST-GROUP",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -78,6 +81,9 @@
         "group.name": "TEST-GROUP2",
         "input.type": "log",
         "log.offset": 683,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
