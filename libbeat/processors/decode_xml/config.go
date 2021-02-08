@@ -5,19 +5,19 @@
 package decode_xml
 
 type decodeXMLConfig struct {
-	Field         string `config:"field"`
-	OverwriteKeys bool   `config:"overwrite_keys"`
-	AddErrorKey   bool   `config:"add_error_key"`
-	Target        string `config:"target"`
-	DocumentID    string `config:"document_id"`
-	ToLower       bool   `config:"to_lower"`
+	Field         string  `config:"field"`
+	OverwriteKeys bool    `config:"overwrite_keys"`
+	AddErrorKey   bool    `config:"add_error_key"`
+	Target        *string `config:"target"`
+	DocumentID    string  `config:"document_id"`
+	ToLower       bool    `config:"to_lower"`
 }
 
 func defaultConfig() decodeXMLConfig {
 	return decodeXMLConfig{
 		Field:         "message",
-		Target:        "",
-		OverwriteKeys: false,
+		Target:        new(string),
+		OverwriteKeys: true,
 		AddErrorKey:   false,
 		ToLower:       true,
 	}

@@ -88,38 +88,39 @@ func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
 	text, ok := data.(string)
 	if !ok {
 		errs = append(errs, errFieldIsNotString)
-	}
-	xmloutput, err := x.decodeField(text)
-	if err != nil {
-		errs = append(errs, fmt.Errorf("failed to decode fields in decode_xml processor: %v", err))
-	}
+	} else {
+		xmloutput, err := x.decodeField(text)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("failed to decode fields in decode_xml processor: %v", err))
+		}
 
-	target := field
-	if x.config.Target != "" {
-		target = x.config.Target
-	}
+		target := field
+		if x.config.Target != nil {
+			target = *x.config.Target
+		}
 
-	var id string
-	if key := x.config.DocumentID; key != "" {
-		if tmp, err := common.MapStr(xmloutput).GetValue(key); err == nil {
-			if v, ok := tmp.(string); ok {
-				id = v
-				common.MapStr(xmloutput).Delete(key)
+		var id string
+		if key := x.config.DocumentID; key != "" {
+			if tmp, err := common.MapStr(xmloutput).GetValue(key); err == nil {
+				if v, ok := tmp.(string); ok {
+					id = v
+					common.MapStr(xmloutput).Delete(key)
+				}
 			}
 		}
-	}
 
-	if target != "" {
-		_, err = event.PutValue(target, xmloutput)
-	} else {
-		jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, x.config.AddErrorKey)
-	}
+		if target != "" {
+			_, err = event.PutValue(target, xmloutput)
+		} else {
+			jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, x.config.AddErrorKey)
+		}
 
-	if err != nil {
-		errs = append(errs, fmt.Errorf("Error trying to Put value %v for field: %s. Error: %w", xmloutput, field, err))
-	}
-	if id != "" {
-		event.SetID(id)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("Error trying to Put value %v for field: %s. Error: %w", xmloutput, field, err))
+		}
+		if id != "" {
+			event.SetID(id)
+		}
 	}
 	// If error has not already been set, add errors if ignore_failure is false.
 	if len(errs) > 0 {

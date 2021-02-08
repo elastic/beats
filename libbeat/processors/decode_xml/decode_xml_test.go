@@ -29,8 +29,8 @@ import (
 )
 
 var (
-	targetField     = "xml"
-	targetRootField = ""
+	testXMLTargetField  = "xml"
+	testRootTargetField = ""
 )
 
 func TestDecodeXML(t *testing.T) {
@@ -46,7 +46,7 @@ func TestDecodeXML(t *testing.T) {
 			description: "Simple xml decode with target field set",
 			config: decodeXMLConfig{
 				Field:  "message",
-				Target: targetField,
+				Target: &testXMLTargetField,
 			},
 			Input: common.MapStr{
 				"message": `<catalog>
@@ -83,7 +83,7 @@ func TestDecodeXML(t *testing.T) {
 			description: "Test with target set to root",
 			config: decodeXMLConfig{
 				Field:  "message",
-				Target: targetRootField,
+				Target: &testRootTargetField,
 			},
 			Input: common.MapStr{
 				"message": `<catalog>
@@ -259,10 +259,10 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": (map[string]interface{})(nil),
-				"error":   []string{"error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>"},
+				"error":   "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 			},
 			error:        true,
-			errorMessage: "error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
+			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
 			description: "Decoding with broken XML format, with AddErrorKey disabled",
@@ -284,7 +284,7 @@ func TestDecodeXML(t *testing.T) {
 				"message": (map[string]interface{})(nil),
 			},
 			error:        true,
-			errorMessage: "error trying to decode XML field xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
+			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
 			description: "Test when the XML field is empty",
@@ -298,7 +298,7 @@ func TestDecodeXML(t *testing.T) {
 				"message": (map[string]interface{})(nil),
 			},
 			error:        true,
-			errorMessage: "error trying to decode XML field EOF",
+			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: EOF",
 		},
 		{
 			description: "Test when the XML field not a string",
@@ -312,7 +312,7 @@ func TestDecodeXML(t *testing.T) {
 				"message": 1,
 			},
 			error:        true,
-			errorMessage: "The configured field is not a string",
+			errorMessage: "field value is not a string",
 		},
 	}
 
@@ -356,6 +356,7 @@ func TestXMLToDocumentID(t *testing.T) {
 	config := common.MustNewConfigFrom(map[string]interface{}{
 		"fields":      []string{"message"},
 		"document_id": "catalog.book.seq",
+		"target":      "message",
 	})
 
 	p, err := New(config)
