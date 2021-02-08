@@ -1,5 +1,6 @@
 - key: threatintel
   title: threatintel
+  default_field: false
   description: >
     Threat intelligence Filebeat Module.
   fields:
