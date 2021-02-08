@@ -374,6 +374,66 @@ func TestDecodeXML(t *testing.T) {
 	}
 }
 
+//BenchmarkProcessor_Run/single_object-4            104070            11351 ns/op
+//BenchmarkProcessor_Run/nested_and_array_object-4  41202             28762 ns/op
+func BenchmarkProcessor_Run(b *testing.B) {
+	c := defaultConfig()
+	p, err := newDecodeXML(c)
+
+	b.Run("single_object", func(b *testing.B) {
+		evt := &beat.Event{Fields: map[string]interface{}{
+			"message": `<?xml version="1.0"?>
+				<catalog>
+					<book>
+					<author>William H. Gaddis</author>
+					<title>The Recognitions</title>
+					<review>One of the great seminal American novels of the 20th century.</review>
+				</book>
+				</catalog>`,
+		}}
+
+		for i := 0; i < b.N; i++ {
+			_, err = p.Run(evt)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+
+	b.Run("nested_and_array_object", func(b *testing.B) {
+		evt := &beat.Event{Fields: map[string]interface{}{
+			"message": `<?xml version="1.0"?>
+				<catalog>
+					<book>
+					<author>William H. Gaddis</author>
+					<title>The Recognitions</title>
+					<review>One of the great seminal American novels of the 20th century.</review>
+				</book>
+				<book>
+					<author>Ralls, Kim</author>
+					<title>Midnight Rain</title>
+					<review>Some review.</review>
+				</book>
+				<secondcategory>
+					<paper id="bk102">
+						<test2>Ralls, Kim</test2>
+						<description>A former architect battles corporate zombies, 
+						an evil sorceress, and her own childhood to become queen 
+						of the world.</description>
+					</paper>
+				</secondcategory>
+				</catalog>`,
+		}}
+
+		for i := 0; i < b.N; i++ {
+			_, err = p.Run(evt)
+			if err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+}
+
 func TestXMLToDocumentID(t *testing.T) {
 	log := logp.NewLogger("decode_xml")
 
