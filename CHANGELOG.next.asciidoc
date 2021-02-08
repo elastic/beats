@@ -500,6 +500,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
+- Unskip s3_request integration test. {pull}23887[23887]
 
 *Packetbeat*
 
@@ -967,6 +968,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Check fields are documented in aws metricsets. {pull}23887[23887]
 
 *Packetbeat*
 
