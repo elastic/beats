@@ -16,11 +16,29 @@ import (
 	"github.com/elastic/go-ucfg/cfgutil"
 )
 
+// options hold the specified options
+type options struct {
+	skipKeys []string
+}
+
+// Option is an option type that modifies how loading configs work
+type Option func(*options)
+
+// VarSkipKeys prevents variable expansion for these keys.
+//
+// The provided keys only skip if the keys are top-level keys.
+func VarSkipKeys(keys ...string) Option {
+	return func(opts *options) {
+		opts.skipKeys = keys
+	}
+}
+
 // DefaultOptions defaults options used to read the configuration
-var DefaultOptions = []ucfg.Option{
+var DefaultOptions = []interface{}{
 	ucfg.PathSep("."),
 	ucfg.ResolveEnv,
 	ucfg.VarExp,
+	VarSkipKeys("inputs"),
 }
 
 // Config custom type over a ucfg.Config to add new methods on the object.
@@ -32,9 +50,25 @@ func New() *Config {
 }
 
 // NewConfigFrom takes a interface and read the configuration like it was YAML.
-func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
+func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 	if len(opts) == 0 {
 		opts = DefaultOptions
+	}
+	var ucfgOpts []ucfg.Option
+	var localOpts []Option
+	for _, o := range opts {
+		switch ot := o.(type) {
+		case ucfg.Option:
+			ucfgOpts = append(ucfgOpts, ot)
+		case Option:
+			localOpts = append(localOpts, ot)
+		default:
+			return nil, fmt.Errorf("unknown option type %T", o)
+		}
+	}
+	local := &options{}
+	for _, o := range localOpts {
+		o(local)
 	}
 
 	var data []byte
@@ -52,7 +86,7 @@ func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
 			return nil, err
 		}
 	} else {
-		c, err := ucfg.NewFrom(from, opts...)
+		c, err := ucfg.NewFrom(from, ucfgOpts...)
 		return newConfigFrom(c), err
 	}
 
@@ -61,18 +95,22 @@ func NewConfigFrom(from interface{}, opts ...ucfg.Option) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	inputs, ok := c["inputs"]
-	delete(c, "inputs")
-	cfg, err := NewConfigFrom(c, DefaultOptions...)
+	skippedKeys := map[string]interface{}{}
+	for _, skip := range local.skipKeys {
+		val, ok := c[skip]
+		if ok {
+			skippedKeys[skip] = val
+			delete(c, skip)
+		}
+	}
+	cfg, err := ucfg.NewFrom(c, ucfgOpts...)
 	if err != nil {
 		return nil, err
 	}
-	if ok {
-		err = cfg.access().Merge(map[string]interface{}{
-			"inputs": inputs,
-		})
+	if len(skippedKeys) > 0 {
+		err = cfg.Merge(skippedKeys, ucfg.ResolveNOOP)
 	}
-	return cfg, err
+	return newConfigFrom(cfg), err
 }
 
 // MustNewConfigFrom try to create a configuration based on the type passed as arguments and panic
@@ -90,8 +128,12 @@ func newConfigFrom(in *ucfg.Config) *Config {
 }
 
 // Unpack unpacks a struct to Config.
-func (c *Config) Unpack(to interface{}) error {
-	return c.access().Unpack(to, DefaultOptions...)
+func (c *Config) Unpack(to interface{}, opts ...interface{}) error {
+	ucfgOpts, err := getUcfgOptions(opts...)
+	if err != nil {
+		return err
+	}
+	return c.access().Unpack(to, ucfgOpts...)
 }
 
 func (c *Config) access() *ucfg.Config {
@@ -99,11 +141,12 @@ func (c *Config) access() *ucfg.Config {
 }
 
 // Merge merges two configuration together.
-func (c *Config) Merge(from interface{}, opts ...ucfg.Option) error {
-	if len(opts) == 0 {
-		opts = DefaultOptions
+func (c *Config) Merge(from interface{}, opts ...interface{}) error {
+	ucfgOpts, err := getUcfgOptions(opts...)
+	if err != nil {
+		return err
 	}
-	return c.access().Merge(from, opts...)
+	return c.access().Merge(from, ucfgOpts...)
 }
 
 // ToMapStr takes the config and transform it into a map[string]interface{}
@@ -150,4 +193,23 @@ func LoadFiles(paths ...string) (*Config, error) {
 		}
 	}
 	return newConfigFrom(merger.Config()), nil
+}
+
+func getUcfgOptions(opts ...interface{}) ([]ucfg.Option, error) {
+	if len(opts) == 0 {
+		opts = DefaultOptions
+	}
+	var ucfgOpts []ucfg.Option
+	for _, o := range opts {
+		switch ot := o.(type) {
+		case ucfg.Option:
+			ucfgOpts = append(ucfgOpts, ot)
+		case Option:
+			// ignored during unpack
+			continue
+		default:
+			return nil, fmt.Errorf("unknown option type %T", o)
+		}
+	}
+	return ucfgOpts, nil
 }
