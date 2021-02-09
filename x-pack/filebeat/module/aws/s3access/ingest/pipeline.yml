@@ -2,6 +2,12 @@ description: "Pipeline for s3 server access logs"
 
 processors:
   - set:
+      field: event.category
+      value: web
+  - append:
+      field: event.type
+      value: access
+  - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
   - grok:
