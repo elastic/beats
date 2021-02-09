@@ -18,7 +18,7 @@ processors:
     field: [syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host]
     ignore_missing: true
 - date:
-    field: json.timestamp
+    field: json.time
     target_field: '@timestamp'
     ignore_failure: true
     formats:
