@@ -1,0 +1,257 @@
+[
+  {
+    "auditd": {
+      "data": {
+        "acct": "(unknown)",
+        "hostname": "localhost",
+        "op": "login",
+        "terminal": "ssh"
+      },
+      "message_type": "user_login",
+      "result": "fail",
+      "sequence": 110544844,
+      "summary": {
+        "actor": {
+          "primary": "unset",
+          "secondary": "(unknown)"
+        },
+        "how": "/usr/sbin/sshd",
+        "object": {
+          "primary": "ssh",
+          "secondary": "1.2.3.4",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "logged-in",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_LOGIN msg=audit(1553501549.148:110544844): user pid=374 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=\"(unknown)\" exe=\"/usr/sbin/sshd\" hostname=localhost addr=1.2.3.4 terminal=ssh res=failed'"
+      ],
+      "outcome": "failure",
+      "type": [
+        "start",
+        "authentication_failure"
+      ]
+    },
+    "network": {
+      "direction": "ingress"
+    },
+    "process": {
+      "executable": "/usr/sbin/sshd",
+      "pid": 374
+    },
+    "related": {
+      "user": [
+        "(unknown)"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "source": {
+      "ip": "1.2.3.4"
+    },
+    "user": {
+      "effective": {
+        "name": "(unknown)"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "1.2.3.4",
+        "id": "700",
+        "op": "login",
+        "terminal": "/dev/pts/0"
+      },
+      "message_type": "user_login",
+      "result": "success",
+      "sequence": 110276965,
+      "session": "5388",
+      "summary": {
+        "actor": {
+          "primary": "700",
+          "secondary": "700"
+        },
+        "how": "/usr/sbin/sshd",
+        "object": {
+          "primary": "/dev/pts/0",
+          "secondary": "1.2.3.4",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "logged-in",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_LOGIN msg=audit(1553452002.231:110276965): user pid=10318 uid=0 auid=700 ses=5388 msg='op=login id=700 exe=\"/usr/sbin/sshd\" hostname=1.2.3.4 addr=1.2.3.4 terminal=/dev/pts/0 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "start",
+        "authentication_success"
+      ]
+    },
+    "network": {
+      "direction": "ingress"
+    },
+    "process": {
+      "executable": "/usr/sbin/sshd",
+      "pid": 10318
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "source": {
+      "ip": "1.2.3.4"
+    },
+    "user": {
+      "audit": {
+        "id": "700"
+      },
+      "id": "700"
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "acct": "bob",
+        "addr": "127.0.0.1",
+        "hostname": "localhost",
+        "op": "PAM:authentication",
+        "terminal": "/dev/pts/0"
+      },
+      "message_type": "user_auth",
+      "result": "success",
+      "sequence": 21114,
+      "session": "62",
+      "summary": {
+        "actor": {
+          "primary": "root",
+          "secondary": "bob"
+        },
+        "how": "/bin/su",
+        "object": {
+          "primary": "/dev/pts/0",
+          "secondary": "127.0.0.1",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "authenticated",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_AUTH msg=audit(1552714590.571:21114): pid=11312 uid=0 auid=0 ses=62 msg='op=PAM:authentication acct=\"bob\" exe=\"/bin/su\" hostname=localhost addr=127.0.0.1 terminal=/dev/pts/0 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "info"
+      ]
+    },
+    "process": {
+      "executable": "/bin/su",
+      "pid": 11312
+    },
+    "related": {
+      "user": [
+        "bob",
+        "root"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "0",
+        "name": "root"
+      },
+      "effective": {
+        "id": "9999",
+        "name": "bob"
+      },
+      "id": "0",
+      "name": "root"
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "acct": "bob",
+        "addr": "127.0.0.1",
+        "hostname": "localhost",
+        "op": "PAM:setcred",
+        "terminal": "ssh"
+      },
+      "message_type": "cred_acq",
+      "result": "success",
+      "sequence": 4088825,
+      "session": "352",
+      "summary": {
+        "actor": {
+          "primary": "alice",
+          "secondary": "bob"
+        },
+        "how": "/usr/sbin/sshd",
+        "object": {
+          "primary": "ssh",
+          "secondary": "127.0.0.1",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "acquired-credentials",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=CRED_ACQ msg=audit(1553557236.015:4088825): pid=9033 uid=0 auid=1001 ses=352 msg='op=PAM:setcred acct=\"bob\" exe=\"/usr/sbin/sshd\" hostname=localhost addr=127.0.0.1 terminal=ssh res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "info"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/sshd",
+      "pid": 9033
+    },
+    "related": {
+      "user": [
+        "alice",
+        "bob"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1001",
+        "name": "alice"
+      },
+      "effective": {
+        "id": "9999",
+        "name": "bob"
+      },
+      "id": "1001",
+      "name": "alice"
+    }
+  }
+]

@@ -556,7 +556,9 @@
             "forwarded"
         ],
         "threat.framework": "MITRE ATT&CK",
-        "threat.technique.name": "SuspiciousActivity"
+        "threat.technique.name": "SuspiciousActivity",
+        "user.id": "8e24c50a-a77c-4782-813f-965009b5ddf3",
+        "user.name": "brent@elasticbv.onmicrosoft.com"
     },
     {
         "@timestamp": "2020-09-23T19:32:05.8366667Z",
