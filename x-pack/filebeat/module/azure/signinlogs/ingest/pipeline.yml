@@ -18,10 +18,11 @@ processors:
     ignore_failure: false
     formats:
     - ISO8601
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.signinlogs.time
+    field: azure.signinlogs.time
     ignore_missing: true
 - rename:
     field: azure.signinlogs.resourceId
