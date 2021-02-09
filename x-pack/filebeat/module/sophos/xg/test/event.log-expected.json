@@ -53,7 +53,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:38:58.000-02:00",
@@ -223,7 +224,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:39:01.000-02:00",
@@ -370,7 +372,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:39:04.000-02:00",
@@ -479,7 +482,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "hendrikl"
     },
     {
         "@timestamp": "2020-05-18T14:39:06.000-02:00",
@@ -705,7 +709,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2018-06-06T11:12:10.000-02:00",
