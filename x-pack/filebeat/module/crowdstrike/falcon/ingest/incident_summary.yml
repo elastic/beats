@@ -1,0 +1,29 @@
+processors:
+  - set:
+      field: event.kind
+      value: alert
+  - append:
+      field: event.category
+      value: [malware]
+  - append:
+      field: event.type
+      value: [info]
+  - set:
+      field: event.action
+      value: incident
+  - set:
+      field: event.dataset
+      value: crowdstrike.falcon_endpoint
+  - set:
+      field: agent.type
+      value: falcon
+  - convert:
+      field: crowdstrike.event.FalconHostLink
+      target_field: event.url
+      type: string
+      ignore_failure: true
+      ignore_missing: true
+  - set:
+      field: message
+      value: "Incident score {{crowdstrike.event.FineScore}}"
+      if: ctx?.crowdstrike?.event?.FineScore != null
