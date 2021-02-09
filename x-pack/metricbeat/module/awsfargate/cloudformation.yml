@@ -61,7 +61,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: metricbeat-container
-          Image: docker.elastic.co/beats/metricbeat:7.11.0-SNAPSHOT
+          Image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
           Secrets:
             - Name: ELASTIC_CLOUD_ID
               ValueFrom: !Ref CloudIDArn

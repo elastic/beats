@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"fmt"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -51,9 +52,16 @@ type publishSettings struct {
 	KeepNull bool `config:"keep_null"`
 
 	// Output meta data settings
-	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
-	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
-	DataSet  string                   `config:"dataset"`
+	Pipeline   string                   `config:"pipeline"` // ES Ingest pipeline name
+	Index      fmtstr.EventFormatString `config:"index"`    // ES output index pattern
+	DataStream *datastream              `config:"data_stream"`
+	DataSet    string                   `config:"dataset"`
+}
+
+type datastream struct {
+	Namespace string `config:"namespace"`
+	Dataset   string `config:"dataset"`
+	Type      string `config:"type"`
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -84,15 +92,9 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	var indexProcessor processors.Processor
-	if !settings.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
-		if err != nil {
-			return nil, err
-		}
-		indexProcessor = add_formatted_index.New(timestampFormat)
+	indexProcessor, err := setupIndexProcessor(info, settings)
+	if err != nil {
+		return nil, err
 	}
 
 	userProcessors, err := processors.New(settings.Processors)
@@ -100,9 +102,14 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
+	// TODO: Remove this logic in the 8.0/master branch, preserve only in 7.x
 	dataset := settings.DataSet
 	if dataset == "" {
-		dataset = "uptime"
+		if settings.DataStream != nil && settings.DataStream.Dataset != "" {
+			dataset = settings.DataStream.Dataset
+		} else {
+			dataset = "uptime"
+		}
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
@@ -140,4 +147,48 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 
 		return clientCfg, nil
 	}, nil
+}
+
+func setupIndexProcessor(info beat.Info, settings publishSettings) (processors.Processor, error) {
+	var indexProcessor processors.Processor
+	if settings.DataStream != nil {
+		namespace := settings.DataStream.Namespace
+		if namespace == "" {
+			namespace = "default"
+		}
+		typ := settings.DataStream.Type
+		if typ == "" {
+			typ = "synthetics"
+		}
+
+		dataset := settings.DataStream.Dataset
+		if dataset == "" {
+			dataset = "generic"
+		}
+
+		index := fmt.Sprintf(
+			"%s-%s-%s",
+			typ,
+			dataset,
+			namespace,
+		)
+		compiled, err := fmtstr.CompileEvent(index)
+		if err != nil {
+			return nil, fmt.Errorf("could not compile datastream: '%s', this should never happen: %w", index, err)
+		} else {
+			settings.Index = *compiled
+		}
+	}
+
+	if !settings.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
+
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor = add_formatted_index.New(timestampFormat)
+	}
+	return indexProcessor, nil
 }

@@ -138,13 +138,9 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 			stepID = configrequest.StepRemove
 		}
 		filebeatStep := configrequest.Step{
-			ID:      stepID,
-			Version: version,
-			ProgramSpec: program.Spec{
-				Name:     logsProcessName,
-				Cmd:      logsProcessName,
-				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, logsProcessName),
-			},
+			ID:          stepID,
+			Version:     version,
+			ProgramSpec: loadSpecFromSupported(logsProcessName),
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: fbConfig,
 			},
@@ -160,13 +156,9 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 		}
 
 		metricbeatStep := configrequest.Step{
-			ID:      stepID,
-			Version: version,
-			ProgramSpec: program.Spec{
-				Name:     metricsProcessName,
-				Cmd:      metricsProcessName,
-				Artifact: fmt.Sprintf("%s/%s", artifactPrefix, metricsProcessName),
-			},
+			ID:          stepID,
+			Version:     version,
+			ProgramSpec: loadSpecFromSupported(metricsProcessName),
 			Meta: map[string]interface{}{
 				configrequest.MetaConfigKey: mbConfig,
 			},
@@ -176,6 +168,18 @@ func (o *Operator) generateMonitoringSteps(version string, output interface{}) [
 	}
 
 	return steps
+}
+
+func loadSpecFromSupported(processName string) program.Spec {
+	if loadedSpec, found := program.SupportedMap[strings.ToLower(processName)]; found {
+		return loadedSpec
+	}
+
+	return program.Spec{
+		Name:     processName,
+		Cmd:      processName,
+		Artifact: fmt.Sprintf("%s/%s", artifactPrefix, processName),
+	}
 }
 
 func (o *Operator) getMonitoringFilebeatConfig(output interface{}) (map[string]interface{}, bool) {
@@ -410,7 +414,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 							},
 							// Cgroup reporting
 							{
-								"from": "http.agent.beat.cgrgit loup",
+								"from": "http.agent.beat.cgroup",
 								"to":   "system.process.cgroup",
 							},
 						},

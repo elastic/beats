@@ -85620,6 +85620,16 @@ type: object
 
 --
 
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
+
+
+type: object
+
+--
+
 *`kubernetes.replicaset.name`*::
 +
 --
@@ -140972,6 +140982,15 @@ type: keyword
 
 --
 
+
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
 
 *`suricata.eve.alert.category`*::
 +
