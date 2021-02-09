@@ -435,7 +435,7 @@ def e2e(Map args = [:]) {
       withEnv(["GO_VERSION=${goVersionForE2E}",
                "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
                "LOG_LEVEL=TRACE"]) {
-        filebeat(output: "docker_logs_${entrypoint}.log", workdir: "${env.WORKSPACE}"){
+        filebeat(output: "docker_logs_${entrypoint}.log"){
           sh script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}"
         }
       }
