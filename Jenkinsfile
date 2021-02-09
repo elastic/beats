@@ -428,21 +428,24 @@ def e2e(Map args = [:]) {
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
-    try {
-      if(isDockerInstalled()) {
-        dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    if(isDockerInstalled()) {
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    }
+    def goVersionForE2E = readFile('.go-version').trim()
+    withEnv(["GO_VERSION=${goVersionForE2E}",
+              "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "LOG_LEVEL=TRACE"]) {
+      def status = 0
+      filebeat(output: dockerLogFile){
+        status = sh(script: ".ci/scripts/${entrypoint}",
+                    label: "Run functional tests ${entrypoint}",
+                    returnStatus: true)
       }
-      def goVersionForE2E = readFile('.go-version').trim()
-      withEnv(["GO_VERSION=${goVersionForE2E}",
-               "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
-               "LOG_LEVEL=TRACE"]) {
-        filebeat(output: dockerLogFile){
-          sh script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}"
-        }
-      }
-    } finally {
       junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
       archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+      if (status != 0) {
+        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+      }
     }
   }
 }
