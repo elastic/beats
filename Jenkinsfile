@@ -459,6 +459,7 @@ def target(Map args = [:]) {
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
   def isE2E = args.e2e?.get('enabled', false)
+  def isPackaging = args.get('package', false)
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -468,11 +469,19 @@ def target(Map args = [:]) {
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
+        // TODO:
+        // Packaging should happen only after the e2e?
+        if (isPackaging) {
+          publishPackages("${directory}")
+        }
         if(isE2E) {
           e2e(args)
         }
-        publishPackages("${directory}")
-        pushCIDockerImages("${directory}")
+        // TODO:
+        // push docker images should happen only after the e2e?
+        if (isPackaging) {
+          pushCIDockerImages("${directory}")
+        }
       }
     }
   }
@@ -909,7 +918,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
     }*/
     if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'))
+      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
     }/*
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
