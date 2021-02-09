@@ -2,6 +2,7 @@
 
 type: tcp
 host: "{{.syslog_host}}:{{.syslog_port}}"
+framing: rfc6587
 
 {{ else if eq .input "udp" }}
 
