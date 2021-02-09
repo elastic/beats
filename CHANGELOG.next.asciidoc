@@ -833,6 +833,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Filebeat auditd dataset to ECS 1.8.0. {pull}23723[23723] {issue}23118[23118]
 - Updated microsoft defender_atp and m365_defender to ECS 1.8. {pull}23897[23897] {issue}23118[23118]
 - Updated o365 module to ECS 1.8. {issue}23118[23118] {pull}23896[23896]
+- Updated azure module to ECS 1.8. {issue}23118[23118] {pull}23927[23927]
 
 *Heartbeat*
 
