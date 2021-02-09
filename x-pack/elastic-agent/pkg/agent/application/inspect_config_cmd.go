@@ -129,7 +129,10 @@ func printMapStringConfig(mapStr map[string]interface{}) error {
 		return err
 	}
 
-	_, newCfg := caps.Apply(mapStr)
+	newCfg, err := caps.Apply(mapStr)
+	if err != nil {
+		return errors.New(err, "failed to apply capabilities")
+	}
 	newMap, ok := newCfg.(map[string]interface{})
 	if !ok {
 		return errors.New("config returned from capabilities has invalid type")

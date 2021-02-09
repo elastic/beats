@@ -7,6 +7,7 @@ package capabilities
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -18,10 +19,10 @@ const (
 
 func newInputsCapability(log *logger.Logger, rd *ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	if rd == nil {
-		return &multiInputsCapability{log: log, caps: []Capability{}}, nil
+		return &multiInputsCapability{log: log, caps: []*inputCapability{}}, nil
 	}
 
-	caps := make([]Capability, 0, len(rd.Capabilities))
+	caps := make([]*inputCapability, 0, len(rd.Capabilities))
 
 	for _, r := range rd.Capabilities {
 		c, err := newInputCapability(log, r, reporter)
@@ -37,7 +38,7 @@ func newInputsCapability(log *logger.Logger, rd *ruleDefinitions, reporter statu
 	return &multiInputsCapability{log: log, caps: caps}, nil
 }
 
-func newInputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
+func newInputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (*inputCapability, error) {
 	cap, ok := r.(*inputCapability)
 	if !ok {
 		return nil, nil
@@ -56,29 +57,24 @@ type inputCapability struct {
 	Input    string `json:"input" yaml:"input"`
 }
 
-func (c *inputCapability) Apply(in interface{}) (bool, interface{}) {
-	cfgMap, ok := in.(map[string]interface{})
-	if !ok || cfgMap == nil {
-		return false, in
-	}
-
+func (c *inputCapability) Apply(cfgMap map[string]interface{}) (map[string]interface{}, error) {
 	inputsIface, ok := cfgMap[inputsKey]
 	if ok {
 		if inputs := inputsMap(inputsIface, c.log); inputs != nil {
 			renderedInputs, err := c.renderInputs(inputs)
 			if err != nil {
 				c.log.Errorf("marking inputs failed for capability '%s': %v", c.name(), err)
-				return false, in
+				return cfgMap, err
 			}
 
 			cfgMap[inputsKey] = renderedInputs
-			return false, cfgMap
+			return cfgMap, nil
 		}
 
-		return false, in
+		return cfgMap, nil
 	}
 
-	return false, in
+	return cfgMap, nil
 }
 
 func inputsMap(cfgInputs interface{}, l *logger.Logger) []map[string]interface{} {
@@ -126,11 +122,10 @@ func (c *inputCapability) name() string {
 func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[string]interface{}, error) {
 	newInputs := make([]map[string]interface{}, 0, len(inputs))
 
-	for _, input := range inputs {
+	for i, input := range inputs {
 		inputTypeIface, found := input[typeKey]
 		if !found {
-			newInputs = append(newInputs, input)
-			continue
+			return newInputs, errors.New(fmt.Sprintf("input '%d' is missing type key", i), errors.TypeConfig)
 		}
 
 		inputType, ok := inputTypeIface.(string)
@@ -166,44 +161,39 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 }
 
 type multiInputsCapability struct {
-	caps []Capability
+	caps []*inputCapability
 	log  *logger.Logger
 }
 
-func (c *multiInputsCapability) Apply(in interface{}) (bool, interface{}) {
+func (c *multiInputsCapability) Apply(in interface{}) (interface{}, error) {
 	inputsMap, transform, err := configObject(in)
 	if err != nil {
 		c.log.Errorf("constructing config object failed for 'multi-inputs' capability '%s': %v", err)
-		return false, in
+		return in, nil
 	}
 	if inputsMap == nil {
-		return false, in
+		return in, nil
 	}
-
-	var mapIface interface{} = inputsMap
 
 	for _, cap := range c.caps {
 		// input capability is not blocking
-		_, mapIface = cap.Apply(mapIface)
-	}
-
-	inputsMap, ok := mapIface.(map[string]interface{})
-	if !ok {
-		c.log.Errorf("expecting map config object but got %T for capability 'multi-outputs': %v", mapIface, err)
-		return false, in
+		inputsMap, err = cap.Apply(inputsMap)
+		if err != nil {
+			return in, err
+		}
 	}
 
 	inputsMap, err = c.cleanupInput(inputsMap)
 	if err != nil {
 		c.log.Errorf("cleaning up config object failed for capability 'multi-outputs': %v", err)
-		return false, in
+		return in, nil
 	}
 
 	if transform == nil {
-		return false, inputsMap
+		return inputsMap, nil
 	}
 
-	return false, transform(inputsMap)
+	return transform(inputsMap), nil
 }
 
 func (c *multiInputsCapability) cleanupInput(cfgMap map[string]interface{}) (map[string]interface{}, error) {

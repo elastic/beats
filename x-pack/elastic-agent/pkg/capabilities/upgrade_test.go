@@ -24,133 +24,178 @@ func TestUpgrade(t *testing.T) {
 	})
 
 	t.Run("empty eql", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 	})
 
 	t.Run("valid action - version match", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "${version} == '8.0.0'",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "${version} == '8.0.0'",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "8.0.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - deny version match", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "deny",
-			UpgradeEqlDefinition: "${version} == '8.0.0'",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "deny",
+					UpgradeEqlDefinition: "${version} == '8.0.0'",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "8.0.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Error(t, err, "should fail")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - deny version match", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "deny",
-			UpgradeEqlDefinition: "${version} == '8.*.*'",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "deny",
+					UpgradeEqlDefinition: "${version} == '8.*.*'",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "9.0.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.NoError(t, err, "should not fail")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - version mismmatch", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "${version} == '7.12.0'",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "${version} == '7.12.0'",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "8.0.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
+		assert.Error(t, err, "should fail")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - version bug allowed minor mismatch", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.0.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.0.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "8.1.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
+		assert.Error(t, err, "should fail")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - version minor allowed major mismatch", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "7.157.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
+		assert.Error(t, err, "should fail")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid action - version minor allowed minor upgrade", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		ta := &testUpgradeAction{version: "8.2.0"}
-		isBlocking, outAfter := cap.Apply(ta)
+		outAfter, err := cap.Apply(ta)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.NoError(t, err, "should not fail")
 		assert.Equal(t, ta, outAfter)
 	})
 
 	t.Run("valid fleetatpi.action - version match", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -160,18 +205,23 @@ func TestUpgrade(t *testing.T) {
 			Version:    "8.2.0",
 			SourceURI:  "http://artifacts.elastic.co",
 		}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.NoError(t, err, "should not fail")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 
 	t.Run("valid fleetatpi.action - version mismmatch", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -179,18 +229,23 @@ func TestUpgrade(t *testing.T) {
 			Version:   "9.0.0",
 			SourceURI: "http://artifacts.elastic.co",
 		}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
+		assert.Error(t, err, "should fail")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 
 	t.Run("valid fleetatpi.action - version mismmatch", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "match(${version}, '8.*.*')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -198,18 +253,23 @@ func TestUpgrade(t *testing.T) {
 			Version:   "9.0.0",
 			SourceURI: "http://artifacts.elastic.co",
 		}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
+		assert.Error(t, err, "should fail")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 
 	t.Run("valid action - source uri trusted", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -217,18 +277,23 @@ func TestUpgrade(t *testing.T) {
 			Version:   "9.0.0",
 			SourceURI: "https://artifacts.elastic.co",
 		}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.NoError(t, err, "should not fail")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 
 	t.Run("valid action - source uri untrusted", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
@@ -236,25 +301,30 @@ func TestUpgrade(t *testing.T) {
 			Version:   "9.0.0",
 			SourceURI: "http://artifacts.elastic.co",
 		}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.True(t, isBlocking, "should not be blocking")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 
 	t.Run("unknown action", func(t *testing.T) {
-		r := &upgradeCapability{
-			Type:                 "allow",
-			UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{
+				&upgradeCapability{
+					Type:                 "allow",
+					UpgradeEqlDefinition: "startsWith(${source_uri}, 'https')",
+				},
+			},
 		}
-		cap, err := newUpgradeCapability(l, r, tr)
+		cap, err := newUpgradesCapability(l, rd, tr)
 		assert.NoError(t, err, "error not expected, provided eql is valid")
 		assert.NotNil(t, cap, "cap should be created")
 
 		apiAction := fleetapi.ActionPolicyChange{}
-		isBlocking, outAfter := cap.Apply(apiAction)
+		outAfter, err := cap.Apply(apiAction)
 
-		assert.False(t, isBlocking, "should not be blocking")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.NoError(t, err, "should not fail")
 		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 }

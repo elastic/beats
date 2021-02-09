@@ -1,3 +1,4 @@
+version: 0.1.0
 capabilities:
 - rule: deny
   input: system/logs

@@ -128,8 +128,9 @@ func TestMultiInput(t *testing.T) {
 		inputs := getInputs(initialInputs...)
 		assert.NotNil(t, inputs)
 
-		blocking, res := cap.Apply(inputs)
-		assert.False(t, blocking, "should not be blocking")
+		res, err := cap.Apply(inputs)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		ast, ok := res.(*transpiler.AST)
 		assert.True(t, ok, "expecting an ast")
@@ -159,6 +160,25 @@ func TestMultiInput(t *testing.T) {
 
 			assert.True(t, typeFound, fmt.Sprintf("input '%s' type key not found", in))
 		}
+	})
+
+	t.Run("unknown action", func(t *testing.T) {
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&inputCapability{
+				Type:  "deny",
+				Input: "system/metrics",
+			}},
+		}
+		cap, err := newInputsCapability(l, rd, tr)
+		assert.NoError(t, err, "error not expected, provided eql is valid")
+		assert.NotNil(t, cap, "cap should be created")
+
+		apiAction := fleetapi.ActionUpgrade{}
+		outAfter, err := cap.Apply(apiAction)
+
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 }
 
@@ -226,21 +246,6 @@ func TestInput(t *testing.T) {
 		runInputTest(t, l, r, expectedInputs, initialInputs)
 	})
 
-	t.Run("unknown action", func(t *testing.T) {
-		r := &inputCapability{
-			Type:  "allow",
-			Input: "system/metrics",
-		}
-		cap, err := newInputCapability(l, r, tr)
-		assert.NoError(t, err, "error not expected, provided eql is valid")
-		assert.NotNil(t, cap, "cap should be created")
-
-		apiAction := fleetapi.ActionUpgrade{}
-		isBlocking, outAfter := cap.Apply(apiAction)
-
-		assert.False(t, isBlocking, "should not be blocking")
-		assert.Equal(t, apiAction, outAfter, "action should not be altered")
-	})
 }
 
 func runInputTest(t *testing.T, l *logger.Logger, r *inputCapability, expectedInputs []string, initialInputs []string) {
@@ -251,12 +256,10 @@ func runInputTest(t *testing.T, l *logger.Logger, r *inputCapability, expectedIn
 
 	inputs := getInputsMap(initialInputs...)
 	assert.NotNil(t, inputs)
-	isBlocking, outAfter := cap.Apply(inputs)
-	assert.False(t, isBlocking, "should not be blocking")
 
-	newMap, ok := outAfter.(map[string]interface{})
-	assert.True(t, ok, "out value should be map")
-	assert.NotNil(t, newMap)
+	newMap, err := cap.Apply(inputs)
+	assert.NoError(t, err, "should not be failing")
+	assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 	inputsNode, found := newMap["inputs"]
 	assert.True(t, found, "inputsnot found")
@@ -315,8 +318,9 @@ func runMultiInputTest(t *testing.T, l *logger.Logger, rd *ruleDefinitions, expe
 	inputs := getInputsMap(initialInputs...)
 	assert.NotNil(t, inputs)
 
-	isBlocking, outAfter := cap.Apply(inputs)
-	assert.False(t, isBlocking, "should not be blocking")
+	outAfter, err := cap.Apply(inputs)
+	assert.NoError(t, err, "should not be failing")
+	assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 	newMap, ok := outAfter.(map[string]interface{})
 	assert.True(t, ok, "out ast should be AST")

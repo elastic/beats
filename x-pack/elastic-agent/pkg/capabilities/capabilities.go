@@ -5,6 +5,7 @@
 package capabilities
 
 import (
+	"errors"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -18,17 +19,23 @@ import (
 type Capability interface {
 	// Apply applies capabilities on input and returns true if input should be completely blocked
 	// otherwise, false and updated input is returned
-	Apply(interface{}) (bool, interface{})
+	Apply(interface{}) (interface{}, error)
 }
+
+var (
+	ErrBlocked = errors.New("Capability blocked")
+)
 
 type capabilitiesManager struct {
 	caps     []Capability
 	reporter status.Reporter
 }
 
+type capabilityFactory func(*logger.Logger, *ruleDefinitions, status.Reporter) (Capability, error)
+
 // Load loads capabilities files and prepares manager.
 func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability, error) {
-	handlers := []func(*logger.Logger, *ruleDefinitions, status.Reporter) (Capability, error){
+	handlers := []capabilityFactory{
 		newInputsCapability,
 		newOutputsCapability,
 		newUpgradesCapability,
@@ -74,16 +81,16 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 	return cm, nil
 }
 
-func (mgr *capabilitiesManager) Apply(in interface{}) (bool, interface{}) {
-	var blocked bool
+func (mgr *capabilitiesManager) Apply(in interface{}) (interface{}, error) {
+	var err error
 	// reset health on start, child caps will update to fail if needed
 	mgr.reporter.Update(status.Healthy)
 	for _, cap := range mgr.caps {
-		blocked, in = cap.Apply(in)
-		if blocked {
-			return blocked, in
+		in, err = cap.Apply(in)
+		if err != nil {
+			return in, err
 		}
 	}
 
-	return false, in
+	return in, nil
 }

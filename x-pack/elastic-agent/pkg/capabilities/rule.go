@@ -24,6 +24,7 @@ type ruler interface {
 type capabilitiesList []ruler
 
 type ruleDefinitions struct {
+	Version      string           `yaml:"version" json:"version"`
 	Capabilities capabilitiesList `yaml:"capabilities" json:"capabilities"`
 }
 

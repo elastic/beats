@@ -26,10 +26,10 @@ const (
 // - source_uri
 func newUpgradesCapability(log *logger.Logger, rd *ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	if rd == nil {
-		return &multiInputsCapability{log: log, caps: []Capability{}}, nil
+		return &multiUpgradeCapability{caps: []*upgradeCapability{}}, nil
 	}
 
-	caps := make([]Capability, 0, len(rd.Capabilities))
+	caps := make([]*upgradeCapability, 0, len(rd.Capabilities))
 
 	for _, r := range rd.Capabilities {
 		c, err := newUpgradeCapability(log, r, reporter)
@@ -42,10 +42,10 @@ func newUpgradesCapability(log *logger.Logger, rd *ruleDefinitions, reporter sta
 		}
 	}
 
-	return &multiUpgradeCapability{caps: caps}, nil
+	return &multiUpgradeCapability{log: log, caps: caps}, nil
 }
 
-func newUpgradeCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
+func newUpgradeCapability(log *logger.Logger, r ruler, reporter status.Reporter) (*upgradeCapability, error) {
 	cap, ok := r.(*upgradeCapability)
 	if !ok {
 		return nil, nil
@@ -103,30 +103,23 @@ func (c *upgradeCapability) name() string {
 }
 
 // Apply supports upgrade action or fleetapi upgrade action object.
-func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
+func (c *upgradeCapability) Apply(upgradeMap map[string]interface{}) (map[string]interface{}, error) {
 	// if eql is not parsed or defined skip
 	if c.upgradeEql == nil {
-		return false, in
-	}
-
-	upgradeMap := upgradeObject(in)
-	if upgradeMap == nil {
-		c.log.Warnf("expecting map config object but got nil for capability 'multi-outputs': %v", c.name())
-		// not an upgrade we don't alter origin
-		return false, in
+		return upgradeMap, nil
 	}
 
 	// create VarStore out of map
 	varStore, err := transpiler.NewAST(upgradeMap)
 	if err != nil {
 		c.log.Errorf("failed creating a varStore for capability '%s': %v", c.name(), err)
-		return false, in
+		return upgradeMap, nil
 	}
 
 	isSupported, err := c.upgradeEql.Eval(varStore)
 	if err != nil {
 		c.log.Errorf("failed evaluating eql formula for capability '%s': %v", c.name(), err)
-		return false, in
+		return upgradeMap, nil
 	}
 
 	// if deny switch the logic
@@ -136,23 +129,35 @@ func (c *upgradeCapability) Apply(in interface{}) (bool, interface{}) {
 		c.reporter.Update(status.Degraded)
 	}
 
-	return !isSupported, in
+	if !isSupported {
+		return upgradeMap, ErrBlocked
+	}
+
+	return upgradeMap, nil
 }
 
 type multiUpgradeCapability struct {
-	caps []Capability
+	log  *logger.Logger
+	caps []*upgradeCapability
 }
 
-func (c *multiUpgradeCapability) Apply(in interface{}) (bool, interface{}) {
+func (c *multiUpgradeCapability) Apply(in interface{}) (interface{}, error) {
+	upgradeMap := upgradeObject(in)
+	if upgradeMap == nil {
+		c.log.Warnf("expecting map config object but got nil for capability 'multi-outputs'")
+		// not an upgrade we don't alter origin
+		return in, nil
+	}
+
 	for _, cap := range c.caps {
 		// upgrade does not modify incoming action
-		blocking, _ := cap.Apply(in)
-		if blocking {
-			return blocking, in
+		_, err := cap.Apply(upgradeMap)
+		if err != nil {
+			return in, err
 		}
 	}
 
-	return false, in
+	return in, nil
 }
 
 func upgradeObject(a interface{}) map[string]interface{} {

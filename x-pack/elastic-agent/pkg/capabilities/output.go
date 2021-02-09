@@ -7,6 +7,7 @@ package capabilities
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
@@ -18,10 +19,10 @@ const (
 
 func newOutputsCapability(log *logger.Logger, rd *ruleDefinitions, reporter status.Reporter) (Capability, error) {
 	if rd == nil {
-		return &multiInputsCapability{log: log, caps: []Capability{}}, nil
+		return &multiOutputsCapability{log: log, caps: []*outputCapability{}}, nil
 	}
 
-	caps := make([]Capability, 0, len(rd.Capabilities))
+	caps := make([]*outputCapability, 0, len(rd.Capabilities))
 
 	for _, r := range rd.Capabilities {
 		c, err := newOutputCapability(log, r, reporter)
@@ -37,7 +38,7 @@ func newOutputsCapability(log *logger.Logger, rd *ruleDefinitions, reporter stat
 	return &multiOutputsCapability{log: log, caps: caps}, nil
 }
 
-func newOutputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (Capability, error) {
+func newOutputCapability(log *logger.Logger, r ruler, reporter status.Reporter) (*outputCapability, error) {
 	cap, ok := r.(*outputCapability)
 	if !ok {
 		return nil, nil
@@ -56,12 +57,7 @@ type outputCapability struct {
 	Output   string `json:"output" yaml:"output"`
 }
 
-func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
-	cfgMap, ok := in.(map[string]interface{})
-	if !ok || cfgMap == nil {
-		return false, in
-	}
-
+func (c *outputCapability) Apply(cfgMap map[string]interface{}) (map[string]interface{}, error) {
 	outputIface, ok := cfgMap[outputKey]
 	if ok {
 		outputs, ok := outputIface.(map[string]interface{})
@@ -69,17 +65,17 @@ func (c *outputCapability) Apply(in interface{}) (bool, interface{}) {
 			renderedOutputs, err := c.renderOutputs(outputs)
 			if err != nil {
 				c.log.Errorf("marking outputs failed for capability '%s': %v", c.name(), err)
-				return false, in
+				return cfgMap, err
 			}
 
 			cfgMap[outputKey] = renderedOutputs
-			return false, cfgMap
+			return cfgMap, nil
 		}
 
-		return false, in
+		return cfgMap, nil
 	}
 
-	return false, in
+	return cfgMap, nil
 }
 
 func (c *outputCapability) Rule() string {
@@ -110,7 +106,7 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 
 		outputTypeIface, ok := output[typeKey]
 		if !ok {
-			continue
+			return nil, errors.New(fmt.Sprintf("output '%s' is missing type key", outputName), errors.TypeConfig)
 		}
 
 		outputType, ok := outputTypeIface.(string)
@@ -142,44 +138,39 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 }
 
 type multiOutputsCapability struct {
-	caps []Capability
+	caps []*outputCapability
 	log  *logger.Logger
 }
 
-func (c *multiOutputsCapability) Apply(in interface{}) (bool, interface{}) {
+func (c *multiOutputsCapability) Apply(in interface{}) (interface{}, error) {
 	configMap, transform, err := configObject(in)
 	if err != nil {
 		c.log.Errorf("creating configuration object failed for capability 'multi-outputs': %v", err)
-		return false, in
+		return in, nil
 	}
 	if configMap == nil {
-		return false, in
+		return in, nil
 	}
-
-	var mapIface interface{} = configMap
 
 	for _, cap := range c.caps {
 		// input capability is not blocking
-		_, mapIface = cap.Apply(mapIface)
-	}
-
-	configMap, ok := mapIface.(map[string]interface{})
-	if !ok {
-		c.log.Errorf("expecting map config object but got %T for capability 'multi-outputs': %v", mapIface, err)
-		return false, in
+		configMap, err = cap.Apply(configMap)
+		if err != nil {
+			return in, err
+		}
 	}
 
 	configMap, err = c.cleanupOutput(configMap)
 	if err != nil {
 		c.log.Errorf("cleaning up config object failed for capability 'multi-outputs': %v", err)
-		return false, in
+		return in, nil
 	}
 
 	if transform == nil {
-		return false, configMap
+		return configMap, nil
 	}
 
-	return false, transform(configMap)
+	return transform(configMap), nil
 }
 
 func (c *multiOutputsCapability) cleanupOutput(cfgMap map[string]interface{}) (map[string]interface{}, error) {

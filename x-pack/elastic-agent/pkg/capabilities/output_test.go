@@ -107,8 +107,9 @@ func TestMultiOutput(t *testing.T) {
 		outputs := getOutputs(initialOutputs...)
 		assert.NotNil(t, outputs)
 
-		blocking, res := cap.Apply(outputs)
-		assert.False(t, blocking, "should not be blocking")
+		res, err := cap.Apply(outputs)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		ast, ok := res.(*transpiler.AST)
 		assert.True(t, ok, "expecting an ast")
@@ -141,6 +142,26 @@ func TestMultiOutput(t *testing.T) {
 
 			assert.True(t, typeFound, fmt.Sprintf("output '%s' type key not found", in))
 		}
+	})
+
+	t.Run("unknown action", func(t *testing.T) {
+		rd := &ruleDefinitions{
+			Capabilities: []ruler{&outputCapability{
+				Type:   "deny",
+				Output: "logstash",
+			}},
+		}
+
+		cap, err := newOutputsCapability(l, rd, tr)
+		assert.NoError(t, err, "error not expected, provided eql is valid")
+		assert.NotNil(t, cap, "cap should be created")
+
+		apiAction := fleetapi.ActionUpgrade{}
+		outAfter, err := cap.Apply(apiAction)
+
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		assert.Equal(t, apiAction, outAfter, "action should not be altered")
 	})
 }
 
@@ -207,23 +228,6 @@ func TestOutput(t *testing.T) {
 		expectedOutputs := []string{"logstash", "elasticsearch"}
 		runOutputTest(t, l, r, expectedOutputs, initialOutputs)
 	})
-
-	t.Run("unknown action", func(t *testing.T) {
-		r := &outputCapability{
-			Type:   "allow",
-			Output: "logstash",
-		}
-
-		cap, err := newOutputCapability(l, r, tr)
-		assert.NoError(t, err, "error not expected, provided eql is valid")
-		assert.NotNil(t, cap, "cap should be created")
-
-		apiAction := fleetapi.ActionUpgrade{}
-		isBlocking, outAfter := cap.Apply(apiAction)
-
-		assert.False(t, isBlocking, "should not be blocking")
-		assert.Equal(t, apiAction, outAfter, "action should not be altered")
-	})
 }
 
 func runMultiOutputTest(t *testing.T, l *logger.Logger, rd *ruleDefinitions, expectedOutputs []string, initialOutputs []string) {
@@ -235,8 +239,10 @@ func runMultiOutputTest(t *testing.T, l *logger.Logger, rd *ruleDefinitions, exp
 	cfg := getOutputsMap(initialOutputs...)
 	assert.NotNil(t, cfg)
 
-	isBlocking, outAfter := cap.Apply(cfg)
-	assert.False(t, isBlocking, "should not be blocking")
+	outAfter, err := cap.Apply(cfg)
+
+	assert.NoError(t, err, "should not be failing")
+	assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 	newMap, ok := outAfter.(map[string]interface{})
 	assert.True(t, ok, "out ast should be a map")
@@ -287,12 +293,10 @@ func runOutputTest(t *testing.T, l *logger.Logger, r *outputCapability, expected
 
 	outputs := getOutputsMap(initialOutputs...)
 	assert.NotNil(t, outputs)
-	isBlocking, outAfter := cap.Apply(outputs)
-	assert.False(t, isBlocking, "should not be blocking")
 
-	newMap, ok := outAfter.(map[string]interface{})
-	assert.True(t, ok, "out value should be map")
-	assert.NotNil(t, newMap)
+	newMap, err := cap.Apply(outputs)
+	assert.NoError(t, err, "should not be failing")
+	assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 	outputsNode, found := newMap[outputKey]
 	assert.True(t, found, "outputs not found")

@@ -6,6 +6,7 @@ package capabilities
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
@@ -38,39 +39,22 @@ func TestLoadCapabilities(t *testing.T) {
 			assert.NoError(t, err)
 			assert.NotNil(t, caps)
 
-			cfgFile := filepath.Join("testdata", fmt.Sprintf("%s-config.yml", tc))
-			configFile, err := os.Open(cfgFile)
-			if err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
-			defer configFile.Close()
-
-			cfg, err := config.NewConfigFrom(configFile)
-			assert.NoError(t, err)
-			assert.NotNil(t, cfg)
+			cfg, configCloser := getConfigWithCloser(t, filepath.Join("testdata", fmt.Sprintf("%s-config.yml", tc)))
+			defer configCloser.Close()
 
 			mm, err := cfg.ToMapStr()
 			assert.NoError(t, err)
 			assert.NotNil(t, mm)
 
-			isBlocked, out := caps.Apply(mm)
-			assert.False(t, isBlocked)
+			out, err := caps.Apply(mm)
+			assert.NoError(t, err, "should not be failing")
+			assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 			resultConfig, ok := out.(map[string]interface{})
 			assert.True(t, ok)
 
-			resultFileName := filepath.Join("testdata", fmt.Sprintf("%s-result.yml", tc))
-			configResultFile, err := os.Open(resultFileName)
-			if err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
-			defer configFile.Close()
-
-			expectedConfig, err := config.NewConfigFrom(configResultFile)
-			assert.NoError(t, err)
-			assert.NotNil(t, cfg)
+			expectedConfig, resultCloser := getConfigWithCloser(t, filepath.Join("testdata", fmt.Sprintf("%s-result.yml", tc)))
+			defer resultCloser.Close()
 
 			expectedMap, err := expectedConfig.ToMapStr()
 			fixInputsType(expectedMap)
@@ -84,6 +68,47 @@ func TestLoadCapabilities(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInvalidLoadCapabilities(t *testing.T) {
+	testCases := []string{
+		"invalid",
+		"invalid_output",
+	}
+
+	l, _ := logger.New("test")
+
+	for _, tc := range testCases {
+		t.Run(tc, func(t *testing.T) {
+			filename := filepath.Join("testdata", fmt.Sprintf("%s-capabilities.yml", tc))
+			controller := status.NewController(l)
+			caps, err := Load(filename, l, controller)
+			assert.NoError(t, err)
+			assert.NotNil(t, caps)
+
+			cfg, configCloser := getConfigWithCloser(t, filepath.Join("testdata", fmt.Sprintf("%s-config.yml", tc)))
+			defer configCloser.Close()
+
+			mm, err := cfg.ToMapStr()
+			assert.NoError(t, err)
+			assert.NotNil(t, mm)
+
+			_, err = caps.Apply(mm)
+			assert.Error(t, err, "should be failing")
+			assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
+		})
+	}
+}
+
+func getConfigWithCloser(t *testing.T, cfgFile string) (*config.Config, io.Closer) {
+	configFile, err := os.Open(cfgFile)
+	require.NoError(t, err)
+
+	cfg, err := config.NewConfigFrom(configFile)
+	require.NoError(t, err)
+	require.NotNil(t, cfg)
+
+	return cfg, configFile
 }
 
 func fixInputsType(mm map[string]interface{}) {
@@ -113,8 +138,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.False(t, blocked, "not expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -137,8 +163,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.True(t, blocked, "expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.Error(t, err, "should be failing")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -161,8 +188,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.True(t, blocked, "expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.Error(t, err, "should be failing")
+		assert.Equal(t, ErrBlocked, err, "should be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -185,8 +213,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.False(t, blocked, "not expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -209,8 +238,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.False(t, blocked, "not expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -233,8 +263,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.False(t, blocked, "not expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -255,8 +286,9 @@ func TestCapabilityManager(t *testing.T) {
 			reporter: status.NewController(l).Register("test"),
 		}
 
-		blocked, newIn := mgr.Apply(m)
-		assert.False(t, blocked, "not expecting to block")
+		newIn, err := mgr.Apply(m)
+		assert.NoError(t, err, "should not be failing")
+		assert.NotEqual(t, ErrBlocked, err, "should not be blocking")
 
 		newMap, ok := newIn.(map[string]string)
 		assert.True(t, ok, "new input is not a map")
@@ -271,28 +303,28 @@ func TestCapabilityManager(t *testing.T) {
 
 type keepAsIsCap struct{}
 
-func (keepAsIsCap) Apply(in interface{}) (bool, interface{}) {
-	return false, in
+func (keepAsIsCap) Apply(in interface{}) (interface{}, error) {
+	return in, nil
 }
 
 type blockCap struct{}
 
-func (blockCap) Apply(in interface{}) (bool, interface{}) {
-	return true, in
+func (blockCap) Apply(in interface{}) (interface{}, error) {
+	return in, ErrBlocked
 }
 
 type filterKeywordCap struct {
 	keyWord string
 }
 
-func (f filterKeywordCap) Apply(in interface{}) (bool, interface{}) {
+func (f filterKeywordCap) Apply(in interface{}) (interface{}, error) {
 	mm, ok := in.(map[string]string)
 	if !ok {
-		return false, in
+		return in, nil
 	}
 
 	delete(mm, f.keyWord)
-	return false, mm
+	return mm, nil
 }
 
 func getConfig() map[string]string {

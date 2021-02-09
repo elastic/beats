@@ -70,7 +70,11 @@ func (e *emitterController) Update(c *config.Config) error {
 
 	if e.caps != nil {
 		var ok bool
-		_, updatedAst := e.caps.Apply(rawAst)
+		updatedAst, err := e.caps.Apply(rawAst)
+		if err != nil {
+			return errors.New(err, "failed to apply capabilities")
+		}
+
 		rawAst, ok = updatedAst.(*transpiler.AST)
 		if !ok {
 			return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
