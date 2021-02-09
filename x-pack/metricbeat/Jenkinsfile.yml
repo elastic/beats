@@ -83,3 +83,4 @@ stages:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+            entrypoint: 'metricbeat-test.sh'

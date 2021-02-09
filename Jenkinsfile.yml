@@ -16,7 +16,7 @@ projects:
     #- "x-pack/functionbeat"
     #- "x-pack/heartbeat"
     #- "x-pack/libbeat"
-    #- "x-pack/metricbeat"
+    - "x-pack/metricbeat"
     #- "x-pack/packetbeat"
     #- "x-pack/winlogbeat"
     #- "dev-tools"
