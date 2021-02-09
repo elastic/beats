@@ -53,7 +53,6 @@ func Package() {
 	}
 
 	devtools.PackageKibanaDashboardsFromBuildDir()
-	heartbeat.CustomizePackaging()
 
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
