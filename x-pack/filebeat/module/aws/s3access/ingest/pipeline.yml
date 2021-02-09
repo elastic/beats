@@ -36,6 +36,16 @@ processors:
       patterns:
         - '%{NOTSPACE:http.request.method} %{NOTSPACE:url.original} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
 
+  #
+  # Best-effort parse of url.original in the form /path?query"
+  #
+  - grok:
+      field: url.original
+      ignore_failure: true
+      patterns:
+        - '^%{ABS_PATH:url.path}(?:\?%{DATA:url.query})?$'
+      pattern_definitions:
+        ABS_PATH: '/[^?]*'
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
