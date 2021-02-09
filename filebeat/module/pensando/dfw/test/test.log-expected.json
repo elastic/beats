@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-02-01T21:02:56.596Z",
+        "@timestamp": "2020-12-14T18:41:01.000Z",
         "client.ip": "10.29.95.102",
         "destination.address": "10.29.95.101",
         "destination.port": 80,
@@ -44,7 +44,7 @@
         "source.port": 46554
     },
     {
-        "@timestamp": "2021-02-01T21:02:56.596Z",
+        "@timestamp": "2020-12-14T18:41:16.000Z",
         "client.ip": "10.29.95.102",
         "destination.address": "10.29.95.101",
         "destination.port": 80,
@@ -88,7 +88,7 @@
         "source.port": 46594
     },
     {
-        "@timestamp": "2021-02-01T21:02:56.597Z",
+        "@timestamp": "2020-12-14T18:41:16.000Z",
         "client.ip": "10.29.95.102",
         "destination.address": "10.29.95.101",
         "destination.port": 80,
