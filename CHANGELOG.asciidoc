@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.14]]
+=== Beats version 6.8.14
+https://github.com/elastic/beats/compare/v6.8.13...v6.8.14[View commits]
+
+
 [[release-notes-6.8.13]]
 === Beats version 6.8.13
 https://github.com/elastic/beats/compare/v6.8.12...v6.8.13[View commits]
