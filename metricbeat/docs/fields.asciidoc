@@ -9986,7 +9986,7 @@ Examples include Beats. Agents may also run on observers. ECS agent.* fields sha
 Extended build information for the agent.
 This field is intended to contain any build information that a data source may provide, no specific formatting is required.
 
-type: wildcard
+type: keyword
 
 example: metricbeat version 7.6.0 (amd64), libbeat 7.6.0 [6a23e8f8f30f5001ba344e4e54d8d9cb82cb107c built 2020-02-05 23:10:10 +0000 UTC]
 
@@ -10074,7 +10074,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -10121,7 +10121,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -10152,7 +10152,7 @@ format: bytes
 --
 Client domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -10218,7 +10218,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -10315,7 +10315,7 @@ The highest registered client domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -10360,7 +10360,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -10369,7 +10369,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -10434,7 +10434,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -10736,7 +10736,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -10767,7 +10767,7 @@ format: bytes
 --
 Destination domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -10833,7 +10833,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -10930,7 +10930,7 @@ The highest registered destination domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -10975,7 +10975,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -10984,7 +10984,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -11049,7 +11049,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -11262,7 +11262,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -11314,7 +11314,7 @@ example: IN
 The data describing the resource.
 The meaning of this data depends on the type and class of the resource record.
 
-type: wildcard
+type: keyword
 
 example: 10.10.10.10
 
@@ -11405,7 +11405,7 @@ example: IN
 The name being queried.
 If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
 
-type: wildcard
+type: keyword
 
 example: www.example.com
 
@@ -11554,7 +11554,9 @@ type: text
 --
 The stack trace of this error in plain text.
 
-type: wildcard
+type: keyword
+
+Field is not indexed.
 
 --
 
@@ -11570,7 +11572,7 @@ type: text
 --
 The type of the error, for example the class name of the exception.
 
-type: wildcard
+type: keyword
 
 example: java.lang.NullPointerException
 
@@ -12004,7 +12006,7 @@ example: sda
 --
 Directory where the file is located. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -12159,7 +12161,7 @@ example: alice
 --
 Full path to the file, including the file name. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice/example.png
 
@@ -12233,7 +12235,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -12267,7 +12269,7 @@ example: 16384
 --
 Target path for symlinks.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -12338,7 +12340,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -12505,7 +12507,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -12633,7 +12635,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -12830,7 +12832,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -12864,7 +12866,7 @@ example: Quebec
 Hostname of the host.
 It normally contains what the `hostname` command returns on the host machine.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -12923,7 +12925,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -12952,7 +12954,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -13023,7 +13025,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -13032,7 +13034,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -13097,7 +13099,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -13145,7 +13147,7 @@ format: bytes
 --
 The full HTTP request body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -13202,7 +13204,7 @@ example: image/gif
 --
 Referrer for this HTTP request.
 
-type: wildcard
+type: keyword
 
 example: https://blog.example.com/
 
@@ -13226,7 +13228,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -13341,7 +13343,7 @@ The details specific to your event source are typically not logged under `log.*`
 Full path to the log file this event came from, including the file name. It should include the drive letter, when appropriate.
 If the event wasn't read from a log file, do not populate this field.
 
-type: wildcard
+type: keyword
 
 example: /var/log/fun-times.log
 
@@ -13365,7 +13367,7 @@ example: error
 --
 The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
 
-type: wildcard
+type: keyword
 
 example: org.elasticsearch.bootstrap.Bootstrap
 
@@ -13838,7 +13840,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -13997,7 +13999,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -14026,7 +14028,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -14134,7 +14136,7 @@ type: keyword
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -14167,7 +14169,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -14196,7 +14198,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -14450,7 +14452,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -14562,7 +14564,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -14593,7 +14595,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -14660,7 +14662,7 @@ type: keyword
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -14761,7 +14763,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -14792,7 +14794,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -14859,7 +14861,7 @@ type: keyword
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -14933,7 +14935,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -15016,7 +15018,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -15028,7 +15030,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -15055,7 +15057,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -15129,7 +15131,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -15212,7 +15214,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -15224,7 +15226,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -15251,7 +15253,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -15288,7 +15290,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: wildcard
+type: keyword
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -15321,7 +15323,7 @@ example: HKLM
 --
 Hive-relative path of keys.
 
-type: wildcard
+type: keyword
 
 example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
 
@@ -15332,7 +15334,7 @@ example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Optio
 --
 Full path, including hive, key and value
 
-type: wildcard
+type: keyword
 
 example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
 
@@ -15545,7 +15547,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -15576,7 +15578,7 @@ format: bytes
 --
 Server domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -15642,7 +15644,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -15739,7 +15741,7 @@ The highest registered server domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -15784,7 +15786,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -15793,7 +15795,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -15858,7 +15860,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -16007,7 +16009,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -16038,7 +16040,7 @@ format: bytes
 --
 Source domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -16104,7 +16106,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -16201,7 +16203,7 @@ The highest registered source domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -16246,7 +16248,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -16255,7 +16257,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -16320,7 +16322,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -16552,7 +16554,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -16607,7 +16609,7 @@ example: www.elastic.co
 --
 Distinguished name of subject of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=myclient, OU=Documentation Team, DC=example, DC=com
 
@@ -16662,7 +16664,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -16829,7 +16831,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -16988,7 +16990,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Subject of the issuer of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -17032,7 +17034,7 @@ example: 1970-01-01T00:00:00.000Z
 --
 Subject of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=www.example.com, OU=Infrastructure Team, DC=example, DC=com
 
@@ -17076,7 +17078,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -17243,7 +17245,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -17372,7 +17374,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
 
-type: wildcard
+type: keyword
 
 example: www.elastic.co
 
@@ -17407,7 +17409,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -17427,7 +17429,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -17454,7 +17456,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: wildcard
+type: keyword
 
 --
 
@@ -17488,7 +17490,7 @@ The highest registered url domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -17546,119 +17548,6 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
-*`user.changes.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.changes.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.changes.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.changes.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.changes.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.changes.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.changes.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.changes.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.changes.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.changes.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.changes.name.text`*::
-+
---
-type: text
-
---
-
-*`user.changes.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 *`user.domain`*::
 +
 --
@@ -17669,125 +17558,12 @@ type: keyword
 
 --
 
-*`user.effective.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.effective.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.effective.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.effective.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.effective.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.effective.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.effective.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.effective.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.effective.name.text`*::
-+
---
-type: text
-
---
-
-*`user.effective.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 *`user.email`*::
 +
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -17796,7 +17572,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -17861,7 +17637,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -17875,119 +17651,6 @@ type: text
 --
 
 *`user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
-*`user.target.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.target.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.target.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.target.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.target.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.target.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.target.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.target.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.target.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.target.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.target.name.text`*::
-+
---
-type: text
-
---
-
-*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -18032,7 +17695,7 @@ example: Safari
 --
 Unparsed user_agent string.
 
-type: wildcard
+type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
 
@@ -18061,7 +17724,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -18090,7 +17753,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -18372,7 +18035,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -18539,7 +18202,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -27361,6 +27024,16 @@ type: object
 +
 --
 Kubernetes annotations map
+
+
+type: object
+
+--
+
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
 
 
 type: object
