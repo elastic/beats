@@ -79,7 +79,9 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 
 	evt, pbf := pb.NewBeatEvent(ts)
 	pbf.SetSource(&src)
+	pbf.AddIP(src.IP)
 	pbf.SetDestination(&dst)
+	pbf.AddIP(dst.IP)
 	pbf.Source.Bytes = int64(xdr.size())
 	pbf.Event.Dataset = "nfs"
 	pbf.Event.Start = ts
@@ -102,6 +104,8 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 		"xid": xid,
 	}
 
+	fields := evt.Fields
+
 	authFlavor := xdr.getUInt()
 	authOpaque := xdr.getDynamicOpaque()
 	switch authFlavor {
@@ -119,8 +123,14 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 			pbf.Source.Domain = machine
 		}
 		cred["machinename"] = machine
+		fields["host.hostname"] = machine
+
 		cred["uid"] = credXdr.getUInt()
+		fields["user.id"] = cred["uid"]
+
 		cred["gid"] = credXdr.getUInt()
+		fields["group.id"] = cred["gid"]
+
 		cred["gids"] = credXdr.getUIntVector()
 		rpcInfo["cred"] = cred
 	case 6:
@@ -133,7 +143,6 @@ func (r *rpc) handleCall(xid string, xdr *xdr, ts time.Time, tcptuple *common.TC
 	xdr.getUInt()
 	xdr.getDynamicOpaque()
 
-	fields := evt.Fields
 	fields["status"] = common.OK_STATUS // all packages are OK for now
 	fields["type"] = pbf.Event.Dataset
 	fields["rpc"] = rpcInfo
