@@ -436,13 +436,13 @@ def e2e(Map args = [:]) {
       withEnv(["GO_VERSION=${goVersionForE2E}",
                "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
                "LOG_LEVEL=TRACE"]) {
-        filebeat(output: dockerLogFile, workdir: "${env.WORKSPACE}"){
+        filebeat(output: dockerLogFile){
           sh script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}"
         }
       }
     } finally {
       junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml, ${env.WORKSPACE}/${dockerLogFile}.log"
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
     }
   }
 }
