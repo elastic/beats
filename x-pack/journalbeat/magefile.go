@@ -15,7 +15,6 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/generator/common/beatgen"
-	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
 
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
