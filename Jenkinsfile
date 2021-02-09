@@ -386,6 +386,7 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
     def status = sh(label: "Change tag and push ${targetName}", script: """#!/usr/bin/env bash
+      docker images
       if docker image inspect "${sourceName}" &> /dev/null ; then
         docker tag ${sourceName} ${targetName}
         docker push ${targetName}
