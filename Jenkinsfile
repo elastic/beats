@@ -423,6 +423,7 @@ def getBeatsName(baseDir) {
 def e2e(Map args = [:]) {
   def enabled = args.e2e?.get('enabled', false)
   def entrypoint = args.e2e?.get('entrypoint')
+  def dockerLogFile = "docker_logs_${entrypoint}.log"
   if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
@@ -435,15 +436,13 @@ def e2e(Map args = [:]) {
       withEnv(["GO_VERSION=${goVersionForE2E}",
                "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
                "LOG_LEVEL=TRACE"]) {
-        filebeat(output: "docker_logs_${entrypoint}.log", workdir: "${env.WORKSPACE}"){
+        filebeat(output: dockerLogFile, workdir: "${env.WORKSPACE}"){
           sh script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}"
         }
       }
-    } catch(e) {
-      error(e.toString())
     } finally {
       junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml, ${env.WORKSPACE}/${dockerLogFile}.log"
     }
   }
 }
