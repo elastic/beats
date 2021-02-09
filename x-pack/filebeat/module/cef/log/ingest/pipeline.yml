@@ -52,35 +52,48 @@ processors:
   - append:
         field: related.hash
         value: "{{cef.extensions.fileHash}}"
-        if: "ctx?.cef?.extensions?.fileHash != null"
+        allow_duplicates: false
+        if: "ctx?.cef?.extensions?.fileHash != null && ctx?.cef?.extensions?.fileHash != ''"
   - append:
         field: related.hash
         value: "{{cef.extensions.oldFileHash}}"
-        if: "ctx?.cef?.extensions?.oldFileHash != null"
+        allow_duplicates: false
+        if: "ctx?.cef?.extensions?.oldFileHash != null && ctx?.cef?.extensions?.oldFileHash != ''"
   - append:
         field: related.ip
         value: "{{destination.ip}}"
-        if: "ctx?.destination?.ip != null"
+        allow_duplicates: false
+        if: "ctx?.destination?.ip != null && ctx?.destination?.ip != ''"
   - append:
         field: related.ip
         value: "{{destination.nat.ip}}"
-        if: "ctx?.destination?.nat?.ip != null"
+        allow_duplicates: false
+        if: "ctx?.destination?.nat?.ip != null && ctx?.destination?.nat?.ip != ''"
   - append:
         field: related.ip
         value: "{{source.ip}}"
-        if: "ctx?.source?.ip != null"
+        allow_duplicates: false
+        if: "ctx?.source?.ip != null && ctx?.source?.ip != ''"
   - append:
         field: related.ip
         value: "{{source.nat.ip}}"
-        if: "ctx?.source?.nat?.ip != null"
+        allow_duplicates: false
+        if: "ctx?.source?.nat?.ip != null && ctx?.source?.nat?.ip != ''"
   - append:
         field: related.user
         value: "{{destination.user.name}}"
-        if: "ctx?.destination?.user?.name != null"
+        allow_duplicates: false
+        if: "ctx?.destination?.user?.name != null && ctx?.destination?.user?.name != ''"
   - append:
         field: related.user
         value: "{{source.user.name}}"
-        if: "ctx?.source?.user?.name != null"
+        allow_duplicates: false
+        if: "ctx?.source?.user?.name != null && ctx?.source?.user?.name != ''"
+  - append:
+        field: related.hosts
+        value: "{{observer.hostname}}"
+        allow_duplicates: false
+        if: "ctx?.observer?.hostname != null && ctx?.observer?.hostname != ''"
   - pipeline:
         name: '{< IngestPipeline "fp-pipeline" >}'
         if: "ctx.cef?.device?.vendor == 'FORCEPOINT'"
