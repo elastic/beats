@@ -193,6 +193,7 @@ func TestSetEcsProcessors(t *testing.T) {
 					map[string]interface{}{
 						"user_agent": map[string]interface{}{
 							"field": "foo.http_user_agent",
+							"ecs":   true,
 						},
 					},
 				},
@@ -205,7 +206,7 @@ func TestSetEcsProcessors(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := setECSProcessors(*test.esVersion, "foo-pipeline", test.content)
+			err := setProcessors(*test.esVersion, "foo-pipeline", test.content)
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -382,7 +383,7 @@ func TestModifySetProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := modifySetProcessor(*test.esVersion, "foo-pipeline", test.content)
+			err := setProcessors(*test.esVersion, "foo-pipeline", test.content)
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
@@ -584,7 +585,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := modifyAppendProcessor(*test.esVersion, "foo-pipeline", test.content)
+			err := setProcessors(*test.esVersion, "foo-pipeline", test.content)
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {

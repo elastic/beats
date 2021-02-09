@@ -19,6 +19,7 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -46,6 +47,19 @@ type MultiplePipelineUnsupportedError struct {
 	fileset              string
 	esVersion            common.Version
 	minESVersionRequired common.Version
+}
+
+// Processor defines a single processors minimum version requirements.
+type Processor struct {
+	minVersion *common.Version
+	name       string
+	fn         func(pipelineID string, processor map[string]interface{}) error
+}
+
+// Processors is a slice of single processor's, used to check the minimum version
+// requirement per processor defined.
+type Processors struct {
+	Processors []Processor
 }
 
 func (m MultiplePipelineUnsupportedError) Error() string {
@@ -122,23 +136,9 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		}
 	}
 
-	err := setECSProcessors(esClient.GetVersion(), pipelineID, content)
+	err := setProcessors(esClient.GetVersion(), pipelineID, content)
 	if err != nil {
-		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
-	}
-
-	err = modifySetProcessor(esClient.GetVersion(), pipelineID, content)
-	if err != nil {
-		return fmt.Errorf("failed to modify set processor in pipeline: %v", err)
-	}
-
-	err = checkProcessorMinVersion(esClient.GetVersion(), pipelineID, content)
-	if err != nil {
-		return fmt.Errorf("failed to check minimum processor version in pipeline: %v", err)
-	}
-
-	if err := modifyAppendProcessor(esClient.GetVersion(), pipelineID, content); err != nil {
-		return fmt.Errorf("failed to modify append processor in pipeline: %v", err)
+		return fmt.Errorf("Failed to adapt pipeline with backwards compatibility changes: %w", err)
 	}
 
 	body, err := esClient.LoadJSON(path, content)
@@ -151,44 +151,11 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 
 // setECSProcessors sets required ECS options in processors when filebeat version is >= 7.0.0
 // and ES is 6.7.X to ease migration to ECS.
-func setECSProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
-	ecsVersion := common.MustNewVersion("7.0.0")
-	if !esVersion.LessThan(ecsVersion) {
-		return nil
-	}
-
-	p, ok := content["processors"]
-	if !ok {
-		return nil
-	}
-	processors, ok := p.([]interface{})
-	if !ok {
-		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
-	}
-
-	minUserAgentVersion := common.MustNewVersion("6.7.0")
-	for _, p := range processors {
-		processor, ok := p.(map[string]interface{})
-		if !ok {
-			continue
-		}
-		if options, ok := processor["user_agent"].(map[string]interface{}); ok {
-			if esVersion.LessThan(minUserAgentVersion) {
-				return fmt.Errorf("user_agent processor requires option 'ecs: true', but Elasticsearch %v does not support this option (Elasticsearch %v or newer is required)", esVersion, minUserAgentVersion)
-			}
-			logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
-			options["ecs"] = true
-		}
-	}
-	return nil
+func setECSProcessors(pipelineID string, processor map[string]interface{}) error {
+	return errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
 }
 
-func checkProcessorMinVersion(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
-	ecsVersion := common.MustNewVersion("7.0.0")
-	if !esVersion.LessThan(ecsVersion) {
-		return nil
-	}
-
+func setProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
 	p, ok := content["processors"]
 	if !ok {
 		return nil
@@ -198,19 +165,57 @@ func checkProcessorMinVersion(esVersion common.Version, pipelineID string, conte
 		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
 	}
 
-	minURIPartsVersion := common.MustNewVersion("7.12")
-	newProcessors := make([]interface{}, len(processors))
+	// A list of all processor names and versions to be checked.
+	versionChecks := Processors{
+		Processors: []Processor{
+			{
+				name:       "uri_parts",
+				minVersion: common.MustNewVersion("7.12.0"),
+				fn:         nil,
+			},
+			{
+				name:       "set",
+				minVersion: common.MustNewVersion("7.9.0"),
+				fn:         modifySetProcessor,
+			},
+			{
+				name:       "append",
+				minVersion: common.MustNewVersion("7.10.0"),
+				fn:         modifyAppendProcessor,
+			},
+			{
+				name:       "user_agent",
+				minVersion: common.MustNewVersion("6.7.0"),
+				fn:         setECSProcessors,
+			},
+		},
+	}
+	var newProcessors []interface{}
 	for i, p := range processors {
 		processor, ok := p.(map[string]interface{})
 		if !ok {
 			continue
 		}
-		if _, ok := processor["uri_parts"].(map[string]interface{}); ok {
-			if esVersion.LessThan(minURIPartsVersion) {
-				logp.Debug("processors", "Current version of Elasticsearch: %v does not support the uri_parts processor, minimum version is: %v and newer)", esVersion, minURIPartsVersion)
+		for _, proc := range versionChecks.Processors {
+			_, found := processor[proc.name]
+			if !found {
 				continue
 			}
 
+			if options, ok := processor[proc.name].(map[string]interface{}); ok {
+				if !esVersion.LessThan(proc.minVersion) {
+					if proc.name == "user_agent" {
+						logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
+						options["ecs"] = true
+					}
+					continue
+				}
+				if proc.fn != nil {
+					if err := proc.fn(pipelineID, processor); err != nil {
+						return err
+					}
+				}
+			}
 		}
 		newProcessors = append(newProcessors, processors[i])
 
@@ -285,124 +290,84 @@ func interpretError(initialErr error, body []byte) error {
 
 // modifySetProcessor replaces ignore_empty_value option with an if statement
 // so ES less than 7.9 will still work
-func modifySetProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
-	flagVersion := common.MustNewVersion("7.9.0")
-	if !esVersion.LessThan(flagVersion) {
-		return nil
-	}
-
-	p, ok := content["processors"]
-	if !ok {
-		return nil
-	}
-	processors, ok := p.([]interface{})
-	if !ok {
-		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
-	}
-
-	for _, p := range processors {
-		processor, ok := p.(map[string]interface{})
+func modifySetProcessor(pipelineID string, processor map[string]interface{}) error {
+	if options, ok := processor["set"].(map[string]interface{}); ok {
+		_, ok := options["ignore_empty_value"].(bool)
 		if !ok {
-			continue
+			// don't have ignore_empty_value nothing to do
+			return nil
 		}
-		if options, ok := processor["set"].(map[string]interface{}); ok {
-			_, ok := options["ignore_empty_value"].(bool)
-			if !ok {
-				// don't have ignore_empty_value nothing to do
-				continue
-			}
 
-			logp.Debug("modules", "In pipeline %q removing unsupported 'ignore_empty_value' in set processor", pipelineID)
-			delete(options, "ignore_empty_value")
+		logp.Debug("modules", "In pipeline %q removing unsupported 'ignore_empty_value' in set processor", pipelineID)
+		delete(options, "ignore_empty_value")
 
-			_, ok = options["if"].(string)
-			if ok {
-				// assume if check is sufficient
-				continue
-			}
-			val, ok := options["value"].(string)
-			if !ok {
-				continue
-			}
-
-			newIf := strings.TrimLeft(val, "{ ")
-			newIf = strings.TrimRight(newIf, "} ")
-			newIf = strings.ReplaceAll(newIf, ".", "?.")
-			newIf = "ctx?." + newIf + " != null"
-
-			logp.Debug("modules", "In pipeline %q adding if %s to replace 'ignore_empty_value' in set processor", pipelineID, newIf)
-			options["if"] = newIf
+		_, ok = options["if"].(string)
+		if ok {
+			// assume if check is sufficient
+			return nil
 		}
+		val, ok := options["value"].(string)
+		if !ok {
+			return nil
+		}
+
+		newIf := strings.TrimLeft(val, "{ ")
+		newIf = strings.TrimRight(newIf, "} ")
+		newIf = strings.ReplaceAll(newIf, ".", "?.")
+		newIf = "ctx?." + newIf + " != null"
+
+		logp.Debug("modules", "In pipeline %q adding if %s to replace 'ignore_empty_value' in set processor", pipelineID, newIf)
+		options["if"] = newIf
 	}
 	return nil
 }
 
 // modifyAppendProcessor replaces allow_duplicates option with an if statement
 // so ES less than 7.10 will still work
-func modifyAppendProcessor(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
-	flagVersion := common.MustNewVersion("7.10.0")
-	if !esVersion.LessThan(flagVersion) {
-		return nil
-	}
-
-	p, ok := content["processors"]
-	if !ok {
-		return nil
-	}
-	processors, ok := p.([]interface{})
-	if !ok {
-		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
-	}
-
-	for _, p := range processors {
-		processor, ok := p.(map[string]interface{})
+func modifyAppendProcessor(pipelineID string, processor map[string]interface{}) error {
+	if options, ok := processor["append"].(map[string]interface{}); ok {
+		allow, ok := options["allow_duplicates"].(bool)
 		if !ok {
-			continue
+			// don't have allow_duplicates, nothing to do
+			return nil
 		}
-		if options, ok := processor["append"].(map[string]interface{}); ok {
-			allow, ok := options["allow_duplicates"].(bool)
-			if !ok {
-				// don't have allow_duplicates, nothing to do
-				continue
-			}
 
-			logp.Debug("modules", "In pipeline %q removing unsupported 'allow_duplicates' in append processor", pipelineID)
-			delete(options, "allow_duplicates")
-			if allow {
-				// it was set to true, nothing else to do after removing the option
-				continue
-			}
-
-			currIf, _ := options["if"].(string)
-			if strings.Contains(strings.ToLower(currIf), "contains") {
-				// if it has a contains statement, we assume it is checking for duplicates already
-				continue
-			}
-			field, ok := options["field"].(string)
-			if !ok {
-				continue
-			}
-			val, ok := options["value"].(string)
-			if !ok {
-				continue
-			}
-
-			field = strings.ReplaceAll(field, ".", "?.")
-
-			val = strings.TrimLeft(val, "{ ")
-			val = strings.TrimRight(val, "} ")
-			val = strings.ReplaceAll(val, ".", "?.")
-
-			if currIf == "" {
-				// if there is not a previous if we add a value sanity check
-				currIf = fmt.Sprintf("ctx?.%s != null", val)
-			}
-
-			newIf := fmt.Sprintf("%s && ((ctx?.%s instanceof List && !ctx?.%s.contains(ctx?.%s)) || ctx?.%s != ctx?.%s)", currIf, field, field, val, field, val)
-
-			logp.Debug("modules", "In pipeline %q adding if %s to replace 'allow_duplicates: false' in append processor", pipelineID, newIf)
-			options["if"] = newIf
+		logp.Debug("modules", "In pipeline %q removing unsupported 'allow_duplicates' in append processor", pipelineID)
+		delete(options, "allow_duplicates")
+		if allow {
+			// it was set to true, nothing else to do after removing the option
+			return nil
 		}
+
+		currIf, _ := options["if"].(string)
+		if strings.Contains(strings.ToLower(currIf), "contains") {
+			// if it has a contains statement, we assume it is checking for duplicates already
+			return nil
+		}
+		field, ok := options["field"].(string)
+		if !ok {
+			return nil
+		}
+		val, ok := options["value"].(string)
+		if !ok {
+			return nil
+		}
+
+		field = strings.ReplaceAll(field, ".", "?.")
+
+		val = strings.TrimLeft(val, "{ ")
+		val = strings.TrimRight(val, "} ")
+		val = strings.ReplaceAll(val, ".", "?.")
+
+		if currIf == "" {
+			// if there is not a previous if we add a value sanity check
+			currIf = fmt.Sprintf("ctx?.%s != null", val)
+		}
+
+		newIf := fmt.Sprintf("%s && ((ctx?.%s instanceof List && !ctx?.%s.contains(ctx?.%s)) || ctx?.%s != ctx?.%s)", currIf, field, field, val, field, val)
+
+		logp.Debug("modules", "In pipeline %q adding if %s to replace 'allow_duplicates: false' in append processor", pipelineID, newIf)
+		options["if"] = newIf
 	}
 	return nil
 }
