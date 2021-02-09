@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 )
 
 type service struct {
@@ -55,6 +56,15 @@ func (s *service) Generate(obj kubernetes.Resource, opts ...FieldOptions) common
 			//out.Put("namespace", meta["namespace"])
 			out.DeepUpdate(meta)
 		}
+	}
+
+	selectors := svc.Spec.Selector
+	if len(selectors) == 0 {
+		return out
+	}
+	svcMap := GenerateMap(selectors, s.resource.config.LabelsDedot)
+	if len(svcMap) != 0 {
+		safemapstr.Put(out, "selectors", svcMap)
 	}
 
 	return out
