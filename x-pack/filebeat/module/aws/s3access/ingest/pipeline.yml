@@ -163,6 +163,7 @@ processors:
   - set:
       field: event.kind
       value: event
+
   #
   # Save original message into event.original
   #
