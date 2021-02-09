@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"time"
 
@@ -138,6 +139,9 @@ func selectImage(platform string) (string, error) {
 	switch {
 	case strings.HasPrefix(platform, "linux/arm"):
 		tagSuffix = "arm"
+		if runtime.GOARCH == "arm64" {
+			tagSuffix = "base-arm-debian9"
+		}
 	case strings.HasPrefix(platform, "linux/mips"):
 		tagSuffix = "mips"
 	case strings.HasPrefix(platform, "linux/ppc"):

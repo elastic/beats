@@ -44,10 +44,10 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 ==== Other installation options
 
 * <<setup-repositories,APT or YUM>>
-* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page] 
+* https://www.elastic.co/downloads/beats/{beatname_lc}[Download page]
 * <<running-on-docker,Docker>>
-* <<running-on-kubernetes,Kubernetes>> 
-* <<running-on-cloudfoundry,Cloud Foundry>> 
+* <<running-on-kubernetes,Kubernetes>>
+* <<running-on-cloudfoundry,Cloud Foundry>>
 
 [float]
 [[set-connection]]
@@ -56,10 +56,20 @@ include::{libbeat-dir}/tab-widgets/install-widget.asciidoc[]
 include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 
 [float]
-[[enable-modules]]
-=== Step 3: Enable and configure data collection modules
+[[collect-log-data]]
+=== Step 3: Collect log data
 
-{beatname_uc} uses modules to collect and parse log data.
+There are several ways to collect log data with {beatname_uc}:
+
+* Data collection modules -- simplify the collection, parsing,
+and visualization of common log formats
+* ECS loggers -- structure and format
+application logs into ECS-compatible JSON
+* Manual {beatname_uc} configuration
+
+[float]
+[[enable-modules]]
+==== Enable and configure data collection modules
 
 . Identify the modules you need to enable. To see a list of available
 <<filebeat-modules,modules>>, run:
@@ -67,9 +77,6 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 --
 include::{libbeat-dir}/tab-widgets/list-modules-widget.asciidoc[]
 --
-+
-Can't find a module for your file type? Skip this section and
-<<configuration-filebeat-options,configure the input>> manually.
 
 . From the installation directory, enable one or more modules. For example, the
 following command enables the `system`, `nginx`, and `mysql` module
@@ -90,7 +97,7 @@ default locations, set the `paths` variable:
 ----
 - module: nginx
   access:
-    var.paths: ["/var/log/nginx/access.log*"] <1> 
+    var.paths: ["/var/log/nginx/access.log*"] <1>
 ----
 --
 
@@ -98,6 +105,27 @@ To see the full list of variables for a module, see the documentation under
 <<filebeat-modules>>.
 
 include::{libbeat-dir}/shared/config-check.asciidoc[]
+
+[float]
+[[collect-application-logs]]
+==== Enable and configure ECS loggers for application log collection
+
+While {beatname_uc} can be used to ingest raw, plain-text application logs,
+we recommend structuring your logs at ingest time. This lets you extract fields,
+like log level and exception stack traces.
+
+Elastic simplifies this process by providing application log formatters in a variety
+of popular programming languages. These plugins format your logs into ECS-compatible JSON,
+which removes the need to manually parse logs.
+
+See {ecs-logging-ref}/intro.html[ECS loggers] to get started.
+
+[float]
+[[manual-configuration]]
+==== Configure {beatname_uc} manually
+
+If you're unable to find a module for your file type, or can't change your application's
+log output, see <<configuration-filebeat-options,configure the input>> manually.
 
 [float]
 [[setup-assets]]

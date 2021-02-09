@@ -18,7 +18,10 @@
 package fileset
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -27,9 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-
-	"github.com/mitchellh/hashstructure"
 )
 
 var (
@@ -77,15 +77,9 @@ func NewFactory(
 
 // Create creates a module based on a config
 func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Runner, error) {
-	// Start a registry of one module:
-	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
+	m, pConfigs, err := f.createRegistry(c)
 	if err != nil {
-		return nil, err
-	}
-
-	pConfigs, err := m.GetInputConfigs()
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create module registry for filesets: %w", err)
 	}
 
 	// Hash module ID
@@ -116,8 +110,36 @@ func (f *Factory) Create(p beat.PipelineConnector, c *common.Config) (cfgfile.Ru
 }
 
 func (f *Factory) CheckConfig(c *common.Config) error {
-	_, err := f.Create(pubpipeline.NewNilPipeline(), c)
-	return err
+	_, pConfigs, err := f.createRegistry(c)
+	if err != nil {
+		return fmt.Errorf("could not create module registry for filesets: %w", err)
+	}
+
+	for _, pConfig := range pConfigs {
+		err = f.inputFactory.CheckConfig(pConfig)
+		if err != nil {
+			logp.Err("Error checking input configuration: %s", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+// createRegistry starts a registry for a set of filesets, it returns the registry and
+// its input configurations
+func (f *Factory) createRegistry(c *common.Config) (*ModuleRegistry, []*common.Config, error) {
+	m, err := NewModuleRegistry([]*common.Config{c}, f.beatInfo, false)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pConfigs, err := m.GetInputConfigs()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return m, pConfigs, err
 }
 
 func (p *inputsRunner) Start() {

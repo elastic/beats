@@ -110,7 +110,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: metricbeat-container
-          Image: docker.elastic.co/beats/metricbeat:7.11.0-SNAPSHOT
+          Image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
           Secrets:
             - Name: ELASTIC_CLOUD_ID
               ValueFrom: !Ref CloudIDArn
@@ -158,7 +158,9 @@ Resources:
 
 [float]
 ==== Create CloudFormation Stack
-Once the CloudFormation template is saved locally into `clouformation.yml`, AWS
+When copying the CloudFormation template, please make sure the Metricbeat
+container image is the correct version.
+Once the template is saved locally into `clouformation.yml`, AWS
 CLI can be used to create a stack using one command:
 ----
 aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<cloud-id-arn> ParameterKey=ClusterName,ParameterValue=<cluster-name> ParameterKey=RoleName,ParameterValue=<role-name> ParameterKey=TaskName,ParameterValue=<task-name> ParameterKey=ServiceName,ParameterValue=<service-name> ParameterKey=LogGroupName,ParameterValue=<log-group-name>
