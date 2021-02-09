@@ -63,6 +63,9 @@
         "related.ip": [
             "111.111.111.11"
         ],
+        "related.user": [
+            "admin"
+        ],
         "service.type": "azure",
         "source.as.number": 2516,
         "source.as.organization.name": "KDDI CORPORATION",
@@ -76,6 +79,7 @@
             "forwarded"
         ],
         "user.domain": "contoso.com",
+        "user.email": " admin@contoso.com",
         "user.full_name": "John Smith",
         "user.name": "admin"
     }
