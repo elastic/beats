@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@fix/log-redundancy-beats') _
+@Library('apm@feature/reproduce-error-with-recurrency') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
