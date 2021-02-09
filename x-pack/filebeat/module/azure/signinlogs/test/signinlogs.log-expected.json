@@ -37,6 +37,7 @@
         "azure.signinlogs.result_signature": "None",
         "azure.signinlogs.result_type": "50140",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "client.ip": "81.171.241.231",
         "cloud.provider": "azure",
         "event.action": "Sign-in activity",
         "event.category": [
@@ -61,6 +62,9 @@
         "log.level": 4,
         "log.offset": 0,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "related.ip": [
+            "81.171.241.231"
+        ],
         "service.type": "azure",
         "source.as.number": 8426,
         "source.as.organization.name": "Claranet Ltd",
@@ -119,6 +123,7 @@
         "azure.signinlogs.result_signature": "None",
         "azure.signinlogs.result_type": "50140",
         "azure.tenant_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "client.ip": "8.8.8.8",
         "cloud.provider": "azure",
         "event.action": "Sign-in activity",
         "event.category": [
@@ -143,6 +148,9 @@
         "log.level": 4,
         "log.offset": 1688,
         "message": "This error occurred due to 'Keep me signed in' interrupt when the user was signing-in.",
+        "related.ip": [
+            "8.8.8.8"
+        ],
         "service.type": "azure",
         "source.as.number": 15169,
         "source.as.organization.name": "Google LLC",

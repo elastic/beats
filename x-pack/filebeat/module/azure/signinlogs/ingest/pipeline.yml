@@ -32,6 +32,14 @@ processors:
     field: azure.signinlogs.callerIpAddress
     target_field: source.ip
     ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.signinlogs.Level
     target_field: log.level

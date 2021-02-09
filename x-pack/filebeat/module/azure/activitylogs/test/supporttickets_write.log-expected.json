@@ -39,6 +39,7 @@
         "azure.correlation_id": "c776f9f4-36e5-4e0e-809b-c9b3c3fb62a8",
         "azure.resource.id": "/subscriptions/s1/resourceGroups/MSSupportGroup/providers/microsoft.support/supporttickets/115012112305841",
         "azure.resource.provider": "microsoft.support/supporttickets/115012112305841",
+        "client.ip": "111.111.111.11",
         "cloud.provider": "azure",
         "event.action": "microsoft.support/supporttickets/write",
         "event.dataset": "azure.activitylogs",
@@ -59,6 +60,9 @@
         "input.type": "log",
         "log.level": "Information",
         "log.offset": 0,
+        "related.ip": [
+            "111.111.111.11"
+        ],
         "service.type": "azure",
         "source.as.number": 2516,
         "source.as.organization.name": "KDDI CORPORATION",

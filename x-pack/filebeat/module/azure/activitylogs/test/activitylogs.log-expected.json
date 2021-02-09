@@ -35,6 +35,7 @@
         "azure.resource.namespace": "AZURELSEVENTS",
         "azure.resource.provider": "MICROSOFT.EVENTHUB",
         "azure.subscription_id": "8a4de8b5-095c-47d0-a96f-a75130c61d53",
+        "client.ip": "51.251.141.41",
         "cloud.provider": "azure",
         "event.action": "MICROSOFT.EVENTHUB/NAMESPACES/AUTHORIZATIONRULES/LISTKEYS/ACTION",
         "event.dataset": "azure.activitylogs",
@@ -54,6 +55,9 @@
         "input.type": "log",
         "log.level": "Information",
         "log.offset": 0,
+        "related.ip": [
+            "51.251.141.41"
+        ],
         "service.type": "azure",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
