@@ -23,7 +23,8 @@ type Capability interface {
 }
 
 var (
-	ErrBlocked = errors.New("Capability blocked")
+	// ErrBlocked is returned when capability is blocking.
+	ErrBlocked = errors.New("capability blocked")
 )
 
 type capabilitiesManager struct {
