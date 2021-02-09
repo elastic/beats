@@ -73,7 +73,7 @@ pipeline {
         withGithubNotify(context: "Lint") {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
-            setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             whenTrue(env.ONLY_DOCS == 'true') {
               cmd(label: "make check", script: "make check")
             }
@@ -147,7 +147,7 @@ pipeline {
     success {
       writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
 COMMIT=${env.GIT_BASE_COMMIT}
-VERSION=${env.BEAT_VERSION}-SNAPSHOT""")
+VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
     cleanup {
@@ -348,7 +348,7 @@ def pushCIDockerImages(beatsFolder){
 * @param beatName name of the Beat
 */
 def tagAndPush(beatName){
-  def libbetaVer = env.BEAT_VERSION
+  def libbetaVer = env.VERSION
   def aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
 
   libbetaVer += "-SNAPSHOT"
