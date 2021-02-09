@@ -66,9 +66,6 @@ pipeline {
     }
     stage('Lint'){
       options { skipDefaultCheckout() }
-      when {
-        expression { return false }
-      }
       environment {
         GOFLAGS = '-mod=readonly'
       }
