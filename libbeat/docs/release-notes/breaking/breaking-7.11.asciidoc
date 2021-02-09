@@ -10,6 +10,19 @@
 
 // tag::notable-breaking-changes[]
 
+[float]
+==== Field changes
+
+The following field changes are potentially breaking for anything that relies
+on these fields:
+
+* In {filebeat}, the `suricata.eve.timestamp` alias field has been removed from
+the Suricata module. 
+
+* In {auditbeat}, the file integrity dataset no longer includes a leading dot
+in `file.extension` values. For example, it will report `png` instead of `.png`
+to comply with Elastic Common Schema (ECS). 
+
 // end::notable-breaking-changes[]
 
 See the <<release-notes,release notes>> for a complete list of changes,
