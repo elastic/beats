@@ -423,10 +423,7 @@ def getBeatsName(baseDir) {
 def e2e(Map args = [:]) {
   def enabled = args.e2e?.get('enabled', false)
   def entrypoint = args.e2e?.get('entrypoint')
-  def directory = args.get('directory', '')
   if (!enabled) { return }
-  sh "ls -ltrah ${env.WORKSPACE}/${env.BASE_DIR}/${directory}/build/distributions || true"
-  sh 'find . -name "*tar.gz" -ls || true'
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -443,8 +440,6 @@ def e2e(Map args = [:]) {
         }
       }
     } catch(e) {
-      sh 'ls -ltra'
-      sh 'cat /var/lib/jenkins/workspace/Beats_beats_PR-23854/src/github.com/elastic/e2e-testing/*.log || true'
       error(e.toString())
     } finally {
       junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
