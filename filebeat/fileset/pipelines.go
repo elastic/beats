@@ -149,12 +149,9 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	return nil
 }
 
-// setECSProcessors sets required ECS options in processors when filebeat version is >= 7.0.0
-// and ES is 6.7.X to ease migration to ECS.
-func setECSProcessors(pipelineID string, processor map[string]interface{}) error {
-	return errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
-}
-
+// setProcessors iterates over all configured processors and performs the
+// function related to it. If no function is set, it will delete the processor if
+// the version of ES is under the required version number.
 func setProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
 	p, ok := content["processors"]
 	if !ok {
@@ -191,7 +188,9 @@ func setProcessors(esVersion common.Version, pipelineID string, content map[stri
 		},
 	}
 	var newProcessors []interface{}
+	var appendProcessor bool
 	for i, p := range processors {
+		appendProcessor = true
 		processor, ok := p.(map[string]interface{})
 		if !ok {
 			continue
@@ -214,14 +213,24 @@ func setProcessors(esVersion common.Version, pipelineID string, content map[stri
 					if err := proc.fn(pipelineID, processor); err != nil {
 						return err
 					}
+				} else {
+					appendProcessor = false
 				}
 			}
 		}
-		newProcessors = append(newProcessors, processors[i])
+		if appendProcessor {
+			newProcessors = append(newProcessors, processors[i])
+		}
 
 	}
 	content["processors"] = newProcessors
 	return nil
+}
+
+// setECSProcessors sets required ECS options in processors when filebeat version is >= 7.0.0
+// and ES is 6.7.X to ease migration to ECS.
+func setECSProcessors(pipelineID string, processor map[string]interface{}) error {
+	return errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
 }
 
 func deletePipeline(esClient PipelineLoader, pipelineID string) error {

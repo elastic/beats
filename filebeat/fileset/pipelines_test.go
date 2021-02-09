@@ -595,3 +595,128 @@ func TestModifyAppendProcessor(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveURIPartsProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.12.0",
+			esVersion: common.MustNewVersion("7.11.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"uri_parts": map[string]interface{}{
+							"field":        "test.url",
+							"target_field": "url",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.12.0",
+			esVersion: common.MustNewVersion("7.12.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"uri_parts": map[string]interface{}{
+							"field":        "test.url",
+							"target_field": "url",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"uri_parts": map[string]interface{}{
+							"field":        "test.url",
+							"target_field": "url",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.12.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"uri_parts": map[string]interface{}{
+							"field":        "test.url",
+							"target_field": "url",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"uri_parts": map[string]interface{}{
+							"field":        "test.url",
+							"target_field": "url",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := setProcessors(*test.esVersion, "foo-pipeline", test.content)
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
