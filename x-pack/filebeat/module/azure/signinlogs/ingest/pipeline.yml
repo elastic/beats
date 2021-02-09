@@ -39,6 +39,7 @@ processors:
 - append:
     field: related.ip
     value: '{{source.ip}}'
+    allow_duplicates: false
     if: 'ctx.source?.ip != null'
 - rename:
     field: azure.signinlogs.Level
