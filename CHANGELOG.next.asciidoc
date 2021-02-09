@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.8.0...6.8.1[Check the HEAD diff]
 
 *Filebeat*
 
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
 
 *Heartbeat*
 
