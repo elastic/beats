@@ -24,6 +24,12 @@ processors:
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
 
+  - grok:
+      field: aws.s3access.request_uri
+      ignore_failure: true
+      patterns:
+        - '%{NOTSPACE:http.request.method} %{NOTSPACE:url.original} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
+
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
@@ -98,6 +104,12 @@ processors:
       if: "ctx?.aws?.s3access?.error_code == null"
       field: event.outcome
       value: success
+
+  - convert:
+      field: aws.s3access.bytes_sent
+      target_field: http.response.body.bytes
+      type: long
+      ignore_failure: true
 
   - convert:
       field: aws.s3access.total_time
