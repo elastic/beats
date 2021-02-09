@@ -836,6 +836,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade CEF module to ECS 1.8.0. {pull}23832[23832]
 - Upgrade fortinet/firewall to ECS 1.8 {issue}23118[23118] {pull}23902[23902]
 - Upgrade Zeek to ECS 1.8.0. {issue}23118[23118] {pull}23847[23847]
+- Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
 
 *Heartbeat*
 
