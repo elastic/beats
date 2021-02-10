@@ -71,6 +71,10 @@ func TestActions(t *testing.T) {
 		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/22518")
 	}
 
+	if runtime.GOOS == "darwin" {
+		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/23965")
+	}
+
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
