@@ -379,6 +379,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - Fix various processing errors in the Suricata module. {pull}23236[23236]
+- aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 
 *Heartbeat*
 
@@ -836,6 +837,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade CEF module to ECS 1.8.0. {pull}23832[23832]
 - Upgrade fortinet/firewall to ECS 1.8 {issue}23118[23118] {pull}23902[23902]
 - Upgrade Zeek to ECS 1.8.0. {issue}23118[23118] {pull}23847[23847]
+- Updated azure module to ECS 1.8. {issue}23118[23118] {pull}23927[23927]
+- Update aws/s3access to ECS 1.8. {issue}23118[23118] {pull}23920[23920]
 - Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
 
 *Heartbeat*
