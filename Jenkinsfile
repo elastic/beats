@@ -75,7 +75,7 @@ pipeline {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
             setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            /*whenTrue(env.ONLY_DOCS == 'true') {
+            whenTrue(env.ONLY_DOCS == 'true') {
               cmd(label: "make check", script: "make check")
             }
             whenTrue(env.ONLY_DOCS == 'false') {
@@ -83,7 +83,7 @@ pipeline {
               cmd(label: "make check-go", script: "make check-go")
               cmd(label: "make notice", script: "make notice")
               cmd(label: "Check for changes", script: "make check-no-changes")
-            }*/
+            }
           }
         }
       }
