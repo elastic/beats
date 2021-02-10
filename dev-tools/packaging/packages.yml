@@ -689,7 +689,23 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
         <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
@@ -781,7 +797,29 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
         <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
@@ -863,7 +901,29 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
         <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
