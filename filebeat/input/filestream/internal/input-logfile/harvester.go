@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -30,6 +31,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
+)
+
+var (
+	HarvesterAlreadyRunning = errors.New("harvester is already running for file")
 )
 
 // Harvester is the reader which collects the lines from
@@ -66,7 +71,7 @@ func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Co
 	defer r.mu.Unlock()
 
 	if _, ok := r.table[id]; ok {
-		return nil, nil, fmt.Errorf("harvester is already running for file")
+		return nil, nil, HarvesterAlreadyRunning
 	}
 
 	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))

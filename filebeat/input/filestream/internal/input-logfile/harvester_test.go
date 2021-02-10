@@ -1,0 +1,286 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package input_logfile
+
+import (
+	"context"
+	"fmt"
+	"runtime"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/go-concert/unison"
+)
+
+func TestReaderGroup(t *testing.T) {
+	t.Run("assert new group is empty", func(t *testing.T) {
+		rg := newReaderGroup()
+		assert.Equal(t, 0, len(rg.table))
+	})
+
+	t.Run("assert non existent key can be removed", func(t *testing.T) {
+		rg := newReaderGroup()
+		assert.Equal(t, 0, len(rg.table))
+		rg.remove("no such id")
+		assert.Equal(t, 0, len(rg.table))
+	})
+
+	t.Run("assert inserting existing key returns error", func(t *testing.T) {
+		rg := newReaderGroup()
+		ctx, cf, err := rg.newContext("test-id", context.Background())
+		assert.NotNil(t, ctx)
+		assert.NotNil(t, cf)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(rg.table))
+
+		newCtx, newCf, err := rg.newContext("test-id", context.Background())
+		assert.Nil(t, newCtx)
+		assert.Nil(t, newCf)
+		assert.Error(t, err)
+	})
+
+	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
+		rg := newReaderGroup()
+		ctx, cf, err := rg.newContext("test-id", context.Background())
+		assert.NotNil(t, ctx)
+		assert.NotNil(t, cf)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(rg.table))
+
+		assert.Nil(t, ctx.Err())
+		rg.remove("test-id")
+
+		assert.Equal(t, 0, len(rg.table))
+		assert.Error(t, ctx.Err(), context.Canceled)
+
+		newCtx, newCf, err := rg.newContext("test-id", context.Background())
+		assert.NotNil(t, newCtx)
+		assert.NotNil(t, newCf)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(rg.table))
+		assert.Nil(t, newCtx.Err())
+	})
+}
+
+func TestDefaultHarvesterGroup(t *testing.T) {
+	source := &testSource{"/path/to/test"}
+
+	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
+		mockHarvester := &mockHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(1 * time.Millisecond)
+		}
+
+		assert.Equal(t, 1, mockHarvester.runCount)
+
+		// when finished removed from bookeeper
+		_, ok := hg.readers.table[source.Name()]
+		assert.False(t, ok)
+		// stopped source can be stopped
+		assert.Nil(t, hg.StopGroup())
+	})
+
+	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
+		mockHarvester := &mockHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			// wait until harvester is started
+			if mockHarvester.runCount == 1 {
+				// assert that it is part of the bookkeeper before it is stopped
+				_, ok := hg.readers.table[source.Name()]
+				assert.True(t, ok)
+				// after started, stop it
+				hg.Stop(source)
+				// wait until the harvester is stopped
+				for goroutinesBeforeRun < runtime.NumGoroutine() {
+				}
+			}
+		}
+
+		// when finished removed from bookeeper
+		_, ok := hg.readers.table[source.Name()]
+		assert.False(t, ok)
+	})
+
+	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
+		mockHarvester := &mockHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(1 * time.Millisecond)
+		}
+
+		assert.Equal(t, 1, mockHarvester.runCount)
+
+		// error is expected as a harvester group was expected to start twice for the same source
+		err := hg.StopGroup()
+		assert.Error(t, err)
+	})
+
+	t.Run("assert a harvester panic is handled", func(t *testing.T) {
+		mockHarvester := &mockPanicHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		defer func() {
+			if v := recover(); v != nil {
+				t.Errorf("did not recover from harvester panic in defaultHarvesterGroup")
+			}
+		}()
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(1 * time.Millisecond)
+		}
+		assert.Nil(t, hg.StopGroup())
+	})
+
+	t.Run("assert a harvester error is handled", func(t *testing.T) {
+		mockHarvester := &mockHarvester{0, true}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+
+		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(1 * time.Millisecond)
+		}
+
+		_, ok := hg.readers.table[source.Name()]
+		assert.False(t, ok)
+
+		err := hg.StopGroup()
+		assert.Error(t, err)
+	})
+
+	t.Run("assert already locked resource has to wait", func(t *testing.T) {
+		mockHarvester := &mockHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+		r, err := lock(inputCtx, hg.store, source.Name())
+		if err != nil {
+			t.Fatalf("cannot lock source")
+		}
+
+		hg.Start(inputCtx, source)
+
+		locked := true
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(10 * time.Millisecond)
+
+			if locked {
+				releaseResource(r)
+				locked = false
+			}
+		}
+
+		assert.Equal(t, 1, mockHarvester.runCount)
+		assert.Nil(t, hg.StopGroup())
+	})
+
+	t.Run("assert already locked resource has no problem when harvestergroup is cancelled", func(t *testing.T) {
+		mockHarvester := &mockHarvester{}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+		goroutinesBeforeRun := runtime.NumGoroutine()
+		r, err := lock(inputCtx, hg.store, source.Name())
+		if err != nil {
+			t.Fatalf("cannot lock source")
+		}
+		defer releaseResource(r)
+
+		hg.Start(inputCtx, source)
+
+		for goroutinesBeforeRun < runtime.NumGoroutine() {
+			time.Sleep(100 * time.Millisecond)
+
+			err := hg.StopGroup()
+			assert.Error(t, err)
+		}
+
+		assert.Equal(t, 0, mockHarvester.runCount)
+	})
+}
+
+func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
+	return &defaultHarvesterGroup{
+		readers:   newReaderGroup(),
+		pipeline:  &pipelinemock.MockPipelineConnector{},
+		harvester: mockHarvester,
+		store:     testOpenStore(t, "test", nil),
+		tg:        unison.TaskGroup{},
+	}
+
+}
+
+type mockHarvester struct {
+	runCount  int
+	returnErr bool
+}
+
+func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher) error {
+	m.runCount += 1
+
+	timed.Wait(ctx.Cancelation, 1*time.Second)
+
+	if m.returnErr {
+		return fmt.Errorf("harvester error")
+	}
+	return nil
+}
+
+func (m *mockHarvester) Test(_ Source, _ input.TestContext) error { return nil }
+
+func (m *mockHarvester) Name() string { return "mock" }
+
+type mockPanicHarvester struct{}
+
+func (m *mockPanicHarvester) Run(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
+	panic(fmt.Errorf("don't panic"))
+}
+
+func (m *mockPanicHarvester) Test(_ Source, _ input.TestContext) error { return nil }
+
+func (m *mockPanicHarvester) Name() string { return "panic_mock" }
