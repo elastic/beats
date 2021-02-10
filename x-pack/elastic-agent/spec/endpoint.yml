@@ -53,6 +53,8 @@ rules:
         key: access_api_key
     - remove_key:
         key: kibana
+    - remove_key:
+        key: server
 
 - filter:
     selectors:
@@ -62,3 +64,4 @@ rules:
     - revision
 
 when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+constraints: ${runtime.arch} != 'arm64'

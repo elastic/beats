@@ -31,6 +31,11 @@ type Processor struct {
 	EsVersion       common.Version
 	Migration       bool
 	ElasticLicensed bool
+
+	// dynamicTemplatesMap records which dynamic templates have been added, to prevent duplicates.
+	dynamicTemplatesMap map[dynamicTemplateKey]common.MapStr
+	// dynamicTemplates records the dynamic templates in the order they were added.
+	dynamicTemplates []common.MapStr
 }
 
 var (
@@ -91,33 +96,18 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.alias(&field)
 		case "histogram":
 			indexMapping = p.histogram(&field)
-		case "group":
-			indexMapping = common.MapStr{}
-			if field.Dynamic.Value != nil {
-				indexMapping["dynamic"] = field.Dynamic.Value
-			}
-
-			// Combine properties with previous field definitions (if any)
-			properties := common.MapStr{}
-			key := mapping.GenerateKey(field.Name) + ".properties"
-			currentProperties, err := output.GetValue(key)
-			if err == nil {
-				var ok bool
-				properties, ok = currentProperties.(common.MapStr)
-				if !ok {
-					// This should never happen
-					return errors.New(key + " is expected to be a MapStr")
-				}
-			}
-
-			groupState := &fieldState{Path: field.Name, DefaultField: *field.DefaultField}
-			if state.Path != "" {
-				groupState.Path = state.Path + "." + field.Name
-			}
-			if err := p.Process(field.Fields, groupState, properties); err != nil {
+		case "nested":
+			mapping, err := p.nested(&field, output)
+			if err != nil {
 				return err
 			}
-			indexMapping["properties"] = properties
+			indexMapping = mapping
+		case "group":
+			mapping, err := p.group(&field, output)
+			if err != nil {
+				return err
+			}
+			indexMapping = mapping
 		default:
 			indexMapping = p.other(&field)
 		}
@@ -185,6 +175,47 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 
 	property["scaling_factor"] = scalingFactor
 	return property
+}
+
+func (p *Processor) nested(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	mapping, err := p.group(f, output)
+	if err != nil {
+		return nil, err
+	}
+	mapping["type"] = "nested"
+	return mapping, nil
+}
+
+func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+	indexMapping := common.MapStr{}
+	if f.Dynamic.Value != nil {
+		indexMapping["dynamic"] = f.Dynamic.Value
+	}
+
+	// Combine properties with previous field definitions (if any)
+	properties := common.MapStr{}
+	key := mapping.GenerateKey(f.Name) + ".properties"
+	currentProperties, err := output.GetValue(key)
+	if err == nil {
+		var ok bool
+		properties, ok = currentProperties.(common.MapStr)
+		if !ok {
+			// This should never happen
+			return nil, errors.New(key + " is expected to be a MapStr")
+		}
+	}
+
+	groupState := &fieldState{Path: f.Name, DefaultField: *f.DefaultField}
+	if f.Path != "" {
+		groupState.Path = f.Path + "." + f.Name
+	}
+	if err := p.Process(f.Fields, groupState, properties); err != nil {
+		return nil, err
+	}
+	if len(properties) != 0 {
+		indexMapping["properties"] = properties
+	}
+	return indexMapping, nil
 }
 
 func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
@@ -394,7 +425,7 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 		if len(otParams) > 1 {
 			path = fmt.Sprintf("%s_%s", path, matchingType)
 		}
-		addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
+		p.addDynamicTemplate(path, pathMatch, dynProperties, matchingType)
 	}
 
 	properties := getDefaultProperties(f)
@@ -410,8 +441,27 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 	return properties
 }
 
-func addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
-	template := common.MapStr{
+type dynamicTemplateKey struct {
+	path      string
+	pathMatch string
+	matchType string
+}
+
+func (p *Processor) addDynamicTemplate(path string, pathMatch string, properties common.MapStr, matchType string) {
+	key := dynamicTemplateKey{
+		path:      path,
+		pathMatch: pathMatch,
+		matchType: matchType,
+	}
+	if p.dynamicTemplatesMap == nil {
+		p.dynamicTemplatesMap = make(map[dynamicTemplateKey]common.MapStr)
+	} else {
+		if _, ok := p.dynamicTemplatesMap[key]; ok {
+			// Dynamic template already added.
+			return
+		}
+	}
+	dynamicTemplate := common.MapStr{
 		// Set the path of the field as name
 		path: common.MapStr{
 			"mapping":            properties,
@@ -419,8 +469,8 @@ func addDynamicTemplate(path string, pathMatch string, properties common.MapStr,
 			"path_match":         pathMatch,
 		},
 	}
-
-	dynamicTemplates = append(dynamicTemplates, template)
+	p.dynamicTemplatesMap[key] = dynamicTemplate
+	p.dynamicTemplates = append(p.dynamicTemplates, dynamicTemplate)
 }
 
 func getDefaultProperties(f *mapping.Field) common.MapStr {

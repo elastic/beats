@@ -70,15 +70,17 @@ func (b *dockerBuilder) Build() error {
 		return errors.Wrap(err, "failed to prepare build")
 	}
 
+	tries := 3
 	tag, err := b.dockerBuild()
-	if err != nil {
+	for err != nil && tries != 0 {
 		fmt.Println(">> Building docker images again (after 10 seconds)")
 		// This sleep is to avoid hitting the docker build issues when resources are not available.
 		time.Sleep(10)
 		tag, err = b.dockerBuild()
-		if err != nil {
-			return errors.Wrap(err, "failed to build docker")
-		}
+		tries -= 1
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to build docker")
 	}
 
 	if err := b.dockerSave(tag); err != nil {
@@ -199,6 +201,12 @@ func (b *dockerBuilder) dockerBuild() (string, error) {
 }
 
 func (b *dockerBuilder) dockerSave(tag string) error {
+	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
+		err := os.MkdirAll(distributionsDir, 0750)
+		if err != nil {
+			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+		}
+	}
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {

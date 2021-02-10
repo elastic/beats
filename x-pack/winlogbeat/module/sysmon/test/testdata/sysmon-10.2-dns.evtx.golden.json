@@ -19,7 +19,8 @@
       "question": {
         "name": "go.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "go"
+        "subdomain": "go",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.223.14.67"
@@ -99,7 +100,8 @@
       "question": {
         "name": "www.msn.com",
         "registered_domain": "msn.com",
-        "subdomain": "www"
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
@@ -179,7 +181,8 @@
       "question": {
         "name": "static-global-s-msn-com.akamaized.net",
         "registered_domain": "akamaized.net",
-        "subdomain": "static-global-s-msn-com"
+        "subdomain": "static-global-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.192",
@@ -264,7 +267,8 @@
       "question": {
         "name": "www.bing.com",
         "registered_domain": "bing.com",
-        "subdomain": "www"
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -345,7 +349,8 @@
       "question": {
         "name": "linkmaker.itunes.apple.com",
         "registered_domain": "apple.com",
-        "subdomain": "linkmaker.itunes"
+        "subdomain": "linkmaker.itunes",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.64.104.249"
@@ -428,7 +433,8 @@
       ],
       "question": {
         "name": "confiant-integrations.global.ssl.fastly.net",
-        "registered_domain": "confiant-integrations.global.ssl.fastly.net"
+        "registered_domain": "confiant-integrations.global.ssl.fastly.net",
+        "top_level_domain": "global.ssl.fastly.net"
       },
       "resolved_ip": [
         "151.101.1.194",
@@ -507,7 +513,8 @@
       "question": {
         "name": "c.msn.com",
         "registered_domain": "msn.com",
-        "subdomain": "c"
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.253.92"
@@ -591,7 +598,8 @@
       "question": {
         "name": "c.bing.com",
         "registered_domain": "bing.com",
-        "subdomain": "c"
+        "subdomain": "c",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "13.107.21.200",
@@ -664,7 +672,8 @@
       "question": {
         "name": "contextual.media.net",
         "registered_domain": "media.net",
-        "subdomain": "contextual"
+        "subdomain": "contextual",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -752,7 +761,8 @@
       "question": {
         "name": "at.atwola.com",
         "registered_domain": "atwola.com",
-        "subdomain": "at"
+        "subdomain": "at",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.120"
@@ -864,7 +874,8 @@
       "question": {
         "name": "m.adnxs.com",
         "registered_domain": "adnxs.com",
-        "subdomain": "m"
+        "subdomain": "m",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.13.192.56",
@@ -948,7 +959,8 @@
       "question": {
         "name": "cms.analytics.yahoo.com",
         "registered_domain": "yahoo.com",
-        "subdomain": "cms.analytics"
+        "subdomain": "cms.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.6.137.78"
@@ -1028,7 +1040,8 @@
       "question": {
         "name": "cvision.media.net",
         "registered_domain": "media.net",
-        "subdomain": "cvision"
+        "subdomain": "cvision",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -1112,7 +1125,8 @@
       "question": {
         "name": "g.bing.com",
         "registered_domain": "bing.com",
-        "subdomain": "g"
+        "subdomain": "g",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -1185,7 +1199,8 @@
       "question": {
         "name": "lg3.media.net",
         "registered_domain": "media.net",
-        "subdomain": "lg3"
+        "subdomain": "lg3",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -1269,7 +1284,8 @@
       "question": {
         "name": "service.sp.advertising.com",
         "registered_domain": "advertising.com",
-        "subdomain": "service.sp"
+        "subdomain": "service.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.88.96.255",
@@ -1351,7 +1367,8 @@
       "question": {
         "name": "sb.scorecardresearch.com",
         "registered_domain": "scorecardresearch.com",
-        "subdomain": "sb"
+        "subdomain": "sb",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "184.25.176.117"
@@ -1431,7 +1448,8 @@
       "question": {
         "name": "otf.msn.com",
         "registered_domain": "msn.com",
-        "subdomain": "otf"
+        "subdomain": "otf",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.114.54.223"
@@ -1531,7 +1549,8 @@
       "question": {
         "name": "ping.chartbeat.net",
         "registered_domain": "chartbeat.net",
-        "subdomain": "ping"
+        "subdomain": "ping",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.171.101.225",
@@ -1621,7 +1640,8 @@
       ],
       "question": {
         "name": "clarium.freetls.fastly.net",
-        "registered_domain": "clarium.freetls.fastly.net"
+        "registered_domain": "clarium.freetls.fastly.net",
+        "top_level_domain": "freetls.fastly.net"
       },
       "resolved_ip": [
         "151.101.194.79",
@@ -1744,7 +1764,8 @@
       "question": {
         "name": "nym1-ib.adnxs.com",
         "registered_domain": "adnxs.com",
-        "subdomain": "nym1-ib"
+        "subdomain": "nym1-ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.178.252",
@@ -1868,7 +1889,8 @@
       "question": {
         "name": "eb2.3lift.com",
         "registered_domain": "3lift.com",
-        "subdomain": "eb2"
+        "subdomain": "eb2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.196.86.129",
@@ -1992,7 +2014,8 @@
       "question": {
         "name": "px.ads.linkedin.com",
         "registered_domain": "linkedin.com",
-        "subdomain": "px.ads"
+        "subdomain": "px.ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "108.174.10.14",
@@ -2089,7 +2112,8 @@
       "question": {
         "name": "login.live.com",
         "registered_domain": "live.com",
-        "subdomain": "login"
+        "subdomain": "login",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.90.23.239",
@@ -2207,7 +2231,8 @@
       "question": {
         "name": "dis.criteo.com",
         "registered_domain": "criteo.com",
-        "subdomain": "dis"
+        "subdomain": "dis",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.119.119.150",
@@ -2338,7 +2363,8 @@
       "question": {
         "name": "ib.adnxs.com",
         "registered_domain": "adnxs.com",
-        "subdomain": "ib"
+        "subdomain": "ib",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.180.12",
@@ -2424,7 +2450,8 @@
       "question": {
         "name": "cm.g.doubleclick.net",
         "registered_domain": "doubleclick.net",
-        "subdomain": "cm.g"
+        "subdomain": "cm.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -2536,7 +2563,8 @@
       "question": {
         "name": "match.adsrvr.org",
         "registered_domain": "adsrvr.org",
-        "subdomain": "match"
+        "subdomain": "match",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "54.208.129.24",
@@ -2625,7 +2653,8 @@
       "question": {
         "name": "ssum-sec.casalemedia.com",
         "registered_domain": "casalemedia.com",
-        "subdomain": "ssum-sec"
+        "subdomain": "ssum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -2737,7 +2766,8 @@
       "question": {
         "name": "protected-by.clarium.io",
         "registered_domain": "clarium.io",
-        "subdomain": "protected-by"
+        "subdomain": "protected-by",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "18.204.130.216",
@@ -2822,7 +2852,8 @@
       "question": {
         "name": "pagead2.googlesyndication.com",
         "registered_domain": "googlesyndication.com",
-        "subdomain": "pagead2"
+        "subdomain": "pagead2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -2898,7 +2929,8 @@
       "question": {
         "name": "googleads.g.doubleclick.net",
         "registered_domain": "doubleclick.net",
-        "subdomain": "googleads.g"
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -3006,7 +3038,8 @@
       "question": {
         "name": "pixel.advertising.com",
         "registered_domain": "advertising.com",
-        "subdomain": "pixel"
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.22.184.73",
@@ -3113,7 +3146,8 @@
       "question": {
         "name": "onevideosync.uplynk.com",
         "registered_domain": "uplynk.com",
-        "subdomain": "onevideosync"
+        "subdomain": "onevideosync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.210.214.197",
@@ -3193,7 +3227,8 @@
       "question": {
         "name": "ad.turn.com",
         "registered_domain": "turn.com",
-        "subdomain": "ad"
+        "subdomain": "ad",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "50.116.194.21"
@@ -3297,7 +3332,8 @@
       "question": {
         "name": "ups.analytics.yahoo.com",
         "registered_domain": "yahoo.com",
-        "subdomain": "ups.analytics"
+        "subdomain": "ups.analytics",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.225.20.218",
@@ -3420,7 +3456,8 @@
       "question": {
         "name": "pm.w55c.net",
         "registered_domain": "w55c.net",
-        "subdomain": "pm"
+        "subdomain": "pm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "34.237.248.89",
@@ -3546,7 +3583,8 @@
       "question": {
         "name": "cm.eyereturn.com",
         "registered_domain": "eyereturn.com",
-        "subdomain": "cm"
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.239.238",
@@ -3633,7 +3671,8 @@
       "question": {
         "name": "www.googletagservices.com",
         "registered_domain": "googletagservices.com",
-        "subdomain": "www"
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.66"
@@ -3749,7 +3788,8 @@
       "question": {
         "name": "cm.adgrx.com",
         "registered_domain": "adgrx.com",
-        "subdomain": "cm"
+        "subdomain": "cm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "173.231.178.117",
@@ -3871,7 +3911,8 @@
       "question": {
         "name": "csm2waycm-atl.netmng.com",
         "registered_domain": "netmng.com",
-        "subdomain": "csm2waycm-atl"
+        "subdomain": "csm2waycm-atl",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.193.83.156",
@@ -3955,7 +3996,8 @@
       "question": {
         "name": "pr-bh.ybp.yahoo.com",
         "registered_domain": "yahoo.com",
-        "subdomain": "pr-bh.ybp"
+        "subdomain": "pr-bh.ybp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.30.2.182"
@@ -4027,7 +4069,8 @@
       "question": {
         "name": "ps.eyeota.net",
         "registered_domain": "eyeota.net",
-        "subdomain": "ps"
+        "subdomain": "ps",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "3.83.220.223"
@@ -4115,7 +4158,8 @@
       "question": {
         "name": "idpix.media6degrees.com",
         "registered_domain": "media6degrees.com",
-        "subdomain": "idpix"
+        "subdomain": "idpix",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.2.197.201",
@@ -4224,7 +4268,8 @@
       "question": {
         "name": "tpc.googlesyndication.com",
         "registered_domain": "googlesyndication.com",
-        "subdomain": "tpc"
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.1",
@@ -4344,7 +4389,8 @@
       "question": {
         "name": "image2.pubmatic.com",
         "registered_domain": "pubmatic.com",
-        "subdomain": "image2"
+        "subdomain": "image2",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "162.248.19.147",
@@ -4436,7 +4482,8 @@
       "question": {
         "name": "sam.msn.com",
         "registered_domain": "msn.com",
-        "subdomain": "sam"
+        "subdomain": "sam",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.203"
@@ -4552,7 +4599,8 @@
       "question": {
         "name": "ocsp.sca1b.amazontrust.com",
         "registered_domain": "amazontrust.com",
-        "subdomain": "ocsp.sca1b"
+        "subdomain": "ocsp.sca1b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.85.89.250",
@@ -4647,7 +4695,8 @@
       "question": {
         "name": "c1.adform.net",
         "registered_domain": "adform.net",
-        "subdomain": "c1"
+        "subdomain": "c1",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "185.167.164.43",
@@ -4748,7 +4797,8 @@
       "question": {
         "name": "urs.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "urs"
+        "subdomain": "urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.84.140.84",
@@ -4833,7 +4883,8 @@
       "question": {
         "name": "dsum-sec.casalemedia.com",
         "registered_domain": "casalemedia.com",
-        "subdomain": "dsum-sec"
+        "subdomain": "dsum-sec",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -4909,7 +4960,8 @@
       "question": {
         "name": "ocsp.godaddy.com",
         "registered_domain": "godaddy.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.167.239.239"
@@ -4975,7 +5027,8 @@
       "question": {
         "name": "googleads.g.doubleclick.net",
         "registered_domain": "doubleclick.net",
-        "subdomain": "googleads.g"
+        "subdomain": "googleads.g",
+        "top_level_domain": "net"
       }
     },
     "event": {
@@ -5038,7 +5091,8 @@
       "question": {
         "name": "tpc.googlesyndication.com",
         "registered_domain": "googlesyndication.com",
-        "subdomain": "tpc"
+        "subdomain": "tpc",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -5147,7 +5201,8 @@
       "question": {
         "name": "ocsp.usertrust.com",
         "registered_domain": "usertrust.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -5240,7 +5295,8 @@
       "question": {
         "name": "isrg.trustid.ocsp.identrust.com",
         "registered_domain": "identrust.com",
-        "subdomain": "isrg.trustid.ocsp"
+        "subdomain": "isrg.trustid.ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -5317,7 +5373,8 @@
       "question": {
         "name": "ad.doubleclick.net",
         "registered_domain": "doubleclick.net",
-        "subdomain": "ad"
+        "subdomain": "ad",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.6.198"
@@ -5429,7 +5486,8 @@
       "question": {
         "name": "ocsp.sectigo.com",
         "registered_domain": "sectigo.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -5522,7 +5580,8 @@
       "question": {
         "name": "ocsp.int-x3.letsencrypt.org",
         "registered_domain": "letsencrypt.org",
-        "subdomain": "ocsp.int-x3"
+        "subdomain": "ocsp.int-x3",
+        "top_level_domain": "org"
       },
       "resolved_ip": [
         "23.50.53.179",
@@ -5635,7 +5694,8 @@
       "question": {
         "name": "ocsp.pki.goog",
         "registered_domain": "pki.goog",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "goog"
       },
       "resolved_ip": [
         "172.217.12.195",
@@ -5720,7 +5780,8 @@
       "question": {
         "name": "googleads4.g.doubleclick.net",
         "registered_domain": "doubleclick.net",
-        "subdomain": "googleads4.g"
+        "subdomain": "googleads4.g",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -5808,7 +5869,8 @@
       "question": {
         "name": "images.taboola.com",
         "registered_domain": "taboola.com",
-        "subdomain": "images"
+        "subdomain": "images",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.2.2",
@@ -5899,7 +5961,8 @@
       "question": {
         "name": "api-s2s.taboola.com",
         "registered_domain": "taboola.com",
-        "subdomain": "api-s2s"
+        "subdomain": "api-s2s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.66.2",
@@ -5978,7 +6041,8 @@
       "question": {
         "name": "x.bidswitch.net",
         "registered_domain": "bidswitch.net",
-        "subdomain": "x"
+        "subdomain": "x",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "35.231.30.22",
@@ -6091,7 +6155,8 @@
       "question": {
         "name": "pixel.adsafeprotected.com",
         "registered_domain": "adsafeprotected.com",
-        "subdomain": "pixel"
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.26",
@@ -6215,7 +6280,8 @@
       ],
       "question": {
         "name": "ml314.com",
-        "registered_domain": "ml314.com"
+        "registered_domain": "ml314.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.171.48.231",
@@ -6342,7 +6408,8 @@
       "question": {
         "name": "aa.agkn.com",
         "registered_domain": "agkn.com",
-        "subdomain": "aa"
+        "subdomain": "aa",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "156.154.200.36",
@@ -6465,7 +6532,8 @@
       "question": {
         "name": "s0.2mdn.net",
         "registered_domain": "2mdn.net",
-        "subdomain": "s0"
+        "subdomain": "s0",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "172.217.10.134",
@@ -6558,7 +6626,8 @@
       "question": {
         "name": "b.scorecardresearch.com",
         "registered_domain": "scorecardresearch.com",
-        "subdomain": "b"
+        "subdomain": "b",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.50.53.195",
@@ -6647,7 +6716,8 @@
       "question": {
         "name": "edw.edmunds.com",
         "registered_domain": "edmunds.com",
-        "subdomain": "edw"
+        "subdomain": "edw",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -6726,7 +6796,8 @@
       "question": {
         "name": "ocsp.digicert.com",
         "registered_domain": "digicert.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -6838,7 +6909,8 @@
       "question": {
         "name": "pre-usermatch.targeting.unrulymedia.com",
         "registered_domain": "unrulymedia.com",
-        "subdomain": "pre-usermatch.targeting"
+        "subdomain": "pre-usermatch.targeting",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.167.55.0",
@@ -6967,7 +7039,8 @@
       "question": {
         "name": "farm.plista.com",
         "registered_domain": "plista.com",
-        "subdomain": "farm"
+        "subdomain": "farm",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "144.76.67.119",
@@ -7090,7 +7163,8 @@
       "question": {
         "name": "beacon.krxd.net",
         "registered_domain": "krxd.net",
-        "subdomain": "beacon"
+        "subdomain": "beacon",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "50.17.180.35",
@@ -7178,7 +7252,8 @@
       "question": {
         "name": "dsum.casalemedia.com",
         "registered_domain": "casalemedia.com",
-        "subdomain": "dsum"
+        "subdomain": "dsum",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.162.21"
@@ -7294,7 +7369,8 @@
       "question": {
         "name": "sync.mathtag.com",
         "registered_domain": "mathtag.com",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "216.200.232.235",
@@ -7384,7 +7460,8 @@
       "question": {
         "name": "status.rapidssl.com",
         "registered_domain": "rapidssl.com",
-        "subdomain": "status"
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -7500,7 +7577,8 @@
       "question": {
         "name": "sync.extend.tv",
         "registered_domain": "extend.tv",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "34.197.195.131",
@@ -7622,7 +7700,8 @@
       "question": {
         "name": "ocsp.comodoca.com",
         "registered_domain": "comodoca.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -7727,7 +7806,8 @@
       "question": {
         "name": "sync-tm.everesttech.net",
         "registered_domain": "everesttech.net",
-        "subdomain": "sync-tm"
+        "subdomain": "sync-tm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "151.101.2.49",
@@ -7846,7 +7926,8 @@
       "question": {
         "name": "idsync.rlcdn.com",
         "registered_domain": "rlcdn.com",
-        "subdomain": "idsync"
+        "subdomain": "idsync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "34.95.92.78",
@@ -7953,7 +8034,8 @@
       "question": {
         "name": "cm.adform.net",
         "registered_domain": "adform.net",
-        "subdomain": "cm"
+        "subdomain": "cm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "37.157.2.239",
@@ -8030,7 +8112,8 @@
       "question": {
         "name": "dm.hybrid.ai",
         "registered_domain": "hybrid.ai",
-        "subdomain": "dm"
+        "subdomain": "dm",
+        "top_level_domain": "ai"
       },
       "resolved_ip": [
         "37.18.16.16"
@@ -8142,7 +8225,8 @@
       "question": {
         "name": "static.adsafeprotected.com",
         "registered_domain": "adsafeprotected.com",
-        "subdomain": "static"
+        "subdomain": "static",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.32",
@@ -8239,7 +8323,8 @@
       "question": {
         "name": "trc.taboola.com",
         "registered_domain": "taboola.com",
-        "subdomain": "trc"
+        "subdomain": "trc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.130.2",
@@ -8313,7 +8398,8 @@
       ],
       "question": {
         "name": "pippio.com",
-        "registered_domain": "pippio.com"
+        "registered_domain": "pippio.com",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.178.254.65"
@@ -8425,7 +8511,8 @@
       "question": {
         "name": "pixel-sync.sitescout.com",
         "registered_domain": "sitescout.com",
-        "subdomain": "pixel-sync"
+        "subdomain": "pixel-sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "209.15.36.34",
@@ -8546,7 +8633,8 @@
       "question": {
         "name": "prod.y-medialink.com",
         "registered_domain": "y-medialink.com",
-        "subdomain": "prod"
+        "subdomain": "prod",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.202.217",
@@ -8652,7 +8740,8 @@
       "question": {
         "name": "jadserve.postrelease.com",
         "registered_domain": "postrelease.com",
-        "subdomain": "jadserve"
+        "subdomain": "jadserve",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.80.117.178",
@@ -8769,7 +8858,8 @@
       "question": {
         "name": "appnexus-partners.tremorhub.com",
         "registered_domain": "tremorhub.com",
-        "subdomain": "appnexus-partners"
+        "subdomain": "appnexus-partners",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.43.184",
@@ -8882,7 +8972,8 @@
       "question": {
         "name": "x.dlx.addthis.com",
         "registered_domain": "addthis.com",
-        "subdomain": "x.dlx"
+        "subdomain": "x.dlx",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "107.21.14.70",
@@ -8992,7 +9083,8 @@
       "question": {
         "name": "dh.serving-sys.com",
         "registered_domain": "serving-sys.com",
-        "subdomain": "dh"
+        "subdomain": "dh",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "18.205.112.71",
@@ -9118,7 +9210,8 @@
       "question": {
         "name": "match.sharethrough.com",
         "registered_domain": "sharethrough.com",
-        "subdomain": "match"
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.55.160.246",
@@ -9241,7 +9334,8 @@
       "question": {
         "name": "tags.rd.linksynergy.com",
         "registered_domain": "linksynergy.com",
-        "subdomain": "tags.rd"
+        "subdomain": "tags.rd",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.241.16.233",
@@ -9359,7 +9453,8 @@
       "question": {
         "name": "rtb-csync.smartadserver.com",
         "registered_domain": "smartadserver.com",
-        "subdomain": "rtb-csync"
+        "subdomain": "rtb-csync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.187.193.166",
@@ -9478,7 +9573,8 @@
       "question": {
         "name": "sc.iasds01.com",
         "registered_domain": "iasds01.com",
-        "subdomain": "sc"
+        "subdomain": "sc",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "199.166.0.200",
@@ -9599,7 +9695,8 @@
       "question": {
         "name": "dt.adsafeprotected.com",
         "registered_domain": "adsafeprotected.com",
-        "subdomain": "dt"
+        "subdomain": "dt",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.38.20",
@@ -9688,7 +9785,8 @@
       "question": {
         "name": "status.thawte.com",
         "registered_domain": "thawte.com",
-        "subdomain": "status"
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -9800,7 +9898,8 @@
       "question": {
         "name": "ads.stickyadstv.com",
         "registered_domain": "stickyadstv.com",
-        "subdomain": "ads"
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "38.134.110.101",
@@ -9887,7 +9986,8 @@
       "question": {
         "name": "hbx.media.net",
         "registered_domain": "media.net",
-        "subdomain": "hbx"
+        "subdomain": "hbx",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.167.93"
@@ -9975,7 +10075,8 @@
       "question": {
         "name": "match.taboola.com",
         "registered_domain": "taboola.com",
-        "subdomain": "match"
+        "subdomain": "match",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.101.194.49",
@@ -10058,7 +10159,8 @@
       "question": {
         "name": "img-s-msn-com.akamaized.net",
         "registered_domain": "akamaized.net",
-        "subdomain": "img-s-msn-com"
+        "subdomain": "img-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.185",
@@ -10139,7 +10241,8 @@
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
         "registered_domain": "akamaized.net",
-        "subdomain": "static-entertainment-eus-s-msn-com"
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -10220,7 +10323,8 @@
       "question": {
         "name": "radarmaps.weather.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "radarmaps.weather"
+        "subdomain": "radarmaps.weather",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.217.149.91"
@@ -10300,7 +10404,8 @@
       "question": {
         "name": "static-entertainment-eus-s-msn-com.akamaized.net",
         "registered_domain": "akamaized.net",
-        "subdomain": "static-entertainment-eus-s-msn-com"
+        "subdomain": "static-entertainment-eus-s-msn-com",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.50.53.194",
@@ -10377,7 +10482,8 @@
       "question": {
         "name": "tag.sp.advertising.com",
         "registered_domain": "advertising.com",
-        "subdomain": "tag.sp"
+        "subdomain": "tag.sp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "152.195.32.163"
@@ -10461,7 +10567,8 @@
       "question": {
         "name": "www.bing.com",
         "registered_domain": "bing.com",
-        "subdomain": "www"
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.79.197.200",
@@ -10542,7 +10649,8 @@
       "question": {
         "name": "cdn.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "cdn"
+        "subdomain": "cdn",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
@@ -10626,7 +10734,8 @@
       "question": {
         "name": "cdn3.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "cdn3"
+        "subdomain": "cdn3",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.52.164.109"
@@ -10706,7 +10815,8 @@
       "question": {
         "name": "rtb0.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "rtb0"
+        "subdomain": "rtb0",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -10786,7 +10896,8 @@
       "question": {
         "name": "dev.virtualearth.net",
         "registered_domain": "virtualearth.net",
-        "subdomain": "dev"
+        "subdomain": "dev",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "20.36.236.157"
@@ -10866,7 +10977,8 @@
       "question": {
         "name": "t.ssl.ak.dynamic.tiles.virtualearth.net",
         "registered_domain": "virtualearth.net",
-        "subdomain": "t.ssl.ak.dynamic.tiles"
+        "subdomain": "t.ssl.ak.dynamic.tiles",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "23.52.161.238"
@@ -10982,7 +11094,8 @@
       "question": {
         "name": "rp.gwallet.com",
         "registered_domain": "gwallet.com",
-        "subdomain": "rp"
+        "subdomain": "rp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "74.217.253.61",
@@ -11081,7 +11194,8 @@
       "question": {
         "name": "ads.yahoo.com",
         "registered_domain": "yahoo.com",
-        "subdomain": "ads"
+        "subdomain": "ads",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "98.139.225.43",
@@ -11164,7 +11278,8 @@
       "question": {
         "name": "um.simpli.fi",
         "registered_domain": "simpli.fi",
-        "subdomain": "um"
+        "subdomain": "um",
+        "top_level_domain": "fi"
       },
       "resolved_ip": [
         "169.55.104.49",
@@ -11278,7 +11393,8 @@
       "question": {
         "name": "mpp.vindicosuite.com",
         "registered_domain": "vindicosuite.com",
-        "subdomain": "mpp"
+        "subdomain": "mpp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "35.186.236.204",
@@ -11360,7 +11476,8 @@
       "question": {
         "name": "sync.1rx.io",
         "registered_domain": "1rx.io",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "io"
       },
       "resolved_ip": [
         "8.41.222.152"
@@ -11440,7 +11557,8 @@
       "question": {
         "name": "sync.teads.tv",
         "registered_domain": "teads.tv",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "tv"
       },
       "resolved_ip": [
         "23.52.160.7"
@@ -11556,7 +11674,8 @@
       "question": {
         "name": "s.thebrighttag.com",
         "registered_domain": "thebrighttag.com",
-        "subdomain": "s"
+        "subdomain": "s",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "3.15.109.176",
@@ -11642,7 +11761,8 @@
       "question": {
         "name": "t.a3cloud.net",
         "registered_domain": "a3cloud.net",
-        "subdomain": "t"
+        "subdomain": "t",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.192.55.189"
@@ -11722,7 +11842,8 @@
       "question": {
         "name": "tps618.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "tps618"
+        "subdomain": "tps618",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -11838,7 +11959,8 @@
       "question": {
         "name": "dpm.demdex.net",
         "registered_domain": "demdex.net",
-        "subdomain": "dpm"
+        "subdomain": "dpm",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "54.157.69.185",
@@ -11966,7 +12088,8 @@
       "question": {
         "name": "secure.adnxs.com",
         "registered_domain": "adnxs.com",
-        "subdomain": "secure"
+        "subdomain": "secure",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.179.228",
@@ -12056,7 +12179,8 @@
       "question": {
         "name": "tps.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "tps"
+        "subdomain": "tps",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -12172,7 +12296,8 @@
       "question": {
         "name": "i.liadm.com",
         "registered_domain": "liadm.com",
-        "subdomain": "i"
+        "subdomain": "i",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "52.71.175.22",
@@ -12298,7 +12423,8 @@
       "question": {
         "name": "pixel.s3xified.com",
         "registered_domain": "s3xified.com",
-        "subdomain": "pixel"
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "67.231.251.189",
@@ -12421,7 +12547,8 @@
       "question": {
         "name": "router.infolinks.com",
         "registered_domain": "infolinks.com",
-        "subdomain": "router"
+        "subdomain": "router",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.20.252.85",
@@ -12539,7 +12666,8 @@
       "question": {
         "name": "grey.erne.co",
         "registered_domain": "erne.co",
-        "subdomain": "grey"
+        "subdomain": "grey",
+        "top_level_domain": "co"
       },
       "resolved_ip": [
         "94.23.171.206",
@@ -12664,7 +12792,8 @@
       "question": {
         "name": "sync.jivox.com",
         "registered_domain": "jivox.com",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "54.243.145.203",
@@ -12955,7 +13084,8 @@
       "question": {
         "name": "b1sync.zemanta.com",
         "registered_domain": "zemanta.com",
-        "subdomain": "b1sync"
+        "subdomain": "b1sync",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "207.244.121.25",
@@ -13134,7 +13264,8 @@
       "question": {
         "name": "tg.socdm.com",
         "registered_domain": "socdm.com",
-        "subdomain": "tg"
+        "subdomain": "tg",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "124.146.215.43",
@@ -13223,7 +13354,8 @@
       "question": {
         "name": "prebid.adnxs.com",
         "registered_domain": "adnxs.com",
-        "subdomain": "prebid"
+        "subdomain": "prebid",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "68.67.153.75"
@@ -13307,7 +13439,8 @@
       "question": {
         "name": "ul1.dvtps.com",
         "registered_domain": "dvtps.com",
-        "subdomain": "ul1"
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -13373,7 +13506,8 @@
       "question": {
         "name": "ul1.dvtps.com",
         "registered_domain": "dvtps.com",
-        "subdomain": "ul1"
+        "subdomain": "ul1",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -13450,7 +13584,8 @@
       "question": {
         "name": "tags.bluekai.com",
         "registered_domain": "bluekai.com",
-        "subdomain": "tags"
+        "subdomain": "tags",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "23.3.125.199"
@@ -13566,7 +13701,8 @@
       "question": {
         "name": "cdnjs.cloudflare.com",
         "registered_domain": "cloudflare.com",
-        "subdomain": "cdnjs"
+        "subdomain": "cdnjs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.19.195.151",
@@ -13693,7 +13829,8 @@
       "question": {
         "name": "pixel.onaudience.com",
         "registered_domain": "onaudience.com",
-        "subdomain": "pixel"
+        "subdomain": "pixel",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "85.194.243.23",
@@ -13784,7 +13921,8 @@
       "question": {
         "name": "status.geotrust.com",
         "registered_domain": "geotrust.com",
-        "subdomain": "status"
+        "subdomain": "status",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.91.29"
@@ -13896,7 +14034,8 @@
       "question": {
         "name": "ocsp.trust-provider.com",
         "registered_domain": "trust-provider.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -14017,7 +14156,8 @@
       "question": {
         "name": "ocsp.comodoca4.com",
         "registered_domain": "comodoca4.com",
-        "subdomain": "ocsp"
+        "subdomain": "ocsp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "151.139.128.14",
@@ -14138,7 +14278,8 @@
       "question": {
         "name": "sync.crwdcntrl.net",
         "registered_domain": "crwdcntrl.net",
-        "subdomain": "sync"
+        "subdomain": "sync",
+        "top_level_domain": "net"
       },
       "resolved_ip": [
         "52.4.111.14",
@@ -14250,7 +14391,8 @@
       "question": {
         "name": "match.sync.ad.cpe.dotomi.com",
         "registered_domain": "dotomi.com",
-        "subdomain": "match.sync.ad.cpe"
+        "subdomain": "match.sync.ad.cpe",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "159.127.42.114",
@@ -14335,7 +14477,8 @@
       "question": {
         "name": "tps10230.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "tps10230"
+        "subdomain": "tps10230",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -14415,7 +14558,8 @@
       "question": {
         "name": "tps10221.doubleverify.com",
         "registered_domain": "doubleverify.com",
-        "subdomain": "tps10221"
+        "subdomain": "tps10221",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "204.154.111.122"
@@ -14527,7 +14671,8 @@
       "question": {
         "name": "www.facebook.com",
         "registered_domain": "facebook.com",
-        "subdomain": "www"
+        "subdomain": "www",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "31.13.71.36",
@@ -14628,7 +14773,8 @@
       "question": {
         "name": "platform.twitter.com",
         "registered_domain": "twitter.com",
-        "subdomain": "platform"
+        "subdomain": "platform",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "192.229.163.25"
@@ -14744,7 +14890,8 @@
       "question": {
         "name": "syndication.twitter.com",
         "registered_domain": "twitter.com",
-        "subdomain": "syndication"
+        "subdomain": "syndication",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "104.244.42.8",
@@ -14831,7 +14978,8 @@
       "question": {
         "name": "ade.googlesyndication.com",
         "registered_domain": "googlesyndication.com",
-        "subdomain": "ade"
+        "subdomain": "ade",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "172.217.10.34"
@@ -14911,7 +15059,8 @@
       "question": {
         "name": "iecvlist.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "iecvlist"
+        "subdomain": "iecvlist",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "72.21.81.200"
@@ -14987,7 +15136,8 @@
       "question": {
         "name": "tsfe.trafficshaping.dsp.mp.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "tsfe.trafficshaping.dsp.mp"
+        "subdomain": "tsfe.trafficshaping.dsp.mp",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.77.232.95"
@@ -15053,7 +15203,8 @@
       "question": {
         "name": "isatap.local.crowbird.com",
         "registered_domain": "crowbird.com",
-        "subdomain": "isatap.local"
+        "subdomain": "isatap.local",
+        "top_level_domain": "com"
       }
     },
     "event": {
@@ -15256,7 +15407,8 @@
       "question": {
         "name": "v10.vortex-win.data.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "v10.vortex-win.data"
+        "subdomain": "v10.vortex-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "65.55.44.109"
@@ -15332,7 +15484,8 @@
       "question": {
         "name": "settings-win.data.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "settings-win.data"
+        "subdomain": "settings-win.data",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "20.36.218.63"
@@ -15436,7 +15589,8 @@
       "question": {
         "name": "c.urs.microsoft.com",
         "registered_domain": "microsoft.com",
-        "subdomain": "c.urs"
+        "subdomain": "c.urs",
+        "top_level_domain": "com"
       },
       "resolved_ip": [
         "40.121.17.79",

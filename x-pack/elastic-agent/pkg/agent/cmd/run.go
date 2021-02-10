@@ -6,16 +6,23 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"syscall"
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -28,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -133,6 +141,12 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		return err
 	}
 
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS())
+	if err != nil {
+		return err
+	}
+	defer serverStopFn()
+
 	if err := app.Start(); err != nil {
 		return err
 	}
@@ -233,4 +247,87 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	}
 
 	return defaultLogLevel
+}
+
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string) (func() error, error) {
+	// use libbeat to setup metrics
+	if err := metrics.SetupMetrics(agentName); err != nil {
+		return nil, err
+	}
+
+	// start server for stats
+	endpointConfig := api.Config{
+		Enabled: true,
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
+	}
+
+	// create agent config path
+	createAgentMonitoringDrop(endpointConfig.Host)
+
+	cfg, err := common.NewConfigFrom(endpointConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err := exposeMetricsEndpoint(logger, cfg, monitoring.GetNamespace)
+	if err != nil {
+		return nil, errors.New(err, "could not start the HTTP server for the API")
+	}
+	s.Start()
+
+	// return server stopper
+	return s.Stop, nil
+}
+
+func createAgentMonitoringDrop(drop string) error {
+	if drop == "" || runtime.GOOS == "windows" {
+		return nil
+	}
+
+	path := strings.TrimPrefix(drop, "unix://")
+	if strings.HasSuffix(path, ".sock") {
+		path = filepath.Dir(path)
+	}
+
+	_, err := os.Stat(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+
+		// create
+		if err := os.MkdirAll(path, 0775); err != nil {
+			return err
+		}
+	}
+
+	return os.Chown(path, os.Geteuid(), os.Getegid())
+}
+
+func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace) (*api.Server, error) {
+	mux := http.NewServeMux()
+
+	makeAPIHandler := func(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Request) {
+		return func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+			data := monitoring.CollectStructSnapshot(
+				ns.GetRegistry(),
+				monitoring.Full,
+				false,
+			)
+
+			bytes, err := json.Marshal(data)
+			var content string
+			if err != nil {
+				content = fmt.Sprintf("Not valid json: %v", err)
+			} else {
+				content = string(bytes)
+			}
+			fmt.Fprintf(w, content)
+		}
+	}
+
+	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
+	return api.New(log, mux, config)
 }

@@ -15,9 +15,11 @@ const (
 )
 
 type responseConfig struct {
-	Transforms transformsConfig `config:"transforms"`
-	Pagination transformsConfig `config:"pagination"`
-	Split      *splitConfig     `config:"split"`
+	DecodeAs                string           `config:"decode_as"`
+	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
+	Transforms              transformsConfig `config:"transforms"`
+	Pagination              transformsConfig `config:"pagination"`
+	Split                   *splitConfig     `config:"split"`
 }
 
 type splitConfig struct {
@@ -35,6 +37,11 @@ func (c *responseConfig) Validate() error {
 	}
 	if _, err := newBasicTransformsFromConfig(c.Pagination, paginationNamespace, nil); err != nil {
 		return err
+	}
+	if c.DecodeAs != "" {
+		if _, found := registeredDecoders[c.DecodeAs]; !found {
+			return fmt.Errorf("decoder not found for contentType: %v", c.DecodeAs)
+		}
 	}
 	return nil
 }

@@ -209,6 +209,12 @@ func (c *EnrollCmd) Execute() error {
 		return err
 	}
 
+	// clear action store
+	// fail only if file exists and there was a failure
+	if err := os.Remove(info.AgentStateStoreFile()); !os.IsNotExist(err) {
+		return err
+	}
+
 	return nil
 }
 

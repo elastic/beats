@@ -24,6 +24,7 @@ processors:
         - {from: suricata.eve.dest_ip, to: destination.address}
         - {from: suricata.eve.dest_port, to: destination.port, type: long}
         - {from: suricata.eve.proto, to: network.transport}
+        - {from: suricata.eve.flow_id, type: string}
   - convert:
       ignore_missing: true
       fail_on_error: false
@@ -53,6 +54,7 @@ processors:
       field: suricata.eve.dns.rrname
       target_field: dns.question.registered_domain
       target_subdomain_field: dns.question.subdomain
+      target_etld_field: dns.question.top_level_domain
   - add_fields:
       target: ''
       fields:

@@ -40,12 +40,10 @@ aws --region us-east-1 secretsmanager create-secret --name ELASTIC_CLOUD_ID --se
 
 [float]
 ==== AWS CloudFormation Template Example
-Here is an example of AWS CloudFormation template to create a new cluster,
-create a task definition that runs Metricbeat container and start the service.
-Please copy this section into a `cloud_formation.yml` file locally and replace
-`<your-cluster-name>`, `<your-log-group-name>`, and `<your-service-name>` with
-your own preferred names. Also you can find `<ELASTIC_CLOUD_ID secret ARN>` and
-`<ELASTIC_CLOUD_AUTH secret ARN>` values from AWS secret manager.
+Here is an example of AWS CloudFormation template for testing purpose only.
+Please replace this with actual applications. This template shows how to define
+a new cluster, how to create a task definition with multiple containers(including
+Metricbeat), and how to start the service.
 
 [source,yaml]
 ----
@@ -53,22 +51,36 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   SubnetID:
     Type: String
+  CloudIDArn:
+    Type: String
+  CloudAuthArn:
+    Type: String
+  ClusterName:
+    Type: String
+  RoleName:
+    Type: String
+  TaskName:
+    Type: String
+  ServiceName:
+    Type: String
+  LogGroupName:
+    Type: String
 Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: <your-cluster-name>
+      ClusterName: !Ref ClusterName
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: <your-log-group-name>
+      LogGroupName: !Ref LogGroupName
   ExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ecsFargateTaskExecutionRole
+      RoleName: !Ref RoleName
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -86,24 +98,24 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource:
-                  - <ELASTIC_CLOUD_ID secret ARN>
-                  - <ELASTIC_CLOUD_AUTH secret ARN>
+                  - !Ref CloudIDArn
+                  - !Ref CloudAuthArn
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: deployment-task-metricbeat
+      Family: !Ref TaskName
       Cpu: 256
       Memory: 512
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
-        - Name: deployment-task-metricbeat-container
-          Image: kaiyansheng/metricbeat-awsfargate:v1
+        - Name: metricbeat-container
+          Image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
           Secrets:
             - Name: ELASTIC_CLOUD_ID
-              ValueFrom: <ELASTIC_CLOUD_ID secret ARN>
+              ValueFrom: !Ref CloudIDArn
             - Name: ELASTIC_CLOUD_AUTH
-              ValueFrom: <ELASTIC_CLOUD_AUTH secret ARN>
+              ValueFrom: !Ref CloudAuthArn
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -114,14 +126,25 @@ Resources:
             - sh
             - -c
           Command:
-            - ./metricbeat setup && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+            - ./metricbeat setup -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH && ./metricbeat modules disable system && ./metricbeat modules enable awsfargate && ./metricbeat -e -E cloud.id=$ELASTIC_CLOUD_ID -E cloud.auth=$ELASTIC_CLOUD_AUTH
+        - Name: stress-test
+          Image: containerstack/alpine-stress
+          Essential: false
+          DependsOn:
+            - ContainerName: metricbeat-container
+              Condition: START
+          EntryPoint:
+            - sh
+            - -c
+          Command:
+            - stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 6000s
       RequiresCompatibilities:
         - EC2
         - FARGATE
   Service:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: <your-service-name>
+      ServiceName: !Ref ServiceName
       Cluster: !Ref Cluster
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: 1
@@ -135,12 +158,15 @@ Resources:
 
 [float]
 ==== Create CloudFormation Stack
-Here is the AWS CLI to create a stack using the CloudFormation config file above:
+When copying the CloudFormation template, please make sure the Metricbeat
+container image is the correct version.
+Once the template is saved locally into `clouformation.yml`, AWS
+CLI can be used to create a stack using one command:
 ----
-aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters 'ParameterKey=SubnetID,ParameterValue=<your-subnet-id>'
+aws --region us-east-1 cloudformation create-stack --stack-name <your-stack-name> --template-body file://./cloudformation.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=SubnetID,ParameterValue=<subnet-id> ParameterKey=CloudAuthArn,ParameterValue=<cloud-auth-arn> ParameterKey=CloudIDArn,ParameterValue=<cloud-id-arn> ParameterKey=ClusterName,ParameterValue=<cluster-name> ParameterKey=RoleName,ParameterValue=<role-name> ParameterKey=TaskName,ParameterValue=<task-name> ParameterKey=ServiceName,ParameterValue=<service-name> ParameterKey=LogGroupName,ParameterValue=<log-group-name>
 ----
 
-Make sure to replace `<your-subnet-id>` with your own subnet in this command. Please go
+Make sure to replace `<subnet-id>` with your own subnet in this command. Please go
 to Services -> VPC -> Subnets to find subnet ID to use. You can also add several
 more containers under the TaskDefinition section.
 
@@ -149,5 +175,12 @@ more containers under the TaskDefinition section.
 Here is the AWS CLI to delete a stack including the cluster, task definition and
 all containers:
 ----
-aws cloudformation delete-stack --stack-name <your-stack-name>
+aws --region us-east-1 cloudformation delete-stack --stack-name <your-stack-name>
 ----
+
+[float]
+=== Dashboard
+
+The task_stats metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-awsfargate-overview.png[]

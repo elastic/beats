@@ -37,7 +37,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
-    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
@@ -56,6 +56,7 @@ pipeline {
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
+          setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
@@ -73,9 +74,15 @@ pipeline {
           withBeatsEnv(archive: false, id: "lint") {
             dumpVariables()
             setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            cmd(label: "make check-python", script: "make check-python")
-            cmd(label: "make check-go", script: "make check-go")
-            cmd(label: "Check for changes", script: "make check-no-changes")
+            whenTrue(env.ONLY_DOCS == 'true') {
+              cmd(label: "make check", script: "make check")
+            }
+            whenTrue(env.ONLY_DOCS == 'false') {
+              cmd(label: "make check-python", script: "make check-python")
+              cmd(label: "make check-go", script: "make check-go")
+              cmd(label: "make notice", script: "make notice")
+              cmd(label: "Check for changes", script: "make check-no-changes")
+            }
           }
         }
       }
@@ -122,7 +129,10 @@ pipeline {
       options { skipDefaultCheckout() }
       when {
         allOf {
-          expression { return env.GO_MOD_CHANGES == "true" }
+          anyOf {
+            expression { return env.GO_MOD_CHANGES == "true" }
+            expression { return env.PACKAGING_CHANGES == "true" }
+          }
           changeRequest()
         }
       }
@@ -644,9 +654,6 @@ def dumpVariables(){
   PYTHON_EXE: ${env.PYTHON_EXE}
   PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}
   PROCESSES: ${env.PROCESSES}
-  REVIEWDOG: ${env.REVIEWDOG}
-  REVIEWDOG_OPTIONS: ${env.REVIEWDOG_OPTIONS}
-  REVIEWDOG_REPO: ${env.REVIEWDOG_REPO}
   STRESS_TESTS: ${env.STRESS_TESTS}
   STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}
   SYSTEM_TESTS: ${env.SYSTEM_TESTS}

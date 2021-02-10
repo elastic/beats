@@ -318,13 +318,13 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
+		s.Offset += int64(message.Bytes)
+
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
 		event := inp.eventFromMessage(message, path)
-		s.Offset += int64(message.Bytes)
-
 		if err := p.Publish(event, s); err != nil {
 			return err
 		}

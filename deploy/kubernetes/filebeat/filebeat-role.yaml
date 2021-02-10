@@ -13,3 +13,7 @@ rules:
   - get
   - watch
   - list
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
