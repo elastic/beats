@@ -626,7 +626,12 @@ func TestNewRoundTripper(t *testing.T) {
 			require.NotNil(t, transp.Dial)
 			require.NotNil(t, transport.TLSDialer)
 
-			require.Equal(t, (&tlscommon.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			expected := (&tlscommon.TLSConfig{}).ToConfig()
+			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
+			// When we remove support for the legacy common name treatment
+			// this test has to be adjusted, as we will not depend on our
+			// VerifyConnection callback.
+			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
 			require.True(t, transp.DisableKeepAlives)
 		})
 	}

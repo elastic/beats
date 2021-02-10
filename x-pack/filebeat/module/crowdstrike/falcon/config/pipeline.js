@@ -12,6 +12,10 @@ var crowdstrikeFalconProcessor = (function () {
 
     function convertToMSEpoch(evt, field) {
         var timestamp = evt.Get(field);
+        if (timestamp == 0) {
+            evt.Delete(field)
+            return
+        }
         if (timestamp) {
             if (timestamp < 100000000000) { // check if we have a seconds timestamp, this is roughly 1973 in MS
                 evt.Put(field, timestamp * 1000);
@@ -103,7 +107,8 @@ var crowdstrikeFalconProcessor = (function () {
                         type: "ip"
                     }, {
                         from: "crowdstrike.event.ProcessId",
-                        to: "process.pid"
+                        to: "process.pid",
+                        type: "long"
                     }, {
                         from: "crowdstrike.event.ParentImageFileName",
                         to: "process.parent.executable"
@@ -284,6 +289,7 @@ var crowdstrikeFalconProcessor = (function () {
                     }, {
                         from: "crowdstrike.event.PID",
                         to: "process.pid",
+                        type: "long"
                     },
                     {
                         from: "crowdstrike.event.RuleId",
@@ -420,6 +426,44 @@ var crowdstrikeFalconProcessor = (function () {
             mode: "copy",
             ignore_missing: false,
             fail_on_error: true
+        })
+        .Convert({
+            fields: [
+                {
+                    from: "crowdstrike.event.LateralMovement",
+                    type: "long",
+                },
+                {
+                    from: "crowdstrike.event.LocalPort",
+                    type: "long",
+                },
+                {
+                    from: "crowdstrike.event.MatchCount",
+                    type: "long",
+                },
+                {
+                    from: "crowdstrike.event.MatchCountSinceLastReport",
+                    type: "long",
+                },
+                {
+                    from: "crowdstrike.event.PID",
+                    type: "long",
+                },
+                {
+                    from: "crowdstrike.event.RemotePort",
+                    type: "long",
+                },
+                {
+                    from: "source.port",
+                    type: "long",
+                },
+                {
+                    from: "destination.port",
+                    type: "long",
+                }
+            ],
+            ignore_missing: true,
+            fail_on_error: false
         })
         .Build()
         .Run

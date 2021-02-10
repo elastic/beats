@@ -40,6 +40,17 @@ expected to be a file mode as an octal string. The default value is the system
 default (generally `0755`).
 
 [float]
+[id="{beatname_lc}-input-{type}-unix-framing"]
+==== `framing`
+
+Specify the framing used to split incoming events.  Can be one of
+`delimiter` or `rfc6587`.  `delimiter` uses the characters specified
+in `line_delimiter` to split the incoming events.  `rfc6587` supports
+octet counting and non-transparent framing as described in
+https://tools.ietf.org/html/rfc6587[RFC6587].  `line_delimiter` is
+used to split the events in non-transparent framing.  The default is `delimiter`.
+
+[float]
 [id="{beatname_lc}-input-{type}-unix-line-delimiter"]
 ==== `line_delimiter`
 

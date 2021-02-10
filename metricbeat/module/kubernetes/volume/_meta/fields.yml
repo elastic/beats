@@ -35,6 +35,11 @@
               format: bytes
               description: >
                 Filesystem total used in bytes
+            - name: pct
+              type: scaled_float
+              format: percent
+              description: >
+                Percentage of used storage
         - name: inodes
           type: group
           fields:

@@ -18,7 +18,6 @@
 package tcp
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -75,9 +74,9 @@ func NewInput(
 		forwarder.Send(event)
 	}
 
-	splitFunc := streaming.SplitFunc([]byte(config.LineDelimiter))
-	if splitFunc == nil {
-		return nil, fmt.Errorf("unable to create splitFunc for delimiter %s", config.LineDelimiter)
+	splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+	if err != nil {
+		return nil, err
 	}
 
 	logger := logp.NewLogger("input.tcp").With("address", config.Config.Host)

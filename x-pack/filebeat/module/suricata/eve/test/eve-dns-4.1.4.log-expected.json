@@ -40,7 +40,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 885455453886936,
+        "suricata.eve.flow_id": "885455453886936",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -87,7 +87,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1418448010418810,
+        "suricata.eve.flow_id": "1418448010418810",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -151,7 +151,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1418448010418810,
+        "suricata.eve.flow_id": "1418448010418810",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -215,7 +215,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 885455453886936,
+        "suricata.eve.flow_id": "885455453886936",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -263,7 +263,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 40074894954311,
+        "suricata.eve.flow_id": "40074894954311",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -311,7 +311,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2130691028471842,
+        "suricata.eve.flow_id": "2130691028471842",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -406,7 +406,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 40074894954311,
+        "suricata.eve.flow_id": "40074894954311",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -501,7 +501,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2130691028471842,
+        "suricata.eve.flow_id": "2130691028471842",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -549,7 +549,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -597,7 +597,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -655,7 +655,7 @@
         "suricata.eve.dns.ttl": 1315,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -717,7 +717,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -779,7 +779,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -841,7 +841,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -903,7 +903,7 @@
         "suricata.eve.dns.ttl": 15,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 814378410010223,
+        "suricata.eve.flow_id": "814378410010223",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -961,7 +961,7 @@
         "suricata.eve.dns.ttl": 1268,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1023,7 +1023,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1085,7 +1085,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1147,7 +1147,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1209,7 +1209,7 @@
         "suricata.eve.dns.ttl": 53,
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 1887239765714716,
+        "suricata.eve.flow_id": "1887239765714716",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1257,7 +1257,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2181951993205289,
+        "suricata.eve.flow_id": "2181951993205289",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1305,7 +1305,7 @@
         "suricata.eve.dns.tx_id": 0,
         "suricata.eve.dns.type": "query",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 928596784370390,
+        "suricata.eve.flow_id": "928596784370390",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1400,7 +1400,7 @@
         "suricata.eve.dns.rrtype": "A",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 2181951993205289,
+        "suricata.eve.flow_id": "2181951993205289",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
@@ -1495,7 +1495,7 @@
         "suricata.eve.dns.rrtype": "AAAA",
         "suricata.eve.dns.type": "answer",
         "suricata.eve.event_type": "dns",
-        "suricata.eve.flow_id": 928596784370390,
+        "suricata.eve.flow_id": "928596784370390",
         "suricata.eve.in_iface": "enp0s3",
         "tags": [
             "suricata"
