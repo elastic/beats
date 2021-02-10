@@ -20062,6 +20062,20 @@ type: keyword
 Nodes statistics.
 
 
+*`elasticsearch.cluster.stats.nodes.fs.total.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.fs.available.bytes`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
@@ -20125,6 +20139,13 @@ Indices statistics.
 
 
 
+*`elasticsearch.cluster.stats.indices.store.size.bytes`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.cluster.stats.indices.total`*::
 +
 --
@@ -20141,6 +20162,13 @@ type: long
 Shard statistics.
 
 
+
+*`elasticsearch.cluster.stats.indices.shards.docs.total`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.indices.shards.count`*::
 +
@@ -20172,6 +20200,13 @@ type: long
 
 --
 
+
+*`elasticsearch.cluster.stats.license.expiry_date_in_millis`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.license.status`*::
 +

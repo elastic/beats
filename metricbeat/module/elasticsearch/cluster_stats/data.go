@@ -41,6 +41,14 @@ var (
 		"nodes": c.Dict("nodes", s.Schema{
 			"count":  c.Int("count.total"),
 			"master": c.Int("count.master"),
+			"fs": c.Dict("fs", s.Schema{
+				"total": s.Object{
+					"bytes": c.Int("total_in_bytes"),
+				},
+				"available": s.Object{
+					"bytes": c.Int("available_in_bytes"),
+				},
+			}),
 			"jvm": c.Dict("jvm", s.Schema{
 				"max_uptime": s.Object{
 					"ms": c.Int("max_uptime_in_millis"),
@@ -57,11 +65,18 @@ var (
 				}),
 			}),
 		}),
+
 		"indices": c.Dict("indices", s.Schema{
+			"docs": c.Dict("docs", s.Schema{
+				"total": c.Int("count"),
+			}),
 			"total": c.Int("count"),
 			"shards": c.Dict("shards", s.Schema{
 				"count":     c.Int("total"),
 				"primaries": c.Int("primaries"),
+			}),
+			"store": c.Dict("store", s.Schema{
+				"size": s.Object{"bytes": c.Int("size_in_bytes")},
 			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
 				"memory": s.Object{
@@ -288,13 +303,20 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 
 	metricSetFields.Put("stack", stackData)
 	metricSetFields.Put("license", struct {
-		Status string `json:"status"`
-		Type   string `json:"type"`
+		Status       string `json:"status"`
+		Type         string `json:"type"`
+		ExpiryDateMs int    `json:"expiry_date_in_millis"`
 	}{
-		Status: license.Status,
-		Type:   license.Type,
+		Status:       license.Status,
+		Type:         license.Type,
+		ExpiryDateMs: license.ExpiryDateInMillis,
 	})
+
 	metricSetFields.Put("state", clusterStateReduced)
+
+	if err = elasticsearch.PassThruField("version", clusterState, event.ModuleFields); err != nil {
+		return errors.Wrap(err, "failed to pass through version field")
+	}
 
 	event.MetricSetFields = metricSetFields
 
