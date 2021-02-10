@@ -42,7 +42,6 @@ var (
 				"free_in_bytes":  c.Int("free_bytes"),
 				"used_in_bytes":  c.Int("used_bytes"),
 			}),
-			"uptime_in_millis": c.Int("uptime_ms"),
 			"distro":           c.Str("distro", s.Optional),
 			"distroRelease":    c.Str("distro_release", s.Optional),
 			"platform":         c.Str("platform", s.Optional),
@@ -55,7 +54,6 @@ var (
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
-		"usage":                  c.Ifc("usage.kibana", s.Optional),
 		"transport_address":      c.Str("kibana.transport_address"),
 		"version":                c.Str("kibana.version"),
 		"snapshot":               c.Bool("kibana.snapshot"),
@@ -172,14 +170,14 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	dataFields.Delete("version")
 
 	// Set service address
-	serviceAddress, err := dataFields.GetValue("transport_address")
+	serviceAddress, err := dataFields.GetValue("kibana.transport_address")
 	if err != nil {
 		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
 		r.Event(event)
 		return event.Error
 	}
 	event.RootFields.Put("service.address", serviceAddress)
-	dataFields.Delete("transport_address")
+	dataFields.Delete("kibana.transport_address")
 
 	event.MetricSetFields = dataFields
 

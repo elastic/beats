@@ -8,7 +8,7 @@
     "kibana": {
         "elasticsearch": {
             "cluster": {
-                "id": "zJpGlM76SkSnRMK1Ihihnw"
+                "id": "XSvgsMy9S8SfNclaNZ__hg"
             }
         },
         "stats": {
@@ -23,31 +23,30 @@
                 "name": "kibana",
                 "snapshot": false,
                 "status": "green",
-                "transport_address": "0:5601",
-                "uuid": "47c5b96a-e3c4-430c-afee-5c7e27683b80",
-                "version": "7.9.0"
+                "uuid": "e84f5418-217b-45f8-8168-54575c63ca09",
+                "version": "7.10.0"
             },
             "name": "kibana",
             "os": {
-                "distro": "Centos",
-                "distroRelease": "Centos-7.8.2003",
+                "distro": "CentOS",
+                "distroRelease": "CentOS-8.2.2004",
                 "load": {
-                    "15m": 1.1416015625,
-                    "1m": 1.18994140625,
-                    "5m": 1.28466796875
+                    "15m": 1.61083984375,
+                    "1m": 2.21728515625,
+                    "5m": 1.92529296875
                 },
                 "memory": {
-                    "free_in_bytes": 11949064192,
-                    "total_in_bytes": 33300463616,
-                    "used_in_bytes": 21351399424
+                    "free_in_bytes": 10878767104,
+                    "total_in_bytes": 33291984896,
+                    "used_in_bytes": 22413217792
                 },
                 "platform": "linux",
-                "platformRelease": "linux-5.6.10-arch1-1",
-                "uptime_in_millis": 11437000
+                "platformRelease": "linux-5.10.14-arch1-1",
+                "uptime_in_millis": 16864000
             },
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.13968499936163425
+                    "ms": 0.4428120031952858
                 },
                 "memory": {
                     "heap": {
@@ -55,55 +54,35 @@
                             "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 475709440
+                            "bytes": 242057216
                         },
                         "used": {
-                            "bytes": 337236176
+                            "bytes": 183346512
                         }
                     },
                     "resident_set_size": {
-                        "bytes": 592297984
+                        "bytes": 356761600
                     }
                 },
                 "uptime": {
-                    "ms": 373166
+                    "ms": 824387
                 }
             },
             "request": {
                 "disconnects": 0,
-                "total": 4
+                "total": 3
             },
             "response_time": {
                 "avg": {
-                    "ms": 5
+                    "ms": 548
                 },
                 "max": {
-                    "ms": 6
+                    "ms": 795
                 }
             },
             "snapshot": false,
             "status": "green",
-            "usage": {
-                "dashboard": {
-                    "total": 0
-                },
-                "graph_workspace": {
-                    "total": 0
-                },
-                "index": ".kibana",
-                "index_pattern": {
-                    "total": 0
-                },
-                "search": {
-                    "total": 0
-                },
-                "timelion_sheet": {
-                    "total": 0
-                },
-                "visualization": {
-                    "total": 0
-                }
-            }
+            "transport_address": "0:5601"
         }
     },
     "metricset": {
@@ -111,12 +90,12 @@
         "period": 10000
     },
     "process": {
-        "pid": 6
+        "pid": 7
     },
     "service": {
-        "address": "172.26.0.3:5601",
-        "id": "47c5b96a-e3c4-430c-afee-5c7e27683b80",
+        "address": "172.20.0.3:5601",
+        "id": "e84f5418-217b-45f8-8168-54575c63ca09",
         "type": "kibana",
-        "version": "7.9.0"
+        "version": "7.10.0"
     }
 }
