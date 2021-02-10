@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -185,25 +186,10 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 }
 
 func TestNewInputDone(t *testing.T) {
-	goroutines := resources.NewGoroutinesChecker()
-	defer goroutines.Check(t)
-
-	config, _ := common.NewConfigFrom(common.MapStr{
+	config := common.MapStr{
 		"paths": path.Join(os.TempDir(), "logs", "*.log"),
-	})
-
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
-		return TestOutlet{}, nil
-	})
-
-	context := input.Context{
-		Done: make(chan struct{}),
 	}
-
-	_, err := NewInput(config, connector, context)
-	assert.NoError(t, err)
-
-	close(context.Done)
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
 
 func TestNewInputError(t *testing.T) {
@@ -213,7 +199,7 @@ func TestNewInputError(t *testing.T) {
 	config := common.NewConfig()
 
 	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
-		return TestOutlet{}, nil
+		return inputtest.Outlet{}, nil
 	})
 
 	context := input.Context{}
@@ -318,10 +304,3 @@ func (o *eventCapturer) Close() error {
 func (o *eventCapturer) Done() <-chan struct{} {
 	return o.c
 }
-
-// TestOutlet is an empty outlet for testing
-type TestOutlet struct{}
-
-func (o TestOutlet) OnEvent(event beat.Event) bool { return true }
-func (o TestOutlet) Close() error                  { return nil }
-func (o TestOutlet) Done() <-chan struct{}         { return nil }

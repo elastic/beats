@@ -142044,13 +142044,6 @@ alias to: source.packets
 
 --
 
-*`suricata.eve.flow.end`*::
-+
---
-type: date
-
---
-
 *`suricata.eve.flow.alerted`*::
 +
 --
