@@ -46,13 +46,21 @@ processors:
     - UNIX_MS
     if: ctx?.event?.action == 'recording.renamed'
     ignore_failure: true
+- remove:
+    field: zoom.recording.recording_file.recording_start
+    if: 'ctx.zoom?.recording?.recording_file?.recording_start == ""'
+- remove:
+    field: zoom.recording.recording_file.recording_end
+    if: 'ctx.zoom?.recording?.recording_file?.recording_end == ""'
 - set:
     field: event.start
     value: '{{ zoom.recording.recording_file.recording_start }}'
+    ignore_empty_value: true
     if: ctx?.event?.action == 'recording.started'
 - set:
     field: event.end
     value: '{{ zoom.recording.recording_file.recording_end }}'
+    ignore_empty_value: true
     if: ctx?.event?.action == 'recording.stopped'
 - script:
     lang: painless
