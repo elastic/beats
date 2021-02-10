@@ -11,8 +11,8 @@ import (
 	"testing"
 )
 
-func TestInitResources(t *testing.T) {
-	t.Run("return error when no resource options were configured", func(t *testing.T) {
+func TestHasRoot(t *testing.T) {
+	t.Run("check if user is admin", func(t *testing.T) {
 		result, err := HasRoot()
 		assert.NoError(t, err)
 		assert.True(t, result)
