@@ -112,6 +112,10 @@ processors:
     field: elasticsearch.audit.level
     target_field: log.level
     ignore_missing: true
+- rename:
+    field: elasticsearch.audit.cluster.uuid
+    target_field: elasticsearch.cluster.uuid
+    ignore_missing: true
 - date:
     field: elasticsearch.audit.@timestamp
     target_field: '@timestamp'
