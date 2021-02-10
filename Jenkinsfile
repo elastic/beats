@@ -915,21 +915,21 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   }
   public run(Map args = [:]){
     def withModule = args.content.get('withModule', false)
-    /*if(args?.content?.containsKey('make')) {
+    if(args?.content?.containsKey('make')) {
       steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
     }
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
-    }*/
+    }
     if(args?.content?.containsKey('packaging-linux')) {
       steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
-    }/*
+    }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
     }
     if(args?.content?.containsKey('cloud')) {
       steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
-    } */
+    }
   }
 }
 
