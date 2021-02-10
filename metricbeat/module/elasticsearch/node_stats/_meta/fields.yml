@@ -200,6 +200,13 @@
     - name: fs
       type: group
       fields:
+        - name: total
+          type: group
+          fields:
+            - name: total_in_bytes
+              type: long
+            - name: available_in_bytes
+              type: long
         - name: summary
           type: group
           description: >

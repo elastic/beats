@@ -21844,6 +21844,21 @@ type: long
 --
 
 
+
+*`elasticsearch.node.stats.fs.total.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.total.available_in_bytes`*::
++
+--
+type: long
+
+--
+
 [float]
 === summary
 

@@ -182,6 +182,10 @@ var (
 					"bytes": c.Int("available_in_bytes"),
 				},
 			}),
+			"total": c.Dict("total", s.Schema{
+				"available_in_bytes": c.Int("available_in_bytes"),
+				"total_in_bytes":     c.Int("total_in_bytes"),
+			}),
 			"io_stats": c.Dict("io_stats", s.Schema{
 				"total": c.Dict("total", s.Schema{
 					"operations": s.Object{
