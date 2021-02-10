@@ -211,7 +211,7 @@ release-manager-snapshot:
 .PHONY: release-manager-release
 release-manager-release:
 	GO_VERSION=$(shell cat ./.go-version) ./.ci/scripts/install-go.sh
-	$(MAKE) release
+	eval $(shell cat ./go_env.properties) ; make release
 
 ## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
