@@ -29748,12 +29748,12 @@ alias to: @timestamp
 
 --
 
-*`kibana_stats.kibana.response_times.max`*::
+*`kibana_stats.kibana.response_time.max`*::
 +
 --
 type: alias
 
-alias to: kibana.stats.response_times.max.ms
+alias to: kibana.stats.response_time.max.ms
 
 --
 
@@ -29784,6 +29784,7 @@ alias to: kibana.stats.process.uptime.ms
 
 --
 
+
 [float]
 === stats
 
@@ -29792,14 +29793,22 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana_stats.stats.usage.index`*::
+*`kibana.stats.kibana.status`*::
 +
 --
 type: keyword
 
 --
 
-*`kibana_stats.stats.uuid`*::
+
+*`kibana.stats.usage.index`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.uuid`*::
 +
 --
 Kibana instance UUID
@@ -29811,7 +29820,7 @@ alias to: service.id
 
 --
 
-*`kibana_stats.stats.name`*::
+*`kibana.stats.name`*::
 +
 --
 Kibana instance name
@@ -29821,7 +29830,7 @@ type: keyword
 
 --
 
-*`kibana_stats.stats.index`*::
+*`kibana.stats.index`*::
 +
 --
 Name of Kibana's internal index
@@ -29831,7 +29840,7 @@ type: keyword
 
 --
 
-*`kibana_stats.stats.host.name`*::
+*`kibana.stats.host.name`*::
 +
 --
 Kibana instance hostname
@@ -29841,7 +29850,7 @@ type: keyword
 
 --
 
-*`kibana_stats.stats.transport_address`*::
+*`kibana.stats.transport_address`*::
 +
 --
 Kibana server's hostname and port
@@ -29853,7 +29862,7 @@ alias to: service.address
 
 --
 
-*`kibana_stats.stats.version`*::
+*`kibana.stats.version`*::
 +
 --
 Kibana version
@@ -29865,7 +29874,7 @@ alias to: service.version
 
 --
 
-*`kibana_stats.stats.snapshot`*::
+*`kibana.stats.snapshot`*::
 +
 --
 Whether the Kibana build is a snapshot build
@@ -29875,7 +29884,7 @@ type: boolean
 
 --
 
-*`kibana_stats.stats.status`*::
+*`kibana.stats.status`*::
 +
 --
 Kibana instance's health status
@@ -29885,7 +29894,13 @@ type: keyword
 
 --
 
-*`kibana_stats.stats.concurrent_connections`*::
+
+*`kibana.stats.os.memory.free_in_bytes`*::
++
+--
+--
+
+*`kibana.stats.concurrent_connections`*::
 +
 --
 Number of client connections made to the server. Note that browsers can send multiple simultaneous connections to request multiple server assets at once, and they can re-use established connections.
@@ -29902,7 +29917,14 @@ Process metrics
 
 
 
-*`kibana_stats.stats.process.event_loop_delay.ms`*::
+*`kibana.stats.process.uptime.ms`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.process.event_loop_delay.ms`*::
 +
 --
 Event loop delay in milliseconds
@@ -29919,7 +29941,7 @@ Process heap metrics
 
 
 
-*`kibana_stats.stats.process.memory.heap.total.bytes`*::
+*`kibana.stats.process.memory.heap.total.bytes`*::
 +
 --
 Total heap allocated to process in bytes
@@ -29931,7 +29953,7 @@ format: bytes
 
 --
 
-*`kibana_stats.stats.process.memory.heap.used.bytes`*::
+*`kibana.stats.process.memory.heap.used.bytes`*::
 +
 --
 Heap used by process in bytes
@@ -29943,7 +29965,7 @@ format: bytes
 
 --
 
-*`kibana_stats.stats.process.memory.heap.size_limit.bytes`*::
+*`kibana.stats.process.memory.heap.size_limit.bytes`*::
 +
 --
 Max. old space size allocated to Node.js process, in bytes
@@ -29955,7 +29977,7 @@ format: bytes
 
 --
 
-*`kibana_stats.stats.process.memory.heap.uptime.ms`*::
+*`kibana.stats.process.memory.heap.uptime.ms`*::
 +
 --
 Uptime of process in milliseconds
@@ -29972,7 +29994,7 @@ Request count metrics
 
 
 
-*`kibana_stats.stats.request.disconnects`*::
+*`kibana.stats.request.disconnects`*::
 +
 --
 Number of requests that were disconnected
@@ -29982,7 +30004,7 @@ type: long
 
 --
 
-*`kibana_stats.stats.request.total`*::
+*`kibana.stats.request.total`*::
 +
 --
 Total number of requests
@@ -29998,22 +30020,19 @@ type: long
 Response times metrics
 
 
-
-*`kibana_stats.stats.response_time.avg.ms`*::
+*`kibana.stats.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
-
 
 type: long
 
 --
 
-*`kibana_stats.stats.response_time.max.ms`*::
+*`kibana.stats.response_time.max.ms`*::
 +
 --
 Maximum response time in milliseconds
-
 
 type: long
 
@@ -30026,7 +30045,7 @@ Status fields
 
 
 
-*`kibana_stats.status.name`*::
+*`kibana.status.name`*::
 +
 --
 Kibana instance name.
@@ -30036,7 +30055,7 @@ type: keyword
 
 --
 
-*`kibana_stats.status.uuid`*::
+*`kibana.status.uuid`*::
 +
 --
 Kibana instance uuid.
@@ -30048,7 +30067,7 @@ alias to: service.id
 
 --
 
-*`kibana_stats.status.version.number`*::
+*`kibana.status.version.number`*::
 +
 --
 Kibana version number.
@@ -30060,7 +30079,7 @@ alias to: service.version
 
 --
 
-*`kibana_stats.status.status.overall.state`*::
+*`kibana.status.status.overall.state`*::
 +
 --
 Kibana overall state.
@@ -30077,7 +30096,7 @@ Metrics fields
 
 
 
-*`kibana_stats.status.metrics.concurrent_connections`*::
+*`kibana.status.metrics.concurrent_connections`*::
 +
 --
 Current concurrent connections.
@@ -30094,7 +30113,7 @@ Request statistics.
 
 
 
-*`kibana_stats.status.metrics.requests.disconnects`*::
+*`kibana.status.metrics.requests.disconnects`*::
 +
 --
 Total number of disconnected connections.
@@ -30104,7 +30123,7 @@ type: long
 
 --
 
-*`kibana_stats.status.metrics.requests.total`*::
+*`kibana.status.metrics.requests.total`*::
 +
 --
 Total number of connections.

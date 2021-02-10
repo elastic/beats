@@ -4,6 +4,11 @@
     Kibana stats and run-time metrics.
   release: ga
   fields:
+    - name: kibana
+      type: group
+      fields:
+        - name: status
+          type: keyword
     - name: usage
       type: group
       fields:
@@ -47,6 +52,10 @@
       type: keyword
       description: >
         Kibana instance's health status
+    - name: os
+      type: group
+      fields:
+        - name: memory.free_in_bytes
     - name: concurrent_connections
       type: long
       description: >
@@ -56,6 +65,8 @@
       description: >
         Process metrics
       fields:
+      - name: uptime.ms
+        type: long
       - name: event_loop_delay.ms
         type: scaled_float
         description: >
@@ -99,14 +110,11 @@
             Total number of requests
     - name: response_time
       type: group
-      description: >
-        Response times metrics
+      description: Response times metrics
       fields:
         - name: avg.ms
           type: long
-          description: >
-            Average response time in milliseconds
+          description: Average response time in milliseconds
         - name: max.ms
           type: long
-          description: >
-            Maximum response time in milliseconds
+          description: Maximum response time in milliseconds
