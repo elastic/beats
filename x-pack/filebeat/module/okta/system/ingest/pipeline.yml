@@ -5,7 +5,7 @@ processors:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
   - script:
-      # drops null/empty values recursively
+      description: Drops null/empty values recursively
       lang: painless
       source: |
         boolean drop(Object o) {
@@ -26,7 +26,7 @@ processors:
       ignore_missing: true
   - convert:
       field: json.uuid
-      target_field: "@metadata._id"
+      target_field: _id
       type: string
       ignore_failure: true
       if: ctx?.json?.uuid != null && ctx?.json?.uuid != ""

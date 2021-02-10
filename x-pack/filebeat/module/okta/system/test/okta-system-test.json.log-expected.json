@@ -1,6 +1,5 @@
 [
     {
-        "@metadata._id": "faf7398a-4f77-11ea-97fb-5925e98228bd",
         "@timestamp": "2020-02-14T22:18:51.843Z",
         "client.geo.city_name": "Dublin",
         "client.geo.country_name": "United States",
@@ -83,7 +82,6 @@
         "user_agent.version": "72.0."
     },
     {
-        "@metadata._id": "3aeede38-4f67-11ea-abd3-1f5d113f2546",
         "@timestamp": "2020-02-14T20:18:57.718Z",
         "client.geo.city_name": "Dublin",
         "client.geo.country_name": "United States",
@@ -167,7 +165,6 @@
         "user_agent.version": "72.0."
     },
     {
-        "@metadata._id": "3af594f9-4f67-11ea-abd3-1f5d113f2546",
         "@timestamp": "2020-02-14T20:18:57.762Z",
         "client.geo.city_name": "Dublin",
         "client.geo.country_name": "United States",
