@@ -19,6 +19,7 @@ pipeline {
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats-build"
+    SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -349,10 +350,12 @@ def pushCIDockerImages(beatsFolder){
 */
 def tagAndPush(beatName){
   def libbetaVer = env.VERSION
-  def aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+  if("${env?.SNAPSHOT.trim()}" == "true"){
+    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
 
-  libbetaVer += "-SNAPSHOT"
-  aliasVersion += "-SNAPSHOT"
+    libbetaVer += "-SNAPSHOT"
+    aliasVersion += "-SNAPSHOT"
+  }
 
   def tagName = "${libbetaVer}"
   if (isPR()) {
