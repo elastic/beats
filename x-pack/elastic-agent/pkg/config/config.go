@@ -71,39 +71,46 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 		o(local)
 	}
 
-	var data []byte
+	var data map[string]interface{}
 	var err error
 	if bytes, ok := from.([]byte); ok {
-		data = bytes
+		err = yaml.Unmarshal(bytes, &data)
+		if err != nil {
+			return nil, err
+		}
 	} else if str, ok := from.(string); ok {
-		data = []byte(str)
+		err = yaml.Unmarshal([]byte(str), &data)
+		if err != nil {
+			return nil, err
+		}
 	} else if in, ok := from.(io.Reader); ok {
 		if closer, ok := from.(io.Closer); ok {
 			defer closer.Close()
 		}
-		data, err = ioutil.ReadAll(in)
+		fData, err := ioutil.ReadAll(in)
 		if err != nil {
 			return nil, err
 		}
+		err = yaml.Unmarshal(fData, &data)
+		if err != nil {
+			return nil, err
+		}
+	} else if contents, ok := from.(map[string]interface{}); ok {
+		data = contents
 	} else {
 		c, err := ucfg.NewFrom(from, ucfgOpts...)
 		return newConfigFrom(c), err
 	}
 
-	var c map[string]interface{}
-	err = yaml.Unmarshal(data, &c)
-	if err != nil {
-		return nil, err
-	}
 	skippedKeys := map[string]interface{}{}
 	for _, skip := range local.skipKeys {
-		val, ok := c[skip]
+		val, ok := data[skip]
 		if ok {
 			skippedKeys[skip] = val
-			delete(c, skip)
+			delete(data, skip)
 		}
 	}
-	cfg, err := ucfg.NewFrom(c, ucfgOpts...)
+	cfg, err := ucfg.NewFrom(data, ucfgOpts...)
 	if err != nil {
 		return nil, err
 	}
