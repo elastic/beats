@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
+- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 
 *Auditbeat*
 
@@ -377,6 +378,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
+- Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - Fix various processing errors in the Suricata module. {pull}23236[23236]
 
@@ -997,6 +999,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Elastic Log Driver*
 
 - Add support for `docker logs` command {pull}19531[19531]
+- Fixed docs for hosts {pull}23644[23644]
 
 ==== Deprecated
 
