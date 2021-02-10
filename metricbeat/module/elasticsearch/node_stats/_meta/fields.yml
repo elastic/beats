@@ -105,7 +105,7 @@
               type: long
               format: bytes
             - name: pct
-              type: long
+              type: double
               format: percent
     - name: jvm.mem.pools
       type: group
@@ -208,15 +208,12 @@
             - name: total.bytes
               type: long
               format: bytes
-              description: >
             - name: free.bytes
               type: long
               format: bytes
-              description: >
             - name: available.bytes
               type: long
               format: bytes
-              description: >
         - name: io_stats
           type: group
           fields:
@@ -236,7 +233,7 @@
           type: group
           fields:
             - name: load_avg.1m
-              type: long
+              type: double
         - name: cgroup
           type: group
           fields:
@@ -268,7 +265,7 @@
                   type: long
                   format: bytes
     - name: process.cpu.pct
-      type: long
+      type: double
       format: percent
     - name: thread_pool
       type: group

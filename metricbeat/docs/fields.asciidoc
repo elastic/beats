@@ -20018,6 +20018,13 @@ Cluster stats
 
 
 
+*`elasticsearch.cluster.stats.version`*::
++
+--
+type: keyword
+
+--
+
 
 *`elasticsearch.cluster.stats.state.nodes_hash`*::
 +
@@ -21651,7 +21658,7 @@ format: bytes
 *`elasticsearch.node.stats.jvm.mem.heap.used.pct`*::
 +
 --
-type: long
+type: double
 
 format: percent
 
@@ -21847,8 +21854,6 @@ File system summary
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -21858,8 +21863,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.free.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -21869,8 +21872,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.available.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -21905,7 +21906,7 @@ type: long
 *`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -21976,7 +21977,7 @@ format: bytes
 *`elasticsearch.node.stats.process.cpu.pct`*::
 +
 --
-type: long
+type: double
 
 format: percent
 
