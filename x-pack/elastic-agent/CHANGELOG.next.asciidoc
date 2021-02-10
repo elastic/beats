@@ -28,6 +28,7 @@
 - Fix composable input processor promotion to fix duplicates {pull}22344[22344]
 - Fix sysv init files for deb/rpm installation {pull}22543[22543]
 - Fixed parsing of npipe URI {pull}22978[22978]
+- Select default agent policy if no enrollment token provided. {pull}23973[23973]
 
 ==== New features
 
