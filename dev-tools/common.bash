@@ -42,8 +42,18 @@ setup_go_root() {
   local version=${1}
   export PROPERTIES_FILE=go_env.properties
   GO_VERSION="${version}" .ci/scripts/install-go.sh
+
+  # Setup GOROOT and add go to the PATH.
   # shellcheck disable=SC1090
   source "${PROPERTIES_FILE}" 2> /dev/null
+
+  # Setup GOPATH and add GOPATH/bin to the PATH.
+  if [ -d "${HOME}" ] ; then
+    setup_go_path "${HOME}"
+  else
+    setup_go_path "${GOROOT}"
+  fi
+
   debug "$(go version)"
 }
 
