@@ -842,6 +842,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update aws/s3access to ECS 1.8. {issue}23118[23118] {pull}23920[23920]
 - Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
 - Updated aws/cloudtrail fileset to ECS 1.8. {issue}23118[23118] {pull}23911[23911]
+- Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
+- Update mysqlenterprise module to ECS 1.8. {issue}23118[23118] {pull}23978[23978]
+- Upgrade sophos/xg fileset to ECS 1.8.0. {issue}23118[23118] {pull}23967[23967]
+- Upgrade system/auth to ECS 1.8 {issue}23118[23118] {pull}23961[23961]
+- Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 
 *Heartbeat*

@@ -55,6 +55,10 @@ processors:
     field: related.user
     value: "{{user.name}}"
     if: "ctx?.user?.name != null"
+- append:
+    field: related.user
+    value: "{{user.effective.name}}"
+    if: "ctx?.user?.effective?.name != null"
 - remove:
     field: elasticsearch.audit.@timestamp
 - remove:
