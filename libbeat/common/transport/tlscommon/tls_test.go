@@ -546,6 +546,7 @@ NHy+PwkYsHhbrPl4dgStTNXLenJLIJ+Ke0Pcld4ZPfYdSyu/Tv4rNswZBNpNsW9K
 nygO9KTJuUiBrLr0AHEnqko=
 -----END PRIVATE KEY-----
 `
+
 		t.Run("embed", func(t *testing.T) {
 			// Create a dummy configuration and append the CA after.
 			cfg, err := load(`
@@ -560,6 +561,48 @@ curve_types: null
 supported_protocols: null
   `)
 			cfg.Certificate.Certificate = c
+			cfg.Certificate.Key = key
+
+			tlsC, err := LoadTLSConfig(cfg)
+			assert.NoError(t, err)
+
+			assert.NotNil(t, tlsC)
+		})
+
+		t.Run("embed small key", func(t *testing.T) {
+			// Create a dummy configuration and append the CA after.
+			cfg, err := load(`
+enabled: true
+verification_mode: null
+certificate: null
+key: null
+key_passphrase: null
+certificate_authorities:
+cipher_suites: null
+curve_types: null
+supported_protocols: null
+  `)
+			certificate := `
+-----BEGIN CERTIFICATE-----
+MIIBmzCCAUCgAwIBAgIRAOQpDyaFimzmueynALHkFEcwCgYIKoZIzj0EAwIwJjEk
+MCIGA1UEChMbVEVTVCAtIEVsYXN0aWMgSW50ZWdyYXRpb25zMB4XDTIxMDIwMjE1
+NTkxMFoXDTQxMDEyODE1NTkxMFowJjEkMCIGA1UEChMbVEVTVCAtIEVsYXN0aWMg
+SW50ZWdyYXRpb25zMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEBc7UEvBd+5SG
+Z6QQfgBaPh/VAlf7ovpa/wfSmbHfBhee+dTvdAO1p90lannCkZmc7OfWAlQ1eTgJ
+QW668CJwE6NPME0wDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMB
+MAwGA1UdEwEB/wQCMAAwGAYDVR0RBBEwD4INZWxhc3RpYy1hZ2VudDAKBggqhkjO
+PQQDAgNJADBGAiEAhpGWL4lxsdb3+hHv0y4ppw6B7IJJLCeCwHLyHt2Dkx4CIQD6
+OEU+yuHzbWa18JVkHafxwnpwQmxwZA3VNitM/AyGTQ==
+-----END CERTIFICATE-----
+`
+			key := `
+-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgFDQJ1CPLXrUbUFqj
+ED8dqsGuVQdcPK7CHpsCeTtAgQqhRANCAAQFztQS8F37lIZnpBB+AFo+H9UCV/ui
++lr/B9KZsd8GF5751O90A7Wn3SVqecKRmZzs59YCVDV5OAlBbrrwInAT
+-----END PRIVATE KEY-----
+`
+			cfg.Certificate.Certificate = certificate
 			cfg.Certificate.Key = key
 
 			tlsC, err := LoadTLSConfig(cfg)
