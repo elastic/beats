@@ -7,14 +7,14 @@
 package install
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHasRoot(t *testing.T) {
 	t.Run("check if user is admin", func(t *testing.T) {
-		result, err := HasRoot()
+		_, err := HasRoot()
 		assert.NoError(t, err)
-		assert.True(t, result)
 	})
 }
