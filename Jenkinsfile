@@ -61,6 +61,7 @@ pipeline {
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
+          cmd(label: "make release-manager-snapshot", script: "make release-manager-snapshot")
         }
       }
     }
