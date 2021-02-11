@@ -34,20 +34,6 @@ get_go_version() {
   fi
 }
 
-# install_gimme
-# Install gimme to HOME/bin.
-install_gimme() {
-  # Install gimme
-  if [ ! -f "${HOME}/bin/gimme" ]; then
-    mkdir -p ${HOME}/bin
-    curl -sL -o ${HOME}/bin/gimme https://raw.githubusercontent.com/travis-ci/gimme/v1.1.0/gimme
-    chmod +x ${HOME}/bin/gimme
-  fi
-
-  GIMME="${HOME}/bin/gimme"
-  debug "Gimme version $(${GIMME} version)"
-}
-
 # setup_go_root "version"
 # This configures the Go version being used. It sets GOROOT and adds
 # GOROOT/bin to the PATH. It uses gimme to download the Go version if
