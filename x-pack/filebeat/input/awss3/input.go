@@ -25,7 +25,7 @@ const inputName = "aws-s3"
 func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from s3",
 		Manager:    v2.ConfigureWith(configure),
@@ -113,6 +113,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
+	log.Debug("s3 input config endpoint = ", in.config.AwsConfig.Endpoint)
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,

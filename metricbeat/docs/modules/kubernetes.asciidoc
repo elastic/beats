@@ -26,9 +26,9 @@ Kubernetes module is a bit complex as its internal metricsets require access to 
 This section highlights and introduces some groups of metricsets with similar endpoint access needs. For more details on the metricsets see `configuration example` and the `metricsets` sections below.
 
 [float]
-==== node / system / pod / container / module
+==== container / node / pod / system / volume
 
-The default metricsets `container`, `node`, `pod`, `system` and `volume` require access to the `kubelet endpoint` in each of the Kubernetes nodes, hence it's recommended to include them as part of a `Metricbeat DaemonSet` or standalone Metricbeats running on the hosts.
+The default metricsets `container`, `node`, `pod`, `system`, and `volume` require access to the `kubelet endpoint` in each of the Kubernetes nodes, hence it's recommended to include them as part of a `Metricbeat DaemonSet` or standalone Metricbeats running on the hosts.
 
 Depending on the version and configuration of Kubernetes nodes, `kubelet` might provide a read only http port (typically 10255), which is used in some configuration examples. But in general, and lately, this endpoint requires SSL (`https`) access (to port 10250 by default) and token based authentication.
 
