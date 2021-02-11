@@ -153,7 +153,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
-- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
@@ -223,15 +222,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
 - Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
-- Fix various processing errors in the Suricata module. {pull}23236[23236]
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Change the `event.created` in Netflow events to be the time the event was created by Filebeat
   to be consistent with ECS. {pull}23094[23094]
 - Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
-- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
-- Fix various processing errors in the Suricata module. {pull}23236[23236]
 
 *Heartbeat*
 
@@ -317,7 +313,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 *Elastic Logging Plugin*
-- Fix out of date CLI flags on docs. {pull}23628[23628]
 
 
 ==== Added
@@ -669,4 +664,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
 
