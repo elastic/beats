@@ -845,6 +845,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update mysqlenterprise module to ECS 1.8. {issue}23118[23118] {pull}23978[23978]
 - Upgrade sophos/xg fileset to ECS 1.8.0. {issue}23118[23118] {pull}23967[23967]
 - Upgrade system/auth to ECS 1.8 {issue}23118[23118] {pull}23961[23961]
+- Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
 
 *Heartbeat*
 

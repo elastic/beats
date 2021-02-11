@@ -47765,11 +47765,6 @@ example: 0
 
 --
 
-[float]
-=== audit
-
-
-
 
 *`elasticsearch.audit.layer`*::
 +
@@ -47830,6 +47825,27 @@ Roles to which the principal belongs
 type: keyword
 
 example: ['kibana_admin', 'beats_admin']
+
+--
+
+*`elasticsearch.audit.user.run_as.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.user.run_as.realm`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.component`*::
++
+--
+type: keyword
 
 --
 
@@ -47926,6 +47942,13 @@ alias to: user.name
 +
 --
 type: text
+
+--
+
+*`elasticsearch.audit.invalidate.apikeys.owned_by_authenticated_user`*::
++
+--
+type: boolean
 
 --
 
