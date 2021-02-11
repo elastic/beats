@@ -18,27 +18,38 @@
 package mxj
 
 import (
+	"sync"
+
 	"github.com/clbanning/mxj/v2"
 )
+
+// The third-party library uses global options. It is unsafe to use the library
+// concurrently.
+var mutex sync.Mutex
 
 // UnmarshalXML takes a slice of bytes, and returns a map[string]interface{}.
 // If the slice is not valid XML, it will return an error.
 // This uses the MXJ library compared to the built-in encoding/xml since the latter does not
 // support unmarshalling XML to an unknown or empty struct/interface.
-func UnmarshalXML(body []byte, prepend bool, toLower bool) (obj map[string]interface{}, err error) {
-	var xmlobj mxj.Map
-	// Disables attribute prefixes and forces all lines to lowercase to meet ECS standards
+//
+// Beware that this function acquires a mutux to protect against race conditions
+// in the third-party library it wraps.
+func UnmarshalXML(body []byte, prepend bool, toLower bool) (map[string]interface{}, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	// Disables attribute prefixes and forces all lines to lowercase to meet ECS standards.
 	mxj.PrependAttrWithHyphen(prepend)
 	mxj.CoerceKeysToLower(toLower)
 
-	xmlobj, err = mxj.NewMapXml(body)
+	xmlObj, err := mxj.NewMapXml(body)
 	if err != nil {
 		return nil, err
 	}
 
-	err = xmlobj.Struct(&obj)
-	if err != nil {
+	var out map[string]interface{}
+	if err = xmlObj.Struct(&out); err != nil {
 		return nil, err
 	}
-	return obj, nil
+	return out, nil
 }

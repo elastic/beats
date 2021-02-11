@@ -31,7 +31,7 @@ func defaultConfig() decodeXMLConfig {
 	return decodeXMLConfig{
 		Field:         "message",
 		IgnoreMissing: false,
-		Target:        new(string),
+		Target:        nil,
 		OverwriteKeys: true,
 		IgnoreFailure: false,
 		ToLower:       true,

@@ -19,10 +19,8 @@ package decode_xml
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,8 +34,8 @@ import (
 )
 
 type decodeXML struct {
-	config decodeXMLConfig
-	log    *logp.Logger
+	decodeXMLConfig
+	log *logp.Logger
 }
 
 var (
@@ -57,7 +55,7 @@ func init() {
 	jsprocessor.RegisterPlugin(procName, New)
 }
 
-// New construct a new decode_xml processor.
+// New constructs a new decode_xml processor.
 func New(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 
@@ -66,83 +64,74 @@ func New(c *common.Config) (processors.Processor, error) {
 	}
 
 	return newDecodeXML(config)
-
 }
 
 func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
 	cfgwarn.Experimental("The " + procName + " processor is experimental.")
 
-	log := logp.NewLogger(logName)
+	// Default target to overwriting field.
+	if config.Target == nil {
+		config.Target = &config.Field
+	}
 
-	return &decodeXML{config: config, log: log}, nil
-
+	return &decodeXML{
+		decodeXMLConfig: config,
+		log:             logp.NewLogger(logName),
+	}, nil
 }
 
 func (x *decodeXML) Run(event *beat.Event) (*beat.Event, error) {
-	var errs []error
-	var field = x.config.Field
-	data, err := event.GetValue(field)
-	if err != nil {
-		if x.config.IgnoreMissing && err == common.ErrKeyNotFound {
-			return event, nil
-		}
-		errs = append(errs, err)
-	}
-	text, ok := data.(string)
-	if !ok {
-		errs = append(errs, errFieldIsNotString)
-	} else {
-		xmloutput, err := x.decodeField(text)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("failed to decode fields in decode_xml processor: %v", err))
-		}
-
-		target := field
-		if x.config.Target != nil {
-			target = *x.config.Target
-		}
-
-		var id string
-		if key := x.config.DocumentID; key != "" {
-			if tmp, err := common.MapStr(xmloutput).GetValue(key); err == nil {
-				if v, ok := tmp.(string); ok {
-					id = v
-					common.MapStr(xmloutput).Delete(key)
-				}
-			}
-		}
-
-		if target != "" {
-			_, err = event.PutValue(target, xmloutput)
-		} else {
-			if x.config.IgnoreFailure {
-				jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, false)
-			} else {
-				jsontransform.WriteJSONKeys(event, xmloutput, false, x.config.OverwriteKeys, true)
-			}
-
-		}
-
-		if err != nil {
-			errs = append(errs, fmt.Errorf("Error trying to Put value %v for field: %s. Error: %w", xmloutput, field, err))
-		}
-		if id != "" {
-			event.SetID(id)
-		}
-	}
-	// If error has not already been set, add errors if ignore_failure is false.
-	if len(errs) > 0 {
-		var combinedErrors = multierr.Combine(errs...)
-		if !x.config.IgnoreFailure {
-			event.Fields["error"] = combinedErrors.Error()
-		}
-		return event, combinedErrors
+	if err := x.run(event); err != nil && !x.IgnoreFailure {
+		err = fmt.Errorf("failed in decode_xml on the %q field: %w", x.Field, err)
+		event.PutValue("error.message", err.Error())
+		return event, err
 	}
 	return event, nil
 }
 
+func (x *decodeXML) run(event *beat.Event) error {
+	data, err := event.GetValue(x.Field)
+	if err != nil {
+		if x.IgnoreMissing && err == common.ErrKeyNotFound {
+			return nil
+		}
+		return err
+	}
+
+	text, ok := data.(string)
+	if !ok {
+		return errFieldIsNotString
+	}
+
+	xmlOutput, err := x.decodeField(text)
+	if err != nil {
+		return err
+	}
+
+	var id string
+	if tmp, err := common.MapStr(xmlOutput).GetValue(x.DocumentID); err == nil {
+		if v, ok := tmp.(string); ok {
+			id = v
+			common.MapStr(xmlOutput).Delete(x.DocumentID)
+		}
+	}
+
+	if *x.Target != "" {
+		if _, err = event.PutValue(*x.Target, xmlOutput); err != nil {
+			return fmt.Errorf("failed to put value %v into field %q: %w", xmlOutput, *x.Target, err)
+		}
+	} else {
+		jsontransform.WriteJSONKeys(event, xmlOutput, false, x.OverwriteKeys, !x.IgnoreFailure)
+	}
+
+	if id != "" {
+		event.SetID(id)
+	}
+	return nil
+}
+
 func (x *decodeXML) decodeField(data string) (decodedData map[string]interface{}, err error) {
-	decodedData, err = mxj.UnmarshalXML([]byte(data), false, x.config.ToLower)
+	decodedData, err = mxj.UnmarshalXML([]byte(data), false, x.ToLower)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding XML field: %w", err)
 	}
@@ -151,6 +140,6 @@ func (x *decodeXML) decodeField(data string) (decodedData map[string]interface{}
 }
 
 func (x *decodeXML) String() string {
-	json, _ := json.Marshal(x.config)
+	json, _ := json.Marshal(x.decodeXMLConfig)
 	return procName + "=" + string(json)
 }

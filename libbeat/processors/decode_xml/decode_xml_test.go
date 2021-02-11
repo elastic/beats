@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (
@@ -76,8 +75,6 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
 			description: "Test with target set to root",
@@ -111,8 +108,6 @@ func TestDecodeXML(t *testing.T) {
 					</book>
 				</catalog>`,
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
 			description: "Simple xml decode with xml string to same field name when Target is null",
@@ -141,8 +136,6 @@ func TestDecodeXML(t *testing.T) {
 					},
 				},
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
 			description: "Decoding with array input",
@@ -182,8 +175,6 @@ func TestDecodeXML(t *testing.T) {
 					},
 				},
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
 			description: "Decoding with multiple xml objects",
@@ -206,9 +197,7 @@ func TestDecodeXML(t *testing.T) {
 				<secondcategory>
 					<paper id="bk102">
 						<test2>Ralls, Kim</test2>
-						<description>A former architect battles corporate zombies, 
-						an evil sorceress, and her own childhood to become queen 
-						of the world.</description>
+						<description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>
 					</paper>
 				</secondcategory>
 				</catalog>`,
@@ -230,7 +219,7 @@ func TestDecodeXML(t *testing.T) {
 						},
 						"secondcategory": map[string]interface{}{
 							"paper": map[string]interface{}{
-								"description": "A former architect battles corporate zombies, \n\t\t\t\t\t\tan evil sorceress, and her own childhood to become queen \n\t\t\t\t\t\tof the world.",
+								"description": "A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.",
 								"id":          "bk102",
 								"test2":       "Ralls, Kim",
 							},
@@ -238,8 +227,6 @@ func TestDecodeXML(t *testing.T) {
 					},
 				},
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
 			description: "Decoding with broken XML format, with IgnoreFailure false",
@@ -258,11 +245,18 @@ func TestDecodeXML(t *testing.T) {
 				catalog>`,
 			},
 			Output: common.MapStr{
-				"message": (map[string]interface{})(nil),
-				"error":   "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
+				"message": `<?xml version="1.0"?>
+				<catalog>
+					<book>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+				</ook>
+				catalog>`,
+				"error": common.MapStr{"message": "failed in decode_xml on the \"message\" field: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>"},
 			},
 			error:        true,
-			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
+			errorMessage: "error decoding XML field:",
 		},
 		{
 			description: "Decoding with broken XML format, with IgnoreFailure true",
@@ -281,10 +275,15 @@ func TestDecodeXML(t *testing.T) {
 				catalog>`,
 			},
 			Output: common.MapStr{
-				"message": (map[string]interface{})(nil),
+				"message": `<?xml version="1.0"?>
+				<catalog>
+					<book>
+						<author>William H. Gaddis</author>
+						<title>The Recognitions</title>
+						<review>One of the great seminal American novels of the 20th century.</review>
+				</ook>
+				catalog>`,
 			},
-			error:        true,
-			errorMessage: "failed to decode fields in decode_xml processor: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>",
 		},
 		{
 			description: "Test when the XML field is empty, IgnoreMissing false",
@@ -297,10 +296,10 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": "testing message",
-				"error":   "key not found; field value is not a string",
+				"error":   common.MapStr{"message": "failed in decode_xml on the \"message2\" field: key not found"},
 			},
 			error:        true,
-			errorMessage: "key not found; field value is not a string",
+			errorMessage: "key not found",
 		},
 		{
 			description: "Test when the XML field is empty IgnoreMissing true",
@@ -314,11 +313,9 @@ func TestDecodeXML(t *testing.T) {
 			Output: common.MapStr{
 				"message": "testing message",
 			},
-			error:        false,
-			errorMessage: "",
 		},
 		{
-			description: "Test when the XML field not a string, Ignorefailure false",
+			description: "Test when the XML field not a string, IgnoreFailure false",
 			config: decodeXMLConfig{
 				Field:         "message",
 				IgnoreFailure: false,
@@ -328,7 +325,7 @@ func TestDecodeXML(t *testing.T) {
 			},
 			Output: common.MapStr{
 				"message": 1,
-				"error":   "field value is not a string",
+				"error":   common.MapStr{"message": "failed in decode_xml on the \"message\" field: field value is not a string"},
 			},
 			error:        true,
 			errorMessage: "field value is not a string",
@@ -345,8 +342,6 @@ func TestDecodeXML(t *testing.T) {
 			Output: common.MapStr{
 				"message": 1,
 			},
-			error:        true,
-			errorMessage: "field value is not a string",
 		},
 	}
 
@@ -354,10 +349,9 @@ func TestDecodeXML(t *testing.T) {
 		test := test
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
-			f := &decodeXML{
-				log:    logp.NewLogger("decode_xml"),
-				config: test.config,
-			}
+
+			f, err := newDecodeXML(test.config)
+			require.NoError(t, err)
 
 			event := &beat.Event{
 				Fields: test.Input,
@@ -366,8 +360,9 @@ func TestDecodeXML(t *testing.T) {
 			if !test.error {
 				assert.NoError(t, err)
 			} else {
-				assert.Error(t, err)
-				assert.EqualError(t, err, test.errorMessage)
+				if assert.Error(t, err) {
+					assert.Contains(t, err.Error(), test.errorMessage)
+				}
 			}
 			assert.Equal(t, test.Output, newEvent.Fields)
 		})
@@ -417,9 +412,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 				<secondcategory>
 					<paper id="bk102">
 						<test2>Ralls, Kim</test2>
-						<description>A former architect battles corporate zombies, 
-						an evil sorceress, and her own childhood to become queen 
-						of the world.</description>
+						<description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>
 					</paper>
 				</secondcategory>
 				</catalog>`,
@@ -435,7 +428,11 @@ func BenchmarkProcessor_Run(b *testing.B) {
 }
 
 func TestXMLToDocumentID(t *testing.T) {
-	log := logp.NewLogger("decode_xml")
+	p, err := newDecodeXML(decodeXMLConfig{
+		Field:      "message",
+		DocumentID: "catalog.book.seq",
+	})
+	require.NoError(t, err)
 
 	input := common.MapStr{
 		"message": `<catalog>
@@ -446,19 +443,6 @@ func TestXMLToDocumentID(t *testing.T) {
 						</book>
 					</catalog>`,
 	}
-
-	config := common.MustNewConfigFrom(map[string]interface{}{
-		"fields":      []string{"message"},
-		"document_id": "catalog.book.seq",
-		"target":      "message",
-	})
-
-	p, err := New(config)
-	if err != nil {
-		log.Error("Error initializing decode_xml")
-		t.Fatal(err)
-	}
-
 	actual, err := p.Run(&beat.Event{Fields: input})
 	require.NoError(t, err)
 
