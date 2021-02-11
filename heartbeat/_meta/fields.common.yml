@@ -122,6 +122,56 @@
               type: long
               description: Duration in microseconds
 
+- key: synthetics
+  title: "Synthetics types"
+  description:
+  fields:
+    - name: synthetics
+      type: group
+      description: >
+        Synthetics related fields.
+      fields:
+        - name: type
+          type: keyword
+        - name: package_version
+          type: keyword
+        - name: index
+          type: integer
+          description: >
+            Indexed used for creating total order of all events
+            in this invocation.
+        - name: payload
+          type: object
+          enabled: false
+        - name: blob
+          type: binary
+          description: binary data payload
+        - name: blob_mime
+          type: keyword
+          description: mime type of blob data
+        - name: step
+          type: group
+          fields:
+            - name: name
+              type: text
+            - name: index
+              type: integer
+        - name: journey
+          type: group
+          fields:
+            - name: name
+              type: text
+            - name: id
+              type: keyword
+        - name: error
+          type: group
+          fields:
+            - name: name
+              type: keyword
+            - name: message
+              type: text
+            - name: stack
+              type: text
 - key: http
   title: "HTTP monitor"
   description:

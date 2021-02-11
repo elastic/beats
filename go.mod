@@ -80,6 +80,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.4.1
+	github.com/go-test/deep v1.0.7
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.10.4
@@ -112,7 +113,7 @@ require (
 	github.com/kardianos/service v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
-	github.com/magefile/mage v1.10.0
+	github.com/magefile/mage v1.11.0
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.6
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
@@ -136,7 +137,6 @@ require (
 	github.com/prometheus/procfs v0.0.11
 	github.com/prometheus/prometheus v2.5.0+incompatible
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
-	github.com/reviewdog/reviewdog v0.9.17
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
@@ -157,7 +157,7 @@ require (
 	go.elastic.co/apm v1.8.1-0.20200909061013-2aef45b9cf4b
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
 	go.elastic.co/apm/module/apmhttp v1.7.2
-	go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193
+	go.elastic.co/ecszap v0.3.0
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.4
 	go.uber.org/atomic v1.5.0

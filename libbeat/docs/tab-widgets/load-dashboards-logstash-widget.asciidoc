@@ -1,0 +1,130 @@
+++++
+<div class="tabs" data-tab-group="os">
+  <div role="tablist" aria-label="Load dashboards Logstash">
+    <button role="tab"
+            aria-selected="true"
+            aria-controls="deb-tab-dashboards-logstash"
+            id="deb-dashboards-logstash">
+      DEB
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="rpm-tab-dashboards-logstash"
+            id="rpm-dashboards-logstash"
+            tabindex="-1">
+      RPM
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="mac-tab-dashboards-logstash"
+            id="mac-dashboards-logstash"
+            tabindex="-1">
+      MacOS
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="brew-tab-dashboards-logstash"
+            id="brew-dashboards-logstash"
+            tabindex="-1">
+      Brew
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="linux-tab-dashboards-logstash"
+            id="linux-dashboards-logstash"
+            tabindex="-1">
+      Linux
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="docker-tab-dashboards-logstash"
+            id="docker-dashboards-logstash"
+            tabindex="-1">
+      Docker
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="win-tab-dashboards-logstash"
+            id="win-dashboards-logstash"
+            tabindex="-1">            
+      Windows
+    </button>
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="deb-tab-dashboards-logstash"
+       aria-labelledby="deb-dashboards-logstash">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=deb]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="rpm-tab-dashboards-logstash"
+       aria-labelledby="rpm-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=rpm]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="mac-tab-dashboards-logstash"
+       aria-labelledby="mac-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=mac]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="brew-tab-dashboards-logstash"
+       aria-labelledby="brew-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=brew]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-dashboards-logstash"
+       aria-labelledby="linux-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=linux]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="docker-tab-dashboards-logstash"
+       aria-labelledby="docker-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=docker]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="win-tab-dashboards-logstash"
+       aria-labelledby="win-dashboards-logstash"
+       hidden="">
+++++
+
+include::load-dashboards-logstash.asciidoc[tag=win]
+
+++++
+  </div>
+</div>
+++++

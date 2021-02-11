@@ -7,7 +7,13 @@ paths:
   {{ end }}
 exclude_files: [".gz$"]
 
-{{ else }}
+{{ else  if eq .input "tcp" }}
+
+type: {{.input}}
+host: "{{.syslog_host}}:{{.syslog_port}}"
+framing: rfc6587
+
+{{ else  if eq .input "udp" }}
 
 type: {{.input}}
 host: "{{.syslog_host}}:{{.syslog_port}}"

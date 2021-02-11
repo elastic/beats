@@ -155,6 +155,10 @@ rules:
   - get
   - watch
   - list
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount
