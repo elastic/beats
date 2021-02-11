@@ -197,6 +197,7 @@ snapshot:
 ## release : Builds a release.
 .PHONY: release
 release: beats-dashboards
+	@mage dumpVariables
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
