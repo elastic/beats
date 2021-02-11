@@ -210,8 +210,7 @@ release-manager-snapshot:
 ## release-manager-release : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
 .PHONY: release-manager-release
 release-manager-release:
-	GO_VERSION=$(shell cat ./.go-version) ./.ci/scripts/install-go.sh
-	$(MAKE) release
+	GO_VERSION=$(shell cat ./.go-version) ./dev-tools/run_with_go_ver $(MAKE) release
 
 ## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
