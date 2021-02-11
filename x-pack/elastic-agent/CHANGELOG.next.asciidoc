@@ -37,6 +37,7 @@
 - Fix issue of missing log messages from filebeat monitor {pull}23514[23514]
 - Increase checkin grace period to 30 seconds {pull}23568[23568]
 - Fix libbeat from reporting back degraded on config update {pull}23537[23537]
+- Select default agent policy if no enrollment token provided. {pull}23973[23973]
 
 ==== New features
 
