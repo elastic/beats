@@ -517,7 +517,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 *Elastic Logging Plugin*
-- Fix out of date CLI flags on docs. {pull}23628[23628]
 
 
 ==== Added
@@ -1030,6 +1029,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
 
 
 
