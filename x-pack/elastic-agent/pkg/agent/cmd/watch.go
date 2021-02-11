@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
@@ -182,7 +183,7 @@ func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 
 func configuredLogger(flags *globalFlags) (*logger.Logger, error) {
 	pathConfigFile := flags.Config()
-	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
+	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
