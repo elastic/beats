@@ -9,7 +9,7 @@ pipeline {
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
@@ -19,6 +19,7 @@ pipeline {
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats-build"
+    SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.12.24"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
@@ -260,16 +261,209 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
+* This method runs the packaging
+*/
+def packagingLinux(Map args = [:]) {
+  def PLATFORMS = [ '+all',
+                'linux/amd64',
+                'linux/386',
+                'linux/arm64',
+                'linux/armv7',
+                // The platforms above are disabled temporarly as crossbuild images are
+                // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+                //'linux/ppc64le',
+                //'linux/mips64',
+                //'linux/s390x',
+                'windows/amd64',
+                'windows/386',
+                (params.macos ? '' : 'darwin/amd64'),
+              ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}"
+  ]) {
+    target(args)
+  }
+}
+
+
+/**
+* Upload the packages to their snapshot or pull request buckets
+* @param beatsFolder beats folder
+*/
+def publishPackages(beatsFolder){
+  def bucketUri = "gs://beats-ci-artifacts/snapshots"
+  if (isPR()) {
+    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
+  }
+  def beatsFolderName = getBeatsName(beatsFolder)
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
+
+  // Copy those files to another location with the sha commit to test them
+  // afterward.
+  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
+}
+
+/**
+* Upload the distribution files to google cloud.
+* TODO: There is a known issue with Google Storage plugin.
+* @param bucketUri the buckets URI.
+* @param beatsFolder the beats folder.
+*/
+def uploadPackages(bucketUri, beatsFolder){
+  googleStorageUpload(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_CREDENTIALS}",
+    pathPrefix: "${beatsFolder}/build/distributions/",
+    pattern: "${beatsFolder}/build/distributions/**/*",
+    sharedPublicly: true,
+    showInline: true
+  )
+}
+
+/**
+* Push the docker images for the given beat.
+* @param beatsFolder beats folder
+*/
+def pushCIDockerImages(beatsFolder){
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    if (beatsFolder.endsWith('auditbeat')) {
+      tagAndPush('auditbeat')
+    } else if (beatsFolder.endsWith('filebeat')) {
+      tagAndPush('filebeat')
+    } else if (beatsFolder.endsWith('heartbeat')) {
+      tagAndPush('heartbeat')
+    } else if ("${beatsFolder}" == "journalbeat"){
+      tagAndPush('journalbeat')
+    } else if (beatsFolder.endsWith('metricbeat')) {
+      tagAndPush('metricbeat')
+    } else if ("${beatsFolder}" == "packetbeat"){
+      tagAndPush('packetbeat')
+    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
+      tagAndPush('elastic-agent')
+    }
+  }
+}
+
+/**
+* Tag and push all the docker images for the given beat.
+* @param beatName name of the Beat
+*/
+def tagAndPush(beatName){
+  def libbetaVer = env.VERSION
+  if("${env?.SNAPSHOT.trim()}" == "true"){
+    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+
+    libbetaVer += "-SNAPSHOT"
+    aliasVersion += "-SNAPSHOT"
+  }
+
+  def tagName = "${libbetaVer}"
+  if (isPR()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    doTagAndPush(beatName, variant, libbetaVer, tagName)
+    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
+
+    if (!isPR() && aliasVersion != "") {
+      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    }
+  }
+}
+
+/**
+* Tag and push the given sourceTag docker image with the tag name targetTag.
+* @param beatName name of the Beat
+* @param variant name of the variant used to build the docker image name
+* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
+* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
+*/
+def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+
+  def iterations = 0
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    iterations++
+    def status = sh(label: "Change tag and push ${targetName}", script: """#!/usr/bin/env bash
+      docker images
+      if docker image inspect "${sourceName}" &> /dev/null ; then
+        docker tag ${sourceName} ${targetName}
+        docker push ${targetName}
+      else
+        echo 'docker image ${sourceName} does not exist'
+      fi
+    """, returnStatus: true)
+    if ( status > 0 && iterations < 3) {
+      error("tag and push failed for ${beatName}, retry")
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+    }
+  }
+}
+
+/**
+* There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
+* therefore the storage bucket in GCP should follow the same folder structure.
+* This is required by https://github.com/elastic/beats-tester
+* e.g.
+* baseDir=name -> return name
+* baseDir=name1/name2/name3-> return name2
+*/
+def getBeatsName(baseDir) {
+  return baseDir.replace('x-pack/', '')
+}
+
+/**
+* This method runs the end 2 end testing in the same worker where the packages have been
+* generated, this should help to speed up the things
+*/
+def e2e(Map args = [:]) {
+  def enabled = args.e2e?.get('enabled', false)
+  def entrypoint = args.e2e?.get('entrypoint')
+  def dockerLogFile = "docker_logs_${entrypoint}.log"
+  if (!enabled) { return }
+  dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
+    // TBC with the target branch if running on a PR basis.
+    git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
+    if(isDockerInstalled()) {
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    }
+    def goVersionForE2E = readFile('.go-version').trim()
+    withEnv(["GO_VERSION=${goVersionForE2E}",
+              "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "LOG_LEVEL=TRACE"]) {
+      def status = 0
+      filebeat(output: dockerLogFile){
+        status = sh(script: ".ci/scripts/${entrypoint}",
+                    label: "Run functional tests ${entrypoint}",
+                    returnStatus: true)
+      }
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+      if (status != 0) {
+        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+      }
+    }
+  }
+}
+
+/**
 * This method runs the given command supporting two kind of scenarios:
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def target(Map args = [:]) {
-  def context = args.context
   def command = args.command
+  def context = args.context
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
+  def isE2E = args.e2e?.get('enabled', false)
+  def isPackaging = args.get('package', false)
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -278,6 +472,19 @@ def target(Map args = [:]) {
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+        }
+        // TODO:
+        // Packaging should happen only after the e2e?
+        if (isPackaging) {
+          publishPackages("${directory}")
+        }
+        if(isE2E) {
+          e2e(args)
+        }
+        // TODO:
+        // push docker images should happen only after the e2e?
+        if (isPackaging) {
+          pushCIDockerImages("${directory}")
         }
       }
     }
@@ -354,7 +561,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
       installTools(args)
@@ -672,7 +879,7 @@ def dumpVariables(){
 def isDockerInstalled(){
   if (isUnix()) {
     // TODO: some issues with macosx if(isInstalled(tool: 'docker', flag: '--version')) {
-    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
+    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
   } else {
     return false
   }
@@ -710,6 +917,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     }
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+    }
+    if(args?.content?.containsKey('packaging-linux')) {
+      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
