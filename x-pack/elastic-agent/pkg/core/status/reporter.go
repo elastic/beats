@@ -27,13 +27,10 @@ const (
 	Failed
 )
 
-var (
-	humanReadableStatuses = map[AgentStatusCode]string{
-		Healthy:  "online",
-		Degraded: "degraded",
-		Failed:   "error",
-	}
-)
+// String returns the string value for the agent code.
+func (s AgentStatusCode) String() string {
+	return []string{"online", "degraded", "error"}[s]
+}
 
 // AgentApplicationStatus returns the status of specific application.
 type AgentApplicationStatus struct {
@@ -61,7 +58,7 @@ type Controller interface {
 }
 
 type controller struct {
-	lock         sync.Mutex
+	mx           sync.Mutex
 	status       AgentStatusCode
 	reporters    map[string]*reporter
 	appReporters map[string]*reporter
@@ -86,7 +83,7 @@ func (r *controller) UpdateStateID(stateID string) {
 		return
 	}
 
-	r.lock.Lock()
+	r.mx.Lock()
 
 	r.stateID = stateID
 	// cleanup status for component reporters
@@ -96,12 +93,12 @@ func (r *controller) UpdateStateID(stateID string) {
 			continue
 		}
 
-		rep.lock.Lock()
+		rep.mx.Lock()
 		rep.status = state.Configuring
 		rep.message = ""
-		rep.lock.Unlock()
+		rep.mx.Unlock()
 	}
-	r.lock.Unlock()
+	r.mx.Unlock()
 
 	r.updateStatus()
 }
@@ -113,16 +110,16 @@ func (r *controller) RegisterComponent(componentIdentifier string) Reporter {
 		name:         componentIdentifier,
 		isRegistered: true,
 		unregisterFunc: func() {
-			r.lock.Lock()
+			r.mx.Lock()
 			delete(r.reporters, id)
-			r.lock.Unlock()
+			r.mx.Unlock()
 		},
 		notifyChangeFunc: r.updateStatus,
 	}
 
-	r.lock.Lock()
+	r.mx.Lock()
 	r.reporters[id] = rep
-	r.lock.Unlock()
+	r.mx.Unlock()
 
 	return rep
 }
@@ -135,36 +132,34 @@ func (r *controller) RegisterApp(componentIdentifier string, name string) Report
 		status:       state.Stopped,
 		isRegistered: true,
 		unregisterFunc: func() {
-			r.lock.Lock()
+			r.mx.Lock()
 			delete(r.appReporters, id)
-			r.lock.Unlock()
+			r.mx.Unlock()
 		},
 		notifyChangeFunc: r.updateStatus,
 	}
 
-	r.lock.Lock()
+	r.mx.Lock()
 	r.appReporters[id] = rep
-	r.lock.Unlock()
+	r.mx.Unlock()
 
 	return rep
 }
 
 // Status retrieves current agent status.
 func (r *controller) Status() AgentStatus {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	apps := make([]AgentApplicationStatus, len(r.appReporters))
-	i := 0
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	apps := make([]AgentApplicationStatus, 0, len(r.appReporters))
 	for key, rep := range r.appReporters {
-		rep.lock.Lock()
-		apps[i] = AgentApplicationStatus{
+		rep.mx.Lock()
+		apps = append(apps, AgentApplicationStatus{
 			ID:      key,
 			Name:    rep.name,
 			Status:  rep.status,
 			Message: rep.message,
-		}
-		rep.lock.Unlock()
-		i++
+		})
+		rep.mx.Unlock()
 	}
 	return AgentStatus{
 		Status:       r.status,
@@ -175,22 +170,22 @@ func (r *controller) Status() AgentStatus {
 
 // StatusCode retrieves current agent status code.
 func (r *controller) StatusCode() AgentStatusCode {
-	r.lock.Lock()
-	defer r.lock.Unlock()
+	r.mx.Lock()
+	defer r.mx.Unlock()
 	return r.status
 }
 
 func (r *controller) updateStatus() {
 	status := Healthy
 
-	r.lock.Lock()
+	r.mx.Lock()
 	for id, rep := range r.reporters {
 		s := statusToAgentStatus(rep.status)
 		if s > status {
 			status = s
 		}
 
-		r.log.Debugf("'%s' has status '%s'", id, humanReadableStatuses[s])
+		r.log.Debugf("'%s' has status '%s'", id, s)
 		if status == Failed {
 			break
 		}
@@ -202,7 +197,7 @@ func (r *controller) updateStatus() {
 				status = s
 			}
 
-			r.log.Debugf("'%s' has status '%s'", id, humanReadableStatuses[s])
+			r.log.Debugf("'%s' has status '%s'", id, s)
 			if status == Failed {
 				break
 			}
@@ -214,7 +209,7 @@ func (r *controller) updateStatus() {
 		r.status = status
 	}
 
-	r.lock.Unlock()
+	r.mx.Unlock()
 
 }
 
@@ -226,12 +221,12 @@ func (r *controller) logStatus(status AgentStatusCode) {
 		logFn = r.log.Errorf
 	}
 
-	logFn("Elastic Agent status changed to: '%s'", humanReadableStatuses[status])
+	logFn("Elastic Agent status changed to: '%s'", status)
 }
 
 // StatusString retrieves human readable string of current agent status.
 func (r *controller) StatusString() string {
-	return humanReadableStatuses[r.StatusCode()]
+	return r.StatusCode().String()
 }
 
 // Reporter reports status of component
@@ -242,7 +237,7 @@ type Reporter interface {
 
 type reporter struct {
 	name             string
-	lock             sync.Mutex
+	mx               sync.Mutex
 	isRegistered     bool
 	status           state.Status
 	message          string
@@ -252,8 +247,8 @@ type reporter struct {
 
 // Update updates the status of a component.
 func (r *reporter) Update(s state.Status, message string) {
-	r.lock.Lock()
-	defer r.lock.Unlock()
+	r.mx.Lock()
+	defer r.mx.Unlock()
 
 	if !r.isRegistered {
 		return
@@ -268,8 +263,8 @@ func (r *reporter) Update(s state.Status, message string) {
 // Unregister unregister status from reporter. Reporter will no longer be taken into consideration
 // for overall status computation.
 func (r *reporter) Unregister() {
-	r.lock.Lock()
-	defer r.lock.Unlock()
+	r.mx.Lock()
+	defer r.mx.Unlock()
 
 	r.isRegistered = false
 	r.unregisterFunc()

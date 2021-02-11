@@ -187,18 +187,18 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 	}
 
 	if c.options.NoRestart {
-		return err
+		return nil
 	}
 
 	if c.daemonReload(ctx) != nil {
 		c.log.Info("Elastic Agent might not be running; unable to trigger restart")
 	}
 	c.log.Info("Successfully triggered restart on running Elastic Agent.")
-	return err
+	return nil
 }
 
 func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
-	c.log.Debug("verifying communication with running elastic-agent daemon")
+	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
