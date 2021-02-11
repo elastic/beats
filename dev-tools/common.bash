@@ -54,12 +54,19 @@ install_gimme() {
 # it does not already exist in the ~/.gimme dir.
 setup_go_root() {
   local version=${1}
-
-  install_gimme
+  export PROPERTIES_FILE=go_env.properties
+  GO_VERSION="${version}" .ci/scripts/install-go.sh
 
   # Setup GOROOT and add go to the PATH.
-  ${GIMME} "${version}" > /dev/null
-  source "${HOME}/.gimme/envs/go${version}.env" 2> /dev/null
+  # shellcheck disable=SC1090
+  source "${PROPERTIES_FILE}" 2> /dev/null
+
+  # Setup GOPATH and add GOPATH/bin to the PATH.
+  if [ -d "${HOME}" ] ; then
+    setup_go_path "${HOME}"
+  else
+    setup_go_path "${GOROOT}"
+  fi
 
   debug "$(go version)"
 }
