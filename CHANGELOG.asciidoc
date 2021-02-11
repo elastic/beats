@@ -7,134 +7,16 @@
 === Beats version 7.11.1
 https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 - Fix various processing errors in the Suricata module. {pull}23236[23236]
 
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Journalbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 *Elastic Logging Plugin*
+
 - Fix out of date CLI flags on docs. {pull}23628[23628]
-
-
-==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-
-*Heartbeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
-
-
 
 [[release-notes-7.11.0]]
 === Beats version 7.11.0
