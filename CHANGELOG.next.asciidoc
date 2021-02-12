@@ -824,6 +824,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move aws-s3 input to GA. {pull}23631[23631]
 - Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
+- Added string splitting for httpjson input {pull}24022[24022]
 
 *Heartbeat*
 
