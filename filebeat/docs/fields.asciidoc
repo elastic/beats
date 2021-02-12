@@ -105583,17 +105583,6 @@ Fields from Pensando logs.
 
 
 
-*`pensando.payload_raw`*::
-+
---
-Please add description
-
-type: text
-
-example: Please add example
-
---
-
 [float]
 === dfw
 
