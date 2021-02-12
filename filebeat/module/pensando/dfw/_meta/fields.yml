@@ -1,7 +1,3 @@
-- name: payload_raw
-  description: Please add description
-  example: Please add example
-  type: text
 - name: dfw 
   type: group
   release: beta
