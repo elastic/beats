@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	splitTypeArr = "array"
-	splitTypeMap = "map"
+	splitTypeArr    = "array"
+	splitTypeMap    = "map"
+	splitTypeString = "string"
 )
 
 type responseConfig struct {
@@ -23,12 +24,13 @@ type responseConfig struct {
 }
 
 type splitConfig struct {
-	Target     string           `config:"target" validation:"required"`
-	Type       string           `config:"type"`
-	Transforms transformsConfig `config:"transforms"`
-	Split      *splitConfig     `config:"split"`
-	KeepParent bool             `config:"keep_parent"`
-	KeyField   string           `config:"key_field"`
+	Target          string           `config:"target" validation:"required"`
+	Type            string           `config:"type"`
+	Transforms      transformsConfig `config:"transforms"`
+	Split           *splitConfig     `config:"split"`
+	KeepParent      bool             `config:"keep_parent"`
+	KeyField        string           `config:"key_field"`
+	DelimiterString string           `config:"delimiter"`
 }
 
 func (c *responseConfig) Validate() error {
@@ -58,6 +60,10 @@ func (c *splitConfig) Validate() error {
 			return fmt.Errorf("key_field can only be used with a %s split type", splitTypeMap)
 		}
 	case splitTypeMap:
+	case splitTypeString:
+		if c.DelimiterString == "" {
+			return fmt.Errorf("delimiter required for split type %s", splitTypeString)
+		}
 	default:
 		return fmt.Errorf("invalid split type: %s", c.Type)
 	}
