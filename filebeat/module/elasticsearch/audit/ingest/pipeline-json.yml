@@ -3,8 +3,6 @@ processors:
 - json:
     field: message
     target_field: elasticsearch.audit
-- drop:
-    if: ctx.elasticsearch.audit?.type != null && ctx.elasticsearch.audit.type != 'audit'
 - remove:
     field: elasticsearch.audit.type
     ignore_missing: true
@@ -16,6 +14,7 @@ processors:
     - yyyy-MM-dd'T'HH:mm:ss,SSS
     - yyyy-MM-dd'T'HH:mm:ss,SSSZ
     timezone: '{{ event.timezone }}'
+    ignore_failure: true
 - remove:
     if: ctx.elasticsearch.audit['@timestamp'] == null && ctx.event.timezone != null
     field: event.timezone
@@ -80,6 +79,54 @@ processors:
 - rename:
     field: elasticsearch.audit.node
     target_field: elasticsearch.node
+- rename:
+    field: elasticsearch.audit.change.disable.user.name
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.change.enable.user.name
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.delete.user.name
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.put.user.name
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.put.user.full_name
+    target_field: user.full_name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.put.user.email
+    target_field: user.email
+    ignore_missing: true
+- remove:
+    field: elasticsearch.audit.put
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.invalidate.apikeys.user.name
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.invalidate.apikeys.user.realm
+    target_field: elasticsearch.audit.user.realm
+    ignore_missing: true
+- dot_expander:
+    field: user.run_as.name
+    path: elasticsearch.audit
+    ignore_failure: true
+- dot_expander:
+    field: user.run_as.realm
+    path: elasticsearch.audit
+    ignore_failure: true
+- convert:
+    field: elasticsearch.audit.user.run_as.name
+    target_field: user.effective.name
+    type: string
+    ignore_failure: true
 - dot_expander:
     field: user.name
     path: elasticsearch.audit
@@ -87,6 +134,9 @@ processors:
     field: elasticsearch.audit.user.name
     target_field: user.name
     ignore_missing: true
+- dot_expander:
+    field: user.email
+    path: elasticsearch.audit
 - dot_expander:
     field: request.method
     path: elasticsearch.audit
@@ -104,9 +154,16 @@ processors:
 - dot_expander:
     field: cluster.name
     path: elasticsearch.audit
+- dot_expander:
+    field: cluster.uuid
+    path: elasticsearch.audit
 - rename:
     field: elasticsearch.audit.cluster.name
     target_field: elasticsearch.cluster.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.audit.cluster.uuid
+    target_field: elasticsearch.cluster.uuid
     ignore_missing: true
 - rename:
     field: elasticsearch.audit.level
