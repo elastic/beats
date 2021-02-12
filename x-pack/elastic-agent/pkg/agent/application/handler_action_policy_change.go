@@ -44,7 +44,7 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetA
 		return fmt.Errorf("invalid type, expected ActionPolicyChange and received %T", a)
 	}
 
-	c, err := LoadConfig(action.Policy)
+	c, err := config.NewConfigFrom(action.Policy)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}
