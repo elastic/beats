@@ -54,7 +54,7 @@ var typesToElasticTypes = map[string]string{
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: fields_gen [-indent=N] [-header=file] [-output=file.yml] [input-csv,name-column,type-column,has-header]+\n")
+	fmt.Fprintf(os.Stderr, "Usage: fields_gen [-header=file] [-output=file.yml] [input-csv,name-column,type-column,has-header]+\n")
 	flag.PrintDefaults()
 	os.Exit(1)
 }
