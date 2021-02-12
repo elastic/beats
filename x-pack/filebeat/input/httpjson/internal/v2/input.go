@@ -104,7 +104,7 @@ func run(
 	publisher inputcursor.Publisher,
 	cursor *inputcursor.Cursor,
 ) error {
-	log := ctx.Logger.With("url", config.Request.URL)
+	log := ctx.Logger.With("input_url", config.Request.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
