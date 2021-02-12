@@ -499,7 +499,7 @@ filebeat.inputs:
 [float]
 ==== `response.split`
 
-Split operation to apply to the response once it is received. A split can convert a map, array or string into multiple events.
+Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
 
 [float]
 ==== `response.split[].target`
