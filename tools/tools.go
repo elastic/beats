@@ -31,7 +31,6 @@ import (
 	_ "gotest.tools/gotestsum/cmd"
 
 	_ "github.com/mitchellh/gox"
-	_ "github.com/reviewdog/reviewdog/cmd/reviewdog"
 	_ "golang.org/x/lint/golint"
 
 	_ "go.elastic.co/go-licence-detector"

@@ -10,9 +10,6 @@ VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
 GOLINT=golint
 GOLINT_REPO=golang.org/x/lint/golint
-REVIEWDOG=reviewdog
-REVIEWDOG_OPTIONS?=-diff "git diff master"
-REVIEWDOG_REPO=github.com/reviewdog/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
@@ -151,12 +148,6 @@ fmt: add-headers python-env
 	@# Cleans also python files which are not part of the beats
 	@$(FIND) -name "*.py" -exec $(PYTHON_ENV)/bin/autopep8 --in-place --max-line-length 120 {} \;
 
-## lint : TBD.
-.PHONY: lint
-lint:
-	@go get $(GOLINT_REPO) $(REVIEWDOG_REPO)
-	$(REVIEWDOG) $(REVIEWDOG_OPTIONS)
-
 ## docs : Builds the documents for each beat
 .PHONY: docs
 docs:
@@ -206,6 +197,7 @@ snapshot:
 ## release : Builds a release.
 .PHONY: release
 release: beats-dashboards
+	@mage dumpVariables
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
@@ -219,7 +211,7 @@ release-manager-snapshot:
 ## release-manager-release : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
 .PHONY: release-manager-release
 release-manager-release:
-	./dev-tools/run_with_go_ver $(MAKE) release
+	GO_VERSION=$(shell cat ./.go-version) ./dev-tools/run_with_go_ver $(MAKE) release
 
 ## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards

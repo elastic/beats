@@ -31,6 +31,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - API address is a required setting in `add_cloudfoundry_metadata`. {pull}21759[21759]
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
+- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 
 *Auditbeat*
 
@@ -264,7 +265,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
-- Fix various processing errors in the Suricata module. {pull}23236[23236]
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - CheckPoint Firewall module: Change event.severity JSON data type to a number because the field mapping is a `long`. {pull}23424[23424]
 - Cisco IOS: Change icmp.type/code and igmp.type JSON data types to strings because the fields mappings are `keyword`. {pull}23424[23424]
@@ -276,7 +276,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change the `event.created` in Netflow events to be the time the event was created by Filebeat
   to be consistent with ECS. {pull}23094[23094]
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
-- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
 
 *Filebeat*
 
@@ -377,8 +376,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
 - Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
-- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
-- Fix various processing errors in the Suricata module. {pull}23236[23236]
+- Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
+- Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
 
 *Heartbeat*
 
@@ -514,7 +513,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 *Elastic Logging Plugin*
-- Fix out of date CLI flags on docs. {pull}23628[23628]
 
 
 ==== Added
@@ -1027,6 +1025,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
 
 
 

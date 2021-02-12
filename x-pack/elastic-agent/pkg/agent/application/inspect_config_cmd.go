@@ -63,7 +63,7 @@ func (c *InspectConfigCmd) inspectConfig() error {
 }
 
 func loadConfig(configPath string) (*config.Config, error) {
-	rawConfig, err := LoadConfigFromFile(configPath)
+	rawConfig, err := config.LoadFile(configPath)
 	if err != nil {
 		return nil, err
 	}

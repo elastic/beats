@@ -28,3 +28,8 @@ const (
 exec /opt/Elastic/Agent/elastic-agent $@
 `
 )
+
+// ArePathsEqual determines whether paths are equal taking case sensitivity of os into account.
+func ArePathsEqual(expected, actual string) bool {
+	return expected == actual
+}
