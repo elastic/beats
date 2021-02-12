@@ -159387,6 +159387,73 @@ type: integer
 --
 
 [float]
+=== signature
+
+Fields exported by the Zeek Signature log.
+
+
+
+*`zeek.signature.note`*::
++
+--
+Notice associated with signature event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_id`*::
++
+--
+The name of the signature that matched.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.event_msg`*::
++
+--
+A more descriptive message of the signature-matching event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sub_msg`*::
++
+--
+Extracted payload data or extra message.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_count`*::
++
+--
+Number of sigs, usually from summary count.
+
+
+type: integer
+
+--
+
+*`zeek.signature.host_count`*::
++
+--
+Number of hosts, from a summary count.
+
+
+type: integer
+
+--
+
+[float]
 === sip
 
 Fields exported by the Zeek SIP log.
