@@ -4,8 +4,19 @@ processors:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
 
+- grok:
+    field: message
+    patterns:
+    - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:message2}'
+    pattern_definitions:
+      DATETIME: '[-0-9]+ %{TIME} %{WORD:event.timezone}'
+      CHAR: .
+      GREEDYDATA: |-
+        (.|
+        |	)*
 - pipeline:
     name: '{< IngestPipeline "pipeline-log" >}'
+    if: ctx.separator != ','
 
 - date:
     field: postgresql.log.timestamp
@@ -42,6 +53,12 @@ processors:
     field: related.user
     value: "{{user.name}}"
     if: "ctx?.user?.name != null"
+- remove:
+    field:
+    - separator
+- remove:
+    field:
+    - message2
 on_failure:
 - set:
     field: error.message
