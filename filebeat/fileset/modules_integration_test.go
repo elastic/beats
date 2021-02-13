@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -48,8 +49,8 @@ func TestLoadPipeline(t *testing.T) {
 
 	content := map[string]interface{}{
 		"description": "describe pipeline",
-		"processors": []map[string]interface{}{
-			{
+		"processors": []interface{}{
+			map[string]interface{}{
 				"set": map[string]interface{}{
 					"field": "foo",
 					"value": "bar",
@@ -59,27 +60,27 @@ func TestLoadPipeline(t *testing.T) {
 	}
 
 	err := loadPipeline(client, "my-pipeline-id", content, false)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	status, _, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 200, status)
 
 	// loading again shouldn't actually update the pipeline
 	content["description"] = "describe pipeline 2"
 	err = loadPipeline(client, "my-pipeline-id", content, false)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline")
 
 	// loading again updates the pipeline
 	err = loadPipeline(client, "my-pipeline-id", content, true)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
 
 func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expectedDescription string) {
 	status, response, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 200, status)
 
 	var res map[string]interface{}
@@ -99,7 +100,7 @@ func TestSetupNginx(t *testing.T) {
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
 		&ModuleConfig{Module: "nginx"},
@@ -133,7 +134,7 @@ func TestAvailableProcessors(t *testing.T) {
 	}
 
 	err := checkAvailableProcessors(client, requiredProcessors)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// these don't exists on our integration test setup
 	requiredProcessors = []ProcessorRequirement{
@@ -172,7 +173,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-plain_logs", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../_meta/test/module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	enabled := true
 	disabled := false
@@ -217,7 +218,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-plain_logs_bad", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../_meta/test/module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	enabled := true
 	disabled := false
@@ -226,7 +227,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		"multibad": &FilesetConfig{Enabled: &enabled},
 	}
 	configs := []*ModuleConfig{
-		&ModuleConfig{"foo", &enabled, filesetConfigs},
+		{"foo", &enabled, filesetConfigs},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"))

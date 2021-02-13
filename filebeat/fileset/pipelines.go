@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -153,7 +152,7 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 			return nil
 		}
 	}
-	spew.Dump(content)
+
 	err := setProcessors(esClient.GetVersion(), pipelineID, content)
 	if err != nil {
 		return fmt.Errorf("Failed to adapt pipeline with backwards compatibility changes: %w", err)

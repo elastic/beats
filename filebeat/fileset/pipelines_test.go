@@ -25,10 +25,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
@@ -92,10 +93,10 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				URL:     testESServer.URL,
 				Timeout: 90 * time.Second,
 			})
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = testESClient.Connect()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = testRegistry.LoadPipelines(testESClient, false)
 			if test.isErrExpected {
@@ -210,7 +211,7 @@ func TestSetEcsProcessors(t *testing.T) {
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.expected, test.content)
 			}
 		})
@@ -387,7 +388,7 @@ func TestModifySetProcessor(t *testing.T) {
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
@@ -589,7 +590,7 @@ func TestModifyAppendProcessor(t *testing.T) {
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
@@ -714,7 +715,7 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
