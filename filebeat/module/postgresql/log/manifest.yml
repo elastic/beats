@@ -9,5 +9,7 @@ var:
     os.windows:
       - "c:/Program Files/PostgreSQL/*/logs/*.log*"
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/pipeline-log.yml
 input: config/log.yml
