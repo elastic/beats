@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -59,7 +60,8 @@ func TestLoadPipeline(t *testing.T) {
 		},
 	}
 
-	err := loadPipeline(client, "my-pipeline-id", content, false)
+	log := logp.NewLogger(logName)
+	err := loadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
 	status, _, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
@@ -68,12 +70,12 @@ func TestLoadPipeline(t *testing.T) {
 
 	// loading again shouldn't actually update the pipeline
 	content["description"] = "describe pipeline 2"
-	err = loadPipeline(client, "my-pipeline-id", content, false)
+	err = loadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline")
 
 	// loading again updates the pipeline
-	err = loadPipeline(client, "my-pipeline-id", content, true)
+	err = loadPipeline(client, "my-pipeline-id", content, true, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
@@ -103,7 +105,7 @@ func TestSetupNginx(t *testing.T) {
 	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		&ModuleConfig{Module: "nginx"},
+		{Module: "nginx"},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))
@@ -178,8 +180,8 @@ func TestLoadMultiplePipelines(t *testing.T) {
 	enabled := true
 	disabled := false
 	filesetConfigs := map[string]*FilesetConfig{
-		"multi":    &FilesetConfig{Enabled: &enabled},
-		"multibad": &FilesetConfig{Enabled: &disabled},
+		"multi":    {Enabled: &enabled},
+		"multibad": {Enabled: &disabled},
 	}
 	configs := []*ModuleConfig{
 		&ModuleConfig{"foo", &enabled, filesetConfigs},
@@ -223,8 +225,8 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	enabled := true
 	disabled := false
 	filesetConfigs := map[string]*FilesetConfig{
-		"multi":    &FilesetConfig{Enabled: &disabled},
-		"multibad": &FilesetConfig{Enabled: &enabled},
+		"multi":    {Enabled: &disabled},
+		"multibad": {Enabled: &enabled},
 	}
 	configs := []*ModuleConfig{
 		{"foo", &enabled, filesetConfigs},
