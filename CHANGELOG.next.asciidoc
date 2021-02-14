@@ -598,11 +598,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
 - Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
 - Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
-- Added new decode_xml processor to libbeat, that is available to all beat types. {pull}23678[23678]
+- Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
 - Add deployment name in pod's meta. {pull}23610[23610]
 - Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
-- Added new decode_xml_fields processor to libbeat, that is available to all beat types. {pull}23678[23678]
-- Add XML processor to libbeat. {pull}23678[23678]
 
 *Auditbeat*
 
