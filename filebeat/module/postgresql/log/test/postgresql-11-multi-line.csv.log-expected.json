@@ -9,20 +9,22 @@
         "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
-        "event.type": ["info"],
+        "event.type": [
+            "info"
+        ],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
             "multiline"
         ],
+        "log.level": "LOG",
         "log.offset": 0,
+        "message": "SELECT 'multi',\n'line';",
         "postgresql.log.application_name": "psql",
         "postgresql.log.client_addr": "172.24.0.1",
         "postgresql.log.client_port": 42642,
         "postgresql.log.command_tag": "SELECT",
         "postgresql.log.database": "postgres",
-        "log.level": "LOG",
-        "message": "SELECT 'multi',\n'line';",
         "postgresql.log.session_id": "5ff25f96.3b",
         "postgresql.log.session_start_time": "2021-01-04T00:21:42.000Z",
         "postgresql.log.sql_state_code": "00000",

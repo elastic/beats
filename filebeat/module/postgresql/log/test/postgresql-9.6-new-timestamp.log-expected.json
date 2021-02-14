@@ -82,8 +82,8 @@
         "log.level": "FATAL",
         "log.offset": 267,
         "message": "the database system is starting up",
-        "postgresql.log.session_line_number": 1,
         "postgresql.log.database": "postgres",
+        "postgresql.log.session_line_number": 1,
         "postgresql.log.timestamp": "2017-07-31 13:46:23 EST",
         "process.pid": 768,
         "related.user": [
@@ -109,8 +109,8 @@
         "log.level": "FATAL",
         "log.offset": 360,
         "message": "the database system is starting up",
-        "postgresql.log.session_line_number": 1,
         "postgresql.log.database": "postgres",
+        "postgresql.log.session_line_number": 1,
         "postgresql.log.timestamp": "2017-07-31 13:46:55 EST",
         "process.pid": 771,
         "related.user": [
