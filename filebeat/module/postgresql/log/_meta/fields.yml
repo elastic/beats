@@ -97,10 +97,6 @@
       type: alias
       path: event.timezone
       migration: true
-    - name: thread_id
-      type: alias
-      path: process.pid
-      migration: true
     - name: user
       type: alias
       path: user.name
