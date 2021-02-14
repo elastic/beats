@@ -17,6 +17,9 @@ processors:
 - pipeline:
     name: '{< IngestPipeline "pipeline-log" >}'
     if: ctx.separator != ','
+- pipeline:
+    name: '{< IngestPipeline "pipeline-csv" >}'
+    if: ctx.separator == ','
 
 - date:
     field: postgresql.log.timestamp
