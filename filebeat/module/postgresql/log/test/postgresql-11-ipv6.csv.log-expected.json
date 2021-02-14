@@ -16,7 +16,7 @@
         "postgresql.log.client_port": 16790,
         "postgresql.log.command_tag": "startup",
         "postgresql.log.database": "loggiproduction",
-        "postgresql.log.error_severity": "FATAL",
+        "log.level": "FATAL",
         "message": "role \"jose.villanova\" does not exist",
         "postgresql.log.session_id": "5ff202ad.4fec",
         "postgresql.log.session_start_time": "2021-01-03T17:45:17.000Z",

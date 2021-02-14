@@ -21,7 +21,7 @@
         "postgresql.log.client_port": 42642,
         "postgresql.log.command_tag": "SELECT",
         "postgresql.log.database": "postgres",
-        "postgresql.log.error_severity": "LOG",
+        "log.level": "LOG",
         "message": "SELECT 'multi',\n'line';",
         "postgresql.log.session_id": "5ff25f96.3b",
         "postgresql.log.session_start_time": "2021-01-04T00:21:42.000Z",

@@ -56,9 +56,6 @@
     - name: transaction_id
       type: long
       description: The id of current transaction.
-    - name: error_severity
-      example: "LOG"
-      description: Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
     - name: sql_state_code
       description: >
         State code returned by Postgres (if any).
@@ -103,9 +100,12 @@
       migration: true
     - name: level
       type: alias
+      example: "LOG"
+      description: Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
       path: log.level
       migration: true
     - name: message
       type: alias
       path: message
       migration: true
+

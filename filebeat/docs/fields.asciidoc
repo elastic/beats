@@ -105717,15 +105717,6 @@ type: long
 
 --
 
-*`postgresql.log.error_severity`*::
-+
---
-Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
-
-example: LOG
-
---
-
 *`postgresql.log.sql_state_code`*::
 +
 --
@@ -105830,7 +105821,11 @@ alias to: user.name
 *`postgresql.log.level`*::
 +
 --
+Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
+
 type: alias
+
+example: LOG
 
 alias to: log.level
 

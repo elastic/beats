@@ -14,7 +14,7 @@ processors:
                     "tempcsv.session_start_time",
                     "postgresql.log.virtual_transaction_id",
                     "postgresql.log.transaction_id",
-                    "postgresql.log.error_severity",
+                    "log.level",
                     "postgresql.log.sql_state_code",
                     "tempcsv.message",
                     "postgresql.log.detail",
