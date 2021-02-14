@@ -253,7 +253,7 @@ func TestDecodeXML(t *testing.T) {
 						<review>One of the great seminal American novels of the 20th century.</review>
 				</ook>
 				catalog>`,
-				"error": common.MapStr{"message": "failed in decode_xml on the \"message\" field: error decoding XML field: xml.Decoder.Token() - XML syntax error on line 7: element <book> closed by </ook>"},
+				"error": common.MapStr{"message": "failed in decode_xml on the \"message\" field: error decoding XML field: XML syntax error on line 7: element <book> closed by </ook>"},
 			},
 			error:        true,
 			errorMessage: "error decoding XML field:",
@@ -369,11 +369,12 @@ func TestDecodeXML(t *testing.T) {
 	}
 }
 
-// BenchmarkProcessor_Run/single_object-4             96710             11232 ns/op            8594 B/op        158 allocs/op
-// BenchmarkProcessor_Run/nested_and_array_object-4   42454             28094 ns/op           20296 B/op        376 allocs/op
 func BenchmarkProcessor_Run(b *testing.B) {
 	c := defaultConfig()
+	target := "xml"
+	c.Target = &target
 	p, err := newDecodeXML(c)
+	require.NoError(b, err)
 
 	b.Run("single_object", func(b *testing.B) {
 		evt := &beat.Event{Fields: map[string]interface{}{
