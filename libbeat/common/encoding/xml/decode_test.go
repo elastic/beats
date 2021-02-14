@@ -20,7 +20,9 @@
 package xml
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 
@@ -295,4 +297,135 @@ func TestDecode(t *testing.T) {
 			assert.EqualValues(t, test.Output, out)
 		})
 	}
+}
+
+func ExampleXMLToJSON() {
+	const xml = `
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+  <System>
+    <Provider Name="Microsoft-Windows-WinRM" Guid="{a7975c8f-ac13-49f1-87da-5a984a4ab417}" EventSourceName="Service Control Manager"/>
+    <EventID>91</EventID>
+    <Version>1</Version>
+    <Level>4</Level>
+    <Task>9</Task>
+    <Opcode>0</Opcode>
+    <Keywords>0x8020000000000000</Keywords>
+    <TimeCreated SystemTime="2016-01-28T20:33:27.990735300Z"/>
+    <EventRecordID>100</EventRecordID>
+    <Correlation ActivityID="{A066CCF1-8AB3-459B-B62F-F79F957A5036}" RelatedActivityID="{85FC0930-9C49-42DA-804B-A7368104BD1B}" />
+    <Execution ProcessID="920" ThreadID="1152"/>
+    <Channel>Microsoft-Windows-WinRM/Operational</Channel>
+    <Computer>vagrant-2012-r2</Computer>
+    <Security UserID="S-1-5-21-3541430928-2051711210-1391384369-1001"/>
+  </System>
+  <EventData>
+    <Data Name="param1">winlogbeat</Data>
+    <Data Name="param2">running</Data>
+    <Binary>770069006E006C006F00670062006500610074002F0034000000</Binary>
+  </EventData>
+  <UserData>
+    <EventXML xmlns="Event_NS">
+      <ServerName>\\VAGRANT-2012-R2</ServerName>
+      <UserName>vagrant</UserName>
+    </EventXML>
+  </UserData>
+  <ProcessingErrorData>
+    <ErrorCode>15005</ErrorCode>
+    <DataItemName>shellId</DataItemName>
+    <EventPayload>68007400740070003A002F002F0073006300680065006D00610073002E006D006900630072006F0073006F00660074002E0063006F006D002F007700620065006D002F00770073006D0061006E002F0031002F00770069006E0064006F00770073002F007300680065006C006C002F0063006D0064000000</EventPayload>
+  </ProcessingErrorData>
+  <RenderingInfo Culture="en-US">
+    <Message>Creating WSMan shell on server with ResourceUri: %1</Message>
+    <Level>Information</Level>
+    <Task>Request handling</Task>
+    <Opcode>Info</Opcode>
+    <Channel>Microsoft-Windows-WinRM/Operational</Channel>
+    <Provider>Microsoft-Windows-Windows Remote Management</Provider>
+    <Keywords>
+      <Keyword>Server</Keyword>
+    </Keywords>
+  </RenderingInfo>
+</Event>
+}
+`
+	dec := NewDecoder(strings.NewReader(xml))
+	dec.LowercaseKeys()
+	m, err := dec.Decode()
+	if err != nil {
+		return
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	if err = enc.Encode(m); err != nil {
+		return
+	}
+
+	// Output:
+	// {
+	//   "event": {
+	//     "eventdata": {
+	//       "binary": "770069006E006C006F00670062006500610074002F0034000000",
+	//       "data": {
+	//         "#text": "running",
+	//         "name": "param2"
+	//       }
+	//     },
+	//     "processingerrordata": {
+	//       "dataitemname": "shellId",
+	//       "errorcode": "15005",
+	//       "eventpayload": "68007400740070003A002F002F0073006300680065006D00610073002E006D006900630072006F0073006F00660074002E0063006F006D002F007700620065006D002F00770073006D0061006E002F0031002F00770069006E0064006F00770073002F007300680065006C006C002F0063006D0064000000"
+	//     },
+	//     "renderinginfo": {
+	//       "channel": "Microsoft-Windows-WinRM/Operational",
+	//       "culture": "en-US",
+	//       "keywords": {
+	//         "keyword": "Server"
+	//       },
+	//       "level": "Information",
+	//       "message": "Creating WSMan shell on server with ResourceUri: %1",
+	//       "opcode": "Info",
+	//       "provider": "Microsoft-Windows-Windows Remote Management",
+	//       "task": "Request handling"
+	//     },
+	//     "system": {
+	//       "channel": "Microsoft-Windows-WinRM/Operational",
+	//       "computer": "vagrant-2012-r2",
+	//       "correlation": {
+	//         "activityid": "{A066CCF1-8AB3-459B-B62F-F79F957A5036}",
+	//         "relatedactivityid": "{85FC0930-9C49-42DA-804B-A7368104BD1B}"
+	//       },
+	//       "eventid": "91",
+	//       "eventrecordid": "100",
+	//       "execution": {
+	//         "processid": "920",
+	//         "threadid": "1152"
+	//       },
+	//       "keywords": "0x8020000000000000",
+	//       "level": "4",
+	//       "opcode": "0",
+	//       "provider": {
+	//         "eventsourcename": "Service Control Manager",
+	//         "guid": "{a7975c8f-ac13-49f1-87da-5a984a4ab417}",
+	//         "name": "Microsoft-Windows-WinRM"
+	//       },
+	//       "security": {
+	//         "userid": "S-1-5-21-3541430928-2051711210-1391384369-1001"
+	//       },
+	//       "task": "9",
+	//       "timecreated": {
+	//         "systemtime": "2016-01-28T20:33:27.990735300Z"
+	//       },
+	//       "version": "1"
+	//     },
+	//     "userdata": {
+	//       "eventxml": {
+	//         "servername": "\\\\VAGRANT-2012-R2",
+	//         "username": "vagrant",
+	//         "xmlns": "Event_NS"
+	//       }
+	//     },
+	//     "xmlns": "http://schemas.microsoft.com/win/2004/08/events/event"
+	//   }
+	// }
 }
