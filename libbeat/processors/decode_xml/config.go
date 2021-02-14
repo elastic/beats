@@ -18,9 +18,9 @@
 package decode_xml
 
 type decodeXMLConfig struct {
-	Field         string  `config:"field"`
+	Field         string  `config:"field" validate:"required"`
+	Target        *string `config:"target_field"`
 	OverwriteKeys bool    `config:"overwrite_keys"`
-	Target        *string `config:"target"`
 	DocumentID    string  `config:"document_id"`
 	ToLower       bool    `config:"to_lower"`
 	IgnoreMissing bool    `config:"ignore_missing"`
@@ -30,10 +30,7 @@ type decodeXMLConfig struct {
 func defaultConfig() decodeXMLConfig {
 	return decodeXMLConfig{
 		Field:         "message",
-		IgnoreMissing: false,
-		Target:        nil,
 		OverwriteKeys: true,
-		IgnoreFailure: false,
 		ToLower:       true,
 	}
 }

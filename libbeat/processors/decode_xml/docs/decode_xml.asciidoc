@@ -7,44 +7,48 @@
 
 experimental[]
 
-The `decode_xml` processor decodes any valid XML data that is stored under the `fields` key,
-It will output the values as an array of strings.
+The `decode_xml` processor decodes XML data that is stored under the `field`
+key. It outputs the result into the `target_field`.
 
-Example that shows how to define which fields include the XML data and allows to overwrite the fields
-if they already exists:
+This example demonstrates how to decode an XML string contained in the `message`
+field and write the resulting fields into the root of the document. Any fields
+that already exist will be overwritten.
 
 [source,yaml]
 -------
 processors:
   - decode_xml:
-      fields: ["field1", "field2"]
+      field: message
+      target_field: ""
       overwrite_keys: true
-      target: ""
 -------
 
-If you want any potential errors to appear in the resulting document or want the automatically generated document ID to be overwritten by 
- by a field that exists in the XML object an example like the below can be used:
-
-[source,yaml]
--------
-processors:
-  - decode_xml:
-      fields: ["field1""]
-      add_error_key: true
-      target: "xml"
-      document_id: "fieldwithid"
--------
-
-By default all keys converted from XML will have the names converted to lowercase. If there is a need to disable this behavior it is possible to use
-the below example:
+By default any decoding errors that occur will stop the processing chain and the
+error will be added to `error.message` field. To ignore all errors and continue
+to the next processor you can set `ignore_failure: true`. To specifically
+ignore failures caused by `field` not existing use `ignore_missing`.
 
 [source,yaml]
 -------
 processors:
   - decode_xml:
-      fields: ["field1""]
+      field: example
+      target_field: xml
+      ignore_missing: true
+      ignore_failure: true
+-------
+
+By default all keys converted from XML will have the names converted to
+lowercase. If there is a need to disable this behavior it is possible to use the
+below example:
+
+[source,yaml]
+-------
+processors:
+  - decode_xml:
+      field: message
+      target_field: xml
       to_lower: false
-      document_id: "fieldwithid"
 -------
 
 Example XML input:
@@ -81,30 +85,31 @@ Will produce the following output:
 -------------------------------------------------------------------------------
 
 
-In the examples above:
+The supported configuration options are:
 
-`target`:: (Optional) The field under which the decoded XML will be written. By
-default the decoded XML object replaces the string field from which it was
-read. To merge the decoded XML fields into the root of the event, specify
-`target` with an empty string (`target: ""`). Note that the `null` value (`target:`)
-is treated as if the field was not set at all.
+`field`:: (Required) Source field containing the XML. Defaults to `message`.
+
+`target_field`:: (Optional) The field under which the decoded XML will be
+written. By default the decoded XML object replaces the field from which it was
+read. To merge the decoded XML fields into the root of the event specify
+`target_field` with an empty string (`target_field: ""`). Note that the `null`
+value (`target_field:`) is treated as if the field was not set at all.
 
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded XML object. The
 default value is false.
 
-`add_error_key`:: (Optional) If it set to true, in case of error while decoding XML objects
-te `error` field is going to be part of event with error message. If it set to false, there
-will not be any error in event's field. Even error occurs while decoding XML objects. The
-default value is false.
+`to_lower`:: (Optional) Converts all keys to lowercase. Accepts either true or
+false. The default value is true.
 
-`to_lower`:: (Optional) Converts all key fields to lower case. Accepts either true or false.
-The default value is true.
+`document_id`:: (Optional) XML key to use as the document ID. If configured, the
+field will be removed from the original XML document and stored in
+`@metadata._id`.
 
-`document_id`:: (Optional) XML key to use as the document id. If configured,
-the field will be removed from the original XML document and stored in
-`@metadata._id`
+`ignore_missing`:: (Optional) If `true` the processor will not return an error
+when a specified field does not exist. Defaults to `false`.
+
+`ignore_failure`:: (Optional) Ignore all errors produced by the processor.
+Defaults to `false`.
 
 See <<conditions>> for a list of supported conditions.
-
-
