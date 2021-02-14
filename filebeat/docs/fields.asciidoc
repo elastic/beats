@@ -105794,7 +105794,11 @@ example: client backend
 *`postgresql.log.error.code`*::
 +
 --
-Error code returned by Postgres (if any)
+
+deprecated:[8.0.0]
+
+Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
+
 
 type: long
 
