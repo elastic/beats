@@ -74,5 +74,11 @@ processors:
    patterns:
     - '^%{DATA:postgresql.log.client_addr}(:%{NUMBER:postgresql.log.client_port:int})?$'
 
+- append:
+    field: event.type
+    value:
+      - error
+    if: "ctx.postgresql.log.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
+
 - remove:
     field: tempcsv

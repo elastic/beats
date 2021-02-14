@@ -411,7 +411,7 @@
         "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
-        "event.type": ["info"],
+        "event.type": ["info", "error"],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -472,7 +472,7 @@
         "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
-        "event.type": ["info"],
+        "event.type": ["info", "error"],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -533,7 +533,7 @@
         "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
-        "event.type": ["info"],
+        "event.type": ["info", "error"],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
@@ -594,7 +594,7 @@
         "event.kind": "event",
         "event.module": "postgresql",
         "event.timezone": "UTC",
-        "event.type": ["info"],
+        "event.type": ["info", "error"],
         "fileset.name": "log",
         "input.type": "log",
         "log.flags": [
