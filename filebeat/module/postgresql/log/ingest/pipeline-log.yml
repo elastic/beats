@@ -1,7 +1,7 @@
 description: Pipeline for parsing PostgreSQL logs.
 processors:
 - grok:
-    field: message2
+    field: raw_message
     ignore_missing: true
     patterns:
     - '^(\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.session_line_number:long})?\] ((\[%{USERNAME:user.name}\]@\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?)?%{WORD:log.level}:  (?:%{NUMBER:postgresql.log.error.code:long}|%{SPACE})(duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:postgresql.log.query}|: %{GREEDYDATA:message}|%{GREEDYDATA:message})'

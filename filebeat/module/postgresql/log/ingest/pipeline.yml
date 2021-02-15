@@ -7,7 +7,7 @@ processors:
 - grok:
     field: message
     patterns:
-    - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:message2}'
+    - '^%{DATETIME:postgresql.log.timestamp}%{CHAR:separator}%{GREEDYDATA:raw_message}'
     pattern_definitions:
       DATETIME: '[-0-9]+ %{TIME} %{WORD:event.timezone}'
       CHAR: .
@@ -61,7 +61,7 @@ processors:
     - separator
 - remove:
     field:
-    - message2
+    - raw_message
 on_failure:
 - set:
     field: error.message

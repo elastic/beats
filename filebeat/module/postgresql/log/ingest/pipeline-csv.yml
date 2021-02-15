@@ -2,7 +2,7 @@ description: Pipeline for parsing PostgreSQL CSV logs.
 processors:
 
 - csv:
-    field: message2
+    field: raw_message
     separator: ","
     target_fields: ["user.name",
                     "postgresql.log.database",
