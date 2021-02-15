@@ -19,7 +19,8 @@ package settings
 
 import (
 	"encoding/json"
-
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -48,10 +49,21 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return err
 	}
 
-	r.Event(mb.Event{
+	event := mb.Event{
 		ModuleFields:    res,
 		MetricSetFields: nil,
-	})
+		RootFields:      make(common.MapStr),
+	}
+
+	// Set service address
+	serviceAddress, err := res.GetValue("settings.transport_address")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
+		return event.Error
+	}
+	event.RootFields.Put("service.address", serviceAddress)
+
+	r.Event(event)
 
 	return nil
 }
