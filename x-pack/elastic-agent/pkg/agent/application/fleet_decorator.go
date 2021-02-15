@@ -54,7 +54,13 @@ func injectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.Ag
 			transpiler.NewKey("id", transpiler.NewStrVal(hostInfo.UniqueID)),
 		}))
 
-		fleet := transpiler.NewDict([]transpiler.Node{agent, token, kbn, host})
+		nodes := []transpiler.Node{agent, token, kbn, host}
+		server, ok := transpiler.Lookup(ast, "fleet.server")
+		if ok {
+			nodes = append(nodes, server)
+		}
+		fleet := transpiler.NewDict(nodes)
+
 		err = transpiler.Insert(rootAst, fleet, "fleet")
 		if err != nil {
 			return err

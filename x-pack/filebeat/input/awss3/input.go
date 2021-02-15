@@ -25,7 +25,7 @@ const inputName = "aws-s3"
 func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from s3",
 		Manager:    v2.ConfigureWith(configure),

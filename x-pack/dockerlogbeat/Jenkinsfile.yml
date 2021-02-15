@@ -21,3 +21,7 @@ stages:
     build:
         mage: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
+    packaging-linux:
+        packaging-linux: "mage package"
+        e2e:
+            enabled: false
