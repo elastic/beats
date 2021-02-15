@@ -299,7 +299,7 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-func ExampleXMLToJSON() {
+func ExampleDecoder_Decode() {
 	const xml = `
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
   <System>
