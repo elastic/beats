@@ -84,3 +84,9 @@ stages:
         e2e:
             enabled: false
             entrypoint: 'metricbeat-test.sh'
+    packaging-arm:
+        packaging-arm: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default label in this specific stage.
+          - "arm"

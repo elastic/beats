@@ -261,7 +261,21 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
-* This method runs the packaging
+* This method runs the packaging for ARM
+*/
+def packagingArm(Map args = [:]) {
+  PACKAGES = "docker"
+  def PLATFORMS = [ 'linux/arm64' ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}",
+    "PACKAGES=docker"
+  ]) {
+    target(args)
+  }
+}
+
+/**
+* This method runs the packaging for Linux
 */
 def packagingLinux(Map args = [:]) {
   def PLATFORMS = [ '+all',
@@ -284,7 +298,6 @@ def packagingLinux(Map args = [:]) {
     target(args)
   }
 }
-
 
 /**
 * Upload the packages to their snapshot or pull request buckets
@@ -919,6 +932,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     }
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+    }
+    if(args?.content?.containsKey('packaging-arm')) {
+      steps.packagingArm(context: args.context, command: args.content.get('packaging-arm'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
     }
     if(args?.content?.containsKey('packaging-linux')) {
       steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
