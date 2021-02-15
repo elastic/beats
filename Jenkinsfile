@@ -311,13 +311,10 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUpload(bucket: bucketUri,
+  googleStorageUploadExt(bucket: bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${beatsFolder}/build/distributions/",
     pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+    sharedPublicly: true)
 }
 
 /**
@@ -693,11 +690,10 @@ def archiveTestOutput(Map args = [:]) {
 */
 def tarAndUploadArtifacts(Map args = [:]) {
   tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-                      credentialsId: "${JOB_GCS_CREDENTIALS}",
-                      pattern: "${args.file}",
-                      sharedPublicly: true,
-                      showInline: true)
+  googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                         credentialsId: "${JOB_GCS_CREDENTIALS}",
+                         pattern: "${args.file}",
+                         sharedPublicly: true)
 }
 
 /**
