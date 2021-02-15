@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 287000000,
           "end": "2018-08-09T16:43:00.307Z",
           "kind": "event",
@@ -102,7 +101,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 30209000000,
           "end": "2018-08-09T16:43:01.317Z",
           "kind": "event",
@@ -188,7 +186,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 0,
           "end": "2018-08-09T16:43:01.41Z",
           "kind": "event",
@@ -274,7 +271,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 59651000000,
           "end": "2018-08-09T16:43:02.334Z",
           "kind": "event",
@@ -360,7 +356,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 40015000000,
           "end": "2018-08-09T16:43:02.876Z",
           "kind": "event",
@@ -446,7 +441,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 37121000000,
           "end": "2018-08-09T16:43:02.43Z",
           "kind": "event",
@@ -532,7 +526,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 31322000000,
           "end": "2018-08-09T16:43:02.43Z",
           "kind": "event",
@@ -618,7 +611,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 31226000000,
           "end": "2018-08-09T16:43:02.334Z",
           "kind": "event",
@@ -704,7 +696,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 30976000000,
           "end": "2018-08-09T16:43:02.334Z",
           "kind": "event",
@@ -790,7 +781,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2018-08-09T16:49:04Z",
           "duration": 0,
           "end": "2018-08-09T16:43:06.28Z",
           "kind": "event",

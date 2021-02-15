@@ -388,7 +388,7 @@ will be found under `rsa.raw`. The default is false.
 
 The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
 
-To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-s3.html[S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
+To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-aws-s3.html[AWS S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
 
 This fileset supports all 4 log types:
 - Proxy
@@ -409,7 +409,7 @@ Example config:
 - module: cisco
   umbrella:
     enabled: true
-    var.input: s3
+    var.input: aws-s3
     var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
     var.access_key_id: 123456
     var.secret_access_key: PASSWORD

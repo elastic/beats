@@ -50,9 +50,13 @@ It also supports the options described in <<module-http-config-options>>.
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-settings,settings>>
+
 * <<metricbeat-metricset-kibana-stats,stats>>
 
 * <<metricbeat-metricset-kibana-status,status>>
+
+include::kibana/settings.asciidoc[]
 
 include::kibana/stats.asciidoc[]
 

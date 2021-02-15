@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "kibana.settings",
+        "duration": 115000,
+        "module": "kibana"
+    },
+    "kibana": {
+        "elasticsearch": {
+            "cluster": {
+                "id": "qb5P5M_QSbWRsE1xA9MDKA"
+            }
+        },
+        "settings": {
+            "host": "0",
+            "index": ".kibana",
+            "locale": "en",
+            "name": "kibana",
+            "port": 5601,
+            "snapshot": false,
+            "status": "green",
+            "transport_address": "0:5601",
+            "uuid": "0c1eaf2c-1c7e-440e-b46e-6cc784daa879",
+            "version": "7.10.0"
+        }
+    },
+    "metricset": {
+        "name": "settings",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.20.0.3:5601",
+        "type": "kibana"
+    }
+}

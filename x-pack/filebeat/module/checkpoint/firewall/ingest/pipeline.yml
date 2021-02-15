@@ -309,9 +309,11 @@ processors:
     type: long
     ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: checkpoint.severity
     target_field: event.severity
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: checkpoint.action
@@ -859,6 +861,7 @@ processors:
     - checkpoint.xlatedst
     - checkpoint.uid
     - checkpoint.time
+    - checkpoint.severity
     - syslog5424_ts
     - _temp_
     ignore_missing: true

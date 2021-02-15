@@ -4,6 +4,8 @@
     Cluster stats
   release: ga
   fields:
+    - name: version
+      type: keyword
     - name: state
       type: group
       fields:
@@ -22,6 +24,10 @@
       type: group
       description: Nodes statistics.
       fields:
+      - name: fs.total.bytes
+        type: long
+      - name: fs.available.bytes
+        type: long
       - name: count
         type: long
         description: Total number of nodes in cluster.
@@ -47,6 +53,8 @@
       description: >
         Indices statistics.
       fields:
+      - name: store.size.bytes
+        type: long
       - name: total
         type: long
         description: >
@@ -56,6 +64,8 @@
         description: >
           Shard statistics.
         fields:
+        - name: docs.total
+          type: long
         - name: count
           type: long
           description: >
@@ -71,6 +81,8 @@
     - name: license
       type: group
       fields:
+      - name: expiry_date_in_millis
+        type: long
       - name: status
         type: keyword
       - name: type

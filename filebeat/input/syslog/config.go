@@ -47,7 +47,8 @@ var defaultConfig = config{
 
 type syslogTCP struct {
 	tcp.Config    `config:",inline"`
-	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
 }
 
 var defaultTCP = syslogTCP{
@@ -90,9 +91,9 @@ func factory(
 			return nil, err
 		}
 
-		splitFunc := streaming.SplitFunc([]byte(config.LineDelimiter))
-		if splitFunc == nil {
-			return nil, fmt.Errorf("error creating splitFunc from delimiter %s", config.LineDelimiter)
+		splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+		if err != nil {
+			return nil, err
 		}
 
 		logger := logp.NewLogger("input.syslog.tcp").With("address", config.Config.Host)

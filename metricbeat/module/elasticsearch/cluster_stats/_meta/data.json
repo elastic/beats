@@ -7,6 +7,9 @@
             "name": "docker-cluster",
             "stats": {
                 "indices": {
+                    "docs": {
+                        "total": 223
+                    },
                     "fielddata": {
                         "memory": {
                             "bytes": 0
@@ -16,14 +19,28 @@
                         "count": 8,
                         "primaries": 8
                     },
+                    "store": {
+                        "size": {
+                            "bytes": 11701629
+                        }
+                    },
                     "total": 8
                 },
                 "license": {
                     "status": "",
-                    "type": "platinum"
+                    "type": "platinum",
+                    "expiry_date_in_millis": 0
                 },
                 "nodes": {
                     "count": 1,
+                    "fs": {
+                        "available": {
+                            "bytes": 182713794560
+                        },
+                        "total": {
+                            "bytes": 958613114880
+                        }
+                    },
                     "jvm": {
                         "max_uptime": {
                             "ms": 17857098
@@ -69,7 +86,8 @@
                 },
                 "status": "yellow"
             }
-        }
+        },
+        "version": 65
     },
     "event": {
         "dataset": "elasticsearch.cluster.stats",
@@ -81,7 +99,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:36567",
+        "address": "127.0.0.1:34983",
         "type": "elasticsearch"
     }
 }
