@@ -1,0 +1,20 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 60m
+  - name: first_interval
+    default: 24h
+  - name: api_token
+  - name: ssl
+  - name: filters
+  - name: url
+    default: "https://localhost/events/restSearch"
+  - name: tags
+    default: [threatintel-misp, forwarded]
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml
