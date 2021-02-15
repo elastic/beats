@@ -8,7 +8,9 @@ auth.basic.user: {{ .username }}
 auth.basic.password: {{ .password }}
 
 request.method: GET
-request.ssl: {{ .ssl | tojson }}
+{{ if .ssl }}
+  - request.ssl: {{ .ssl | tojson }}
+{{ end }}
 request.url: {{ .url }}
 request.redirect.forward_headers: true
 request.transforms:

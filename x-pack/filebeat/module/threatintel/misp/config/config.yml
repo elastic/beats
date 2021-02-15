@@ -5,7 +5,9 @@ config_version: "2"
 interval: {{ .interval }}
 
 request.method: POST
-request.ssl: {{ .ssl | tojson }}
+{{ if .ssl }}
+  - request.ssl: {{ .ssl | tojson }}
+{{ end }}
 request.url: {{ .url }}
 request.body:
     limit: 100
