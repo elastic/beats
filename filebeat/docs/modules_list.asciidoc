@@ -63,6 +63,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
+  * <<filebeat-module-threatintel>>
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
@@ -133,6 +134,7 @@ include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/threatintel.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]

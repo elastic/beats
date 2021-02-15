@@ -84,6 +84,7 @@ grouped in the following categories:
 * <<exported-fields-squid>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
+* <<exported-fields-threatintel>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
@@ -142471,6 +142472,1423 @@ alias to: process.pid
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-threatintel]]
+== threatintel fields
+
+Threat intelligence Filebeat Module.
+
+
+
+[float]
+=== threatintel
+
+Fields from the threatintel Filebeat module.
+
+
+
+*`threatintel.indicator.first_seen`*::
++
+--
+The date and time when intelligence source first reported sighting this indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.last_seen`*::
++
+--
+The date and time when intelligence source last reported sighting this indicator.
+
+
+type: date
+
+--
+
+*`threatintel.indicator.sightings`*::
++
+--
+Number of times this indicator was observed conducting threat activity.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.type`*::
++
+--
+Type of indicator as represented by Cyber Observable in STIX 2.0. Expected values
+  * autonomous-system
+  * artifact
+  * directory
+  * domain-name
+  * email-addr
+  * file
+  * ipv4-addr
+  * ipv6-addr
+  * mac-addr
+  * mutex
+  * process
+  * software
+  * url
+  * user-account
+  * windows-registry-key
+  * x-509-certificate
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.description`*::
++
+--
+Describes the type of action conducted by the threat.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.scanner_stats`*::
++
+--
+Count of AV/EDR vendors that successfully detected malicious file or URL.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.provider`*::
++
+--
+Identifies the name of the intelligence provider.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.confidence`*::
++
+--
+Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values
+  * Not Specified, None, Low, Medium, High
+  * 0-10
+  * Admirality Scale (1-6)
+  * DNI Scale (5-95)
+  * WEP Scale (Impossible - Certain)
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.module`*::
++
+--
+Identifies the name of specific module this data is coming from.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.dataset`*::
++
+--
+Identifies the name of specific dataset from the intelligence source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.ip`*::
++
+--
+Identifies a threat indicator as an IP address (irrespective of direction).
+
+
+type: ip
+
+--
+
+*`threatintel.indicator.domain`*::
++
+--
+Identifies a threat indicator as a domain (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.port`*::
++
+--
+Identifies a threat indicator as a port number (irrespective of direction).
+
+
+type: long
+
+--
+
+*`threatintel.indicator.email.address`*::
++
+--
+Identifies a threat indicator as an email address (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.marking.tlp`*::
++
+--
+Traffic Light Protocol sharing markings. Expected values are:
+  * White
+  * Green
+  * Amber
+  * Red
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.matched.atomic`*::
++
+--
+Identifies the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.field`*::
++
+--
+Identifies the field of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.type`*::
++
+--
+Identifies the type of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`threatintel.indicator.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`threatintel.indicator.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+
+*`threatintel.indicator.registry.data.strings`*::
++
+--
+Content when writing string types. Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`threatintel.indicator.registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`threatintel.indicator.registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
+*`threatintel.indicator.registry.key`*::
++
+--
+Registry key value
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.geo.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`threatintel.indicator.geo.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`threatintel.indicator.geo.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`threatintel.indicator.geo.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`threatintel.indicator.geo.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`threatintel.indicator.geo.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`threatintel.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+
+
+*`threatintel.indicator.file.hash.tlsh`*::
++
+--
+The file's import tlsh, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.ssdeep`*::
++
+--
+The file's ssdeep hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.md5`*::
++
+--
+The file's md5 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha1`*::
++
+--
+The file's sha1 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha256`*::
++
+--
+The file's sha256 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha512`*::
++
+--
+The file's sha512 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.type`*::
++
+--
+The file type
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.size`*::
++
+--
+The file's total size
+
+
+type: long
+
+--
+
+*`threatintel.indicator.file.name`*::
++
+--
+The file's name
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.extension`*::
++
+--
+The field contains the file extension from the original request
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.original`*::
++
+--
+Unmodified original url as seen in the event source. Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.password`*::
++
+--
+Password of the request.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.path`*::
++
+--
+Path of the request, such as "/search".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.port`*::
++
+--
+Port of the request, such as 443.
+
+
+type: long
+
+format: string
+
+--
+
+*`threatintel.indicator.url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch". The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain. For example, the registered domain for "foo.example.com" is "example.com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain. For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.username`*::
++
+--
+Username of the request.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threatintel.indicator.x509.issuer`*::
++
+--
+Name of issuing certificate authority. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threatintel.indicator.x509.subject`*::
++
+--
+Name of the certificate subject entity. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threatintel.indicator.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+[float]
+=== abusemalware
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abusemalware.file_type`*::
++
+--
+File type guessed by URLhaus.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.urlhaus_download`*::
++
+--
+Location (URL) where you can download a copy of this file.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.result`*::
++
+--
+AV detection ration.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.percent`*::
++
+--
+AV detection in percent.
+
+
+type: float
+
+--
+
+*`threatintel.abusemalware.virustotal.link`*::
++
+--
+Link to the Virustotal report.
+
+
+type: keyword
+
+--
+
+[float]
+=== abuseurl
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abuseurl.id`*::
++
+--
+The ID of the url.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.urlhaus_reference`*::
++
+--
+Link to URLhaus entry.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.url_status`*::
++
+--
+The current status of the URL. Possible values are: online, offline and unknown.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.threat`*::
++
+--
+The threat corresponding to this malware URL.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.surbl`*::
++
+--
+SURBL blacklist status. Possible values are: listed and not_listed
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.spamhaus_dbl`*::
++
+--
+Spamhaus DBL blacklist status.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.reporter`*::
++
+--
+The Twitter handle of the reporter that has reported this malware URL (or anonymous).
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.larted`*::
++
+--
+Indicates whether the malware URL has been reported to the hosting provider (true or false)
+
+
+type: boolean
+
+--
+
+*`threatintel.abuseurl.tags`*::
++
+--
+A list of tags associated with the queried malware URL
+
+
+type: keyword
+
+--
+
+[float]
+=== anomali
+
+Fields for Anomali Threat Intel
+
+
+
+*`threatintel.anomali.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.name`*::
++
+--
+The name of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.pattern`*::
++
+--
+The pattern ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.valid_from`*::
++
+--
+When the indicator was first found or is considered valid.
+
+
+type: date
+
+--
+
+*`threatintel.anomali.modified`*::
++
+--
+When the indicator was last modified
+
+
+type: date
+
+--
+
+*`threatintel.anomali.labels`*::
++
+--
+The labels related to the indicator
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.object_marking_refs`*::
++
+--
+The STIX reference object.
+
+
+type: keyword
+
+--
+
+[float]
+=== misp
+
+Fields for MISP Threat Intel
+
+
+
+*`threatintel.misp.id`*::
++
+--
+Attribute ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc_id`*::
++
+--
+Organization Community ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org_id`*::
++
+--
+Organization ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.threat_level_id`*::
++
+--
+Threat level from 5 to 1, where 1 is the most critical.
+
+
+type: long
+
+--
+
+*`threatintel.misp.info`*::
++
+--
+Additional text or information related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.published`*::
++
+--
+When the event was published.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.uuid`*::
++
+--
+The UUID of the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.date`*::
++
+--
+The date of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute_count`*::
++
+--
+How many attributes are included in a single event object.
+
+
+type: long
+
+--
+
+*`threatintel.misp.timestamp`*::
++
+--
+The timestamp of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.distribution`*::
++
+--
+Distribution type related to MISP.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.proposal_email_lock`*::
++
+--
+Settings configured on MISP for email lock on this event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.locked`*::
++
+--
+If the current MISP event object is locked or not.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.publish_timestamp`*::
++
+--
+At what time the event object was published
+
+
+type: date
+
+--
+
+*`threatintel.misp.sharing_group_id`*::
++
+--
+The ID of the grouped events or sources of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.disable_correlation`*::
++
+--
+If correlation is disabled on the MISP event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.extends_uuid`*::
++
+--
+The UUID of the event object it might extend.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.id`*::
++
+--
+The organization ID related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.name`*::
++
+--
+The organization name related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.uuid`*::
++
+--
+The UUID of the organization related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.local`*::
++
+--
+If the event object is local or from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.orgc.id`*::
++
+--
+The Organization Community ID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.name`*::
++
+--
+The Organization Community name in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.uuid`*::
++
+--
+The Organization Community UUID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.local`*::
++
+--
+If the Organization Community was local or synced from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.id`*::
++
+--
+The ID of the attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.type`*::
++
+--
+The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.category`*::
++
+--
+The category of the attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.to_ids`*::
++
+--
+If the attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.uuid`*::
++
+--
+The UUID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.event_id`*::
++
+--
+The local event ID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.distribution`*::
++
+--
+How the attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.attribute.timestamp`*::
++
+--
+The timestamp in which the attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute.comment`*::
++
+--
+Comments made to the attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.deleted`*::
++
+--
+If the attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.object_id`*::
++
+--
+The ID of the Object in which the attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.object_relation`*::
++
+--
+The type of relation the attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
+[float]
+=== otx
+
+Fields for OTX Threat Intel
+
+
+
+*`threatintel.otx.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
 
 --
 
