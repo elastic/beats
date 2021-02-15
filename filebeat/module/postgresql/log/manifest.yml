@@ -4,7 +4,7 @@ var:
   - name: paths
     default:
       - /var/log/postgresql/postgresql-*-*.log*
-      - /var/log/postgresql/postgresql-*-*.csv
+      - /var/log/postgresql/postgresql-*-*.csv*
     os.darwin:
       - /usr/local/var/postgres/*.log*
       - /usr/local/var/postgres/*.csv
