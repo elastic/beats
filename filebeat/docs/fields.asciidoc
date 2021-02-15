@@ -105728,11 +105728,17 @@ State code returned by Postgres (if any). This code is not a number. See also ht
 *`postgresql.log.detail`*::
 +
 --
+More information about the message, parameters in case of a parametrized query. e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
+
+
 --
 
 *`postgresql.log.hint`*::
 +
 --
+A possible solution to solve an error.
+
+
 --
 
 *`postgresql.log.internal_query`*::
@@ -105800,7 +105806,9 @@ deprecated:[8.0.0]
 Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
 
 
-type: keyword
+type: alias
+
+alias to: postresql.log.sql_state_code
 
 --
 

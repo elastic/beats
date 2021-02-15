@@ -62,7 +62,12 @@
         This code is not a number.
         See also https://www.postgresql.org/docs/current/errcodes-appendix.html
     - name: detail
+      description: >
+        More information about the message, parameters in case of a parametrized query.
+        e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
     - name: hint
+      description: >
+        A possible solution to solve an error.
     - name: internal_query
       description: internal query that led to the error (if any).
     - name: internal_query_pos
@@ -87,7 +92,8 @@
         In addition, background workers registered by extensions may have additional types.
 
     - name: error.code
-      type: keyword
+      type: alias
+      path: postresql.log.sql_state_code
       description: >
         Error code returned by Postgres (if any).
         Deprecated: errors can have letters. Use sql_state_code instead.
