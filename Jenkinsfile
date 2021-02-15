@@ -311,7 +311,7 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUploadExt(bucket: bucket: bucketUri,
+  googleStorageUploadExt(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
     pattern: "${beatsFolder}/build/distributions/**/*",
     sharedPublicly: true)

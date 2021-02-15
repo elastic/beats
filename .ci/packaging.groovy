@@ -448,14 +448,11 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }
 
-def uploadPackages(bucketUri, baseDir){
-  googleStorageUpload(bucket: bucketUri,
+def uploadPackages(bucketUri, beatsFolder){
+  googleStorageUploadExt(bucket: bucketUri,
     credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+    pattern: "${beatsFolder}/build/distributions/**/*",
+    sharedPublicly: true)
 }
 
 /**
