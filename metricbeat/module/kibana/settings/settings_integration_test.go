@@ -17,7 +17,7 @@
 
 // +build integration
 
-package stats
+package settings
 
 import (
 	"encoding/json"
@@ -38,7 +38,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("settings", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -57,13 +57,13 @@ func TestFetch(t *testing.T) {
 	require.NotEmpty(t, events)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("kibana", "stats").Fields.StringToPrint())
+		events[0].BeatEvent("kibana", "settings").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "kibana")
 
-	config := mtest.GetConfig("stats", service.Host(), false)
+	config := mtest.GetConfig("settings", service.Host(), false)
 	host := config["hosts"].([]string)[0]
 	version, err := getKibanaVersion(t, host)
 	require.NoError(t, err)
@@ -72,7 +72,7 @@ func TestData(t *testing.T) {
 	require.NoError(t, err)
 
 	if !isStatsAPIAvailable {
-		t.Skip("Kibana stats API is not available until 6.4.0")
+		t.Skip("Kibana settings API is not available until 6.4.0")
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -81,7 +81,7 @@ func TestData(t *testing.T) {
 }
 
 func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
-	resp, err := http.Get("http://" + kibanaHostPort + "/" + kibana.StatusPath)
+	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, err
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		t.Log("Kibana GET /"+kibana.StatusPath+" response:", string(body))
+		t.Log("Kibana GET /api/status response:", string(body))
 		return nil, err
 	}
 

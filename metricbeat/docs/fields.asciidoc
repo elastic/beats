@@ -29590,6 +29590,101 @@ alias to: kibana.stats.usage.index
 --
 
 [float]
+=== settings
+
+Kibana stats and run-time metrics.
+
+
+
+*`kibana.settings.uuid`*::
++
+--
+Kibana instance UUID
+
+
+type: keyword
+
+--
+
+*`kibana.settings.name`*::
++
+--
+Kibana instance name
+
+
+type: keyword
+
+--
+
+*`kibana.settings.index`*::
++
+--
+Name of Kibana's internal index
+
+type: keyword
+
+--
+
+*`kibana.settings.host`*::
++
+--
+Kibana instance hostname
+
+type: keyword
+
+--
+
+*`kibana.settings.transport_address`*::
++
+--
+Kibana server's hostname and port
+
+type: keyword
+
+--
+
+*`kibana.settings.version`*::
++
+--
+Kibana version
+
+type: keyword
+
+--
+
+*`kibana.settings.snapshot`*::
++
+--
+Whether the Kibana build is a snapshot build
+
+type: boolean
+
+--
+
+*`kibana.settings.status`*::
++
+--
+Kibana instance's health status
+
+type: keyword
+
+--
+
+*`kibana.settings.locale`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.settings.port`*::
++
+--
+type: integer
+
+--
+
+[float]
 === stats
 
 Kibana stats and run-time metrics.

@@ -33,7 +33,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
-		mb.WithNamespace("elasticsearch.index"),
+		mb.DefaultMetricSet(),
 	)
 }
 

@@ -15,12 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package stats
+package settings
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -31,7 +29,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(kibana.ModuleName, "stats", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "settings", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -39,27 +37,21 @@ func init() {
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		DefaultPath:   kibana.StatsPath,
+		DefaultPath:   kibana.SettingsPath,
 		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	*kibana.MetricSet
-	statsHTTP         *helper.HTTP
-	isUsageExcludable bool
+	mb.BaseMetricSet
+	settingsHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := kibana.NewMetricSet(base)
-	if err != nil {
-		return nil, err
-	}
-
 	return &MetricSet{
-		MetricSet: ms,
+		BaseMetricSet: base,
 	}, nil
 }
 
@@ -68,55 +60,35 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	if err = m.init(); err != nil {
-		return err
+		return
 	}
 
-	if err = m.fetchStats(r); err != nil {
-		return errors.Wrap(err, "error trying to get stats data from Kibana")
-	}
-
-	return
-}
-
-func (m *MetricSet) init() error {
-	statsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		return err
-	}
-
-	kibanaVersion, err := kibana.GetVersion(statsHTTP, kibana.StatsPath)
-	if err != nil {
-		return err
-	}
-
-	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
-	if !isStatsAPIAvailable {
-		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
-	}
-
-	m.statsHTTP = statsHTTP
-	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
-
-	return nil
-}
-
-func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
-	var content []byte
-	var err error
-
-	// Add exclude_usage=true if the Kibana Version supports it
-	if m.isUsageExcludable {
-		origURI := m.statsHTTP.GetURI()
-		defer m.statsHTTP.SetURI(origURI)
-
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
-	}
-
-	content, err = m.statsHTTP.FetchContent()
-	if err != nil {
-		return err
+		return
 	}
 
 	return eventMapping(r, content)
+}
+
+func (m *MetricSet) init() (err error) {
+	httpHelper, err := helper.NewHTTP(m.BaseMetricSet)
+	if err != nil {
+		return err
+	}
+
+	kibanaVersion, err := kibana.GetVersion(httpHelper, kibana.SettingsPath)
+	if err != nil {
+		return err
+	}
+
+	isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+	if !isSettingsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
+	}
+
+	m.settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
+
+	return
 }

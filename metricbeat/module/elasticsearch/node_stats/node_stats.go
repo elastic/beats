@@ -57,10 +57,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err := m.updateServiceURI(); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 

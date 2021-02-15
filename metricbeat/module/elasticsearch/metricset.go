@@ -78,7 +78,6 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	XPack bool
 	Scope Scope
 }
 
@@ -91,10 +90,8 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack bool  `config:"xpack.enabled"`
 		Scope Scope `config:"scope"`
 	}{
-		XPack: false,
 		Scope: ScopeNode,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -105,7 +102,6 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		base,
 		servicePath,
 		http,
-		config.XPack,
 		config.Scope,
 	}
 

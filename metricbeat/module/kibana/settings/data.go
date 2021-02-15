@@ -15,36 +15,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat_test
+package settings
 
 import (
-	"testing"
+	"encoding/json"
 
-	"github.com/stretchr/testify/require"
+	"github.com/pkg/errors"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/beat"
-
-	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/state"
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
+	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func TestXPackEnabledMetricsets(t *testing.T) {
-	config := map[string]interface{}{
-		"module":        beat.ModuleName,
-		"hosts":         []string{"foobar:5066"},
-		"xpack.enabled": true,
+func eventMapping(r mb.ReporterV2, content []byte) error {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Kibana API response")
 	}
 
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 2)
-	for _, ms := range metricSets {
-		name := ms.Name()
-		switch name {
-		case "state", "stats":
-		default:
-			t.Errorf("unexpected metricset name = %v", name)
-		}
+	schema := s.Schema{
+		"elasticsearch": s.Object{
+			"cluster": s.Object{
+				"id": c.Str("cluster_uuid"),
+			},
+		},
+		"settings": c.Ifc("settings.kibana"),
 	}
+
+	res, err := schema.Apply(data)
+	if err != nil {
+		return err
+	}
+
+	r.Event(mb.Event{
+		ModuleFields:    res,
+		MetricSetFields: nil,
+	})
+
+	return nil
 }
