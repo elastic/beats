@@ -227,17 +227,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
-- Remove io.time from windows {pull}22237[22237]
-- Change Session ID type from int to string {pull}22359[22359]
-- Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
-- Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
-- Stop generating NaN values from Cloud Foundry module to avoid errors in outputs. {pull}22634[22634]
-- Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
-- Fix rate metrics in Kafka broker metricset by using last minute rate instead of mean rate. {pull}22733[22733]
-- Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
-- Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
-- Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
-- Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
 
 *Packetbeat*
