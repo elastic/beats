@@ -9,7 +9,7 @@
         The timestamp from the log line.
     - name: core_id
       type: alias
-      path: session_line_number
+      path: postgresql.log.session_line_number
       description: >
         Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number)
       deprecated: 8.0.0
@@ -111,4 +111,3 @@
       type: alias
       path: message
       migration: true
-
