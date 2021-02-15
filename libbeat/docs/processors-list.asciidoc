@@ -110,6 +110,9 @@ endif::[]
 ifndef::no_urldecode_processor[]
 * <<urldecode, `urldecode`>>
 endif::[]
+ifndef::no_decode_xml_processor[]
+* <<decode_xml, `decode_xml`>>
+endif::[]
 //# end::processors-list[]
 
 //# tag::processors-include[]
@@ -224,6 +227,9 @@ include::{libbeat-processors-dir}/actions/docs/truncate_fields.asciidoc[]
 endif::[]
 ifndef::no_urldecode_processor[]
 include::{libbeat-processors-dir}/urldecode/docs/urldecode.asciidoc[]
+endif::[]
+ifndef::no_decode_xml_processor[]
+include::{libbeat-processors-dir}/decode_xml/docs/decode_xml.asciidoc[]
 endif::[]
 
 //# end::processors-include[]

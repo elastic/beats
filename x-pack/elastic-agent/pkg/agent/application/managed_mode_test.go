@@ -39,7 +39,7 @@ func TestManagedModeRouting(t *testing.T) {
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)
-	emit, err := emitter(ctx, log, agentInfo, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}})
+	emit, err := emitter(ctx, log, agentInfo, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}}, nil)
 	require.NoError(t, err)
 
 	actionDispatcher, err := newActionDispatcher(ctx, log, &handlerDefault{log: log})

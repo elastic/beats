@@ -6,6 +6,8 @@
 
 package install
 
+import "strings"
+
 const (
 	// BinaryName is the name of the installed binary.
 	BinaryName = "elastic-agent.exe"
@@ -25,3 +27,8 @@ const (
 	// ShellWrapper is the wrapper that is installed.
 	ShellWrapper = "" // no wrapper on Windows
 )
+
+// ArePathsEqual determines whether paths are equal taking case sensitivity of os into account.
+func ArePathsEqual(expected, actual string) bool {
+	return strings.EqualFold(expected, actual)
+}
