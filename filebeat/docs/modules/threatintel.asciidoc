@@ -12,7 +12,7 @@ This file is generated! See scripts/docs_collector.py
 == Threat Intel module
 beta[]
 
-This module is a collection of different threat intelligence sources. The ingested data is meant to be used with [Indicator Match rules]https://www.elastic.co/guide/en/security/7.11/rules-ui-create.html#create-indicator-rule, but are also
+This module is a collection of different threat intelligence sources. The ingested data is meant to be used with [Indicator Match rules]https://www.elastic.co/guide/en/security/7.11/rules-ui-create.html#create-indicator-rule, but is also
 compatible with other features like [Enrich Processors]https://www.elastic.co/guide/en/elasticsearch/reference/current/enrich-processor.html.
 The related threat intel attribute that is meant to be used for matching incoming source data is stored under the `threatintel.indicator.*` fields.
 
