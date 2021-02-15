@@ -36,6 +36,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
+var availableMLModules = map[string]string{
+	"apache": "access",
+	"nginx":  "access",
+}
+
 const logName = "modules"
 
 type ModuleRegistry struct {
