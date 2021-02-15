@@ -4,13 +4,19 @@ type: httpjson
 config_version: "2"
 interval: {{ .interval }}
 
+{{ if .client_id }}
 auth.basic.user: {{ .client_id }}
+{{ end }}
+{{ if .api_key }}
 auth.basic.password: {{ .api_key }}
+{{ end }}
 
 request.url: {{ .url }}
 request.method: GET
 request.timeout: {{ .request_timeout }}
+{{ if .ssl }}
 request.ssl: {{ .ssl | tojson }}
+{{ end }}
 request.transforms:
 - set:
     target: url.params.start_date

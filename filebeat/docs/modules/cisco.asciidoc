@@ -453,7 +453,7 @@ The Cisco AMP fileset focuses on collecting events from your Cisco AMP/Cisco Sec
 To configure the Cisco AMP fileset you will need to retrieve your `client_id` and `api_key` from the AMP dashboard.
 For more information on how to retrieve these credentials, please reference the https://api-docs.amp.cisco.com/api_resources?api_host=api.amp.cisco.com&api_version=v1[Cisco AMP API documentation].
 
-The URL configured for the API depends on which region your AMP is located, currently there is 3 choices:
+The URL configured for the API depends on which region your AMP is located, currently there are three choices:
 - api.amp.cisco.com
 - api.apjc.amp.cisco.com
 - api.eu.amp.cisco.com
@@ -515,7 +515,7 @@ timeout value for each request sent by Filebeat.
 
 *`var.first_interval`*::
 
-How far back you would want to collect events the first time the Filebeat module starts up. Supports amount in hours.
+How far back you would want to collect events the first time the Filebeat module starts up. Supports amount in hours(example: 24h), minutes(example: 10m) and seconds(example: 50s).
 
 *`var.limit`*::
 

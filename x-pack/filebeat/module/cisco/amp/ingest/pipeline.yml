@@ -284,24 +284,29 @@ processors:
     field: related.hosts
     value: "{{ host.name }}"
     if: ctx?.host?.name != null
+    allow_duplicates: false
 - append:
     field: related.ip
     value: "{{ source.ip }}"
     if: ctx?.source?.ip != null
+    allow_duplicates: false
 - append:
     field: related.ip
     value: "{{ destination.ip }}"
     if: ctx?.destination?.ip != null
+    allow_duplicates: false
 - append:
     field: related.ip
     value: "{{ cisco.amp.computer.external_ip }}"
     if: ctx?.cisco?.amp?.computer?.external_ip != null
+    allow_duplicates: false
 - foreach:
     field: cisco.amp.computer.network_addresses
     processor:
       append:
         field: related.ip
         value: "{{ _ingest._value.ip }}"
+        allow_duplicates: false
     if: ctx?.cisco?.amp?.computer?.network_addresses != null
 - foreach:
     field: cisco.amp.computer.network_addresses
@@ -309,6 +314,7 @@ processors:
       append:
         field: cisco.amp.related.mac
         value: "{{ _ingest._value.mac }}"
+        allow_duplicates: false
     if: ctx?.cisco?.amp?.computer?.network_addresses != null
 - foreach:
     field: cisco.amp.vulnerabilities
@@ -316,6 +322,7 @@ processors:
       append:
         field: cisco.amp.related.cve
         value: "{{ _ingest._value.cve }}"
+        allow_duplicates: false
     if: ctx?.cisco?.amp?.vulnerabilities != null
 
 #############
@@ -382,8 +389,10 @@ processors:
     ignore_failure: true
     if: ctx?.cisco?.amp?.threat_hunting?.incident_end_time != null
 
+
 - script:
     lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
     if: ctx?.json != null
     source: |
       void handleMap(Map map) {
@@ -394,7 +403,7 @@ processors:
               handleList(x);
           }
         }
-      map.values().removeIf(v -> v == null);
+        map.values().removeIf(v -> v == null);
       }
       void handleList(List list) {
         for (def x : list) {
