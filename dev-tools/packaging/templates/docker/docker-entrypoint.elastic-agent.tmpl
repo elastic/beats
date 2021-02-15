@@ -41,7 +41,7 @@ function enroll(){
       local apikeyId=$(echo $enrollResp | jq -r '.list[] | select((.name | startswith("Default ")) and (.active == true)) | .id')
       echo $apikeyId
 
-      if [[ -z "${$apikeyId}" ]]; then
+      if [[ -z "${apikeyId}" ]]; then
         echo "Default agent policy was not found. Please consider using own enrollment token (FLEET_ENROLLMENT_TOKEN)."
         exit 1
       fi
