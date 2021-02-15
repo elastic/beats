@@ -51,7 +51,7 @@ processors:
     field: event.type
     value:
       - error
-    if: "ctx?.postgresql?.log?.error?.code != null && ctx.postgresql.log.error.code >= 02000"
+    if: "ctx.postgresql.log.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
 - append:
     field: related.user
     value: "{{user.name}}"
