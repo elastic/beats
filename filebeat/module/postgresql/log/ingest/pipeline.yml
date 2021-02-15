@@ -47,11 +47,12 @@ processors:
     field: event.type
     value:
       - info
+    if: "ctx?.postgresql?.log?.sql_state_code == null || (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
 - append:
     field: event.type
     value:
       - error
-    if: "ctx.postgresql.log.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
+    if: "ctx?.postgresql?.log?.sql_state_code != null && ! (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
 - append:
     field: related.user
     value: "{{user.name}}"
