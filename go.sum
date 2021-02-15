@@ -740,8 +740,8 @@ go.elastic.co/apm/module/apmelasticsearch v1.7.2 h1:5STGHLZLSeAzxordMc+dFVKiyVtM
 go.elastic.co/apm/module/apmelasticsearch v1.7.2/go.mod h1:ZyNFuyWdt42GBZkz0SogoLzDBrBGj4orxpiUuxYeYq8=
 go.elastic.co/apm/module/apmhttp v1.7.2 h1:2mRh7SwBuEVLmJlX+hsMdcSg9xaielCLElaPn/+i34w=
 go.elastic.co/apm/module/apmhttp v1.7.2/go.mod h1:sTFWiWejnhSdZv6+dMgxGec2Nxe/ZKfHfz/xtRM+cRY=
-go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193 h1:NjYJ/beChqugXSavTkH5tF6shvr/is8jdgJ331wfwT8=
-go.elastic.co/ecszap v0.1.1-0.20200424093508-cdd95a104193/go.mod h1:HTUi+QRmr3EuZMqxPX+5fyOdMNfUu5iPebgfhgsTJYQ=
+go.elastic.co/ecszap v0.3.0 h1:Zo/Y4sJLqbWDlqCHI4F4Lzeg0Fs4+n5ldVis4h9xV8w=
+go.elastic.co/ecszap v0.3.0/go.mod h1:HTUi+QRmr3EuZMqxPX+5fyOdMNfUu5iPebgfhgsTJYQ=
 go.elastic.co/fastjson v1.0.0/go.mod h1:PmeUOMMtLHQr9ZS9J9owrAVg0FkaZDRZJEFTTGHtchs=
 go.elastic.co/fastjson v1.1.0 h1:3MrGBWWVIxe/xvsbpghtkFoPciPhOCmjsR/HfwEeQR4=
 go.elastic.co/fastjson v1.1.0/go.mod h1:boNGISWMjQsUPy/t6yqt2/1Wx4YNPSe+mZjlyw9vKKI=

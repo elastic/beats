@@ -225,7 +225,7 @@ func PythonVirtualenv() (string, error) {
 	}
 
 	// Ensure we are using the latest pip version.
-	if err = pipUpgrade("pip"); err != nil {
+	if err = pipUpgrade("pip==20.3.4"); err != nil {
 		fmt.Printf("warn: failed to upgrade pip (ignoring): %v", err)
 	}
 

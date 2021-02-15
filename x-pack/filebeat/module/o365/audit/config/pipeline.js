@@ -157,7 +157,7 @@ function makeDictFromModifiedPropertyArray(options) {
             if (src[i] == null
                 || (name=src[i].Name) == null
                 || (newValue=src[i].NewValue) == null
-                || (oldValue=src[i].OldValue)) continue;
+                || (oldValue=src[i].OldValue) == null) continue;
             name = validFieldName(name);
             if (name in dict) {
                 if (dict[name].NewValue instanceof Array) {
