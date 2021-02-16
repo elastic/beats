@@ -86603,6 +86603,13 @@ type: object
 
 --
 
+*`logstash.log.log_event.action`*::
++
+--
+type: keyword
+
+--
+
 *`logstash.log.pipeline_id`*::
 +
 --
