@@ -79,10 +79,11 @@ type MetricOption interface {
 	Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr)
 }
 
-// OpFilter only processes metrics matching the given filter
-func OpFilter(filter map[string]string) MetricOption {
-	return opFilter{
-		labels: filter,
+// OpFilterMap only processes metrics matching the given filter
+func OpFilterMap(label string, filterMap map[string]string) MetricOption {
+	return opFilterMap{
+		label:     label,
+		filterMap: filterMap,
 	}
 }
 
@@ -331,18 +332,22 @@ func (m *infoMetric) GetField() string {
 	return ""
 }
 
-type opFilter struct {
-	labels map[string]string
+type opFilterMap struct {
+	label     string
+	filterMap map[string]string
 }
 
-// Process will return nil if labels don't match the filter
-func (o opFilter) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
-	for k, v := range o.labels {
-		if labels[k] != v {
-			return "", nil, nil
+// Called by the Prometheus helper to apply extra options on retrieved metrics
+// Check whether the value of the specified label is allowed and, if yes, return the metric via the specified mapped field
+// Else, if the specified label does not match the filter, return nil
+// This is useful in cases where multiple Metricbeat fields need to be defined per Prometheus metric, based on label values
+func (o opFilterMap) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	for k, v := range o.filterMap {
+		if labels[o.label] == k {
+			return fmt.Sprintf("%v.%v", field, v), value, labels
 		}
 	}
-	return field, value, labels
+	return "", nil, nil
 }
 
 type opLowercaseValue struct{}

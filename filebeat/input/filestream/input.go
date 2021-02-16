@@ -159,7 +159,7 @@ func (inp *filestream) Run(
 		return err
 	}
 
-	_, streamCancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {

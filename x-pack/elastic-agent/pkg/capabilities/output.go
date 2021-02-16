@@ -7,6 +7,8 @@ package capabilities
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -129,8 +131,9 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 		outputs[outputName] = output
 
 		if !isSupported {
-			c.log.Errorf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
-			c.reporter.Update(status.Degraded)
+			msg := fmt.Sprintf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
+			c.log.Errorf(msg)
+			c.reporter.Update(state.Degraded, msg)
 		}
 	}
 
