@@ -66,11 +66,7 @@ func TestData(t *testing.T) {
 
 func TestActions(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
-
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/22518")
-	}
-
+	
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
