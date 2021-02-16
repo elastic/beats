@@ -2326,7 +2326,7 @@ type: scaled_float
 
 --
 
-*`aws.ec2.diskio.read.ops`*::
+*`aws.ec2.diskio.read.count`*::
 +
 --
 Total completed read operations from all instance store volumes available to the instance in collection period.
@@ -2336,7 +2336,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.read.ops_per_sec`*::
+*`aws.ec2.diskio.read.count_per_sec`*::
 +
 --
 Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
@@ -2346,7 +2346,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops`*::
+*`aws.ec2.diskio.write.count`*::
 +
 --
 Total completed write operations to all instance store volumes available to the instance in collection period.
@@ -2356,7 +2356,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops_per_sec`*::
+*`aws.ec2.diskio.write.count_per_sec`*::
 +
 --
 Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
