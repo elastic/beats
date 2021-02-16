@@ -15,6 +15,22 @@
           type: boolean
           description: >
             Node unschedulable status
+        - name: memory_pressure
+          type: boolean
+          description: >
+            Node MemoryPressure status
+        - name: disk_pressure
+          type: boolean
+          description: >
+            Node DiskPressure status
+        - name: out_of_disk
+          type: boolean
+          description: >
+            Node OutOfDisk status
+        - name: pid_pressure
+          type: boolean
+          description: >
+            Node PIDPressure status
     - name: cpu
       type: group
       fields:
