@@ -29837,6 +29837,46 @@ type: boolean
 
 --
 
+*`kubernetes.node.status.memory_pressure`*::
++
+--
+Node MemoryPressure status
+
+
+type: boolean
+
+--
+
+*`kubernetes.node.status.disk_pressure`*::
++
+--
+Node DiskPressure status
+
+
+type: boolean
+
+--
+
+*`kubernetes.node.status.out_of_disk`*::
++
+--
+Node OutOfDisk status
+
+
+type: boolean
+
+--
+
+*`kubernetes.node.status.pid_pressure`*::
++
+--
+Node PIDPressure status
+
+
+type: boolean
+
+--
+
 
 *`kubernetes.node.cpu.allocatable.cores`*::
 +

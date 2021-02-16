@@ -41,7 +41,11 @@ get_go_version() {
 setup_go_root() {
   local version=${1}
   export PROPERTIES_FILE=go_env.properties
-  GO_VERSION="${version}" .ci/scripts/install-go.sh
+
+  # Support cases when the call to this script is done not from the
+  # root folder but from a nested folder.
+  BASEDIR=$(dirname "$(dirname "$0")")
+  GO_VERSION="${version}" "${BASEDIR}"/.ci/scripts/install-go.sh
 
   # Setup GOROOT and add go to the PATH.
   # shellcheck disable=SC1090
