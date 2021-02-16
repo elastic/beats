@@ -32,6 +32,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

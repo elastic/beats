@@ -239,6 +239,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
 - Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
+- aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
+- Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 
 *Heartbeat*
 
@@ -390,6 +392,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
 - Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
 - Add deployment name in pod's meta. {pull}23610[23610]
+- Added ECS 1.8 `host.os.type` field to `add_host_metadata` processor. {pull}23513[23513]
 - Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
 
 *Auditbeat*
@@ -402,6 +405,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
 - Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
 - Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
+- system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
+- Update Auditbeat auditd module to ECS 1.8 {pull}23594[23594] {issue}23118[23118]
 
 *Filebeat*
 
@@ -543,6 +548,26 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move aws-s3 input to GA. {pull}23631[23631]
 - Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
 - Added string splitting for httpjson input {pull}24022[24022]
+- Upgrade Cisco ASA/FTD/Umbrella to ECS 1.8.0. {pull}23819[23819]
+- Add new ECS user and categories features to google_workspace/gsuite {issue}23118[23118] {pull}23709[23709]
+- Move crowdstrike JS processor to ingest pipelines and upgrade to ECS 1.8.0 {issue}23118[23118] {pull}23875[23875]
+- Update Filebeat auditd dataset to ECS 1.8.0. {pull}23723[23723] {issue}23118[23118]
+- Updated microsoft defender_atp and m365_defender to ECS 1.8. {pull}23897[23897] {issue}23118[23118]
+- Updated o365 module to ECS 1.8. {issue}23118[23118] {pull}23896[23896]
+- Upgrade CEF module to ECS 1.8.0. {pull}23832[23832]
+- Upgrade fortinet/firewall to ECS 1.8 {issue}23118[23118] {pull}23902[23902]
+- Upgrade Zeek to ECS 1.8.0. {issue}23118[23118] {pull}23847[23847]
+- Updated azure module to ECS 1.8. {issue}23118[23118] {pull}23927[23927]
+- Update aws/s3access to ECS 1.8. {issue}23118[23118] {pull}23920[23920]
+- Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
+- Updated aws/cloudtrail fileset to ECS 1.8. {issue}23118[23118] {pull}23911[23911]
+- Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
+- Update mysqlenterprise module to ECS 1.8. {issue}23118[23118] {pull}23978[23978]
+- Upgrade sophos/xg fileset to ECS 1.8.0. {issue}23118[23118] {pull}23967[23967]
+- Upgrade system/auth to ECS 1.8 {issue}23118[23118] {pull}23961[23961]
+- Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
+- Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
+- Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 
 *Heartbeat*
 
@@ -551,6 +576,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Update Journalbeat to ECS 1.8. {pull}23737[23737]
 
 *Heartbeat*
 
@@ -632,6 +658,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 
+- Upgrade to ECS 1.8.0. {pull}23783[23783]
 
 *Functionbeat*
 
@@ -652,6 +679,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add additional event categorization for security and sysmon modules. {pull}22988[22988]
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 - Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
+- Add new ECS 1.8 improvements. {pull}23563[23563]
 
 *Elastic Log Driver*
 
@@ -685,7 +713,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
-
-
-

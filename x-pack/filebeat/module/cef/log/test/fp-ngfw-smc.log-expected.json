@@ -27,6 +27,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "6.6.1",
+        "related.hosts": [
+            "10.1.1.40"
+        ],
         "service.type": "cef",
         "tags": [
             "cef",
@@ -61,6 +64,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "6.6.1",
+        "related.hosts": [
+            "10.1.1.40"
+        ],
         "service.type": "cef",
         "tags": [
             "cef",
@@ -108,6 +114,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "6.6.1",
+        "related.hosts": [
+            "10.1.1.40"
+        ],
         "related.ip": [
             "10.1.1.40",
             "10.37.205.252"
@@ -161,6 +170,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.10"
+        ],
         "related.ip": [
             "255.255.255.255",
             "172.16.1.1"
@@ -214,6 +226,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.1"
+        ],
         "related.ip": [
             "192.168.1.1",
             "172.16.1.1"
@@ -264,6 +279,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.6"
+        ],
         "related.user": [
             "alice"
         ],
@@ -304,6 +322,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.3"
+        ],
         "related.ip": [
             "192.168.1.1"
         ],
@@ -347,6 +368,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.10"
+        ],
         "related.ip": [
             "192.168.1.1"
         ],
@@ -390,6 +414,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "unknown",
+        "related.hosts": [
+            "10.1.1.8"
+        ],
         "related.ip": [
             "172.16.2.1"
         ],
@@ -432,6 +459,9 @@
         "observer.product": "Firewall",
         "observer.vendor": "FORCEPOINT",
         "observer.version": "6.6.1",
+        "related.hosts": [
+            "10.1.1.40"
+        ],
         "service.type": "cef",
         "tags": [
             "cef",
