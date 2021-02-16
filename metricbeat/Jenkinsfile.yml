@@ -20,8 +20,6 @@ stages:
           make check-no-changes;
     build:
         make: "RACE_DETECTOR=1 make -C metricbeat check testsuite integration-tests-environment"
-        when:
-            disabled: true     ## Disabled since Integration Testing is broken. See https://github.com/elastic/beats/issues/21961
     crosscompile:
         make: "make -C metricbeat crosscompile"
     windows:
