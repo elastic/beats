@@ -17,26 +17,29 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // Server is the daemon side of the control protocol.
 type Server struct {
-	logger   *logger.Logger
-	rex      reexec.ExecManager
-	up       *upgrade.Upgrader
-	listener net.Listener
-	server   *grpc.Server
-	lock     sync.RWMutex
+	logger     *logger.Logger
+	rex        reexec.ExecManager
+	statusCtrl status.Controller
+	up         *upgrade.Upgrader
+	listener   net.Listener
+	server     *grpc.Server
+	lock       sync.RWMutex
 }
 
 // New creates a new control protocol server.
-func New(log *logger.Logger, rex reexec.ExecManager, up *upgrade.Upgrader) *Server {
+func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader) *Server {
 	return &Server{
-		logger: log,
-		rex:    rex,
-		up:     up,
+		logger:     log,
+		rex:        rex,
+		statusCtrl: statusCtrl,
+		up:         up,
 	}
 }
 
@@ -95,11 +98,11 @@ func (s *Server) Version(_ context.Context, _ *proto.Empty) (*proto.VersionRespo
 
 // Status returns the overall status of the agent.
 func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusResponse, error) {
-	// not implemented
+	status := s.statusCtrl.Status()
 	return &proto.StatusResponse{
-		Status:       proto.Status_HEALTHY,
-		Message:      "not implemented",
-		Applications: nil,
+		Status:       agentStatusToProto(status.Status),
+		Message:      status.Message,
+		Applications: agentAppStatusToProto(status.Applications),
 	}, nil
 }
 
@@ -157,4 +160,28 @@ func (r *upgradeRequest) SourceURI() string {
 func (r *upgradeRequest) FleetAction() *fleetapi.ActionUpgrade {
 	// upgrade request not from Fleet
 	return nil
+}
+
+func agentStatusToProto(code status.AgentStatusCode) proto.Status {
+	if code == status.Degraded {
+		return proto.Status_DEGRADED
+	}
+	if code == status.Failed {
+		return proto.Status_FAILED
+	}
+	return proto.Status_HEALTHY
+}
+
+func agentAppStatusToProto(apps []status.AgentApplicationStatus) []*proto.ApplicationStatus {
+	s := make([]*proto.ApplicationStatus, len(apps))
+	for i, a := range apps {
+		s[i] = &proto.ApplicationStatus{
+			Id:      a.ID,
+			Name:    a.Name,
+			Status:  proto.Status(a.Status.ToProto()),
+			Message: a.Message,
+			Payload: "",
+		}
+	}
+	return s
 }

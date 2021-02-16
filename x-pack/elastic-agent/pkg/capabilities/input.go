@@ -7,6 +7,8 @@ package capabilities
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -150,8 +152,9 @@ func (c *inputCapability) renderInputs(inputs []map[string]interface{}) ([]map[s
 
 		input[conditionKey] = isSupported
 		if !isSupported {
-			c.log.Errorf("input '%s' is left out due to capability restriction '%s'", inputType, c.name())
-			c.reporter.Update(status.Degraded)
+			msg := fmt.Sprintf("input '%s' is left out due to capability restriction '%s'", inputType, c.name())
+			c.log.Errorf(msg)
+			c.reporter.Update(state.Degraded, msg)
 		}
 
 		newInputs = append(newInputs, input)
