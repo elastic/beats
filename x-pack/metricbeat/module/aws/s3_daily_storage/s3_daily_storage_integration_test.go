@@ -27,14 +27,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		mtest.CheckEventField("cloud.region", "string", event, t)
-		mtest.CheckEventField("aws.dimensions.BucketName", "string", event, t)
-		mtest.CheckEventField("aws.dimensions.StorageType", "string", event, t)
-		mtest.CheckEventField("aws.s3.metrics.BucketSizeBytes.avg", "float", event, t)
-		mtest.CheckEventField("aws.s3.metrics.NumberOfObjects.avg", "float", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
