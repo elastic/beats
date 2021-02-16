@@ -2,6 +2,7 @@ revision: 5
 fleet:
   agent:
     id: fleet-agent-id
+    logging.level: error
   host:
     id: host-agent-id
   api:
