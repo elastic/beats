@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/override-google-storage-step') _
+@Library('apm@current') _
 
 import groovy.transform.Field
 
