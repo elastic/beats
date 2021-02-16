@@ -116,6 +116,11 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 	}
 	if len(skippedKeys) > 0 {
 		err = cfg.Merge(skippedKeys, ucfg.ResolveNOOP)
+
+		// we're modifying object
+		for k, v := range skippedKeys {
+			data[k] = v
+		}
 	}
 	return newConfigFrom(cfg), err
 }
