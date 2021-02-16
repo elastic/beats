@@ -15,19 +15,19 @@
           type: boolean
           description: >
             Node unschedulable status
-        - name: memorypressure
+        - name: memory_pressure
           type: boolean
           description: >
             Node MemoryPressure status
-        - name: diskpressure
+        - name: disk_pressure
           type: boolean
           description: >
             Node DiskPressure status
-        - name: outofdisk
+        - name: out_of_disk
           type: boolean
           description: >
             Node OutOfDisk status
-        - name: pidpressure
+        - name: pid_pressure
           type: boolean
           description: >
             Node PIDPressure status

@@ -29811,7 +29811,7 @@ type: boolean
 
 --
 
-*`kubernetes.node.status.memorypressure`*::
+*`kubernetes.node.status.memory_pressure`*::
 +
 --
 Node MemoryPressure status
@@ -29821,7 +29821,7 @@ type: boolean
 
 --
 
-*`kubernetes.node.status.diskpressure`*::
+*`kubernetes.node.status.disk_pressure`*::
 +
 --
 Node DiskPressure status
@@ -29831,7 +29831,7 @@ type: boolean
 
 --
 
-*`kubernetes.node.status.outofdisk`*::
+*`kubernetes.node.status.out_of_disk`*::
 +
 --
 Node OutOfDisk status
@@ -29841,7 +29841,7 @@ type: boolean
 
 --
 
-*`kubernetes.node.status.pidpressure`*::
+*`kubernetes.node.status.pid_pressure`*::
 +
 --
 Node PIDPressure status
@@ -30814,7 +30814,7 @@ type: long
 *`linux.conntrack.summary.insert_failed`*::
 +
 --
-Number of entries where list insert insert failed 
+Number of entries where list insert insert failed
 
 
 type: long
@@ -40442,7 +40442,7 @@ format: bytes
 *`redis.info.memory.used.lua`*::
 +
 --
-Used memory by the Lua engine.        
+Used memory by the Lua engine.
 
 
 type: long
@@ -40454,7 +40454,7 @@ format: bytes
 *`redis.info.memory.used.dataset`*::
 +
 --
-The size in bytes of the dataset 
+The size in bytes of the dataset
 
 
 type: long
@@ -40699,7 +40699,7 @@ format: duration
 *`redis.info.persistence.rdb.copy_on_write.last_size`*::
 +
 --
-The size in bytes of copy-on-write allocations during the last RBD save operation                
+The size in bytes of copy-on-write allocations during the last RBD save operation
 
 
 type: long
@@ -40828,7 +40828,7 @@ format: bytes
 *`redis.info.persistence.aof.size.current`*::
 +
 --
-AOF current file size             
+AOF current file size
 
 
 type: long
@@ -40934,7 +40934,7 @@ format: bytes
 *`redis.info.replication.backlog.first_byte_offset`*::
 +
 --
-The master offset of the replication backlog buffer          
+The master offset of the replication backlog buffer
 
 
 type: long
@@ -44599,7 +44599,7 @@ type: keyword
 *`system.raid.sync_action`*::
 +
 --
-Current sync action, if the RAID array is redundant 
+Current sync action, if the RAID array is redundant
 
 
 type: keyword
@@ -45040,7 +45040,7 @@ All TCP connections
 *`system.socket.summary.tcp.memory`*::
 +
 --
-Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux. 
+Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
 
 
 type: integer
@@ -45186,7 +45186,7 @@ All UDP connections
 *`system.socket.summary.udp.memory`*::
 +
 --
-Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux. 
+Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
 
 
 type: integer
@@ -46877,4 +46877,3 @@ Epoch value of the Zookeeper transaction ID. An epoch signifies the period in wh
 type: long
 
 --
-
