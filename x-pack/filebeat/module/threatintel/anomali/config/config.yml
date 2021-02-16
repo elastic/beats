@@ -35,7 +35,7 @@ request.transforms:
     default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05.999Z" ]]'
 
 response.split:
-  target: body.results
+  target: body.objects
 
 cursor:
   timestamp:
