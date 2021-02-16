@@ -8,6 +8,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -85,7 +87,7 @@ func Load(capsFile string, log *logger.Logger, sc status.Controller) (Capability
 func (mgr *capabilitiesManager) Apply(in interface{}) (interface{}, error) {
 	var err error
 	// reset health on start, child caps will update to fail if needed
-	mgr.reporter.Update(status.Healthy)
+	mgr.reporter.Update(state.Healthy, "")
 	for _, cap := range mgr.caps {
 		in, err = cap.Apply(in)
 		if err != nil {

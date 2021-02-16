@@ -11,8 +11,10 @@ import (
 
 type noopController struct{}
 
-func (*noopController) RegisterComponent(_ string) status.Reporter     { return &noopReporter{} }
-func (*noopController) RegisterComponentWithPersistance(_ string, _ bool) status.Reporter     { return &noopReporter{} }
+func (*noopController) RegisterComponent(_ string) status.Reporter { return &noopReporter{} }
+func (*noopController) RegisterComponentWithPersistance(_ string, _ bool) status.Reporter {
+	return &noopReporter{}
+}
 func (*noopController) RegisterApp(_ string, _ string) status.Reporter { return &noopReporter{} }
 func (*noopController) Status() status.AgentStatus                     { return status.AgentStatus{Status: status.Healthy} }
 func (*noopController) StatusCode() status.AgentStatusCode             { return status.Healthy }

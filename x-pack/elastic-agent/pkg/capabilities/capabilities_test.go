@@ -135,7 +135,7 @@ func TestCapabilityManager(t *testing.T) {
 			caps: []Capability{
 				filterKeywordCap{keyWord: "filter"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -160,7 +160,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -185,7 +185,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -210,7 +210,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -235,7 +235,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -260,7 +260,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				filterKeywordCap{keyWord: "key"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -283,7 +283,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "key"},
 				filterKeywordCap{keyWord: "filter"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)

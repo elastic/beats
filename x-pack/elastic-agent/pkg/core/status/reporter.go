@@ -7,8 +7,9 @@ package status
 import (
 	"sync"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/google/uuid"
+
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
