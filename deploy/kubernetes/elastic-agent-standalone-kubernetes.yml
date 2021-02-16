@@ -23,10 +23,10 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:7.11.0-SNAPSHOT
+          image: docker.elastic.co/beats/elastic-agent:7.12.0-SNAPSHOT
           args: [
             "-c", "/etc/agent.yml",
-            "-e", "-d", "*",
+            "-e", "-d", "composable.providers.kubernetes",
           ]
           env:
             - name: ES_USERNAME
@@ -99,28 +99,28 @@ data:
         data_stream:
           namespace: default
         streams:
-          #- id: >-
-          #    kubernetes/metrics-kubernetes.controllermanager-3d50c483-2327-40e7-b3e5-d877d4763fe1
-          #  data_stream:
-          #    dataset: kubernetes.controllermanager
-          #    type: metrics
-          #  metricsets:
-          #    - controllermanager
-          #  hosts:
-          #    - '${kubernetes.pod.ip}:10252'
-          #  period: 10s
-          #  condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
-          #- id: >-
-          #    kubernetes/metrics-kubernetes.scheduler-3d50c483-2327-40e7-b3e5-d877d4763fe1
-          #  data_stream:
-          #    dataset: kubernetes.scheduler
-          #    type: metrics
-          #  metricsets:
-          #    - scheduler
-          #  hosts:
-          #    - '${kubernetes.pod.ip}:10251'
-          #  period: 10s
-          #  condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
+          - id: >-
+              kubernetes/metrics-kubernetes.controllermanager-3d50c483-2327-40e7-b3e5-d877d4763fe1
+            data_stream:
+              dataset: kubernetes.controllermanager
+              type: metrics
+            metricsets:
+              - controllermanager
+            hosts:
+              - '${kubernetes.pod.ip}:10252'
+            period: 10s
+            condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
+          - id: >-
+              kubernetes/metrics-kubernetes.scheduler-3d50c483-2327-40e7-b3e5-d877d4763fe1
+            data_stream:
+              dataset: kubernetes.scheduler
+              type: metrics
+            metricsets:
+              - scheduler
+            hosts:
+              - '${kubernetes.pod.ip}:10251'
+            period: 10s
+            condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
           - id: >-
               kubernetes/metrics-kubernetes.proxy-3d50c483-2327-40e7-b3e5-d877d4763fe1
             data_stream:
@@ -141,7 +141,7 @@ data:
             add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${NODE_NAME}:10250'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
           - id: >-
@@ -154,7 +154,7 @@ data:
             add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${NODE_NAME}:10250'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
           - id: kubernetes/metrics-kubernetes.pod-934ef8aa-ed19-405b-8160-ebf62e3d32f8
@@ -166,7 +166,7 @@ data:
             add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${NODE_NAME}:10250'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
           - id: >-
@@ -179,7 +179,7 @@ data:
             add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${NODE_NAME}:10250'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
           - id: >-
@@ -192,7 +192,7 @@ data:
             add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${NODE_NAME}:10250'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
 ---
@@ -215,10 +215,10 @@ spec:
       serviceAccountName: elastic-agent
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:7.11.0-SNAPSHOT
+          image: docker.elastic.co/beats/elastic-agent:7.12.0-SNAPSHOT
           args: [
             "-c", "/etc/agent.yml",
-            "-e", "-d", "*",
+            "-e", "-d", "composable.providers.kubernetes",
           ]
           env:
             - name: ES_USERNAME
@@ -226,7 +226,7 @@ spec:
             - name: ES_PASSWORD
               value: ""
             - name: ES_HOST
-                value: ""
+              value: ""
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
