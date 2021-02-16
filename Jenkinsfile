@@ -265,9 +265,11 @@ def k8sTest(Map args = [:]) {
 * This method runs the packaging for ARM
 */
 def packagingArm(Map args = [:]) {
+  PACKAGES = "docker"
   def PLATFORMS = [ 'linux/arm64' ].join(' ')
   withEnv([
-    "PLATFORMS=${PLATFORMS}"
+    "PLATFORMS=${PLATFORMS}",
+    "PACKAGES=docker"
   ]) {
     target(args)
   }
