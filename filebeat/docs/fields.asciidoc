@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-oracle>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
+* <<exported-fields-pensando>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-proofpoint>>
@@ -84,6 +85,7 @@ grouped in the following categories:
 * <<exported-fields-squid>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
+* <<exported-fields-threatintel>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
@@ -522,6 +524,54 @@ type: keyword
 --
 Name of the group.
 
+
+type: keyword
+
+--
+
+[float]
+=== effective
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+Effective user ID.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Effective user name.
+
+type: keyword
+
+--
+
+[float]
+=== group
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+Effective group ID.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Effective group name.
 
 type: keyword
 
@@ -20762,6 +20812,543 @@ Module for handling Cisco network device logs.
 
 
 [float]
+=== cisco.amp
+
+Module for parsing Cisco AMP logs.
+
+
+
+*`cisco.amp.timestamp_nanoseconds`*::
++
+--
+The timestamp in Epoch nanoseconds.
+
+
+type: date
+
+--
+
+*`cisco.amp.event_type_id`*::
++
+--
+A sub ID of the event, depending on event type.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.detection`*::
++
+--
+The name of the malware detected.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.detection_id`*::
++
+--
+The ID of the detection.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.connector_guid`*::
++
+--
+The GUID of the connector sending information to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.group_guids`*::
++
+--
+An array of group GUIDS related to the connector sending information to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.vulnerabilities`*::
++
+--
+An array of related vulnerabilities to the malicious event.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.scan.description`*::
++
+--
+Description of an event related to a scan being initiated, for example the specific directory name.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.scan.clean`*::
++
+--
+Boolean value if a scanned file was clean or not.
+
+
+type: boolean
+
+--
+
+*`cisco.amp.scan.scanned_files`*::
++
+--
+Count of files scanned in a directory.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.scanned_processes`*::
++
+--
+Count of processes scanned related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.scanned_paths`*::
++
+--
+Count of different directories scanned related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.malicious_detections`*::
++
+--
+Count of malicious files or documents detected related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.computer.connector_guid`*::
++
+--
+The GUID of the connector, similar to top level connector_guid, but unique if multiple connectors are involved.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.computer.external_ip`*::
++
+--
+The external IP of the related host.
+
+
+type: ip
+
+--
+
+*`cisco.amp.computer.active`*::
++
+--
+If the current endpoint is active or not.
+
+
+type: boolean
+
+--
+
+*`cisco.amp.computer.network_addresses`*::
++
+--
+All network interface information on the related host.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.file.disposition`*::
++
+--
+Categorization of file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.disposition`*::
++
+--
+Categorization of a network event related to a file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.nfm.direction`*::
++
+--
+The current direction based on source and destination IP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.related.mac`*::
++
+--
+An array of all related MAC addresses.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.related.cve`*::
++
+--
+An array of all related MAC addresses.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.cloud_ioc.description`*::
++
+--
+Description of the related IOC for specific IOC events from AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.cloud_ioc.short_description`*::
++
+--
+Short description of the related IOC for specific IOC events from AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.disposition`*::
++
+--
+Categorization of a IOC for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identity.md5`*::
++
+--
+MD5 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identity.sha1`*::
++
+--
+SHA1 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identify.sha256`*::
++
+--
+SHA256 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.disposition`*::
++
+--
+Categorization of a file archive related to a file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identity.md5`*::
++
+--
+MD5 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identity.sha1`*::
++
+--
+SHA1 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identify.sha256`*::
++
+--
+SHA256 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.application`*::
++
+--
+The application name related to Exploit Prevention events.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.attacked_module`*::
++
+--
+Path to the executable or dll that was attacked and detected by Exploit Prevention.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.base_address`*::
++
+--
+The base memory address related to the exploit detected.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.suspicious_files`*::
++
+--
+An array of related files when an attack is detected by Exploit Prevention.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.parent.disposition`*::
++
+--
+Categorization of parrent, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.error.description`*::
++
+--
+Description of an endpoint error event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.error.error_code`*::
++
+--
+The error code describing the related error event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.severity`*::
++
+--
+Severity result of the threat hunt registered to the malicious event. Can be Low-Critical.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_report_guid`*::
++
+--
+The GUID of the related threat hunting report.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_hunt_guid`*::
++
+--
+The GUID of the related investigation tracking issue.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_title`*::
++
+--
+Title of the incident related to the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_summary`*::
++
+--
+Summary of the outcome on the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_remediation`*::
++
+--
+Recommendations to resolve the vulnerability or exploited host.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_id`*::
++
+--
+The id of the related incident for the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_end_time`*::
++
+--
+When the threat hunt finalized or closed.
+
+
+type: date
+
+--
+
+*`cisco.amp.threat_hunting.incident_start_time`*::
++
+--
+When the threat hunt was initiated.
+
+
+type: date
+
+--
+
+*`cisco.amp.file.attack_details.indicators`*::
++
+--
+Different indicator types that matches the exploit detected, for example different MITRE tactics.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.threat_hunting.tactics`*::
++
+--
+List of all MITRE tactics related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.threat_hunting.techniques`*::
++
+--
+List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.tactics`*::
++
+--
+List of all MITRE tactics related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.techniques`*::
++
+--
+List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+[float]
 === cisco.asa
 
 Fields for Cisco ASA Firewall.
@@ -38999,7 +39586,7 @@ Examples include Beats. Agents may also run on observers. ECS agent.* fields sha
 Extended build information for the agent.
 This field is intended to contain any build information that a data source may provide, no specific formatting is required.
 
-type: wildcard
+type: keyword
 
 example: metricbeat version 7.6.0 (amd64), libbeat 7.6.0 [6a23e8f8f30f5001ba344e4e54d8d9cb82cb107c built 2020-02-05 23:10:10 +0000 UTC]
 
@@ -39087,7 +39674,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -39134,7 +39721,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -39165,7 +39752,7 @@ format: bytes
 --
 Client domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -39231,7 +39818,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -39328,7 +39915,7 @@ The highest registered client domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -39373,7 +39960,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -39382,7 +39969,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -39447,7 +40034,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -39749,7 +40336,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -39780,7 +40367,7 @@ format: bytes
 --
 Destination domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -39846,7 +40433,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -39943,7 +40530,7 @@ The highest registered destination domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -39988,7 +40575,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -39997,7 +40584,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -40062,7 +40649,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -40275,7 +40862,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -40327,7 +40914,7 @@ example: IN
 The data describing the resource.
 The meaning of this data depends on the type and class of the resource record.
 
-type: wildcard
+type: keyword
 
 example: 10.10.10.10
 
@@ -40418,7 +41005,7 @@ example: IN
 The name being queried.
 If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
 
-type: wildcard
+type: keyword
 
 example: www.example.com
 
@@ -40567,7 +41154,9 @@ type: text
 --
 The stack trace of this error in plain text.
 
-type: wildcard
+type: keyword
+
+Field is not indexed.
 
 --
 
@@ -40583,7 +41172,7 @@ type: text
 --
 The type of the error, for example the class name of the exception.
 
-type: wildcard
+type: keyword
 
 example: java.lang.NullPointerException
 
@@ -41017,7 +41606,7 @@ example: sda
 --
 Directory where the file is located. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -41172,7 +41761,7 @@ example: alice
 --
 Full path to the file, including the file name. It should include the drive letter, when appropriate.
 
-type: wildcard
+type: keyword
 
 example: /home/alice/example.png
 
@@ -41246,7 +41835,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -41280,7 +41869,7 @@ example: 16384
 --
 Target path for symlinks.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -41351,7 +41940,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -41518,7 +42107,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -41646,7 +42235,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -41843,7 +42432,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -41877,7 +42466,7 @@ example: Quebec
 Hostname of the host.
 It normally contains what the `hostname` command returns on the host machine.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -41936,7 +42525,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -41965,7 +42554,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -42036,7 +42625,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -42045,7 +42634,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -42110,7 +42699,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -42158,7 +42747,7 @@ format: bytes
 --
 The full HTTP request body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -42215,7 +42804,7 @@ example: image/gif
 --
 Referrer for this HTTP request.
 
-type: wildcard
+type: keyword
 
 example: https://blog.example.com/
 
@@ -42239,7 +42828,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: wildcard
+type: keyword
 
 example: Hello world
 
@@ -42354,7 +42943,7 @@ The details specific to your event source are typically not logged under `log.*`
 Full path to the log file this event came from, including the file name. It should include the drive letter, when appropriate.
 If the event wasn't read from a log file, do not populate this field.
 
-type: wildcard
+type: keyword
 
 example: /var/log/fun-times.log
 
@@ -42378,7 +42967,7 @@ example: error
 --
 The name of the logger inside an application. This is usually the name of the class which initialized the logger, or can be a custom name.
 
-type: wildcard
+type: keyword
 
 example: org.elasticsearch.bootstrap.Bootstrap
 
@@ -42851,7 +43440,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -43010,7 +43599,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -43039,7 +43628,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -43147,7 +43736,7 @@ type: keyword
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -43180,7 +43769,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -43209,7 +43798,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -43463,7 +44052,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -43575,7 +44164,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -43606,7 +44195,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -43673,7 +44262,7 @@ type: keyword
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -43774,7 +44363,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -43805,7 +44394,7 @@ example: c2c455d9f99375d
 --
 Absolute path to the process executable.
 
-type: wildcard
+type: keyword
 
 example: /usr/bin/ssh
 
@@ -43872,7 +44461,7 @@ type: keyword
 Process name.
 Sometimes called program name or similar.
 
-type: wildcard
+type: keyword
 
 example: ssh
 
@@ -43946,7 +44535,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -44029,7 +44618,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -44041,7 +44630,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -44068,7 +44657,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -44142,7 +44731,7 @@ example: 0c6803c4e922103c4dca5963aad36ddf
 --
 Internal name of the file, provided at compile-time.
 
-type: wildcard
+type: keyword
 
 example: MSPAINT.EXE
 
@@ -44225,7 +44814,7 @@ format: string
 --
 Thread name.
 
-type: wildcard
+type: keyword
 
 example: thread-0
 
@@ -44237,7 +44826,7 @@ example: thread-0
 Process title.
 The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -44264,7 +44853,7 @@ example: 1325
 --
 The working directory of the process.
 
-type: wildcard
+type: keyword
 
 example: /home/alice
 
@@ -44301,7 +44890,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: wildcard
+type: keyword
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -44334,7 +44923,7 @@ example: HKLM
 --
 Hive-relative path of keys.
 
-type: wildcard
+type: keyword
 
 example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
 
@@ -44345,7 +44934,7 @@ example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Optio
 --
 Full path, including hive, key and value
 
-type: wildcard
+type: keyword
 
 example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
 
@@ -44558,7 +45147,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -44589,7 +45178,7 @@ format: bytes
 --
 Server domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -44655,7 +45244,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -44752,7 +45341,7 @@ The highest registered server domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -44797,7 +45386,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -44806,7 +45395,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -44871,7 +45460,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -45020,7 +45609,7 @@ example: 15169
 --
 Organization name.
 
-type: wildcard
+type: keyword
 
 example: Google LLC
 
@@ -45051,7 +45640,7 @@ format: bytes
 --
 Source domain.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -45117,7 +45706,7 @@ User-defined description of a location, at the level of granularity they care ab
 Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
 Not typically used in automated geolocation.
 
-type: wildcard
+type: keyword
 
 example: boston-dc
 
@@ -45214,7 +45803,7 @@ The highest registered source domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -45259,7 +45848,7 @@ type: keyword
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -45268,7 +45857,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -45333,7 +45922,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -45565,7 +46154,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Distinguished name of subject of the issuer of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -45620,7 +46209,7 @@ example: www.elastic.co
 --
 Distinguished name of subject of the x.509 certificate presented by the client.
 
-type: wildcard
+type: keyword
 
 example: CN=myclient, OU=Documentation Team, DC=example, DC=com
 
@@ -45675,7 +46264,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -45842,7 +46431,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -46001,7 +46590,7 @@ example: 0687F666A054EF17A08E2F2162EAB4CBC0D265E1D7875BE74BF3C712CA92DAF0
 --
 Subject of the issuer of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=Example Root CA, OU=Infrastructure Team, DC=example, DC=com
 
@@ -46045,7 +46634,7 @@ example: 1970-01-01T00:00:00.000Z
 --
 Subject of the x.509 certificate presented by the server.
 
-type: wildcard
+type: keyword
 
 example: CN=www.example.com, OU=Infrastructure Team, DC=example, DC=com
 
@@ -46089,7 +46678,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -46256,7 +46845,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -46385,7 +46974,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
 
-type: wildcard
+type: keyword
 
 example: www.elastic.co
 
@@ -46420,7 +47009,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -46440,7 +47029,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: wildcard
+type: keyword
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -46467,7 +47056,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: wildcard
+type: keyword
 
 --
 
@@ -46501,7 +47090,7 @@ The highest registered url domain, stripped of the subdomain.
 For example, the registered domain for "foo.example.com" is "example.com".
 This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
 
-type: wildcard
+type: keyword
 
 example: example.com
 
@@ -46559,119 +47148,6 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
-*`user.changes.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.changes.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.changes.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.changes.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.changes.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.changes.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.changes.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.changes.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.changes.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.changes.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.changes.name.text`*::
-+
---
-type: text
-
---
-
-*`user.changes.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 *`user.domain`*::
 +
 --
@@ -46682,125 +47158,12 @@ type: keyword
 
 --
 
-*`user.effective.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.effective.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.effective.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.effective.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.effective.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.effective.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.effective.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.effective.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.effective.name.text`*::
-+
---
-type: text
-
---
-
-*`user.effective.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 *`user.email`*::
 +
 --
 User email address.
 
-type: wildcard
+type: keyword
 
 --
 
@@ -46809,7 +47172,7 @@ type: wildcard
 --
 User's full name, if available.
 
-type: wildcard
+type: keyword
 
 example: Albert Einstein
 
@@ -46874,7 +47237,7 @@ type: keyword
 --
 Short name or login of the user.
 
-type: wildcard
+type: keyword
 
 example: albert
 
@@ -46888,119 +47251,6 @@ type: text
 --
 
 *`user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
-*`user.target.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.target.email`*::
-+
---
-User email address.
-
-type: wildcard
-
---
-
-*`user.target.full_name`*::
-+
---
-User's full name, if available.
-
-type: wildcard
-
-example: Albert Einstein
-
---
-
-*`user.target.full_name.text`*::
-+
---
-type: text
-
---
-
-*`user.target.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`user.target.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`user.target.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`user.target.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`user.target.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
---
-
-*`user.target.name`*::
-+
---
-Short name or login of the user.
-
-type: wildcard
-
-example: albert
-
---
-
-*`user.target.name.text`*::
-+
---
-type: text
-
---
-
-*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -47045,7 +47295,7 @@ example: Safari
 --
 Unparsed user_agent string.
 
-type: wildcard
+type: keyword
 
 example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
 
@@ -47074,7 +47324,7 @@ example: debian
 --
 Operating system name, including the version or code name.
 
-type: wildcard
+type: keyword
 
 example: Mac OS Mojave
 
@@ -47103,7 +47353,7 @@ example: 4.4.0-112-generic
 --
 Operating system name, without the version.
 
-type: wildcard
+type: keyword
 
 example: Mac OS X
 
@@ -47385,7 +47635,7 @@ example: US
 --
 Distinguished name (DN) of issuing certificate authority.
 
-type: wildcard
+type: keyword
 
 example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
 
@@ -47552,7 +47802,7 @@ example: US
 --
 Distinguished name (DN) of the certificate subject entity.
 
-type: wildcard
+type: keyword
 
 example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
 
@@ -85909,6 +86159,16 @@ type: object
 
 --
 
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
+
+
+type: object
+
+--
+
 *`kubernetes.replicaset.name`*::
 +
 --
@@ -105565,6 +105825,147 @@ Specifies the type of the log
 +
 --
 Specifies the sub type of the log
+
+--
+
+[[exported-fields-pensando]]
+== Pensando fields
+
+pensando Module
+
+
+
+[float]
+=== pensando
+
+Fields from Pensando logs.
+
+
+
+[float]
+=== dfw
+
+Fields for Pensando DFW
+
+
+
+*`pensando.dfw.action`*::
++
+--
+Action on the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.app_id`*::
++
+--
+Application ID 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.destination_address`*::
++
+--
+Address of destination. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.destination_port`*::
++
+--
+Port of destination. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.direction`*::
++
+--
+Direction of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.protocol`*::
++
+--
+Protocol of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.rule_id`*::
++
+--
+Rule ID that was matched. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.session_id`*::
++
+--
+Session ID of the flow 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.session_state`*::
++
+--
+Session state of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_address`*::
++
+--
+Source address of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_port`*::
++
+--
+Source port of the flow. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.timestamp`*::
++
+--
+Timestamp of the log. 
+
+
+type: date
 
 --
 
@@ -141262,6 +141663,15 @@ type: keyword
 --
 
 
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
+
 *`suricata.eve.alert.category`*::
 +
 --
@@ -142762,6 +143172,1423 @@ alias to: process.pid
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-threatintel]]
+== threatintel fields
+
+Threat intelligence Filebeat Module.
+
+
+
+[float]
+=== threatintel
+
+Fields from the threatintel Filebeat module.
+
+
+
+*`threatintel.indicator.first_seen`*::
++
+--
+The date and time when intelligence source first reported sighting this indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.last_seen`*::
++
+--
+The date and time when intelligence source last reported sighting this indicator.
+
+
+type: date
+
+--
+
+*`threatintel.indicator.sightings`*::
++
+--
+Number of times this indicator was observed conducting threat activity.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.type`*::
++
+--
+Type of indicator as represented by Cyber Observable in STIX 2.0. Expected values
+  * autonomous-system
+  * artifact
+  * directory
+  * domain-name
+  * email-addr
+  * file
+  * ipv4-addr
+  * ipv6-addr
+  * mac-addr
+  * mutex
+  * process
+  * software
+  * url
+  * user-account
+  * windows-registry-key
+  * x-509-certificate
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.description`*::
++
+--
+Describes the type of action conducted by the threat.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.scanner_stats`*::
++
+--
+Count of AV/EDR vendors that successfully detected malicious file or URL.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.provider`*::
++
+--
+Identifies the name of the intelligence provider.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.confidence`*::
++
+--
+Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values
+  * Not Specified, None, Low, Medium, High
+  * 0-10
+  * Admirality Scale (1-6)
+  * DNI Scale (5-95)
+  * WEP Scale (Impossible - Certain)
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.module`*::
++
+--
+Identifies the name of specific module this data is coming from.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.dataset`*::
++
+--
+Identifies the name of specific dataset from the intelligence source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.ip`*::
++
+--
+Identifies a threat indicator as an IP address (irrespective of direction).
+
+
+type: ip
+
+--
+
+*`threatintel.indicator.domain`*::
++
+--
+Identifies a threat indicator as a domain (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.port`*::
++
+--
+Identifies a threat indicator as a port number (irrespective of direction).
+
+
+type: long
+
+--
+
+*`threatintel.indicator.email.address`*::
++
+--
+Identifies a threat indicator as an email address (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.marking.tlp`*::
++
+--
+Traffic Light Protocol sharing markings. Expected values are:
+  * White
+  * Green
+  * Amber
+  * Red
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.matched.atomic`*::
++
+--
+Identifies the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.field`*::
++
+--
+Identifies the field of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.type`*::
++
+--
+Identifies the type of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`threatintel.indicator.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`threatintel.indicator.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+
+*`threatintel.indicator.registry.data.strings`*::
++
+--
+Content when writing string types. Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`threatintel.indicator.registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`threatintel.indicator.registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
+*`threatintel.indicator.registry.key`*::
++
+--
+Registry key value
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.geo.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`threatintel.indicator.geo.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`threatintel.indicator.geo.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`threatintel.indicator.geo.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`threatintel.indicator.geo.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`threatintel.indicator.geo.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`threatintel.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+
+
+*`threatintel.indicator.file.hash.tlsh`*::
++
+--
+The file's import tlsh, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.ssdeep`*::
++
+--
+The file's ssdeep hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.md5`*::
++
+--
+The file's md5 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha1`*::
++
+--
+The file's sha1 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha256`*::
++
+--
+The file's sha256 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha512`*::
++
+--
+The file's sha512 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.type`*::
++
+--
+The file type
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.size`*::
++
+--
+The file's total size
+
+
+type: long
+
+--
+
+*`threatintel.indicator.file.name`*::
++
+--
+The file's name
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.extension`*::
++
+--
+The field contains the file extension from the original request
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.original`*::
++
+--
+Unmodified original url as seen in the event source. Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.password`*::
++
+--
+Password of the request.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.path`*::
++
+--
+Path of the request, such as "/search".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.port`*::
++
+--
+Port of the request, such as 443.
+
+
+type: long
+
+format: string
+
+--
+
+*`threatintel.indicator.url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch". The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain. For example, the registered domain for "foo.example.com" is "example.com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain. For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.username`*::
++
+--
+Username of the request.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threatintel.indicator.x509.issuer`*::
++
+--
+Name of issuing certificate authority. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threatintel.indicator.x509.subject`*::
++
+--
+Name of the certificate subject entity. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threatintel.indicator.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+[float]
+=== abusemalware
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abusemalware.file_type`*::
++
+--
+File type guessed by URLhaus.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.urlhaus_download`*::
++
+--
+Location (URL) where you can download a copy of this file.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.result`*::
++
+--
+AV detection ration.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.percent`*::
++
+--
+AV detection in percent.
+
+
+type: float
+
+--
+
+*`threatintel.abusemalware.virustotal.link`*::
++
+--
+Link to the Virustotal report.
+
+
+type: keyword
+
+--
+
+[float]
+=== abuseurl
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abuseurl.id`*::
++
+--
+The ID of the url.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.urlhaus_reference`*::
++
+--
+Link to URLhaus entry.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.url_status`*::
++
+--
+The current status of the URL. Possible values are: online, offline and unknown.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.threat`*::
++
+--
+The threat corresponding to this malware URL.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.surbl`*::
++
+--
+SURBL blacklist status. Possible values are: listed and not_listed
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.spamhaus_dbl`*::
++
+--
+Spamhaus DBL blacklist status.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.reporter`*::
++
+--
+The Twitter handle of the reporter that has reported this malware URL (or anonymous).
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.larted`*::
++
+--
+Indicates whether the malware URL has been reported to the hosting provider (true or false)
+
+
+type: boolean
+
+--
+
+*`threatintel.abuseurl.tags`*::
++
+--
+A list of tags associated with the queried malware URL
+
+
+type: keyword
+
+--
+
+[float]
+=== anomali
+
+Fields for Anomali Threat Intel
+
+
+
+*`threatintel.anomali.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.name`*::
++
+--
+The name of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.pattern`*::
++
+--
+The pattern ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.valid_from`*::
++
+--
+When the indicator was first found or is considered valid.
+
+
+type: date
+
+--
+
+*`threatintel.anomali.modified`*::
++
+--
+When the indicator was last modified
+
+
+type: date
+
+--
+
+*`threatintel.anomali.labels`*::
++
+--
+The labels related to the indicator
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.object_marking_refs`*::
++
+--
+The STIX reference object.
+
+
+type: keyword
+
+--
+
+[float]
+=== misp
+
+Fields for MISP Threat Intel
+
+
+
+*`threatintel.misp.id`*::
++
+--
+Attribute ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc_id`*::
++
+--
+Organization Community ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org_id`*::
++
+--
+Organization ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.threat_level_id`*::
++
+--
+Threat level from 5 to 1, where 1 is the most critical.
+
+
+type: long
+
+--
+
+*`threatintel.misp.info`*::
++
+--
+Additional text or information related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.published`*::
++
+--
+When the event was published.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.uuid`*::
++
+--
+The UUID of the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.date`*::
++
+--
+The date of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute_count`*::
++
+--
+How many attributes are included in a single event object.
+
+
+type: long
+
+--
+
+*`threatintel.misp.timestamp`*::
++
+--
+The timestamp of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.distribution`*::
++
+--
+Distribution type related to MISP.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.proposal_email_lock`*::
++
+--
+Settings configured on MISP for email lock on this event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.locked`*::
++
+--
+If the current MISP event object is locked or not.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.publish_timestamp`*::
++
+--
+At what time the event object was published
+
+
+type: date
+
+--
+
+*`threatintel.misp.sharing_group_id`*::
++
+--
+The ID of the grouped events or sources of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.disable_correlation`*::
++
+--
+If correlation is disabled on the MISP event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.extends_uuid`*::
++
+--
+The UUID of the event object it might extend.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.id`*::
++
+--
+The organization ID related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.name`*::
++
+--
+The organization name related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.uuid`*::
++
+--
+The UUID of the organization related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.local`*::
++
+--
+If the event object is local or from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.orgc.id`*::
++
+--
+The Organization Community ID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.name`*::
++
+--
+The Organization Community name in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.uuid`*::
++
+--
+The Organization Community UUID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.local`*::
++
+--
+If the Organization Community was local or synced from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.id`*::
++
+--
+The ID of the attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.type`*::
++
+--
+The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.category`*::
++
+--
+The category of the attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.to_ids`*::
++
+--
+If the attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.uuid`*::
++
+--
+The UUID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.event_id`*::
++
+--
+The local event ID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.distribution`*::
++
+--
+How the attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.attribute.timestamp`*::
++
+--
+The timestamp in which the attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute.comment`*::
++
+--
+Comments made to the attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.deleted`*::
++
+--
+If the attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.object_id`*::
++
+--
+The ID of the Object in which the attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.object_relation`*::
++
+--
+The type of relation the attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
+[float]
+=== otx
+
+Fields for OTX Threat Intel
+
+
+
+*`threatintel.otx.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
 
 --
 

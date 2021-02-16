@@ -6,6 +6,15 @@ processors:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
 
+  - rename:
+      field: suricata.eve.ether.dest_mac
+      target_field: destination.mac
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.ether.src_mac
+      target_field: source.mac
+      ignore_missing: true
+
   # Handle the different Suricata event types.
   - lowercase:
       field: suricata.eve.event_type

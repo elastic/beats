@@ -63,6 +63,7 @@ subdirectories of a directory.
 You can configure {beatname_uc} to use the following inputs:
 
 * <<{beatname_lc}-input-aws-cloudwatch>>
+* <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
@@ -76,7 +77,6 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-o365audit>>
 * <<{beatname_lc}-input-redis>>
-* <<{beatname_lc}-input-s3>>
 * <<{beatname_lc}-input-stdin>>
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>

@@ -20,6 +20,7 @@ package streaming
 import (
 	"bufio"
 	"bytes"
+	"strconv"
 )
 
 // FactoryDelimiter return a function to split line using a custom delimiter supporting multibytes
@@ -45,4 +46,44 @@ func dropDelimiter(data []byte, delimiter []byte) []byte {
 		return data[0 : len(data)-len(delimiter)]
 	}
 	return data
+}
+
+// FactoryRFC6587Framing returns a function that splits based on octet
+// counting or non-transparent framing as defined in RFC6587.  Allows
+// for custom delimter for non-transparent framing.
+func FactoryRFC6587Framing(delimiter []byte) bufio.SplitFunc {
+	return func(data []byte, eof bool) (int, []byte, error) {
+		if eof && len(data) == 0 {
+			return 0, nil, nil
+		}
+		// need at least one character to see if octet or
+		// non transparent framing
+		if len(data) <= 1 {
+			return 0, nil, nil
+		}
+		// It can be assumed that octet-counting framing is
+		// used if a syslog frame starts with a digit RFC6587
+		if bytes.ContainsAny(data[0:1], "0123456789") {
+			if i := bytes.IndexByte(data, ' '); i > 0 {
+				length, err := strconv.Atoi(string(data[0:i]))
+				if err != nil {
+					return 0, nil, err
+				}
+				end := length + i + 1
+				if len(data) >= end {
+					return end, data[i+1 : end], nil
+				}
+			}
+			//request more data
+			return 0, nil, nil
+		}
+		if i := bytes.Index(data, delimiter); i >= 0 {
+			return i + len(delimiter), dropDelimiter(data[0:i], delimiter), nil
+		}
+		if eof {
+			return len(data), dropDelimiter(data, delimiter), nil
+		}
+		// request more data
+		return 0, nil, nil
+	}
 }

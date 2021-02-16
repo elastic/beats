@@ -13,7 +13,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
@@ -61,7 +63,7 @@ func (c *InspectConfigCmd) inspectConfig() error {
 }
 
 func loadConfig(configPath string) (*config.Config, error) {
-	rawConfig, err := LoadConfigFromFile(configPath)
+	rawConfig, err := config.LoadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
@@ -100,12 +102,12 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	as, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
+	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, c := range as.Actions() {
+	for _, c := range stateStore.Actions() {
 		cfgChange, ok := c.(*fleetapi.ActionPolicyChange)
 		if !ok {
 			continue
@@ -118,7 +120,25 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 }
 
 func printMapStringConfig(mapStr map[string]interface{}) error {
-	data, err := yaml.Marshal(mapStr)
+	l, err := newErrorLogger()
+	if err != nil {
+		return err
+	}
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), l, status.NewController(l))
+	if err != nil {
+		return err
+	}
+
+	newCfg, err := caps.Apply(mapStr)
+	if err != nil {
+		return errors.New(err, "failed to apply capabilities")
+	}
+	newMap, ok := newCfg.(map[string]interface{})
+	if !ok {
+		return errors.New("config returned from capabilities has invalid type")
+	}
+
+	data, err := yaml.Marshal(newMap)
 	if err != nil {
 		return errors.New(err, "could not marshal to YAML")
 	}

@@ -35,9 +35,6 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 			return
 		}
 
-		// it was a crash, cleanup anything required
-		go a.cleanUp()
-
 		// kill the process
 		if a.state.ProcessInfo != nil {
 			_ = a.state.ProcessInfo.Process.Kill()

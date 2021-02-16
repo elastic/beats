@@ -112,7 +112,7 @@
   umbrella:
     enabled: true
 
-    #var.input: s3
+    #var.input: aws-s3
     # AWS SQS queue url
     #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
     # Access ID to authenticate with the S3 input
@@ -123,3 +123,20 @@
     #var.visibility_timeout: 300s
     # Maximum duration before AWS API request will be interrupted
     #var.api_timeout: 120s
+
+  amp:
+    enabled: true
+
+    # Set which input to use between httpjson (default) or file.
+    #var.input: httpjson
+
+    # The API URL
+    #var.url: https://api.amp.cisco.com/v1/events
+    # The client ID used as a username for the API requests.
+    #var.client_id:
+    # The API key related to the client ID.
+    #var.api_key:
+    # How far to look back the first time the module is started. Expects an amount of hours.
+    #var.first_interval: 24h
+    # Overriding the default request timeout, optional.
+    #var.request_timeout: 60s

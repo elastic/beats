@@ -53,8 +53,9 @@ func DefaultClientConfig() *Config {
 		SpaceID:  "",
 		Username: "",
 		Password: "",
-		Timeout:  5 * time.Minute,
-		TLS:      nil,
+		// Default timeout 10 minutes, expecting Fleet Server to control the long poll with default timeout of 5 minutes
+		Timeout: 10 * time.Minute,
+		TLS:     nil,
 	}
 }
 

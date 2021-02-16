@@ -17,6 +17,8 @@ stages:
         make: |
           make -C x-pack/winlogbeat check;
           make -C x-pack/winlogbeat update;
+          make -C winlogbeat check;
+          make -C winlogbeat update;
           make check-no-changes;
         platforms:             ## override default labels in this specific stage.
             - "immutable && ubuntu-18"
@@ -29,76 +31,33 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-2016"
-            labels:
-                - "windows-2016"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-2012"
-            labels:
-                - "windows-2012"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-10"
-            labels:
-                - "windows-10"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-2008"
-            labels:
-                - "windows-2008"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-8"
-            labels:
-                - "windows-8"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-7"
-            labels:
-                - "windows-7"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-7-32:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7-32-bit"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/winlogbeat for windows-7-32"
-            labels:
-                - "windows-7-32"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
+    packaging-linux:
+        packaging-linux: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default labels in this specific stage.
+            - "immutable && ubuntu-18"

@@ -25,7 +25,7 @@ request.transforms:
   - set:
       target: url.params.since
       value: "[[.cursor.published]]"
-      default: '[[now (parseDuration "-{{.initial_interval}}")]]'
+      default: '[[formatDate (now (parseDuration "-{{.initial_interval}}")) "RFC3339"]]'
 
 response.pagination:
   - set:
