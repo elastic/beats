@@ -56,6 +56,9 @@ type Watcher interface {
 
 	// Store returns the store object for the watcher
 	Store() cache.Store
+
+	// Client returns the kubernetes client object used by the watcher
+	Client() kubernetes.Interface
 }
 
 // WatchOptions controls watch behaviors
@@ -165,6 +168,11 @@ func (w *watcher) Store() cache.Store {
 	return w.store
 }
 
+// Client returns the kubernetes client object used by the watcher
+func (w *watcher) Client() kubernetes.Interface {
+	return w.client
+}
+
 // Start watching pods
 func (w *watcher) Start() error {
 	go w.informer.Run(w.ctx.Done())
@@ -198,6 +206,10 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		return
+	}
+	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
+		obj = deleted.Obj
 	}
 	w.queue.Add(&item{key, obj, state})
 }

@@ -77,6 +77,7 @@ type fleetGateway struct {
 	unauthCounter    int
 	statusController status.Controller
 	statusReporter   status.Reporter
+	stateStore       *stateStore
 }
 
 func newFleetGateway(
@@ -88,6 +89,7 @@ func newFleetGateway(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
+	stateStore *stateStore,
 ) (*fleetGateway, error) {
 
 	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
@@ -102,6 +104,7 @@ func newFleetGateway(
 		r,
 		acker,
 		statusController,
+		stateStore,
 	)
 }
 
@@ -116,6 +119,7 @@ func newFleetGatewayWithScheduler(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
+	stateStore *stateStore,
 ) (*fleetGateway, error) {
 
 	// Backoff implementation doesn't support the using context as the shutdown mechanism.
@@ -140,6 +144,7 @@ func newFleetGatewayWithScheduler(
 		acker:            acker,
 		statusReporter:   statusController.Register("gateway"),
 		statusController: statusController,
+		stateStore:       stateStore,
 	}, nil
 }
 
@@ -209,9 +214,16 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 		f.log.Error(errors.New("failed to load metadata", err))
 	}
 
+	// retrieve ack token from the store
+	ackToken := f.stateStore.AckToken()
+	if ackToken != "" {
+		f.log.Debug("using previously saved ack token: %v", ackToken)
+	}
+
 	// checkin
 	cmd := fleetapi.NewCheckinCmd(f.agentInfo, f.client)
 	req := &fleetapi.CheckinRequest{
+		AckToken: ackToken,
 		Events:   ee,
 		Metadata: ecsMeta,
 		Status:   f.statusController.StatusString(),
@@ -234,6 +246,15 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	f.unauthCounter = 0
 	if err != nil {
 		return nil, err
+	}
+
+	// Save the latest ackToken
+	if resp.AckToken != "" {
+		f.stateStore.SetAckToken(resp.AckToken)
+		serr := f.stateStore.Save()
+		if serr != nil {
+			f.log.Errorf("failed to save the ack token, err: %v", serr)
+		}
 	}
 
 	// ack events so they are dropped from queue

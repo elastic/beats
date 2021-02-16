@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -54,7 +55,7 @@ type Managed struct {
 	gateway     *fleetGateway
 	router      *router
 	srv         *server.Server
-	as          *actionStore
+	stateStore  *stateStore
 	upgrader    *upgrade.Upgrader
 }
 
@@ -66,6 +67,11 @@ func newManaged(
 	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
 	statusController := status.NewController(log)
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusController)
+	if err != nil {
+		return nil, err
+	}
+
 	path := info.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
@@ -173,6 +179,7 @@ func newManaged(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker, injectFleet(config, sysInfo.Info(), agentInfo)},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -183,15 +190,15 @@ func newManaged(
 		return nil, err
 	}
 
-	batchedAcker := newLazyAcker(acker)
+	batchedAcker := newLazyAcker(acker, log)
 
-	// Create the action store that will persist the last good policy change on disk.
-	actionStore, err := newActionStore(log, storage.NewDiskStore(info.AgentActionStoreFile()))
+	// Create the state store that will persist the last good policy change on disk.
+	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())
 	if err != nil {
 		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
 	}
-	managedApplication.as = actionStore
-	actionAcker := newActionStoreAcker(batchedAcker, actionStore)
+	managedApplication.stateStore = stateStore
+	actionAcker := newStateStoreActionAcker(batchedAcker, stateStore)
 
 	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
 	if err != nil {
@@ -205,7 +212,8 @@ func newManaged(
 		[]context.CancelFunc{managedApplication.cancelCtxFn},
 		reexec,
 		acker,
-		combinedReporter)
+		combinedReporter,
+		caps)
 
 	policyChanger := &handlerPolicyChange{
 		log:       log,
@@ -223,11 +231,11 @@ func newManaged(
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
-			log:         log,
-			emitter:     emit,
-			dispatcher:  router,
-			closers:     []context.CancelFunc{managedApplication.cancelCtxFn},
-			actionStore: actionStore,
+			log:        log,
+			emitter:    emit,
+			dispatcher: router,
+			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
+			stateStore: stateStore,
 		},
 	)
 
@@ -249,11 +257,18 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionApp{},
+		&handlerAppAction{
+			log: log,
+		},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
 		&handlerUnknown{log: log},
 	)
 
-	actions := actionStore.Actions()
+	actions := stateStore.Actions()
 
 	if len(actions) > 0 && !managedApplication.wasUnenrolled() {
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
@@ -273,6 +288,7 @@ func newManaged(
 		fleetR,
 		actionAcker,
 		statusController,
+		stateStore,
 	)
 	if err != nil {
 		return nil, err
@@ -316,7 +332,7 @@ func (m *Managed) AgentInfo() *info.AgentInfo {
 }
 
 func (m *Managed) wasUnenrolled() bool {
-	actions := m.as.Actions()
+	actions := m.stateStore.Actions()
 	for _, a := range actions {
 		if a.Type() == "UNENROLL" {
 			return true

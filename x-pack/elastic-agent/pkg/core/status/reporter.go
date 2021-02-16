@@ -38,6 +38,7 @@ var (
 // Controller takes track of component statuses.
 type Controller interface {
 	Register(string) Reporter
+	RegisterWithPersistance(string, bool) Reporter
 	Status() AgentStatus
 	StatusString() string
 	UpdateStateID(string)
@@ -77,7 +78,9 @@ func (r *controller) UpdateStateID(stateID string) {
 		}
 
 		rep.lock.Lock()
-		rep.status = Healthy
+		if !rep.isPersistent {
+			rep.status = Healthy
+		}
 		rep.lock.Unlock()
 	}
 	r.lock.Unlock()
@@ -87,6 +90,10 @@ func (r *controller) UpdateStateID(stateID string) {
 
 // Register registers new component for status updates.
 func (r *controller) Register(componentIdentifier string) Reporter {
+	return r.RegisterWithPersistance(componentIdentifier, false)
+}
+
+func (r *controller) RegisterWithPersistance(componentIdentifier string, persistent bool) Reporter {
 	id := componentIdentifier + "-" + uuid.New().String()[:8]
 	rep := &reporter{
 		isRegistered: true,
@@ -96,6 +103,7 @@ func (r *controller) Register(componentIdentifier string) Reporter {
 			r.lock.Unlock()
 		},
 		notifyChangeFunc: r.updateStatus,
+		isPersistent:     persistent,
 	}
 
 	r.lock.Lock()
@@ -159,6 +167,7 @@ type Reporter interface {
 
 type reporter struct {
 	lock             sync.Mutex
+	isPersistent     bool
 	isRegistered     bool
 	status           AgentStatus
 	unregisterFunc   func()

@@ -20,11 +20,11 @@
               type: group
               fields:
                 - name: ns
-                  type: long
+                  type: double
                   description: >
                     Node CPU Core usage nanoseconds
             - name: nanocores
-              type: long
+              type: double
               description: >
                 CPU used nanocores
     - name: memory
@@ -34,7 +34,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total available memory
@@ -42,7 +42,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Total memory usage
@@ -50,7 +50,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 RSS memory usage
@@ -58,16 +58,16 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Working set memory usage
         - name: pagefaults
-          type: long
+          type: double
           description: >
             Number of page faults
         - name: majorpagefaults
-          type: long
+          type: double
           description: >
             Number of major page faults
     - name: network
@@ -77,24 +77,24 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Received bytes
             - name: errors
-              type: long
+              type: double
               description: >
                 Rx errors
         - name: tx
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Transmitted bytes
             - name: errors
-              type: long
+              type: double
               description: >
                 Tx errors
     - name: fs
@@ -104,7 +104,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total capacity in bytes
@@ -112,7 +112,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total available in bytes
@@ -120,7 +120,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total used in bytes
@@ -128,15 +128,15 @@
           type: group
           fields:
             - name: used
-              type: long
+              type: double
               description: >
                 Number of used inodes
             - name: count
-              type: long
+              type: double
               description: >
                 Number of inodes
             - name: free
-              type: long
+              type: double
               description: >
                 Number of free inodes
     - name: runtime
@@ -149,7 +149,7 @@
               type: group
               fields:
                 - name: bytes
-                  type: long
+                  type: double
                   format: bytes
                   description: >
                     Image filesystem total capacity in bytes
@@ -157,7 +157,7 @@
               type: group
               fields:
                 - name: bytes
-                  type: long
+                  type: double
                   format: bytes
                   description: >
                     Image filesystem total available in bytes
@@ -165,7 +165,7 @@
               type: group
               fields:
                 - name: bytes
-                  type: long
+                  type: double
                   format: bytes
                   description: >
                     Image filesystem total used in bytes

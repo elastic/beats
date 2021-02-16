@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"net"
 	"sync"
 
@@ -40,12 +41,26 @@ type Listener struct {
 	family          inputsource.Family
 	wg              sync.WaitGroup
 	log             *logp.Logger
-	ctx             context.Context
-	cancel          context.CancelFunc
+	ctx             ctxtool.CancelContext
 	clientsCount    atomic.Int
 	handlerFactory  HandlerFactory
 	listenerFactory ListenerFactory
 }
+
+// FramingType are supported framing options for the SplitFunc
+type FramingType int
+
+const (
+	FramingDelimiter = iota
+	FramingRFC6587
+)
+
+var (
+	framingTypes = map[string]FramingType{
+		"delimiter": FramingDelimiter,
+		"rfc6587":   FramingRFC6587,
+	}
+)
 
 // NewListener creates a new Listener
 func NewListener(family inputsource.Family, location string, handlerFactory HandlerFactory, listenerFactory ListenerFactory, config *ListenerConfig) *Listener {
@@ -95,9 +110,9 @@ func (l *Listener) initListen(ctx context.Context) error {
 		return err
 	}
 
-	l.ctx, l.cancel = ctxtool.WithFunc(ctx, func() {
+	l.ctx = ctxtool.WrapCancel(ctxtool.WithFunc(ctx, func() {
 		l.Listener.Close()
-	})
+	}))
 	return nil
 }
 
@@ -155,7 +170,7 @@ func (l *Listener) run() {
 // Stop stops accepting new incoming connections and Close any active clients
 func (l *Listener) Stop() {
 	l.log.Info("Stopping" + l.family.String() + "server")
-	l.cancel()
+	l.ctx.Cancel()
 	l.wg.Wait()
 	l.log.Info(l.family.String() + " server stopped")
 }
@@ -168,18 +183,43 @@ func (l *Listener) unregisterHandler() {
 	l.clientsCount.Dec()
 }
 
-// SplitFunc allows to create a `bufio.SplitFunc` based on a delimiter provided.
-func SplitFunc(lineDelimiter []byte) bufio.SplitFunc {
+// SplitFunc allows to create a `bufio.SplitFunc` based on a framing &
+// delimiter provided.
+func SplitFunc(framing FramingType, lineDelimiter []byte) (bufio.SplitFunc, error) {
 	if len(lineDelimiter) == 0 {
-		return nil
+		return nil, fmt.Errorf("line delimiter required")
+	}
+	switch framing {
+	case FramingDelimiter:
+		// This will work for most usecases and will also
+		// strip \r if present.  CustomDelimiter, need to
+		// match completely and the delimiter will be
+		// completely removed from the returned byte slice
+		if bytes.Equal(lineDelimiter, []byte("\n")) {
+			return bufio.ScanLines, nil
+		}
+		return FactoryDelimiter(lineDelimiter), nil
+	case FramingRFC6587:
+		return FactoryRFC6587Framing(lineDelimiter), nil
+	default:
+		return nil, fmt.Errorf("unknown SplitFunc for framing %d and line delimiter %s", framing, string(lineDelimiter))
 	}
 
-	ld := []byte(lineDelimiter)
-	if bytes.Equal(ld, []byte("\n")) {
-		// This will work for most usecases and will also strip \r if present.
-		// CustomDelimiter, need to match completely and the delimiter will be completely removed from
-		// the returned byte slice
-		return bufio.ScanLines
+}
+
+// Unpack for config
+func (f *FramingType) Unpack(value string) error {
+	ft, ok := framingTypes[value]
+	if !ok {
+		availableTypes := make([]string, len(framingTypes))
+		i := 0
+		for t := range framingTypes {
+			availableTypes[i] = t
+			i++
+		}
+		return fmt.Errorf("invalid framing type '%s', supported types: %v", value, availableTypes)
+
 	}
-	return FactoryDelimiter(ld)
+	*f = ft
+	return nil
 }

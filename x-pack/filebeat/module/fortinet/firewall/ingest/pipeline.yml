@@ -80,26 +80,26 @@ processors:
     formats:
     - UNIX_MS
     timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
     timezone: "{{fortinet.firewall.tz}}"
-    if: "ctx.fortinet?.firewall?.tz != null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX_MS
-    if: "ctx.fortinet?.firewall?.tz == null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() > 11"
 - date:
     field: fortinet.firewall.eventtime
     target_field: event.start
     formats:
     - UNIX
-    if: "ctx.fortinet?.firewall?.tz == null && ctx.fortinet?.firewall?.eventtime != null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
+    if: "ctx?.fortinet?.firewall?.eventtime != null && ctx.fortinet?.firewall?.tz == null && (ctx.fortinet?.firewall?.eventtime).length() <= 11"
 - script:
     lang: painless
     source: "ctx.event.duration = Long.parseLong(ctx.fortinet.firewall.duration) * 1000000000"
@@ -134,6 +134,9 @@ processors:
     field: fortinet.firewall.level
     target_field: log.level
     ignore_missing: true
+- remove:
+    field: fortinet.firewall.assignip
+    if: "ctx.fortinet?.firewall?.assignip == 'N/A'"
 - remove:
     field: fortinet.firewall.dstip
     if: "ctx.fortinet?.firewall?.dstip == 'N/A'"
@@ -222,16 +225,18 @@ processors:
       )
 - remove:
     field:
-    - _temp
-    - message
-    - syslog5424_sd
-    - syslog5424_pri
-    - fortinet.firewall.tz
-    - fortinet.firewall.date
-    - fortinet.firewall.eventtime
-    - fortinet.firewall.time
-    - fortinet.firewall.duration
-    - host
+      - _temp.time
+      - _temp
+      - message
+      - syslog5424_sd
+      - syslog5424_pri
+      - fortinet.firewall.tz
+      - fortinet.firewall.date
+      - fortinet.firewall.devid
+      - fortinet.firewall.eventtime
+      - fortinet.firewall.time
+      - fortinet.firewall.duration
+      - host
     ignore_missing: true
 - pipeline:
     name: '{< IngestPipeline "event" >}'
@@ -242,6 +247,18 @@ processors:
 - pipeline:
     name: '{< IngestPipeline "utm" >}'
     if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+- convert:
+    field: fortinet.firewall.quotamax
+    type: long
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.quotaused
+    type: long
+    ignore_missing: true
+- convert:
+    field: fortinet.firewall.size
+    type: long
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

@@ -9,6 +9,7 @@ This is a module for Cisco network device's logs and Cisco Umbrella. It includes
 filesets for receiving logs over syslog or read from a file:
 
 - `asa` fileset: supports Cisco ASA firewall logs.
+- `amp` fileset: supports Cisco AMP API logs.
 - `ftd` fileset: supports Cisco Firepower Threat Defense logs.
 - `ios` fileset: supports Cisco IOS router and switch logs.
 - `nexus` fileset: supports Cisco Nexus switch logs.
@@ -383,7 +384,7 @@ will be found under `rsa.raw`. The default is false.
 
 The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
 
-To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-s3.html[S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
+To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-aws-s3.html[AWS S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
 
 This fileset supports all 4 log types:
 - Proxy
@@ -404,7 +405,7 @@ Example config:
 - module: cisco
   umbrella:
     enabled: true
-    var.input: s3
+    var.input: aws-s3
     var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
     var.access_key_id: 123456
     var.secret_access_key: PASSWORD
@@ -434,6 +435,86 @@ Default to be 300 seconds.
 *`var.api_timeout`*::
 
 Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `amp` fileset settings
+
+The Cisco AMP fileset focuses on collecting events from your Cisco AMP/Cisco Secure Endpoint API.
+
+To configure the Cisco AMP fileset you will need to retrieve your `client_id` and `api_key` from the AMP dashboard.
+For more information on how to retrieve these credentials, please reference the https://api-docs.amp.cisco.com/api_resources?api_host=api.amp.cisco.com&api_version=v1[Cisco AMP API documentation].
+
+The URL configured for the API depends on which region your AMP is located, currently there are three choices:
+- api.amp.cisco.com
+- api.apjc.amp.cisco.com
+- api.eu.amp.cisco.com
+
+If new endpoints are added by Cisco in the future, please reference the API URL list located at the https://api-docs.amp.cisco.com/[Cisco AMP API Docs].
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  amp:
+    enabled: true
+    var.input: httpjson
+    var.url: https://api.amp.cisco.com/v1/events
+    var.client_id: 123456
+    var.api_key: sfda987gdf90s0df0
+----
+
+When starting up the Filebeat module for the first time, you are able to configure how far back you want Filebeat to collect existing events from.
+It is also possible to select how often Filebeat will check the Cisco AMP API. Another example below which looks back 200 hours and have a custom timeout:
+
+[source,yaml]
+----
+- module: cisco
+  amp:
+    enabled: true
+    var.input: httpjson
+    var.url: https://api.amp.cisco.com/v1/events
+    var.client_id: 123456
+    var.api_key: sfda987gdf90s0df0
+    var.first_interval: 200h
+    var.interval: 60m
+    var.request_timeout: 120s
+    var.limit: 100
+
+----
+
+*`var.input`*::
+
+The input from which messages are read. Supports httpjson.
+
+*`var.url`*::
+
+The URL to the Cisco AMP API endpoint, this url value depends on your region. It will be the same region as your Cisco AMP Dashboard URL.
+
+*`var.client_id`*::
+
+The ID for the user account used to access the API.
+
+*`var.api_key`*::
+
+The API secret used together with the related client_id.
+
+*`var.request_timeout`*::
+
+When handling large influxes of events, especially for large enterprises, the API might take longer to respond. This value is to set a custom
+timeout value for each request sent by Filebeat.
+
+*`var.first_interval`*::
+
+How far back you would want to collect events the first time the Filebeat module starts up. Supports amount in hours(example: 24h), minutes(example: 10m) and seconds(example: 50s).
+
+*`var.limit`*::
+
+This value controls how many events are returned by the Cisco AMP API per page.
 
 :has-dashboards!:
 

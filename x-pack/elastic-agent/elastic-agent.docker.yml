@@ -11,22 +11,13 @@ outputs:
 inputs:
   - type: system/metrics
 
-    # The only two requirement are that it has only characters allowed in an Elasticsearch index name
-    # Index names must meet the following criteria:
-    #   Lowercase only
-    #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-    #   Cannot start with -, _, +
-    #   Cannot be . or ..
+    # Namespace name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
+    # For index naming restrictions, see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params
     data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
-        # The only two requirement are that it has only characters allowed in an Elasticsearch index name
-        # Index names must meet the following criteria:
-        #   Lowercase only
-        #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-        #   Cannot start with -, _, +
-        #   Cannot be . or ..
+        # Dataset name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
         data_stream.dataset: system.cpu
       - metricset: memory
         data_stream.dataset: system.memory

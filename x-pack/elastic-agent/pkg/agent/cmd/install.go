@@ -51,7 +51,8 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		return fmt.Errorf("unable to perform install command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
-	if status == install.Installed {
+	force, _ := cmd.Flags().GetBool("force")
+	if status == install.Installed && !force {
 		return fmt.Errorf("already installed at: %s", install.InstallPath)
 	}
 
@@ -66,7 +67,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	locker.Unlock()
 
 	warn.PrintNotGA(streams.Out)
-	force, _ := cmd.Flags().GetBool("force")
+
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)

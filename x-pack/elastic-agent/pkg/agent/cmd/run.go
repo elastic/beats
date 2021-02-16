@@ -79,7 +79,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	service.HandleSignals(stopBeat, cancel)
 
 	pathConfigFile := flags.Config()
-	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
+	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),

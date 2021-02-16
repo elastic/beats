@@ -152,25 +152,25 @@ processors:
             Map map = new HashMap();
             ctx.aws.cloudtrail.put("flattened", map);
           }
-        if (ctx.json.requestParameters != null) {
+        if (ctx.json?.requestParameters != null) {
           ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
           if (ctx.aws.cloudtrail.request_parameters.length() < 32766) {
             ctx.aws.cloudtrail.flattened.put("request_parameters", ctx.json.requestParameters);
           }
         }
-        if (ctx.json.responseElements != null) {
+        if (ctx.json?.responseElements != null) {
           ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
           if (ctx.aws.cloudtrail.response_elements.length() < 32766) {
             ctx.aws.cloudtrail.flattened.put("response_elements", ctx.json.responseElements);
           }
         }
-        if (ctx.json.additionalEventData != null) {
+        if (ctx.json?.additionalEventData != null) {
           ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
           if (ctx.aws.cloudtrail.additional_eventdata.length() < 32766) {
             ctx.aws.cloudtrail.flattened.put("additional_eventdata", ctx.json.additionalEventData);
           }
         }
-        if (ctx.json.serviceEventDetails != null) {
+        if (ctx.json?.serviceEventDetails != null) {
           ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
           if (ctx.aws.cloudtrail.service_event_details.length() < 32766) {
             ctx.aws.cloudtrail.flattened.put("service_event_details", ctx.json.serviceEventDetails);
