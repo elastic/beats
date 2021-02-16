@@ -253,7 +253,9 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 	var firstCheckin *proto.StateObserved
 	select {
 	case firstCheckin, ok = <-firstCheckinChan:
-		observedConfigStateIdx = firstCheckin.ConfigStateIdx
+		if firstCheckin != nil {
+			observedConfigStateIdx = firstCheckin.ConfigStateIdx
+		}
 		break
 	case <-time.After(InitialCheckinTimeout):
 		// close connection
