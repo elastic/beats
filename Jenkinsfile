@@ -14,6 +14,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
@@ -324,13 +325,10 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUpload(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${beatsFolder}/build/distributions/",
+  googleStorageUploadExt(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
     pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+    sharedPublicly: true)
 }
 
 /**
@@ -706,11 +704,10 @@ def archiveTestOutput(Map args = [:]) {
 */
 def tarAndUploadArtifacts(Map args = [:]) {
   tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-                      credentialsId: "${JOB_GCS_CREDENTIALS}",
-                      pattern: "${args.file}",
-                      sharedPublicly: true,
-                      showInline: true)
+  googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                         credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                         pattern: "${args.file}",
+                         sharedPublicly: true)
 }
 
 /**

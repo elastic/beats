@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
 - Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
 - Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
+- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}[23905]
 
 *Packetbeat*
 
@@ -497,6 +498,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
 - Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
+- Unskip s3_request integration test. {pull}23887[23887]
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 
 *Packetbeat*
@@ -598,6 +600,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update the baseline version of Sarama (Kafka support library) to 1.27.2. {pull}23595[23595]
 - Add kubernetes.volume.fs.used.pct field. {pull}23564[23564]
 - Add the `enable_krb5_fast` flag to the Kafka output to explicitly opt-in to FAST authentication. {pull}23629[23629]
+- Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
 - Add deployment name in pod's meta. {pull}23610[23610]
 - Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
 
@@ -825,6 +828,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
 - Move aws-s3 input to GA. {pull}23631[23631]
 - Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
+- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
+  removing unsupported processors. {pull}23763[23763]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Added string splitting for httpjson input {pull}24022[24022]
 
@@ -956,6 +961,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Check fields are documented in aws metricsets. {pull}23887[23887]
 
 *Packetbeat*
 
