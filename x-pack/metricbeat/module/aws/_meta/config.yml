@@ -49,3 +49,7 @@
   latency: 5m
   metricsets:
     - s3_request
+- module: aws
+  period: 1h
+  metricsets:
+    - resource

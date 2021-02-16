@@ -16,6 +16,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/ec2"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/rds"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/resource"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/sqs"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate/task_stats"

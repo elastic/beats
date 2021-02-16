@@ -1,0 +1,603 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Overview of AWS Resource Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Filters"
+            },
+            "gridData": {
+              "h": 10,
+              "i": "021b998f-38f0-43ba-8e31-eb5ff47fc5d4",
+              "w": 8,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "021b998f-38f0-43ba-8e31-eb5ff47fc5d4",
+            "panelRefName": "panel_0",
+            "title": "Filters",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Resources"
+            },
+            "gridData": {
+              "h": 22,
+              "i": "064e9365-ba24-48ce-9d27-8a0e1ae51c95",
+              "w": 20,
+              "x": 8,
+              "y": 0
+            },
+            "panelIndex": "064e9365-ba24-48ce-9d27-8a0e1ae51c95",
+            "panelRefName": "panel_1",
+            "title": "Resources",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Regions"
+            },
+            "gridData": {
+              "h": 22,
+              "i": "baf2071a-6ecf-4142-a66a-58b5ff5c4800",
+              "w": 20,
+              "x": 28,
+              "y": 0
+            },
+            "panelIndex": "baf2071a-6ecf-4142-a66a-58b5ff5c4800",
+            "panelRefName": "panel_2",
+            "title": "Regions",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Total Number of Resources"
+            },
+            "gridData": {
+              "h": 12,
+              "i": "b431be93-5c54-43c1-8af3-3b8b622be89d",
+              "w": 8,
+              "x": 0,
+              "y": 10
+            },
+            "panelIndex": "b431be93-5c54-43c1-8af3-3b8b622be89d",
+            "panelRefName": "panel_3",
+            "title": "Total Number of Resources",
+            "version": "7.10.0"
+          },
+          {
+            "embeddableConfig": {
+              "hidePanelTitles": false,
+              "title": "Top 5 Resources"
+            },
+            "gridData": {
+              "h": 23,
+              "i": "90c4e9db-54b0-4a99-a673-e13d15b994b8",
+              "w": 48,
+              "x": 0,
+              "y": 22
+            },
+            "panelIndex": "90c4e9db-54b0-4a99-a673-e13d15b994b8",
+            "panelRefName": "panel_4",
+            "title": "Top 5 Resources",
+            "version": "7.10.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] Resource Overview",
+        "version": 1
+      },
+      "id": "056a7dc0-3ff3-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "dashboard": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "5ddc5b50-3ff2-11eb-a417-f961313c14f6",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "4c321170-3ff1-11eb-a417-f961313c14f6",
+          "name": "panel_1",
+          "type": "lens"
+        },
+        {
+          "id": "7ed8fcb0-3ff1-11eb-a417-f961313c14f6",
+          "name": "panel_2",
+          "type": "lens"
+        },
+        {
+          "id": "b6d833f0-3ff2-11eb-a417-f961313c14f6",
+          "name": "panel_3",
+          "type": "lens"
+        },
+        {
+          "id": "177018f0-3ff2-11eb-a417-f961313c14f6",
+          "name": "panel_4",
+          "type": "lens"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2020-12-16T23:04:16.540Z",
+      "version": "WzE0MzMwOCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "Resource Filters [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.account.name",
+                "id": "1608159537734",
+                "indexPatternRefName": "control_0_index_pattern",
+                "label": "",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              },
+              {
+                "fieldName": "cloud.region",
+                "id": "1608159548995",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "Resource Filters [Metricbeat AWS]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "5ddc5b50-3ff2-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "visualization": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "control_0_index_pattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2020-12-16T22:59:35.428Z",
+      "version": "WzE0MzI2MywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "state": {
+          "datasourceStates": {
+            "indexpattern": {
+              "layers": {
+                "40477d7a-dc04-446d-ba39-baa2609662fc": {
+                  "columnOrder": [
+                    "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                    "5e1bf5e0-6f09-474a-9987-43ea9921bfee"
+                  ],
+                  "columns": {
+                    "5e1bf5e0-6f09-474a-9987-43ea9921bfee": {
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "Unique count of aws.resource.arn",
+                      "operationType": "cardinality",
+                      "scale": "ratio",
+                      "sourceField": "aws.resource.arn"
+                    },
+                    "dcea8d2e-21a8-411b-8fac-df06bc4ae953": {
+                      "dataType": "string",
+                      "isBucketed": true,
+                      "label": "Top values of aws.resource.service_name",
+                      "operationType": "terms",
+                      "params": {
+                        "orderBy": {
+                          "columnId": "5e1bf5e0-6f09-474a-9987-43ea9921bfee",
+                          "type": "column"
+                        },
+                        "orderDirection": "desc",
+                        "size": 100
+                      },
+                      "scale": "ordinal",
+                      "sourceField": "aws.resource.service_name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "visualization": {
+            "layers": [
+              {
+                "categoryDisplay": "default",
+                "groups": [
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953"
+                ],
+                "layerId": "40477d7a-dc04-446d-ba39-baa2609662fc",
+                "legendDisplay": "default",
+                "metric": "5e1bf5e0-6f09-474a-9987-43ea9921bfee",
+                "nestedLegend": false,
+                "numberDisplay": "percent"
+              }
+            ],
+            "shape": "pie"
+          }
+        },
+        "title": "Resource Pie Chart [Metricbeat AWS]",
+        "visualizationType": "lnsPie"
+      },
+      "id": "4c321170-3ff1-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "lens": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-40477d7a-dc04-446d-ba39-baa2609662fc",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "lens",
+      "updated_at": "2020-12-16T22:51:56.295Z",
+      "version": "WzE0MzA5OSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "state": {
+          "datasourceStates": {
+            "indexpattern": {
+              "layers": {
+                "40477d7a-dc04-446d-ba39-baa2609662fc": {
+                  "columnOrder": [
+                    "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                    "5e1bf5e0-6f09-474a-9987-43ea9921bfee"
+                  ],
+                  "columns": {
+                    "5e1bf5e0-6f09-474a-9987-43ea9921bfee": {
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "Unique count of aws.resource.arn",
+                      "operationType": "cardinality",
+                      "scale": "ratio",
+                      "sourceField": "aws.resource.arn"
+                    },
+                    "dcea8d2e-21a8-411b-8fac-df06bc4ae953": {
+                      "dataType": "string",
+                      "isBucketed": true,
+                      "label": "Top values of cloud.region",
+                      "operationType": "terms",
+                      "params": {
+                        "orderBy": {
+                          "columnId": "5e1bf5e0-6f09-474a-9987-43ea9921bfee",
+                          "type": "column"
+                        },
+                        "orderDirection": "desc",
+                        "size": 100
+                      },
+                      "scale": "ordinal",
+                      "sourceField": "cloud.region"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "visualization": {
+            "layers": [
+              {
+                "categoryDisplay": "default",
+                "groups": [
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953",
+                  "dcea8d2e-21a8-411b-8fac-df06bc4ae953"
+                ],
+                "layerId": "40477d7a-dc04-446d-ba39-baa2609662fc",
+                "legendDisplay": "default",
+                "metric": "5e1bf5e0-6f09-474a-9987-43ea9921bfee",
+                "nestedLegend": false,
+                "numberDisplay": "percent"
+              }
+            ],
+            "shape": "pie"
+          }
+        },
+        "title": "Resource Per Region Pie Chart [Metricbeat AWS]",
+        "visualizationType": "lnsPie"
+      },
+      "id": "7ed8fcb0-3ff1-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "lens": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-40477d7a-dc04-446d-ba39-baa2609662fc",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "lens",
+      "updated_at": "2020-12-16T22:53:21.275Z",
+      "version": "WzE0MzE0NCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "state": {
+          "datasourceStates": {
+            "indexpattern": {
+              "layers": {
+                "45de3b94-628c-4ba9-91c3-1efe16e2e754": {
+                  "columnOrder": [
+                    "5d5d9f4a-bd51-4482-bff9-f71d8dd4c0ff"
+                  ],
+                  "columns": {
+                    "5d5d9f4a-bd51-4482-bff9-f71d8dd4c0ff": {
+                      "customLabel": true,
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "",
+                      "operationType": "cardinality",
+                      "scale": "ratio",
+                      "sourceField": "aws.resource.arn",
+                      "suggestedPriority": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "visualization": {
+            "accessor": "5d5d9f4a-bd51-4482-bff9-f71d8dd4c0ff",
+            "layerId": "45de3b94-628c-4ba9-91c3-1efe16e2e754"
+          }
+        },
+        "title": "Resource Total Number [Metricbeat AWS]",
+        "visualizationType": "lnsMetric"
+      },
+      "id": "b6d833f0-3ff2-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "lens": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-45de3b94-628c-4ba9-91c3-1efe16e2e754",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "lens",
+      "updated_at": "2020-12-16T23:02:04.719Z",
+      "version": "WzE0MzI5OSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "state": {
+          "datasourceStates": {
+            "indexpattern": {
+              "layers": {
+                "9021cb04-2b60-4e9d-b408-73fab9952646": {
+                  "columnOrder": [
+                    "7296a281-9d92-47cf-9020-21ba4584d324",
+                    "a0132b31-f296-434d-878b-d1391865fc2f",
+                    "07184a67-4682-44fc-b7e0-d094ee469207"
+                  ],
+                  "columns": {
+                    "07184a67-4682-44fc-b7e0-d094ee469207": {
+                      "dataType": "number",
+                      "isBucketed": false,
+                      "label": "Unique count of aws.resource.arn",
+                      "operationType": "cardinality",
+                      "scale": "ratio",
+                      "sourceField": "aws.resource.arn"
+                    },
+                    "7296a281-9d92-47cf-9020-21ba4584d324": {
+                      "dataType": "date",
+                      "isBucketed": true,
+                      "label": "@timestamp",
+                      "operationType": "date_histogram",
+                      "params": {
+                        "interval": "auto"
+                      },
+                      "scale": "interval",
+                      "sourceField": "@timestamp",
+                      "suggestedPriority": 1
+                    },
+                    "a0132b31-f296-434d-878b-d1391865fc2f": {
+                      "customLabel": true,
+                      "dataType": "string",
+                      "isBucketed": true,
+                      "label": "Top 5 Resources",
+                      "operationType": "terms",
+                      "params": {
+                        "orderBy": {
+                          "columnId": "07184a67-4682-44fc-b7e0-d094ee469207",
+                          "type": "column"
+                        },
+                        "orderDirection": "desc",
+                        "size": 5
+                      },
+                      "scale": "ordinal",
+                      "sourceField": "aws.resource.service_name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "filters": [],
+          "query": {
+            "language": "kuery",
+            "query": ""
+          },
+          "visualization": {
+            "axisTitlesVisibilitySettings": {
+              "x": true,
+              "yLeft": true,
+              "yRight": true
+            },
+            "fittingFunction": "None",
+            "gridlinesVisibilitySettings": {
+              "x": true,
+              "yLeft": true,
+              "yRight": true
+            },
+            "layers": [
+              {
+                "accessors": [
+                  "07184a67-4682-44fc-b7e0-d094ee469207"
+                ],
+                "layerId": "9021cb04-2b60-4e9d-b408-73fab9952646",
+                "position": "top",
+                "seriesType": "bar",
+                "showGridlines": false,
+                "splitAccessor": "a0132b31-f296-434d-878b-d1391865fc2f",
+                "xAccessor": "7296a281-9d92-47cf-9020-21ba4584d324"
+              }
+            ],
+            "legend": {
+              "isVisible": true,
+              "position": "right"
+            },
+            "preferredSeriesType": "bar",
+            "tickLabelsVisibilitySettings": {
+              "x": true,
+              "yLeft": true,
+              "yRight": true
+            }
+          }
+        },
+        "title": "Resource Top 5 [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+      },
+      "id": "177018f0-3ff2-11eb-a417-f961313c14f6",
+      "migrationVersion": {
+        "lens": "7.10.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-9021cb04-2b60-4e9d-b408-73fab9952646",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "lens",
+      "updated_at": "2020-12-16T22:57:37.278Z",
+      "version": "WzE0MzI0MCwxXQ=="
+    }
+  ],
+  "version": "7.10.0"
+}

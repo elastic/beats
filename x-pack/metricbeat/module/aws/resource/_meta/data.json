@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "resource": {
+            "resource": {
+                "arn": "arn:aws:rds:eu-west-1:428152502467:cluster:cluster-vno4erilytfx3bkpbmkd7kxsom",
+                "name": "rds"
+            }
+        }
+    },
+    "cloud": {
+        "account": {
+            "id": "428152502467",
+            "name": "elastic-beats"
+        },
+        "provider": "aws",
+        "region": "eu-west-1"
+    },
+    "event": {
+        "dataset": "aws.resource",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "resource",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
