@@ -840,6 +840,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Added string splitting for httpjson input {pull}24022[24022]
 - Added field mappings for Netflow/IPFIX vendor fields that are known to Filebeat. {issue}23771[23771]
+- Added Signatures fileset to Zeek module {pull}23772[23772]
 - Upgrade Cisco ASA/FTD/Umbrella to ECS 1.8.0. {pull}23819[23819]
 - Add new ECS user and categories features to google_workspace/gsuite {issue}23118[23118] {pull}23709[23709]
 - Move crowdstrike JS processor to ingest pipelines and upgrade to ECS 1.8.0 {issue}23118[23118] {pull}23875[23875]
@@ -860,6 +861,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
+
 
 *Heartbeat*
 
