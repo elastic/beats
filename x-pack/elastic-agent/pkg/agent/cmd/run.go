@@ -16,6 +16,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -129,14 +131,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	rexLogger := logger.Named("reexec")
 	rex := reexec.NewManager(rexLogger, execPath)
 
+	statusCtrl := status.NewController(logger)
+
 	// start the control listener
-	control := server.New(logger.Named("control"), rex, nil)
+	control := server.New(logger.Named("control"), rex, statusCtrl, nil)
 	if err := control.Start(); err != nil {
 		return err
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo)
+	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo)
 	if err != nil {
 		return err
 	}

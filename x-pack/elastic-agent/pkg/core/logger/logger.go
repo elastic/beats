@@ -43,7 +43,7 @@ func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
 	return new(name, defaultCfg)
 }
 
-//NewFromConfig takes the user configuration and generate the right logger.
+// NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
 func NewFromConfig(name string, cfg *Config) (*Logger, error) {
 	return new(name, cfg)

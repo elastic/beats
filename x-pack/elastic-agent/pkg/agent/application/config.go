@@ -26,3 +26,26 @@ func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*conf
 	}
 	return cfg, nil
 }
+
+func createFleetServerBootstrapConfig(connStr string, policyID string) (*configuration.FleetAgentConfig, error) {
+	es, err := configuration.ElasticsearchFromConnStr(connStr)
+	if err != nil {
+		return nil, err
+	}
+	cfg := configuration.DefaultFleetAgentConfig()
+	cfg.Enabled = true
+	cfg.Server = &configuration.FleetServerConfig{
+		Bootstrap: true,
+		Output: configuration.FleetServerOutputConfig{
+			Elasticsearch: es,
+		},
+	}
+	if policyID != "" {
+		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
+	}
+
+	if err := cfg.Valid(); err != nil {
+		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
+	}
+	return cfg, nil
+}
