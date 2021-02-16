@@ -4,7 +4,8 @@
     "event": {
       "action": "session-reconnected",
       "category": [
-        "authentication"
+        "authentication",
+        "session"
       ],
       "code": 4778,
       "kind": "event",
