@@ -833,6 +833,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   removing unsupported processors. {pull}23763[23763]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Added string splitting for httpjson input {pull}24022[24022]
+- Added field mappings for Netflow/IPFIX vendor fields that are known to Filebeat. {issue}23771[23771]
 
 *Heartbeat*
 
