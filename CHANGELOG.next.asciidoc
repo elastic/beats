@@ -536,6 +536,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move aws-s3 input to GA. {pull}23631[23631]
 - Populate `source.mac` and `destination.mac` for Suricata EVE events. {issue}23706[23706] {pull}23721[23721]
 - Added string splitting for httpjson input {pull}24022[24022]
+- Added Signatures fileset to Zeek module {pull}23772[23772]
 
 *Heartbeat*
 
