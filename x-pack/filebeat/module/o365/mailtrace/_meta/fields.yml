@@ -1,0 +1,22 @@
+  - name: o365.mailtrace
+    type: group
+    default_field: false
+    description: >
+      Fields from Office 365 Mailtrace logs
+    fields:
+    - name: index
+      type: keyword
+      description: >
+        Index number from the API request
+    - name: message_trace_id
+      type: keyword
+      description: >
+         An identifier used to get the detailed message transfer trace information.
+    - name: status
+      type: keyword
+      description: >
+        The status of the message in the Office 365 email system. This corresponds to the Detail field of the last processing step recorded for the message.
+    - name: organization
+      type: keyword
+      description: >
+        The fully qualified domain name that was processing the email

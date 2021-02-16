@@ -1,0 +1,79 @@
+description: Pipeline for Office 365 Mailtrace logs
+
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- append:
+    field: event.category
+    value: email
+- rename:
+    field: o365.mailtrace.StartDate
+    target_field: event.start
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.EndDate
+    target_field: event.end
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.FromIP
+    target_field: source.ip
+    ignore_missing: true
+    if: ctx?.o365?.mailtrace?.FromIP != null
+- rename:
+    field: o365.mailtrace.ToIP
+    target_field: destination.ip
+    ignore_missing: true
+    if: ctx?.o365?.mailtrace?.ToIP != null
+- rename:
+    field: o365.mailtrace.Size
+    target_field: email.size
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.MessageId
+    target_field: email.message_id
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.MessageTraceId
+    target_field: o365.mailtrace.message_trace_id
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.Organization
+    target_field: o365.mailtrace.organization
+    ignore_missing: true
+- date:
+    field: o365.mailtrace.Received
+    formats:
+    - ISO8601
+- rename:
+    field: o365.mailtrace.RecipientAddress
+    target_field: email.recipients.addresses
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.SenderAddress
+    target_field: email.sender.address
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.Status
+    target_field: o365.mailtrace.status
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.Index
+    target_field: o365.mailtrace.index
+    ignore_missing: true
+- rename:
+    field: o365.mailtrace.Subject
+    target_field: email.subject
+    ignore_missing: true
+- remove:
+    field:
+        - message
+        - o365.mailtrace.Received
+        - o365.mailtrace.ToIP
+        - o365.mailtrace.FromIP
+    ignore_missing: true
+
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'
