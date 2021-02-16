@@ -877,12 +877,14 @@ def dumpVariables(){
 }
 
 def isDockerInstalled(){
-  if (isUnix()) {
-    // TODO: some issues with macosx if(isInstalled(tool: 'docker', flag: '--version')) {
-    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
-  } else {
+  if (env?.NODE_LABELS?.toLowerCase().contains('macosx')) {
+    log(level: 'WARN', text: "Macosx workers require some docker-machine context. They are not used for anything related to docker stuff yet.")
     return false
   }
+  if (isUnix()) {
+    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
+  }
+  return false
 }
 
 /**
