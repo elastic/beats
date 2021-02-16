@@ -4,9 +4,12 @@ type: httpjson
 config_version: "2"
 interval: {{ .interval }}
 
+{{ if .username }}
 auth.basic.user: {{ .username }}
+{{ end }}
+{{ if .password }}
 auth.basic.password: {{ .password }}
-
+{{ end }}
 request.method: GET
 {{ if .ssl }}
   - request.ssl: {{ .ssl | tojson }}
