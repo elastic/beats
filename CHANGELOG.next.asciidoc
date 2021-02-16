@@ -380,6 +380,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
 - Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
+- Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 
 *Heartbeat*
 
