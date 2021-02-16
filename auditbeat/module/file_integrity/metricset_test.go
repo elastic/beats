@@ -71,10 +71,6 @@ func TestActions(t *testing.T) {
 		t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/22518")
 	}
 
-	//if runtime.GOOS == "darwin" {
-	//	t.Skip("Skipping flaky test: https://github.com/elastic/beats/issues/23965")
-	//}
-
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
@@ -142,12 +138,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	go func() {
-		ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
-		ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
-	}()
-
-	time.Sleep(2 * time.Minute)
+	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
+	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
