@@ -86603,6 +86603,13 @@ type: object
 
 --
 
+*`logstash.log.log_event.action`*::
++
+--
+type: keyword
+
+--
+
 *`logstash.log.pipeline_id`*::
 +
 --
@@ -141660,6 +141667,15 @@ type: keyword
 
 --
 
+
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
 
 *`suricata.eve.alert.category`*::
 +

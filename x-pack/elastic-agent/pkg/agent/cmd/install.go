@@ -37,8 +37,6 @@ would like the Agent to operate.
 		},
 	}
 
-	cmd.Flags().StringP("kibana-url", "k", "", "URL of Kibana to enroll Agent into Fleet")
-	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
 	addEnrollFlags(cmd)
 
@@ -93,9 +91,12 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 
 	enroll := true
 	askEnroll := true
-	kibana, _ := cmd.Flags().GetString("kibana-url")
+	url, _ := cmd.Flags().GetString("url")
+	if url == "" {
+		url, _ = cmd.Flags().GetString("kibana-url")
+	}
 	token, _ := cmd.Flags().GetString("enrollment-token")
-	if kibana != "" && token != "" {
+	if url != "" && token != "" {
 		askEnroll = false
 	}
 	if force {
@@ -111,18 +112,18 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			enroll = false
 		}
 	}
-	if !askEnroll && (kibana == "" || token == "") {
+	if !askEnroll && (url == "" || token == "") {
 		// force was performed without required enrollment arguments, all done (standalone mode)
 		enroll = false
 	}
 
 	if enroll {
-		if kibana == "" {
-			kibana, err = c.ReadInput("Kibana URL you want to enroll this Agent into:")
+		if url == "" {
+			url, err = c.ReadInput("URL you want to enroll this Agent into:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
-			if kibana == "" {
+			if url == "" {
 				fmt.Fprintf(streams.Out, "Enrollment cancelled because no URL was provided.\n")
 				return nil
 			}
@@ -144,16 +145,33 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		return err
 	}
 
+	defer func() {
+		if err != nil {
+			install.Uninstall()
+		}
+	}()
+
+	err = install.StartService()
+	if err != nil {
+		fmt.Fprintf(streams.Out, "Installation failed to start Elastic Agent service.\n")
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			install.StopService()
+		}
+	}()
+
 	if enroll {
-		enrollArgs := []string{"enroll", kibana, token, "--from-install"}
-		enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd)...)
+		enrollArgs := []string{"enroll", "--from-install"}
+		enrollArgs = append(enrollArgs, buildEnrollmentFlags(cmd, url, token)...)
 		enrollCmd := exec.Command(install.ExecutablePath(), enrollArgs...)
 		enrollCmd.Stdin = os.Stdin
 		enrollCmd.Stdout = os.Stdout
 		enrollCmd.Stderr = os.Stderr
 		err = enrollCmd.Start()
 		if err != nil {
-			install.Uninstall()
 			return fmt.Errorf("failed to execute enroll command: %s", err)
 		}
 		err = enrollCmd.Wait()
@@ -167,11 +185,5 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	}
 
-	err = install.StartService()
-	if err != nil {
-		fmt.Fprintf(streams.Out, "Installation of required system files was successful, but starting of the service failed.\n")
-		return err
-	}
-	fmt.Fprintf(streams.Out, "Installation was successful and Elastic Agent is running.\n")
 	return nil
 }

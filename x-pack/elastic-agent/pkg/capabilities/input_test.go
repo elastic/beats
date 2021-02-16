@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
@@ -394,5 +395,5 @@ func getInputsMap(tt ...string) map[string]interface{} {
 
 type testReporter struct{}
 
-func (*testReporter) Update(status.AgentStatus) {}
-func (*testReporter) Unregister()               {}
+func (*testReporter) Update(state.Status, string) {}
+func (*testReporter) Unregister()                 {}

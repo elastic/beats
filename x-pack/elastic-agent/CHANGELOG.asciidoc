@@ -34,6 +34,7 @@
 - Fixed make status readable in the log. {pull}23849[23849]
 - Fixed Monitoring filebeat and metricbeat not connecting to Agent over GRPC {pull}23843[23843]
 - Windows agent doesn't uninstall with a lowercase `c:` drive in the path {pull}23998[23998]
+- Fix reloading of log level for services {pull}[24055]24055
 
 ==== New features
 
