@@ -57,9 +57,10 @@
       type: long
       description: The id of current transaction.
     - name: sql_state_code
+      # This code is not a number.
+      type: keyword
       description: >
         State code returned by Postgres (if any).
-        This code is not a number.
         See also https://www.postgresql.org/docs/current/errcodes-appendix.html
     - name: detail
       description: >
