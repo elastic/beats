@@ -7,12 +7,11 @@ package status
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-
 	"github.com/google/uuid"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
 
 // AgentStatusCode is the status code for the Elastic Agent overall.
@@ -50,6 +49,7 @@ type AgentStatus struct {
 // Controller takes track of component statuses.
 type Controller interface {
 	RegisterComponent(string) Reporter
+	RegisterComponentWithPersistance(string, bool) Reporter
 	RegisterApp(id string, name string) Reporter
 	Status() AgentStatus
 	StatusCode() AgentStatusCode
@@ -94,8 +94,10 @@ func (r *controller) UpdateStateID(stateID string) {
 		}
 
 		rep.mx.Lock()
-		rep.status = state.Configuring
-		rep.message = ""
+		if !rep.isPersistent {
+			rep.status = state.Configuring
+			rep.message = ""
+		}
 		rep.mx.Unlock()
 	}
 	r.mx.Unlock()
@@ -105,6 +107,11 @@ func (r *controller) UpdateStateID(stateID string) {
 
 // Register registers new component for status updates.
 func (r *controller) RegisterComponent(componentIdentifier string) Reporter {
+	return r.RegisterComponentWithPersistance(componentIdentifier, false)
+}
+
+// Register registers new component for status updates.
+func (r *controller) RegisterComponentWithPersistance(componentIdentifier string, persistent bool) Reporter {
 	id := componentIdentifier + "-" + uuid.New().String()[:8]
 	rep := &reporter{
 		name:         componentIdentifier,
@@ -115,6 +122,7 @@ func (r *controller) RegisterComponent(componentIdentifier string) Reporter {
 			r.mx.Unlock()
 		},
 		notifyChangeFunc: r.updateStatus,
+		isPersistent:     persistent,
 	}
 
 	r.mx.Lock()
@@ -238,6 +246,7 @@ type Reporter interface {
 type reporter struct {
 	name             string
 	mx               sync.Mutex
+	isPersistent     bool
 	isRegistered     bool
 	status           state.Status
 	message          string

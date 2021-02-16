@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -68,6 +69,11 @@ func newManaged(
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusCtrl)
+	if err != nil {
+		return nil, err
+	}
+
 	client, err := fleetapi.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
@@ -133,6 +139,7 @@ func newManaged(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -165,7 +172,8 @@ func newManaged(
 		[]context.CancelFunc{managedApplication.cancelCtxFn},
 		reexec,
 		acker,
-		combinedReporter)
+		combinedReporter,
+		caps)
 
 	policyChanger := &handlerPolicyChange{
 		log:       log,

@@ -7,8 +7,6 @@ package application
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
@@ -16,11 +14,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -68,6 +68,11 @@ func newLocal(
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (*Local, error) {
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusCtrl)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
@@ -122,6 +127,7 @@ func newLocal(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -147,7 +153,8 @@ func newLocal(
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
 		newNoopAcker(),
-		reporter)
+		reporter,
+		caps)
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil

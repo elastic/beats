@@ -13,7 +13,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
@@ -118,7 +120,25 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 }
 
 func printMapStringConfig(mapStr map[string]interface{}) error {
-	data, err := yaml.Marshal(mapStr)
+	l, err := newErrorLogger()
+	if err != nil {
+		return err
+	}
+	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), l, status.NewController(l))
+	if err != nil {
+		return err
+	}
+
+	newCfg, err := caps.Apply(mapStr)
+	if err != nil {
+		return errors.New(err, "failed to apply capabilities")
+	}
+	newMap, ok := newCfg.(map[string]interface{})
+	if !ok {
+		return errors.New("config returned from capabilities has invalid type")
+	}
+
+	data, err := yaml.Marshal(newMap)
 	if err != nil {
 		return errors.New(err, "could not marshal to YAML")
 	}
