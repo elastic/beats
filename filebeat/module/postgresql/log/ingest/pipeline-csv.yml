@@ -59,8 +59,8 @@ processors:
     ignore_missing: true
     patterns:
     - '^duration: %{NUMBER:temp.duration:float} ms$'
-    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP} %{DATA:postgresql.log.query_name}: %{GREEDYDATA:message}$'
-    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP}: %{GREEDYDATA:message}$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP:postgresql.log.query_step} %{DATA:postgresql.log.query_name}: %{GREEDYDATA:message}$'
+    - '^duration: %{NUMBER:temp.duration:float} ms  %{POSTGRESQL_QUERY_STEP:postgresql.log.query_step}: %{GREEDYDATA:message}$'
     - '^(%{POSTGRESQL_QUERY_STEP}: )?%{GREEDYDATA:message}$'
     pattern_definitions:
       GREEDYDATA: |-

@@ -43,12 +43,12 @@ processors:
     field: event.category
     value:
       - database
-- append:
+- set:
     field: event.type
     value:
       - info
     if: "ctx?.postgresql?.log?.sql_state_code == null || (ctx.postgresql.log.sql_state_code ==~ /^0[012].*/)"
-- append:
+- set:
     field: event.type
     value:
       - error

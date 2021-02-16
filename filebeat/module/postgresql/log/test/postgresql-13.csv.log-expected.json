@@ -747,6 +747,7 @@
         "postgresql.log.client_port": 45126,
         "postgresql.log.command_tag": "CHECKPOINT",
         "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.session_id": "5ff26a0c.56",
         "postgresql.log.session_start_time": "2021-01-04T01:06:20.000Z",
         "postgresql.log.sql_state_code": "00000",

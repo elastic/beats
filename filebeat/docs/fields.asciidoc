@@ -106131,8 +106131,10 @@ type: long
 *`postgresql.log.sql_state_code`*::
 +
 --
-State code returned by Postgres (if any). This code is not a number. See also https://www.postgresql.org/docs/current/errcodes-appendix.html
+State code returned by Postgres (if any). See also https://www.postgresql.org/docs/current/errcodes-appendix.html
 
+
+type: keyword
 
 --
 
