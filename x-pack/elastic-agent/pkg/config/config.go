@@ -117,7 +117,8 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 	if len(skippedKeys) > 0 {
 		err = cfg.Merge(skippedKeys, ucfg.ResolveNOOP)
 
-		// we're modifying object
+		// we modified incoming object
+		// cleanup so skipped keys are not missing
 		for k, v := range skippedKeys {
 			data[k] = v
 		}
