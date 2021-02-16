@@ -16,11 +16,18 @@ tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-- script:
-    lang: javascript
-    id: crowdstrike_falcon
-    file: ${path.home}/module/crowdstrike/falcon/config/pipeline.js
+- decode_json_fields:
+    fields:
+      - message
+    target: crowdstrike
+    process_array: true
+    max_depth: 8
+- drop_fields:
+    fields:
+      - message
+      - host.name
+    ignore_missing: true
 - add_fields:
     target: ''
     fields:
-      ecs.version: 1.7.0
+      ecs.version: 1.8.0

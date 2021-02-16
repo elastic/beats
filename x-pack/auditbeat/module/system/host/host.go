@@ -144,6 +144,10 @@ func (host *Host) toMapStr() common.MapStr {
 		mapstr.Put("os.codename", host.Info.OS.Codename)
 	}
 
+	if host.Info.OS.Type != "" {
+		mapstr.Put("os.type", host.Info.OS.Type)
+	}
+
 	var ipStrings []string
 	for _, ip := range host.Ips {
 		ipStrings = append(ipStrings, ip.String())
@@ -362,6 +366,7 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 	hostFields.CopyFieldsTo(hostTopLevel, "os.kernel")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.name")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.platform")
+	hostFields.CopyFieldsTo(hostTopLevel, "os.type")
 	hostFields.CopyFieldsTo(hostTopLevel, "os.version")
 
 	event.RootFields.Put("host", hostTopLevel)

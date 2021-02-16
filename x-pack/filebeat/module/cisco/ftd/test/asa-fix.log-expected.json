@@ -98,7 +98,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -146,7 +145,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -201,7 +199,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -247,7 +244,6 @@
             "SNL-ASA-VPN-A01"
         ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
