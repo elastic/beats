@@ -103,7 +103,7 @@ func NewOperator(
 		reporter:         reporter,
 		monitor:          monitor,
 		statusController: statusController,
-		statusReporter:   statusController.Register("operator-" + pipelineID),
+		statusReporter:   statusController.RegisterComponent("operator-" + pipelineID),
 	}
 
 	operator.initHandlerMap()
@@ -142,7 +142,7 @@ func (o *Operator) Close() error {
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		o.statusReporter.Update(status.Failed)
+		o.statusReporter.Update(state.Failed, err.Error())
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
 	o.statusController.UpdateStateID(stateID)
@@ -151,8 +151,9 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
 			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
 				// mark failed, new config cannot be run
-				o.statusReporter.Update(status.Failed)
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
+				msg := fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd)
+				o.statusReporter.Update(state.Failed, msg)
+				return errors.New(msg,
 					errors.TypeApplication,
 					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
@@ -160,18 +161,20 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 		handler, found := o.handlers[step.ID]
 		if !found {
-			o.statusReporter.Update(status.Failed)
-			return errors.New(fmt.Sprintf("operator: received unexpected event '%s'", step.ID), errors.TypeConfig)
+			msg := fmt.Sprintf("operator: received unexpected event '%s'", step.ID)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(msg, errors.TypeConfig)
 		}
 
 		if err := handler(step); err != nil {
-			o.statusReporter.Update(status.Failed)
-			return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err))
+			msg := fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(err, errors.TypeConfig, msg)
 		}
 	}
 
 	// Ack the resolver should state for next call.
-	o.statusReporter.Update(status.Healthy)
+	o.statusReporter.Update(state.Healthy, "")
 	ack()
 
 	return nil

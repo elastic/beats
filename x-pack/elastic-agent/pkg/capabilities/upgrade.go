@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -125,8 +127,9 @@ func (c *upgradeCapability) Apply(upgradeMap map[string]interface{}) (map[string
 	// if deny switch the logic
 	if c.Type == denyKey {
 		isSupported = !isSupported
-		c.log.Errorf("upgrade is blocked out due to capability restriction '%s'", c.name())
-		c.reporter.Update(status.Degraded)
+		msg := fmt.Sprintf("upgrade is blocked out due to capability restriction '%s'", c.name())
+		c.log.Errorf(msg)
+		c.reporter.Update(state.Degraded, msg)
 	}
 
 	if !isSupported {

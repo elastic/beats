@@ -220,7 +220,7 @@ func (u *Upgrader) ackAction(ctx context.Context, action fleetapi.Action) error 
 	u.reporter.OnStateChange(
 		"",
 		agentName,
-		state.State{Status: state.Running},
+		state.State{Status: state.Healthy},
 	)
 
 	return nil
