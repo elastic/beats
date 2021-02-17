@@ -75,12 +75,12 @@ func TestJourneyEnricher(t *testing.T) {
 	// We need an expectation for each input
 	// plus a final expectation for the summary which comes
 	// on the nil data.
-	for idx, se := range append(synthEvents, nil) {
+	for idx, se := range synthEvents {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se)
 
-			if se != nil {
+			if se != nil && se.Type != "journey/end" {
 				// Test that the created event includes the mapped
 				// version of the event
 				testslike.Test(t, lookslike.MustCompile(se.ToMap()), e.Fields)
@@ -89,7 +89,7 @@ func TestJourneyEnricher(t *testing.T) {
 				if se.Error != nil {
 					require.Equal(t, stepError(se.Error), enrichErr)
 				}
-			} else {
+			} else { // journey end gets a summary
 				require.Equal(t, stepError(syntherr), enrichErr)
 
 				u, _ := url.Parse(url1)
