@@ -106221,7 +106221,7 @@ Error code returned by Postgres (if any). Deprecated: errors can have letters. U
 
 type: alias
 
-alias to: postresql.log.sql_state_code
+alias to: postgresql.log.sql_state_code
 
 --
 

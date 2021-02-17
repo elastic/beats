@@ -94,7 +94,7 @@
 
     - name: error.code
       type: alias
-      path: postresql.log.sql_state_code
+      path: postgresql.log.sql_state_code
       description: >
         Error code returned by Postgres (if any).
         Deprecated: errors can have letters. Use sql_state_code instead.
