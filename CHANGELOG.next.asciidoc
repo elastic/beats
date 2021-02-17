@@ -49,6 +49,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
+- Adds negative body match. {pull}20728[20728]
+- Refactor synthetics configuration to new syntax. {pull}23467[23467]
 
 *Journalbeat*
 

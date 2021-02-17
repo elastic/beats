@@ -15,46 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package monitors
+package plugin
 
 import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
-type registryRecorder interface {
-	startMonitor(endpoints int64)
-	stopMonitor(endpoints int64)
+type RegistryRecorder interface {
+	StartMonitor(endpoints int64)
+	StopMonitor(endpoints int64)
 }
 
-// multiRegistryRecorder composes multiple statsRecorders.
-type multiRegistryRecorder struct {
-	recorders []registryRecorder
+// MultiRegistryRecorder composes multiple statsRecorders.
+type MultiRegistryRecorder struct {
+	recorders []RegistryRecorder
 }
 
-func (mr multiRegistryRecorder) startMonitor(endpoints int64) {
+func (mr MultiRegistryRecorder) StartMonitor(endpoints int64) {
 	for _, recorder := range mr.recorders {
-		recorder.startMonitor(endpoints)
+		recorder.StartMonitor(endpoints)
 	}
 }
 
-func (mr multiRegistryRecorder) stopMonitor(endpoints int64) {
+func (mr MultiRegistryRecorder) StopMonitor(endpoints int64) {
 	for _, recorder := range mr.recorders {
-		recorder.stopMonitor(endpoints)
+		recorder.StopMonitor(endpoints)
 	}
 }
 
 // countersRecorder is used to record start/stop events for a single monitor/plugin
 // to a single registry as counters.
-type countersRecorder struct {
+type CountersRecorder struct {
 	monitorStarts  *monitoring.Int
 	monitorStops   *monitoring.Int
 	endpointStarts *monitoring.Int
 	endpointStops  *monitoring.Int
 }
 
-func newPluginCountersRecorder(pluginName string, rootRegistry *monitoring.Registry) registryRecorder {
+func NewPluginCountersRecorder(pluginName string, rootRegistry *monitoring.Registry) RegistryRecorder {
 	pluginRegistry := rootRegistry.NewRegistry(pluginName)
-	return countersRecorder{
+	return CountersRecorder{
 		monitoring.NewInt(pluginRegistry, "monitor_starts"),
 		monitoring.NewInt(pluginRegistry, "monitor_stops"),
 		monitoring.NewInt(pluginRegistry, "endpoint_starts"),
@@ -62,12 +62,12 @@ func newPluginCountersRecorder(pluginName string, rootRegistry *monitoring.Regis
 	}
 }
 
-func (r countersRecorder) startMonitor(endpoints int64) {
+func (r CountersRecorder) StartMonitor(endpoints int64) {
 	r.monitorStarts.Inc()
 	r.endpointStarts.Add(endpoints)
 }
 
-func (r countersRecorder) stopMonitor(endpoints int64) {
+func (r CountersRecorder) StopMonitor(endpoints int64) {
 	r.monitorStops.Inc()
 	r.endpointStops.Add(endpoints)
 }
@@ -79,24 +79,24 @@ type gaugeRecorder struct {
 	endpoints *monitoring.Int
 }
 
-func newRootGaugeRecorder(r *monitoring.Registry) registryRecorder {
+func newRootGaugeRecorder(r *monitoring.Registry) RegistryRecorder {
 	return gaugeRecorder{
 		monitoring.NewInt(r, "monitors"),
 		monitoring.NewInt(r, "endpoints"),
 	}
 }
 
-func newPluginGaugeRecorder(pluginName string, rootRegistry *monitoring.Registry) registryRecorder {
+func newPluginGaugeRecorder(pluginName string, rootRegistry *monitoring.Registry) RegistryRecorder {
 	pluginRegistry := rootRegistry.NewRegistry(pluginName)
 	return newRootGaugeRecorder(pluginRegistry)
 }
 
-func (r gaugeRecorder) startMonitor(endpoints int64) {
+func (r gaugeRecorder) StartMonitor(endpoints int64) {
 	r.monitors.Inc()
 	r.endpoints.Add(endpoints)
 }
 
-func (r gaugeRecorder) stopMonitor(endpoints int64) {
+func (r gaugeRecorder) StopMonitor(endpoints int64) {
 	r.monitors.Dec()
 	r.endpoints.Sub(endpoints)
 }
