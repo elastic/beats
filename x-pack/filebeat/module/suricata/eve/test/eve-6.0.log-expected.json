@@ -70,7 +70,7 @@
         "suricata.eve.alert.signature": "GPL ATTACK_RESPONSE id check returned root",
         "suricata.eve.alert.signature_id": 2100498,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 1805461738637437,
+        "suricata.eve.flow_id": "1805461738637437",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp6s0",
