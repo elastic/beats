@@ -29,8 +29,10 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -125,7 +127,7 @@ func mockEventCustomFields() map[string]interface{} {
 	return common.MapStr{"foo": "bar"}
 }
 
-func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
+func createMockJob() ([]jobs.Job, error) {
 	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
@@ -134,28 +136,42 @@ func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
 	return []jobs.Job{j}, nil
 }
 
-func mockPluginBuilder() pluginBuilder {
+func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	reg := monitoring.NewRegistry()
 
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
-		// Declare a real config block with a required attr so we can see what happens when it doesn't work
-		unpacked := struct {
-			URLs []string `config:"urls" validate:"required"`
-		}{}
-		err := config.Unpack(&unpacked)
-		if err != nil {
-			return nil, 0, err
-		}
-		c := common.Config{}
-		j, err := createMockJob("test", &c)
-		return j, 1, err
-	}, newPluginCountersRecorder("test", reg)}
+	built := atomic.NewInt(0)
+	closed := atomic.NewInt(0)
+
+	return plugin.PluginFactory{
+			Name:    "test",
+			Aliases: []string{"testAlias"},
+			Builder: func(s string, config *common.Config) (plugin.Plugin, error) {
+				built.Inc()
+				// Declare a real config block with a required attr so we can see what happens when it doesn't work
+				unpacked := struct {
+					URLs []string `config:"urls" validate:"required"`
+				}{}
+				err := config.Unpack(&unpacked)
+				if err != nil {
+					return plugin.Plugin{}, err
+				}
+				j, err := createMockJob()
+				closer := func() error {
+					closed.Inc()
+					return nil
+				}
+				return plugin.Plugin{Jobs: j, Close: closer, Endpoints: 1}, err
+			},
+			Stats: plugin.NewPluginCountersRecorder("test", reg)},
+		built,
+		closed
 }
 
-func mockPluginsReg() *pluginsReg {
-	reg := newPluginsReg()
-	reg.add(mockPluginBuilder())
-	return reg
+func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
+	reg := plugin.NewPluginsReg()
+	builder, built, closed := mockPluginBuilder()
+	reg.Add(builder)
+	return reg, built, closed
 }
 
 func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {

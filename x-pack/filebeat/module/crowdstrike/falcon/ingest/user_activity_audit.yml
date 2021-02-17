@@ -1,0 +1,29 @@
+processors:
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: [iam]
+  - append:
+      field: event.type
+      value: [change]
+  - set:
+      field: event.dataset
+      value: crowdstrike.falcon_audit
+  - set:
+      field: event.action
+      value: user_activity_audit_event
+  - convert:
+      field: crowdstrike.event.OperationName
+      target_field: message
+      type: string
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: crowdstrike.event.UserIp
+      target_field: source.ip
+      type: string
+      ignore_failure: true
+      ignore_missing: true
+      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""

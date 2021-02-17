@@ -27,6 +27,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.116"
         ],
@@ -50,7 +53,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:38:58.000-02:00",
@@ -80,6 +84,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "83.20.132.250",
             "214.167.51.66"
@@ -137,6 +144,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "service.type": "sophos",
         "sophos.xg.connectiontype": "0",
         "sophos.xg.device": "SFW",
@@ -180,6 +190,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "83.9.140.96"
         ],
@@ -211,7 +224,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:39:01.000-02:00",
@@ -239,6 +253,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
@@ -274,6 +291,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
@@ -318,6 +338,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "217.250.157.135"
         ],
@@ -349,7 +372,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2020-05-18T14:39:04.000-02:00",
@@ -372,6 +396,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.user": [
             "elastic.user@elastic.test.com"
         ],
@@ -420,6 +447,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "91.67.201.4"
         ],
@@ -452,7 +482,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "hendrikl"
     },
     {
         "@timestamp": "2020-05-18T14:39:06.000-02:00",
@@ -473,6 +504,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
@@ -510,6 +544,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.66.35.15"
         ],
@@ -556,6 +593,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
@@ -591,6 +631,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "service.type": "sophos",
         "sophos.xg.backup_mode": "'appliance' ",
         "sophos.xg.device": "SFW",
@@ -637,6 +680,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "10.84.234.38"
         ],
@@ -663,7 +709,8 @@
         "tags": [
             "sophos-xg",
             "forwarded"
-        ]
+        ],
+        "user.name": "elastic.user@elastic.test.com"
     },
     {
         "@timestamp": "2018-06-06T11:12:10.000-02:00",
@@ -684,6 +731,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "SG430",

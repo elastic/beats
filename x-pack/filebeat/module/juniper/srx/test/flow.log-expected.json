@@ -45,8 +45,6 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "10.0.0.1",
-            "10.128.0.1",
-            "10.0.0.1",
             "10.128.0.1"
         ],
         "rule.name": "vpn_trust_permit-all",
@@ -246,8 +244,6 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "1.2.3.4",
-            "5.6.7.8",
-            "1.2.3.4",
             "5.6.7.8"
         ],
         "rule.name": "mngmt-to-vcenter",
@@ -324,8 +320,6 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "50.0.0.100",
-            "30.0.0.100",
-            "50.0.0.100",
             "30.0.0.100"
         ],
         "rule.name": "alg-policy",
@@ -396,7 +390,6 @@
         "related.ip": [
             "192.0.2.1",
             "198.51.100.12",
-            "192.0.2.1",
             "18.51.100.12"
         ],
         "rule.name": "policy1",
@@ -472,7 +465,6 @@
         "related.ip": [
             "192.0.2.1",
             "198.51.100.12",
-            "192.0.2.1",
             "18.51.100.12"
         ],
         "rule.name": "policy1",
@@ -563,8 +555,7 @@
         "related.ip": [
             "10.3.255.203",
             "8.23.224.110",
-            "10.3.136.49",
-            "8.23.224.110"
+            "10.3.136.49"
         ],
         "rule.name": "permit_all",
         "server.bytes": 535,
@@ -636,8 +627,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "192.168.2.164",
-            "172.16.1.19",
             "192.168.2.164",
             "172.16.1.19"
         ],
@@ -722,8 +711,7 @@
         "related.ip": [
             "100.73.10.92",
             "58.68.126.198",
-            "58.78.140.131",
-            "58.68.126.198"
+            "58.78.140.131"
         ],
         "rule.name": "NAT",
         "server.bytes": 136,
@@ -816,8 +804,7 @@
         "related.ip": [
             "192.168.255.2",
             "8.8.8.8",
-            "192.168.0.47",
-            "8.8.8.8"
+            "192.168.0.47"
         ],
         "rule.name": "trust-to-untrust-001",
         "server.bytes": 116,
@@ -966,8 +953,7 @@
         "related.ip": [
             "192.168.224.30",
             "207.17.137.56",
-            "173.167.224.7",
-            "207.17.137.56"
+            "173.167.224.7"
         ],
         "rule.name": "General-Outbound",
         "server.ip": "207.17.137.56",
@@ -1053,8 +1039,7 @@
         "related.ip": [
             "192.168.224.30",
             "207.17.137.56",
-            "173.167.224.7",
-            "207.17.137.56"
+            "173.167.224.7"
         ],
         "rule.name": "General-Outbound",
         "server.bytes": 0,
@@ -1146,8 +1131,7 @@
         "related.ip": [
             "192.168.224.30",
             "207.17.137.56",
-            "173.167.224.7",
-            "207.17.137.56"
+            "173.167.224.7"
         ],
         "rule.name": "General-Outbound",
         "server.bytes": 104,
@@ -1241,9 +1225,10 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "4.0.0.1",
-            "5.0.0.1",
-            "4.0.0.1",
             "5.0.0.1"
+        ],
+        "related.user": [
+            "user1"
         ],
         "rule.name": "permit-all",
         "server.bytes": 686432,
@@ -1329,9 +1314,10 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "4.0.0.1",
-            "5.0.0.1",
-            "4.0.0.1",
             "5.0.0.1"
+        ],
+        "related.user": [
+            "user1"
         ],
         "rule.name": "permit-all",
         "server.ip": "5.0.0.1",
@@ -1418,9 +1404,10 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "4.0.0.1",
-            "5.0.0.1",
-            "4.0.0.1",
             "5.0.0.1"
+        ],
+        "related.user": [
+            "user1"
         ],
         "rule.name": "permit-all",
         "server.bytes": 646,
@@ -1495,8 +1482,6 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "50.0.0.100",
-            "30.0.0.100",
             "50.0.0.100",
             "30.0.0.100"
         ],
@@ -1638,9 +1623,10 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "4.0.0.1",
-            "5.0.0.1",
-            "4.0.0.1",
             "5.0.0.1"
+        ],
+        "related.user": [
+            "user1"
         ],
         "rule.name": "permit-all",
         "server.bytes": 646,
@@ -1733,8 +1719,7 @@
         "related.ip": [
             "10.1.1.100",
             "46.165.154.241",
-            "172.19.34.100",
-            "46.165.154.241"
+            "172.19.34.100"
         ],
         "rule.name": "default-permit",
         "server.bytes": 2132,
@@ -1829,8 +1814,7 @@
         "related.ip": [
             "10.1.1.100",
             "91.228.167.172",
-            "172.19.34.100",
-            "91.228.167.172"
+            "172.19.34.100"
         ],
         "rule.name": "default-permit",
         "server.bytes": 9670,
@@ -1906,8 +1890,7 @@
         "related.ip": [
             "10.1.1.100",
             "8.8.8.8",
-            "172.19.34.100",
-            "8.8.8.8"
+            "172.19.34.100"
         ],
         "rule.name": "default-permit",
         "server.ip": "8.8.8.8",
@@ -1989,8 +1972,7 @@
         "related.ip": [
             "10.1.1.100",
             "8.8.8.8",
-            "172.19.34.100",
-            "8.8.8.8"
+            "172.19.34.100"
         ],
         "rule.name": "default-permit",
         "server.bytes": 82,
