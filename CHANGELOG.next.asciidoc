@@ -41,6 +41,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
+- Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
+- Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
+- Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
+- Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
+- Rename `s3` input to `aws-s3` input. {pull}23469[23469]
+- Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
 
 *Heartbeat*
 
