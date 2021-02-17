@@ -130,10 +130,12 @@ Loop:
 
 	t.Run("has echo'd stdin to stdout", func(t *testing.T) {
 		stdoutEvents := eventsWithType("stdout")
+		require.Len(t, stdoutEvents, 1)
 		require.Equal(t, stdinStr, stdoutEvents[0].Payload["message"])
 	})
 	t.Run("has echo'd two lines to stderr", func(t *testing.T) {
 		stdoutEvents := eventsWithType("stderr")
+		require.Len(t, stdoutEvents, 2)
 		require.Equal(t, "Stderr 1", stdoutEvents[0].Payload["message"])
 		require.Equal(t, "Stderr 2", stdoutEvents[1].Payload["message"])
 	})
