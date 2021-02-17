@@ -26,7 +26,7 @@ spec:
           image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
           args: [
             "-c", "/etc/agent.yml",
-            "-e", "-d", "composable.providers.kubernetes",
+            "-e", "-d", "*",
           ]
           env:
             - name: ES_USERNAME
@@ -373,7 +373,7 @@ spec:
           image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
           args: [
             "-c", "/etc/agent.yml",
-            "-e", "-d", "composable.providers.kubernetes",
+            "-e", "-d", "*",
           ]
           env:
             - name: ES_USERNAME
