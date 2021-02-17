@@ -28,7 +28,7 @@
         Used bytes of the datastore
       format: bytes
     - name: capacity.used.pct
-      type: long
+      type: scaled_float
       description: >
         Used percent of the datastore
       format: percent

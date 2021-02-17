@@ -59,7 +59,8 @@ rules:
     selector: inputs
     key: type
     values:
-    - awscloudwatch
+    - aws-cloudwatch
+    - aws-s3
     - azure-eventhub
     - cloudfoundry
     - container
@@ -73,7 +74,6 @@ rules:
     - netflow
     - o365audit
     - redis
-    - s3
     - stdin
     - syslog
     - tcp

@@ -6,6 +6,7 @@ package application
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"io"
 	"io/ioutil"
@@ -94,7 +95,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.Error(t, err)
 		},
 	))
@@ -147,7 +148,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			config, err := readConfig(store.Content)
@@ -205,7 +206,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -265,7 +266,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -310,7 +311,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.Error(t, err)
 			require.False(t, store.Called)
 		},

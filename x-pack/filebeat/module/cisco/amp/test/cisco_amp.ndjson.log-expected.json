@@ -1,0 +1,87 @@
+[
+    {
+        "@timestamp": "2020-11-11T09:51:38.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "192.168.196.22",
+                "mac": "aa:d9:ac:af:1d:ad"
+            },
+            {
+                "ip": "192.168.120.1",
+                "mac": "12:24:56:c2:00:01"
+            },
+            {
+                "ip": "192.168.160.1",
+                "mac": "12:50:56:c2:53:08"
+            }
+        ],
+        "cisco.amp.connector_guid": "1235-1234sdgf-654sdf-7562345",
+        "cisco.amp.detection": "W32.Trojan.22gp.1201",
+        "cisco.amp.detection_id": "12365423467",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "6542345gdfs-234-sdf2-34-6345243"
+        ],
+        "cisco.amp.related.mac": [
+            "aa:d9:ac:af:1d:ad",
+            "12:24:56:c2:00:01",
+            "12:50:56:c2:53:08"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 153000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 123578990,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "9a8557b98ed1469272fa0ace91d63477",
+        "file.hash.sha1": "d0c4192b65e36553fvfd2b83f3113f6ae8390baa",
+        "file.hash.sha256": "e678899d7ea9702184067b56655f91b69f8a0bdc9df65613762252c055c2cdvc",
+        "file.name": "HYXiN3hY.exe.part",
+        "file.path": "\\\\?\\C:\\Users\\elastic\\AppData\\Local\\Temp\\HYXiN3hY.exe.part",
+        "fileset.name": "amp",
+        "host.hostname": "testhost",
+        "host.name": "testhost",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@domain",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.hash.md5": "e50ab86d5409d4d0ad386b27ea7f78fb",
+        "process.hash.sha1": "d539afb0991e823c7cdf824b610a5a5d7655a2da",
+        "process.hash.sha256": "a7ca534327103ec5fac749f5ab8b7a1fe81209aa580a52df656284ef6215f0ab",
+        "process.name": "firefox.exe",
+        "process.pid": 88,
+        "related.hash": [
+            "e678899d7ea9702184067b56655f91b69f8a0bdc9df65613762252c055c2cdvc",
+            "9a8557b98ed1469272fa0ace91d63477",
+            "d0c4192b65e36553fvfd2b83f3113f6ae8390baa"
+        ],
+        "related.hosts": [
+            "testhost"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "192.168.196.22",
+            "192.168.120.1",
+            "192.168.160.1"
+        ],
+        "related.user": [
+            "user@domain"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    }
+]

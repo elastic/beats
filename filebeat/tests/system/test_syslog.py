@@ -117,21 +117,17 @@ class Test(BaseTest):
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # TCP
 
-        for n in range(0, 2):
+        for n in range(0, 50):
             m = "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:" \
                 " 'su root' failed for lonvick on /dev/pts/8 {}\n"
             m = m.format(n)
             sock.sendto(m.encode("utf-8"), (host, port))
 
-        self.wait_until(lambda: self.output_count(lambda x: x >= 2))
-
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         filebeat.check_kill_and_wait()
-
         sock.close()
 
         output = self.read_output()
-
-        assert len(output) == 2
         self.assert_syslog(output[0])
 
     # AF_UNIX support in python isn't available until
@@ -258,7 +254,7 @@ class Test(BaseTest):
         assert syslog["event.severity"] == 5
         assert syslog["hostname"] == "wopr.mymachine.co"
         assert syslog["input.type"] == "syslog"
-        assert syslog["message"] == "'su root' failed for lonvick on /dev/pts/8 0"
+        assert syslog["message"].startswith("'su root' failed for lonvick on /dev/pts/8")
         assert syslog["process.pid"] == 2000
         assert syslog["process.program"] == "postfix/smtpd"
         assert syslog["syslog.facility"] == 1

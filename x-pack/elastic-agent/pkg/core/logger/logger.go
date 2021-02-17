@@ -43,7 +43,7 @@ func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
 	return new(name, defaultCfg)
 }
 
-//NewFromConfig takes the user configuration and generate the right logger.
+// NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
 func NewFromConfig(name string, cfg *Config) (*Logger, error) {
 	return new(name, cfg)
@@ -100,7 +100,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", agentName))
+	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),

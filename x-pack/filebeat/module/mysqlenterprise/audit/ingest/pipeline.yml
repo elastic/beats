@@ -1,0 +1,213 @@
+description: Pipeline for parsing MySQL Enterprise Audit logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- json:
+    field: message
+    target_field: mysqlenterprise.audit
+- remove:
+    field: '@timestamp'
+    ignore_missing: true
+    if: ctx?.mysqlenterprise?.audit?.timestamp != null
+- set:
+    field: event.kind
+    value: event
+- append:
+    field: event.category
+    value: database
+- append:
+    field: event.category
+    value: network
+    if: ctx?.mysqlenterprise?.audit?.event == 'connect'
+- append:
+    field: event.category
+    value: iam
+    if: '["create_user", "delete_user", "drop_user", "grant", "flush_privileges"].contains(ctx.mysqlenterprise.audit?.general_data?.sql_command)'
+- append:
+    field: event.type
+    value: access
+    if: ctx?.mysqlenterprise?.audit?.class != 'audit'
+- append:
+    field: event.type
+    value: connection
+    if: ctx?.mysqlenterprise?.audit?.class != 'audit'
+- append:
+    field: event.type
+    value: start
+    if: ctx?.mysqlenterprise?.audit?.event == 'connect'
+- append:
+    field: event.type
+    value: end
+    if: ctx?.mysqlenterprise?.audit?.event == 'disconnect'
+- set:
+    field: event.outcome
+    value: success
+    if: ctx?.mysqlenterprise?.audit?.connection_data?.status != null && ctx?.mysqlenterprise?.audit?.connection_data?.status == 0 || ctx?.mysqlenterprise?.audit?.general_data?.status != null && ctx?.mysqlenterprise?.audit?.general_data?.status == 0
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx?.mysqlenterprise?.audit?.connection_data?.status != null && ctx?.mysqlenterprise?.audit?.connection_data?.status > 0 || ctx?.mysqlenterprise?.audit?.general_data?.status != null && ctx?.mysqlenterprise?.audit?.general_data?.status > 0
+- set:
+    field: event.outcome
+    value: unknown
+    if: ctx?.event?.outcome == null
+- set:
+    field: event.action
+    value: mysql-{{ mysqlenterprise.audit.event }}
+    if: ctx?.mysqlenterprise?.audit?.event != null
+- script:
+    lang: painless
+    if: ctx?.mysqlenterprise?.audit != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v instanceof String && v.isEmpty() == true);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+- rename:
+    field: mysqlenterprise.audit.account.user
+    target_field: server.user.name
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.account.host
+    target_field: client.domain
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.login.os
+    target_field: client.user.name
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.login.ip
+    target_field: client.ip
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.startup_data.os_version
+    target_field: host.os.full
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.startup_data.mysql_version
+    target_field: service.version
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.startup_data.server_id
+    target_field: service.id
+    ignore_missing: true
+- rename:
+    field: mysqlenterprise.audit.startup_data.args
+    target_field: process.args
+    ignore_missing: true
+- set:
+    field: process.name
+    value: mysqld
+- join:
+    field: process.args
+    target_field: process.command_line
+    separator: " "
+    ignore_failure: true
+- script:
+    lang: painless
+    if: ctx?.process?.args != null
+    source: |
+      ctx.process.args_count = ctx.process.args.length;
+      if (ctx.process.args.length > 0) {
+        ctx.process.executable = ctx.process.args[0];
+      }
+# Query parsing
+- grok:
+    field: mysqlenterprise.audit.general_data.query
+    if: '["create_user", "delete_user", "drop_user"].contains(ctx.mysqlenterprise?.audit?.general_data?.sql_command)'
+    ignore_failure: true
+    patterns:
+      - '(?i)(?:CREATE|DROP)\s+USER(?:\s+IF\s+(?:NOT\s+)?EXISTS)?\s+(?:%{START_QUOTE}%{QUOTED:user.target.name}%{END_QUOTE}|%{UNQUOTED:user.target.name})(?:@(?:%{START_QUOTE}%{QUOTED:user.target.domain}%{END_QUOTE}|%{UNQUOTED:user.target.domain}))?'
+    pattern_definitions:
+      START_QUOTE: (?<__quote>['"`])
+      QUOTED: (?~\k<__quote>)
+      END_QUOTE: (?:\k<__quote>)
+      UNQUOTED: (?:[^\s@;]*+)
+- remove:
+    field: __quote
+    ignore_missing: true
+- set:
+    field: user.name
+    value: '{{server.user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.target != null'
+- append:
+    field: event.type
+    value:
+      - user
+      - creation
+    if: 'ctx.mysqlenterprise?.audit?.general_data?.sql_command == "create_user"'
+- append:
+    field: event.type
+    value:
+      - user
+      - deletion
+    if: 'ctx.mysqlenterprise?.audit?.general_data?.sql_command == "drop_user" || ctx.mysqlenterprise?.audit?.general_data?.sql_command == "delete_user"'
+
+# Attributes starting with _ is only supported by MySQL 8.0.19 and above.
+- convert:
+    field: mysqlenterprise.audit.connection_data.connection_attributes._pid
+    target_field: process.pid
+    type: long
+    ignore_missing: true
+- append:
+    field: related.user
+    value: '{{server.user.name}}'
+    allow_duplicates: false
+    if: ctx?.server?.user?.name != null
+- append:
+    field: related.user
+    value: '{{client.user.name}}'
+    allow_duplicates: false
+    if: ctx?.client?.user?.name != null
+- append:
+    field: related.user
+    value: '{{user.target.name}}'
+    allow_duplicates: false
+    if: ctx?.user?.target?.name != null
+- append:
+    field: related.ip
+    value: '{{client.ip}}'
+    allow_duplicates: false
+    if: ctx?.client?.ip != null
+- append:
+    field: related.hosts
+    value: '{{client.domain}}'
+    allow_duplicates: false
+    if: ctx?.client?.domain != null
+- date:
+    field: mysqlenterprise.audit.timestamp
+    formats:
+    - yyyy-MM-dd HH:mm:ss
+    if: ctx?.mysqlenterprise?.audit?.timestamp != null
+- rename:
+    field: message
+    target_field: event.original
+    ignore_missing: true
+- remove:
+    field:
+    - mysqlenterprise.audit.event
+    - mysqlenterprise.audit.timestamp
+    - mysqlenterprise.audit.connection_data.connection_attributes._pid
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

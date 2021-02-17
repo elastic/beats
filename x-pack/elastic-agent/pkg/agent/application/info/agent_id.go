@@ -20,11 +20,13 @@ import (
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
+const defaultAgentCapabilitiesFile = "capabilities.yml"
 const defaultAgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
+const defaultAgentStateStoreFile = "state.yml"
 
 const defaultLogLevel = "info"
 
@@ -43,9 +45,19 @@ func AgentConfigFile() string {
 	return filepath.Join(paths.Config(), defaultAgentConfigFile)
 }
 
-// AgentActionStoreFile is the file that will contains the action that can be replayed after restart.
+// AgentCapabilitiesPath is a name of file used to store agent capabilities
+func AgentCapabilitiesPath() string {
+	return filepath.Join(paths.Config(), defaultAgentCapabilitiesFile)
+}
+
+// AgentActionStoreFile is the file that contains the action that can be replayed after restart.
 func AgentActionStoreFile() string {
 	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
+}
+
+// AgentStateStoreFile is the file that contains the persisted state of the agent including the action that can be replayed after restart.
+func AgentStateStoreFile() string {
+	return filepath.Join(paths.Home(), defaultAgentStateStoreFile)
 }
 
 // updateLogLevel updates log level and persists it to disk.

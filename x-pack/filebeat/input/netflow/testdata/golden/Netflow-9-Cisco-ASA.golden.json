@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -99,7 +98,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -182,7 +180,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -265,7 +262,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -348,7 +344,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -431,7 +426,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -514,7 +508,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -597,7 +590,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -680,7 +672,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -763,7 +754,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -846,7 +836,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -929,7 +918,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1012,7 +1000,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1095,7 +1082,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2015-10-09T09:47:51Z",
           "kind": "event",
           "type": [
             "connection"

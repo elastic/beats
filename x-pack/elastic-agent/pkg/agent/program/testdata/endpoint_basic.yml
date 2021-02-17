@@ -3,6 +3,7 @@ name: Endpoint Host
 fleet:
   agent:
     id: fleet-agent-id
+    logging.level: error
   host:
     id: host-agent-id
   access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
@@ -111,3 +112,5 @@ inputs:
         process: true
         file: true
         network: true
+runtime:
+  arch: x86_64

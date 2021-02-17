@@ -1,0 +1,56 @@
+{{ if eq .input "httpjson" }}
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+auth.oauth2.provider: google
+auth.oauth2.google.jwt_file: {{ .jwt_file }}
+auth.oauth2.google.delegated_account: {{ .delegated_account }}
+auth.oauth2.scopes:
+  - https://www.googleapis.com/auth/admin.reports.audit.readonly
+request.url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user_key }}/applications/saml
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
+{{ end }}
+request.transforms:
+  - set:
+      target: url.params.startTime
+      value: "[[.cursor.last_execution_datetime]]"
+      default: '[[parseDate now (parseDuration "-{{.initial_interval}}")]]'
+response.split:
+  target: body.items
+  split:
+    target: body.events
+    keep_parent: true
+response.pagination:
+  - set:
+      target: url.params.pageToken
+      value: "[[.last_response.body.nextPageToken]]"
+cursor:
+  last_execution_datetime:
+    value: "[[now]]"
+
+{{ else if eq .input "file" }}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.8.0
+  - script:
+      lang: javascript
+      id: gworkspace-common
+      file: ${path.home}/module/google_workspace/config/common.js
+  - script:
+      lang: javascript
+      id: gworkspace-admin
+      file: ${path.home}/module/google_workspace/saml/config/pipeline.js

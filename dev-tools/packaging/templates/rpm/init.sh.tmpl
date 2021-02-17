@@ -33,6 +33,8 @@ wrapperopts="-r / -n -p $pidfile"
 user_wrapper="su"
 user_wrapperopts="$beat_user -c"
 RETVAL=0
+DEFAULT_GODEBUG="madvdontneed=1"
+export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 # Source function library.
 . /etc/rc.d/init.d/functions

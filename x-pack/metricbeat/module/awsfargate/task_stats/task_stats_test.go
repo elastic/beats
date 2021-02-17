@@ -122,3 +122,15 @@ func TestGetCPUStats(t *testing.T) {
 	assert.Equal(t, 0.4, cpuStats.TotalUsage)
 	assert.Equal(t, 0.2, cpuStats.TotalUsageNormalized)
 }
+
+func TestGetRegionAndClusterName(t *testing.T) {
+	labels := map[string]string{}
+	labels["com_amazonaws_ecs_cluster"] = "arn:aws:ecs:us-east-1:1234:cluster/metricbeat-fargate-1"
+	regionName, clusterName := getRegionAndClusterName(labels)
+	assert.Equal(t, "us-east-1", regionName)
+	assert.Equal(t, "metricbeat-fargate-1", clusterName)
+}
+
+func TestGenerateIdentifier(t *testing.T) {
+	assert.Equal(t, "container-name/123", generateIdentifier("container-name", "123"))
+}

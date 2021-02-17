@@ -169,7 +169,7 @@ func (cm *Manager) OnConfig(s string) {
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
-		cm.UpdateStatus(management.Degraded, errs.Error())
+		cm.UpdateStatus(management.Failed, errs.Error())
 		return
 	}
 

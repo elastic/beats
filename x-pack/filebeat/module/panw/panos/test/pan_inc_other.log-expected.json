@@ -803,11 +803,9 @@
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",

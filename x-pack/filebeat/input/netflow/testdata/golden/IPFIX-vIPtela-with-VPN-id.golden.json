@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-11-21T14:32:15Z",
           "kind": "event",
           "type": [
             "connection"

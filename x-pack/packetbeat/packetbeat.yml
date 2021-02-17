@@ -13,6 +13,16 @@
 # "any" keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: any
 
+# The network CIDR blocks that are considered "internal" networks for
+# the purpose of network perimeter boundary classification. The valid
+# values for internal_networks are the same as those that can be used
+# with processor network conditions.
+#
+# For a list of available values see:
+# https://www.elastic.co/guide/en/beats/packetbeat/current/defining-processors.html#condition-network
+packetbeat.interfaces.internal_networks:
+  - private
+
 # =================================== Flows ====================================
 
 # Set `enabled: false` or comment out all options to disable flows reporting.
@@ -28,7 +38,7 @@ packetbeat.flows:
 
 packetbeat.protocols:
 - type: icmp
-  # Enable ICMPv4 and ICMPv6 monitoring. Default: false
+  # Enable ICMPv4 and ICMPv6 monitoring. The default is true.
   enabled: true
 
 - type: amqp
@@ -37,7 +47,8 @@ packetbeat.protocols:
   ports: [5672]
 
 - type: cassandra
-  #Cassandra port for traffic monitoring.
+  # Configure the ports where to listen for Cassandra traffic. You can disable
+  # the Cassandra protocol by commenting out the list of ports.
   ports: [9042]
 
 - type: dhcpv4
@@ -102,7 +113,8 @@ packetbeat.protocols:
     - 9243  # Elasticsearch
 
 - type: sip
-  # Configure the ports where to listen for SIP traffic. You can disable the SIP protocol by commenting out the list of ports.
+  # Configure the ports where to listen for SIP traffic. You can disable
+  # the SIP protocol by commenting out the list of ports.
   ports: [5060]
 
 # ======================= Elasticsearch template setting =======================
@@ -214,6 +226,12 @@ processors:
       - add_host_metadata: ~
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
+  - detect_mime_type:
+      field: http.request.body.content
+      target: http.request.mime_type
+  - detect_mime_type:
+      field: http.response.body.content
+      target: http.response.mime_type
 
 # ================================== Logging ===================================
 

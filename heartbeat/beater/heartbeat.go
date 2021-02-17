@@ -35,6 +35,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -80,10 +82,11 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
-	err := bt.RunStaticMonitors(b)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
 		return err
 	}
+	defer stopStaticMonitors()
 
 	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
@@ -121,9 +124,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
 
+	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
@@ -131,12 +135,19 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 				continue // don't stop loading monitors just because they're disabled
 			}
 
-			return errors.Wrap(err, "could not create monitor")
+			return nil, errors.Wrap(err, "could not create monitor")
 		}
 
 		created.Start()
+		runners = append(runners, created)
 	}
-	return nil
+
+	stop = func() {
+		for _, runner := range runners {
+			runner.Stop()
+		}
+	}
+	return stop, nil
 }
 
 // RunCentralMgmtMonitors loads any central management configured configs.
