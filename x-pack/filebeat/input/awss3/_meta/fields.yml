@@ -2,7 +2,7 @@
   title: "s3"
   description: >
     S3 fields from s3 input.
-  release: beta
+  release: ga
   fields:
     - name: bucket_name
       type: keyword

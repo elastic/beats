@@ -43,10 +43,25 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
+// Types is the list of package types
+var SelectedPackageTypes []PackageType
+
 func init() {
 	// Allow overriding via PLATFORMS.
 	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {
 		Platforms = NewPlatformList(expression)
+	}
+
+	// Allow overriding via PACKAGES.
+	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
+		for _, pkgtype := range strings.Split(packageTypes, ",") {
+			var p PackageType
+			err := p.UnmarshalText([]byte(pkgtype))
+			if err != nil {
+				continue
+			}
+			SelectedPackageTypes = append(SelectedPackageTypes, p)
+		}
 	}
 }
 
@@ -169,12 +184,13 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 	return CrossBuild(o...)
 }
 
-// buildMage pre-compiles the magefile to a binary using the native GOOS/GOARCH
-// values for Docker. It has the benefit of speeding up the build because the
+// buildMage pre-compiles the magefile to a binary using the GOARCH parameter.
+// It has the benefit of speeding up the build because the
 // mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
-	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch=amd64",
-		"-compile", CreateDir(filepath.Join("build", "mage-linux-amd64")))
+	arch := runtime.GOARCH
+	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch="+arch,
+		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
 func crossBuildImage(platform string) (string, error) {
@@ -185,6 +201,9 @@ func crossBuildImage(platform string) (string, error) {
 		tagSuffix = "darwin"
 	case strings.HasPrefix(platform, "linux/arm"):
 		tagSuffix = "arm"
+		if runtime.GOARCH == "arm64" {
+			tagSuffix = "base-arm-debian9"
+		}
 	case strings.HasPrefix(platform, "linux/mips"):
 		tagSuffix = "mips"
 	case strings.HasPrefix(platform, "linux/ppc"):
@@ -231,9 +250,10 @@ func (b GolangCrossBuilder) Build() error {
 	}
 	workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
 
-	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-amd64"))
+	builderArch := runtime.GOARCH
+	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
 	if err != nil {
-		return errors.Wrap(err, "failed to determine mage-linux-amd64 relative path")
+		return errors.Wrap(err, "failed to determine mage-linux-"+builderArch+" relative path")
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")

@@ -25,7 +25,7 @@ request.transforms:
   - set:
       target: url.params.since
       value: "[[.cursor.published]]"
-      default: '[[now (parseDuration "-{{.initial_interval}}")]]'
+      default: '[[formatDate (now (parseDuration "-{{.initial_interval}}")) "RFC3339"]]'
 
 response.pagination:
   - set:
@@ -50,13 +50,17 @@ tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - script:
-      lang: javascript
-      id: okta_system_script
-      file: ${path.home}/module/okta/system/config/pipeline.js
-      params:
-        keep_original_message: {{ .keep_original_message }}
+  - decode_json_fields:
+      fields:
+        - message
+      target: json
+{{ if eq .keep_original_message true }}
+  - rename:
+      fields:
+        - from: message
+          to: event.original
+{{ end }}
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

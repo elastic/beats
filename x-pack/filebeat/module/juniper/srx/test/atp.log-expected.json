@@ -58,6 +58,9 @@
             "10.10.10.1",
             "187.19.188.200"
         ],
+        "related.user": [
+            "user1"
+        ],
         "server.ip": "187.19.188.200",
         "server.port": 80,
         "service.type": "juniper",
@@ -109,6 +112,9 @@
         ],
         "related.ip": [
             "192.0.2.0"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "juniper",
         "source.domain": "host.example.com",

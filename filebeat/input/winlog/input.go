@@ -98,7 +98,7 @@ func (eventlogRunner) Run(
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+	cancelCtx, cancelFn := ctxtool.WithFunc(ctx.Cancelation, func() {
 		if err := api.Close(); err != nil {
 			log.Errorf("Error while closing Windows Eventlog Access: %v", err)
 		}

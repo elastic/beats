@@ -37,8 +37,13 @@ function enroll(){
         exit $exitCode
       fi
       echo $enrollResp
-      local apikeyId=$(echo $enrollResp | jq -r '.list[0].id')
+      local apikeyId=$(echo $enrollResp | jq -r '.list[] | select((.name | startswith("Default ")) and (.active == true)) | .id')
       echo $apikeyId
+
+      if [[ -z "${apikeyId}" ]]; then
+        echo "Default agent policy was not found. Please consider using own enrollment token (FLEET_ENROLLMENT_TOKEN)."
+        exit 1
+      fi
 
       enrollResp=$(curl ${KIBANA_HOST:-http://localhost:5601}/api/fleet/enrollment-api-keys/$apikeyId \
         -H 'Content-Type: application/json' \

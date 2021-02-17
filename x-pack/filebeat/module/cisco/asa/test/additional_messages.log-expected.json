@@ -1743,6 +1743,9 @@
         "related.hosts": [
             "dev01"
         ],
+        "related.user": [
+            "aaaa"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1778,6 +1781,9 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
+        ],
+        "related.user": [
+            "aaaa"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2115,7 +2121,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2207,7 +2212,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2302,7 +2306,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2347,7 +2350,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2392,7 +2394,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2437,7 +2438,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2710,6 +2710,9 @@
         "related.ip": [
             "10.10.0.87"
         ],
+        "related.user": [
+            "enable_15"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
         "source.ip": "10.10.0.87",
@@ -2748,6 +2751,9 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
+        ],
+        "related.user": [
+            "enable_15"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2794,6 +2800,9 @@
             "10.10.1.212",
             "10.10.1.254"
         ],
+        "related.user": [
+            "*****"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.1.212",
         "source.ip": "10.10.1.212",
@@ -2836,6 +2845,9 @@
         ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2884,6 +2896,9 @@
             "10.10.0.87",
             "10.10.1.254"
         ],
+        "related.user": [
+            "admin"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
         "source.ip": "10.10.0.87",
@@ -2926,6 +2941,9 @@
         ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -3031,6 +3049,9 @@
         "related.ip": [
             "91.240.17.178"
         ],
+        "related.user": [
+            "91.240.17.178"
+        ],
         "service.type": "cisco",
         "source.bytes": 297103,
         "source.user.name": "91.240.17.178",
@@ -3070,6 +3091,9 @@
         ],
         "related.ip": [
             "8.8.8.8"
+        ],
+        "related.user": [
+            "testuser"
         ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
@@ -3119,6 +3143,9 @@
         "related.ip": [
             "8.8.8.8"
         ],
+        "related.user": [
+            "testuser"
+        ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
         "source.as.number": 15169,
@@ -3166,6 +3193,9 @@
         ],
         "related.ip": [
             "192.168.50.1"
+        ],
+        "related.user": [
+            "alice"
         ],
         "service.type": "cisco",
         "source.address": "192.168.50.1",
