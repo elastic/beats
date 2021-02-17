@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: agent-deployment-datastreams
+  name: agent-node-datastreams
   namespace: kube-system
   labels:
     k8s-app: elastic-agent
 data:
-  # This part requires `kube-state-metrics` up and running under `kube-system` namespace
   agent.yml: |-
     id: ef9cc740-5bf0-11eb-8b51-39775155c3f5
     revision: 2
@@ -24,9 +23,143 @@ data:
         use_output: default
         logs: true
         metrics: true
+    providers.kubernetes:
+      node: ${NODE_NAME}
+      scope: node
     inputs:
-      - id: 934ef8aa-ed19-405b-8160-ebf62e3d32f9
-        name: kubernetes-cluster-metrics
+      - id: 4ae27079-6cd4-4ab7-a459-abbae74ffc44
+        name: log-1
+        revision: 1
+        type: logfile
+        use_output: default
+        meta:
+          package:
+            name: log
+            version: 0.4.6
+        data_stream:
+          namespace: default
+        streams:
+          - id: logfile-log.log-4ae27079-6cd4-4ab7-a459-abbae74ffc44
+            data_stream:
+              dataset: generic
+            symlinks: true
+            paths:
+              - /var/log/containers/*${kubernetes.container.id}.log
+      - id: 1f6112ef-9847-4294-aba4-0dc9e7240551
+        name: system-3
+        revision: 2
+        type: system/metrics
+        use_output: default
+        meta:
+          package:
+            name: system
+            version: 0.10.9
+        data_stream:
+          namespace: default
+        streams:
+          - id: system/metrics-system.core-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.core
+              type: metrics
+            metricsets:
+              - core
+            core.metrics:
+              - percentages
+          - id: system/metrics-system.cpu-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.cpu
+              type: metrics
+            period: 10s
+            cpu.metrics:
+              - percentages
+              - normalized_percentages
+            metricsets:
+              - cpu
+          - id: system/metrics-system.diskio-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.diskio
+              type: metrics
+            period: 10s
+            diskio.include_devices: null
+            metricsets:
+              - diskio
+          - id: system/metrics-system.filesystem-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.filesystem
+              type: metrics
+            period: 1m
+            metricsets:
+              - filesystem
+            processors:
+              - drop_event.when.regexp:
+                  system.filesystem.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+          - id: system/metrics-system.fsstat-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.fsstat
+              type: metrics
+            period: 1m
+            metricsets:
+              - fsstat
+            processors:
+              - drop_event.when.regexp:
+                  system.fsstat.mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib|snap)($|/)
+          - id: system/metrics-system.load-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.load
+              type: metrics
+            period: 10s
+            metricsets:
+              - load
+          - id: system/metrics-system.memory-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.memory
+              type: metrics
+            period: 10s
+            metricsets:
+              - memory
+          - id: system/metrics-system.network-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.network
+              type: metrics
+            period: 10s
+            network.interfaces: null
+            metricsets:
+              - network
+          - id: system/metrics-system.process-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.process
+              type: metrics
+            process.include_top_n.by_memory: 5
+            period: 10s
+            processes:
+              - .*
+            process.include_top_n.by_cpu: 5
+            process.cgroups.enabled: false
+            process.cmdline.cache.enabled: true
+            metricsets:
+              - process
+            process.include_cpu_ticks: false
+            system.hostfs: /hostfs
+          - id: >-
+              system/metrics-system.process_summary-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.process_summary
+              type: metrics
+            period: 10s
+            metricsets:
+              - process_summary
+            system.hostfs: /hostfs
+          - id: >-
+              system/metrics-system.socket_summary-1f6112ef-9847-4294-aba4-0dc9e7240551
+            data_stream:
+              dataset: system.socket_summary
+              type: metrics
+            period: 10s
+            metricsets:
+              - socket_summary
+            system.hostfs: /hostfs
+      - id: 934ef8aa-ed19-405b-8160-ebf62e3d32f8
+        name: kubernetes-node-metrics
         revision: 1
         type: kubernetes/metrics
         use_output: default
@@ -38,156 +171,98 @@ data:
           namespace: default
         streams:
           - id: >-
-              kubernetes/metrics-kubernetes.apiserver-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+              kubernetes/metrics-kubernetes.controllermanager-3d50c483-2327-40e7-b3e5-d877d4763fe1
             data_stream:
-              dataset: kubernetes.apiserver
+              dataset: kubernetes.controllermanager
               type: metrics
             metricsets:
-              - apiserver
+              - controllermanager
+            hosts:
+              - '${kubernetes.pod.ip}:10252'
+            period: 10s
+            condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
+          - id: >-
+              kubernetes/metrics-kubernetes.scheduler-3d50c483-2327-40e7-b3e5-d877d4763fe1
+            data_stream:
+              dataset: kubernetes.scheduler
+              type: metrics
+            metricsets:
+              - scheduler
+            hosts:
+              - '${kubernetes.pod.ip}:10251'
+            period: 10s
+            condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
+          - id: >-
+              kubernetes/metrics-kubernetes.proxy-3d50c483-2327-40e7-b3e5-d877d4763fe1
+            data_stream:
+              dataset: kubernetes.proxy
+              type: metrics
+            metricsets:
+              - proxy
+            hosts:
+              - 'localhost:10249'
+            period: 10s
+          - id: >-
+              kubernetes/metrics-kubernetes.container-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            data_stream:
+              dataset: kubernetes.container
+              type: metrics
+            metricsets:
+              - container
+            add_metadata: true
             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'https://${env.KUBERNETES_SERVICE_HOST}:${env.KUBERNETES_SERVICE_PORT}'
-            period: 30s
-            ssl.certificate_authorities:
-              - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-          - id: >-
-              kubernetes/metrics-kubernetes.event-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.event
-              type: metrics
-            metricsets:
-              - event
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
-            add_metadata: true
+            ssl.verification_mode: none
           - id: >-
-              kubernetes/metrics-kubernetes.state_container-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+              kubernetes/metrics-kubernetes.node-934ef8aa-ed19-405b-8160-ebf62e3d32f8
             data_stream:
-              dataset: kubernetes.state_container
+              dataset: kubernetes.node
               type: metrics
             metricsets:
-              - state_container
+              - node
             add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_cronjob-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+            ssl.verification_mode: none
+          - id: kubernetes/metrics-kubernetes.pod-934ef8aa-ed19-405b-8160-ebf62e3d32f8
             data_stream:
-              dataset: kubernetes.state_cronjob
+              dataset: kubernetes.pod
               type: metrics
             metricsets:
-              - state_cronjob
+              - pod
             add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
+            ssl.verification_mode: none
           - id: >-
-              kubernetes/metrics-kubernetes.state_deployment-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+              kubernetes/metrics-kubernetes.system-934ef8aa-ed19-405b-8160-ebf62e3d32f8
             data_stream:
-              dataset: kubernetes.state_deployment
+              dataset: kubernetes.system
               type: metrics
             metricsets:
-              - state_deployment
+              - system
             add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
+            ssl.verification_mode: none
           - id: >-
-              kubernetes/metrics-kubernetes.state_node-934ef8aa-ed19-405b-8160-ebf62e3d32f8
+              kubernetes/metrics-kubernetes.volume-934ef8aa-ed19-405b-8160-ebf62e3d32f8
             data_stream:
-              dataset: kubernetes.state_node
+              dataset: kubernetes.volume
               type: metrics
             metricsets:
-              - state_node
+              - volume
             add_metadata: true
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'https://${env.NODE_NAME}:10250'
             period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_persistentvolume-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_persistentvolume
-              type: metrics
-            metricsets:
-              - state_persistentvolume
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_persistentvolumeclaim-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_persistentvolumeclaim
-              type: metrics
-            metricsets:
-              - state_persistentvolumeclaim
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_pod-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_pod
-              type: metrics
-            metricsets:
-              - state_pod
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_replicaset-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_replicaset
-              type: metrics
-            metricsets:
-              - state_replicaset
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_resourcequota-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_resourcequota
-              type: metrics
-            metricsets:
-              - state_resourcequota
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_service-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_service
-              type: metrics
-            metricsets:
-              - state_service
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_statefulset-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_statefulset
-              type: metrics
-            metricsets:
-              - state_statefulset
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
-          - id: >-
-              kubernetes/metrics-kubernetes.state_storageclass-934ef8aa-ed19-405b-8160-ebf62e3d32f8
-            data_stream:
-              dataset: kubernetes.state_storageclass
-              type: metrics
-            metricsets:
-              - state_storageclass
-            add_metadata: true
-            hosts:
-              - 'kube-state-metrics:8080'
-            period: 10s
+            ssl.verification_mode: none
