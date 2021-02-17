@@ -24,6 +24,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
+- Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
+- Improve ECS field mappings in santa module. move hash.sha256 to process.hash.sha256 & move certificate fields to santa.certificate . {issue}16180[16180] {pull}17982[17982]
+- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
+- Adds oauth support for httpjson input. {issue}18415[18415] {pull}18892[18892]
+- Adds `split_events_by` option to httpjson input. {pull}19246[19246]
+- Adds `date_cursor` option to httpjson input. {pull}19483[19483]
+- Adds Gsuite module with SAML support. {pull}19329[19329]
+- Adds Gsuite User Accounts support. {pull}19329[19329]
+- Adds Gsuite Login audit support. {pull}19702[19702]
+- Adds Gsuite Admin support. {pull}19769[19769]
+- Adds Gsuite Drive support. {pull}19704[19704]
+- Adds Gsuite Groups support. {pull}19725[19725]
 - Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
 
 *Heartbeat*
