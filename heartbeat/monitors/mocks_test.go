@@ -136,11 +136,11 @@ func createMockJob() ([]jobs.Job, error) {
 	return []jobs.Job{j}, nil
 }
 
-func mockPluginBuilder() (p plugin.PluginFactory, built *atomic.Int, closed *atomic.Int) {
+func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	reg := monitoring.NewRegistry()
 
-	built = atomic.NewInt(0)
-	closed = atomic.NewInt(0)
+	built := atomic.NewInt(0)
+	closed := atomic.NewInt(0)
 
 	return plugin.PluginFactory{
 			Name:    "test",

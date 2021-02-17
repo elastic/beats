@@ -18,8 +18,9 @@
 package monitors
 
 import (
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"fmt"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
