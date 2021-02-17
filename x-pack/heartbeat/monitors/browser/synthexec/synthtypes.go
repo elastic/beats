@@ -37,6 +37,7 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
 			"payload":         se.Payload,
+			"index":           se.index,
 		},
 	}
 	if se.Blob != "" {

@@ -32,6 +32,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "89.40.182.58",
             "172.16.68.20"
@@ -104,6 +107,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "117.50.11.192",
             "172.16.66.155"
@@ -178,6 +184,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "77.61.185.101",
             "172.16.68.20"
@@ -250,6 +259,9 @@
         "observer.serial_number": "SFDemo-f64dd6be",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.0.0.168",
             "10.1.1.234"
@@ -315,6 +327,9 @@
         "observer.serial_number": "SFDemo-f64dd6be",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.0.1.31",
             "10.1.0.115"

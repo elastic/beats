@@ -19,6 +19,7 @@ package http
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/url"
@@ -439,6 +440,11 @@ func (http *httpPlugin) handleHTTP(
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = http.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
+
+	if !http.redactAuthorization {
+		m.username = extractBasicAuthUser(m.headers)
+	}
+
 	http.hideHeaders(m)
 
 	if m.isRequest {
@@ -533,6 +539,8 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	evt, pbf := pb.NewBeatEvent(ts)
 	pbf.SetSource(src)
 	pbf.SetDestination(dst)
+	pbf.AddIP(src.IP)
+	pbf.AddIP(dst.IP)
 	pbf.Network.Transport = "tcp"
 	pbf.Network.Protocol = "http"
 
@@ -552,6 +560,9 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		host, port := extractHostHeader(string(requ.host))
 		if net.ParseIP(host) == nil {
 			pbf.Destination.Domain = host
+			pbf.AddHost(host)
+		} else {
+			pbf.AddIP(host)
 		}
 		if port == 0 {
 			port = int(pbf.Destination.Port)
@@ -560,6 +571,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		}
 		pbf.Event.Start = requ.ts
 		pbf.Network.ForwardedIP = string(requ.realIP)
+		pbf.AddIP(string(requ.realIP))
 		pbf.Error.Message = requ.notes
 
 		// http
@@ -568,6 +580,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.RequestBodyBytes = int64(requ.contentLength)
 		httpFields.RequestMethod = bytes.ToLower(requ.method)
 		httpFields.RequestReferrer = requ.referer
+		pbf.AddHost(string(requ.referer))
 		if requ.sendBody && len(requ.body) > 0 {
 			httpFields.RequestBodyBytes = int64(len(requ.body))
 			httpFields.RequestBodyContent = common.NetString(requ.body)
@@ -588,6 +601,11 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		}
 		fields["method"] = httpFields.RequestMethod
 		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
+
+		if requ.username != "" {
+			fields["user.name"] = requ.username
+			pbf.AddUser(requ.username)
+		}
 	}
 
 	if resp != nil {
@@ -912,4 +930,29 @@ func (ml *messageList) pop() *message {
 
 func (ml *messageList) last() *message {
 	return ml.tail
+}
+
+func extractBasicAuthUser(headers map[string]common.NetString) string {
+	const prefix = "Basic "
+
+	auth := string(headers["authorization"])
+	if len(auth) < len(prefix) || !strings.EqualFold(auth[:len(prefix)], prefix) {
+		return ""
+	}
+
+	c, err := base64.StdEncoding.DecodeString(auth[len(prefix):])
+	if err != nil {
+		c, err = base64.RawStdEncoding.DecodeString(auth[len(prefix):])
+		if err != nil {
+			return ""
+		}
+	}
+
+	cs := string(c)
+	s := strings.IndexByte(cs, ':')
+	if s < 0 {
+		return ""
+	}
+
+	return cs[:s]
 }
