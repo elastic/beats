@@ -2,6 +2,7 @@
 
 type: tcp
 host: "{{.syslog_host}}:{{.syslog_port}}"
+framing: rfc6587
 
 {{ else if eq .input "udp" }}
 
@@ -27,7 +28,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0
 
 {{ if .external_interfaces }}
   - add_fields:

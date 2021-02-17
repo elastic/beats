@@ -1,0 +1,35 @@
+- name: signature
+  type: group
+  default_field: false
+  description: >
+    Fields exported by the Zeek Signature log.
+  fields:
+    - name: note
+      type: keyword
+      description: >
+        Notice associated with signature event.
+
+    - name: sig_id
+      type: keyword
+      description: >
+        The name of the signature that matched.
+
+    - name: event_msg
+      type: keyword
+      description: >
+        A more descriptive message of the signature-matching event.
+
+    - name: sub_msg
+      type: keyword
+      description: >
+        Extracted payload data or extra message.
+
+    - name: sig_count
+      type: integer
+      description: >
+        Number of sigs, usually from summary count.
+
+    - name: host_count
+      type: integer
+      description: >
+        Number of hosts, from a summary count.

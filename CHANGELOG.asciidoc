@@ -3,6 +3,21 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.11.1]]
+=== Beats version 7.11.1
+https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix goroutines leak with some inputs in autodiscover. {pull}23722[23722]
+- Fix various processing errors in the Suricata module. {pull}23236[23236]
+
+*Elastic Logging Plugin*
+
+- Fix out of date CLI flags on docs. {pull}23628[23628]
+
 [[release-notes-7.11.0]]
 === Beats version 7.11.0
 https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]

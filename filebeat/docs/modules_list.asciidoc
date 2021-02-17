@@ -50,6 +50,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-oracle>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-panw>>
+  * <<filebeat-module-pensando>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-proofpoint>>
   * <<filebeat-module-rabbitmq>>
@@ -63,6 +64,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
+  * <<filebeat-module-threatintel>>
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
@@ -120,6 +122,7 @@ include::modules/okta.asciidoc[]
 include::modules/oracle.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
+include::modules/pensando.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/proofpoint.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
@@ -133,6 +136,7 @@ include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
+include::modules/threatintel.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]

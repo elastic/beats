@@ -4,7 +4,8 @@
     "event": {
       "action": "session-disconnected",
       "category": [
-        "authentication"
+        "authentication",
+        "session"
       ],
       "code": 4779,
       "kind": "event",

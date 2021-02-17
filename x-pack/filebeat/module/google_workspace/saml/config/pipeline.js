@@ -7,7 +7,7 @@ var saml = (function () {
 
     var categorizeEvent = function(evt) {
         evt.Put("event.type", ["start"]);
-        evt.Put("event.category", ["authentication"]);
+        evt.Put("event.category", ["authentication", "session"]);
         switch (evt.Get("event.action")) {
             case "login_failure":
                 evt.Put("event.outcome", "failure");
