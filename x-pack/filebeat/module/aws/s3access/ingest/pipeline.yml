@@ -2,6 +2,12 @@ description: "Pipeline for s3 server access logs"
 
 processors:
   - set:
+      field: event.category
+      value: web
+  - append:
+      field: event.type
+      value: access
+  - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
   - grok:
@@ -24,6 +30,22 @@ processors:
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
 
+  - grok:
+      field: aws.s3access.request_uri
+      ignore_failure: true
+      patterns:
+        - '%{NOTSPACE:http.request.method} %{NOTSPACE:url.original} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
+
+  #
+  # Best-effort parse of url.original in the form /path?query"
+  #
+  - grok:
+      field: url.original
+      ignore_failure: true
+      patterns:
+        - '^%{ABS_PATH:url.path}(?:\?%{DATA:url.query})?$'
+      pattern_definitions:
+        ABS_PATH: '/[^?]*'
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
@@ -99,10 +121,25 @@ processors:
       field: event.outcome
       value: success
 
-  - set:
-      field: event.duration
-      value: "{{aws.s3access.total_time}}"
-      ignore_empty_value: true
+  - convert:
+      field: aws.s3access.bytes_sent
+      target_field: http.response.body.bytes
+      type: long
+      ignore_failure: true
+
+  - convert:
+      field: aws.s3access.total_time
+      target_field: event.duration
+      type: long
+      ignore_failure: true
+
+  - script:
+      lang: painless
+      if: ctx.event?.duration != null
+      params:
+        MS_TO_NS: 1000000
+      source: >-
+        ctx.event.duration *= params.MS_TO_NS;
 
   - set:
       field: http.request.referrer
@@ -138,12 +175,17 @@ processors:
       value: event
 
   #
+  # Save original message into event.original
+  #
+  - rename:
+      field: "message"
+      target_field: "event.original"
+
+  #
   # Remove temporary fields
   #
   - remove:
-      field:
-        - message
-        - _temp_
+      field: _temp_
       ignore_missing: true
 
 on_failure:

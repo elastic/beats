@@ -39,6 +39,11 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
 {{ if eq .input "file" }}
   - rename:
+      fields:
+        - from: json.error
+          to: error
+      ignore_missing: true
+  - rename:
      fields:
       - from: json
         to: o365audit
@@ -62,4 +67,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

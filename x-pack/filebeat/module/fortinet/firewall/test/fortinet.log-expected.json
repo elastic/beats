@@ -427,6 +427,9 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "elastic.example.com"
+        ],
         "related.ip": [
             "192.168.2.1",
             "8.8.8.8"
@@ -498,9 +501,13 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "elastic.example.com"
+        ],
         "related.ip": [
             "192.168.2.1",
-            "8.8.8.8"
+            "8.8.8.8",
+            "8.8.4.4"
         ],
         "rule.category": "Web-based Email",
         "rule.id": "26",
@@ -642,6 +649,9 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "elastic.co"
+        ],
         "related.ip": [
             "192.168.2.1",
             "8.8.8.8"
@@ -704,6 +714,9 @@
         "observer.serial_number": "somerouterid",
         "observer.type": "firewall",
         "observer.vendor": "Fortinet",
+        "related.hosts": [
+            "elastic.co"
+        ],
         "related.ip": [
             "192.168.2.1",
             "8.8.8.8"
@@ -864,9 +877,6 @@
         "fortinet.firewall.subtype": "vpn",
         "fortinet.firewall.type": "event",
         "fortinet.firewall.vd": "root",
-        "fortinet.firewall.vpntunnel": "N/A",
-        "fortinet.firewall.xauthgroup": "N/A",
-        "fortinet.firewall.xauthuser": "N/A",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 7112,
@@ -934,8 +944,6 @@
         "fortinet.firewall.type": "event",
         "fortinet.firewall.vd": "root",
         "fortinet.firewall.vpntunnel": "elasticvpn",
-        "fortinet.firewall.xauthgroup": "N/A",
-        "fortinet.firewall.xauthuser": "N/A",
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 7680,
@@ -1096,8 +1104,6 @@
         "fortinet.firewall.type": "event",
         "fortinet.firewall.vd": "root",
         "fortinet.firewall.vpntunnel": "testvpn",
-        "fortinet.firewall.xauthgroup": "N/A",
-        "fortinet.firewall.xauthuser": "N/A",
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 9122,
@@ -1198,7 +1204,6 @@
     },
     {
         "@timestamp": "2020-04-23T12:23:47.000-05:00",
-        "destination.address": "N/A",
         "destination.as.number": 15169,
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
@@ -1221,7 +1226,6 @@
         ],
         "fileset.name": "firewall",
         "fortinet.firewall.action": "ssl-new-con",
-        "fortinet.firewall.reason": "N/A",
         "fortinet.firewall.subtype": "vpn",
         "fortinet.firewall.tunnelid": "2",
         "fortinet.firewall.tunneltype": "ssl",
@@ -1248,7 +1252,6 @@
     },
     {
         "@timestamp": "2020-04-23T12:23:47.000-05:00",
-        "destination.address": "N/A",
         "destination.as.number": 3356,
         "destination.as.organization.name": "Level 3 Parent, LLC",
         "destination.geo.continent_name": "North America",
@@ -2005,8 +2008,6 @@
         "fortinet.firewall.type": "event",
         "fortinet.firewall.vd": "root",
         "fortinet.firewall.vpntunnel": "P1_Test",
-        "fortinet.firewall.xauthgroup": "N/A",
-        "fortinet.firewall.xauthuser": "N/A",
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 17123,

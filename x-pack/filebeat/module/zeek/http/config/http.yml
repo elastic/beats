@@ -76,6 +76,7 @@ processors:
         - {from: "destination.address", to: "destination.ip", type: "ip"}
         - {from: "destination.port", to: "url.port"}
         - {from: "http.request.method", to: "event.action"}
+        - {from: "url.username", to: "user.name"}
       ignore_missing: true
       fail_on_error: false
   - add_fields:
@@ -93,4 +94,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

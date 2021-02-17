@@ -62,11 +62,11 @@ func TestTypes(t *testing.T) {
 			EventMessage:  "Application: a-configuring[id]: State changed to CONFIG: Configuring",
 		},
 		{
-			Status:        state.Running,
-			StatusMessage: "Running",
+			Status:        state.Healthy,
+			StatusMessage: "Healthy",
 			EventType:     EventTypeState,
 			EventSubType:  EventSubTypeRunning,
-			EventMessage:  "Application: a-running[id]: State changed to RUNNING: Running",
+			EventMessage:  "Application: a-healthy[id]: State changed to RUNNING: Healthy",
 		},
 		{
 			Status:        state.Degraded,

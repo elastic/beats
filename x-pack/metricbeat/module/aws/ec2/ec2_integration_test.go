@@ -17,7 +17,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/20951")
 	config := mtest.GetConfigForTest(t, "ec2", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -27,41 +26,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.instance.id", "string", event, t)
-		mtest.CheckEventField("cloud.machine.type", "string", event, t)
-		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
-		mtest.CheckEventField("instance.image.id", "string", event, t)
-		mtest.CheckEventField("instance.state.name", "string", event, t)
-		mtest.CheckEventField("instance.state.code", "int", event, t)
-		mtest.CheckEventField("instance.monitoring.state", "string", event, t)
-		mtest.CheckEventField("instance.core.count", "int", event, t)
-		mtest.CheckEventField("instance.threads_per_core", "int", event, t)
-
-		// MetricSetField
-		mtest.CheckEventField("cpu.total.pct", "float", event, t)
-		mtest.CheckEventField("cpu.credit_usage", "float", event, t)
-		mtest.CheckEventField("cpu.credit_balance", "float", event, t)
-		mtest.CheckEventField("cpu.surplus_credit_balance", "float", event, t)
-		mtest.CheckEventField("cpu.surplus_credits_charged", "float", event, t)
-		mtest.CheckEventField("network.in.packets", "float", event, t)
-		mtest.CheckEventField("network.out.packets", "float", event, t)
-		mtest.CheckEventField("network.in.bytes", "float", event, t)
-		mtest.CheckEventField("network.out.bytes", "float", event, t)
-		mtest.CheckEventField("diskio.read.bytes", "float", event, t)
-		mtest.CheckEventField("diskio.write.bytes", "float", event, t)
-		mtest.CheckEventField("diskio.read.ops", "float", event, t)
-		mtest.CheckEventField("diskio.write.ops", "float", event, t)
-		mtest.CheckEventField("status.check_failed", "int", event, t)
-		mtest.CheckEventField("status.check_failed_system", "int", event, t)
-		mtest.CheckEventField("status.check_failed_instance", "int", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {

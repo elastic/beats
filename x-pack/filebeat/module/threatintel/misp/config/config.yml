@@ -17,9 +17,11 @@ request.body:
     {{ range $key, $value := .filters}}{{$key}}: {{$value | tojson}}{{end}}
 {{end}}
 request.transforms:
+{{ if .api_token }}
 - set:
     target: header.Authorization
     value: {{ .api_token }}
+{{end}}
 - set:
     target: body.timestamp
     value: '[[.cursor.timestamp]]'
