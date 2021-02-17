@@ -106007,7 +106007,7 @@ The timestamp from the log line.
 
 deprecated:[8.0.0]
 
-Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number)
+Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
 
 
 type: alias
@@ -106021,6 +106021,7 @@ alias to: postgresql.log.session_line_number
 --
 Host where the connection originated from.
 
+
 example: 127.0.0.1
 
 --
@@ -106029,6 +106030,7 @@ example: 127.0.0.1
 +
 --
 Port where the connection originated from.
+
 
 example: 59700
 
@@ -106039,6 +106041,7 @@ example: 59700
 --
 PostgreSQL session.
 
+
 example: 5ff1dd98.22
 
 --
@@ -106046,7 +106049,7 @@ example: 5ff1dd98.22
 *`postgresql.log.session_line_number`*::
 +
 --
-Line number inside a session. (%l in `log_line_prefix`)
+Line number inside a session. (%l in `log_line_prefix`).
 
 
 type: long
@@ -106076,7 +106079,7 @@ example: SELECT * FROM users;
 *`postgresql.log.query_step`*::
 +
 --
-Statement step when using extended query protocol (one of statement, parse, bind or execute)
+Statement step when using extended query protocol (one of statement, parse, bind or execute).
 
 
 example: parse
@@ -106108,6 +106111,7 @@ example: SELECT
 --
 Time when this session started.
 
+
 type: date
 
 --
@@ -106115,7 +106119,8 @@ type: date
 *`postgresql.log.virtual_transaction_id`*::
 +
 --
-Backend local transaction id .
+Backend local transaction id.
+
 
 --
 
@@ -106123,6 +106128,7 @@ Backend local transaction id .
 +
 --
 The id of current transaction.
+
 
 type: long
 
@@ -106157,14 +106163,16 @@ A possible solution to solve an error.
 *`postgresql.log.internal_query`*::
 +
 --
-internal query that led to the error (if any).
+Internal query that led to the error (if any).
+
 
 --
 
 *`postgresql.log.internal_query_pos`*::
 +
 --
-character count of the error position (if any).
+Character count of the internal query (if any).
+
 
 type: long
 
@@ -106175,12 +106183,14 @@ type: long
 --
 Error context.
 
+
 --
 
 *`postgresql.log.query_pos`*::
 +
 --
-character count of the error position (if any).
+Character count of the error position (if any).
+
 
 type: long
 
@@ -106191,12 +106201,14 @@ type: long
 --
 Location of the error in the PostgreSQL source code (if log_error_verbosity is set to verbose).
 
+
 --
 
 *`postgresql.log.application_name`*::
 +
 --
 Name of the application of this event. It is defined by the client.
+
 
 --
 
@@ -106247,6 +106259,7 @@ alias to: user.name
 +
 --
 Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
+
 
 type: alias
 
