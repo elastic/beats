@@ -13,12 +13,16 @@ request.transforms:
 - set:
     target: header.Content-Type
     value: application/json
+{{ if .api_token }}
 - set:
     target: header.X-OTX-API-KEY
     value: {{ .api_token }}
+{{ end }}
+{{ if .types }}
 - set:
     target: url.params.types
     value: {{ .types }}
+{{ end }}
 - set:
     target: url.params.modified_since
     value: '[[.cursor.timestamp]]'

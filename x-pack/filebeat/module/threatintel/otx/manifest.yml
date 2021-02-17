@@ -5,6 +5,8 @@ var:
     default: httpjson
   - name: interval
     default: 60m
+  - name: first_interval
+    default: 24h
   - name: api_token
   - name: ssl
   - name: types
