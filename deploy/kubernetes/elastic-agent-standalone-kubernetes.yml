@@ -58,6 +58,12 @@ spec:
             - name: cgroup
               mountPath: /hostfs/sys/fs/cgroup
               readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
       volumes:
         - name: datastreams
           configMap:
@@ -69,6 +75,12 @@ spec:
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: varlog
+          hostPath:
+            path: /var/log
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -99,6 +111,24 @@ data:
       node: ${NODE_NAME}
       scope: node
     inputs:
+      - id: 4ae27079-6cd4-4ab7-a459-abbae74ffc44
+        name: log-1
+        revision: 1
+        type: logfile
+        use_output: default
+        meta:
+          package:
+            name: log
+            version: 0.4.6
+        data_stream:
+          namespace: default
+        streams:
+          - id: logfile-log.log-4ae27079-6cd4-4ab7-a459-abbae74ffc44
+            data_stream:
+              dataset: generic
+            symlinks: true
+            paths:
+              - /var/log/containers/*${kubernetes.container.id}.log
       - id: 1f6112ef-9847-4294-aba4-0dc9e7240551
         name: system-3
         revision: 2
