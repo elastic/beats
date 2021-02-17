@@ -13,32 +13,38 @@ install_es_ag_deb()
     local SHASUM="$PACKAGE.sha$ALGORITHM"
     local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
     local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
-
-    log "[install_es_ag_deb] installing Elastic Agent $STACK_VERSION" "INFO"
+    get_cloud_stack_version
+    if [ $STACK_VERSION = "" ]; then
+       log "ERROR" "[install_es_ag_deb] Stack version could not be found"
+      exit 1
+    else
+    log "INFO" "[install_es_ag_deb] installing Elastic Agent $STACK_VERSION"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum" "ERROR"
+        log "ERROR" "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
         exit $EXIT_CODE
     fi
     log "[install_es_ag_deb] download location - $DOWNLOAD_URL" "INFO"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-    log "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION" "ERROR"
+    log "ERROR" "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_deb] downloaded Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_deb] downloaded Elastic Agent $STACK_VERSION"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_deb] error validating checksum for Elastic Agent $STACK_VERSION" "ERROR"
+        log "ERROR" "[install_es_ag_deb] error validating checksum for Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
 
     sudo dpkg -i $PACKAGE
-    log "[install_es_ag_deb] installed Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_deb] installed Elastic Agent $STACK_VERSION"
+
+ fi
 }
 
 install_es_ag_rpm()
@@ -50,31 +56,31 @@ install_es_ag_rpm()
     local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
     local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
 
-    log "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum" "ERROR"
+        log "ERROR" "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_rpm] download location - $DOWNLOAD_URL" "INFO"
+    log "INFO" "[install_es_ag_rpm] download location - $DOWNLOAD_URL"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION" "ERROR"
+        log "ERROR" "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_rpm] downloaded Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_rpm] downloaded Elastic Agent $STACK_VERSION"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_rpm] error validating checksum for Elastic Agent $STACK_VERSION" "ERROR"
+        log "ERROR" "[install_es_ag_rpm] error validating checksum for Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
 
     sudo rpm -vi $PACKAGE
-    log "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION"
 }
 
 install_es_ag_linux()
@@ -87,53 +93,51 @@ install_es_ag_linux()
     local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
 
 
-    log "[install_es_ag_linux] installing Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_linux] installing Elastic Agent $STACK_VERSION"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_linux] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum" "ERROR"
+        log "ERROR" "[install_es_ag_linux] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_linux] download location - $DOWNLOAD_URL" "INFO"
+    log "INFO" "[install_es_ag_linux] download location - $DOWNLOAD_URL"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_linux] error downloading Elastic Agent $STACK_VERSION" "ERROR"
+        log "ERROR" "[install_es_ag_linux] error downloading Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_linux] downloaded Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_linux] downloaded Elastic Agent $STACK_VERSION"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "[install_es_ag_linux] error validating checksum for Elastic Agent $STACK_VERSION" "ERROR"
+        log "ERROR" "[install_es_ag_linux] error validating checksum for Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
     tar xzvf $PACKAGE
-    log "[install_es_ag_linux] installed Elastic Agent $STACK_VERSION" "INFO"
+    log "INFO" "[install_es_ag_linux] installed Elastic Agent $STACK_VERSION"
 }
 
 checkOS
 
 # Enroll Elastic Agent
-es_agent_enroll() {
-  cloud_hash=$(echo $CLOUD_ID | cut -f2 -d:)
-  cloud_tokens=$(echo $cloud_hash | base64 -d -)
-  host_port=$(echo $cloud_tokens | cut -f1 -d$)
-  local ELASTICSEARCH_URL="https://$(echo $cloud_tokens | cut -f2 -d$).${host_port}"
-  local KIBANA_URL="https://$(echo $cloud_tokens | cut -f3 -d$).${host_port}"
-  log "[es_agent_enroll] Found ES uri $ELASTICSEARCH_URL and Kibana host $KIBANA_URL" "INFO"
+enroll_es_agent() {
+  get_kibana_host
+  get_username
+  get_password
+   if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
   local ENROLLMENT_TOKEN_ID=""
   local ENROLLMENT_TOKEN=""
   jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u ${USERNAME}:${PASSWORD} )
 
       local EXITCODE=$?
       if [ $EXITCODE -ne 0 ]; then
-        log "[es_agent_enroll] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN" "ERROR"
+        log "ERROR" "[enroll_es_agent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"
         exit $EXITCODE
       fi
       ENROLLMENT_TOKEN_ID=$(echo $jsonResult | jq -r '.list[0].id')
-       log "[es_agent_enroll] ENROLLMENT_TOKEN_ID is $ENROLLMENT_TOKEN_ID" "INFO"
+       log "INFO" "[enroll_es_agent] ENROLLMENT_TOKEN_ID is $ENROLLMENT_TOKEN_ID"
 
       jsonResult=$(curl ${KIBANA_URL}/api/fleet/enrollment-api-keys/$ENROLLMENT_TOKEN_ID \
         -H 'Content-Type: application/json' \
@@ -141,16 +145,21 @@ es_agent_enroll() {
         -u ${USERNAME}:${PASSWORD} )
       EXITCODE=$?
       if [ $EXITCODE -ne 0 ]; then
-        log "[es_agent_enroll] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN" "ERROR"
+        log "ERROR" "[enroll_es_agent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"
         exit $EXITCODE
       fi
 
       ENROLLMENT_TOKEN=$(echo $jsonResult | jq -r '.item.api_key')
-      log "[es_agent_enroll] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN" "INFO"
-      log "[es_agent_enroll] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}" "INFO"
-      elastic-agent enroll  ${KIBANA_URL} $ENROLLMENT_TOKEN -f
-
+      log "INFO" "[enroll_es_agent] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN"
+      log "INFO" "[enroll_es_agent] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}"
+      elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
+else
+   log "ERROR" "[enroll_es_agent] error retrieving user credentials"
+   exit 1
+  fi
 }
+
+
 
 if [ "$DISTRO_OS" = "DEB" ]; then
     install_es_ag_deb
@@ -160,6 +169,6 @@ else
   install_es_ag_linux
 fi
 
-log "[es_agent_start] enrolling Elastic Agent $STACK_VERSION" "INFO"
-es_agent_enroll
-log "[es_agent_start] Elastic Agent $STACK_VERSION enrolled" "INFO"
+log "INFO" "[es_agent_start] enrolling Elastic Agent $STACK_VERSION"
+enroll_es_agent
+log "INFO" "[es_agent_start] Elastic Agent $STACK_VERSION enrolled"

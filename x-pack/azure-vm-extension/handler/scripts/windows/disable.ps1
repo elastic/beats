@@ -3,6 +3,17 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
 
-Write-Log "Stopping Elastic Agent" "INFO"
-Stop-Service "elastic agent"
-Write-Log "Elastic Agent has been stopped" "INFO"
+
+function disable-elastic-agent {
+try {
+    Write-Log "Stopping Elastic Agent" "INFO"
+    Stop-Service "elastic agent"
+    Write-Log "Elastic Agent has been stopped" "INFO"
+}
+catch{
+Write-Log "An error occurred:" "ERROR"
+        Write-Log $_ "ERROR"
+        Write-Log $_.ScriptStackTrace "ERROR"
+}
+
+disable-elastic-agent

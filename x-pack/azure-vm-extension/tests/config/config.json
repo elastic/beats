@@ -1,0 +1,15 @@
+{
+    "runtimeSettings": [
+        {
+            "handlerSettings": {
+                "protectedSettings": {
+                    "password": ""
+                },
+                "publicSettings": {
+                    "username": "",
+                    "cloud_id": "ddd"
+                }
+            }
+        }
+    ]
+}

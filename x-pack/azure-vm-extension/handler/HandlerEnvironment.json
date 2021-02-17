@@ -1,0 +1,12 @@
+[{
+    "version": 1.0,
+    "handlerEnvironment": {
+        "logFolder": "../../../tests/logs",
+        "configFolder": "../../../tests/config",
+        "statusFolder": "<your status folder location>",
+        "heartbeatFile": "<your heartbeat file location>",
+        "deploymentid": "<deployment id for the vm>",
+        "rolename": "<role name for the vm>",
+        "instance": "<instance name for the vm>"
+    }
+}]

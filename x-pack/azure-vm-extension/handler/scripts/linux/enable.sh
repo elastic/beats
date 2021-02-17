@@ -4,16 +4,16 @@ script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
 # Start Elastic Agent
-es_agent_start()
+start_es_agent()
 {
-log "[es_agent_start] enabling Elastic Agent $STACK_VERSION" "INFO"
+log "INFO" "[es_agent_start] enabling Elastic Agent $STACK_VERSION"
 sudo systemctl enable elastic-agent
-log "[es_agent_start] Elastic Agent $STACK_VERSION enabled" "INFO"
+log "INFO" "[es_agent_start] Elastic Agent $STACK_VERSION enabled"
 
-log "[es_agent_start] starting Elastic Agent $STACK_VERSION" "INFO"
+log "INFO" "[es_agent_start] starting Elastic Agent $STACK_VERSION"
 sudo service elastic-agent start
-log "[es_agent_start] Elastic Agent $STACK_VERSION started" "INFO"
+log "INFO" "[es_agent_start] Elastic Agent $STACK_VERSION started"
 
 }
 
-es_agent_start
+start_es_agent
