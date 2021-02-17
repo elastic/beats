@@ -159,6 +159,7 @@
         "postgresql.log.client_port": 38356,
         "postgresql.log.command_tag": "idle",
         "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
         "postgresql.log.session_id": "5ff2227e.24",
         "postgresql.log.session_start_time": "2021-01-03T20:01:02.000Z",
         "postgresql.log.sql_state_code": "00000",
