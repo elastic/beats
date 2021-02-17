@@ -3,10 +3,11 @@
 type: http_endpoint
 listen_address: {{ .listen_address }}
 listen_port: {{ .listen_port }}
+{{ if .url }}url: {{ .url}}{{ end }}
 prefix: {{ .prefix }}
 basic_auth: {{ .basic_auth }}
 username: {{ .username }}
-username: {{ .password }}
+password: {{ .password }}
 content_type: "{{ .content_type }}"
 secret: {{ .secret | tojson }}
 ssl: {{ .ssl | tojson }}
@@ -33,4 +34,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

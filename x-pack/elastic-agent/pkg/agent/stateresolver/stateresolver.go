@@ -34,25 +34,30 @@ func NewStateResolver(log *logger.Logger) (*StateResolver, error) {
 // Resolve resolves passed config into one or multiple steps
 func (s *StateResolver) Resolve(
 	cfg configrequest.Request,
-) (uid.ID, []configrequest.Step, Acker, error) {
+) (uid.ID, string, []configrequest.Step, Acker, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	newState, steps := converge(s.curState, cfg)
+	newStateID := newState.ShortID()
 	id, err := uid.Generate()
 	if err != nil {
-		return id, nil, nil, err
+		return id, newStateID, nil, nil, err
 	}
 
-	s.l.Infof("New State ID is %s", newState.ShortID())
+	s.l.Infof("New State ID is %s", newStateID)
 	s.l.Infof("Converging state requires execution of %d step(s)", len(steps))
+	for i, step := range steps {
+		// more detailed debug log
+		s.l.Debugf("step %d: %s", i, step.String())
+	}
 
 	// Allow the operator to ack the should state when applying the steps is done correctly.
 	ack := func() {
 		s.ack(newState)
 	}
 
-	return id, steps, ack, nil
+	return id, newStateID, steps, ack, nil
 }
 
 func (s *StateResolver) ack(newState state) {

@@ -5,15 +5,9 @@ var:
     default: httpjson
   - name: interval
     default: 5m
-  - name: date_cursor
-    default:
-      cursor_template: "{{.last_response.body.lastUpdateTime}}"
-      value_template: 'lastUpdateTime gt {{formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"}}'
-      default_template: 'lastUpdateTime gt {{formatDate (now (parseDuration "-5m")) "2006-01-02T15:04:05.9999999Z"}}'
   - name: tags
     default: [defender-atp, forwarded]
   - name: oauth2
-
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/atp.yml

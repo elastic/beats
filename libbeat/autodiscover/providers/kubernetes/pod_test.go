@@ -1497,7 +1497,7 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
@@ -1505,10 +1505,11 @@ func TestEmitEvent(t *testing.T) {
 				logger:    logp.NewLogger("kubernetes"),
 			}
 
+			pub := &publisher{b: p.bus}
 			pod := &pod{
 				metagen: metaGen,
 				config:  defaultConfig(),
-				publish: p.publish,
+				publish: pub.publish,
 				uuid:    UUID,
 				logger:  logp.NewLogger("kubernetes.pod"),
 			}
@@ -1543,6 +1544,20 @@ func NewMockPodEventerManager(pod *pod) EventManager {
 	em := &eventerManager{}
 	em.eventer = pod
 	return em
+}
+
+type publisher struct {
+	b bus.Bus
+}
+
+func (p *publisher) publish(events []bus.Event) {
+	if len(events) == 0 {
+		return
+	}
+	for _, event := range events {
+		event["config"] = []*common.Config{}
+		p.b.Publish(event)
+	}
 }
 
 func getNestedAnnotations(in common.MapStr) common.MapStr {

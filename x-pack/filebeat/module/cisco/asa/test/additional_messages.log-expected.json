@@ -172,12 +172,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T17:51:17.000-02:00",
+        "event.end": "2021-05-05T17:51:17.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-609002: Teardown local-host net:192.168.2.2 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T19:51:17.000Z",
+        "event.start": "2021-05-05T19:51:17.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -678,12 +678,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:24:31.000-02:00",
+        "event.end": "2021-05-05T18:24:31.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-609002: Teardown local-host identity:10.10.10.10 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T20:24:31.000Z",
+        "event.start": "2021-05-05T20:24:31.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -822,12 +822,12 @@
         "event.code": 302014,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 2960892904 for out111:10.10.10.10/443 to fw111:192.168.2.2/55225 duration 0:00:00 bytes 0 TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -935,12 +935,12 @@
         "event.code": 302012,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1150,12 +1150,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.asa",
         "event.duration": 124000000000,
-        "event.end": "2020-05-05T18:40:50.000-02:00",
+        "event.end": "2021-05-05T18:40:50.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-302016: Teardown UDP connection 1671727 for intfacename:10.10.10.10/161 to net:192.186.2.2/53356 duration 0:02:04 bytes 64585",
         "event.severity": 2,
-        "event.start": "2020-05-05T20:38:46.000Z",
+        "event.start": "2021-05-05T20:38:46.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1604,17 +1604,26 @@
         ]
     },
     {
+        "cisco.asa.destination_interface": "net",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for fw111:10.10.10.10/39210 to net:192.168.2.2/10051 duration 0:00:00 forwarded bytes 0 Cluster flow with CLU closed on owner",
+        "event.reason": "Cluster flow with CLU closed on owner",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1624,31 +1633,52 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4949,
+        "network.bytes": "0",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
         ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 39210,
         "tags": [
             "cisco-asa",
             "forwarded"
         ]
     },
     {
+        "cisco.asa.destination_interface": "unknown",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "net",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 39222,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for net:10.10.10.10/10051 to unknown:192.168.2.2/39222 duration 0:00:00 forwarded bytes 0 Forwarding or redirect flow removed to create director or backup flow",
+        "event.reason": "Forwarding or redirect flow removed to create director or backup flow",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1658,14 +1688,26 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5142,
+        "network.bytes": "0",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "unknown",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
         ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 10051,
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -1700,6 +1742,9 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
+        ],
+        "related.user": [
+            "aaaa"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1736,6 +1781,9 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
+        ],
+        "related.user": [
+            "aaaa"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2073,7 +2121,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2165,7 +2212,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2260,7 +2306,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2305,7 +2350,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2350,7 +2394,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2395,7 +2438,6 @@
             "dev01"
         ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2432,12 +2474,12 @@
         "event.code": 302304,
         "event.dataset": "cisco.asa",
         "event.duration": 3602000000000,
-        "event.end": "2020-04-27T04:12:23.000-02:00",
+        "event.end": "2021-04-27T04:12:23.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:1.2.3.4/54242 to server.deflan:2.3.4.5/9101 duration 1:00:02 bytes 245 Connection timeout",
         "event.severity": 6,
-        "event.start": "2020-04-27T05:12:21.000Z",
+        "event.start": "2021-04-27T05:12:21.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -2668,6 +2710,9 @@
         "related.ip": [
             "10.10.0.87"
         ],
+        "related.user": [
+            "enable_15"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
         "source.ip": "10.10.0.87",
@@ -2706,6 +2751,9 @@
         "observer.vendor": "Cisco",
         "related.hosts": [
             "dev01"
+        ],
+        "related.user": [
+            "enable_15"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2752,6 +2800,9 @@
             "10.10.1.212",
             "10.10.1.254"
         ],
+        "related.user": [
+            "*****"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.1.212",
         "source.ip": "10.10.1.212",
@@ -2794,6 +2845,9 @@
         ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2842,6 +2896,9 @@
             "10.10.0.87",
             "10.10.1.254"
         ],
+        "related.user": [
+            "admin"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
         "source.ip": "10.10.0.87",
@@ -2884,6 +2941,9 @@
         ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2964,12 +3024,12 @@
         "event.code": 113019,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.end": "2021-04-27T02:03:03.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
         "event.severity": 4,
-        "event.start": "2020-04-27T04:03:03.000Z",
+        "event.start": "2021-04-27T04:03:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -2987,6 +3047,9 @@
             "dev01"
         ],
         "related.ip": [
+            "91.240.17.178"
+        ],
+        "related.user": [
             "91.240.17.178"
         ],
         "service.type": "cisco",
@@ -3028,6 +3091,9 @@
         ],
         "related.ip": [
             "8.8.8.8"
+        ],
+        "related.user": [
+            "testuser"
         ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
@@ -3077,6 +3143,9 @@
         "related.ip": [
             "8.8.8.8"
         ],
+        "related.user": [
+            "testuser"
+        ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
         "source.as.number": 15169,
@@ -3124,6 +3193,9 @@
         ],
         "related.ip": [
             "192.168.50.1"
+        ],
+        "related.user": [
+            "alice"
         ],
         "service.type": "cisco",
         "source.address": "192.168.50.1",

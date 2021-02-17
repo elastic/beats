@@ -1,0 +1,76 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+{{ if .audit_type }}
+{{ if eq .audit_type "group" }}
+request.url: https://snyk.io/api/v1/group/{{.audit_id}}/audit?page=1&sortOrder=ASC
+{{ end }}
+{{ if eq .audit_type "organization" }}
+request.url: https://snyk.io/api/v1/org/{{.audit_id}}/audit?page=1&sortOrder=ASC
+{{ end }}
+{{ end }}
+request.method: POST
+request.ssl: {{ .ssl | tojson }}
+request.transforms:
+- set:
+    target: header.Authorization
+    value: token {{ .api_token }}
+- set:
+    target: url.params.to
+    value: '[[ formatDate (now) "2006-01-02" ]]'
+- set:
+    target: url.params.from
+    value: '[[ formatDate (now (parseDuration .cursor.interval)) "2006-01-02" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02" ]]'
+cursor:
+  interval:
+    value: "-24h"
+
+request.timeout: 120s
+request.body:
+  filters:
+    userId: {{ .user_id }}
+    email: {{ .email_address }}
+    event: {{ .event }}
+    projectId: {{ .project_id }}
+
+response.pagination:
+- set:
+    target: url.value
+    value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_locale: ~
+  - decode_json_fields:
+      fields: [message]
+      target: json
+  - fingerprint:
+      fields: ["json.orgId", "json.created", "json.event"]
+      target_field: "@metadata._id"
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.8.0

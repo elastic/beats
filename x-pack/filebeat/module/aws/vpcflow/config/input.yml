@@ -1,6 +1,6 @@
-{{ if eq .input "s3" }}
+{{ if eq .input "aws-s3" }}
 
-type: s3
+type: aws-s3
 queue_url: {{ .queue_url }}
 
 {{ if .credential_profile_name }}
@@ -181,4 +181,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

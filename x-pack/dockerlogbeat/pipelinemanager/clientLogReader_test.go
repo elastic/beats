@@ -7,6 +7,7 @@ package pipelinemanager
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -84,7 +85,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 
 	info := logger.Info{
 		ContainerID: "b87d3b0379f816a5f2f7070f28cc05e2f564a3fb549a67c64ec30fc5b04142ed",
-		LogPath:     filepath.Join("/tmp/dockerbeattest/", string(time.Now().Unix())),
+		LogPath:     filepath.Join("/tmp/dockerbeattest/", strconv.FormatInt(time.Now().Unix(), 10)),
 	}
 
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)

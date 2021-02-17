@@ -1,0 +1,99 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+
+request.url: {{ .url }}
+request.method: POST
+request.ssl: {{ .ssl | tojson }}
+request.transforms:
+- set:
+    target: header.Authorization
+    value: token {{ .api_token }}
+- set:
+    target: url.params.to
+    value: '[[ formatDate (now) "2006-01-02" ]]'
+- set:
+    target: url.params.from
+    value: '[[ formatDate (now (parseDuration .cursor.interval)) "2006-01-02" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02" ]]'
+cursor:
+  interval:
+    value: "-24h"
+request.timeout: 120s
+request.body:
+  filters:
+    orgs:
+    {{ range .orgs }}
+    - {{ . }}
+    {{ end }}
+    severity:
+    {{ range .included_severity }}
+    - {{ . }}
+    {{ end }}
+    exploitMaturity:
+    {{ range .exploit_maturity }}
+    - {{ . }}
+    {{ end }}
+    types:
+    {{ range .types }}
+    - {{ . }}
+    {{ end }}
+    languages:
+    {{ range .languages }}
+    - {{ . }}
+    {{ end }}
+    identifier: {{ .identifier | tojson}}
+    ignored: {{ .ignored }}
+    patched: {{ .patched }}
+    fixable: {{ .fixable }}
+    isFixed: {{ .is_fixed }}
+    isUpgradable: {{ .is_upgradeable }}
+    isPatchable: {{ .is_patchable }}
+    isPinnable: {{ .is_pinnable }}
+    priorityScore:
+      min: {{ .min_priority_score }}
+      max: {{ .max_priority_score }}
+
+response.pagination:
+- set:
+    target: url.value
+    value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+
+response.split:
+  target: body.results
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_locale: ~
+  - decode_json_fields:
+      fields: [message]
+      target: json
+  - fingerprint:
+      fields: ["json.issue.id"]
+      target_field: "@metadata._id"
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.8.0

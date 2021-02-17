@@ -7,15 +7,18 @@ package v2
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var (
-	errEmptyField       = errors.New("the requested field is empty")
-	errExpectedSplitArr = errors.New("split was expecting field to be an array")
-	errExpectedSplitObj = errors.New("split was expecting field to be an object")
+	errEmptyField          = errors.New("the requested field is empty")
+	errEmptyRootField      = errors.New("the requested root field is empty")
+	errExpectedSplitArr    = errors.New("split was expecting field to be an array")
+	errExpectedSplitObj    = errors.New("split was expecting field to be an object")
+	errExpectedSplitString = errors.New("split was expecting field to be a string")
 )
 
 type split struct {
@@ -26,6 +29,8 @@ type split struct {
 	child      *split
 	keepParent bool
 	keyField   string
+	isRoot     bool
+	delimiter  string
 }
 
 func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
@@ -37,11 +42,8 @@ func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if split.targetInfo.Type != targetBody {
-		return nil, fmt.Errorf("invalid target type: %s", split.targetInfo.Type)
-	}
-
+	// we want to be able to identify which split is the root of the chain
+	split.isRoot = true
 	return split, nil
 }
 
@@ -51,6 +53,10 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		return nil, err
 	}
 
+	if ti.Type != targetBody {
+		return nil, fmt.Errorf("invalid target type: %s", ti.Type)
+	}
+
 	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, log)
 	if err != nil {
 		return nil, err
@@ -58,7 +64,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 
 	var s *split
 	if c.Split != nil {
-		s, err = newSplitResponse(c.Split, log)
+		s, err = newSplit(c.Split, log)
 		if err != nil {
 			return nil, err
 		}
@@ -70,6 +76,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		kind:       c.Type,
 		keepParent: c.KeepParent,
 		keyField:   c.KeyField,
+		delimiter:  c.DelimiterString,
 		transforms: ts,
 		child:      s,
 	}, nil
@@ -87,6 +94,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 	}
 
 	if v == nil {
+		if s.isRoot {
+			return errEmptyRootField
+		}
 		ch <- maybeMsg{msg: root}
 		return errEmptyField
 	}
@@ -99,6 +109,9 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(varr) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
 			ch <- maybeMsg{msg: root}
 			return errEmptyField
 		}
@@ -117,12 +130,35 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(vmap) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
 			ch <- maybeMsg{msg: root}
 			return errEmptyField
 		}
 
 		for k, e := range vmap {
 			if err := s.sendMessage(ctx, root, k, e, ch); err != nil {
+				s.log.Debug(err)
+			}
+		}
+
+		return nil
+	case splitTypeString:
+		vstr, ok := v.(string)
+		if !ok {
+			return errExpectedSplitString
+		}
+
+		if len(vstr) == 0 {
+			if s.isRoot {
+				return errEmptyRootField
+			}
+			ch <- maybeMsg{msg: root}
+			return errEmptyField
+		}
+		for _, substr := range strings.Split(vstr, s.delimiter) {
+			if err := s.sendMessageSplitString(ctx, root, substr, ch); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -182,4 +218,28 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 		return common.MapStr(t), true
 	}
 	return common.MapStr{}, false
+}
+
+func (s *split) sendMessageSplitString(ctx *transformContext, root common.MapStr, v string, ch chan<- maybeMsg) error {
+	clone := root.Clone()
+	_, _ = clone.Put(s.targetInfo.Name, v)
+
+	tr := transformable{}
+	tr.setBody(clone)
+
+	var err error
+	for _, t := range s.transforms {
+		tr, err = t.run(ctx, tr)
+		if err != nil {
+			return err
+		}
+	}
+
+	if s.child != nil {
+		return s.child.split(ctx, clone, ch)
+	}
+
+	ch <- maybeMsg{msg: clone}
+
+	return nil
 }

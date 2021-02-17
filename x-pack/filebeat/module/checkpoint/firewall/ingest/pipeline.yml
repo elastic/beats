@@ -309,9 +309,11 @@ processors:
     type: long
     ignore_failure: true
     ignore_missing: true
-- rename:
+- convert:
     field: checkpoint.severity
     target_field: event.severity
+    type: long
+    ignore_failure: true
     ignore_missing: true
 - rename:
     field: checkpoint.action
@@ -781,6 +783,65 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+# Handle zone-based network directionality
+- set:
+    field: network.direction
+    value: inbound
+    if: >
+      ctx?._temp_?.external_zones != null &&
+      ctx?._temp_?.internal_zones != null &&
+      ctx?.observer?.ingress?.zone != null &&
+      ctx?.observer?.egress?.zone != null &&
+      ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+      ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+- set:
+    field: network.direction
+    value: outbound
+    if: >
+      ctx?._temp_?.external_zones != null &&
+      ctx?._temp_?.internal_zones != null &&
+      ctx?.observer?.ingress?.zone != null &&
+      ctx?.observer?.egress?.zone != null &&
+      ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+      ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+- set:
+    field: network.direction
+    value: internal
+    if: >
+      ctx?._temp_?.external_zones != null &&
+      ctx?._temp_?.internal_zones != null &&
+      ctx?.observer?.ingress?.zone != null &&
+      ctx?.observer?.egress?.zone != null &&
+      ctx._temp_.internal_zones.contains(ctx.observer.egress.zone) &&
+      ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+- set:
+    field: network.direction
+    value: external
+    if: >
+      ctx?._temp_?.external_zones != null &&
+      ctx?._temp_?.internal_zones != null &&
+      ctx?.observer?.ingress?.zone != null &&
+      ctx?.observer?.egress?.zone != null &&
+      ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+      ctx._temp_.external_zones.contains(ctx.observer.ingress.zone)
+- set:
+    field: network.direction
+    value: unknown
+    if: >
+      ctx?._temp_?.external_zones != null &&
+      ctx?._temp_?.internal_zones != null &&
+      ctx?.observer?.ingress?.zone != null &&
+      ctx?.observer?.egress?.zone != null &&
+      (
+        (
+          !ctx._temp_.external_zones.contains(ctx.observer.egress.zone) &&
+          !ctx._temp_.internal_zones.contains(ctx.observer.egress.zone)
+        ) ||
+        (
+          !ctx._temp_.external_zones.contains(ctx.observer.ingress.zone) &&
+          !ctx._temp_.internal_zones.contains(ctx.observer.ingress.zone)
+        )
+      )
 - remove:
     field:
     - checkpoint.client_outbound_packets
@@ -800,7 +861,9 @@ processors:
     - checkpoint.xlatedst
     - checkpoint.uid
     - checkpoint.time
+    - checkpoint.severity
     - syslog5424_ts
+    - _temp_
     ignore_missing: true
 on_failure:
 - set:

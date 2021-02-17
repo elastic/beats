@@ -276,13 +276,13 @@ func TestSplit(t *testing.T) {
 			},
 		},
 		{
-			name: "First level split skips publish if no events and keep_parent: false",
+			name: "First level split skips publish if no events",
 			config: &splitConfig{
 				Target: "body.response",
 				Type:   "array",
 				Split: &splitConfig{
 					Target:     "body.Event.Attributes",
-					KeepParent: false,
+					KeepParent: true,
 				},
 			},
 			ctx: emptyTransformContext(),
@@ -291,10 +291,8 @@ func TestSplit(t *testing.T) {
 					"response": []interface{}{},
 				},
 			},
-			expectedMessages: []common.MapStr{
-				{"response": []interface{}{}},
-			},
-			expectedErr: errEmptyField,
+			expectedMessages: []common.MapStr{},
+			expectedErr:      errEmptyRootField,
 		},
 		{
 			name: "Changes must be local to parent when nested splits",
@@ -334,6 +332,26 @@ func TestSplit(t *testing.T) {
 				{"foo": "bar"},
 				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest1": "data"}}},
 				{"baz": "buzz", "splitHere": common.MapStr{"splitMore": common.MapStr{"deepest2": "data"}}},
+			},
+		},
+		{
+			name: "Split string",
+			config: &splitConfig{
+				Target:          "body.items",
+				Type:            "string",
+				DelimiterString: "\n",
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"@timestamp": "1234567890",
+					"items":      "Line 1\nLine 2\nLine 3",
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{"@timestamp": "1234567890", "items": "Line 1"},
+				{"@timestamp": "1234567890", "items": "Line 2"},
+				{"@timestamp": "1234567890", "items": "Line 3"},
 			},
 		},
 	}

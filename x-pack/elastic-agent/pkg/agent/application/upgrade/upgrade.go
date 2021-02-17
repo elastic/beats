@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -48,6 +49,7 @@ type Upgrader struct {
 	acker       acker
 	reporter    stateReporter
 	upgradeable bool
+	caps        capabilities.Capability
 }
 
 // Action is the upgrade action state.
@@ -81,7 +83,7 @@ func IsUpgradeable() bool {
 }
 
 // NewUpgrader creates an upgrader which is capable of performing upgrade operation
-func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker, r stateReporter) *Upgrader {
+func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logger.Logger, closers []context.CancelFunc, reexec reexecManager, a acker, r stateReporter, caps capabilities.Capability) *Upgrader {
 	return &Upgrader{
 		agentInfo:   agentInfo,
 		settings:    settings,
@@ -91,6 +93,7 @@ func NewUpgrader(agentInfo *info.AgentInfo, settings *artifact.Config, log *logg
 		acker:       a,
 		reporter:    r,
 		upgradeable: IsUpgradeable(),
+		caps:        caps,
 	}
 }
 
@@ -114,6 +117,12 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 		return fmt.Errorf(
 			"cannot be upgraded; must be installed with install sub-command and " +
 				"running under control of the systems supervisor")
+	}
+
+	if u.caps != nil {
+		if _, err := u.caps.Apply(a); err == capabilities.ErrBlocked {
+			return nil
+		}
 	}
 
 	u.reportUpdating(a.Version())
@@ -211,7 +220,7 @@ func (u *Upgrader) ackAction(ctx context.Context, action fleetapi.Action) error 
 	u.reporter.OnStateChange(
 		"",
 		agentName,
-		state.State{Status: state.Running},
+		state.State{Status: state.Healthy},
 	)
 
 	return nil
@@ -247,19 +256,25 @@ func rollbackInstall(ctx context.Context, hash string) {
 }
 
 func copyActionStore(newHash string) error {
-	currentActionStorePath := info.AgentActionStoreFile()
+	storePaths := []string{info.AgentActionStoreFile(), info.AgentStateStoreFile()}
 
-	newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
-	newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
+	for _, currentActionStorePath := range storePaths {
+		newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
+		newActionStorePath := filepath.Join(newHome, filepath.Base(currentActionStorePath))
 
-	currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
-	if os.IsNotExist(err) {
-		// nothing to copy
-		return nil
+		currentActionStore, err := ioutil.ReadFile(currentActionStorePath)
+		if os.IsNotExist(err) {
+			// nothing to copy
+			continue
+		}
+		if err != nil {
+			return err
+		}
+
+		if err := ioutil.WriteFile(newActionStorePath, currentActionStore, 0600); err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
 
-	return ioutil.WriteFile(newActionStorePath, currentActionStore, 0600)
+	return nil
 }

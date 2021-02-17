@@ -68,6 +68,7 @@ const (
 // system using the contained PackageSpec.
 type OSPackageArgs struct {
 	OS    string        `yaml:"os"`
+	Arch  string        `yaml:"arch,omitempty"`
 	Types []PackageType `yaml:"types"`
 	Spec  PackageSpec   `yaml:"spec"`
 }
@@ -172,6 +173,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		},
 		Docker: map[string]string{
 			"amd64": "amd64",
+			"arm64": "arm64",
 		},
 	},
 }

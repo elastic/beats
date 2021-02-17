@@ -9,6 +9,8 @@ var:
     default: 9004
   - name: input
     default: udp
+  - name: internal_interfaces
+  - name: external_interfaces
 
 ingest_pipeline:
   - ingest/pipeline.yml

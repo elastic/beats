@@ -6,6 +6,10 @@ processors:
 - json:
     field: message
     target_field: mysqlenterprise.audit
+- remove:
+    field: '@timestamp'
+    ignore_missing: true
+    if: ctx?.mysqlenterprise?.audit?.timestamp != null
 - set:
     field: event.kind
     value: event
@@ -19,7 +23,7 @@ processors:
 - append:
     field: event.category
     value: iam
-    if: '["create_user", "delete_user", "grant", "flush_privileges"].contains(ctx.mysqlenterprise.audit?.general_data?.sql_command)'
+    if: '["create_user", "delete_user", "drop_user", "grant", "flush_privileges"].contains(ctx.mysqlenterprise.audit?.general_data?.sql_command)'
 - append:
     field: event.type
     value: access
@@ -124,6 +128,38 @@ processors:
       if (ctx.process.args.length > 0) {
         ctx.process.executable = ctx.process.args[0];
       }
+# Query parsing
+- grok:
+    field: mysqlenterprise.audit.general_data.query
+    if: '["create_user", "delete_user", "drop_user"].contains(ctx.mysqlenterprise?.audit?.general_data?.sql_command)'
+    ignore_failure: true
+    patterns:
+      - '(?i)(?:CREATE|DROP)\s+USER(?:\s+IF\s+(?:NOT\s+)?EXISTS)?\s+(?:%{START_QUOTE}%{QUOTED:user.target.name}%{END_QUOTE}|%{UNQUOTED:user.target.name})(?:@(?:%{START_QUOTE}%{QUOTED:user.target.domain}%{END_QUOTE}|%{UNQUOTED:user.target.domain}))?'
+    pattern_definitions:
+      START_QUOTE: (?<__quote>['"`])
+      QUOTED: (?~\k<__quote>)
+      END_QUOTE: (?:\k<__quote>)
+      UNQUOTED: (?:[^\s@;]*+)
+- remove:
+    field: __quote
+    ignore_missing: true
+- set:
+    field: user.name
+    value: '{{server.user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.user?.target != null'
+- append:
+    field: event.type
+    value:
+      - user
+      - creation
+    if: 'ctx.mysqlenterprise?.audit?.general_data?.sql_command == "create_user"'
+- append:
+    field: event.type
+    value:
+      - user
+      - deletion
+    if: 'ctx.mysqlenterprise?.audit?.general_data?.sql_command == "drop_user" || ctx.mysqlenterprise?.audit?.general_data?.sql_command == "delete_user"'
 
 # Attributes starting with _ is only supported by MySQL 8.0.19 and above.
 - convert:
@@ -134,23 +170,39 @@ processors:
 - append:
     field: related.user
     value: '{{server.user.name}}'
+    allow_duplicates: false
     if: ctx?.server?.user?.name != null
 - append:
     field: related.user
     value: '{{client.user.name}}'
+    allow_duplicates: false
     if: ctx?.client?.user?.name != null
+- append:
+    field: related.user
+    value: '{{user.target.name}}'
+    allow_duplicates: false
+    if: ctx?.user?.target?.name != null
 - append:
     field: related.ip
     value: '{{client.ip}}'
+    allow_duplicates: false
     if: ctx?.client?.ip != null
+- append:
+    field: related.hosts
+    value: '{{client.domain}}'
+    allow_duplicates: false
+    if: ctx?.client?.domain != null
 - date:
     field: mysqlenterprise.audit.timestamp
     formats:
-    - YYYY-MM-DD HH:mm:ss
+    - yyyy-MM-dd HH:mm:ss
     if: ctx?.mysqlenterprise?.audit?.timestamp != null
+- rename:
+    field: message
+    target_field: event.original
+    ignore_missing: true
 - remove:
     field:
-    - message
     - mysqlenterprise.audit.event
     - mysqlenterprise.audit.timestamp
     - mysqlenterprise.audit.connection_data.connection_attributes._pid

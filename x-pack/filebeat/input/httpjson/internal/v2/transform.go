@@ -25,6 +25,7 @@ type transforms []transform
 type transformContext struct {
 	lock         sync.RWMutex
 	cursor       *cursor
+	firstEvent   *common.MapStr
 	lastEvent    *common.MapStr
 	lastResponse *response
 }
@@ -33,6 +34,7 @@ func emptyTransformContext() *transformContext {
 	return &transformContext{
 		cursor:       &cursor{},
 		lastEvent:    &common.MapStr{},
+		firstEvent:   &common.MapStr{},
 		lastResponse: &response{},
 	}
 }
@@ -50,6 +52,13 @@ func (ctx *transformContext) lastEventClone() *common.MapStr {
 	return &clone
 }
 
+func (ctx *transformContext) firstEventClone() *common.MapStr {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+	clone := ctx.firstEvent.Clone()
+	return &clone
+}
+
 func (ctx *transformContext) lastResponseClone() *response {
 	ctx.lock.RLock()
 	defer ctx.lock.RUnlock()
@@ -63,6 +72,7 @@ func (ctx *transformContext) updateCursor() {
 	// we do not want to pass the cursor data to itself
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
+	newCtx.firstEvent = ctx.firstEvent
 	newCtx.lastResponse = ctx.lastResponse
 
 	ctx.cursor.update(newCtx)
@@ -72,6 +82,12 @@ func (ctx *transformContext) updateLastEvent(e common.MapStr) {
 	ctx.lock.Lock()
 	defer ctx.lock.Unlock()
 	*ctx.lastEvent = e
+}
+
+func (ctx *transformContext) updateFirstEvent(e common.MapStr) {
+	ctx.lock.Lock()
+	defer ctx.lock.Unlock()
+	*ctx.firstEvent = e
 }
 
 func (ctx *transformContext) updateLastResponse(r response) {
@@ -105,13 +121,13 @@ func (tr transformable) setHeader(v http.Header) {
 func (tr transformable) header() http.Header {
 	val, err := tr.GetValue("header")
 	if err != nil {
-		return http.Header{}
+		// if it does not exist, initialize it
+		header := http.Header{}
+		tr.setHeader(header)
+		return header
 	}
 
-	header, ok := val.(http.Header)
-	if !ok {
-		return http.Header{}
-	}
+	header, _ := val.(http.Header)
 
 	return header
 }
@@ -123,13 +139,13 @@ func (tr transformable) setBody(v common.MapStr) {
 func (tr transformable) body() common.MapStr {
 	val, err := tr.GetValue("body")
 	if err != nil {
-		return common.MapStr{}
+		// if it does not exist, initialize it
+		body := common.MapStr{}
+		tr.setBody(body)
+		return body
 	}
 
-	body, ok := val.(common.MapStr)
-	if !ok {
-		return common.MapStr{}
-	}
+	body, _ := val.(common.MapStr)
 
 	return body
 }

@@ -4,7 +4,8 @@
     "event": {
       "action": "session-disconnected",
       "category": [
-        "authentication"
+        "authentication",
+        "session"
       ],
       "code": 4779,
       "kind": "event",
@@ -22,6 +23,7 @@
       "level": "information"
     },
     "related": {
+      "ip": "10.100.150.17",
       "user": "at_adm"
     },
     "source": {

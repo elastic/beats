@@ -104,6 +104,22 @@ func StartService() error {
 	return nil
 }
 
+// StopService stops the installed service.
+func StopService() error {
+	svc, err := newService()
+	if err != nil {
+		return err
+	}
+	err = svc.Stop()
+	if err != nil {
+		return errors.New(
+			err,
+			fmt.Sprintf("failed to stop service (%s)", ServiceName),
+			errors.M("service", ServiceName))
+	}
+	return nil
+}
+
 // findDirectory returns the directory to copy into the installation location.
 //
 // This also verifies that the discovered directory is a valid directory for installation.

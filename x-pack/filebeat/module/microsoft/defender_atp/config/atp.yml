@@ -20,8 +20,8 @@ request.transforms:
       value: evidence
   - set:
       target: "url.params.$filter"
-      value: {{.date_cursor.value_template}}
-      default: {{.date_cursor.default_template}}
+      value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"]]'
+      default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-5m")) "2006-01-02T15:04:05.9999999Z"]]'
 
 response.split:
   target: body.value
@@ -31,7 +31,7 @@ response.split:
 
 cursor:
   lastUpdateTime:
-    value: "{{.date_cursor.cursor_template}}"
+    value: "[[.last_response.body.lastUpdateTime]]"
 
 {{ else if eq .input "file" }}
 
@@ -54,4 +54,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0
