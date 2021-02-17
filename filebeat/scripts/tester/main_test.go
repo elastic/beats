@@ -34,7 +34,7 @@ func TestGetPipelinePath(t *testing.T) {
 		},
 		{
 			pipelinePath: "../../module/postgresql/log/ingest",
-			count:        1,
+			count:        3,
 		},
 		{
 			pipelinePath: "postgresql/log",
