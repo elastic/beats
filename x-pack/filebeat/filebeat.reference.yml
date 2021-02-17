@@ -2138,7 +2138,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true    
+    enabled: true
   irc:
     enabled: true
   kerberos:
@@ -2160,6 +2160,8 @@ filebeat.modules:
   rdp:
     enabled: true
   rfb:
+    enabled: true
+  signature:
     enabled: true
   sip:
     enabled: true
