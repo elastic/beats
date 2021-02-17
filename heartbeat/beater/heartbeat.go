@@ -18,15 +18,16 @@
 package beater
 
 import (
+	"context"
 	"fmt"
 	"time"
-
-	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -54,7 +57,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
-
 	limit := parsedConfig.Scheduler.Limit
 	locationName := parsedConfig.Scheduler.Location
 	if locationName == "" {
@@ -72,7 +74,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(scheduler, false),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler, false),
 	}
 	return bt, nil
 }
@@ -95,6 +97,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors(b)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(bt.config.SyntheticSuites) > 0 {
+		err := bt.RunSyntheticSuiteMonitors(b)
 		if err != nil {
 			return err
 		}
@@ -123,13 +132,18 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
-	factory := monitors.NewFactory(bt.scheduler, true)
+	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
+			if err == stdfields.ErrPluginDisabled {
+				continue // don't stop loading monitors just because they're disabled
+			}
+
 			return errors.Wrap(err, "could not create monitor")
 		}
+
 		created.Start()
 	}
 	return nil
@@ -139,6 +153,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList("inputs", inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
@@ -151,6 +167,50 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Execute the monitor
 	go bt.monitorReloader.Run(bt.dynamicFactory)
 
+	return nil
+}
+
+// Provide hook to define journey list discovery from x-pack
+type JourneyLister func(ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
+
+var mainJourneyLister JourneyLister
+
+func RegisterJourneyLister(jl JourneyLister) {
+	mainJourneyLister = jl
+}
+
+func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
+	// If we are running without XPack this will be nil
+	if mainJourneyLister == nil {
+		return nil
+	}
+	for _, suite := range bt.config.SyntheticSuites {
+		logp.Info("Listing suite %s", suite.Path)
+		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
+		if err != nil {
+			return err
+		}
+		factory := monitors.NewFactory(b.Info, bt.scheduler, false)
+		for _, name := range journeyNames {
+			cfg, err := common.NewConfigFrom(map[string]interface{}{
+				"type":         "browser",
+				"path":         suite.Path,
+				"schedule":     suite.Schedule,
+				"params":       suite.Params,
+				"journey_name": name,
+				"name":         name,
+				"id":           name,
+			})
+			if err != nil {
+				return err
+			}
+			created, err := factory.Create(b.Publisher, cfg)
+			if err != nil {
+				return errors.Wrap(err, "could not create monitor")
+			}
+			created.Start()
+		}
+	}
 	return nil
 }
 

@@ -1,0 +1,218 @@
+---
+description: Pipeline for parsing Penando DFW logs
+processors:
+- set:
+    field: event.ingested
+    value: "{{_ingest.timestamp}}"
+- rename:
+    field: message
+    target_field: event.original
+- grok:
+    field: event.original
+    patterns:
+      - "%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-) +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app}) +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(?::-|%{SYSLOG5424PRINTASCII:syslog5424_msgid}) +\\[%{GREEDYDATA:payload_raw}\\]$"
+- json:
+    field: payload_raw
+    target_field: json
+- remove:
+    field: [syslog5424_sd,syslog5424_app,syslog5424_host,syslog5424_msgid,syslog5424_pri,syslog5424_proc,syslog5424_ver,host]
+    ignore_missing: true
+- date:
+    field: json.time
+    target_field: '@timestamp'
+    ignore_failure: true
+    formats:
+      - ISO8601
+- rename:
+    field: json.action
+    target_field: pensando.dfw.action
+    ignore_failure: true
+- rename:
+    field: json.app-id
+    target_field: pensando.dfw.app_id
+    ignore_failure: true
+- rename:
+    field: json.destaddr
+    target_field: pensando.dfw.destination_address
+    ignore_failure: true
+- rename:
+    field: json.destport
+    target_field: pensando.dfw.destination_port
+    ignore_failure: true
+- rename:
+    field: json.direction
+    target_field: pensando.dfw.direction
+    ignore_failure: true
+- rename:
+    field: json.protocol
+    target_field: pensando.dfw.protocol
+    ignore_failure: true
+- rename:
+    field: json.rule-id
+    target_field: pensando.dfw.rule_id
+    ignore_failure: true
+- rename:
+    field: json.session-id
+    target_field: pensando.dfw.session_id
+    ignore_failure: true
+- rename:
+    field: json.session-state
+    target_field: pensando.dfw.session_state
+    ignore_failure: true
+- rename:
+    field: json.srcaddr
+    target_field: pensando.dfw.source_address
+    ignore_failure: true
+- rename:
+    field: json.srcport
+    target_field: pensando.dfw.source_port
+    ignore_failure: true
+- set:
+    field: event.category
+    value: ['network']
+- set:
+    field: observer.vendor
+    value: Pensando Systems
+- set:
+    field: observer.type
+    value: 'firewall'
+- set:
+    field: observer.product
+    value: 'Distributed Services Platform'
+- set:
+    field: network.type
+    value: 'ipv4'
+- set:
+    field: network.transport
+    value: '{{pensando.dfw.protocol}}'
+    ignore_failure: true
+- lowercase:
+    field: network.transport
+    ignore_missing: true
+    ignore_failure: true
+- set:
+    field: source.address
+    value: "{{pensando.dfw.source_address}}"
+    ignore_failure: true
+    ignore_empty_value: true
+- convert:
+    field: pensando.dfw.source_port
+    target_field: source.port
+    type: integer
+    ignore_failure: true
+    ignore_missing: true
+- set:
+    field: destination.address
+    value: "{{pensando.dfw.destination_address}}"
+    ignore_failure: true
+    ignore_empty_value: true
+- convert:
+    field: pensando.dfw.destination_port
+    target_field: destination.port
+    type: integer
+    ignore_failure: true
+    ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{pensando.dfw.source_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.source_port > ctx.pensando.dfw?.destination_port
+- set:
+    field: client.ip
+    value: '{{pensando.dfw.destination_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.destination_port > ctx.pensando.dfw?.source_port
+- set:
+    field: client.ip
+    value: '{{pensando.dfw.source_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.protocol == 'ICMP'
+- set:
+    field: server.ip
+    value: '{{pensando.dfw.source_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.source_port < ctx.pensando.dfw?.destination_port
+- set:
+    field: server.ip
+    value: '{{pensando.dfw.destination_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.destination_port < ctx.pensando.dfw?.source_port
+- set:
+    field: server.ip
+    value: '{{pensando.dfw.destination_address}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.protocol == 'ICMP'
+- set:
+    field: server.port
+    value: '{{pensando.dfw.source_port}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.source_port < ctx.pensando.dfw?.destination_port
+- set:
+    field: server.port
+    value: '{{pensando.dfw.destination_port}}'
+    ignore_failure: true
+    if: ctx.pensando.dfw?.destination_port < ctx.pensando.dfw?.source_port
+- set:
+    field: server.port
+    value: 0
+    ignore_failure: true
+    if: ctx.pensando.dfw?.protocol == 'ICMP'
+- set:
+    field: event.kind
+    value: 'event'
+- set:
+    field: event.action
+    value: 'allowed'
+    if: '[''allow''].contains(ctx.pensando.dfw?.action)'
+- set:
+    field: rule.id
+    value: '{{pensando.dfw.rule_id}}'
+    ignore_failure: true
+- set:
+    field: event.outcome
+    value: success
+    if: '[''allow'', ''deny''].contains(ctx.pensando.dfw?.action)'
+- set:
+    field: event.action
+    value: denied
+    if: '[''deny''].contains(ctx.pensando.dfw?.action)'
+- set:
+    field: event.type
+    value: ['connection', 'allowed']
+    if: '[''allow''].contains(ctx.pensando.dfw?.action)'
+    ignore_failure: true
+- set:
+    field: event.type
+    value: ['connection', 'denied']
+    if: '[''deny''].contains(ctx.pensando.dfw?.action)'
+    ignore_failure: true
+- geoip:
+    field: pensando.dfw.source_address
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: pensando.dfw.source_address
+    target_field: source.as
+    properties:
+    - asn
+    - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- remove:
+    field:
+      - syslog5424_ts
+      - json
+      - payload_raw
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

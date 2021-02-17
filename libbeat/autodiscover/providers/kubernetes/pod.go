@@ -39,7 +39,7 @@ type pod struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func(bus.Event)
+	publish          func([]bus.Event)
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
@@ -47,7 +47,7 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event bus.Event)) (Eventer, error) {
+func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
 	config := defaultConfig()
@@ -67,51 +67,43 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		Namespace:   config.Namespace,
+		SyncTimeout:  config.SyncPeriod,
+		Node:         config.Node,
+		Namespace:    config.Namespace,
+		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
 	}
 
-	var nodeMeta, namespaceMeta metadata.MetaGen
-	var nodeWatcher, namespaceWatcher kubernetes.Watcher
-	metaConf := config.AddResourceMetadata
-	if metaConf != nil {
-		if metaConf.Node != nil && metaConf.Node.Enabled() {
-			options := kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-				Node:        config.Node,
-			}
-			if config.Namespace != "" {
-				options.Namespace = config.Namespace
-			}
-			nodeWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-			}
-
-			nodeMeta = metadata.NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
-		}
-
-		if metaConf.Namespace != nil && metaConf.Namespace.Enabled() {
-			namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-			}, nil)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-			}
-
-			namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
-		}
+	options := kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+		Node:        config.Node,
 	}
+	if config.Namespace != "" {
+		options.Namespace = config.Namespace
+	}
+	metaConf := config.AddResourceMetadata
+	if metaConf == nil {
+		metaConf = metadata.GetDefaultResourceMetadataConfig()
+	}
+	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	if err != nil {
+		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+	}
+	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: config.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	}
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 	p := &pod{
 		config:           config,
 		uuid:             uuid,
 		publish:          publish,
-		metagen:          metadata.NewPodMetadataGenerator(cfg, watcher.Store(), nodeMeta, namespaceMeta),
+		metagen:          metaGen,
 		logger:           logger,
 		watcher:          watcher,
 		nodeWatcher:      nodeWatcher,
@@ -266,11 +258,33 @@ func (p *pod) Stop() {
 }
 
 func (p *pod) emit(pod *kubernetes.Pod, flag string) {
+	containers, statuses := getContainersInPod(pod)
+	p.emitEvents(pod, flag, containers, statuses)
+}
+
+// getContainersInPod returns all the containers defined in a pod and their statuses.
+// It includes init and ephemeral containers.
+func getContainersInPod(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
+	var containers []kubernetes.Container
+	var statuses []kubernetes.PodContainerStatus
+
 	// Emit events for all containers
-	p.emitEvents(pod, flag, pod.Spec.Containers, pod.Status.ContainerStatuses)
+	containers = append(containers, pod.Spec.Containers...)
+	statuses = append(statuses, pod.Status.ContainerStatuses...)
 
 	// Emit events for all initContainers
-	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+	containers = append(containers, pod.Spec.InitContainers...)
+	statuses = append(statuses, pod.Status.InitContainerStatuses...)
+
+	// Emit events for all ephemeralContainers
+	// Ephemeral containers are alpha feature in k8s and this code may require some changes, if their
+	// api change in the future.
+	for _, c := range pod.Spec.EphemeralContainers {
+		containers = append(containers, kubernetes.Container(c.EphemeralContainerCommon))
+	}
+	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+
+	return containers, statuses
 }
 
 func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
@@ -304,7 +318,8 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	var (
 		annotations = common.MapStr{}
 		nsAnn       = common.MapStr{}
-		events      = make([]bus.Event, 0)
+		podPorts    = common.MapStr{}
+		eventList   = make([][]bus.Event, 0)
 	)
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
@@ -320,7 +335,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		}
 	}
 
-	podPorts := common.MapStr{}
 	// Emit container and port information
 	for _, c := range containers {
 		// If it doesn't have an ID, container doesn't exist in
@@ -335,23 +349,34 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
+		meta := p.metagen.Generate(
+			pod,
+			metadata.WithFields("container.name", c.Name),
+			metadata.WithFields("container.image", c.Image),
+		)
+
 		cmeta := common.MapStr{
+			"id": cid,
+			"image": common.MapStr{
+				"name": c.Image,
+			},
+			"runtime": runtimes[c.Name],
+		}
+
+		// Information that can be used in discovering a workload
+		kubemeta := meta.Clone()
+		kubemeta["annotations"] = annotations
+		kubemeta["container"] = common.MapStr{
 			"id":      cid,
 			"name":    c.Name,
 			"image":   c.Image,
 			"runtime": runtimes[c.Name],
 		}
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name),
-			metadata.WithFields("container.image", c.Image))
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["container"] = cmeta
-		kubemeta["annotations"] = annotations
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
 		}
 
+		var events []bus.Event
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			// Set a zero port on the event to signify that the event is from a container
@@ -364,6 +389,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)
@@ -380,9 +406,13 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,
+					"container":  cmeta,
 				},
 			}
 			events = append(events, event)
+		}
+		if len(events) != 0 {
+			eventList = append(eventList, events)
 		}
 	}
 
@@ -391,7 +421,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
 	// no unnecessary pod level events emitted prematurely.
 	// We publish the pod level hint first so that it doesn't override a valid container level event.
-	if len(events) != 0 {
+	if len(eventList) != 0 {
 		meta := p.metagen.Generate(pod)
 
 		// Information that can be used in discovering a workload
@@ -413,11 +443,11 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": meta,
 			},
 		}
-		p.publish(event)
+		p.publish([]bus.Event{event})
 	}
 
-	// Publish the container level hints finally.
-	for _, event := range events {
-		p.publish(event)
+	// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+	for _, events := range eventList {
+		p.publish(events)
 	}
 }

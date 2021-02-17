@@ -64,8 +64,6 @@ spec:
         - name: modules
           mountPath: /usr/share/metricbeat/modules.d
           readOnly: true
-        - name: dockersock
-          mountPath: /var/run/docker.sock
         - name: proc
           mountPath: /hostfs/proc
           readOnly: true
@@ -79,9 +77,6 @@ spec:
       - name: cgroup
         hostPath:
           path: /sys/fs/cgroup
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock
       - name: config
         configMap:
           defaultMode: 0640

@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"errors"
+	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -36,6 +37,7 @@ type TimeoutReader struct {
 	signal  error
 	running bool
 	ch      chan lineMessage
+	done    chan struct{}
 }
 
 type lineMessage struct {
@@ -54,6 +56,7 @@ func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *Time
 		signal:  signal,
 		timeout: t,
 		ch:      make(chan lineMessage, 1),
+		done:    make(chan struct{}),
 	}
 }
 
@@ -68,9 +71,13 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		go func() {
 			for {
 				message, err := r.reader.Next()
-				r.ch <- lineMessage{message, err}
-				if err != nil {
-					break
+				select {
+				case <-r.done:
+					return
+				case r.ch <- lineMessage{message, err}:
+					if err != nil {
+						return
+					}
 				}
 			}
 		}()
@@ -85,5 +92,13 @@ func (r *TimeoutReader) Next() (reader.Message, error) {
 		return msg.line, msg.err
 	case <-timer.C:
 		return reader.Message{}, r.signal
+	case <-r.done:
+		return reader.Message{}, io.EOF
 	}
+}
+
+func (r *TimeoutReader) Close() error {
+	close(r.done)
+
+	return r.reader.Close()
 }

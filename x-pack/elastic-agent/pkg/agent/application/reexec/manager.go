@@ -5,21 +5,14 @@
 package reexec
 
 import (
-	"sync"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-)
-
-var (
-	execSingleton     ExecManager
-	execSingletonOnce sync.Once
 )
 
 // ExecManager is the interface that the global reexec manager implements.
 type ExecManager interface {
 	// ReExec asynchronously re-executes command in the same PID and memory address
 	// as the currently running application.
-	ReExec()
+	ReExec(argOverrides ...string)
 
 	// ShutdownChan returns the shutdown channel the main function should use to
 	// handle shutdown of the current running application.
@@ -30,14 +23,6 @@ type ExecManager interface {
 	ShutdownComplete()
 }
 
-// Manager returns the global reexec manager.
-func Manager(log *logger.Logger, exec string) ExecManager {
-	execSingletonOnce.Do(func() {
-		execSingleton = newManager(log, exec)
-	})
-	return execSingleton
-}
-
 type manager struct {
 	logger   *logger.Logger
 	exec     string
@@ -46,7 +31,8 @@ type manager struct {
 	complete chan bool
 }
 
-func newManager(log *logger.Logger, exec string) *manager {
+// NewManager returns the reexec manager.
+func NewManager(log *logger.Logger, exec string) ExecManager {
 	return &manager{
 		logger:   log,
 		exec:     exec,
@@ -56,12 +42,12 @@ func newManager(log *logger.Logger, exec string) *manager {
 	}
 }
 
-func (m *manager) ReExec() {
+func (m *manager) ReExec(argOverrides ...string) {
 	go func() {
 		close(m.trigger)
 		<-m.shutdown
 
-		if err := reexec(m.logger, m.exec); err != nil {
+		if err := reexec(m.logger, m.exec, argOverrides...); err != nil {
 			// panic; because there is no going back, everything is shutdown
 			panic(err)
 		}

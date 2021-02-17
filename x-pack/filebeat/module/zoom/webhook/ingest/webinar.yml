@@ -1,0 +1,141 @@
+description: Pipeline for parsing Zoom webinar webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+    if: ctx?.event?.action != 'webinar.alert'
+- append:
+    field: event.type
+    value: error
+    if: ctx?.event?.action == 'webinar.alert'
+- append:
+    field: event.type
+    value: creation
+    if: "['webinar.created', 'webinar.registration_created'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'webinar.deleted'
+- append:
+    field: event.type
+    value: allowed
+    if: ctx?.event?.action == 'webinar.registration_approved'
+- append:
+    field: event.type
+    value: denied
+    if: ctx?.event?.action == 'webinar.registration_denied'
+- append:
+    field: event.type
+    value: change
+    if: "['webinar.updated', 'webinar.registration_approved', 'webinar.registration_denied', 'webinar.registration_cancelled'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: start
+    if: "['webinar.started', 'webinar.sharing_started'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: end
+    if: "['webinar.ended', 'webinar.sharing_ended'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.object
+    target_field: zoom.webinar
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.event?.action == 'webinar.updated'
+    ignore_failure: true
+- date:
+    field: zoom.webinar.start_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'webinar.started'
+    ignore_failure: true
+- date:
+    field: zoom.participant.join_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'webinar.participant_joined'
+    ignore_failure: true
+- date:
+    field: zoom.participant.leave_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'webinar.participant_left'
+    ignore_failure: true
+
+#
+# set user.* from participant
+#
+- set:
+    field: user.id
+    value: '{{zoom.participant.id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.participant != null'
+- set:
+    field: user.full_name
+    value: '{{zoom.participant.user_name}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.participant != null'
+
+#
+# set user.* from registrant
+#
+- set:
+    field: user.id
+    value: '{{zoom.registrant.id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant != null'
+- set:
+    field: user.email
+    value: '{{zoom.registrant.email}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant != null'
+- set:
+    field: user.full_name
+    value: '{{zoom.registrant.first_name}} {{zoom.registrant.last_name}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant != null'
+
+#
+# set user.* from operator
+#
+- set:
+    field: user.id
+    value: '{{zoom.operator_id}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant == null && ctx.zoom?.participant == null'
+- set:
+    field: user.email
+    value: '{{zoom.operator}}'
+    ignore_empty_value: true
+    if: 'ctx.zoom?.registrant == null && ctx.zoom?.participant == null'
+
+#
+# append to related.user
+#
+- append:
+    field: related.user
+    value: "{{zoom.webinar.host_id}}"
+    allow_duplicates: false
+    if: "ctx.zoom?.webinar?.host_id != null"
+- append:
+    field: related.user
+    value: "{{zoom.registrant.id}}"
+    allow_duplicates: false
+    if: "ctx.zoom?.registrant?.id != null"
+- append:
+    field: related.user
+    value: "{{zoom.participant.id}}"
+    allow_duplicates: false
+    if: "ctx.zoom?.participant?.id != null"
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

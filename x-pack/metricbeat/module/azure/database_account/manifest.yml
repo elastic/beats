@@ -14,12 +14,14 @@ input:
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
           value: "*"
       - name: ["TotalRequestUnits", "TotalRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
@@ -28,6 +30,7 @@ input:
           value: "*"
       - name: ["CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT1M"
         dimensions:
         - name: "DatabaseName"
@@ -38,6 +41,7 @@ input:
         "SqlContainerDelete", "SqlContainerThroughputUpdate", "SqlContainerUpdate", "SqlDatabaseDelete", "SqlDatabaseThroughputUpdate", "SqlDatabaseUpdate", "TableTableDelete",
                 "TableTableThroughputUpdate","TableTableUpdate"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         dimensions:
         - name: "ResourceName"
           value: "*"
@@ -49,12 +53,14 @@ input:
       - name: ["AvailableStorage", "DataUsage","DocumentCount", "DocumentQuota", "IndexUsage", "MetadataRequests", "MongoRequestCharge", "MongoRequests", "MongoRequestsCount",
                "MongoRequestsInsert", "MongoRequestsDelete", "MongoRequestsQuery", "MongoRequestsUpdate","ProvisionedThroughput", "NormalizedRUConsumption"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
           value: "*"
       - name: ["TotalRequestUnits", "TotalRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "DatabaseName"
@@ -63,6 +69,7 @@ input:
           value: "*"
       - name: ["CassandraRequestCharges", "CassandraRequests"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         timegrain: "PT1M"
         dimensions:
         - name: "DatabaseName"
@@ -73,6 +80,7 @@ input:
                 "SqlContainerDelete", "SqlContainerThroughputUpdate", "SqlContainerUpdate", "SqlDatabaseDelete", "SqlDatabaseThroughputUpdate", "SqlDatabaseUpdate", "TableTableDelete",
                 "TableTableThroughputUpdate","TableTableUpdate"]
         namespace: "Microsoft.DocumentDb/databaseAccounts"
+        ignore_unsupported: true
         dimensions:
         - name: "ResourceName"
           value: "*"

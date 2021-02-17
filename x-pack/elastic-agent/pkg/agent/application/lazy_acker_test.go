@@ -32,7 +32,7 @@ func TestLazyAcker(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	lacker := newLazyAcker(acker)
+	lacker := newLazyAcker(acker, log)
 
 	if acker == nil {
 		t.Fatal("acker not initialized")
@@ -64,7 +64,7 @@ func TestLazyAcker(t *testing.T) {
 			assert.EqualValues(t, 1, len(cr.Events))
 		}
 
-		resp := wrapStrToResp(http.StatusOK, `{ "actions": [], "success": true }`)
+		resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 		return resp, nil
 	})
 

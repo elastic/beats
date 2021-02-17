@@ -49,37 +49,45 @@ rules:
     - remove_key:
         key: use_output
     - remove_key:
-        key: dataset
+        key: data_stream
     - remove_key:
-        key: dataset.namespace
+        key: data_stream.namespace
     - remove_key:
-        key: dataset.name
+        key: data_stream.dataset
 
 - filter_values:
     selector: inputs
     key: type
     values:
-    - log
-    - stdin
-    - udp
-    - tcp
-    - docker
-    - redis
-    - syslog
-    - s3
-    - netflow
-    - httpjson
-    - o365audit
-    - azureeventhub
+    - aws-cloudwatch
+    - aws-s3
+    - azure-eventhub
     - cloudfoundry
-    - googlepubsub
+    - container
+    - docker
+    - gcp-pubsub
+    - http_endpoint
+    - httpjson
     - kafka
+    - log
+    - mqtt
+    - netflow
+    - o365audit
+    - redis
+    - stdin
+    - syslog
+    - tcp
+    - udp
+    - unix
+    - winlog
 
 - filter_values:
     selector: inputs
     key: enabled
     values:
     - true
+
+- inject_agent_info: {}
 
 - copy:
     from: inputs
@@ -90,5 +98,5 @@ rules:
     - filebeat
     - output
     - keystore
-when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

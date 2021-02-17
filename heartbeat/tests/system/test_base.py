@@ -5,7 +5,6 @@ from heartbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
-import nose.tools
 
 
 class Test(BaseTest, common_tests.TestExportsMixin):
@@ -19,6 +18,30 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             "monitors": [
                 {
                     "type": "http",
+                    "urls": ["http://localhost:9200"],
+                }
+            ]
+        }
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            **config
+        )
+
+        heartbeat_proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
+        heartbeat_proc.check_kill_and_wait()
+
+    def test_disabled(self):
+        """
+        Basic test against a disabled monitor
+        """
+
+        config = {
+            "monitors": [
+                {
+                    "type": "http",
+                    "enabled": "false",
                     "urls": ["http://localhost:9200"],
                 }
             ]
@@ -135,7 +158,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         heartbeat_proc.check_kill_and_wait()
 
         doc = self.read_output()[0]
-        self.assertDictContainsSubset(expected, doc)
+        assert expected.items() <= doc.items()
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -181,7 +204,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             heartbeat_proc.check_kill_and_wait()
 
         for output in self.read_output():
-            nose.tools.assert_equal(
+            self.assertEqual(
                 output["event.dataset"],
                 "uptime",
                 "Check for event.dataset in {} failed".format(output)

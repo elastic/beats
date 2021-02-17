@@ -1,0 +1,40 @@
+{{ if eq .input "tcp" }}
+
+type: tcp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "udp" }}
+
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{ .tags | tojson }}
+
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.8.0
+  - add_fields:
+      target: '_conf'
+      fields:
+          default: {{ .default_host_name | printf "%q" }}
+          mappings:
+{{ range $i, $entry := .known_devices }}
+            - serial: {{$entry.serial_number | printf "%q"}}
+              hostname: {{$entry.hostname | printf "%q"}}
+{{ end }}
+

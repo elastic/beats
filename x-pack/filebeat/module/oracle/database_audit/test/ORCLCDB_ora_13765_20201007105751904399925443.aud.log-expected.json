@@ -1,0 +1,102 @@
+[
+    {
+        "@timestamp": "2020-10-07T14:57:51.000Z",
+        "client.user.name": "oracle",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "SYSDBA",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 583,
+        "oracle.database_audit.action": "CONNECT",
+        "oracle.database_audit.action_number": "100",
+        "oracle.database_audit.client.terminal": "pts/0",
+        "oracle.database_audit.length": 253,
+        "oracle.database_audit.session_id": "4294967295",
+        "oracle.database_audit.status": "0",
+        "process.pid": "13765",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "/",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-07T14:57:52.000Z",
+        "client.user.name": "oracle",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "SYSDBA",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 883,
+        "oracle.database_audit.action": "SELECT DECODE(null,'','Total System Global Area','') NAME_COL_PLUS_SHOW_SGA, SUM(VALUE), DECODE (null,'', 'bytes','') units_col_plus_show_sga FROM V$SGA UNION ALL SELECT NAME NAME_COL_PLUS_SHOW_SGA , VALUE, DECODE (null,'', 'bytes','') units_col_plus_show_sga FROM V$SGA",
+        "oracle.database_audit.action_number": "3",
+        "oracle.database_audit.client.terminal": "pts/0",
+        "oracle.database_audit.length": 527,
+        "oracle.database_audit.session_id": "4294967295",
+        "oracle.database_audit.status": "0",
+        "process.pid": "13765",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "/",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    },
+    {
+        "@timestamp": "2020-10-07T14:58:01.000Z",
+        "client.user.name": "oracle",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "SYSDBA",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 1457,
+        "oracle.database_audit.action": "ALTER DATABASE MOUNT",
+        "oracle.database_audit.action_number": "35",
+        "oracle.database_audit.client.terminal": "pts/0",
+        "oracle.database_audit.database.id": "39496799",
+        "oracle.database_audit.length": 276,
+        "oracle.database_audit.session_id": "4294967295",
+        "oracle.database_audit.status": "0",
+        "process.pid": "13765",
+        "server.address": "testlab.local",
+        "server.domain": "testlab.local",
+        "server.user.name": "/",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]

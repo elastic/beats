@@ -4,6 +4,9 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: '@timestamp'
     target_field: event.created

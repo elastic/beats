@@ -41,7 +41,7 @@ class Test(BaseTest):
         index_name = "filebeat-test-input"
         try:
             self.es.indices.delete(index=index_name)
-        except:
+        except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(index_name))
 
@@ -83,7 +83,7 @@ class Test(BaseTest):
                 res = self.es.search(index=index_name,
                                      body={"query": {"match_all": {}}})
                 return [o["_source"] for o in res["hits"]["hits"]]
-            except:
+            except BaseException:
                 return []
 
         self.wait_until(lambda: len(search_objects()) > 0, max_timeout=20)

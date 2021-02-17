@@ -233,7 +233,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "cloud.instance.name",
+                                "terms_field": "azure.resource.name",
                                 "type": "timeseries"
                             }
                         ],
@@ -306,7 +306,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "cloud.instance.name",
+                                "terms_field": "azure.resource.name",
                                 "type": "timeseries"
                             }
                         ],
@@ -372,7 +372,7 @@
                                 "type": "list"
                             },
                             {
-                                "fieldName": "cloud.instance.name",
+                                "fieldName": "azure.resource.name",
                                 "id": "1584710535722",
                                 "indexPatternRefName": "control_2_index_pattern",
                                 "label": "Resource",
@@ -471,7 +471,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "cloud.instance.name",
+                                "terms_field": "azure.resource.name",
                                 "type": "timeseries"
                             }
                         ],
@@ -544,7 +544,7 @@
                                 "separate_axis": 0,
                                 "split_mode": "terms",
                                 "stacked": "none",
-                                "terms_field": "cloud.instance.name",
+                                "terms_field": "azure.resource.name",
                                 "type": "timeseries"
                             }
                         ],

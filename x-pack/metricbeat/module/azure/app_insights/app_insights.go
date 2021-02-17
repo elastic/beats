@@ -22,7 +22,8 @@ type Config struct {
 	ApplicationId string        `config:"application_id"    validate:"required"`
 	ApiKey        string        `config:"api_key" validate:"required"`
 	Period        time.Duration `config:"period" validate:"nonzero,required"`
-	Metrics       []Metric      `config:"metrics"`
+	Metrics       []Metric      `config:"metrics" validate:"required"`
+	Namespace     string        `config:"namespace"`
 }
 
 // Metric struct used for configuration options
@@ -70,7 +71,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error retrieving metric values")
 	}
-	events := EventsMapping(results, m.client.Config.ApplicationId)
+	events := EventsMapping(results, m.client.Config.ApplicationId, m.client.Config.Namespace)
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {

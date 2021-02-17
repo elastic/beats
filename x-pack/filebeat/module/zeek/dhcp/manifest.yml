@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/dhcp.log
   - name: tags
     default: [zeek.dhcp]
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/dhcp.yml

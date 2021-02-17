@@ -3,13 +3,17 @@
     "@timestamp": "2020-04-01T08:45:44.1717416Z",
     "event": {
       "action": "kerberos-authentication-ticket-requested",
-      "category": "authentication",
+      "category": [
+        "authentication"
+      ],
       "code": 4768,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"

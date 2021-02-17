@@ -1,0 +1,57 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_ora_13765_20201007105751904399925443.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 0 <none>
+Oracle process number: 7
+Unix process pid: 13765, image: oracle@testlab.local (TNS V1-V3)
+
+Wed Oct  7 10:57:51 2020 -04:00
+LENGTH : '253'
+ACTION :[7] 'CONNECT'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[0] ''
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[3] '100'
+
+Wed Oct  7 10:57:52 2020 -04:00
+LENGTH : '527'
+ACTION :[281] 'SELECT DECODE(null,'','Total System Global Area','') NAME_COL_PLUS_SHOW_SGA,   SUM(VALUE), DECODE (null,'', 'bytes','') units_col_plus_show_sga FROM V$SGA    UNION ALL    SELECT NAME NAME_COL_PLUS_SHOW_SGA , VALUE,    DECODE (null,'', 'bytes','') units_col_plus_show_sga FROM V$SGA'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[0] ''
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:01 2020 -04:00
+LENGTH : '276'
+ACTION :[22] 'ALTER DATABASE   MOUNT'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '35'
+

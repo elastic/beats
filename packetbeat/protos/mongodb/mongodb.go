@@ -47,6 +47,7 @@ type mongodbPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 }
 
 type transactionKey struct {
@@ -65,6 +66,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
@@ -75,13 +77,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (mongodb *mongodbPlugin) init(results protos.Reporter, config *mongodbConfig) error {
+func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mongodbConfig) error {
 	debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
@@ -94,6 +96,7 @@ func (mongodb *mongodbPlugin) init(results protos.Reporter, config *mongodbConfi
 		protos.DefaultTransactionHashSize)
 	mongodb.responses.StartJanitor(mongodb.transactionTimeout)
 	mongodb.results = results
+	mongodb.watcher = watcher
 
 	return nil
 }
@@ -218,7 +221,7 @@ func (mongodb *mongodbPlugin) handleMongodb(
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = mongodb.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isResponse {
 		debugf("MongoDB response message")
@@ -379,7 +382,9 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)
+	pbf.AddIP(t.src.IP)
 	pbf.SetDestination(&t.dst)
+	pbf.AddIP(t.dst.IP)
 	pbf.Source.Bytes = int64(t.bytesIn)
 	pbf.Destination.Bytes = int64(t.bytesOut)
 	pbf.Event.Dataset = "mongodb"

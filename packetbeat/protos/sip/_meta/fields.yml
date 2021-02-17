@@ -1,0 +1,235 @@
+- key: sip
+  title: "SIP"
+  description: SIP-specific event fields.
+  fields:
+    - name: sip
+      type: group
+      description: Information about SIP traffic.
+      fields:
+      - name: code
+        type: keyword
+        description: Response status code.
+      - name: method
+        type: keyword
+        description: Request method.
+      - name: status
+        type: keyword
+        description: Response status phrase.
+      - name: type
+        type: keyword
+        description: Either request or response.
+      - name: version
+        type: keyword
+        description: SIP protocol version.
+      - name: uri.original
+        type: keyword
+        description: The original URI.
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: uri.scheme
+        type: keyword
+        description: The URI scheme.
+      - name: uri.username
+        type: keyword
+        description: The URI user name.
+      - name: uri.host
+        type: keyword
+        description: The URI host.
+      - name: uri.port
+        type: keyword
+        description: The URI port.
+      - name: accept
+        type: keyword
+        description: Accept header value.
+      - name: allow
+        type: keyword
+        description: Allowed methods.
+      - name: call_id
+        type: keyword
+        description: Call ID.
+      - name: content_length
+        type: long
+      - name: content_type
+        type: keyword
+      - name: max_forwards
+        type: long
+      - name: supported
+        type: keyword
+        description: Supported methods.
+      - name: user_agent.original
+        type: keyword
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: private.uri.original
+        type: keyword
+        description: Private original URI.
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: private.uri.scheme
+        type: keyword
+        description: Private URI scheme.
+      - name: private.uri.username
+        type: keyword
+        description: Private URI user name.
+      - name: private.uri.host
+        type: keyword
+        description: Private URI host.
+      - name: private.uri.port
+        type: keyword
+        description: Private URI port.
+      - name: cseq.code
+        type: keyword
+        description: Sequence code.
+      - name: cseq.method
+        type: keyword
+        description: Sequence method.
+      - name: via.original
+        type: keyword
+        description: The original Via value.
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: to.display_info
+        type: keyword
+        description: "To display info"
+      - name: to.uri.original
+        type: keyword
+        description: "To original URI"
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: to.uri.scheme
+        type: keyword
+        description: "To URI scheme"
+      - name: to.uri.username
+        type: keyword
+        description: "To URI user name"
+      - name: to.uri.host
+        type: keyword
+        description: "To URI host"
+      - name: to.uri.port
+        type: keyword
+        description: "To URI port"
+      - name: to.tag
+        type: keyword
+        description: "To tag"
+      - name: from.display_info
+        type: keyword
+        description: "From display info"
+      - name: from.uri.original
+        type: keyword
+        description: "From original URI"
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: from.uri.scheme
+        type: keyword
+        description: "From URI scheme"
+      - name: from.uri.username
+        type: keyword
+        description: "From URI user name"
+      - name: from.uri.host
+        type: keyword
+        description: "From URI host"
+      - name: from.uri.port
+        type: keyword
+        description: "From URI port"
+      - name: from.tag
+        type: keyword
+        description: "From tag"
+      - name: contact.display_info
+        type: keyword
+        description: "Contact display info"
+      - name: contact.uri.original
+        type: keyword
+        description: "Contact original URI"
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: contact.uri.scheme
+        type: keyword
+        description: "Contat URI scheme"
+      - name: contact.uri.username
+        type: keyword
+        description: "Contact URI user name"
+      - name: contact.uri.host
+        type: keyword
+        description: "Contact URI host"
+      - name: contact.uri.port
+        type: keyword
+        description: "Contact URI port"
+      - name: contact.transport
+        type: keyword
+        description: "Contact transport"
+      - name: contact.line
+        type: keyword
+        description: "Contact line"
+      - name: contact.expires
+        type: keyword
+        description: "Contact expires"
+      - name: contact.q
+        type: keyword
+        description: "Contact Q"
+      - name: auth.scheme
+        type: keyword
+        description: "Auth scheme"
+      - name: auth.realm
+        type: keyword
+        description: "Auth realm"
+      - name: auth.uri.original
+        type: keyword
+        description: "Auth original URI"
+        multi_fields:
+          - name: text
+            type: text
+            norms: false
+      - name: auth.uri.scheme
+        type: keyword
+        description: "Auth URI scheme"
+      - name: auth.uri.host
+        type: keyword
+        description: "Auth URI host"
+      - name: auth.uri.port
+        type: keyword
+        description: "Auth URI port"
+      - name: sdp.version
+        type: keyword
+        description: "SDP version"
+      - name: sdp.owner.username
+        type: keyword
+        description: "SDP owner user name"
+      - name: sdp.owner.session_id
+        type: keyword
+        description: "SDP owner session ID"
+      - name: sdp.owner.version
+        type: keyword
+        description: "SDP owner version"
+      - name: sdp.owner.ip
+        type: ip
+        description: "SDP owner IP"
+      - name: sdp.session.name
+        type: keyword
+        description: "SDP session name"
+      - name: sdp.connection.info
+        type: keyword
+        description: "SDP connection info"
+      - name: sdp.connection.address
+        type: keyword
+        description: "SDP connection address"
+      - name: sdp.body.original
+        type: keyword
+        description: "SDP original body"
+        multi_fields:
+          - name: text
+            type: text
+            norms: false

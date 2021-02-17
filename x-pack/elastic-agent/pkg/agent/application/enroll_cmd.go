@@ -9,9 +9,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 
 	"gopkg.in/yaml.v2"
 
@@ -23,6 +29,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+)
+
+const (
+	waitingForAgent       = "waiting for Elastic Agent to start"
+	waitingForFleetServer = "waiting for Elastic Agent to start Fleet Server"
+)
+
+var (
+	enrollDelay   = 1 * time.Second  // max delay to start enrollment
+	daemonTimeout = 30 * time.Second // max amount of for communication to running Agent daemon
 )
 
 type store interface {
@@ -66,6 +82,9 @@ type EnrollCmdOption struct {
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 	Staging              string
+	FleetServerConnStr   string
+	FleetServerPolicyID  string
+	NoRestart            bool
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -149,7 +168,95 @@ func NewEnrollCmdWithStore(
 }
 
 // Execute tries to enroll the agent into Fleet.
-func (c *EnrollCmd) Execute() error {
+func (c *EnrollCmd) Execute(ctx context.Context) error {
+	if c.options.FleetServerConnStr != "" {
+		err := c.fleetServerBootstrap(ctx)
+		if err != nil {
+			return err
+		}
+
+		// enroll should use localhost as fleet-server is now running
+		// it must also restart
+		c.options.URL = "http://localhost:8000"
+		c.options.NoRestart = false
+	}
+
+	err := c.enrollWithBackoff(ctx)
+	if err != nil {
+		return errors.New(err, "fail to enroll")
+	}
+
+	if c.options.NoRestart {
+		return nil
+	}
+
+	if c.daemonReload(ctx) != nil {
+		c.log.Info("Elastic Agent might not be running; unable to trigger restart")
+	}
+	c.log.Info("Successfully triggered restart on running Elastic Agent.")
+	return nil
+}
+
+func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
+	c.log.Debug("verifying communication with running Elastic Agent daemon")
+	_, err := getDaemonStatus(ctx)
+	if err != nil {
+		return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+	}
+
+	fleetConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+	configToStore := map[string]interface{}{
+		"fleet": fleetConfig,
+	}
+	reader, err := yamlToReader(configToStore)
+	if err != nil {
+		return err
+	}
+	if err := c.configStore.Save(reader); err != nil {
+		return errors.New(err, "could not save fleet server bootstrap information", errors.TypeFilesystem)
+	}
+
+	err = c.daemonReload(ctx)
+	if err != nil {
+		return errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
+	}
+
+	err = waitForFleetServer(ctx, c.log)
+	if err != nil {
+		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+	}
+	return nil
+}
+
+func (c *EnrollCmd) daemonReload(ctx context.Context) error {
+	daemon := client.New()
+	err := daemon.Connect(ctx)
+	if err != nil {
+		return err
+	}
+	defer daemon.Disconnect()
+	return daemon.Restart(ctx)
+}
+
+func (c *EnrollCmd) enrollWithBackoff(ctx context.Context) error {
+	delay(ctx, enrollDelay)
+
+	err := c.enroll(ctx)
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
+
+	for errors.Is(err, fleetapi.ErrTooManyRequests) {
+		c.log.Warn("Too many requests on the remote server, will retry in a moment.")
+		backExp.Wait()
+		c.log.Info("Retrying to enroll...")
+		err = c.enroll(ctx)
+	}
+
+	close(signal)
+	return err
+}
+
+func (c *EnrollCmd) enroll(ctx context.Context) error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
 	metadata, err := metadata()
@@ -167,7 +274,7 @@ func (c *EnrollCmd) Execute() error {
 		},
 	}
 
-	resp, err := cmd.Execute(context.Background(), r)
+	resp, err := cmd.Execute(ctx, r)
 	if err != nil {
 		return errors.New(err,
 			"fail to execute request to Kibana",
@@ -183,6 +290,15 @@ func (c *EnrollCmd) Execute() error {
 		agentConfig["download"] = map[string]interface{}{
 			"sourceURI": staging,
 		}
+	}
+	if c.options.FleetServerConnStr != "" {
+		serverConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+		if err != nil {
+			return err
+		}
+		// no longer need bootstrap at this point
+		serverConfig.Server.Bootstrap = false
+		fleetConfig.Server = serverConfig.Server
 	}
 
 	configToStore := map[string]interface{}{
@@ -209,6 +325,12 @@ func (c *EnrollCmd) Execute() error {
 		return err
 	}
 
+	// clear action store
+	// fail only if file exists and there was a failure
+	if err := os.Remove(info.AgentStateStoreFile()); !os.IsNotExist(err) {
+		return err
+	}
+
 	return nil
 }
 
@@ -218,4 +340,99 @@ func yamlToReader(in interface{}) (io.Reader, error) {
 		return nil, errors.New(err, "could not marshal to YAML")
 	}
 	return bytes.NewReader(data), nil
+}
+
+func delay(ctx context.Context, d time.Duration) {
+	t := time.NewTimer(time.Duration(rand.Int63n(int64(d))))
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+	case <-t.C:
+	}
+}
+
+func getDaemonStatus(ctx context.Context) (*client.AgentStatus, error) {
+	ctx, cancel := context.WithTimeout(ctx, daemonTimeout)
+	defer cancel()
+	daemon := client.New()
+	err := daemon.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer daemon.Disconnect()
+	return daemon.Status(ctx)
+}
+
+type waitResult struct {
+	err error
+}
+
+func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
+	resChan := make(chan waitResult)
+	innerCtx, innerCancel := context.WithCancel(context.Background())
+	defer innerCancel()
+	go func() {
+		msg := ""
+		for {
+			<-time.After(1 * time.Second)
+			status, err := getDaemonStatus(innerCtx)
+			if err == context.Canceled {
+				resChan <- waitResult{err: err}
+				return
+			}
+			if err != nil {
+				log.Debug(waitingForAgent)
+				if msg != waitingForAgent {
+					msg = waitingForAgent
+					log.Info(waitingForAgent)
+				}
+				continue
+			}
+			app := getAppFromStatus(status, "fleet-server")
+			if app == nil {
+				log.Debug(waitingForFleetServer)
+				if msg != waitingForFleetServer {
+					msg = waitingForFleetServer
+					log.Info(waitingForFleetServer)
+				}
+				continue
+			}
+			log.Debugf("fleet-server status: %s - %s", app.Status, app.Message)
+			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
+				// app has started and is running
+				resChan <- waitResult{}
+				break
+			}
+			appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
+			if msg != appMsg {
+				msg = appMsg
+				log.Info(appMsg)
+			}
+		}
+	}()
+
+	var res waitResult
+	select {
+	case <-ctx.Done():
+		innerCancel()
+		res = <-resChan
+	case res = <-resChan:
+	}
+
+	if res.err != nil {
+		return res.err
+	}
+	return nil
+}
+
+func getAppFromStatus(status *client.AgentStatus, name string) *client.ApplicationStatus {
+	for _, app := range status.Applications {
+		if app.Name == name {
+			return app
+		}
+	}
+	return nil
 }

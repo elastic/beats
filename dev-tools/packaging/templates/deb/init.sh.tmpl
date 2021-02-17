@@ -25,11 +25,15 @@ BEAT_USER="{{.BeatUser}}"
 WRAPPER_ARGS="-r / -n -p $PIDFILE"
 SCRIPTNAME=/etc/init.d/{{.ServiceName}}
 
+
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
 
 # Read configuration variable file if it is present
 [ -r /etc/default/{{.ServiceName}} ] && . /etc/default/{{.ServiceName}}
+
+DEFAULT_GODEBUG="madvdontneed=1"
+export GODEBUG=${GODEBUG-$DEFAULT_GODEBUG}
 
 [ "$BEAT_USER" != "root" ] && WRAPPER_ARGS="$WRAPPER_ARGS -u $BEAT_USER"
 USER_WRAPPER="su"

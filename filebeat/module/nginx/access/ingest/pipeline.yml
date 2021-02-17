@@ -1,6 +1,9 @@
 description: Pipeline for parsing Nginx access logs. Requires the geoip and user_agent
   plugins.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
@@ -145,7 +148,7 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"      
+    if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
 - append:
     field: related.ip
     value: "{{source.ip}}"

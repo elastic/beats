@@ -317,7 +317,6 @@ func TestProcessor(t *testing.T) {
 }
 
 func TestDynamicTemplates(t *testing.T) {
-	p := &Processor{}
 	tests := []struct {
 		field    mapping.Field
 		expected []common.MapStr
@@ -493,9 +492,10 @@ func TestDynamicTemplates(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		dynamicTemplates = nil
+		p := &Processor{}
 		p.object(&test.field)
-		assert.Equal(t, test.expected, dynamicTemplates)
+		p.object(&test.field) // should not be added twice
+		assert.Equal(t, test.expected, p.dynamicTemplates)
 	}
 }
 
@@ -675,4 +675,200 @@ func TestProcessDefaultField(t *testing.T) {
 		"nested.foo",
 		"nested.bar",
 	)
+}
+
+func TestProcessWildcardOSS(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "group",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "wildcard",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("8.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "keyword",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessWildcardElastic(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "group",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "wildcard",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("8.0.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "wildcard",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessWildcardPreSupport(t *testing.T) {
+	// Test common fields are combined even if they come from different objects
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "group",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "wildcard",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make sure fields without a name are skipped during template generation
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "keyword",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessNestedSupport(t *testing.T) {
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "nested",
+			Fields: mapping.Fields{
+				mapping.Field{
+					Name: "one",
+					Type: "keyword",
+				},
+			},
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"type": "nested",
+			"properties": common.MapStr{
+				"one": common.MapStr{
+					"ignore_above": 1024,
+					"type":         "keyword",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestProcessNestedSupportNoSubfields(t *testing.T) {
+	fields := mapping.Fields{
+		mapping.Field{
+			Name: "test",
+			Type: "nested",
+		},
+	}
+
+	output := common.MapStr{}
+	version, err := common.NewVersion("7.8.0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := Processor{EsVersion: *version, ElasticLicensed: true}
+	err = p.Process(fields, nil, output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOutput := common.MapStr{
+		"test": common.MapStr{
+			"type": "nested",
+		},
+	}
+
+	assert.Equal(t, expectedOutput, output)
 }

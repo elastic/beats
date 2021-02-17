@@ -1,5 +1,8 @@
 description: Pipeline for parsing azure signin logs.
 processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
 - rename:
     field: azure
     target_field: azure-eventhub
@@ -15,10 +18,11 @@ processors:
     ignore_failure: false
     formats:
     - ISO8601
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.signinlogs.time
+    field: azure.signinlogs.time
     ignore_missing: true
 - rename:
     field: azure.signinlogs.resourceId
@@ -28,6 +32,15 @@ processors:
     field: azure.signinlogs.callerIpAddress
     target_field: source.ip
     ignore_missing: true
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    ignore_empty_value: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    allow_duplicates: false
+    if: 'ctx.source?.ip != null'
 - rename:
     field: azure.signinlogs.Level
     target_field: log.level
@@ -256,12 +269,14 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null || ctx.azure.signinlogs.properties.status.error_code > 0"
+    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null && ctx.azure.signinlogs.properties.status.error_code > 0"
 - grok:
     field: azure.signinlogs.properties.user_principal_name
     patterns:
       - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+      - '%{GREEDYDATA:user.name}'
     ignore_missing: true
+    ignore_failure: true
 - convert:
     field: azure.signinlogs.properties.user_display_name
     target_field: user.full_name
@@ -275,6 +290,7 @@ processors:
 - geoip:
     field: source.ip
     target_field: source.geo
+    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip

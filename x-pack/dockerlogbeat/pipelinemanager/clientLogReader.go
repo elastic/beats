@@ -32,16 +32,20 @@ type ClientLogger struct {
 	logger *logp.Logger
 	// ContainerMeta is the metadata object for the container we get from docker
 	ContainerMeta logger.Info
+	// ContainerECSMeta is a container metadata object appended to every event
+	ContainerECSMeta common.MapStr
 	// logFile is the FIFO reader that reads from the docker container stdio
 	logFile *pipereader.PipeReader
 	// client is the libbeat client object that sends logs upstream
 	client beat.Client
 	// localLog manages the local JSON logs for containers
 	localLog logger.Logger
+	// hostname for event metadata
+	hostname string
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger, hostname string) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
@@ -59,11 +63,13 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 	clientLogger.Debugf("Created new logger for %d", hash)
 
 	return &ClientLogger{logFile: inputFile,
-		client:        client,
-		pipelineHash:  hash,
-		ContainerMeta: info,
-		localLog:      localLog,
-		logger:        clientLogger}, nil
+		client:           client,
+		pipelineHash:     hash,
+		ContainerMeta:    info,
+		ContainerECSMeta: constructECSContainerData(info),
+		localLog:         localLog,
+		logger:           clientLogger,
+		hostname:         hostname}, nil
 }
 
 // Close closes the pipeline client and reader
@@ -100,6 +106,26 @@ func (cl *ClientLogger) ConsumePipelineAndSend() {
 	}
 }
 
+// constructECSContainerData creates an ES-ready MapString object with container metadata.
+func constructECSContainerData(metadata logger.Info) common.MapStr {
+
+	var containerImageName, containerImageTag string
+	if idx := strings.IndexRune(metadata.ContainerImageName, ':'); idx >= 0 {
+		containerImageName = string([]rune(metadata.ContainerImageName)[:idx])
+		containerImageTag = string([]rune(metadata.ContainerImageName)[idx+1:])
+	}
+
+	return common.MapStr{
+		"labels": helper.DeDotLabels(metadata.ContainerLabels, true),
+		"id":     metadata.ContainerID,
+		"name":   helper.ExtractContainerName([]string{metadata.ContainerName}),
+		"image": common.MapStr{
+			"name": containerImageName,
+			"tag":  containerImageTag,
+		},
+	}
+}
+
 // publishLoop sits in a loop and waits for events to publish
 // Publish() can block if there is an upstream output issue. This is a problem because if the FIFO queues that handle the docker logs fill up, plugins can no longer send logs
 // A buffered channel with its own publish gives us a little more wiggle room.
@@ -117,20 +143,14 @@ func (cl *ClientLogger) publishLoop(reader chan logdriver.LogEntry) {
 		cl.client.Publish(beat.Event{
 			Timestamp: time.Unix(0, entry.TimeNano),
 			Fields: common.MapStr{
-				"message": line,
-				"container": common.MapStr{
-					"labels": helper.DeDotLabels(cl.ContainerMeta.ContainerLabels, true),
-					"id":     cl.ContainerMeta.ContainerID,
-					"name":   helper.ExtractContainerName([]string{cl.ContainerMeta.ContainerName}),
-					"image": common.MapStr{
-						"name": cl.ContainerMeta.ContainerImageName,
-					},
+				"message":   line,
+				"container": cl.ContainerECSMeta,
+				"host": common.MapStr{
+					"name": cl.hostname,
 				},
 			},
 		})
-
 	}
-
 }
 
 func constructLogSpoolMsg(line logdriver.LogEntry) *logger.Message {

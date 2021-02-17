@@ -37,7 +37,7 @@ func InstallVendored(importPath string) error {
 
 // InstallGoLicenser target installs go-licenser
 func InstallGoLicenser() error {
-	return gotool.Get(
-		gotool.Get.Package(GoLicenserImportPath),
+	return gotool.Install(
+		gotool.Install.Package(GoLicenserImportPath),
 	)
 }

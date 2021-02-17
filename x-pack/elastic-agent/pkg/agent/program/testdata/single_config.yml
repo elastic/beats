@@ -8,6 +8,12 @@ fleet:
     protocol: https
     host: localhost:5601
     timeout: 30s
+  server:
+    output:
+      elasticsearch:
+        hosts: [ 127.0.0.1:9200, 127.0.0.1:9300 ]
+        username: fleet
+        password: fleetpassword
 
 outputs:
   default:
@@ -25,15 +31,20 @@ outputs:
     ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
 
 inputs:
+- id: fleet-server-id
+  type: fleet-server
+  use_output: default
+  data_stream:
+    type: default
 - type: docker/metrics
   use_output: default
   streams:
     - metricset: status
-      dataset:
-        name: docker.status
+      data_stream:
+        dataset: docker.status
     - metricset: info
-      dataset:
-        name: ""
+      data_stream:
+        dataset: ""
   hosts: ["http://127.0.0.1:8080"]
 - type: logfile
   use_output: default
@@ -44,7 +55,7 @@ inputs:
   vars:
     var: value
 - type: logfile
-  dataset:
+  data_stream:
     type: testtype
   use_output: default
   streams:
@@ -55,7 +66,7 @@ inputs:
     var: value
 - id: apache-metrics-id
   type: apache/metrics
-  dataset:
+  data_stream:
     namespace: testing
   use_output: default
   processors:
@@ -67,13 +78,34 @@ inputs:
       metricset: info
       hosts: ["http://apache.remote"]
   hosts: ["http://apache.local"]
+- type: synthetics/http
+  id: unique-http-id
+  name: my-http
+  schedule: '*/5 * * * * * *'
+  host: "http://localhost:80/service/status"
+  timeout: 16s
+  wait: 1s
+- type: packet
+  streams:
+    - type: flow
+      timeout: 10s
+      period: 10s
+      keep_null: false
+      data_stream:
+        dataset: packet.flow
+        type: logs
+    - type: icmp
+      data_stream:
+        dataset: packet.icmp
+        type: logs
 - id: endpoint-id
+  type: endpoint
   name: endpoint-1
   enabled: true
   package:
     name: endpoint
     version: 0.3.0
-  dataset:
+  data_stream:
     namespace: default
   artifact_manifest:
     schema_version: v22

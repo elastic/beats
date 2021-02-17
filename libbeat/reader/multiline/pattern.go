@@ -20,6 +20,7 @@ package multiline
 import (
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -252,6 +253,15 @@ func (pr *patternReader) resetState() {
 // setState sets state to the given function
 func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, error)) {
 	pr.state = next
+}
+
+func (pr *patternReader) Close() error {
+	pr.setState((*patternReader).readClosed)
+	return pr.reader.Close()
+}
+
+func (pr *patternReader) readClosed() (reader.Message, error) {
+	return reader.Message{}, io.EOF
 }
 
 // matchers

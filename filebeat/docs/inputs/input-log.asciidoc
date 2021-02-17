@@ -73,7 +73,7 @@ of the file. To solve this problem you can configure `file_identity` option. Pos
 values besides the default `inode_deviceid` are `path` and `inode_marker`.
 
 Selecting `path` instructs {beatname_uc} to identify files based on their
-paths. This is a quick way to aviod rereading files if inode and device ids
+paths. This is a quick way to avoid rereading files if inode and device ids
 might change. However, keep in mind if the files are rotated (renamed), they
 will be reread and resubmitted.
 
@@ -90,7 +90,7 @@ more volatile.
 
 ["source","sh",subs="attributes"]
 ----
-$ lsblk -o MOUNTPOINT,UUD | grep /logs | awk '{print $2}' >> /logs/.filebeat-marker
+$ lsblk -o MOUNTPOINT,UUID | grep /logs | awk '{print $2}' >> /logs/.filebeat-marker
 ----
 
 To set the generated file as a marker for `file_identity` you should configure

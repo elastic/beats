@@ -1,0 +1,20 @@
+description: Pipeline for parsing sophos firewall logs (wifi pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.outcome
+    value: success
+    if: 'ctx?.sophos?.xg?.log_type == "Wireless Protection"'
+
+#############
+## Cleanup ##
+#############
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

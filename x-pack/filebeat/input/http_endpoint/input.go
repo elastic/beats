@@ -59,7 +59,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 	if tlsConfigBuilder != nil {
-		tlsConfig = tlsConfigBuilder.BuildModuleConfig(addr)
+		tlsConfig = tlsConfigBuilder.BuildModuleClientConfig(addr)
 	}
 
 	return &httpEndpoint{
@@ -83,11 +83,13 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	log := ctx.Logger.With("address", e.addr)
 
 	validator := &apiValidator{
-		basicAuth:   e.config.BasicAuth,
-		username:    e.config.Username,
-		password:    e.config.Password,
-		method:      http.MethodPost,
-		contentType: e.config.ContentType,
+		basicAuth:    e.config.BasicAuth,
+		username:     e.config.Username,
+		password:     e.config.Password,
+		method:       http.MethodPost,
+		contentType:  e.config.ContentType,
+		secretHeader: e.config.SecretHeader,
+		secretValue:  e.config.SecretValue,
 	}
 
 	handler := &httpHandler{
@@ -101,9 +103,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	mux := http.NewServeMux()
 	mux.HandleFunc(e.config.URL, withValidator(validator, handler.apiResponse))
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
-	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
-		server.Close()
-	})
+	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
 	defer cancel()
 
 	var err error

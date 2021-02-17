@@ -40,6 +40,9 @@
         "observer.name": "WindowsDefenderAv",
         "observer.product": "Defender ATP",
         "observer.vendor": "Microsoft",
+        "related.hosts": [
+            "testserver4"
+        ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nA malware is considered active if it is found running on the machine or it already has persistence mechanisms in place. Active malware detections are assigned higher severity ratings.\n\nBecause this malware was active, take precautionary measures and check for residual signs of infection.",
         "service.type": "microsoft",
         "tags": [
@@ -102,6 +105,9 @@
             "b6d237154f2e528f0b503b58b025862d66b02b73",
             "a92056d772260b39a876d01552496b2f8b4610a0b1e084952fe1176784e2ce77"
         ],
+        "related.hosts": [
+            "testserver4"
+        ],
         "related.user": [
             "administrator1"
         ],
@@ -112,7 +118,9 @@
             "forwarded"
         ],
         "threat.framework": "MITRE ATT&CK",
-        "threat.technique.name": "DefenseEvasion"
+        "threat.technique.name": "DefenseEvasion",
+        "user.domain": "TestServer4",
+        "user.name": "administrator1"
     },
     {
         "cloud.account.id": "43521344-d66c-4c7e-9e30-40034eb7c6f3",
@@ -157,6 +165,9 @@
         "observer.name": "WindowsDefenderAtp",
         "observer.product": "Defender ATP",
         "observer.vendor": "Microsoft",
+        "related.hosts": [
+            "testserver4"
+        ],
         "related.user": [
             "administrator1"
         ],
@@ -167,7 +178,10 @@
             "forwarded"
         ],
         "threat.framework": "MITRE ATT&CK",
-        "threat.technique.name": "DefenseEvasion"
+        "threat.technique.name": "DefenseEvasion",
+        "user.domain": "TestServer4",
+        "user.id": "S-1-5-21-46152456-1367606905-4031241297-500",
+        "user.name": "administrator1"
     },
     {
         "cloud.account.id": "1234543-d66c-4c7e-9e30-40034eb7c6f3",
@@ -214,6 +228,9 @@
         "related.hash": [
             "ffb1670c6c6a9c5b4c5cea8b6b8e68d62e7ff281",
             "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356"
+        ],
+        "related.hosts": [
+            "testserver4"
         ],
         "rule.description": "Malware and unwanted software are undesirable applications that perform annoying, disruptive, or harmful actions on affected machines. Some of these undesirable applications can replicate and spread from one machine to another. Others are able to receive commands from remote attackers and perform activities associated with cyber attacks.\n\nThis detection might indicate that the malware was stopped from delivering its payload. However, it is prudent to check the machine for signs of infection.",
         "service.type": "microsoft",

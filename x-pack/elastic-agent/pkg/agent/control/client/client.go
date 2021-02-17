@@ -8,11 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 )
 
@@ -62,10 +62,10 @@ type AgentStatus struct {
 
 // Client communicates to Elastic Agent through the control protocol.
 type Client interface {
-	// Start starts the client.
-	Start(ctx context.Context) error
-	// Stop stops the client.
-	Stop()
+	// Connect connects to the running Elastic Agent.
+	Connect(ctx context.Context) error
+	// Disconnect disconnects from the running Elastic Agent.
+	Disconnect()
 	// Version returns the current version of the running agent.
 	Version(ctx context.Context) (Version, error)
 	// Status returns the current status of the running agent.
@@ -81,7 +81,7 @@ type client struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
-	client  proto.ElasticAgentClient
+	client  proto.ElasticAgentControlClient
 	cfgLock sync.RWMutex
 	obsLock sync.RWMutex
 }
@@ -91,19 +91,19 @@ func New() Client {
 	return &client{}
 }
 
-// Start starts the connection to Elastic Agent.
-func (c *client) Start(ctx context.Context) error {
+// Connect connects to the running Elastic Agent.
+func (c *client) Connect(ctx context.Context) error {
 	c.ctx, c.cancel = context.WithCancel(ctx)
 	conn, err := dialContext(ctx)
 	if err != nil {
 		return err
 	}
-	c.client = proto.NewElasticAgentClient(conn)
+	c.client = proto.NewElasticAgentControlClient(conn)
 	return nil
 }
 
-// Stop stops the connection to Elastic Agent.
-func (c *client) Stop() {
+// Disconnect disconnects from the running Elastic Agent.
+func (c *client) Disconnect() {
 	if c.cancel != nil {
 		c.cancel()
 		c.wg.Wait()

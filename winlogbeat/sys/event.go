@@ -235,10 +235,10 @@ func (v *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	num, err := strconv.ParseInt(s, 0, 64)
+	num, err := strconv.ParseUint(s, 0, 64)
 	if err != nil {
 		// Ignore invalid version values.
-		return nil
+		return err
 	}
 
 	*v = HexInt64(num)

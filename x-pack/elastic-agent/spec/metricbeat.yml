@@ -65,13 +65,15 @@ rules:
     - remove_key:
         key: enabled
     - remove_key:
-        key: dataset
+        key: data_stream
     - remove_key:
-        key: dataset.name
+        key: data_stream.dataset
     - remove_key:
-        key: dataset.namespace
+        key: data_stream.namespace
     - remove_key:
         key: use_output
+
+- inject_agent_info: {}
 
 - copy:
     from: inputs
@@ -87,5 +89,5 @@ rules:
     - output
     - keystore
 
-when: HasItems(%{[metricbeat.modules]}) && HasNamespace('output', 'elasticsearch',
+when: length(${metricbeat.modules}) > 0 and hasKey(${output}, 'elasticsearch',
   'redis', 'kafka', 'logstash')

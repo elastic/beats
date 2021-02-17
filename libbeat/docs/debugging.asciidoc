@@ -27,12 +27,12 @@ platform). You can use a different configuration file by specifying the `-c` fla
 ------------------------------------------------------------
 
 You can increase the verbosity of debug messages by enabling one or more debug
-selectors. For example, to view the published transactions, you can start {beatname_uc}
-with the `publish` selector like this:
+selectors. For example, to view publisher-related messages, start {beatname_uc}
+with the `publisher` selector:
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------------------
-{beatname_lc} -e -d "publish"
+{beatname_lc} -e -d "publisher"
 ------------------------------------------------------------
 
 If you want all the debugging output (fair warning, it's quite a lot), you can

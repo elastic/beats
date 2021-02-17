@@ -98,6 +98,18 @@ The {kibana-ref}/xpack-spaces.html[Kibana space] ID to use. If specified,
 use the default space.
 
 [float]
+===== `setup.kibana.headers`
+
+Custom HTTP headers to add to each request sent to Kibana.
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+setup.kibana.headers:
+  X-My-Header: Header contents
+------------------------------------------------------------------------------
+
+[float]
 ==== `setup.kibana.ssl.enabled`
 
 Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.

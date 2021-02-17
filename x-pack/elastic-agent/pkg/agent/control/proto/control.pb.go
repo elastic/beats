@@ -662,24 +662,24 @@ var file_control_proto_rawDesc = []byte{
 	0x10, 0x06, 0x12, 0x0c, 0x0a, 0x08, 0x52, 0x4f, 0x4c, 0x4c, 0x42, 0x41, 0x43, 0x4b, 0x10, 0x07,
 	0x2a, 0x28, 0x0a, 0x0c, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
 	0x12, 0x0b, 0x0a, 0x07, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x00, 0x12, 0x0b, 0x0a,
-	0x07, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x01, 0x32, 0xd9, 0x01, 0x0a, 0x0c, 0x45,
-	0x6c, 0x61, 0x73, 0x74, 0x69, 0x63, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x12, 0x2f, 0x0a, 0x07, 0x56,
-	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x0c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45,
-	0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x56, 0x65, 0x72,
-	0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x06,
-	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x0c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45,
-	0x6d, 0x70, 0x74, 0x79, 0x1a, 0x15, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x07, 0x52,
-	0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12, 0x0c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45,
-	0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73,
-	0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x07,
-	0x55, 0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x12, 0x15, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
-	0x55, 0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16,
+	0x07, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x01, 0x32, 0xe0, 0x01, 0x0a, 0x13, 0x45,
+	0x6c, 0x61, 0x73, 0x74, 0x69, 0x63, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x72,
+	0x6f, 0x6c, 0x12, 0x2f, 0x0a, 0x07, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x0c, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x0c, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x15, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x2f, 0x0a, 0x07, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x12, 0x0c, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x16, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x07, 0x55, 0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x12, 0x15,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x55, 0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x22, 0x5a, 0x1d, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x67,
-	0x65, 0x6e, 0x74, 0x2f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0xf8, 0x01, 0x01, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x55, 0x70,
+	0x67, 0x72, 0x61, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x22, 0x5a,
+	0x1d, 0x70, 0x6b, 0x67, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2f, 0x63, 0x6f, 0x6e, 0x74, 0x72,
+	0x6f, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0xf8, 0x01,
+	0x01, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -713,14 +713,14 @@ var file_control_proto_depIdxs = []int32{
 	0, // 2: proto.ApplicationStatus.status:type_name -> proto.Status
 	0, // 3: proto.StatusResponse.status:type_name -> proto.Status
 	7, // 4: proto.StatusResponse.applications:type_name -> proto.ApplicationStatus
-	2, // 5: proto.ElasticAgent.Version:input_type -> proto.Empty
-	2, // 6: proto.ElasticAgent.Status:input_type -> proto.Empty
-	2, // 7: proto.ElasticAgent.Restart:input_type -> proto.Empty
-	5, // 8: proto.ElasticAgent.Upgrade:input_type -> proto.UpgradeRequest
-	3, // 9: proto.ElasticAgent.Version:output_type -> proto.VersionResponse
-	8, // 10: proto.ElasticAgent.Status:output_type -> proto.StatusResponse
-	4, // 11: proto.ElasticAgent.Restart:output_type -> proto.RestartResponse
-	6, // 12: proto.ElasticAgent.Upgrade:output_type -> proto.UpgradeResponse
+	2, // 5: proto.ElasticAgentControl.Version:input_type -> proto.Empty
+	2, // 6: proto.ElasticAgentControl.Status:input_type -> proto.Empty
+	2, // 7: proto.ElasticAgentControl.Restart:input_type -> proto.Empty
+	5, // 8: proto.ElasticAgentControl.Upgrade:input_type -> proto.UpgradeRequest
+	3, // 9: proto.ElasticAgentControl.Version:output_type -> proto.VersionResponse
+	8, // 10: proto.ElasticAgentControl.Status:output_type -> proto.StatusResponse
+	4, // 11: proto.ElasticAgentControl.Restart:output_type -> proto.RestartResponse
+	6, // 12: proto.ElasticAgentControl.Upgrade:output_type -> proto.UpgradeResponse
 	9, // [9:13] is the sub-list for method output_type
 	5, // [5:9] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
@@ -848,10 +848,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// ElasticAgentClient is the client API for ElasticAgent service.
+// ElasticAgentControlClient is the client API for ElasticAgentControl service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ElasticAgentClient interface {
+type ElasticAgentControlClient interface {
 	// Fetches the currently running version of the Elastic Agent.
 	Version(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VersionResponse, error)
 	// Fetches the currently status of the Elastic Agent.
@@ -862,52 +862,52 @@ type ElasticAgentClient interface {
 	Upgrade(ctx context.Context, in *UpgradeRequest, opts ...grpc.CallOption) (*UpgradeResponse, error)
 }
 
-type elasticAgentClient struct {
+type elasticAgentControlClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewElasticAgentClient(cc grpc.ClientConnInterface) ElasticAgentClient {
-	return &elasticAgentClient{cc}
+func NewElasticAgentControlClient(cc grpc.ClientConnInterface) ElasticAgentControlClient {
+	return &elasticAgentControlClient{cc}
 }
 
-func (c *elasticAgentClient) Version(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
+func (c *elasticAgentControlClient) Version(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*VersionResponse, error) {
 	out := new(VersionResponse)
-	err := c.cc.Invoke(ctx, "/proto.ElasticAgent/Version", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.ElasticAgentControl/Version", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *elasticAgentClient) Status(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StatusResponse, error) {
+func (c *elasticAgentControlClient) Status(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*StatusResponse, error) {
 	out := new(StatusResponse)
-	err := c.cc.Invoke(ctx, "/proto.ElasticAgent/Status", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.ElasticAgentControl/Status", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *elasticAgentClient) Restart(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RestartResponse, error) {
+func (c *elasticAgentControlClient) Restart(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RestartResponse, error) {
 	out := new(RestartResponse)
-	err := c.cc.Invoke(ctx, "/proto.ElasticAgent/Restart", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.ElasticAgentControl/Restart", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *elasticAgentClient) Upgrade(ctx context.Context, in *UpgradeRequest, opts ...grpc.CallOption) (*UpgradeResponse, error) {
+func (c *elasticAgentControlClient) Upgrade(ctx context.Context, in *UpgradeRequest, opts ...grpc.CallOption) (*UpgradeResponse, error) {
 	out := new(UpgradeResponse)
-	err := c.cc.Invoke(ctx, "/proto.ElasticAgent/Upgrade", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.ElasticAgentControl/Upgrade", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ElasticAgentServer is the server API for ElasticAgent service.
-type ElasticAgentServer interface {
+// ElasticAgentControlServer is the server API for ElasticAgentControl service.
+type ElasticAgentControlServer interface {
 	// Fetches the currently running version of the Elastic Agent.
 	Version(context.Context, *Empty) (*VersionResponse, error)
 	// Fetches the currently status of the Elastic Agent.
@@ -918,118 +918,118 @@ type ElasticAgentServer interface {
 	Upgrade(context.Context, *UpgradeRequest) (*UpgradeResponse, error)
 }
 
-// UnimplementedElasticAgentServer can be embedded to have forward compatible implementations.
-type UnimplementedElasticAgentServer struct {
+// UnimplementedElasticAgentControlServer can be embedded to have forward compatible implementations.
+type UnimplementedElasticAgentControlServer struct {
 }
 
-func (*UnimplementedElasticAgentServer) Version(context.Context, *Empty) (*VersionResponse, error) {
+func (*UnimplementedElasticAgentControlServer) Version(context.Context, *Empty) (*VersionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (*UnimplementedElasticAgentServer) Status(context.Context, *Empty) (*StatusResponse, error) {
+func (*UnimplementedElasticAgentControlServer) Status(context.Context, *Empty) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
 }
-func (*UnimplementedElasticAgentServer) Restart(context.Context, *Empty) (*RestartResponse, error) {
+func (*UnimplementedElasticAgentControlServer) Restart(context.Context, *Empty) (*RestartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Restart not implemented")
 }
-func (*UnimplementedElasticAgentServer) Upgrade(context.Context, *UpgradeRequest) (*UpgradeResponse, error) {
+func (*UnimplementedElasticAgentControlServer) Upgrade(context.Context, *UpgradeRequest) (*UpgradeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Upgrade not implemented")
 }
 
-func RegisterElasticAgentServer(s *grpc.Server, srv ElasticAgentServer) {
-	s.RegisterService(&_ElasticAgent_serviceDesc, srv)
+func RegisterElasticAgentControlServer(s *grpc.Server, srv ElasticAgentControlServer) {
+	s.RegisterService(&_ElasticAgentControl_serviceDesc, srv)
 }
 
-func _ElasticAgent_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ElasticAgentControl_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ElasticAgentServer).Version(ctx, in)
+		return srv.(ElasticAgentControlServer).Version(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ElasticAgent/Version",
+		FullMethod: "/proto.ElasticAgentControl/Version",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ElasticAgentServer).Version(ctx, req.(*Empty))
+		return srv.(ElasticAgentControlServer).Version(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ElasticAgent_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ElasticAgentControl_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ElasticAgentServer).Status(ctx, in)
+		return srv.(ElasticAgentControlServer).Status(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ElasticAgent/Status",
+		FullMethod: "/proto.ElasticAgentControl/Status",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ElasticAgentServer).Status(ctx, req.(*Empty))
+		return srv.(ElasticAgentControlServer).Status(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ElasticAgent_Restart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ElasticAgentControl_Restart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ElasticAgentServer).Restart(ctx, in)
+		return srv.(ElasticAgentControlServer).Restart(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ElasticAgent/Restart",
+		FullMethod: "/proto.ElasticAgentControl/Restart",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ElasticAgentServer).Restart(ctx, req.(*Empty))
+		return srv.(ElasticAgentControlServer).Restart(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ElasticAgent_Upgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ElasticAgentControl_Upgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpgradeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ElasticAgentServer).Upgrade(ctx, in)
+		return srv.(ElasticAgentControlServer).Upgrade(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ElasticAgent/Upgrade",
+		FullMethod: "/proto.ElasticAgentControl/Upgrade",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ElasticAgentServer).Upgrade(ctx, req.(*UpgradeRequest))
+		return srv.(ElasticAgentControlServer).Upgrade(ctx, req.(*UpgradeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _ElasticAgent_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.ElasticAgent",
-	HandlerType: (*ElasticAgentServer)(nil),
+var _ElasticAgentControl_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.ElasticAgentControl",
+	HandlerType: (*ElasticAgentControlServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Version",
-			Handler:    _ElasticAgent_Version_Handler,
+			Handler:    _ElasticAgentControl_Version_Handler,
 		},
 		{
 			MethodName: "Status",
-			Handler:    _ElasticAgent_Status_Handler,
+			Handler:    _ElasticAgentControl_Status_Handler,
 		},
 		{
 			MethodName: "Restart",
-			Handler:    _ElasticAgent_Restart_Handler,
+			Handler:    _ElasticAgentControl_Restart_Handler,
 		},
 		{
 			MethodName: "Upgrade",
-			Handler:    _ElasticAgent_Upgrade_Handler,
+			Handler:    _ElasticAgentControl_Upgrade_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
