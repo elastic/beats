@@ -1,0 +1,9 @@
+- key: gitlab
+  title: "Gitlab"
+  description: >
+    Gitlab Module to ingest gitlab log events into Elasticsearch in ECS
+  fields:
+    - name: gitlab
+      type: group
+      description: >
+      fields:
