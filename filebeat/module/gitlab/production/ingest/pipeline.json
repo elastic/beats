@@ -1,7 +1,133 @@
 {
   "description": "Pipeline for parsing gitlab production logs",
   "processors": [
-    ],
+    "rename": {
+      "field": "method",
+      "target_field": "http.request.method",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "path",
+      "target_field": "url.path",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "format",
+      "target_field": "gitlab.production.format",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "controller",
+      "target_field": "gitlab.production.controller",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "action",
+      "target_field": "event.action",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "status",
+      "target_field": "http.response.status_code",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "remote_ip",
+      "target_field": "source.ip",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "user_id",
+      "target_field": "user.id",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "username",
+      "target_field": "user.name",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "queue_duration",
+      "target_field": "gitlab.production.queue_duration",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "correlation_id",
+      "target_field": "gitlab.production.correlation_id",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "queue_duration_s",
+      "target_field": "gitlab.production.queue_duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "gitaly_calls",
+      "target_field": "gitlab.production.gitaly_calls",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "gitaly_duration_s",
+      "target_field": "gitlab.production.gitaly_duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "redis_calls",
+      "target_field": "gitlab.production.redis_calls",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "redis_duration_s",
+      "target_field": "gitlab.production.redis_duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "correlation_id",
+      "target_field": "gitlab.production.correlation_id",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "cpu_s",
+      "target_field": "gitlab.production.cpu_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "db_duration_s",
+      "target_field": "gitlab.production.db_duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "view_duration_s",
+      "target_field": "gitlab.production.view_duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "duration_s",
+      "target_field": "gitlab.production.duration_s",
+      "ignore_failure": "true"
+    },
+    "rename": {
+      "field": "exception.class",
+      "target_field": "error.type"
+    },
+    "rename": {
+      "field": "exception.message",
+      "target_field": "error.message"
+    },
+    "rename": {
+      "field": "exception.backtrace",
+      "target_field": "error.stack_trace"
+    },
+    "user_agent" : {
+      "field" : "ua"
+    },
+    "date": {
+      "field": "time",
+      "formats": [
+        "ISO8601"
+      ]
+    }
+  ],
   "on_failure" : [{
     "set" : {
       "field" : "error.message",
