@@ -70,7 +70,7 @@ func TestData(t *testing.T) {
 	mux.Handle("/_xpack", http.HandlerFunc(xpackHandler))
 
 	mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		input, _ := ioutil.ReadFile("./_meta/test/ml.700.json")
+		input, _ := ioutil.ReadFile("./_meta/test/ml.711.json")
 		w.Write(input)
 	}))
 

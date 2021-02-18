@@ -9,12 +9,18 @@
             "job": {
                 "data_counts": {
                     "invalid_date_count": 0,
-                    "processed_record_count": 14
+                    "processed_record_count": 1216
                 },
-                "id": "55",
+                "forecasts_stats": {
+                    "total": 1
+                },
+                "id": "low_request_rate",
                 "model_size": {},
-                "state": "closed"
+                "state": "opened"
             }
+        },
+        "node": {
+            "id": "a14cf47ef7f2"
         }
     },
     "event": {
@@ -27,7 +33,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:46763",
+        "address": "127.0.0.1:39631",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

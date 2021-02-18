@@ -38,10 +38,13 @@ var (
 		"state": c.Str("state"),
 		"data_counts": c.Dict("data_counts", s.Schema{
 			"processed_record_count": c.Int("processed_record_count"),
-			"invalid_date_count": c.Int("invalid_date_count"),
+			"invalid_date_count":     c.Int("invalid_date_count"),
 		}),
 		"model_size": c.Dict("model_size_stats", s.Schema{
 			"memory_status": c.Int("memory_status"),
+		}),
+		"forecasts_stats": c.Dict("forecasts_stats", s.Schema{
+			"total": c.Int("total"),
 		}),
 	}
 )
@@ -78,6 +81,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		event.ModuleFields.Put("node.id", info.Name)
 
 		event.MetricSetFields, _ = schema.Apply(job)
 

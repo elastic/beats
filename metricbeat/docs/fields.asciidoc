@@ -18530,6 +18530,15 @@ alias to: elasticsearch.ml.job.id
 
 --
 
+*`job_stats.forecasts_stats.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.forecasts.stats.total
+
+--
+
 
 *`index_stats.index`*::
 +
@@ -21296,6 +21305,13 @@ Job state.
 
 
 type: keyword
+
+--
+
+*`elasticsearch.ml.job.forecasts_stats.total`*::
++
+--
+type: long
 
 --
 

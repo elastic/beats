@@ -120,6 +120,9 @@
     - name: job_stats.job_id
       type: alias
       path: elasticsearch.ml.job.id
+    - name: job_stats.forecasts_stats.total
+      type: alias
+      path: elasticsearch.ml.job.forecasts.stats.total
     - name: index_stats
       type: group
       fields:

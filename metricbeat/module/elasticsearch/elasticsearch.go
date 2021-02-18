@@ -73,6 +73,7 @@ type Info struct {
 	ClusterName string  `json:"cluster_name"`
 	ClusterID   string  `json:"cluster_uuid"`
 	Version     Version `json:"version"`
+	Name        string  `json:"name"`
 }
 
 // Version contains the semver formatted version of ES
