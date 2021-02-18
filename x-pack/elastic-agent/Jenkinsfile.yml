@@ -88,4 +88,5 @@ stages:
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
-            enabled: false
+            enabled: true
+            entrypoint: 'fleet-test.sh'
