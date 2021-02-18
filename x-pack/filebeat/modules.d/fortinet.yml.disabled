@@ -1,5 +1,5 @@
 # Module: fortinet
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-fortinet.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.12/filebeat-module-fortinet.html
 
 - module: fortinet
   firewall:
