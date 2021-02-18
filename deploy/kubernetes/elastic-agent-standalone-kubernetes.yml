@@ -23,7 +23,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
+          image: docker.elastic.co/beats/elastic-agent:8.0.0
           args: [
             "-c", "/etc/agent.yml",
             "-e", "-d", "*",
@@ -370,7 +370,7 @@ spec:
       serviceAccountName: elastic-agent
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0-SNAPSHOT
+          image: docker.elastic.co/beats/elastic-agent:8.0.0
           args: [
             "-c", "/etc/agent.yml",
             "-e", "-d", "*",
