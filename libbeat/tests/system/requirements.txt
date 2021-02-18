@@ -1,5 +1,5 @@
 attrs==19.3.0
-autopep8==1.3.5
+autopep8==1.5.4
 backports.ssl-match-hostname==3.5.0.1
 cached-property==1.4.2
 certifi==2018.1.18
@@ -27,15 +27,17 @@ packaging==20.4
 parameterized==0.7.0
 pluggy==0.13.1
 py==1.9.0
-pycodestyle==2.4.0
+pycodestyle==2.6.0
 pyparsing==2.4.7
 pyrsistent==0.16.0
 pytest==6.0.1
 pytest-timeout==1.3.4
+pytest-rerunfailures==9.0
 PyYAML==5.3.1
 redis==2.10.6
 requests==2.20.0
 semver==2.8.1
+setuptools==47.3.2
 six==1.15.0
 stomp.py==4.1.22
 termcolor==1.1.0

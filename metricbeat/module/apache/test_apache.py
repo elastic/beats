@@ -1,15 +1,13 @@
+import metricbeat
 import os
-import unittest
-import urllib.request
-import urllib.error
-import urllib.parse
 import pytest
-import time
 import semver
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
+import time
+import unittest
+import urllib.error
+import urllib.parse
+import urllib.request
 
 APACHE_FIELDS = metricbeat.COMMON_FIELDS + ["apache"]
 

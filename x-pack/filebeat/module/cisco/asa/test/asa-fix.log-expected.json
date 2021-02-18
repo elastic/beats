@@ -34,6 +34,15 @@
         "network.bytes": 148,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Outside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "10.123.123.123",
             "10.233.123.123"
@@ -77,8 +86,16 @@
         "log.offset": 200,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -119,8 +136,12 @@
         "log.offset": 381,
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -164,8 +185,16 @@
         "log.offset": 545,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "Inside",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "Outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -202,8 +231,14 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 734,
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
-            "10.123.123.123",
             "10.123.123.123"
         ],
         "service.type": "cisco",
@@ -242,6 +277,14 @@
         "log.offset": 853,
         "network.iana_number": 58,
         "network.transport": "ipv6-icmp",
+        "observer.egress.interface.name": "ISP1",
+        "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "SNL-ASA-VPN-A01"
+        ],
         "related.ip": [
             "fe80::1ff:fe23:4567:890a"
         ],
@@ -287,6 +330,11 @@
         "log.offset": 989,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "Inside",
+        "observer.ingress.interface.name": "identity",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.255.0.206",
             "10.12.31.51"
@@ -330,6 +378,11 @@
         "log.offset": 1171,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "dmz2",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "127.2.3.4",
             "127.3.4.5"
@@ -373,6 +426,11 @@
         "log.offset": 1334,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "dmz2",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "127.2.3.4",
             "127.3.4.5"
@@ -417,6 +475,11 @@
         "log.offset": 1514,
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.123.123.20",
             "10.223.223.40"
@@ -442,6 +505,7 @@
         "destination.address": "1.2.33.40",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "CN",
+        "destination.geo.country_name": "China",
         "destination.geo.location.lat": 23.1167,
         "destination.geo.location.lon": 113.25,
         "destination.geo.region_iso_code": "CN-GD",
@@ -470,6 +534,11 @@
         "log.offset": 1723,
         "network.iana_number": 1,
         "network.transport": "icmp",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.2.3",
             "1.2.33.40"

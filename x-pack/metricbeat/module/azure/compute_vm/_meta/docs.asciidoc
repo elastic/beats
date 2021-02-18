@@ -8,7 +8,7 @@ include::../../_meta/shared-azure.asciidoc[]
 ==== Config options to identify resources
 
 `resource_id`:: (_[]string_) The fully qualified ID's of the resource, including the resource name and resource type. Has the format /subscriptions/{guid}/resourceGroups/{resource-group-name}/providers/{resource-provider-namespace}/{resource-type}/{resource-name}.
-  Should return a list of resources.
+Should return a list of resources.
 
 `resource_group`:: (_[]string_) This option will select all virtual machines inside the resource group.
 

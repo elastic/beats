@@ -6,7 +6,7 @@ inputs:
   host: "http://localhost:80/service/status"
   timeout: 16s
   wait: 1s
-  dataset.namespace: default
+  data_stream.namespace: default
 output:
   elasticsearch:
     hosts:

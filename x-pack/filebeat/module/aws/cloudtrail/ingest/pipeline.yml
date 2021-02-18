@@ -4,6 +4,9 @@ processors:
   - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
+  - set:
+      field: event.created
+      value: '{{@timestamp}}'
   - rename:
       field: "message"
       target_field: "event.original"
@@ -24,6 +27,11 @@ processors:
       field: "json.userIdentity.type"
       target_field: "aws.cloudtrail.user_identity.type"
       ignore_failure: true
+  - append:
+      field: related.user
+      value: '{{json.userIdentity.userName}}'
+      allow_duplicates: false
+      if: 'ctx.json?.userIdentity?.userName != null'
   - rename:
       field: "json.userIdentity.userName"
       target_field: "user.name"
@@ -58,7 +66,7 @@ processors:
       field: "json.userIdentity.sessionContext.sessionIssuer.type"
       target_field: "aws.cloudtrail.user_identity.session_context.session_issuer.type"
       ignore_failure: true
-# userIdentity.sessionIssuer.userName is only set with assumed roles.
+  # userIdentity.sessionIssuer.userName is only set with assumed roles.
   - rename:
       field: "json.userIdentity.sessionContext.sessionIssuer.userName"
       target_field: "user.name"
@@ -88,6 +96,10 @@ processors:
       value: "{{json.eventName}}"
       ignore_failure: true
       ignore_empty_value: true
+  - rename:
+      field: "json.eventCategory"
+      target_field: "aws.cloudtrail.event_category"
+      ignore_failure: true
   - rename:
       field: "json.awsRegion"
       target_field: "cloud.region"
@@ -119,9 +131,9 @@ processors:
       target_field: source.as.number
       ignore_missing: true
   - rename:
-        field: source.as.organization_name
-        target_field: source.as.organization.name
-        ignore_missing: true
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
   - user_agent:
       field: "json.userAgent"
       target_field: "user_agent"
@@ -138,37 +150,36 @@ processors:
       field: "json.errorMessage"
       target_field: "aws.cloudtrail.error_message"
       ignore_failure: true
-  - rename:
-      field: json.requestParameters
-      target_field: "aws.cloudtrail.flattened.request_parameters"
-      if: ctx.json.requestParameters != null
   - script:
       lang: painless
       source: |
-        if (ctx.aws.cloudtrail.flattened.request_parameters != null) {
-          ctx.aws.cloudtrail.request_parameters = ctx.aws.cloudtrail.flattened.request_parameters.toString();
+        if (ctx.aws.cloudtrail?.flattened == null) {
+            Map map = new HashMap();
+            ctx.aws.cloudtrail.put("flattened", map);
+          }
+        if (ctx.json?.requestParameters != null) {
+          ctx.aws.cloudtrail.request_parameters = ctx.json.requestParameters.toString();
+          if (ctx.aws.cloudtrail.request_parameters.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("request_parameters", ctx.json.requestParameters);
+          }
         }
-      ignore_failure: true
-  - rename:
-      field: json.responseElements
-      target_field: "aws.cloudtrail.flattened.response_elements"
-      if: ctx.json.responseElements != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.response_elements != null) {
-          ctx.aws.cloudtrail.response_elements = ctx.aws.cloudtrail.flattened.response_elements.toString();
+        if (ctx.json?.responseElements != null) {
+          ctx.aws.cloudtrail.response_elements = ctx.json.responseElements.toString();
+          if (ctx.aws.cloudtrail.response_elements.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("response_elements", ctx.json.responseElements);
+          }
         }
-      ignore_failure: true
-  - rename:
-      field: json.additionalEventData
-      target_field: "aws.cloudtrail.flattened.additional_eventdata"
-      if: ctx?.json?.additionalEventData != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.additional_eventdata != null) {
-          ctx.aws.cloudtrail.additional_eventdata = ctx.aws.cloudtrail.flattened.additional_eventdata.toString();
+        if (ctx.json?.additionalEventData != null) {
+          ctx.aws.cloudtrail.additional_eventdata = ctx.json.additionalEventData.toString();
+          if (ctx.aws.cloudtrail.additional_eventdata.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("additional_eventdata", ctx.json.additionalEventData);
+          }
+        }
+        if (ctx.json?.serviceEventDetails != null) {
+          ctx.aws.cloudtrail.service_event_details = ctx.json.serviceEventDetails.toString();
+          if (ctx.aws.cloudtrail.service_event_details.length() < 32766) {
+            ctx.aws.cloudtrail.flattened.put("service_event_details", ctx.json.serviceEventDetails);
+          }
         }
       ignore_failure: true
   - rename:
@@ -212,17 +223,6 @@ processors:
       target_field: "aws.cloudtrail.recipient_account_id"
       ignore_failure: true
   - rename:
-      field: json.serviceEventDetails
-      target_field: "aws.cloudtrail.flattened.service_event_details"
-      if: ctx.json.serviceEventDetails != null
-  - script:
-      lang: painless
-      source: |
-        if (ctx.aws.cloudtrail.flattened.service_event_details != null) {
-          ctx.aws.cloudtrail.service_event_details = ctx.aws.cloudtrail.flattened.service_event_details.toString();
-        }
-      ignore_failure: true
-  - rename:
       field: "json.sharedEventId"
       target_field: "aws.cloudtrail.shared_event_id"
       ignore_failure: true
@@ -230,28 +230,16 @@ processors:
       field: "json.vpcEndpointId"
       target_field: "aws.cloudtrail.vpc_endpoint_id"
       ignore_failure: true
-  - script:
-      lang: painless
-      ignore_failure: true
-      source: >-
-        void addRelatedUser(def ctx, String userName) {
-          if (ctx.related == null) {
-            Map map = new HashMap();
-            ctx.put("related", map);
-          }
-          if (ctx.related.user == null) {
-            ArrayList al = new ArrayList();
-            ctx.related.put("user", al);
-          }
-          ctx.related.user.add(userName);
-        }
-        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.userName != null) {
-          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.userName);
-        }
-        if (ctx?.aws?.cloudtrail?.flattened?.request_parameters?.newUserName != null) {
-          addRelatedUser(ctx, ctx.aws.cloudtrail.flattened.request_parameters.newUserName);
-        }
-
+  - append:
+      field: related.user
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      allow_duplicates: false
+      if: 'ctx.aws?.cloudtrail?.flattened?.request_parameters?.userName != null'
+  - append:
+      field: related.user
+      value: '{{aws.cloudtrail.flattened.request_parameters.newUserName}}'
+      allow_duplicates: false
+      if: 'ctx.aws?.cloudtrail?.flattened?.request_parameters?.newUserName != null'
   - script:
       lang: painless
       ignore_failure: true
@@ -468,12 +456,6 @@ processors:
           type:
             - user
             - info
-        ListGroupsForUser:
-          category:
-            - iam
-          type:
-            - user
-            - info
         ListGroupPolicies:
           category:
             - iam
@@ -620,6 +602,107 @@ processors:
 
         def hm = new HashMap(params.get(ctx.event.action));
         hm.forEach((k, v) -> ctx.event[k] = v);
+
+  - rename:
+      field: "json.awsAccountId"
+      target_field: "cloud.account.id"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestS3Object"
+      target_field: "file.path"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestSignature"
+      target_field: "file.hash.sha256"
+      if: >-
+        ctx?.json?.previousDigestHashAlgorithm != null && ctx.json.previousDigestHashAlgorithm == 'SHA-256'
+  - append:
+      field: "related.hash"
+      value: "{{json.previousDigestSignature}}"
+      if: "ctx?.json?.previousDigestSignature != null"
+  - rename:
+      field: "json.logFiles"
+      target_field: "aws.cloudtrail.digest.log_files"
+      ignore_failure: true
+  - date:
+      field: "json.digestStartTime"
+      target_field: "aws.cloudtrail.digest.start_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.digestEndTime"
+      target_field: "@timestamp"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.digestEndTime"
+      target_field: "aws.cloudtrail.digest.end_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.digestS3Bucket"
+      target_field: "aws.cloudtrail.digest.s3_bucket"
+      ignore_failure: true
+  - date:
+      field: "json.newestEventTime"
+      target_field: "aws.cloudtrail.digest.newest_event_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - date:
+      field: "json.oldestEventTime"
+      target_field: "aws.cloudtrail.digest.oldest_event_time"
+      ignore_failure: true
+      formats:
+        - ISO8601
+  - rename:
+      field: "json.previousDigestS3Bucket"
+      target_field: "aws.cloudtrail.digest.previous_s3_bucket"
+      ignore_failure: true
+  - rename:
+      field: "json.previousDigestHashAlgorithm"
+      target_field: "aws.cloudtrail.digest.previous_hash_algorithm"
+      ignore_failure: true
+  - rename:
+      field: "json.publicKeyFingerprint"
+      target_field: "aws.cloudtrail.digest.public_key_fingerprint"
+      ignore_failure: true
+  - rename:
+      field: "json.digestSignatureAlgorithm"
+      target_field: "aws.cloudtrail.digest.signature_algorithm"
+      ignore_failure: true
+  - rename:
+      field: "json.insightDetails"
+      target_field: "aws.cloudtrail.insight_details"
+      ignore_failure: true
+  - set:
+      field: group.id
+      value: '{{aws.cloudtrail.flattened.response_elements.group.groupId}}'
+      ignore_empty_value: true
+      ignore_failure: true
+  - set:
+      field: user.target.id
+      value: '{{aws.cloudtrail.flattened.response_elements.user.userId}}'
+      ignore_empty_value: true
+      ignore_failure: true
+  - set:
+      field: user.changes.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.newUserName}}'
+      ignore_empty_value: true
+      ignore_failure: true
+  - set:
+      field: group.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.groupName}}'
+      ignore_empty_value: true
+      ignore_failure: true
+  - set:
+      field: user.target.name
+      value: '{{aws.cloudtrail.flattened.request_parameters.userName}}'
+      ignore_empty_value: true
+      ignore_failure: true
 
   - remove:
       field:

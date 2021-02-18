@@ -20,12 +20,15 @@ package add_cloud_metadata
 import (
 	"fmt"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 type config struct {
-	Timeout   time.Duration `config:"timeout"`   // Amount of time to wait for responses from the metadata services.
-	Overwrite bool          `config:"overwrite"` // Overwrite if cloud.* fields already exist.
-	Providers providerList  `config:"providers"` // List of providers to probe
+	Timeout   time.Duration     `config:"timeout"`   // Amount of time to wait for responses from the metadata services.
+	TLS       *tlscommon.Config `config:"ssl"`       // TLS configuration
+	Overwrite bool              `config:"overwrite"` // Overwrite if cloud.* fields already exist.
+	Providers providerList      `config:"providers"` // List of providers to probe
 }
 
 type providerList []string

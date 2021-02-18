@@ -41,3 +41,33 @@
     - name: systemd.unit
       type: keyword
       description: the unit name of the systemd service
+
+    - name: host
+      type: group
+      fields:
+        - name: cpu.pct
+          type: scaled_float
+          format: percent
+          description: Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
+        - name: network.in.bytes
+          type: long
+          format: bytes
+          description: The number of bytes received on all network interfaces by the host in a given period of time.
+        - name: network.out.bytes
+          type: long
+          format: bytes
+          description: The number of bytes sent out on all network interfaces by the host in a given period of time.
+        - name: network.in.packets
+          type: long
+          description: The number of packets received on all network interfaces by the host in a given period of time.
+        - name: network.out.packets
+          type: long
+          description: The number of packets sent out on all network interfaces by the host in a given period of time.
+        - name: disk.read.bytes
+          type: long
+          format: bytes
+          description: The total number of bytes read successfully in a given period of time.
+        - name: disk.write.bytes
+          type: long
+          format: bytes
+          description: The total number of bytes write successfully in a given period of time.

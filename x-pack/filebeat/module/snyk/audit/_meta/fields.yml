@@ -1,0 +1,18 @@
+- name: audit
+  type: group
+  release: beta
+  description: >
+    Module for parsing Snyk audit logs.
+  fields:
+    - name: org_id
+      type: keyword
+      description: >
+        ID of the related Organization related to the event.
+    - name: project_id
+      type: keyword
+      description: >
+        ID of the project related to the event.
+    - name: content
+      type: flattened
+      description: >
+        Overview of the content that was changed, both old and new values.

@@ -5,6 +5,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -21,9 +22,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
-            "209.73.177.115",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.73.177.115"
         ],
         "related.user": [
             "badeyek"
@@ -33,8 +37,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -44,6 +48,9 @@
         "rsa.time.event_time_str": "1157689312",
         "rsa.web.alias_host": "login.yahoo.com",
         "server.domain": "login.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "login",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 19763,
         "source.ip": [
@@ -55,6 +62,9 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "login",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -64,6 +74,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -82,6 +93,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "207.58.145.61",
             "10.105.21.199"
@@ -95,8 +109,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -106,6 +120,9 @@
         "rsa.time.event_time_str": "1157689320",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10182,
         "source.ip": [
@@ -117,6 +134,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -126,6 +146,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -145,9 +166,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -169,6 +193,9 @@
         "rsa.time.event_time_str": "1157689320",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
         "source.ip": [
@@ -180,6 +207,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/styles.css",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -196,6 +226,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -208,8 +241,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -219,6 +252,9 @@
         "rsa.time.event_time_str": "1157689321",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1464,
         "source.ip": [
@@ -230,6 +266,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/styles.css",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -246,6 +285,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google-analytics.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -269,6 +311,9 @@
         "rsa.time.event_time_str": "1157689322",
         "rsa.web.alias_host": "www.google-analytics.com",
         "server.domain": "www.google-analytics.com",
+        "server.registered_domain": "google-analytics.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5626,
         "source.ip": [
@@ -280,6 +325,9 @@
         ],
         "url.domain": "www.google-analytics.com",
         "url.original": "http://www.google-analytics.com/urchin.js",
+        "url.registered_domain": "google-analytics.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -289,6 +337,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -307,6 +356,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "207.58.145.61"
@@ -320,8 +372,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -331,6 +383,9 @@
         "rsa.time.event_time_str": "1157689323",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30169,
         "source.ip": [
@@ -342,6 +397,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -350,6 +408,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -367,6 +426,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google-analytics.com"
+        ],
         "related.ip": [
             "66.102.9.147",
             "10.105.21.199"
@@ -391,6 +453,9 @@
         "rsa.time.event_time_str": "1157689324",
         "rsa.web.alias_host": "www.google-analytics.com",
         "server.domain": "www.google-analytics.com",
+        "server.registered_domain": "google-analytics.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 399,
         "source.ip": [
@@ -402,6 +467,9 @@
         ],
         "url.domain": "www.google-analytics.com",
         "url.original": "http://www.google-analytics.com/__utm.gif?",
+        "url.registered_domain": "google-analytics.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -411,6 +479,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -430,9 +499,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -454,6 +526,9 @@
         "rsa.time.event_time_str": "1157689324",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 215,
         "source.ip": [
@@ -465,6 +540,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/graphics/newslogo.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -474,6 +552,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -493,9 +572,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -517,6 +599,9 @@
         "rsa.time.event_time_str": "1157689324",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 215,
         "source.ip": [
@@ -528,6 +613,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/shop/arsenal_shop_ad.jpg",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -537,6 +625,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -556,9 +645,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -569,8 +661,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -580,6 +672,9 @@
         "rsa.time.event_time_str": "1157689325",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
         "source.ip": [
@@ -591,6 +686,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FUS.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -607,6 +705,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -619,8 +720,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_HIT"
+            "TCP_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -630,6 +731,9 @@
         "rsa.time.event_time_str": "1157689325",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1353,
         "source.ip": [
@@ -641,6 +745,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FGB.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -650,6 +757,7 @@
         "destination.geo.city_name": "Dallas",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 32.9379,
         "destination.geo.location.lon": -96.8384,
         "destination.geo.region_iso_code": "US-TX",
@@ -669,6 +777,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "as.casalemedia.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "209.85.16.38"
@@ -693,6 +804,9 @@
         "rsa.time.event_time_str": "1157689325",
         "rsa.web.alias_host": "as.casalemedia.com",
         "server.domain": "as.casalemedia.com",
+        "server.registered_domain": "casalemedia.com",
+        "server.subdomain": "as",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1013,
         "source.ip": [
@@ -704,12 +818,16 @@
         ],
         "url.domain": "as.casalemedia.com",
         "url.original": "http://as.casalemedia.com/s?",
+        "url.registered_domain": "casalemedia.com",
+        "url.subdomain": "as",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:06.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -726,6 +844,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.bc.yahoo.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "68.142.213.132"
@@ -749,6 +870,9 @@
         "rsa.time.event_time_str": "1157689326",
         "rsa.web.alias_host": "us.bc.yahoo.com",
         "server.domain": "us.bc.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "us.bc",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1845,
         "source.ip": [
@@ -760,6 +884,9 @@
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "us.bc.yahoo.com:443",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "us.bc",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -768,6 +895,7 @@
         "destination.as.organization.name": "Telia Company AB",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
         "destination.geo.location.lat": 59.3247,
         "destination.geo.location.lon": 18.056,
         "destination.ip": [
@@ -785,9 +913,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "impgb.tradedoubler.com"
+        ],
         "related.ip": [
-            "217.212.240.172",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.212.240.172"
         ],
         "related.user": [
             "badeyek"
@@ -809,6 +940,9 @@
         "rsa.time.event_time_str": "1157689327",
         "rsa.web.alias_host": "impgb.tradedoubler.com",
         "server.domain": "impgb.tradedoubler.com",
+        "server.registered_domain": "tradedoubler.com",
+        "server.subdomain": "impgb",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 729,
         "source.ip": [
@@ -820,6 +954,9 @@
         ],
         "url.domain": "impgb.tradedoubler.com",
         "url.original": "http://impgb.tradedoubler.com/imp/img/16349696/992098",
+        "url.registered_domain": "tradedoubler.com",
+        "url.subdomain": "impgb",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -829,6 +966,7 @@
         "destination.geo.city_name": "Los Angeles",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 34.0675,
         "destination.geo.location.lon": -118.3521,
         "destination.geo.region_iso_code": "US-CA",
@@ -848,9 +986,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "4.adbrite.com"
+        ],
         "related.ip": [
-            "206.169.136.22",
-            "10.105.21.199"
+            "10.105.21.199",
+            "206.169.136.22"
         ],
         "related.user": [
             "badeyek"
@@ -861,8 +1002,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -872,6 +1013,9 @@
         "rsa.time.event_time_str": "1157689327",
         "rsa.web.alias_host": "4.adbrite.com",
         "server.domain": "4.adbrite.com",
+        "server.registered_domain": "adbrite.com",
+        "server.subdomain": "4",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1577,
         "source.ip": [
@@ -883,6 +1027,9 @@
         ],
         "url.domain": "4.adbrite.com",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
+        "url.registered_domain": "adbrite.com",
+        "url.subdomain": "4",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -899,6 +1046,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -922,6 +1072,9 @@
         "rsa.time.event_time_str": "1157689327",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1353,
         "source.ip": [
@@ -933,6 +1086,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FFR.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -942,6 +1098,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -961,9 +1118,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -985,6 +1145,9 @@
         "rsa.time.event_time_str": "1157689329",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
         "source.ip": [
@@ -996,6 +1159,9 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/flags/FAU.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -1005,6 +1171,7 @@
         "destination.geo.city_name": "Falls Church",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.9307,
         "destination.geo.location.lon": -77.1673,
         "destination.geo.region_iso_code": "US-VA",
@@ -1024,9 +1191,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.goonernews.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "207.58.145.61"
+            "207.58.145.61",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -1037,8 +1207,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1048,6 +1218,9 @@
         "rsa.time.event_time_str": "1157689329",
         "rsa.web.alias_host": "www.goonernews.com",
         "server.domain": "www.goonernews.com",
+        "server.registered_domain": "goonernews.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 213,
         "source.ip": [
@@ -1059,12 +1232,16 @@
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/graphics/spacer.gif",
+        "url.registered_domain": "goonernews.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
         "@timestamp": "2006-09-08T04:22:10.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1082,6 +1259,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "4.adbrite.com"
+        ],
         "related.ip": [
             "64.127.126.178",
             "10.105.21.199"
@@ -1095,8 +1275,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1106,6 +1286,9 @@
         "rsa.time.event_time_str": "1157689330",
         "rsa.web.alias_host": "4.adbrite.com",
         "server.domain": "4.adbrite.com",
+        "server.registered_domain": "adbrite.com",
+        "server.subdomain": "4",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1784,
         "source.ip": [
@@ -1117,6 +1300,9 @@
         ],
         "url.domain": "4.adbrite.com",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
+        "url.registered_domain": "adbrite.com",
+        "url.subdomain": "4",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -1126,6 +1312,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -1145,9 +1332,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "ff.connextra.com"
+        ],
         "related.ip": [
-            "213.160.98.161",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.161"
         ],
         "related.user": [
             "badeyek"
@@ -1158,8 +1348,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "302",
@@ -1169,6 +1359,9 @@
         "rsa.time.event_time_str": "1157689331",
         "rsa.web.alias_host": "ff.connextra.com",
         "server.domain": "ff.connextra.com",
+        "server.registered_domain": "connextra.com",
+        "server.subdomain": "ff",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 851,
         "source.ip": [
@@ -1180,6 +1373,9 @@
         ],
         "url.domain": "ff.connextra.com",
         "url.original": "http://ff.connextra.com/Ladbrokes/selector/image?",
+        "url.registered_domain": "connextra.com",
+        "url.subdomain": "ff",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -1189,6 +1385,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -1208,9 +1405,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "dd.connextra.com"
+        ],
         "related.ip": [
-            "213.160.98.160",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.160"
         ],
         "related.user": [
             "badeyek"
@@ -1232,6 +1432,9 @@
         "rsa.time.event_time_str": "1157689335",
         "rsa.web.alias_host": "dd.connextra.com",
         "server.domain": "dd.connextra.com",
+        "server.registered_domain": "connextra.com",
+        "server.subdomain": "dd",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30904,
         "source.ip": [
@@ -1243,6 +1446,9 @@
         ],
         "url.domain": "dd.connextra.com",
         "url.original": "http://dd.connextra.com/servlet/controller?",
+        "url.registered_domain": "connextra.com",
+        "url.subdomain": "dd",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -1258,6 +1464,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1281,6 +1490,8 @@
         "rsa.time.event_time_str": "1157689337",
         "rsa.web.alias_host": "hi5.com",
         "server.domain": "hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1661,
         "source.ip": [
@@ -1292,6 +1503,8 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.registered_domain": "hi5.com",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -1300,6 +1513,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1316,6 +1530,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "209.73.177.115"
@@ -1328,8 +1545,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "CONNECT",
-            "TCP_MISS"
+            "TCP_MISS",
+            "CONNECT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1339,6 +1556,9 @@
         "rsa.time.event_time_str": "1157689342",
         "rsa.web.alias_host": "login.yahoo.com",
         "server.domain": "login.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "login",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 12569,
         "source.ip": [
@@ -1350,6 +1570,9 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "login",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -1366,6 +1589,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "update.messenger.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -1389,6 +1615,9 @@
         "rsa.time.event_time_str": "1157689343",
         "rsa.web.alias_host": "update.messenger.yahoo.com",
         "server.domain": "update.messenger.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "update.messenger",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1752,
         "source.ip": [
@@ -1400,6 +1629,9 @@
         ],
         "url.domain": "update.messenger.yahoo.com",
         "url.original": "http://update.messenger.yahoo.com/msgrcli7.html",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "update.messenger",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -1408,6 +1640,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1424,6 +1657,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
@@ -1436,8 +1672,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1447,6 +1683,9 @@
         "rsa.time.event_time_str": "1157689343",
         "rsa.web.alias_host": "shttp.msg.yahoo.com",
         "server.domain": "shttp.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "shttp.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 484,
         "source.ip": [
@@ -1458,6 +1697,9 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "shttp.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -1467,6 +1709,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1485,6 +1728,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
             "204.13.51.238",
             "10.105.47.218"
@@ -1509,6 +1755,8 @@
         "rsa.time.event_time_str": "1157689344",
         "rsa.web.alias_host": "hi5.com",
         "server.domain": "hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 29359,
         "source.ip": [
@@ -1520,6 +1768,8 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.registered_domain": "hi5.com",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1529,6 +1779,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1548,9 +1799,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
-            "10.105.47.218",
-            "204.13.51.238"
+            "204.13.51.238",
+            "10.105.47.218"
         ],
         "related.user": [
             "nazsoau"
@@ -1572,6 +1826,8 @@
         "rsa.time.event_time_str": "1157689344",
         "rsa.web.alias_host": "hi5.com",
         "server.domain": "hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5930,
         "source.ip": [
@@ -1583,6 +1839,8 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/friend/styles/homepage.css",
+        "url.registered_domain": "hi5.com",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1591,6 +1849,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1607,6 +1866,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "216.155.194.239"
@@ -1619,8 +1881,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1630,6 +1892,9 @@
         "rsa.time.event_time_str": "1157689345",
         "rsa.web.alias_host": "shttp.msg.yahoo.com",
         "server.domain": "shttp.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "shttp.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1645,
         "source.ip": [
@@ -1641,6 +1906,9 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "shttp.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -1657,6 +1925,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "rms.adobe.com"
+        ],
         "related.ip": [
             "10.105.37.58"
         ],
@@ -1680,6 +1951,9 @@
         "rsa.time.event_time_str": "1157689346",
         "rsa.web.alias_host": "rms.adobe.com",
         "server.domain": "rms.adobe.com",
+        "server.registered_domain": "adobe.com",
+        "server.subdomain": "rms",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1812,
         "source.ip": [
@@ -1691,6 +1965,9 @@
         ],
         "url.domain": "rms.adobe.com",
         "url.original": "http://rms.adobe.com/read/0600/win_/ENU/read0600win_ENUadbe0000.xml",
+        "url.registered_domain": "adobe.com",
+        "url.subdomain": "rms",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -1707,6 +1984,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "images.hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1730,6 +2010,9 @@
         "rsa.time.event_time_str": "1157689347",
         "rsa.web.alias_host": "images.hi5.com",
         "server.domain": "images.hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.subdomain": "images",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 217,
         "source.ip": [
@@ -1741,6 +2024,9 @@
         ],
         "url.domain": "images.hi5.com",
         "url.original": "http://images.hi5.com/styles/style.css",
+        "url.registered_domain": "hi5.com",
+        "url.subdomain": "images",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1757,6 +2043,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "images.hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218"
         ],
@@ -1780,6 +2069,9 @@
         "rsa.time.event_time_str": "1157689347",
         "rsa.web.alias_host": "images.hi5.com",
         "server.domain": "images.hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.subdomain": "images",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 217,
         "source.ip": [
@@ -1791,6 +2083,9 @@
         ],
         "url.domain": "images.hi5.com",
         "url.original": "http://images.hi5.com/friend/styles/buttons_en_us.css",
+        "url.registered_domain": "hi5.com",
+        "url.subdomain": "images",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1800,6 +2095,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1818,6 +2114,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
             "10.105.47.218",
             "204.13.51.238"
@@ -1842,6 +2141,8 @@
         "rsa.time.event_time_str": "1157689347",
         "rsa.web.alias_host": "hi5.com",
         "server.domain": "hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 27799,
         "source.ip": [
@@ -1853,6 +2154,8 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.registered_domain": "hi5.com",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1862,6 +2165,7 @@
         "destination.geo.city_name": "Victoria",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "CA",
+        "destination.geo.country_name": "Canada",
         "destination.geo.location.lat": 48.4267,
         "destination.geo.location.lon": -123.3655,
         "destination.geo.region_iso_code": "CA-BC",
@@ -1881,9 +2185,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "hi5.com"
+        ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1894,8 +2201,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -1905,6 +2212,8 @@
         "rsa.time.event_time_str": "1157689349",
         "rsa.web.alias_host": "hi5.com",
         "server.domain": "hi5.com",
+        "server.registered_domain": "hi5.com",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4470,
         "source.ip": [
@@ -1916,6 +2225,8 @@
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/friend/styles/headernav.css",
+        "url.registered_domain": "hi5.com",
+        "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
     {
@@ -1924,6 +2235,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1940,9 +2252,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -1963,6 +2278,9 @@
         "rsa.time.event_time_str": "1157689350",
         "rsa.web.alias_host": "shttp.msg.yahoo.com",
         "server.domain": "shttp.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "shttp.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 382,
         "source.ip": [
@@ -1974,12 +2292,16 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "shttp.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -1996,9 +2318,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2009,8 +2334,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2020,6 +2345,9 @@
         "rsa.time.event_time_str": "1157689353",
         "rsa.web.alias_host": "insider.msg.yahoo.com",
         "server.domain": "insider.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "insider.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 24095,
         "source.ip": [
@@ -2031,6 +2359,9 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "insider.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2039,6 +2370,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2056,6 +2388,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -2069,8 +2404,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2080,6 +2415,9 @@
         "rsa.time.event_time_str": "1157689353",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 22964,
         "source.ip": [
@@ -2091,6 +2429,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/playmessenger.asp",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2099,6 +2440,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2115,6 +2457,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
             "216.155.194.239",
             "10.105.33.214"
@@ -2127,8 +2472,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2138,6 +2483,9 @@
         "rsa.time.event_time_str": "1157689354",
         "rsa.web.alias_host": "shttp.msg.yahoo.com",
         "server.domain": "shttp.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "shttp.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 646,
         "source.ip": [
@@ -2149,12 +2497,16 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "shttp.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:35.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2172,6 +2524,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "address.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "209.191.93.51"
@@ -2196,6 +2551,9 @@
         "rsa.time.event_time_str": "1157689355",
         "rsa.web.alias_host": "address.yahoo.com",
         "server.domain": "address.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "address",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 699,
         "source.ip": [
@@ -2207,6 +2565,9 @@
         ],
         "url.domain": "address.yahoo.com",
         "url.original": "http://address.yahoo.com/yab/us?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "address",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2216,6 +2577,7 @@
         "destination.geo.city_name": "Sacramento",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.6415,
         "destination.geo.location.lon": -121.5114,
         "destination.geo.region_iso_code": "US-CA",
@@ -2235,6 +2597,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "fxfeeds.mozilla.org"
+        ],
         "related.ip": [
             "63.245.209.21",
             "10.105.21.199"
@@ -2259,6 +2624,9 @@
         "rsa.time.event_time_str": "1157689356",
         "rsa.web.alias_host": "fxfeeds.mozilla.org",
         "server.domain": "fxfeeds.mozilla.org",
+        "server.registered_domain": "mozilla.org",
+        "server.subdomain": "fxfeeds",
+        "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 734,
         "source.ip": [
@@ -2270,6 +2638,9 @@
         ],
         "url.domain": "fxfeeds.mozilla.org",
         "url.original": "http://fxfeeds.mozilla.org/rss20.xml",
+        "url.registered_domain": "mozilla.org",
+        "url.subdomain": "fxfeeds",
+        "url.top_level_domain": "org",
         "user.name": "badeyek"
     },
     {
@@ -2278,6 +2649,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2294,66 +2666,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.231.252"
-        ],
-        "related.user": [
-            "adeolaegbedokun"
-        ],
-        "rsa.internal.hcode": "DIRECT",
-        "rsa.internal.messageid": "GET",
-        "rsa.investigations.ec_activity": "Request",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
-        ],
-        "rsa.misc.content_type": "text/xml",
-        "rsa.misc.result_code": "200",
-        "rsa.network.domain": "insider.msg.yahoo.com",
-        "rsa.time.duration_time": 6424,
-        "rsa.time.event_time": "2006-09-08T04:22:37.000Z",
-        "rsa.time.event_time_str": "1157689357",
-        "rsa.web.alias_host": "insider.msg.yahoo.com",
-        "server.domain": "insider.msg.yahoo.com",
-        "service.type": "squid",
-        "source.bytes": 31400,
-        "source.ip": [
+            "68.142.231.252",
             "10.105.33.214"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "insider.msg.yahoo.com",
-        "url.original": "http://insider.msg.yahoo.com/ycontent/?",
-        "user.name": "adeolaegbedokun"
-    },
-    {
-        "@timestamp": "2006-09-08T04:22:37.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.194.14"
-        ],
-        "event.action": "TCP_MISS",
-        "event.code": "GET",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1157689357.720   2831 10.105.33.214 TCP_MISS/200 21152 GET http://insider.msg.yahoo.com/ycontent/? adeolaegbedokun DIRECT/68.142.194.14 text/xml",
-        "fileset.name": "log",
-        "input.type": "log",
-        "log.offset": 5316,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
-        "related.ip": [
-            "10.105.33.214",
-            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2370,11 +2688,81 @@
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
         "rsa.network.domain": "insider.msg.yahoo.com",
+        "rsa.time.duration_time": 6424,
+        "rsa.time.event_time": "2006-09-08T04:22:37.000Z",
+        "rsa.time.event_time_str": "1157689357",
+        "rsa.web.alias_host": "insider.msg.yahoo.com",
+        "server.domain": "insider.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "insider.msg",
+        "server.top_level_domain": "com",
+        "service.type": "squid",
+        "source.bytes": 31400,
+        "source.ip": [
+            "10.105.33.214"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "insider.msg.yahoo.com",
+        "url.original": "http://insider.msg.yahoo.com/ycontent/?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "insider.msg",
+        "url.top_level_domain": "com",
+        "user.name": "adeolaegbedokun"
+    },
+    {
+        "@timestamp": "2006-09-08T04:22:37.000Z",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": [
+            "68.142.194.14"
+        ],
+        "event.action": "TCP_MISS",
+        "event.code": "GET",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1157689357.720   2831 10.105.33.214 TCP_MISS/200 21152 GET http://insider.msg.yahoo.com/ycontent/? adeolaegbedokun DIRECT/68.142.194.14 text/xml",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 5316,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
+        "related.ip": [
+            "10.105.33.214",
+            "68.142.194.14"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
+        "rsa.internal.hcode": "DIRECT",
+        "rsa.internal.messageid": "GET",
+        "rsa.investigations.ec_activity": "Request",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "GET",
+            "TCP_MISS"
+        ],
+        "rsa.misc.content_type": "text/xml",
+        "rsa.misc.result_code": "200",
+        "rsa.network.domain": "insider.msg.yahoo.com",
         "rsa.time.duration_time": 2831,
         "rsa.time.event_time": "2006-09-08T04:22:37.000Z",
         "rsa.time.event_time_str": "1157689357",
         "rsa.web.alias_host": "insider.msg.yahoo.com",
         "server.domain": "insider.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "insider.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 21152,
         "source.ip": [
@@ -2386,6 +2774,9 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "insider.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2401,6 +2792,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2423,6 +2817,9 @@
         "rsa.time.event_time_str": "1157689358",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1667,
         "source.ip": [
@@ -2434,6 +2831,9 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -2450,6 +2850,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2472,6 +2875,9 @@
         "rsa.time.event_time_str": "1157689358",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1767,
         "source.ip": [
@@ -2483,6 +2889,9 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -2499,6 +2908,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2521,6 +2933,9 @@
         "rsa.time.event_time_str": "1157689358",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1761,
         "source.ip": [
@@ -2532,6 +2947,9 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -2547,114 +2965,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
-        "related.ip": [
-            "10.105.37.17"
+        "related.hosts": [
+            "us.mcafee.com"
         ],
-        "related.user": [
-            "-"
-        ],
-        "rsa.internal.hcode": "NONE",
-        "rsa.internal.messageid": "CONNECT",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
-        ],
-        "rsa.misc.content_type": "text/html",
-        "rsa.misc.result_code": "407",
-        "rsa.network.domain": "us.mcafee.com",
-        "rsa.time.duration_time": 0,
-        "rsa.time.event_time": "2006-09-08T04:22:38.000Z",
-        "rsa.time.event_time_str": "1157689358",
-        "rsa.web.alias_host": "us.mcafee.com",
-        "server.domain": "us.mcafee.com",
-        "service.type": "squid",
-        "source.bytes": 1667,
-        "source.ip": [
-            "10.105.37.17"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "us.mcafee.com",
-        "url.original": "us.mcafee.com:443",
-        "user.name": "-"
-    },
-    {
-        "@timestamp": "2006-09-08T04:22:38.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
-        "event.action": "TCP_REFRESH_HIT",
-        "event.code": "GET",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1157689358.486    711 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif adeolaegbedokun DIRECT/68.142.219.132 -",
-        "file.name": "btn_stations.gif",
-        "fileset.name": "log",
-        "input.type": "log",
-        "log.offset": 5923,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
-        "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
-        ],
-        "related.user": [
-            "adeolaegbedokun"
-        ],
-        "rsa.internal.hcode": "DIRECT",
-        "rsa.internal.messageid": "GET",
-        "rsa.investigations.ec_activity": "Request",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "GET",
-            "TCP_REFRESH_HIT"
-        ],
-        "rsa.misc.content_type": "-",
-        "rsa.misc.result_code": "304",
-        "rsa.network.domain": "radio.launch.yahoo.com",
-        "rsa.time.duration_time": 711,
-        "rsa.time.event_time": "2006-09-08T04:22:38.000Z",
-        "rsa.time.event_time_str": "1157689358",
-        "rsa.web.alias_host": "radio.launch.yahoo.com",
-        "server.domain": "radio.launch.yahoo.com",
-        "service.type": "squid",
-        "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "radio.launch.yahoo.com",
-        "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif",
-        "user.name": "adeolaegbedokun"
-    },
-    {
-        "@timestamp": "2006-09-08T04:22:38.000Z",
-        "event.action": "TCP_DENIED",
-        "event.code": "CONNECT",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1157689358.683      0 10.105.37.17 TCP_DENIED/407 1667 CONNECT us.mcafee.com:443 - NONE/- text/html",
-        "fileset.name": "log",
-        "input.type": "log",
-        "log.offset": 6102,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
         "related.ip": [
             "10.105.37.17"
         ],
@@ -2677,6 +2990,9 @@
         "rsa.time.event_time_str": "1157689358",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1667,
         "source.ip": [
@@ -2688,6 +3004,136 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
+        "user.name": "-"
+    },
+    {
+        "@timestamp": "2006-09-08T04:22:38.000Z",
+        "destination.as.number": 26101,
+        "destination.as.organization.name": "Oath Holdings Inc.",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": [
+            "68.142.219.132"
+        ],
+        "event.action": "TCP_REFRESH_HIT",
+        "event.code": "GET",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1157689358.486    711 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif adeolaegbedokun DIRECT/68.142.219.132 -",
+        "file.name": "btn_stations.gif",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 5923,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
+        "related.ip": [
+            "68.142.219.132",
+            "10.105.33.214"
+        ],
+        "related.user": [
+            "adeolaegbedokun"
+        ],
+        "rsa.internal.hcode": "DIRECT",
+        "rsa.internal.messageid": "GET",
+        "rsa.investigations.ec_activity": "Request",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "TCP_REFRESH_HIT",
+            "GET"
+        ],
+        "rsa.misc.content_type": "-",
+        "rsa.misc.result_code": "304",
+        "rsa.network.domain": "radio.launch.yahoo.com",
+        "rsa.time.duration_time": 711,
+        "rsa.time.event_time": "2006-09-08T04:22:38.000Z",
+        "rsa.time.event_time_str": "1157689358",
+        "rsa.web.alias_host": "radio.launch.yahoo.com",
+        "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
+        "service.type": "squid",
+        "source.bytes": 512,
+        "source.ip": [
+            "10.105.33.214"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "radio.launch.yahoo.com",
+        "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
+        "user.name": "adeolaegbedokun"
+    },
+    {
+        "@timestamp": "2006-09-08T04:22:38.000Z",
+        "event.action": "TCP_DENIED",
+        "event.code": "CONNECT",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1157689358.683      0 10.105.37.17 TCP_DENIED/407 1667 CONNECT us.mcafee.com:443 - NONE/- text/html",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 6102,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
+        "related.ip": [
+            "10.105.37.17"
+        ],
+        "related.user": [
+            "-"
+        ],
+        "rsa.internal.hcode": "NONE",
+        "rsa.internal.messageid": "CONNECT",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "TCP_DENIED",
+            "CONNECT"
+        ],
+        "rsa.misc.content_type": "text/html",
+        "rsa.misc.result_code": "407",
+        "rsa.network.domain": "us.mcafee.com",
+        "rsa.time.duration_time": 0,
+        "rsa.time.event_time": "2006-09-08T04:22:38.000Z",
+        "rsa.time.event_time_str": "1157689358",
+        "rsa.web.alias_host": "us.mcafee.com",
+        "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
+        "service.type": "squid",
+        "source.bytes": 1667,
+        "source.ip": [
+            "10.105.37.17"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "us.mcafee.com",
+        "url.original": "us.mcafee.com:443",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -2696,6 +3142,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2713,9 +3160,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2737,6 +3187,9 @@
         "rsa.time.event_time_str": "1157689359",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -2748,6 +3201,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations_over.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2756,6 +3212,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2772,9 +3229,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "shttp.msg.yahoo.com"
+        ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2795,6 +3255,9 @@
         "rsa.time.event_time_str": "1157689359",
         "rsa.web.alias_host": "shttp.msg.yahoo.com",
         "server.domain": "shttp.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "shttp.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 362,
         "source.ip": [
@@ -2806,6 +3269,9 @@
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "shttp.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2814,6 +3280,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2831,6 +3298,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -2855,6 +3325,9 @@
         "rsa.time.event_time_str": "1157689359",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 511,
         "source.ip": [
@@ -2866,6 +3339,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_left.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2874,6 +3350,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -2891,6 +3368,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -2904,8 +3384,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -2915,6 +3395,9 @@
         "rsa.time.event_time_str": "1157689360",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -2926,6 +3409,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/launchcast_radio.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -2942,6 +3428,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -2953,8 +3442,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_DENIED"
+            "TCP_DENIED",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2964,6 +3453,9 @@
         "rsa.time.event_time_str": "1157689360",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1767,
         "source.ip": [
@@ -2975,6 +3467,9 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -2991,6 +3486,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -3013,6 +3511,9 @@
         "rsa.time.event_time_str": "1157689361",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1761,
         "source.ip": [
@@ -3024,6 +3525,9 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -3032,6 +3536,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3049,6 +3554,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -3062,8 +3570,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3073,6 +3581,9 @@
         "rsa.time.event_time_str": "1157689361",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -3084,6 +3595,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_right.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3092,6 +3606,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3109,6 +3624,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -3133,6 +3651,9 @@
         "rsa.time.event_time_str": "1157689361",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -3144,6 +3665,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_center.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3152,6 +3676,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3169,6 +3694,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -3193,6 +3721,9 @@
         "rsa.time.event_time_str": "1157689362",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -3204,6 +3735,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_off.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3212,6 +3746,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3229,9 +3764,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3253,6 +3791,9 @@
         "rsa.time.event_time_str": "1157689362",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
         "source.ip": [
@@ -3264,6 +3805,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3280,6 +3824,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3303,6 +3850,9 @@
         "rsa.time.event_time_str": "1157689362",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 218,
         "source.ip": [
@@ -3314,6 +3864,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_off_state_station.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3330,6 +3883,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3342,8 +3898,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3353,6 +3909,9 @@
         "rsa.time.event_time_str": "1157689362",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 218,
         "source.ip": [
@@ -3364,6 +3923,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_fill.gif",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3380,6 +3942,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.i1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3392,8 +3957,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3403,6 +3968,9 @@
         "rsa.time.event_time_str": "1157689362",
         "rsa.web.alias_host": "us.i1.yimg.com",
         "server.domain": "us.i1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.i1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2263,
         "source.ip": [
@@ -3414,6 +3982,9 @@
         ],
         "url.domain": "us.i1.yimg.com",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/toolbar50x50.gif",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.i1",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3422,6 +3993,7 @@
         "destination.as.organization.name": "BBC",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.4964,
         "destination.geo.location.lon": -0.1224,
         "destination.ip": [
@@ -3439,9 +4011,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "newsrss.bbc.co.uk"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "212.58.226.33"
+            "212.58.226.33",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -3452,8 +4027,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_MISS",
-            "GET"
+            "GET",
+            "TCP_REFRESH_MISS"
         ],
         "rsa.misc.content_type": "application/xml",
         "rsa.misc.result_code": "200",
@@ -3463,6 +4038,9 @@
         "rsa.time.event_time_str": "1157689363",
         "rsa.web.alias_host": "newsrss.bbc.co.uk",
         "server.domain": "newsrss.bbc.co.uk",
+        "server.registered_domain": "bbc.co.uk",
+        "server.subdomain": "newsrss",
+        "server.top_level_domain": "co.uk",
         "service.type": "squid",
         "source.bytes": 17396,
         "source.ip": [
@@ -3474,6 +4052,9 @@
         ],
         "url.domain": "newsrss.bbc.co.uk",
         "url.original": "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml",
+        "url.registered_domain": "bbc.co.uk",
+        "url.subdomain": "newsrss",
+        "url.top_level_domain": "co.uk",
         "user.name": "badeyek"
     },
     {
@@ -3482,6 +4063,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3499,9 +4081,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.231.252",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.231.252"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3512,8 +4097,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -3523,6 +4108,9 @@
         "rsa.time.event_time_str": "1157689364",
         "rsa.web.alias_host": "insider.msg.yahoo.com",
         "server.domain": "insider.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "insider.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 407,
         "source.ip": [
@@ -3534,6 +4122,9 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "insider.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3550,6 +4141,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.ent1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3562,8 +4156,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "304",
@@ -3573,6 +4167,9 @@
         "rsa.time.event_time_str": "1157689364",
         "rsa.web.alias_host": "us.ent1.yimg.com",
         "server.domain": "us.ent1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.ent1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 219,
         "source.ip": [
@@ -3584,6 +4181,9 @@
         ],
         "url.domain": "us.ent1.yimg.com",
         "url.original": "http://us.ent1.yimg.com/images.launch.yahoo.com/000/032/457/32457654.jpg",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.ent1",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3600,6 +4200,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -3623,6 +4226,9 @@
         "rsa.time.event_time_str": "1157689364",
         "rsa.web.alias_host": "us.news1.yimg.com",
         "server.domain": "us.news1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.news1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10593,
         "source.ip": [
@@ -3634,6 +4240,9 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060906/thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.news1",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3642,6 +4251,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3659,9 +4269,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3671,8 +4284,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "POST",
-            "TCP_MISS"
+            "TCP_MISS",
+            "POST"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -3682,6 +4295,9 @@
         "rsa.time.event_time_str": "1157689365",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1270,
         "source.ip": [
@@ -3693,6 +4309,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3702,6 +4321,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -3721,9 +4341,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3734,8 +4357,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -3745,6 +4368,9 @@
         "rsa.time.event_time_str": "1157689366",
         "rsa.web.alias_host": "us.news1.yimg.com",
         "server.domain": "us.news1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.news1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10519,
         "source.ip": [
@@ -3756,6 +4382,9 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060908/thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.news1",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3764,6 +4393,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3781,6 +4411,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.music.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "68.142.219.132"
@@ -3805,6 +4438,9 @@
         "rsa.time.event_time_str": "1157689368",
         "rsa.web.alias_host": "radio.music.yahoo.com",
         "server.domain": "radio.music.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.music",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 515,
         "source.ip": [
@@ -3816,6 +4452,9 @@
         ],
         "url.domain": "radio.music.yahoo.com",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.music",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3824,6 +4463,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3841,9 +4481,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.music.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.219.132"
+            "68.142.219.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3865,6 +4508,9 @@
         "rsa.time.event_time_str": "1157689368",
         "rsa.web.alias_host": "radio.music.yahoo.com",
         "server.domain": "radio.music.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.music",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14411,
         "source.ip": [
@@ -3876,6 +4522,9 @@
         ],
         "url.domain": "radio.music.yahoo.com",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.music",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3884,6 +4533,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -3901,9 +4551,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3914,8 +4567,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -3925,6 +4578,9 @@
         "rsa.time.event_time_str": "1157689368",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1627,
         "source.ip": [
@@ -3936,6 +4592,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -3952,6 +4611,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "natrocket.kmip.net"
+        ],
         "related.ip": [
             "10.105.37.65"
         ],
@@ -3975,6 +4637,9 @@
         "rsa.time.event_time_str": "1157689369",
         "rsa.web.alias_host": "natrocket.kmip.net",
         "server.domain": "natrocket.kmip.net",
+        "server.registered_domain": "kmip.net",
+        "server.subdomain": "natrocket",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1728,
         "source.ip": [
@@ -3986,6 +4651,9 @@
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/iesocks?",
+        "url.registered_domain": "kmip.net",
+        "url.subdomain": "natrocket",
+        "url.top_level_domain": "net",
         "user.name": "-"
     },
     {
@@ -4002,6 +4670,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "natrocket.kmip.net"
+        ],
         "related.ip": [
             "10.105.37.65"
         ],
@@ -4025,6 +4696,9 @@
         "rsa.time.event_time_str": "1157689369",
         "rsa.web.alias_host": "natrocket.kmip.net",
         "server.domain": "natrocket.kmip.net",
+        "server.registered_domain": "kmip.net",
+        "server.subdomain": "natrocket",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1725,
         "source.ip": [
@@ -4036,6 +4710,9 @@
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/return?",
+        "url.registered_domain": "kmip.net",
+        "url.subdomain": "natrocket",
+        "url.top_level_domain": "net",
         "user.name": "-"
     },
     {
@@ -4045,6 +4722,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4064,6 +4742,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.news1.yimg.com"
+        ],
         "related.ip": [
             "213.160.98.159",
             "10.105.33.214"
@@ -4077,8 +4758,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4088,6 +4769,9 @@
         "rsa.time.event_time_str": "1157689370",
         "rsa.web.alias_host": "us.news1.yimg.com",
         "server.domain": "us.news1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.news1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 13124,
         "source.ip": [
@@ -4099,6 +4783,9 @@
         ],
         "url.domain": "us.news1.yimg.com",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060907/thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.news1",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4107,6 +4794,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4124,9 +4812,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4148,6 +4839,9 @@
         "rsa.time.event_time_str": "1157689370",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 912,
         "source.ip": [
@@ -4159,6 +4853,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/515/starter.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4167,6 +4864,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4184,6 +4882,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -4197,8 +4898,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4208,6 +4909,9 @@
         "rsa.time.event_time_str": "1157689371",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1450,
         "source.ip": [
@@ -4219,6 +4923,9 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/player/default.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4228,6 +4935,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4247,6 +4955,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.a2.yimg.com"
+        ],
         "related.ip": [
             "213.160.98.152",
             "10.105.33.214"
@@ -4271,6 +4982,9 @@
         "rsa.time.event_time_str": "1157689371",
         "rsa.web.alias_host": "us.a2.yimg.com",
         "server.domain": "us.a2.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.a2",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30432,
         "source.ip": [
@@ -4282,6 +4996,9 @@
         ],
         "url.domain": "us.a2.yimg.com",
         "url.original": "http://us.a2.yimg.com/us.yimg.com/a/ya/yahoo_messenger/081106_lrec_msgr_interophitchhiker.swf?",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.a2",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4290,6 +5007,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4307,6 +5025,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "radio.launch.yahoo.com"
+        ],
         "related.ip": [
             "68.142.219.132",
             "10.105.33.214"
@@ -4331,6 +5052,9 @@
         "rsa.time.event_time_str": "1157689373",
         "rsa.web.alias_host": "radio.launch.yahoo.com",
         "server.domain": "radio.launch.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "radio.launch",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14643,
         "source.ip": [
@@ -4342,12 +5066,16 @@
         ],
         "url.domain": "radio.launch.yahoo.com",
         "url.original": "http://radio.launch.yahoo.com/radio/player/stickwall.asp?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "radio.launch",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:54.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4365,9 +5093,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.bc.yahoo.com"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "68.142.213.132"
+            "68.142.213.132",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4378,8 +5109,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4389,6 +5120,9 @@
         "rsa.time.event_time_str": "1157689374",
         "rsa.web.alias_host": "us.bc.yahoo.com",
         "server.domain": "us.bc.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "us.bc",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 425,
         "source.ip": [
@@ -4400,12 +5134,16 @@
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "http://us.bc.yahoo.com/b?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "us.bc",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:56.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4423,6 +5161,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "insider.msg.yahoo.com"
+        ],
         "related.ip": [
             "68.142.194.14",
             "10.105.33.214"
@@ -4447,6 +5188,9 @@
         "rsa.time.event_time_str": "1157689376",
         "rsa.web.alias_host": "insider.msg.yahoo.com",
         "server.domain": "insider.msg.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "insider.msg",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 407,
         "source.ip": [
@@ -4458,12 +5202,16 @@
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "insider.msg",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4480,6 +5228,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "pclick.internal.yahoo.com"
+        ],
         "related.ip": [
             "216.109.124.55",
             "10.105.33.214"
@@ -4503,6 +5254,9 @@
         "rsa.time.event_time_str": "1157689377",
         "rsa.web.alias_host": "pclick.internal.yahoo.com",
         "server.domain": "pclick.internal.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "pclick.internal",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1476,
         "source.ip": [
@@ -4514,6 +5268,9 @@
         ],
         "url.domain": "pclick.internal.yahoo.com",
         "url.original": "pclick.internal.yahoo.com:443",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "pclick.internal",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4530,6 +5287,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -4553,6 +5313,9 @@
         "rsa.time.event_time_str": "1157689377",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 233,
         "source.ip": [
@@ -4564,6 +5327,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20051025184124/radio.launch.yahoo.com/radioapi/includes/js/compVersionedJS/rapiBridge_1_4.js",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4573,6 +5339,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4592,9 +5359,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
-            "10.105.33.214",
-            "213.160.98.159"
+            "213.160.98.159",
+            "10.105.33.214"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4605,8 +5375,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -4616,6 +5386,9 @@
         "rsa.time.event_time_str": "1157689377",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 236,
         "source.ip": [
@@ -4627,6 +5400,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222754/radio.launch.yahoo.com/radio/clientdata/515/other.css",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4636,6 +5412,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4655,6 +5432,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.159"
@@ -4668,8 +5448,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4679,6 +5459,9 @@
         "rsa.time.event_time_str": "1157689378",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
         "source.ip": [
@@ -4690,6 +5473,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_left.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4698,6 +5484,7 @@
         "destination.as.organization.name": "Oath Holdings Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -4714,9 +5501,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.yahoo.com"
+        ],
         "related.ip": [
-            "209.73.177.115",
-            "10.105.21.199"
+            "10.105.21.199",
+            "209.73.177.115"
         ],
         "related.user": [
             "badeyek"
@@ -4737,6 +5527,9 @@
         "rsa.time.event_time_str": "1157689378",
         "rsa.web.alias_host": "login.yahoo.com",
         "server.domain": "login.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "login",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2681,
         "source.ip": [
@@ -4748,6 +5541,9 @@
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "login",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -4757,6 +5553,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4776,6 +5573,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "213.160.98.167",
             "10.105.33.214"
@@ -4800,6 +5600,9 @@
         "rsa.time.event_time_str": "1157689378",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 136,
         "source.ip": [
@@ -4811,6 +5614,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20050829181418/radio.launch.yahoo.com/radio/common_radio/resources/images/noaccess_msgr_uk.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4820,6 +5626,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4839,6 +5646,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.159"
@@ -4863,6 +5673,9 @@
         "rsa.time.event_time_str": "1157689378",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 237,
         "source.ip": [
@@ -4874,6 +5687,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_right.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4890,6 +5706,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214"
         ],
@@ -4902,8 +5721,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_IMS_HIT"
+            "TCP_IMS_HIT",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4913,6 +5732,9 @@
         "rsa.time.event_time_str": "1157689378",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 218,
         "source.ip": [
@@ -4924,6 +5746,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222807/radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4933,6 +5758,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -4952,6 +5778,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "213.160.98.167",
             "10.105.33.214"
@@ -4965,8 +5794,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -4976,6 +5805,9 @@
         "rsa.time.event_time_str": "1157689379",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
         "source.ip": [
@@ -4987,6 +5819,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_off.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -4996,6 +5831,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5015,9 +5851,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5039,6 +5878,9 @@
         "rsa.time.event_time_str": "1157689379",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
         "source.ip": [
@@ -5050,6 +5892,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222756/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_center.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -5059,6 +5904,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5078,6 +5924,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "a1568.g.akamai.net"
+        ],
         "related.ip": [
             "10.105.33.214",
             "213.160.98.167"
@@ -5091,8 +5940,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5102,6 +5951,9 @@
         "rsa.time.event_time_str": "1157689380",
         "rsa.web.alias_host": "a1568.g.akamai.net",
         "server.domain": "a1568.g.akamai.net",
+        "server.registered_domain": "akamai.net",
+        "server.subdomain": "a1568.g",
+        "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
         "source.ip": [
@@ -5113,6 +5965,9 @@
         ],
         "url.domain": "a1568.g.akamai.net",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_fill.gif",
+        "url.registered_domain": "akamai.net",
+        "url.subdomain": "a1568.g",
+        "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -5129,6 +5984,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "www.google.com"
+        ],
         "related.ip": [
             "10.105.37.180"
         ],
@@ -5141,8 +5999,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5152,6 +6010,9 @@
         "rsa.time.event_time_str": "1157689381",
         "rsa.web.alias_host": "www.google.com",
         "server.domain": "www.google.com",
+        "server.registered_domain": "google.com",
+        "server.subdomain": "www",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1728,
         "source.ip": [
@@ -5163,6 +6024,9 @@
         ],
         "url.domain": "www.google.com",
         "url.original": "http://www.google.com/supported_domains",
+        "url.registered_domain": "google.com",
+        "url.subdomain": "www",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -5179,6 +6043,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.mcafee.com"
+        ],
         "related.ip": [
             "10.105.47.191"
         ],
@@ -5191,8 +6058,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -5202,6 +6069,9 @@
         "rsa.time.event_time_str": "1157689381",
         "rsa.web.alias_host": "us.mcafee.com",
         "server.domain": "us.mcafee.com",
+        "server.registered_domain": "mcafee.com",
+        "server.subdomain": "us",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1782,
         "source.ip": [
@@ -5213,12 +6083,16 @@
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "http://us.mcafee.com/apps/agent/en-us/agent5/chknews.asp?",
+        "url.registered_domain": "mcafee.com",
+        "url.subdomain": "us",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": [
@@ -5236,6 +6110,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "launch.adserver.yahoo.com"
+        ],
         "related.ip": [
             "10.105.33.214",
             "216.109.125.112"
@@ -5249,8 +6126,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5260,6 +6137,9 @@
         "rsa.time.event_time_str": "1157689381",
         "rsa.web.alias_host": "launch.adserver.yahoo.com",
         "server.domain": "launch.adserver.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "launch.adserver",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 449,
         "source.ip": [
@@ -5271,6 +6151,9 @@
         ],
         "url.domain": "launch.adserver.yahoo.com",
         "url.original": "http://launch.adserver.yahoo.com/l?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "launch.adserver",
+        "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
     },
     {
@@ -5279,6 +6162,7 @@
         "destination.as.organization.name": "Yahoo! UK Services Limited",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.4964,
         "destination.geo.location.lon": -0.1224,
         "destination.ip": [
@@ -5296,9 +6180,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "uk.f250.mail.yahoo.com"
+        ],
         "related.ip": [
-            "217.12.10.96",
-            "10.105.21.199"
+            "10.105.21.199",
+            "217.12.10.96"
         ],
         "related.user": [
             "badeyek"
@@ -5309,8 +6196,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "GET",
-            "TCP_MISS"
+            "TCP_MISS",
+            "GET"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -5320,6 +6207,9 @@
         "rsa.time.event_time_str": "1157689382",
         "rsa.web.alias_host": "uk.f250.mail.yahoo.com",
         "server.domain": "uk.f250.mail.yahoo.com",
+        "server.registered_domain": "yahoo.com",
+        "server.subdomain": "uk.f250.mail",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 11746,
         "source.ip": [
@@ -5331,6 +6221,9 @@
         ],
         "url.domain": "uk.f250.mail.yahoo.com",
         "url.original": "http://uk.f250.mail.yahoo.com/dc/launch?",
+        "url.registered_domain": "yahoo.com",
+        "url.subdomain": "uk.f250.mail",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -5346,6 +6239,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "login.live.com"
+        ],
         "related.ip": [
             "10.105.37.180"
         ],
@@ -5368,6 +6264,9 @@
         "rsa.time.event_time_str": "1157689382",
         "rsa.web.alias_host": "login.live.com",
         "server.domain": "login.live.com",
+        "server.registered_domain": "live.com",
+        "server.subdomain": "login",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1670,
         "source.ip": [
@@ -5379,6 +6278,9 @@
         ],
         "url.domain": "login.live.com",
         "url.original": "login.live.com:443",
+        "url.registered_domain": "live.com",
+        "url.subdomain": "login",
+        "url.top_level_domain": "com",
         "user.name": "-"
     },
     {
@@ -5388,6 +6290,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5407,9 +6310,12 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
         "related.ip": [
-            "10.105.21.199",
-            "213.160.98.169"
+            "213.160.98.169",
+            "10.105.21.199"
         ],
         "related.user": [
             "badeyek"
@@ -5431,6 +6337,9 @@
         "rsa.time.event_time_str": "1157689384",
         "rsa.web.alias_host": "us.js2.yimg.com",
         "server.domain": "us.js2.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.js2",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 633,
         "source.ip": [
@@ -5442,6 +6351,9 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/77cf3e56414f974dfd8616f56f0f632c_1.js",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.js2",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -5458,6 +6370,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js1.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5481,6 +6396,9 @@
         "rsa.time.event_time_str": "1157689385",
         "rsa.web.alias_host": "us.js1.yimg.com",
         "server.domain": "us.js1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.js1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1742,
         "source.ip": [
@@ -5492,6 +6410,9 @@
         ],
         "url.domain": "us.js1.yimg.com",
         "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/hdr/ygma5.css",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.js1",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -5501,6 +6422,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5064,
         "destination.geo.location.lon": -0.02,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -5520,6 +6442,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199",
             "213.160.98.169"
@@ -5544,6 +6469,9 @@
         "rsa.time.event_time_str": "1157689387",
         "rsa.web.alias_host": "us.js2.yimg.com",
         "server.domain": "us.js2.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.js2",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14561,
         "source.ip": [
@@ -5555,6 +6483,9 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/f7fc76100697c9c2d25dd0ec35e563b0_1.js",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.js2",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -5571,56 +6502,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
-        "related.ip": [
-            "10.105.21.199"
+        "related.hosts": [
+            "us.js1.yimg.com"
         ],
-        "related.user": [
-            "badeyek"
-        ],
-        "rsa.internal.hcode": "NONE",
-        "rsa.internal.messageid": "GET",
-        "rsa.investigations.ec_activity": "Request",
-        "rsa.investigations.ec_subject": "NetworkComm",
-        "rsa.investigations.ec_theme": "ALM",
-        "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
-        ],
-        "rsa.misc.content_type": "application/x-javascript",
-        "rsa.misc.result_code": "200",
-        "rsa.network.domain": "us.js1.yimg.com",
-        "rsa.time.duration_time": 80,
-        "rsa.time.event_time": "2006-09-08T04:23:07.000Z",
-        "rsa.time.event_time_str": "1157689387",
-        "rsa.web.alias_host": "us.js1.yimg.com",
-        "server.domain": "us.js1.yimg.com",
-        "service.type": "squid",
-        "source.bytes": 68733,
-        "source.ip": [
-            "10.105.21.199"
-        ],
-        "tags": [
-            "squid.log",
-            "forwarded"
-        ],
-        "url.domain": "us.js1.yimg.com",
-        "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js",
-        "user.name": "badeyek"
-    },
-    {
-        "@timestamp": "2006-09-08T04:23:07.000Z",
-        "event.action": "TCP_HIT",
-        "event.code": "GET",
-        "event.dataset": "squid.log",
-        "event.module": "squid",
-        "event.original": "1157689387.830      1 10.105.21.199 TCP_HIT/200 898 GET http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js badeyek NONE/- application/x-javascript",
-        "file.name": "yahoo_2.0.0-b4.js",
-        "fileset.name": "log",
-        "input.type": "log",
-        "log.offset": 15231,
-        "observer.product": "Proxy",
-        "observer.type": "Proxies",
-        "observer.vendor": "Squid",
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5638,12 +6522,74 @@
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
+        "rsa.network.domain": "us.js1.yimg.com",
+        "rsa.time.duration_time": 80,
+        "rsa.time.event_time": "2006-09-08T04:23:07.000Z",
+        "rsa.time.event_time_str": "1157689387",
+        "rsa.web.alias_host": "us.js1.yimg.com",
+        "server.domain": "us.js1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.js1",
+        "server.top_level_domain": "com",
+        "service.type": "squid",
+        "source.bytes": 68733,
+        "source.ip": [
+            "10.105.21.199"
+        ],
+        "tags": [
+            "squid.log",
+            "forwarded"
+        ],
+        "url.domain": "us.js1.yimg.com",
+        "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.js1",
+        "url.top_level_domain": "com",
+        "user.name": "badeyek"
+    },
+    {
+        "@timestamp": "2006-09-08T04:23:07.000Z",
+        "event.action": "TCP_HIT",
+        "event.code": "GET",
+        "event.dataset": "squid.log",
+        "event.module": "squid",
+        "event.original": "1157689387.830      1 10.105.21.199 TCP_HIT/200 898 GET http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js badeyek NONE/- application/x-javascript",
+        "file.name": "yahoo_2.0.0-b4.js",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 15231,
+        "observer.product": "Proxy",
+        "observer.type": "Proxies",
+        "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.js2.yimg.com"
+        ],
+        "related.ip": [
+            "10.105.21.199"
+        ],
+        "related.user": [
+            "badeyek"
+        ],
+        "rsa.internal.hcode": "NONE",
+        "rsa.internal.messageid": "GET",
+        "rsa.investigations.ec_activity": "Request",
+        "rsa.investigations.ec_subject": "NetworkComm",
+        "rsa.investigations.ec_theme": "ALM",
+        "rsa.misc.action": [
+            "TCP_HIT",
+            "GET"
+        ],
+        "rsa.misc.content_type": "application/x-javascript",
+        "rsa.misc.result_code": "200",
         "rsa.network.domain": "us.js2.yimg.com",
         "rsa.time.duration_time": 1,
         "rsa.time.event_time": "2006-09-08T04:23:07.000Z",
         "rsa.time.event_time_str": "1157689387",
         "rsa.web.alias_host": "us.js2.yimg.com",
         "server.domain": "us.js2.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.js2",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 898,
         "source.ip": [
@@ -5655,6 +6601,9 @@
         ],
         "url.domain": "us.js2.yimg.com",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.js2",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     },
     {
@@ -5671,6 +6620,9 @@
         "observer.product": "Proxy",
         "observer.type": "Proxies",
         "observer.vendor": "Squid",
+        "related.hosts": [
+            "us.i1.yimg.com"
+        ],
         "related.ip": [
             "10.105.21.199"
         ],
@@ -5694,6 +6646,9 @@
         "rsa.time.event_time_str": "1157689387",
         "rsa.web.alias_host": "us.i1.yimg.com",
         "server.domain": "us.i1.yimg.com",
+        "server.registered_domain": "yimg.com",
+        "server.subdomain": "us.i1",
+        "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 26803,
         "source.ip": [
@@ -5705,6 +6660,9 @@
         ],
         "url.domain": "us.i1.yimg.com",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/pim/dclient/d/img/liam_ball_1.gif",
+        "url.registered_domain": "yimg.com",
+        "url.subdomain": "us.i1",
+        "url.top_level_domain": "com",
         "user.name": "badeyek"
     }
 ]

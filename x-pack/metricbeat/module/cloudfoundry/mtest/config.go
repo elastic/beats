@@ -7,6 +7,7 @@ package mtest
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
 )
 
@@ -18,4 +19,9 @@ func GetConfig(t *testing.T, metricset string) map[string]interface{} {
 	config["metricsets"] = []string{metricset}
 
 	return config
+}
+
+// CleanFields removes fields that can contain data of real deployments
+func CleanFields(e beat.Event) {
+	e.Fields.Delete("cloudfoundry.tags.system_domain")
 }

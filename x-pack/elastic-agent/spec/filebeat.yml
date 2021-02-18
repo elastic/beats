@@ -59,12 +59,13 @@ rules:
     selector: inputs
     key: type
     values:
-    - awscloudwatch
-    - azureeventhub
+    - aws-cloudwatch
+    - aws-s3
+    - azure-eventhub
     - cloudfoundry
     - container
     - docker
-    - googlepubsub
+    - gcp-pubsub
     - http_endpoint
     - httpjson
     - kafka
@@ -73,7 +74,6 @@ rules:
     - netflow
     - o365audit
     - redis
-    - s3
     - stdin
     - syslog
     - tcp
@@ -87,6 +87,8 @@ rules:
     values:
     - true
 
+- inject_agent_info: {}
+
 - copy:
     from: inputs
     to: filebeat
@@ -96,5 +98,5 @@ rules:
     - filebeat
     - output
     - keystore
-when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

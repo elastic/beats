@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -243,6 +244,13 @@ func TestParseAndCreateEvent(t *testing.T) {
 			assert.Equal(t, metadata.Truncated, event.Meta["truncated"])
 		})
 	}
+}
+
+func TestNewInputDone(t *testing.T) {
+	config := common.MapStr{
+		"protocol.tcp.host": "localhost:9000",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
 
 func dummyMetadata() inputsource.NetworkMetadata {

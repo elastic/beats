@@ -7,6 +7,7 @@
         "destination.as.organization.name": "BHARTI Airtel Ltd.",
         "destination.geo.continent_name": "Asia",
         "destination.geo.country_iso_code": "IN",
+        "destination.geo.country_name": "India",
         "destination.geo.location.lat": 20.0,
         "destination.geo.location.lon": 77.0,
         "destination.ip": "182.79.221.19",
@@ -37,6 +38,9 @@
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.47.71",
             "182.79.221.19"
@@ -78,6 +82,7 @@
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.4043,
         "destination.geo.location.lon": -122.0748,
         "destination.geo.region_iso_code": "US-CA",
@@ -112,6 +117,9 @@
         "observer.serial_number": "S110000E28BA631",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "5.5.5.15",
             "216.58.197.44"
@@ -134,6 +142,7 @@
         "source.as.organization.name": "Telefonica Germany",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 51.2993,
         "source.geo.location.lon": 9.491,
         "source.ip": "5.5.5.15",
@@ -153,6 +162,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "74.125.130.188",
@@ -185,6 +195,9 @@
         "observer.serial_number": "S110016E28BA631",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "5.5.5.15",
             "74.125.130.188"
@@ -213,6 +226,7 @@
         "source.as.organization.name": "Telefonica Germany",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 51.2993,
         "source.geo.location.lon": 9.491,
         "source.ip": "5.5.5.15",
@@ -231,6 +245,7 @@
         "destination.geo.city_name": "Dublin",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IE",
+        "destination.geo.country_name": "Ireland",
         "destination.geo.location.lat": 53.3338,
         "destination.geo.location.lon": -6.2488,
         "destination.geo.region_iso_code": "IE-L",
@@ -264,6 +279,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.34.10",
             "13.79.168.201"
@@ -302,6 +320,7 @@
         "destination.geo.city_name": "Washington",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.7095,
         "destination.geo.location.lon": -78.1539,
         "destination.geo.region_iso_code": "US-VA",
@@ -337,6 +356,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.34.15",
             "40.90.137.127"
@@ -375,6 +397,7 @@
         "destination.geo.city_name": "Bratislava",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SK",
+        "destination.geo.country_name": "Slovakia",
         "destination.geo.location.lat": 48.15,
         "destination.geo.location.lon": 17.1078,
         "destination.geo.region_iso_code": "SK-BL",
@@ -408,6 +431,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.34.15",
             "91.228.167.133"
@@ -463,6 +489,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.108.108.49"
         ],
@@ -498,6 +527,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "64.233.189.147",
@@ -528,6 +558,9 @@
         "observer.serial_number": "C01001K234RXPA1",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "192.168.73.220",
             "64.233.189.147"
@@ -569,6 +602,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "64.233.188.94",
@@ -599,6 +633,9 @@
         "observer.serial_number": "C01001K234RXPA1",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "192.168.73.220",
             "64.233.188.94"

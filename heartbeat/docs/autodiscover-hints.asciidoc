@@ -84,7 +84,7 @@ container to have an TCP check.
 -----
 annotations:
   co.elastic.monitor/type: http
-  co.elastic.monitor/hosts: ${data.host}:8080/healtlz
+  co.elastic.monitor/hosts: ${data.host}:8080/healthz
   co.elastic.monitor/schedule: "@every 5s"
   co.elastic.monitor.sidecar/type: tcp
   co.elastic.monitor.sidecar/hosts: ${data.host}:8081
@@ -101,7 +101,7 @@ Annotations without numeric prefixes would default into a single monitor configu
 -------------------------------------------------------------------------------------
 annotations:
   co.elastic.monitor/type: http
-  co.elastic.monitor/hosts: ${data.host}:8080/healtlz
+  co.elastic.monitor/hosts: ${data.host}:8080/healthz
   co.elastic.monitor/schedule: "@every 5s"
   co.elastic.monitor/1.type: tcp
   co.elastic.monitor/1.hosts: ${data.host}:8080

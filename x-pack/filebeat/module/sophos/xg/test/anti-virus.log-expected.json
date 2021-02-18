@@ -10,6 +10,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6348,
         "destination.geo.location.lon": -122.3451,
         "destination.geo.region_iso_code": "US-WA",
@@ -45,6 +46,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.93"
@@ -87,6 +91,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6348,
         "destination.geo.location.lon": -122.3451,
         "destination.geo.region_iso_code": "US-WA",
@@ -122,6 +127,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.18"
@@ -163,6 +171,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "South America",
         "destination.geo.country_iso_code": "UY",
+        "destination.geo.country_name": "Uruguay",
         "destination.geo.location.lat": -33.0,
         "destination.geo.location.lon": -56.0,
         "destination.ip": "186.8.209.194",
@@ -196,6 +205,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "82.165.194.211",
             "186.8.209.194"
@@ -225,6 +237,7 @@
         "source.bytes": 0,
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 51.2993,
         "source.geo.location.lon": 9.491,
         "source.ip": "82.165.194.211",
@@ -246,6 +259,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "185.7.209.194",
@@ -279,6 +293,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "23.254.247.78",
             "185.7.209.194"
@@ -309,6 +326,7 @@
         "source.geo.city_name": "Seattle",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 47.4902,
         "source.geo.location.lon": -122.3004,
         "source.geo.region_iso_code": "US-WA",
@@ -359,6 +377,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.16.121",
             "10.198.234.240"
@@ -430,6 +451,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.16.121",
             "10.198.234.240"
@@ -503,6 +527,9 @@
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.146.13.49",
             "10.8.142.181"
@@ -568,6 +595,9 @@
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.146.13.49",
             "10.8.142.181"

@@ -7,7 +7,6 @@
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
-            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -60,13 +59,13 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
-            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -118,13 +117,13 @@
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
         "destination.packets": 1,
         "destination.port": 53,
         "event.category": [
-            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",
@@ -157,6 +156,7 @@
         "source.bytes": 103,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "4.4.2.2",
@@ -180,7 +180,6 @@
         "destination.ip": "198.51.100.249",
         "destination.packets": 0,
         "event.category": [
-            "network",
             "network"
         ],
         "event.dataset": "zeek.connection",

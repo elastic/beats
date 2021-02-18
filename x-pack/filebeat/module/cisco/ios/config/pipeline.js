@@ -166,9 +166,6 @@ var ciscoIOS = (function() {
             {from: "source.port", type: "long"},
             {from: "source.packets", type: "long"},
             {from: "source.packets", to: "network.packets", type: "long"},
-            {from: "icmp.type", type: "long"},
-            {from: "icmp.code", type: "long"},
-            {from: "igmp.type", type: "long"},
         ],
         ignore_missing: true,
     }).Run;

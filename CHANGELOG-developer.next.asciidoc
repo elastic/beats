@@ -52,11 +52,13 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Replace `ACKCount`, `ACKEvents`, and `ACKLastEvent` callbacks with `ACKHandler` and interface in `beat.ClientConfig`. {pull}19632[19632]
 - Remove global ACK handler support via `SetACKHandler` from publisher pipeline. {pull}19632[19632]
 - Make implementing `Close` required for `reader.Reader` interfaces. {pull}20455[20455]
+- Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 
 ==== Bugfixes
 
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
+- Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
 
 ==== Added
 
@@ -100,3 +102,10 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Added SQL helper that can be used from any Metricbeat module {pull}18955[18955]
 - Update Go version to 1.14.4. {pull}19753[19753]
 - Update Go version to 1.14.7. {pull}20508[20508]
+- Add packaging for docker image based on UBI minimal 8. {pull}20576[20576]
+- Make the mage binary used by the build process in the docker container to be statically compiled. {pull}20827[20827]
+- Add Pensando distributed firewall module. {pull}21063[21063]
+- Update ecszap to v0.3.0 for using ECS 1.6.0 in logs {pull}22267[22267]
+- Add support for customized monitoring API. {pull}22605[22605]
+- Update Go version to 1.15.7. {pull}22495[22495]
+- Update Go version to 1.15.8. {pull}23955[23955]

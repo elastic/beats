@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
 
@@ -36,8 +37,8 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(_ context.Context, programName, version, installDir string) error {
-	artifactPath, err := artifact.GetArtifactPath(programName, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
+func (i *Installer) Install(_ context.Context, spec program.Spec, version, installDir string) error {
+	artifactPath, err := artifact.GetArtifactPath(spec, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
 	}
@@ -102,14 +103,18 @@ func (i *Installer) unzip(artifactPath string) error {
 				return err
 			}
 			defer func() {
-				if cerr := f.Close(); cerr != nil {
-					err = multierror.Append(err, cerr)
+				if closeErr := f.Close(); closeErr != nil {
+					err = multierror.Append(err, closeErr)
 				}
 			}()
 
 			if _, err = io.Copy(f, rc); err != nil {
 				return err
 			}
+
+			// sometimes we try executing binary too fast and run into text file busy after unpacking
+			// syncing prevents this
+			f.Sync()
 		}
 		return nil
 	}

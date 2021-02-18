@@ -1,6 +1,9 @@
 import argparse
 from collections import OrderedDict
+from functools import lru_cache
 import os
+import re
+import requests
 
 import yaml
 
@@ -20,11 +23,24 @@ def document_fields(output, section, sections, path):
         output.write("[float]\n")
 
     if "description" in section:
-        if "anchor" in section:
+        if "anchor" in section and section["name"] == "ECS":
             output.write("== {} fields\n\n".format(section["name"]))
+            output.write("""
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
+""")
+        elif "anchor" in section:
+            output.write("== {} fields\n\n".format(section["name"]))
+            output.write("{}\n\n".format(section["description"]))
         else:
             output.write("=== {}\n\n".format(section["name"]))
-        output.write("{}\n\n".format(section["description"]))
+            output.write("{}\n\n".format(section["description"]))
 
     if "fields" not in section or not section["fields"]:
         return
@@ -70,6 +86,12 @@ def document_field(output, field, field_path):
     if "path" in field:
         output.write("alias to: {}\n\n".format(field["path"]))
 
+    # For Apm-Server docs only
+    # Assign an ECS badge for ECS fields
+    if beat_title == "Apm-Server":
+        if field_path in ecs_fields():
+            output.write("{yes-icon} {ecs-ref}[ECS] field.\n\n")
+
     if "index" in field:
         if not field["index"]:
             output.write("{}\n\n".format("Field is not indexed."))
@@ -84,6 +106,19 @@ def document_field(output, field, field_path):
         for subfield in field["multi_fields"]:
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
+
+
+@lru_cache(maxsize=None)
+def ecs_fields():
+    """
+    Fetch flattened ECS fields based on ECS 1.6.0 spec
+    The result of this function is cached
+    """
+    url = "https://raw.githubusercontent.com/elastic/ecs/v1.6.0/generated/ecs/ecs_flat.yml"
+    resp = requests.get(url)
+    if resp.status_code != 200:
+        raise ValueError(resp.content)
+    return yaml.load(resp.content, Loader=yaml.FullLoader)
 
 
 def fields_to_asciidoc(input, output, beat):
@@ -106,7 +141,7 @@ grouped in the following categories:
 
 """.format(**dict))
 
-    docs = yaml.load(input)
+    docs = yaml.load(input, Loader=yaml.FullLoader)
 
     # fields file is empty
     if docs is None:

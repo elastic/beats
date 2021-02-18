@@ -37,7 +37,7 @@ const gigabyte = 1 << 30
 
 var (
 	benchTest    = flag.Bool("benchtest", false, "Run benchmarks for the eventlog package.")
-	injectAmount = flag.Int("inject", 1E6, "Number of events to inject before running benchmarks.")
+	injectAmount = flag.Int("inject", 1e6, "Number of events to inject before running benchmarks.")
 )
 
 // TestBenchmarkRead benchmarks each event log reader implementation with
@@ -57,10 +57,7 @@ func TestBenchmarkRead(t *testing.T) {
 
 	// Publish test messages:
 	for i := 0; i < *injectAmount; i++ {
-		err := writer.Report(eventlog.Info, uint32(rand.Int63()%1000), []string{strconv.Itoa(i) + " " + randomSentence(256)})
-		if err != nil {
-			t.Fatal(err)
-		}
+		safeWriteEvent(t, writer, eventlog.Info, uint32(rand.Int63()%1000), []string{strconv.Itoa(i) + " " + randomSentence(256)})
 	}
 
 	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {

@@ -25,6 +25,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 0,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "205.251.233.182",
         "source.as.number": 16509,
@@ -32,6 +35,7 @@
         "source.geo.city_name": "Boardman",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 45.8491,
         "source.geo.location.lon": -119.7143,
         "source.geo.region_iso_code": "US-OR",
@@ -91,6 +95,9 @@
         "fileset.name": "cloudtrail",
         "input.type": "log",
         "log.offset": 766,
+        "related.user": [
+            "Alice"
+        ],
         "service.type": "aws",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

@@ -11,6 +11,9 @@
         "message": "Stopped target Basic System.",
         "process.name": "systemd",
         "process.pid": 4179,
+        "related.hosts": [
+            "linux-sqrz"
+        ],
         "service.type": "system"
     },
     {
@@ -25,6 +28,9 @@
         "message": "Stopped target Paths.",
         "process.name": "systemd",
         "process.pid": 4179,
+        "related.hosts": [
+            "linux-sqrz"
+        ],
         "service.type": "system"
     }
 ]

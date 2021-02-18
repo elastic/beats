@@ -4,7 +4,7 @@
 {es} uses {ref}/indices-templates.html[index templates] to define:
 
 * Settings that control the behavior of your indices. The settings include the
-lifecycle policy used to manage indices as they grow and age. 
+lifecycle policy used to manage indices as they grow and age.
 * Mappings that determine how fields are analyzed. Each mapping sets the
 {ref}/mapping-types.html[{es} datatype] to use for a specific data field.
 
@@ -17,7 +17,7 @@ it's not overwritten unless you configure {beatname_uc} to do so.
 ifndef::no-output-logstash[]
 NOTE: A connection to {es} is required to load the index template. If
 the output is not {es} (or {ess}), you must
-<<load-template-manually,load the template manually>>. 
+<<load-template-manually,load the template manually>>.
 endif::[]
 
 This page shows how to change the default template loading behavior to:
@@ -47,6 +47,10 @@ If the template already exists, it’s not overwritten unless you configure
 [float]
 [[overwrite-template]]
 === Overwrite an existing index template
+
+WARNING: Do not enable this option for more than one instance of {beatname_uc}. If you start
+multiple instances at the same time, it can overload your {es} with too many
+template update requests.
 
 To overwrite a template that's already loaded into {es}, set:
 
@@ -83,9 +87,10 @@ The examples here assume that Logstash output is enabled.
 endif::[]
 You can omit the `-E` flags if {es} output is already enabled.
 
-
+ifndef::apm-server[]
 If you are connecting to a secured {es} cluster, make sure you've
 configured credentials as described in the <<{beatname_lc}-installation-configuration>>.
+endif::[]
 
 If the host running {beatname_uc} does not have direct connectivity to
 {es}, see <<load-template-manually-alternate>>.

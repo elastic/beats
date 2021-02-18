@@ -105,7 +105,7 @@ class Test(BaseTest):
 
         try:
             self.es.indices.delete(index=self.index_name)
-        except:
+        except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
@@ -131,22 +131,29 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
 
         output_path = os.path.join(self.working_dir)
-        output = open(os.path.join(output_path, "output.log"), "ab")
-        output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
+        # Runs inside a with block to ensure file is closed afterwards
+        with open(os.path.join(output_path, "output.log"), "ab") as output:
+            output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
 
-        # Use a fixed timezone so results don't vary depending on the environment
-        # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
-        # this can happen because UTC uses to be the default timezone in date parsers when no other
-        # timezone is specified.
-        local_env = os.environ.copy()
-        local_env["TZ"] = 'Etc/GMT+2'
+            # Use a fixed timezone so results don't vary depending on the environment
+            # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
+            # this can happen because UTC uses to be the default timezone in date parsers when no other
+            # timezone is specified.
+            local_env = os.environ.copy()
+            local_env["TZ"] = 'Etc/GMT+2'
 
-        subprocess.Popen(cmd,
-                         env=local_env,
-                         stdin=None,
-                         stdout=output,
-                         stderr=subprocess.STDOUT,
-                         bufsize=0).wait()
+            subprocess.Popen(cmd,
+                             env=local_env,
+                             stdin=None,
+                             stdout=output,
+                             stderr=subprocess.STDOUT,
+                             bufsize=0).wait()
+
+        # List of errors to check in filebeat output logs
+        errors = ["Error loading pipeline for fileset"]
+        # Checks if the output of filebeat includes errors
+        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
+        assert contains_error is False, "Error found in log:{}".format(error_line)
 
         # Make sure index exists
         self.wait_until(lambda: self.es.indices.exists(self.index_name))
@@ -226,21 +233,29 @@ def clean_keys(obj):
     # datasets for which @timestamp is removed due to date missing
     remove_timestamp = {
         "activemq.audit",
+        "barracuda.spamfirewall",
         "barracuda.waf",
         "bluecoat.director",
         "cef.log",
         "cisco.asa",
         "cisco.ios",
+        "citrix.netscaler",
+        "cyberark.corepas",
         "cylance.protect",
+        "f5.bigipafm",
         "fortinet.clientendpoint",
         "haproxy.log",
         "icinga.startup",
         "imperva.securesphere",
         "infoblox.nios",
         "iptables.log",
+        "juniper.junos",
+        "juniper.netscreen",
         "netscout.sightline",
-        "rapid7.nexpose",
+        "proofpoint.emailsecurity",
         "redis.log",
+        "snort.log",
+        "symantec.endpointprotection",
         "system.auth",
         "system.syslog",
         "microsoft.defender_atp",
@@ -254,6 +269,12 @@ def clean_keys(obj):
         "gsuite.login",
         "gsuite.saml",
         "gsuite.user_accounts",
+        "zoom.webhook",
+        "threatintel.otx",
+        "threatintel.abuseurl",
+        "threatintel.abusemalware",
+        "threatintel.anomali",
+        "snyk.vulnerabilities"
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {
@@ -295,6 +316,15 @@ def clean_keys(obj):
 def delete_key(obj, key):
     if key in obj:
         del obj[key]
+
+
+def file_contains(filepath, strings):
+    with open(filepath, 'r') as file:
+        for line in file:
+            for string in strings:
+                if string in line:
+                    return True, line
+    return False, None
 
 
 def pretty_json(obj):

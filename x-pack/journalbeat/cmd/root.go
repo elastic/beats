@@ -5,13 +5,17 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/journalbeat/cmd"
+	journalbeatCmd "github.com/elastic/beats/v7/journalbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 )
 
 // RootCmd to handle beats cli
-var RootCmd = cmd.RootCmd
+var RootCmd *cmd.BeatsRootCmd
 
 func init() {
-	xpackcmd.AddXPack(RootCmd, cmd.Name)
+	settings := journalbeatCmd.JournalbeatSettings()
+	settings.ElasticLicensed = true
+	RootCmd = journalbeatCmd.Initialize(settings)
+	xpackcmd.AddXPack(RootCmd, journalbeatCmd.Name)
 }

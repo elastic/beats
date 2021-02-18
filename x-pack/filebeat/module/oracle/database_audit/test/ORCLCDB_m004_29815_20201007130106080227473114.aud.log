@@ -1,0 +1,35 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_m004_29815_20201007130106080227473114.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 50
+Unix process pid: 29815, image: oracle@testlab.local (M004)
+
+Wed Oct  7 13:01:06 2020 -04:00
+LENGTH : '447'
+ACTION :[205] 'BEGIN
+          sys.prvt_hdm.auto_execute(
+            db_id => :bind_dbid,
+            inst_id => :bind_inst,
+            end_snap => :bind_snap,
+            time_left_in_secs => :bind_time);
+        END;'
+DATABASE USER:[1] '/'
+PRIVILEGE :[4] 'NONE'
+CLIENT USER:[0] ''
+CLIENT TERMINAL:[7] 'UNKNOWN'
+STATUS:[1] '0'
+DBID:[10] '2824230686'
+SESSIONID:[1] '0'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '47'
+

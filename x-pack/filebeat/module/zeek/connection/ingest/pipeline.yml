@@ -30,18 +30,14 @@ processors:
 - script:
     source: if (ctx.zeek.connection.local_resp) ctx.tags.add("local_resp");
     if: ctx.zeek.connection.local_resp != null
-- set:
-    field: source.ip
-    value: '{{source.address}}'
 - append:
     field: related.ip
-    value: '{{source.address}}'
-- set:
-    field: destination.ip
-    value: '{{destination.address}}'
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
 - append:
     field: related.ip
-    value: '{{destination.address}}'
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
 - script:
     source: ctx.network.packets = ctx.source.packets + ctx.destination.packets
     ignore_failure: true
@@ -49,19 +45,30 @@ processors:
     source: ctx.network.bytes = ctx.source.bytes + ctx.destination.bytes
     ignore_failure: true
 - script:
-    source: >-
-      if (ctx?.zeek?.connection?.local_orig == true) {
-        if (ctx?.zeek?.connection?.local_resp == true) {
-          ctx.network.direction = "internal";
-        } else {
-          ctx.network.direction = "outbound";
-        }
-      } else {
-        if (ctx?.zeek?.connection?.local_resp == true) {
-          ctx.network.direction = "inbound";
-        } else {
-          ctx.network.direction = "external";
-        }
+    source: |-
+      if (ctx?.zeek?.connection?.local_orig == null ||
+          ctx?.zeek?.connection?.local_resp == null) {
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "internal";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == true &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "outbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == true) {
+        ctx.network.direction = "inbound";
+        return;
+      }
+      if (ctx.zeek.connection.local_orig == false &&
+          ctx.zeek.connection.local_resp == false) {
+        ctx.network.direction = "external";
+        return;
       }
 - geoip:
     field: destination.ip
@@ -101,12 +108,6 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
-- set:
-    field: event.kind
-    value: event
-- append:
-    field: event.category
-    value: network
 - script:
     params:
       S0:
@@ -125,7 +126,7 @@ processors:
           - connection
           - start
           - end
-      REG:
+      REJ:
         conn_str: "Connection attempt rejected."
         types:
           - connection

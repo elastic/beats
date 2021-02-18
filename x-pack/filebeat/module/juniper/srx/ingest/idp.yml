@@ -1,0 +1,287 @@
+description: Pipeline for parsing junipersrx firewall logs (idp pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx.juniper?.srx?.tag != null"
+- append:
+    field: event.category
+    value: network
+- set:
+    field: event.kind
+    value: alert
+    if: '["IDP_ATTACK_LOG_EVENT", "IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_ATTACK_LOG_EVENT_LS", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+- append:
+    field: event.category
+    value: intrusion_detection
+    if: '["IDP_ATTACK_LOG_EVENT", "IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_ATTACK_LOG_EVENT_LS", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+- append:
+    field: event.type
+    value:
+      - info
+      - denied
+      - connection
+    if: '["IDP_ATTACK_LOG_EVENT", "IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_ATTACK_LOG_EVENT_LS", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+- append:
+    field: event.type
+    value:
+     - allowed
+     - connection
+    if: '!["IDP_ATTACK_LOG_EVENT", "IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_ATTACK_LOG_EVENT_LS", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+- set:
+    field: event.action
+    value: application_ddos
+    if: '["IDP_APPDDOS_APP_STATE_EVENT", "IDP_APPDDOS_APP_ATTACK_EVENT", "IDP_APPDDOS_APP_STATE_EVENT_LS", "IDP_APPDDOS_APP_ATTACK_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+- set:
+    field: event.action
+    value: security_threat
+    if: '["IDP_ATTACK_LOG_EVENT", "IDP_ATTACK_LOG_EVENT_LS"].contains(ctx.juniper?.srx?.tag)'
+
+
+####################################
+## ECS Server/Destination Mapping ##
+####################################
+- rename:
+    field: juniper.srx.destination_address
+    target_field: destination.ip
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.destination_address != null"
+- set:
+    field: server.ip
+    value: '{{destination.ip}}'
+    if: "ctx.destination?.ip != null"
+- rename:
+    field: juniper.srx.nat_destination_address
+    target_field: destination.nat.ip
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.nat_destination_address != null"
+- convert:
+    field: juniper.srx.destination_port
+    target_field: destination.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.destination_port != null"
+- set:
+    field: server.port
+    value: '{{destination.port}}'
+    if: "ctx.destination?.port != null"
+- convert:
+    field: server.port
+    target_field: server.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.server?.port != null"
+- convert:
+    field: juniper.srx.nat_destination_port
+    target_field: destination.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx['nat_destination_port'] != null"
+- set:
+    field: server.nat.port
+    value: '{{destination.nat.port}}'
+    if: "ctx.destination?.nat?.port != null"
+- convert:
+    field: server.nat.port
+    target_field: server.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.server?.nat?.port != null"
+- convert:
+    field: juniper.srx.inbound_bytes
+    target_field: destination.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.inbound_bytes != null"
+- set:
+    field: server.bytes
+    value: '{{destination.bytes}}'
+    if: "ctx.destination?.bytes != null"
+- convert:
+    field: server.bytes
+    target_field: server.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.server?.bytes != null"
+- convert:
+    field: juniper.srx.inbound_packets
+    target_field: destination.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.inbound_packets !=null"
+- set:
+    field: server.packets
+    value: '{{destination.packets}}'
+    if: "ctx.destination?.packets != null"
+- convert:
+    field: server.packets
+    target_field: server.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.server?.packets != null"
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
+- rename:
+    field: juniper.srx.source_address
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.source_address != null"
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    if: "ctx.source?.ip != null"
+- rename:
+    field: juniper.srx.nat_source_address
+    target_field: source.nat.ip
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.nat_source_address != null"
+- rename:
+    field: juniper.srx.sourceip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.sourceip != null"
+- convert:
+    field: juniper.srx.source_port
+    target_field: source.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.source_port != null"
+- set:
+    field: client.port
+    value: '{{source.port}}'
+    if: "ctx.source?.port != null"
+- convert:
+    field: client.port
+    target_field: client.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.port != null"
+- convert:
+    field: juniper.srx.nat_source_port
+    target_field: source.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.nat_source_port != null"
+- set:
+    field: client.nat.port
+    value: '{{source.nat.port}}'
+    if: "ctx.source?.nat?.port != null"
+- convert:
+    field: client.nat.port
+    target_field: client.nat.port
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.nat?.port != null"
+- convert:
+    field: juniper.srx.outbound_bytes
+    target_field: source.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.outbound_bytes != null"
+- set:
+    field: client.bytes
+    value: '{{source.bytes}}'
+    if: "ctx.source?.bytes != null"
+- convert:
+    field: client.bytes
+    target_field: client.bytes
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.bytes != null"
+- convert:
+    field: juniper.srx.outbound_packets
+    target_field: source.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.outbound_packets != null"
+- set:
+    field: client.packets
+    value: '{{source.packets}}'
+    if: "ctx.source?.packets != null"
+- convert:
+    field: client.packets
+    target_field: client.packets
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.client?.packets != null"
+- rename:
+    field: juniper.srx.username
+    target_field: source.user.name
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.username != null"
+
+######################
+## ECS Rule Mapping ##
+######################
+- rename:
+    field: juniper.srx.rulebase_name
+    target_field: rule.name
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.rulebase_name != null"
+- rename:
+    field: juniper.srx.rule_name
+    target_field: rule.id
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.rule_name != null"
+
+#########################
+## ECS Network Mapping ##
+#########################
+- rename:
+    field: juniper.srx.protocol_name
+    target_field: network.protocol
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.protocol_name != null"
+
+#########################
+## ECS message Mapping ##
+#########################
+- rename:
+    field: juniper.srx.message
+    target_field: message
+    ignore_missing: true
+    if: "ctx.juniper?.srx?.message != null"
+
+#############
+## Cleanup ##
+#############
+- remove:
+    field:
+    - juniper.srx.destination_port
+    - juniper.srx.nat_destination_port
+    - juniper.srx.outbound_bytes
+    - juniper.srx.outbound_packets
+    - juniper.srx.source_port
+    - juniper.srx.nat_source_port
+    - juniper.srx.inbound_bytes
+    - juniper.srx.inbound_packets
+    ignore_missing: true
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

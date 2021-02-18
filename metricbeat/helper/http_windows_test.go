@@ -62,7 +62,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/",
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()
@@ -95,7 +95,7 @@ func TestOverNamedpipe(t *testing.T) {
 			SanitizedURI: "http://npipe/ok",
 		}
 
-		h, err := newHTTPFromConfig(cfg, "test", hostData)
+		h, err := NewHTTPFromConfig(cfg, hostData)
 		require.NoError(t, err)
 
 		r, err := h.FetchResponse()

@@ -1,11 +1,9 @@
+import metricbeat
 import os
 import pytest
 import redis
 import sys
 import unittest
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
-import metricbeat
 
 
 REDIS_FIELDS = metricbeat.COMMON_FIELDS + ["redis"]

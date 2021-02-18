@@ -1,0 +1,5 @@
+[role="exclude",id="whats-new"]
+== What's new in {beats} {minor-version}
+
+This page has moved. Please see {observability-guide}/whats-new.html[What's new
+in Observability {minor-version}].

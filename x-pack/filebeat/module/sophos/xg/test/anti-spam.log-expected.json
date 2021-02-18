@@ -32,6 +32,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.port": 0,
         "service.type": "sophos",
@@ -70,6 +73,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -103,6 +107,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -131,6 +138,7 @@
         "source.geo.city_name": "Miami",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 25.7806,
         "source.geo.location.lon": -80.1826,
         "source.geo.region_iso_code": "US-FL",
@@ -154,6 +162,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -189,6 +198,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -217,6 +229,7 @@
         "source.geo.city_name": "Cabreuva",
         "source.geo.continent_name": "South America",
         "source.geo.country_iso_code": "BR",
+        "source.geo.country_name": "Brazil",
         "source.geo.location.lat": -23.3149,
         "source.geo.location.lon": -47.0763,
         "source.geo.region_iso_code": "BR-SP",
@@ -240,6 +253,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -275,6 +289,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "server.bytes": 0,
         "server.ip": "185.8.209.194",
         "server.port": 25,
@@ -302,6 +319,7 @@
         "source.domain": "ELTOBGI.COM",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
         "source.geo.location.lat": 51.4964,
         "source.geo.location.lon": -0.1224,
         "source.ip": "77.72.3.56",
@@ -349,6 +367,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 25,
@@ -417,6 +438,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.234.240",
         "server.port": 25,
@@ -485,6 +509,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -551,6 +578,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.16.204",
         "server.port": 25,
@@ -618,6 +648,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -682,6 +715,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.17.121",
         "server.port": 25,
@@ -749,6 +785,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "server.bytes": 0,
         "server.ip": "10.198.233.61",
         "server.port": 110,

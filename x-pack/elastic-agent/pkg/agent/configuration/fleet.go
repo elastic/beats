@@ -18,11 +18,17 @@ type FleetAgentConfig struct {
 	Kibana       *kibana.Config        `config:"kibana" yaml:"kibana"`
 	Reporting    *fleetreporter.Config `config:"reporting" yaml:"reporting"`
 	Info         *AgentInfo            `config:"agent" yaml:"agent"`
+	Server       *FleetServerConfig    `config:"server" yaml:"server,omitempty"`
 }
 
 // Valid validates the required fields for accessing the API.
 func (e *FleetAgentConfig) Valid() error {
 	if e.Enabled {
+		if e.Server != nil && e.Server.Bootstrap {
+			// bootstrapping Fleet Server, checks below can be ignored
+			return nil
+		}
+
 		if len(e.AccessAPIKey) == 0 {
 			return errors.New("empty access token", errors.TypeConfig)
 		}

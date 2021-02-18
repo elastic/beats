@@ -41,6 +41,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	// set default resource type to indicate this is not the generic monitor metricset
+	ms.Client.Config.DefaultResourceType = defaultStorageAccountNamespace
 	// if no options are entered we will retrieve all the vm's from the entire subscription
 	if len(ms.Client.Config.Resources) == 0 {
 		ms.Client.Config.Resources = []azure.ResourceConfig{

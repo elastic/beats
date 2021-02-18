@@ -6,6 +6,7 @@ package application
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"io"
 	"io/ioutil"
@@ -49,12 +50,11 @@ func TestEnroll(t *testing.T) {
 	t.Run("fail to save is propagated", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -95,7 +95,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.Error(t, err)
 		},
 	))
@@ -103,12 +103,11 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll with TLS and save access api key in the store", withTLSServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
        "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -149,7 +148,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			config, err := readConfig(store.Content)
@@ -165,12 +164,11 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll when a slash is defined at the end of host", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -208,7 +206,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -226,12 +224,11 @@ func TestEnroll(t *testing.T) {
 	t.Run("successfully enroll without TLS and save access api key in the store", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`
 {
     "action": "created",
-    "success": true,
     "item": {
         "id": "a9328860-ec54-11e9-93c4-d72ab8a69391",
         "active": true,
@@ -269,7 +266,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -287,7 +284,7 @@ func TestEnroll(t *testing.T) {
 	t.Run("fail to enroll without TLS", withServer(
 		func(t *testing.T) *http.ServeMux {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/api/ingest_manager/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc("/api/fleet/agents/enroll", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`
 {
@@ -314,7 +311,7 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute()
+			err = cmd.Execute(context.Background())
 			require.Error(t, err)
 			require.False(t, store.Called)
 		},

@@ -90,6 +90,7 @@ func NewClient(
 		Kerberos:         s.Kerberos,
 		Proxy:            s.Proxy,
 		ProxyDisable:     s.ProxyDisable,
+		Observer:         s.Observer,
 		Parameters:       s.Parameters,
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,

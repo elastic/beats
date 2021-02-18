@@ -55,6 +55,11 @@
       type: long
       description: >
         The total number of of milliseconds spent doing I/Os.
+    
+    - name: io.ops
+      type: long
+      description: >
+        The total number of I/Os in progress.
 
     - name: iostat.read.request.merges_per_sec
       type: float

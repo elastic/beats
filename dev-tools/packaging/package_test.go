@@ -48,13 +48,15 @@ const (
 )
 
 var (
-	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml$`)
+	configFilePattern      = regexp.MustCompile(`.*beat\.yml$|apm-server\.yml|elastic-agent\.yml$`)
 	manifestFilePattern    = regexp.MustCompile(`manifest.yml`)
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
+
+	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -122,6 +124,7 @@ func checkRPM(t *testing.T, file string) {
 	checkModulesPresent(t, "/usr/share", p)
 	checkModulesDPresent(t, "/etc/", p)
 	checkMonitorsDPresent(t, "/etc", p)
+	checkLicensesPresent(t, "/usr/share", p)
 	checkSystemdUnitPermissions(t, p)
 	ensureNoBuildIDLinks(t, p)
 }
@@ -141,6 +144,7 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesPresent(t, "./usr/share", p)
 	checkModulesDPresent(t, "./etc/", p)
 	checkMonitorsDPresent(t, "./etc/", p)
+	checkLicensesPresent(t, "./usr/share", p)
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
@@ -160,6 +164,7 @@ func checkTar(t *testing.T, file string) {
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p, true)
+	checkLicensesPresent(t, "", p)
 }
 
 func checkZip(t *testing.T, file string) {
@@ -174,6 +179,7 @@ func checkZip(t *testing.T, file string) {
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
+	checkLicensesPresent(t, "", p)
 }
 
 func checkDocker(t *testing.T, file string) {
@@ -190,6 +196,7 @@ func checkDocker(t *testing.T, file string) {
 	checkManifestPermissionsWithMode(t, p, os.FileMode(0640))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
+	checkLicensesPresent(t, "licenses/", p)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -373,6 +380,22 @@ func checkMonitors(t *testing.T, name, prefix string, r *regexp.Regexp, p *packa
 	})
 }
 
+func checkLicensesPresent(t *testing.T, prefix string, p *packageFile) {
+	for _, licenseFile := range licenseFiles {
+		t.Run("License file "+licenseFile, func(t *testing.T) {
+			for _, entry := range p.Contents {
+				if strings.HasPrefix(entry.File, prefix) && strings.HasSuffix(entry.File, "/"+licenseFile) {
+					return
+				}
+			}
+			if prefix != "" {
+				t.Fatalf("not found under %s", prefix)
+			}
+			t.Fatal("not found")
+		})
+	}
+}
+
 func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	expectedMode := os.FileMode(0755)
 
@@ -402,7 +425,8 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 	if vendor != "Elastic" {
 		return
 	}
-	t.Run(fmt.Sprintf("%s labels", p.Name), func(t *testing.T) {
+
+	t.Run(fmt.Sprintf("%s license labels", p.Name), func(t *testing.T) {
 		expectedLicense := "Elastic License"
 		ossPrefix := strings.Join([]string{
 			info.Config.Labels["org.label-schema.name"],
@@ -412,8 +436,24 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
 			expectedLicense = "ASL 2.0"
 		}
-		if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
-			t.Errorf("unexpected license label: %s", license)
+		licenseLabels := []string{
+			"license",
+			"org.label-schema.license",
+		}
+		for _, licenseLabel := range licenseLabels {
+			if license, present := info.Config.Labels[licenseLabel]; !present || license != expectedLicense {
+				t.Errorf("unexpected license label %s: %s", licenseLabel, license)
+			}
+		}
+	})
+
+	t.Run(fmt.Sprintf("%s required labels", p.Name), func(t *testing.T) {
+		// From https://redhat-connect.gitbook.io/partner-guide-for-red-hat-openshift-and-container/program-on-boarding/technical-prerequisites
+		requiredLabels := []string{"name", "vendor", "version", "release", "summary", "description"}
+		for _, label := range requiredLabels {
+			if value, present := info.Config.Labels[label]; !present || value == "" {
+				t.Errorf("missing required label %s", label)
+			}
 		}
 	})
 }
@@ -656,6 +696,12 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 			// Check only files in working dir and entrypoint
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
 				p.Contents[name] = entry
+			}
+			// Add also licenses
+			for _, licenseFile := range licenseFiles {
+				if strings.Contains(name, licenseFile) {
+					p.Contents[name] = entry
+				}
 			}
 		}
 	}

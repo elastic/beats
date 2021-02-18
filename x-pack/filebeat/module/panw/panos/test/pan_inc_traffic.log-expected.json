@@ -13,6 +13,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -70,15 +71,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -111,6 +112,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -166,15 +168,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -207,6 +209,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -262,15 +265,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -304,6 +307,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -361,15 +365,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -403,6 +407,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -460,15 +465,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -501,6 +506,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -556,15 +562,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -597,6 +603,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -652,15 +659,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -694,6 +701,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -751,15 +759,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -793,6 +801,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -850,15 +859,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -892,6 +901,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -949,15 +959,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -991,6 +1001,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1048,15 +1059,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1090,6 +1101,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1147,15 +1159,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1189,6 +1201,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1246,15 +1259,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1288,6 +1301,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1345,15 +1359,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1387,6 +1401,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1444,15 +1459,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1486,6 +1501,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1543,15 +1559,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1585,6 +1601,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1642,15 +1659,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "malware-sites",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1684,6 +1701,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1741,15 +1759,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1783,6 +1801,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -1840,15 +1859,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1881,6 +1900,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -1936,15 +1956,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -1977,6 +1997,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -2032,15 +2053,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2074,6 +2095,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -2131,15 +2153,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2172,6 +2194,7 @@
         "destination.bytes": 98,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -2227,15 +2250,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2269,6 +2292,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -2326,15 +2350,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2368,6 +2392,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -2425,15 +2450,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "private-ip-addresses",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2467,6 +2492,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -2524,15 +2550,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2565,6 +2591,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -2620,15 +2647,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2661,6 +2688,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -2716,15 +2744,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2758,6 +2786,7 @@
         "destination.geo.city_name": "Westminster",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 33.7518,
         "destination.geo.location.lon": -117.9932,
         "destination.geo.region_iso_code": "US-CA",
@@ -2815,15 +2844,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "98.149.55.63",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2857,6 +2886,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -2914,15 +2944,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -2955,6 +2985,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -3010,15 +3041,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3052,6 +3083,7 @@
         "destination.geo.city_name": "Assago",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 45.4087,
         "destination.geo.location.lon": 9.1225,
         "destination.geo.region_iso_code": "IT-MI",
@@ -3109,15 +3141,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3151,6 +3183,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -3208,15 +3241,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3249,6 +3282,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -3304,15 +3338,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3345,6 +3379,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -3400,15 +3435,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3442,6 +3477,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -3499,15 +3535,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3541,6 +3577,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -3598,15 +3635,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3639,6 +3676,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -3694,15 +3732,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3735,6 +3773,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -3790,15 +3829,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -3830,6 +3869,7 @@
         "destination.bytes": 111,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -3884,11 +3924,12 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.100",
             "8.8.8.8",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.name": "rule1",
@@ -3920,6 +3961,7 @@
         "destination.bytes": 906,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 43.1479,
         "destination.geo.location.lon": 12.1097,
         "destination.ip": "62.211.68.12",
@@ -3975,15 +4017,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4016,6 +4058,7 @@
         "destination.geo.city_name": "Ashburn",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 39.0481,
         "destination.geo.location.lon": -77.4728,
         "destination.geo.region_iso_code": "US-VA",
@@ -4072,11 +4115,12 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-security",
         "related.ip": [
             "192.168.0.100",
             "50.19.102.116",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.name": "rule1",
@@ -4109,6 +4153,7 @@
         "destination.geo.city_name": "Washington",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.7095,
         "destination.geo.location.lon": -78.1539,
         "destination.geo.region_iso_code": "US-VA",
@@ -4166,15 +4211,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.19",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4208,6 +4253,7 @@
         "destination.geo.city_name": "Washington",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.7095,
         "destination.geo.location.lon": -78.1539,
         "destination.geo.region_iso_code": "US-VA",
@@ -4265,15 +4311,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.24",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4305,6 +4351,7 @@
         "destination.bytes": 141,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -4359,11 +4406,12 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.100",
             "8.8.8.8",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.name": "rule1",
@@ -4396,6 +4444,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -4453,15 +4502,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4494,6 +4543,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -4549,15 +4599,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4591,6 +4641,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -4648,15 +4699,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4689,6 +4740,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -4744,15 +4796,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4785,6 +4837,7 @@
         "destination.bytes": 316,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -4840,15 +4893,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4881,6 +4934,7 @@
         "destination.bytes": 121,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -4936,15 +4990,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -4977,6 +5031,7 @@
         "destination.bytes": 169,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -5032,15 +5087,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5073,6 +5128,7 @@
         "destination.bytes": 954,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 43.1479,
         "destination.geo.location.lon": 12.1097,
         "destination.ip": "62.211.68.12",
@@ -5128,15 +5184,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5170,6 +5226,7 @@
         "destination.geo.city_name": "Assago",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 45.4087,
         "destination.geo.location.lon": 9.1225,
         "destination.geo.region_iso_code": "IT-MI",
@@ -5227,15 +5284,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5269,6 +5326,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -5326,15 +5384,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "malware-sites",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5367,6 +5425,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -5422,15 +5481,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5464,6 +5523,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -5521,15 +5581,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5562,6 +5622,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -5617,15 +5678,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5658,6 +5719,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -5713,15 +5775,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5755,6 +5817,7 @@
         "destination.geo.city_name": "Washington",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 38.7095,
         "destination.geo.location.lon": -78.1539,
         "destination.geo.region_iso_code": "US-VA",
@@ -5812,15 +5875,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "65.55.223.31",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5854,6 +5917,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -5911,15 +5975,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -5952,6 +6016,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6007,15 +6072,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6048,6 +6113,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6103,15 +6169,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6144,6 +6210,7 @@
         "destination.bytes": 906,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 43.1479,
         "destination.geo.location.lon": 12.1097,
         "destination.ip": "62.211.68.12",
@@ -6199,15 +6266,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6240,6 +6307,7 @@
         "destination.bytes": 163,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6295,15 +6363,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6336,6 +6404,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6391,15 +6460,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6432,6 +6501,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6487,15 +6557,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6529,6 +6599,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -6586,15 +6657,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6627,6 +6698,7 @@
         "destination.bytes": 922,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 43.1479,
         "destination.geo.location.lon": 12.1097,
         "destination.ip": "62.211.68.12",
@@ -6682,15 +6754,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6724,6 +6796,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -6781,15 +6854,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6822,6 +6895,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6877,15 +6951,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -6918,6 +6992,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -6973,15 +7048,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7015,6 +7090,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -7072,15 +7148,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7113,6 +7189,7 @@
         "destination.bytes": 26786,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.5.1.1",
@@ -7168,15 +7245,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "not-resolved",
         "related.ip": [
             "192.168.0.2",
             "8.5.1.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7209,6 +7286,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -7264,15 +7342,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7305,6 +7383,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -7360,15 +7439,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7402,6 +7481,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -7459,15 +7539,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7549,15 +7629,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7591,6 +7671,7 @@
         "destination.geo.city_name": "Assago",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 45.4087,
         "destination.geo.location.lon": 9.1225,
         "destination.geo.region_iso_code": "IT-MI",
@@ -7648,15 +7729,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7690,6 +7771,7 @@
         "destination.geo.city_name": "Assago",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 45.4087,
         "destination.geo.location.lon": 9.1225,
         "destination.geo.region_iso_code": "IT-MI",
@@ -7747,15 +7829,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "search-engines",
         "related.ip": [
             "192.168.0.2",
             "212.48.10.58",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7837,15 +7919,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7927,15 +8009,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -7969,6 +8051,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -8026,15 +8109,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8067,6 +8150,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8122,15 +8206,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8163,6 +8247,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8218,15 +8303,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8260,6 +8345,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -8317,15 +8403,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8358,6 +8444,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8413,15 +8500,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8503,15 +8590,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8544,6 +8631,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8599,15 +8687,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8641,6 +8729,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -8698,15 +8787,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8739,6 +8828,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8794,15 +8884,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8835,6 +8925,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "205.171.2.25",
@@ -8890,15 +8981,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "205.171.2.25",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -8931,6 +9022,7 @@
         "destination.bytes": 906,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "IT",
+        "destination.geo.country_name": "Italy",
         "destination.geo.location.lat": 43.1479,
         "destination.geo.location.lon": 12.1097,
         "destination.ip": "62.211.68.12",
@@ -8986,15 +9078,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "entertainment-and-arts",
         "related.ip": [
             "192.168.0.2",
             "62.211.68.12",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9028,6 +9120,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9085,15 +9178,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9127,6 +9220,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9184,15 +9278,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9226,6 +9320,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9283,15 +9378,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9373,15 +9468,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "end",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "192.168.0.1",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9415,6 +9510,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9472,15 +9568,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9514,6 +9610,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9571,15 +9668,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",
@@ -9613,6 +9710,7 @@
         "destination.geo.city_name": "Fort Lauderdale",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 26.1792,
         "destination.geo.location.lon": -80.1749,
         "destination.geo.region_iso_code": "US-FL",
@@ -9670,15 +9768,15 @@
         "panw.panos.source.nat.ip": "0.0.0.0",
         "panw.panos.source.nat.port": 0,
         "panw.panos.source.zone": "trust",
+        "panw.panos.sub_type": "start",
+        "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "related.user": [
-            "crusher",
             "crusher"
         ],
         "rule.name": "rule1",

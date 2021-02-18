@@ -67,7 +67,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	namespace := "AWS/SQS"
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	for _, regionName := range m.MetricSet.RegionsList {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
@@ -174,9 +175,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Dura
 	return
 }
 
-func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema, accountName string, accountID string) (event mb.Event, err error) {
-	event = aws.InitEvent(regionName, accountName, accountID)
-
+func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, regionName string, schemaMetricFields s.Schema, accountName string, accountID string) (event mb.Event, err error) {
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
@@ -203,6 +202,7 @@ func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, que
 		return
 	}
 
+	event = aws.InitEvent(regionName, accountName, accountID, timestamp)
 	event.MetricSetFields = resultMetricSetFields
 	event.MetricSetFields.Put("queue.name", queueName)
 	return
@@ -212,7 +212,7 @@ func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDa
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
-		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields, accountName, accountID)
+		event, err := createEventPerQueue(metricDataResults, queueName, regionName, schemaRequestFields, accountName, accountID)
 		if err != nil {
 			event.Error = err
 			report.Event(event)

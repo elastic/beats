@@ -13,6 +13,7 @@
         "destination.geo.city_name": "Bratislava",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SK",
+        "destination.geo.country_name": "Slovakia",
         "destination.geo.location.lat": 48.15,
         "destination.geo.location.lon": 17.1078,
         "destination.geo.region_iso_code": "SK-BL",
@@ -59,6 +60,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.34.15",
             "91.228.167.86",
@@ -98,6 +102,7 @@
         "source.bytes": 459,
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7386,
         "source.geo.location.lon": 37.6068,
         "source.ip": "172.17.34.15",
@@ -125,6 +130,7 @@
         "destination.geo.city_name": "Bratislava",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "SK",
+        "destination.geo.country_name": "Slovakia",
         "destination.geo.location.lat": 48.15,
         "destination.geo.location.lon": 17.1078,
         "destination.geo.region_iso_code": "SK-BL",
@@ -171,6 +177,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.66.155",
             "91.228.165.117",
@@ -211,6 +220,7 @@
         "source.geo.city_name": "Saint-Prex",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "CH",
+        "source.geo.country_name": "Switzerland",
         "source.geo.location.lat": 46.4796,
         "source.geo.location.lon": 6.4599,
         "source.geo.region_iso_code": "CH-VD",
@@ -272,6 +282,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.113",
             "172.20.4.52"
@@ -355,6 +368,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.82.234.6",
             "192.168.0.1"
@@ -410,6 +426,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "185.7.209.207",
@@ -448,6 +465,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "51.77.56.9",
             "185.7.209.207"
@@ -481,6 +501,7 @@
         "source.geo.city_name": "Warsaw",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
+        "source.geo.country_name": "Poland",
         "source.geo.location.lat": 52.25,
         "source.geo.location.lon": 21.0,
         "source.geo.region_iso_code": "PL-14",
@@ -541,6 +562,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.17.35.101",
             "192.168.5.11"
@@ -630,6 +654,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.36.105",
             "10.84.234.14"
@@ -712,6 +739,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.82.234.9",
             "10.82.234.11"
@@ -799,6 +829,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.84.234.7",
             "172.16.34.50"
@@ -890,6 +923,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "192.168.1.254",
             "172.17.32.19"
@@ -977,6 +1013,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.17.35.119",
             "172.16.34.10"
@@ -1030,6 +1069,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1067,6 +1107,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "8.8.8.8"
@@ -1147,8 +1190,10 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
-            "0.0.0.0",
             "0.0.0.0"
         ],
         "rule.id": "0",
@@ -1228,6 +1273,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.38.184",
             "10.198.39.255"
@@ -1311,6 +1359,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.19",
             "10.198.32.48"
@@ -1389,6 +1440,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.23",
             "10.198.36.48"
@@ -1437,6 +1491,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -1475,6 +1530,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.12.19",
             "8.8.8.8"
@@ -1556,6 +1614,9 @@
         "observer.serial_number": "SFDemo-763180a",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "fe80::59f5:3ce8:c98e:5062",
             "ff02::1:2"
@@ -1636,6 +1697,9 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.57",
             "10.198.32.19"
@@ -1687,6 +1751,7 @@
         "destination.geo.city_name": "Richardson",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 32.9473,
         "destination.geo.location.lon": -96.7028,
         "destination.geo.region_iso_code": "US-TX",
@@ -1727,6 +1792,9 @@
         "observer.serial_number": "SFDemo-9a04c43",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.37.57",
             "72.163.4.185"

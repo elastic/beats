@@ -6,8 +6,14 @@ package application
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -21,12 +27,20 @@ type Application interface {
 	AgentInfo() *info.AgentInfo
 }
 
+type reexecManager interface {
+	ReExec(argOverrides ...string)
+}
+
+type upgraderControl interface {
+	SetUpgrader(upgrader *upgrade.Upgrader)
+}
+
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string) (Application, error) {
+func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, statusCtrl status.Controller, uc upgraderControl, agentInfo *info.AgentInfo) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
-	rawConfig, err := config.LoadYAML(pathConfigFile)
+	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, err
 	}
@@ -35,13 +49,17 @@ func New(log *logger.Logger, pathConfigFile string) (Application, error) {
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
 }
 
 func createApplication(
 	log *logger.Logger,
 	pathConfigFile string,
 	rawConfig *config.Config,
+	reexec reexecManager,
+	statusCtrl status.Controller,
+	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (Application, error) {
 	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
@@ -52,16 +70,74 @@ func createApplication(
 		return nil, err
 	}
 
-	if isStandalone(cfg.Fleet) {
+	if IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig)
+		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+	}
+
+	// not in standalone; both modes require reading the fleet.yml configuration file
+	var store storage.Store
+	store, cfg, err = mergeFleetConfig(rawConfig)
+
+	if IsFleetServerBootstrap(cfg.Fleet) {
+		log.Info("Agent is in Fleet Server bootstrap mode")
+		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo)
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, rawConfig)
+	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo)
 }
 
-// missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func isStandalone(cfg *configuration.FleetAgentConfig) bool {
+// IsStandalone decides based on missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
+func IsStandalone(cfg *configuration.FleetAgentConfig) bool {
 	return cfg == nil || !cfg.Enabled
+}
+
+// IsFleetServerBootstrap decides if Elastic Agent is started in bootstrap mode.
+func IsFleetServerBootstrap(cfg *configuration.FleetAgentConfig) bool {
+	return cfg != nil && cfg.Server != nil && cfg.Server.Bootstrap
+}
+
+func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {
+	path := info.AgentConfigFile()
+	store := storage.NewDiskStore(path)
+	reader, err := store.Load()
+	if err != nil {
+		return store, nil, errors.New(err, "could not initialize config store",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+	config, err := config.NewConfigFrom(reader)
+	if err != nil {
+		return store, nil, errors.New(err,
+			fmt.Sprintf("fail to read configuration %s for the elastic-agent", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	// merge local configuration and configuration persisted from fleet.
+	err = rawConfig.Merge(config)
+	if err != nil {
+		return store, nil, errors.New(err,
+			fmt.Sprintf("fail to merge configuration with %s for the elastic-agent", path),
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return store, nil, errors.New(err,
+			fmt.Sprintf("fail to unpack configuration from %s", path),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	if err := cfg.Fleet.Valid(); err != nil {
+		return store, nil, errors.New(err,
+			"fleet configuration is invalid",
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, path))
+	}
+
+	return store, cfg, nil
 }

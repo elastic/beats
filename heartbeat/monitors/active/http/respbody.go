@@ -28,14 +28,20 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/mime"
 )
 
-// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
-// since we must buffer the whole body for body validators this is effectively a cap on that.
-// 100MiB out to be enough for everybody.
-const maxBufferBodyBytes = 100 * units.MiB
+const (
+	// maxBufferBodyBytes sets a hard limit on how much we're willing to buffer for any reason internally.
+	// since we must buffer the whole body for body validators this is effectively a cap on that.
+	// 100MiB out to be enough for everybody.
+	maxBufferBodyBytes = 100 * units.MiB
+	// minBufferBytes is the lower bound on how much of the body content we actually read. In order to do
+	// do mime type detection of the response body, we always need a small read buffer.
+	minBufferBodyBytes = 128
+)
 
-func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, reason.Reason) {
+func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, string, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
@@ -43,15 +49,16 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	} else if config.IncludeBody == "always" || config.IncludeBody == "on_error" {
 		// If the user has asked for bodies to be recorded we only need to buffer that much
 		bufferBodyBytes = config.IncludeBodyMaxBytes
-	} else {
-		// Otherwise, we buffer nothing
-		bufferBodyBytes = 0
+	}
+
+	if bufferBodyBytes < minBufferBodyBytes {
+		bufferBodyBytes = minBufferBodyBytes
 	}
 
 	respBody, bodyLenBytes, bodyHash, respErr := readBody(resp, bufferBodyBytes)
 	// If we encounter an error while reading the body just fail early
 	if respErr != nil {
-		return nil, reason.IOFailed(respErr)
+		return nil, "", reason.IOFailed(respErr)
 	}
 
 	// Run any validations
@@ -77,7 +84,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 		bodyFields["content"] = respBody[0:sampleNumBytes]
 	}
 
-	return bodyFields, errReason
+	return bodyFields, mime.Detect(respBody), errReason
 }
 
 // readBody reads the first sampleSize bytes from the httpResponse,

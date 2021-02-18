@@ -18,5 +18,5 @@ rules:
         - inputs
         - output
         - keystore
-when: HasItems(%{[inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

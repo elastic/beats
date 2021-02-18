@@ -3,13 +3,17 @@
     "@timestamp": "2019-11-14T17:10:15.1515514Z",
     "event": {
       "action": "created-process",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 4688,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "start"
+      "type": [
+        "start"
+      ]
     },
     "host": {
       "name": "vagrant"

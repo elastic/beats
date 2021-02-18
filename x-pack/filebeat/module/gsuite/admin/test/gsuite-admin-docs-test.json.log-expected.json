@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "TRANSFER_DOCUMENT_OWNERSHIP",
         "event.category": [
             "iam"
@@ -37,6 +36,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -48,10 +48,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "DRIVE_DATA_RESTORE",
         "event.category": [
             "iam"
@@ -89,6 +94,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -100,13 +106,19 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_DOCS_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -144,6 +156,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -155,6 +168,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

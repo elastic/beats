@@ -10,13 +10,13 @@
         "name":"connections",
         "rtt":44269
     },
-    "nats":{
+    "nats": {
         "server": {
             "id": "bUAdpRFtMWddIBWw80Yd9D",
             "time": "2018-12-28T12:33:53.026865597Z"
         },
-        "connections":{
-            "total": 10
+        "connections": {
+            "total": 1
         }
     },
     "type":"metricsets"

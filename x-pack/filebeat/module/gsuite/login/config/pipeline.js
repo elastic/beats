@@ -9,14 +9,17 @@ var login = (function () {
         evt.Put("event.category", ["authentication"]);
         switch (evt.Get("event.action")) {
             case "login_failure":
+                evt.AppendTo("event.category", "session");
                 evt.Put("event.type", ["start"]);
                 evt.Put("event.outcome", "failure");
                 break;
             case "login_success":
+                evt.AppendTo("event.category", "session");
                 evt.Put("event.type", ["start"]);
                 evt.Put("event.outcome", "success");
                 break;
             case "logout":
+                evt.AppendTo("event.category", "session");
                 evt.Put("event.type", ["end"]);
                 break;
             case "account_disabled_generic":
@@ -83,9 +86,25 @@ var login = (function () {
         evt.Delete("json.events.parameters");
     };
 
+    var addTargetUser = function(evt) {
+        var affectedEmail = evt.Get("google_workspace.login.affected_email_address");
+        if (affectedEmail) {
+            evt.Put("user.target.email", affectedEmail);
+            var data = affectedEmail.split("@");
+            if (data.length !== 2) {
+                return;
+            }
+
+            evt.Put("user.target.name", data[0]);
+            evt.Put("user.target.domain", data[1]);
+            evt.AppendTo("related.user", data[0]);
+        }
+    };
+
     var pipeline = new processor.Chain()
         .Add(categorizeEvent)
         .Add(processParams)
+        .Add(addTargetUser)
         .Build();
 
     return {

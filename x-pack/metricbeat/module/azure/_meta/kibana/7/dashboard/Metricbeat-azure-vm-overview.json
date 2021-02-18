@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "title": "VM Filters"
+            },
             "gridData": {
               "h": 12,
               "i": "aa881f9d-28d3-4722-822e-3e670021cf52",
@@ -29,7 +31,8 @@
             },
             "panelIndex": "aa881f9d-28d3-4722-822e-3e670021cf52",
             "panelRefName": "panel_0",
-            "version": "7.4.0"
+            "title": "VM Filters",
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -45,7 +48,7 @@
             "panelIndex": "e673f70c-f811-4290-9087-578c7dd13675",
             "panelRefName": "panel_1",
             "title": "VM CPU Utilization",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -61,7 +64,7 @@
             "panelIndex": "2473ef72-c56c-4783-a36a-f4b8efd66ab7",
             "panelRefName": "panel_2",
             "title": "VM Available Memory",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {},
@@ -74,7 +77,7 @@
             },
             "panelIndex": "14e225ef-6417-4377-b2cb-6b46b6693b78",
             "panelRefName": "panel_3",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -90,7 +93,7 @@
             "panelIndex": "535d70b3-3f3c-4a84-85ba-ab671b6d144f",
             "panelRefName": "panel_4",
             "title": "VM Network In Total",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -106,7 +109,7 @@
             "panelIndex": "6903a45e-bf11-4db2-9497-fd9692e83448",
             "panelRefName": "panel_5",
             "title": "VM Network Out Total",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -122,7 +125,7 @@
             "panelIndex": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
             "panelRefName": "panel_6",
             "title": "VM Disk Writes",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -138,7 +141,7 @@
             "panelIndex": "8879143b-ed83-45ec-8c58-b10dc1597c22",
             "panelRefName": "panel_7",
             "title": "VM Disk Read Operations/s",
-            "version": "7.4.0"
+            "version": "7.9.1"
           },
           {
             "embeddableConfig": {
@@ -154,7 +157,7 @@
             "panelIndex": "4071f2bf-1794-45ff-b76d-58864226d8b7",
             "panelRefName": "panel_8",
             "title": "VM Disk Write Operations/s",
-            "version": "7.4.0"
+            "version": "7.9.1"
           }
         ],
         "timeRestore": false,
@@ -165,6 +168,9 @@
       "migrationVersion": {
         "dashboard": "7.3.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "5031b220-eb61-11e9-90ec-112a988266d5",
@@ -213,8 +219,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-10-15T11:53:03.300Z",
-      "version": "WzMxOTAsMV0="
+      "updated_at": "2020-09-15T16:10:59.501Z",
+      "version": "Wzg4NSwxXQ=="
     },
     {
       "attributes": {
@@ -266,7 +272,7 @@
                 "type": "list"
               },
               {
-                "fieldName": "cloud.instance.name",
+                "fieldName": "azure.resource.name",
                 "id": "1570774891724",
                 "indexPatternRefName": "control_2_index_pattern",
                 "label": "VM Name",
@@ -291,8 +297,11 @@
       },
       "id": "5031b220-eb61-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "metricbeat-*",
@@ -311,8 +320,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-10-11T06:35:45.645Z",
-      "version": "WzE0ODMsMV0="
+      "updated_at": "2020-09-15T16:21:47.113Z",
+      "version": "WzkyNywxXQ=="
     },
     {
       "attributes": {
@@ -372,7 +381,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "value_template": "{{value}}%"
               }
             ],
@@ -387,12 +396,15 @@
       },
       "id": "db9a3490-ea8f-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:52:01.637Z",
-      "version": "WzMxODQsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzMywxXQ=="
     },
     {
       "attributes": {
@@ -445,9 +457,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "value_template": "{{value}}"
               }
             ],
@@ -462,12 +475,15 @@
       },
       "id": "7205a4f0-ea95-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:52:22.085Z",
-      "version": "WzMxODYsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzNCwxXQ=="
     },
     {
       "attributes": {
@@ -520,9 +536,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -538,12 +555,15 @@
       },
       "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:50:30.820Z",
-      "version": "WzMxNzgsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzNSwxXQ=="
     },
     {
       "attributes": {
@@ -596,9 +616,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "value_template": "{{value}}"
               }
             ],
@@ -613,12 +634,15 @@
       },
       "id": "8b6b9450-ea99-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:52:40.578Z",
-      "version": "WzMxODgsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzNiwxXQ=="
     },
     {
       "attributes": {
@@ -671,9 +695,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -689,12 +714,15 @@
       },
       "id": "abd32c30-ea99-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:49:45.582Z",
-      "version": "WzMxNzQsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzNywxXQ=="
     },
     {
       "attributes": {
@@ -747,9 +775,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -765,12 +794,15 @@
       },
       "id": "5c016810-ea9a-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:50:07.876Z",
-      "version": "WzMxNzYsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzOCwxXQ=="
     },
     {
       "attributes": {
@@ -823,9 +855,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -841,12 +874,15 @@
       },
       "id": "3a50e950-eb46-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:50:55.337Z",
-      "version": "WzMxODAsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzMzOSwxXQ=="
     },
     {
       "attributes": {
@@ -899,9 +935,10 @@
                 ],
                 "point_size": 0,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "cloud.instance.name",
+                "terms_field": "azure.resource.name",
                 "type": "timeseries",
                 "value_template": "{{value}}"
               }
@@ -917,13 +954,16 @@
       },
       "id": "0892eaa0-ea9a-11e9-90ec-112a988266d5",
       "migrationVersion": {
-        "visualization": "7.3.1"
+        "visualization": "7.8.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-10-15T11:51:33.545Z",
-      "version": "WzMxODIsMV0="
+      "updated_at": "2020-09-15T16:01:27.530Z",
+      "version": "WzM0MCwxXQ=="
     }
   ],
-  "version": "7.4.0"
+  "version": "7.9.1"
 }

@@ -9,6 +9,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -41,6 +42,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "89.68.140.204",
             "185.8.209.207"
@@ -66,6 +70,7 @@
         "source.geo.city_name": "Gdynia",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
+        "source.geo.country_name": "Poland",
         "source.geo.location.lat": 54.5055,
         "source.geo.location.lon": 18.5403,
         "source.geo.region_iso_code": "PL-22",
@@ -88,6 +93,7 @@
         "destination.geo.city_name": "Saint-Prex",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
         "destination.geo.location.lat": 46.4796,
         "destination.geo.location.lon": 6.4599,
         "destination.geo.region_iso_code": "CH-VD",
@@ -120,6 +126,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "89.68.140.204",
             "185.8.209.207"
@@ -146,6 +155,7 @@
         "source.geo.city_name": "Gdynia",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PL",
+        "source.geo.country_name": "Poland",
         "source.geo.location.lat": 54.5055,
         "source.geo.location.lon": 18.5403,
         "source.geo.region_iso_code": "PL-22",
@@ -192,6 +202,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "10.198.235.254",
             "10.198.233.48"
@@ -260,6 +273,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "10.198.235.254",
             "10.198.233.48"
@@ -303,6 +319,7 @@
         "destination.bytes": 403,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "216.167.51.72",
@@ -334,6 +351,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "83.97.20.30",
             "216.167.51.72"
@@ -359,6 +379,7 @@
         "source.geo.city_name": "Bucharest",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RO",
+        "source.geo.country_name": "Romania",
         "source.geo.location.lat": 44.4176,
         "source.geo.location.lon": 26.1708,
         "source.geo.region_iso_code": "RO-B",

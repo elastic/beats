@@ -20,7 +20,9 @@ import (
 
 const perms os.FileMode = 0600
 
-type store interface {
+// Store saves the io.Reader.
+type Store interface {
+	// Save the io.Reader.
 	Save(io.Reader) error
 }
 
@@ -62,12 +64,12 @@ type ReplaceOnSuccessStore struct {
 	target      string
 	replaceWith []byte
 
-	wrapped store
+	wrapped Store
 }
 
 // NewReplaceOnSuccessStore takes a target file and a replacement content and will replace the target
 // file content if the wrapped store execution is done without any error.
-func NewReplaceOnSuccessStore(target string, replaceWith []byte, wrapped store) *ReplaceOnSuccessStore {
+func NewReplaceOnSuccessStore(target string, replaceWith []byte, wrapped Store) *ReplaceOnSuccessStore {
 	return &ReplaceOnSuccessStore{
 		target:      target,
 		replaceWith: replaceWith,
@@ -149,6 +151,23 @@ type DiskStore struct {
 // NewDiskStore creates an unencrypted disk store.
 func NewDiskStore(target string) *DiskStore {
 	return &DiskStore{target: target}
+}
+
+// Exists check if the store file exists on the disk
+func (d *DiskStore) Exists() (bool, error) {
+	_, err := os.Stat(d.target)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+// Delete deletes the store file on the disk
+func (d *DiskStore) Delete() error {
+	return os.Remove(d.target)
 }
 
 // Save accepts a persistedConfig and saved it to a target file, to do so we will

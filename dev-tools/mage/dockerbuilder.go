@@ -26,6 +26,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -69,7 +70,15 @@ func (b *dockerBuilder) Build() error {
 		return errors.Wrap(err, "failed to prepare build")
 	}
 
+	tries := 3
 	tag, err := b.dockerBuild()
+	for err != nil && tries != 0 {
+		fmt.Println(">> Building docker images again (after 10 seconds)")
+		// This sleep is to avoid hitting the docker build issues when resources are not available.
+		time.Sleep(10)
+		tag, err = b.dockerBuild()
+		tries -= 1
+	}
 	if err != nil {
 		return errors.Wrap(err, "failed to build docker")
 	}
@@ -151,19 +160,14 @@ func isDockerFile(path string) bool {
 }
 
 func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
-	// has specific dockerfile
-	dockerfile := fmt.Sprintf("Dockerfile.%s.tmpl", b.imageName)
-	_, err := os.Stat(filepath.Join(templatesDir, dockerfile))
-	if err != nil {
-		// specific missing fallback to generic
-		dockerfile = "Dockerfile.tmpl"
+	dockerfile := "Dockerfile.tmpl"
+	if f, found := b.ExtraVars["dockerfile"]; found {
+		dockerfile = f
 	}
 
-	entrypoint := fmt.Sprintf("docker-entrypoint.%s.tmpl", b.imageName)
-	_, err = os.Stat(filepath.Join(templatesDir, entrypoint))
-	if err != nil {
-		// specific missing fallback to generic
-		entrypoint = "docker-entrypoint.tmpl"
+	entrypoint := "docker-entrypoint.tmpl"
+	if e, found := b.ExtraVars["docker_entrypoint"]; found {
+		entrypoint = e
 	}
 
 	type fileExpansion struct {
@@ -176,7 +180,7 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 			".tmpl",
 		)
 		path := filepath.Join(templatesDir, file.source)
-		err = b.ExpandFile(path, target, data)
+		err := b.ExpandFile(path, target, data)
 		if err != nil {
 			return errors.Wrapf(err, "expanding template '%s' to '%s'", path, target)
 		}
@@ -197,6 +201,12 @@ func (b *dockerBuilder) dockerBuild() (string, error) {
 }
 
 func (b *dockerBuilder) dockerSave(tag string) error {
+	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
+		err := os.MkdirAll(distributionsDir, 0750)
+		if err != nil {
+			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+		}
+	}
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {

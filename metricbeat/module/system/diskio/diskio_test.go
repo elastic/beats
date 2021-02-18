@@ -27,7 +27,47 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
+
+func TestDataNameFilter(t *testing.T) {
+	oldFS := system.HostFS
+	newFS := "_meta/testdata"
+	system.HostFS = &newFS
+	defer func() {
+		system.HostFS = oldFS
+	}()
+
+	conf := map[string]interface{}{
+		"module":                 "system",
+		"metricsets":             []string{"diskio"},
+		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.Equal(t, 3, len(data))
+}
+
+func TestDataEmptyFilter(t *testing.T) {
+	oldFS := system.HostFS
+	newFS := "_meta/testdata"
+	system.HostFS = &newFS
+	defer func() {
+		system.HostFS = oldFS
+	}()
+
+	conf := map[string]interface{}{
+		"module":     "system",
+		"metricsets": []string{"diskio"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2Error(t, conf)
+	data, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.Equal(t, 10, len(data))
+}
 
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())

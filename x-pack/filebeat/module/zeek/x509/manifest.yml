@@ -10,8 +10,6 @@ var:
       - /usr/local/var/logs/current/x509.log
   - name: tags
     default: [zeek.x509]
-  - name: community_id
-    default: true
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/x509.yml

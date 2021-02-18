@@ -39,5 +39,5 @@ class Test(BaseTest):
 
         assert len(objs) >= 1
         assert all([o["type"] == "http" for o in objs])
-        assert all([re.search("[Aa]uthorization:\*+", o["request"])
+        assert all([re.search(r"[Aa]uthorization:\*+", o["request"])
                     is not None for o in objs])

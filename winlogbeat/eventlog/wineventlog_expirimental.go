@@ -243,7 +243,7 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 	cfgwarn.Experimental("The %s event log reader is experimental.", winEventLogExpAPIName)
 
 	c := winEventLogConfig{BatchReadSize: 512}
-	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 

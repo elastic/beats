@@ -5,7 +5,6 @@
 package application
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -19,6 +18,7 @@ import (
 // take care of action policy change every other action are discarded. The store will only keep the
 // last good action on disk, we assume that the action is added to the store after it was ACK with
 // Fleet. The store is not threadsafe.
+// ATTN!!!: THE actionStore is deprecated, please use and extend the stateStore instead. The actionStore will be eventually removed.
 type actionStore struct {
 	log    *logger.Logger
 	store  storeLoad
@@ -35,7 +35,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	}
 	defer reader.Close()
 
-	var action actionConfigChangeSerializer
+	var action ActionPolicyChangeSerializer
 
 	dec := yaml.NewDecoder(reader)
 	err = dec.Decode(&action)
@@ -49,7 +49,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 		return nil, err
 	}
 
-	apc := fleetapi.ActionConfigChange(action)
+	apc := fleetapi.ActionPolicyChange(action)
 
 	return &actionStore{
 		log:    log,
@@ -62,7 +62,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 // any other type of action will be silently ignored.
 func (s *actionStore) Add(a action) {
 	switch v := a.(type) {
-	case *fleetapi.ActionConfigChange, *fleetapi.ActionUnenroll:
+	case *fleetapi.ActionPolicyChange, *fleetapi.ActionUnenroll:
 		// Only persist the action if the action is different.
 		if s.action != nil && s.action.ID() == v.ID() {
 			return
@@ -79,8 +79,8 @@ func (s *actionStore) Save() error {
 	}
 
 	var reader io.Reader
-	if apc, ok := s.action.(*fleetapi.ActionConfigChange); ok {
-		serialize := actionConfigChangeSerializer(*apc)
+	if apc, ok := s.action.(*fleetapi.ActionPolicyChange); ok {
+		serialize := ActionPolicyChangeSerializer(*apc)
 
 		r, err := yamlToReader(&serialize)
 		if err != nil {
@@ -120,7 +120,7 @@ func (s *actionStore) Actions() []action {
 	return []action{s.action}
 }
 
-// actionConfigChangeSerializer is a struct that adds a YAML serialization, I don't think serialization
+// ActionPolicyChangeSerializer is a struct that adds a YAML serialization, I don't think serialization
 // is a concern of the fleetapi package. I went this route so I don't have to do much refactoring.
 //
 // There are four ways to achieve the same results:
@@ -130,14 +130,14 @@ func (s *actionStore) Actions() []action {
 // 4. We have two sets of type.
 //
 // This could be done in a refactoring.
-type actionConfigChangeSerializer struct {
+type ActionPolicyChangeSerializer struct {
 	ActionID   string                 `yaml:"action_id"`
 	ActionType string                 `yaml:"action_type"`
-	Config     map[string]interface{} `yaml:"config"`
+	Policy     map[string]interface{} `yaml:"policy"`
 }
 
 // Add a guards between the serializer structs and the original struct.
-var _ actionConfigChangeSerializer = actionConfigChangeSerializer(fleetapi.ActionConfigChange{})
+var _ ActionPolicyChangeSerializer = ActionPolicyChangeSerializer(fleetapi.ActionPolicyChange{})
 
 // actionUnenrollSerializer is a struct that adds a YAML serialization,
 type actionUnenrollSerializer struct {
@@ -148,42 +148,3 @@ type actionUnenrollSerializer struct {
 
 // Add a guards between the serializer structs and the original struct.
 var _ actionUnenrollSerializer = actionUnenrollSerializer(fleetapi.ActionUnenroll{})
-
-// actionStoreAcker wraps an existing acker and will send any acked event to the action store,
-// its up to the action store to decide if we need to persist the event for future replay or just
-// discard the event.
-type actionStoreAcker struct {
-	acker fleetAcker
-	store *actionStore
-}
-
-func (a *actionStoreAcker) Ack(ctx context.Context, action fleetapi.Action) error {
-	if err := a.acker.Ack(ctx, action); err != nil {
-		return err
-	}
-	a.store.Add(action)
-	return a.store.Save()
-}
-
-func (a *actionStoreAcker) Commit(ctx context.Context) error {
-	return a.acker.Commit(ctx)
-}
-
-func newActionStoreAcker(acker fleetAcker, store *actionStore) *actionStoreAcker {
-	return &actionStoreAcker{acker: acker, store: store}
-}
-
-func replayActions(
-	log *logger.Logger,
-	dispatcher dispatcher,
-	acker fleetAcker,
-	actions ...action,
-) error {
-	log.Info("restoring current policy from disk")
-
-	if err := dispatcher.Dispatch(acker, actions...); err != nil {
-		return err
-	}
-
-	return nil
-}

@@ -102,6 +102,18 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # Process CloudTrail logs
+    # default is true, set to false to skip Cloudtrail logs
+    # var.process_cloudtrail_logs: false
+
+    # Process CloudTrail Digest logs
+    # default true, set to false to skip CloudTrail Digest logs
+    # var.process_digest_logs: false
+
+    # Process CloudTrail Insight logs
+    # default true, set to false to skip CloudTrail Insight logs
+    # var.process_insight_logs: false
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -129,6 +141,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   cloudwatch:
     enabled: false
@@ -164,6 +182,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   ec2:
     enabled: false
 
@@ -197,6 +221,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   elb:
     enabled: false
@@ -232,6 +262,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
   s3access:
     enabled: false
 
@@ -265,6 +301,12 @@ filebeat.modules:
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   vpcflow:
     enabled: false
@@ -300,6 +342,12 @@ filebeat.modules:
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
@@ -316,6 +364,16 @@ filebeat.modules:
       storage_account: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
+
+  platformlogs:
+    enabled: false
+  #  var:
+  #    eventhub: ""
+  #    consumer_group: "$Default"
+  #    connection_string: ""
+  #    storage_account: ""
+  #    storage_account_key: ""
+
 
   auditlogs:
     enabled: false
@@ -343,6 +401,25 @@ filebeat.modules:
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9503
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  spamfirewall:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9524
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -384,6 +461,14 @@ filebeat.modules:
       syslog_host: localhost
       syslog_port: 9003
 
+      # Set internal security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.internal_zones: [ "Internal" ]
+
+      # Set external security zones. used to override parsed network.direction
+      # based on zone egress and ingress
+      #var.external_zones: [ "External" ]
+
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
@@ -398,6 +483,14 @@ filebeat.modules:
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
@@ -419,6 +512,14 @@ filebeat.modules:
     # See https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog/syslogs-sev-level.html
     #var.log_level: 7
 
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
+
   ftd:
     enabled: true
 
@@ -436,6 +537,14 @@ filebeat.modules:
     # Messages with a log level higher than the specified will be dropped.
     # See https://www.cisco.com/c/en/us/td/docs/security/firepower/Syslogs/b_fptd_syslog_guide/syslogs-sev-level.html
     #var.log_level: 7
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]
 
   ios:
     enabled: true
@@ -473,15 +582,13 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#---------------------------- Citrix XenApp Module ----------------------------
-- module: citrix
-  virtualapps:
+  meraki:
     enabled: true
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
     # var.syslog_host: localhost
-    # var.syslog_port: 9507
+    # var.syslog_port: 9525
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -493,6 +600,38 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+  umbrella:
+    enabled: true
+
+    #var.input: aws-s3
+    # AWS SQS queue url
+    #var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    # Access ID to authenticate with the S3 input
+    #var.access_key_id: 123456
+    # Access key to authenticate with the S3 input
+    #var.secret_access_key: PASSWORD
+    # The duration that the received messages are hidden from ReceiveMessage request
+    #var.visibility_timeout: 300s
+    # Maximum duration before AWS API request will be interrupted
+    #var.api_timeout: 120s
+
+  amp:
+    enabled: true
+
+    # Set which input to use between httpjson (default) or file.
+    #var.input: httpjson
+
+    # The API URL
+    #var.url: https://api.amp.cisco.com/v1/events
+    # The client ID used as a username for the API requests.
+    #var.client_id:
+    # The API key related to the client ID.
+    #var.api_key:
+    # How far to look back the first time the module is started. Expects an amount of hours.
+    #var.first_interval: 24h
+    # Overriding the default request timeout, optional.
+    #var.request_timeout: 60s
 
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
@@ -513,6 +652,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------------ Cyber-Ark Module ------------------------------
+- module: cyberark
+  corepas:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9527
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #---------------------------- CylanceProtect Module ----------------------------
 - module: cylance
@@ -600,6 +760,25 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  bigipafm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9528
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:
@@ -614,6 +793,16 @@ filebeat.modules:
 
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
+
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
 
   clientendpoint:
     enabled: true
@@ -634,8 +823,46 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
-#----------------------------- Google Cloud Module -----------------------------
-- module: googlecloud
+  fortimail:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9529
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  fortimanager:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9530
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#--------------------- Google Cloud Platform (GCP) Module ---------------------
+- module: gcp
   vpcflow:
     enabled: true
 
@@ -644,11 +871,139 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
     # configured to use this topic as a sink for VPC flow logs.
-    var.topic: googlecloud-vpc-flowlogs
+    var.topic: gcp-vpc-flowlogs
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-vpc-flowlogs-sub
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # direction is determined by whether it is between source and destination
+    # instance information rather than IP.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
+  firewall:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-firewall
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-firewall-sub
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+    # Set internal networks. This is used to classify network.direction based
+    # off of what networks are considered "internal" either base off of a CIDR
+    # block or named network conditions. If this is not specified, then traffic
+    # is taken from the direction data in the rule_details event payload.
+    #
+    # For a full list of network conditions see:
+    # https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+    #var.internal_networks: [ "private" ]
+
+  audit:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
+    # configured to use this topic as a sink for firewall logs.
+    var.topic: gcp-vpc-audit
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-audit
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+#--------------------------- Google_workspace Module ---------------------------
+- module: google_workspace
+  saml:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  user_accounts:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  login:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  admin:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  drive:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+  groups:
+    enabled: true
+    # var.jwt_file: credentials.json
+    # var.delegated_account: admin@example.com
+    # var.initial_interval: 24h
+    # var.http_client_timeout: 60s
+    # var.user_key: all
+    # var.interval: 2h
+
+
+#----------------------------- Googlecloud Module -----------------------------
+# googlecloud module is deprecated, please use gcp instead
+- module: gcp
+  vpcflow:
+    enabled: true
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
+    # configured to use this topic as a sink for VPC flow logs.
+    var.topic: gcp-vpc-flowlogs
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -662,11 +1017,11 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-firewall
+    var.topic: gcp-vpc-firewall
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-firewall-sub
+    var.subscription_name: filebeat-gcp-firewall-sub
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
@@ -680,17 +1035,18 @@ filebeat.modules:
 
     # Google Pub/Sub topic containing firewall logs. Stackdriver must be
     # configured to use this topic as a sink for firewall logs.
-    var.topic: googlecloud-vpc-audit
+    var.topic: gcp-vpc-audit
 
     # Google Pub/Sub subscription for the topic. Filebeat will create this
     # subscription if it does not exist.
-    var.subscription_name: filebeat-googlecloud-audit
+    var.subscription_name: filebeat-gcp-audit
 
     # Credentials file for the service account with authorization to read from
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
 #-------------------------------- Gsuite Module --------------------------------
+# Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
 - module: gsuite
   saml:
     enabled: true
@@ -903,6 +1259,38 @@ filebeat.modules:
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
 
+  netscreen:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9523
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+  srx:
+    enabled: true
+
+    # Set which input to use between tcp, udp (default) or file.
+    #var.input: udp
+
+    # The interface to listen to syslog traffic. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.syslog_host: localhost
+
+    # The port to listen for syslog traffic. Defaults to 9006.
+    #var.syslog_port: 9006
+
 #-------------------------------- Kafka Module --------------------------------
 - module: kafka
   # All logs
@@ -917,31 +1305,18 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------- Kaspersky Anti-Virus Module -------------------------
-- module: kaspersky
-  av:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9514
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #-------------------------------- Kibana Module --------------------------------
 - module: kibana
-  # All logs
+  # Server logs
   log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  # Audit logs
+  audit:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -979,7 +1354,20 @@ filebeat.modules:
 
     # Oauth Client Secret
     #var.oauth2.client.secret: ""
-   
+
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  m365_defender:
+    enabled: true
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
   dhcp:
@@ -1009,16 +1397,13 @@ filebeat.modules:
     #var.api_key
 
     # Array object in MISP response
-    #var.json_objects_array
+    #var.http_request_body.limit: 1000
 
     # URL of the MISP REST API
     #var.url
-   
+
     # You can also pass SSL options. For example:
-    #var.ssl: |-
-    #  {
-    #    verification_mode: none
-    #  }
+    #var.ssl.verification_mode: none
 
 #------------------------------- Mongodb Module -------------------------------
 #- module: mongodb
@@ -1042,7 +1427,7 @@ filebeat.modules:
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+    #var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
 
 #-------------------------------- MySQL Module --------------------------------
 #- module: mysql
@@ -1070,6 +1455,19 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------- MySQL Enterprise Module ---------------------------
+- module: mysqlenterprise
+  audit:
+    enabled: true
+
+    # Sets the input type. Currently only supports file
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths:
+    #  - /home/user/mysqlauditlogs/audit.*.log
+
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   # All logs
@@ -1087,6 +1485,11 @@ filebeat.modules:
     var:
       netflow_host: localhost
       netflow_port: 2055
+      # internal_networks specifies which networks are considered internal or private
+      # you can specify either a CIDR block or any of the special named ranges listed
+      # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
+      internal_networks:
+        - private
 
 #-------------------------- Arbor Peakflow SP Module --------------------------
 - module: netscout
@@ -1199,6 +1602,18 @@ filebeat.modules:
     #var.url: https://yourOktaDomain/api/v1/logs
     #var.api_key: 'yourApiTokenHere'
 
+#-------------------------------- Oracle Module --------------------------------
+- module: oracle
+  database_audit:
+    enabled: true
+
+    # Set which input to use between syslog or file (default).
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths: /home/user/oracleauditlogs/*.aud
+
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
   result:
@@ -1225,6 +1640,27 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Set internal security zones. used to determine network.direction
+    # default "trust"
+    #var.internal_zones:
+
+    # Set external security zones. used to determine network.direction
+    # default "untrust"
+    #var.external_zones:
+
+
+#------------------------------- Pensando Module -------------------------------
+- module: pensando
+# Firewall logs
+  dfw:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
@@ -1238,6 +1674,27 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#---------------------- Proofpoint Email Security Module ----------------------
+- module: proofpoint
+  emailsecurity:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9531
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
@@ -1258,27 +1715,6 @@ filebeat.modules:
     # var.input: udp
     # var.syslog_host: localhost
     # var.syslog_port: 9518
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-#---------------------------- Rapid7 NeXpose Module ----------------------------
-- module: rapid7
-  nexpose:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9517
 
     # Set paths for the log files when file input is used.
     # var.paths:
@@ -1318,6 +1754,138 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the the default path.
     #var.paths:
+
+#--------------------------- Snort/Sourcefire Module ---------------------------
+- module: snort
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9532
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
+
+#--------------------------------- Snyk Module ---------------------------------
+- module: snyk
+  audit:
+    enabled: true
+
+    # Set which input to use between httpjson (default) or file.
+    #var.input: httpjson
+    #
+    # What audit type to collect, can be either "group" or "organization".
+    #var.audit_type: organization
+    #
+    # The ID related to the audit_type. If audit type is group, then this value should be
+    # the group ID and if it is organization it should be the organization ID to collect from.
+    #var.audit_id: 1235432-asdfdf-2341234-asdgjhg
+
+    # How often the API should be polled, defaults to 1 hour.
+    #var.interval: 1h
+    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
+    #var.first_interval: 24h
+
+    # The API token that is created for a specific user, found in the Snyk management dashboard.
+    #var.api_token:
+
+    # Event filtering.
+    # All configuration items below is OPTIONAL and the default options will be overwritten
+    # for each entry that is not commented out.
+
+    # Will return only logs for this specific project.
+    #var.project_id: ""
+    # User public ID. Will fetch only audit logs originated from this user's actions.
+    #var.user_id: ""
+    # Will return only logs for this specific event.
+    #var.event: ""
+    # User email address. Will fetch only audit logs originated from this user's actions.
+    #var.email_address: ""
+
+  vulnerabilities:
+    enabled: true
+
+    # Set which input to use between httpjson (default) or file.
+    #var.input: httpjson
+
+    # How often the API should be polled. Data from the Snyk API is automatically updated
+    # once per day, so the default interval is 24 hours.
+    #var.interval: 24h
+
+    # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
+    #var.first_interval: 24h
+
+    # The API token that is created for a specific user, found in the Snyk management dashboard.
+    #var.api_token:
+
+    # The list of org IDs to filter the results by.
+    # One organization ID per line, starting with a - sign
+    #var.orgs:
+    #  - 12354-asdfdf-123543-asdsdfg
+    #  - 76554-jhggfd-654342-hgrfasd
+
+
+    # Event filtering.
+    # All configuration items below is OPTIONAL and the default options will be overwritten
+    # for each entry that is not commented out.
+
+    # The severity levels of issues to filter the results by.
+    #var.included_severity:
+    #  - high
+    #  - medium
+    #  - low
+    #
+    # The exploit maturity levels of issues to filter the results by.
+    #var.exploit_maturity:
+    #  - mature
+    #  - proof-of-concept
+    #  - no-known-exploit
+    #  - no-data
+    #
+    # The type of issues to filter the results by.
+    #var.types:
+    #  - vuln
+    #  - license
+    #
+    # The type of languages to filter the results by.
+    #var.languages:
+    #  - javascript
+    #  - ruby
+    #  - java
+    #  - scala
+    #  - python
+    #  - golang
+    #  - php
+    #  - dotnet
+    #  - swift
+    #  - docker
+    #
+    # Search term to filter issue name by, or an exact CVE or CWE.
+    #var.identifier:
+    #  - ""
+    #
+    # If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+    #var.ignored: false
+    #var.patched: false
+    #var.fixable: false
+    #var.is_fixed: false
+    #var.is_patchable: false
+    #var.is_pinnable: false
+    #
+    # The priority score ranging between 0-1000
+    #var.min_priority_score: 0
+    #var.max_priority_score: 1000
+
 
 #----------------------------- Sonicwall-FW Module -----------------------------
 - module: sonicwall
@@ -1360,9 +1928,30 @@ filebeat.modules:
 
     # known firewalls
     #var.known_devices:
-    #   "device1_serialnumber": "a.host.local"
-    #   "device2_serialnumber": "b.host.local"
+      #- serial_number: "1234567890123457"
+      #  hostname: "a.host.local"
+      #- serial_number: "1234234590678557"
+      #  hostname: "b.host.local"
 
+
+  utm:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9533
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
+    # Toggle output of non-ECS fields (default true).
+    # var.rsa_fields: true
+
+    # Set custom timezone offset.
+    # "local" (default) for system timezone.
+    # "+02:00" for GMT+02:00
+    # var.tz_offset: local
 
 #-------------------------------- Squid Module --------------------------------
 - module: squid
@@ -1395,26 +1984,101 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------- Tenable Network Security Nessus Module -------------------
-- module: tenable
-  nessus_security:
+#----------------------------- Threatintel Module -----------------------------
+- module: threatintel
+  abuseurl:
     enabled: true
 
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9516
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
 
-    # Set paths for the log files when file input is used.
-    # var.paths:
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
 
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
+    # The interval to poll the API for updates.
+    var.interval: 60m
 
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
+  abusemalware:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+
+    # The interval to poll the API for updates.
+    var.interval: 60m
+
+  misp:
+    enabled: true
+
+    # Input used for ingesting threat intel data, defaults to JSON.
+    var.input: httpjson
+
+    # The URL of the MISP instance, should end with "/events/restSearch".
+    var.url: https://SERVER/events/restSearch
+
+    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
+    var.api_token: API_KEY
+
+    # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
+    # For examples please reference the filebeat module documentation.
+    #var.filters:
+    #  - threat_level: [4, 5] 
+    #  - to_ids: true
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours. Each request afterwards will filter on any event newer
+    # than the last event that was already ingested.
+    var.first_interval: 24h
+
+    # The interval to poll the API for updates.
+    var.interval: 60m
+
+  otx:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for OTX Threat Intel API calls.
+    var.url: https://otx.alienvault.com/api/v1/indicators/export
+
+    # The authentication token used to contact the OTX API, can be found on the OTX UI.
+    var.api_token: API_KEY
+
+    # Optional filters that can be applied to retrieve only specific indicators.
+    #var.types: "domain,IPv4,hostname,url,FileHash-SHA256"
+
+    # How many hours to look back for each request, should be close to the configured interval. Deduplication of events is handled by the module.
+    var.lookback_range: 2h
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 24h
+
+    # The interval to poll the API for updates
+    var.interval: 60m
+  
+  anomali:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
+
+    # The Username used by anomali Limo, defaults to guest.
+    #var.username: guest
+
+    # The password used by anomali Limo, defaults to guest.
+    #var.password: guest
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 24h
+
+    # The interval to poll the API for updates
+    var.interval: 60m
 
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
@@ -1474,7 +2138,7 @@ filebeat.modules:
   http:
     enabled: true
   intel:
-    enabled: true    
+    enabled: true
   irc:
     enabled: true
   kerberos:
@@ -1496,6 +2160,8 @@ filebeat.modules:
   rdp:
     enabled: true
   rfb:
+    enabled: true
+  signature:
     enabled: true
   sip:
     enabled: true
@@ -1531,6 +2197,27 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#--------------------------------- Zoom Module ---------------------------------
+- module: zoom
+  webhook:
+    enabled: true
+
+    # The type of input to use
+    #var.input: http_endpoint
+
+    # The interface to listen for incoming HTTP requests. Defaults to
+    # localhost. Set to 0.0.0.0 to bind to all available interfaces.
+    #var.listen_address: localhost
+
+    # The port to bind to
+    #var.listen_port: 80
+
+    # The header Zoom uses to send its secret token, defaults to "Authorization"
+    #secret.header: Authorization
+
+    # The secret token value created by Zoom
+    #secret.value: ZOOMTOKEN
 
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
@@ -1568,6 +2255,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
+# * filestream: Improved version of log input. Experimental.
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -1674,6 +2362,11 @@ filebeat.inputs:
   # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
   # in case of conflicts.
   #json.overwrite_keys: false
+
+  # If this setting is enabled, then keys in the decoded JSON object will be recursively
+  # de-dotted, and expanded into a hierarchical object structure.
+  # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+  #json.expand_keys: false
 
   # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
@@ -1787,6 +2480,145 @@ filebeat.inputs:
 
   # Defines if inputs is enabled
   #enabled: true
+
+#--------------------------- Filestream input ----------------------------
+- type: filestream
+
+  # Change to true to enable this input configuration.
+  enabled: false
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  # To fetch all ".log" files from a specific level of subdirectories
+  # /var/log/*/*.log can be used.
+  # For each file found under this path, a harvester is started.
+  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  paths:
+    - /var/log/*.log
+    #- c:\programdata\elasticsearch\logs\*
+
+  # Configure the file encoding for reading files with international characters
+  # following the W3C recommendation for HTML5 (http://www.w3.org/TR/encoding).
+  # Some sample encodings:
+  #   plain, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk,
+  #    hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
+  #encoding: plain
+
+
+  # Exclude lines. A list of regular expressions to match. It drops the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, no lines are dropped.
+  #exclude_lines: ['^DBG']
+
+  # Include lines. A list of regular expressions to match. It exports the lines that are
+  # matching any regular expression from the list. The include_lines is called before
+  # exclude_lines. By default, all the lines are exported.
+  #include_lines: ['^ERR', '^WARN']
+
+  ### Prospector options
+
+  # How often the input checks for new files in the paths that are specified
+  # for harvesting. Specify 1s to scan the directory as frequently as possible
+  # without causing Filebeat to scan too frequently. Default: 10s.
+  #prospector.scanner.check_interval: 10s
+
+  # Exclude files. A list of regular expressions to match. Filebeat drops the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.exclude_files: ['.gz$']
+
+  # Expand "**" patterns into regular glob patterns.
+  #prospector.scanner.recursive_glob: true
+
+  # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
+  # original for harvesting but will report the symlink name as source.
+  #prospector.scanner.symlinks: false
+
+  ### State options
+
+  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # By default this is disabled.
+  #clean_inactive: 0
+
+  # Removes the state for file which cannot be found on disk anymore immediately
+  #clean_removed: true
+
+  # Method to determine if two files are the same or not. By default
+  # the Beat considers two files the same if their inode and device id are the same.
+  #file_identity.native: ~
+
+  # Optional additional fields. These fields can be freely picked
+  # to add additional information to the crawled log files for filtering
+  #fields:
+  #  level: debug
+  #  review: 1
+
+  # Set to true to publish fields with null values in events.
+  #keep_null: false
+
+  # By default, all events contain `host.name`. This option can be set to true
+  # to disable the addition of this field to all events. The default value is
+  # false.
+  #publisher_pipeline.disable_host: false
+
+  # Ignore files which were modified more then the defined timespan in the past.
+  # ignore_older is disabled by default, so no files are ignored by setting it to 0.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #ignore_older: 0
+
+  # Defines the buffer size every harvester uses when fetching the file
+  #harvester_buffer_size: 16384
+
+  # Maximum number of bytes a single log event can have
+  # All bytes after max_bytes are discarded and not sent. The default is 10MB.
+  # This is especially useful for multiline log messages which can get large.
+  #message_max_bytes: 10485760
+
+  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  #line_terminator: auto
+
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # overwrites the pipeline option from the Elasticsearch output.
+  #pipeline:
+
+  # Backoff values define how aggressively filebeat crawls new files for updates
+  # The default values can be used in most cases. Backoff defines how long it is waited
+  # to check a file again after EOF is reached. Default is 1s which means the file
+  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # Every time a new line appears, backoff is reset to the initial value.
+  #backoff.init: 1s
+
+  # Max backoff defines what the maximum backoff time is. After having backed off multiple times
+  # from checking the files, the waiting time will never exceed max_backoff independent of the
+  # backoff factor. Having it set to 10s means in the worst case a new line can be added to a log
+  # file after having backed off multiple times, it takes a maximum of 10s to read the new line
+  #backoff.max: 10s
+
+  ### Harvester closing options
+
+  # Close inactive closes the file handler after the predefined period.
+  # The period starts when the last line of the file was, not the file ModTime.
+  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  #close.on_state_change.inactive: 5m
+
+  # Close renamed closes a file handler when the file is renamed or rotated.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.on_state_change.renamed: false
+
+  # When enabling this option, a file handler is closed immediately in case a file can't be found
+  # any more. In case the file shows up again later, harvesting will continue at the last known position
+  # after scan_frequency.
+  #close.on_state_change.removed: true
+
+  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.eof: false
+
+  # Close timeout closes the harvester after the predefined time.
+  # This is independent if the harvester did finish reading the file or not.
+  # By default this option is disabled.
+  # Note: Potential data loss. Make sure to read and understand the docs for this option.
+  #close.reader.after_interval: 0
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -1982,7 +2814,7 @@ filebeat.inputs:
 
 #---------------------------- Google Cloud Pub/Sub Input -----------------------
 # Input for reading messages from a Google Cloud Pub/Sub topic subscription.
-- type: google-pubsub
+- type: gcp-pubsub
   enabled: false
 
   # Google Cloud project ID. Required.
@@ -2006,21 +2838,21 @@ filebeat.inputs:
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
-#------------------------------ S3 input --------------------------------
+#------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
-#- type: s3
+#- type: aws-s3
   #enabled: false
 
   # AWS Credentials
   # If access_key_id and secret_access_key are configured, then use them to make api calls.
-  # If not, s3 input will load default AWS config or load with given profile name.
+  # If not, aws-s3 input will load default AWS config or load with given profile name.
   #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   #session_token: '${AWS_SESSION_TOKEN:"”}'
-  #credential_profile_name: test-s3-input
+  #credential_profile_name: test-aws-s3-input
 
-  # Queue urls (required) to receive queue messages from
-  #queue_urls: ["https://sqs.us-east-1.amazonaws.com/1234/test-s3-logs-queue"]
+  # Queue url (required) to receive queue messages from
+  #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
@@ -2134,6 +2966,41 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
+  
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+    
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
@@ -2461,10 +3328,22 @@ output.elasticsearch:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL-based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
@@ -2577,20 +3456,31 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -2600,7 +3490,7 @@ output.elasticsearch:
   # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
@@ -2668,6 +3558,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Filebeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
@@ -2763,30 +3657,45 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Optional SSL configuration options. SSL is off by default.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
@@ -2798,6 +3707,12 @@ output.elasticsearch:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -2906,41 +3821,59 @@ output.elasticsearch:
   # occurs on the proxy server.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # Optional SSL configuration options. SSL is off by default.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
 
 # -------------------------------- File Output ---------------------------------
 #output.file:
@@ -3074,6 +4007,11 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default filebeat uses the legacy index templates.
+#setup.template.type: legacy
+
 # Template name. By default the template name is "filebeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "filebeat-%{[agent.version]}"
@@ -3102,6 +4040,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of filebeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
@@ -3177,20 +4117,35 @@ setup.kibana:
   # Optional Kibana space ID.
   #space.id: ""
 
-  # Use SSL settings for HTTPS. Default is true.
+  # Custom HTTP headers to add to each request
+  #headers:
+  #  X-My-Header: Contents of the header
+
+  # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -3209,6 +4164,17 @@ setup.kibana:
   # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
+  # Configure what types of renegotiation are supported. Valid options are
+  # never, once, and freely. Default is never.
+  #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
+
+
 # ================================== Logging ===================================
 
 # There are four options for the log output: file, stderr, syslog, eventlog
@@ -3219,7 +4185,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
@@ -3359,17 +4325,28 @@ logging.files:
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
-  # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
-  # susceptible to man-in-the-middle attacks. Use only for testing. Default is
-  # `full`.
+  # Controls the verification of certificates. Valid values are:
+  # * full, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
+  # * certificate, which verifies that the provided certificate is signed by a
+  # trusted authority (CA), but does not perform any hostname verification.
+  #  * none, which performs no verification of the server's certificate. This
+  # mode disables many of the security benefits of SSL/TLS and should only be used
+  # after very careful consideration. It is primarily intended as a temporary
+  # diagnostic mechanism when attempting to resolve TLS errors; its use in
+  # production environments is strongly discouraged.
+  # The default value is full.
   #ssl.verification_mode: full
 
   # List of supported/valid TLS versions. By default all TLS versions from 1.1
   # up to 1.3 are enabled.
   #ssl.supported_protocols: [TLSv1.1, TLSv1.2, TLSv1.3]
 
-  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
@@ -3391,6 +4368,12 @@ logging.files:
   # Configure what types of renegotiation are supported. Valid options are
   # never, once, and freely. Default is never.
   #ssl.renegotiation: never
+
+  # Configure a pin that can be used to do extra validation of the verified certificate chain,
+  # this allow you to ensure that a specific certificate is used to validate the chain of trust.
+  #
+  # The pin is a base64 encoded string of the SHA-256 fingerprint.
+  #ssl.ca_sha256: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

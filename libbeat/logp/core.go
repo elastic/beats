@@ -79,7 +79,7 @@ func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 
 	// Build a single output (stderr has priority if more than one are enabled).
 	if cfg.toObserver {
-		sink, observedLogs = observer.New(cfg.Level.zapLevel())
+		sink, observedLogs = observer.New(cfg.Level.ZapLevel())
 	} else {
 		sink, err = createLogOutput(cfg)
 	}
@@ -201,16 +201,16 @@ func makeOptions(cfg Config) []zap.Option {
 
 func makeStderrOutput(cfg Config) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
 }
 
 func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
 }
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newSyslog(buildEncoder(cfg), cfg.Level.ZapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 }
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.ZapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +244,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		return nil, errors.Wrap(err, "failed to create file rotator")
 	}
 
-	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
 }
 
 func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {

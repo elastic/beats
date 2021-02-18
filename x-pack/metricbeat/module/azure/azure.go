@@ -6,49 +6,11 @@ package azure
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-// Config options
-type Config struct {
-	ClientId            string           `config:"client_id"`
-	ClientSecret        string           `config:"client_secret"`
-	TenantId            string           `config:"tenant_id"`
-	SubscriptionId      string           `config:"subscription_id"`
-	Period              time.Duration    `config:"period" validate:"nonzero,required"`
-	Resources           []ResourceConfig `config:"resources"`
-	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
-	DefaultResourceType string           `config:"default_resource_type"`
-}
-
-// ResourceConfig contains resource and metric list specific configuration.
-type ResourceConfig struct {
-	Id          []string       `config:"resource_id"`
-	Group       []string       `config:"resource_group"`
-	Metrics     []MetricConfig `config:"metrics"`
-	Type        string         `config:"resource_type"`
-	Query       string         `config:"resource_query"`
-	ServiceType []string       `config:"service_type"`
-}
-
-// MetricConfig contains metric specific configuration.
-type MetricConfig struct {
-	Name         []string          `config:"name"`
-	Namespace    string            `config:"namespace"`
-	Aggregations []string          `config:"aggregations"`
-	Dimensions   []DimensionConfig `config:"dimensions"`
-	Timegrain    string            `config:"timegrain"`
-}
-
-// DimensionConfig contains dimensions specific configuration.
-type DimensionConfig struct {
-	Name  string `config:"name"`
-	Value string `config:"value"`
-}
 
 func init() {
 	// Register the ModuleFactory function for the "azure" module.
@@ -127,20 +89,20 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	err := m.Client.InitResources(m.MapMetrics, report)
+	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
-	if len(m.Client.Resources.Metrics) == 0 {
+	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
 		// error message is previously logged in the InitResources, no error event should be created
 		return nil
 	}
 	// retrieve metrics
-	groupedMetrics := groupMetricsByResource(m.Client.Resources.Metrics)
+	groupedMetrics := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
 
 	for _, metrics := range groupedMetrics {
 		results := m.Client.GetMetricValues(metrics, report)
-		err := EventsMapping(results, m.BaseMetricSet.Name(), report)
+		err := EventsMapping(results, m.Client, report)
 		if err != nil {
 			return errors.Wrap(err, "error running EventsMapping")
 		}
@@ -159,20 +121,4 @@ func hasConfigOptions(config []string) bool {
 		}
 	}
 	return true
-}
-
-func (conf *Config) Validate() error {
-	if conf.SubscriptionId == "" {
-		return errors.New("no subscription ID has been configured")
-	}
-	if conf.ClientSecret == "" {
-		return errors.New("no client secret has been configured")
-	}
-	if conf.ClientId == "" {
-		return errors.New("no client ID has been configured")
-	}
-	if conf.TenantId == "" {
-		return errors.New("no tenant ID has been configured")
-	}
-	return nil
 }

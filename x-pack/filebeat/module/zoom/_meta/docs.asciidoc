@@ -1,0 +1,56 @@
+[role="xpack"]
+
+:modulename: zoom
+:has-dashboards: false
+
+
+== Zoom module
+beta[]
+
+This is a module for Zoom webhook logs. The module creates an HTTP listener that accepts incoming webhooks from Zoom.
+
+To configure Zoom to send webhooks to the filebeat module, please follow the https://marketplace.zoom.us/docs/guides/build/webhook-only-app[Zoom Documentation].
+
+include::../include/gs-link.asciidoc[]
+
+:fileset_ex: webhook
+
+include::../include/configuring-intro.asciidoc[]
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `webhook` fileset settings
+
+When a webhook integration is created on Zoom, it will show a special token used to ensure that filebeat only handles HTTP requests from the correct source.
+This is configured with the `secret.header` and `secret.value` settings as shown below.
+
+Example config:
+
+[source,yaml]
+----
+- module: zoom
+  webhook:
+    enabled: true
+    var.input: http_endpoint
+    var.listen_address: 0.0.0.0
+    var.listen_port: 8080
+    var.secret.header: Authorization
+    var.secret.value: ZOOMTOKEN
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.listen_address`*::
+
+The IP address of the interface the module should listen on. Also supports 0.0.0.0 to listen on all interfaces.
+
+*`var.listen_port`*::
+
+The port the module should be listening on.
+
+*`var.ssl`*::
+
+Configuration options for SSL parameters like the SSL certificate and CA to use for the HTTP(s) listener See <<configuration-ssl>> for more information.
+
+:modulename!:
+:has-dashboards!:

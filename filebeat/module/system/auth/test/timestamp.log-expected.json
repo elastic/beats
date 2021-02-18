@@ -12,7 +12,17 @@
         "log.offset": 0,
         "message": "pam_unix(sudo-i:session): session opened for user root by userauth3(uid=0)",
         "process.name": "sudo",
-        "service.type": "system"
+        "related.hosts": [
+            "localhost"
+        ],
+        "related.user": [
+            "userauth3",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "0",
+        "user.name": "userauth3"
     },
     {
         "@timestamp": "2019-06-14T09:31:15.412-02:00",
@@ -27,6 +37,9 @@
         "log.offset": 118,
         "message": "user nobody logged out.",
         "process.name": "pam",
+        "related.hosts": [
+            "localhost"
+        ],
         "service.type": "system"
     }
 ]

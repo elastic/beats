@@ -205,6 +205,10 @@ func LoadList(file string) ([]*common.Config, error) {
 	return c, nil
 }
 
+func SetConfigPath(path string) {
+	*configPath = path
+}
+
 // GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.
 func GetPathConfig() string {
 	if *configPath != "" {

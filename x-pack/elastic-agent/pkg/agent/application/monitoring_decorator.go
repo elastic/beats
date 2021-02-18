@@ -5,8 +5,10 @@
 package application
 
 import (
+	"crypto/md5"
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 )
@@ -14,6 +16,7 @@ import (
 const (
 	monitoringName            = "FLEET_MONITORING"
 	programsKey               = "programs"
+	monitoringChecksumKey     = "monitoring_checksum"
 	monitoringKey             = "agent.monitoring"
 	monitoringUseOutputKey    = "agent.monitoring.use_output"
 	monitoringOutputFormatKey = "outputs.%s"
@@ -28,7 +31,7 @@ const (
 	defaultOutputName = "default"
 )
 
-func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
+func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
 	var err error
 	monitoringProgram := program.Program{
 		Spec: program.Spec{
@@ -63,7 +66,7 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	}
 
 	ast := rootAst.Clone()
-	if err := getMonitoringRule(monitoringOutputName).Apply(ast); err != nil {
+	if err := getMonitoringRule(monitoringOutputName).Apply(agentInfo, ast); err != nil {
 		return programsToRun, err
 	}
 
@@ -73,12 +76,15 @@ func injectMonitoring(outputGroup string, rootAst *transpiler.AST, programsToRun
 	}
 
 	programList := make([]string, 0, len(programsToRun))
+	cfgHash := md5.New()
 	for _, p := range programsToRun {
 		programList = append(programList, p.Spec.Cmd)
+		cfgHash.Write(p.Config.Hash())
 	}
-	// making program list part of the config
+	// making program list and their hashes part of the config
 	// so it will get regenerated with every change
 	config[programsKey] = programList
+	config[monitoringChecksumKey] = fmt.Sprintf("%x", cfgHash.Sum(nil))
 
 	monitoringProgram.Config, err = transpiler.NewAST(config)
 	if err != nil {
