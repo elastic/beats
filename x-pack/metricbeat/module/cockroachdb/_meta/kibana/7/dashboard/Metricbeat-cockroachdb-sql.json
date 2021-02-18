@@ -434,9 +434,15 @@
       "attributes": {
         "description": "Average SQL execution latency",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "[CRDB Dev] Average Exec latency [Metricbeat CockroachDB]",
+        "title": "Average Exec latency [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -523,7 +529,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "[CRDB Dev] Average Exec latency [Metricbeat CockroachDB]",
+          "title": "Average Exec latency [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -537,16 +543,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODIsMl0="
+      "updated_at": "2021-02-18T14:35:33.725Z",
+      "version": "WzM0MTAsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev Transactions [Metricbeat Cockoach]",
+        "title": "Transactions [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -690,7 +702,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev Transactions [Metricbeat Cockoach]",
+          "title": "Transactions [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -704,16 +716,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODMsMl0="
+      "updated_at": "2021-02-18T14:33:24.171Z",
+      "version": "WzMzMTIsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev SQL Bytes [Metricbeat Cockroach]",
+        "title": "SQL Bytes [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -812,7 +830,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev SQL Bytes [Metricbeat Cockroach]",
+          "title": "SQL Bytes [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -826,16 +844,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODQsMl0="
+      "updated_at": "2021-02-18T14:33:40.440Z",
+      "version": "WzMzMjgsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev Schema Changes [Metricbeat Cockroach]",
+        "title": "Schema Changes [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -882,7 +906,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev Schema Changes [Metricbeat Cockroach]",
+          "title": "Schema Changes [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -896,8 +920,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODUsMl0="
+      "updated_at": "2021-02-18T14:33:58.480Z",
+      "version": "WzMzNDAsMl0="
     }
   ],
   "version": "8.0.0-SNAPSHOT"

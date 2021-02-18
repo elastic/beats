@@ -1051,9 +1051,15 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev Live Nodes [Metricbeat CockroachDB]",
+        "title": "Live Nodes [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1118,7 +1124,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev Live Nodes [Metricbeat CockroachDB]",
+          "title": "Live Nodes [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -1132,16 +1138,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTIsMl0="
+      "updated_at": "2021-02-18T14:34:29.612Z",
+      "version": "WzMzNTMsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB DEV Cockroach Process Uptime [Metricbeat CockroachDB]",
+        "title": "Process Uptime [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1189,7 +1201,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB DEV Cockroach Process Uptime [Metricbeat CockroachDB]",
+          "title": "Process Uptime [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -1203,16 +1215,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTMsMl0="
+      "updated_at": "2021-02-18T14:32:59.495Z",
+      "version": "WzMyOTEsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "[CRDB Dev] Capacity Usage [Metricbeat CockroachDB]",
+        "title": "Capacity Usage [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1342,7 +1360,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "[CRDB Dev] Capacity Usage [Metricbeat CockroachDB]",
+          "title": "Capacity Usage [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -1356,16 +1374,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTQsMl0="
+      "updated_at": "2021-02-18T14:34:45.059Z",
+      "version": "WzMzNjgsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev Disk Metrics [Metricbeat CockroachDB]",
+        "title": "Disk Metrics [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1476,7 +1500,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev Disk Metrics [Metricbeat CockroachDB]",
+          "title": "Disk Metrics [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -1490,16 +1514,22 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTUsMl0="
+      "updated_at": "2021-02-18T14:35:00.108Z",
+      "version": "WzMzODQsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
         },
-        "title": "CRDB Dev Clock Offset [Metricbeat CockroachDB]",
+        "title": "Dev Clock Offset [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1549,7 +1579,7 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "CRDB Dev Clock Offset [Metricbeat CockroachDB]",
+          "title": "Dev Clock Offset [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
@@ -1563,8 +1593,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTYsMl0="
+      "updated_at": "2021-02-18T14:35:16.362Z",
+      "version": "WzMzOTgsMl0="
     }
   ],
   "version": "8.0.0-SNAPSHOT"
