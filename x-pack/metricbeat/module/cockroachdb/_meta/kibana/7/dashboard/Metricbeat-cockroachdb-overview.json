@@ -19,7 +19,9 @@
         },
         "panelsJSON": [
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 11,
               "i": "1",
@@ -30,10 +32,12 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 11,
               "i": "2",
@@ -44,10 +48,12 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "SQL queries",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 9,
               "i": "3",
@@ -58,10 +64,12 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Replicas per Store",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 9,
               "i": "4",
@@ -72,10 +80,12 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Replica leaseholders",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 9,
               "i": "5",
@@ -86,10 +96,12 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Ranges",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 10,
               "i": "6",
@@ -100,10 +112,12 @@
             "panelIndex": "6",
             "panelRefName": "panel_5",
             "title": "Average log commit latency",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
           },
           {
-            "embeddableConfig": {},
+            "embeddableConfig": {
+              "enhancements": {}
+            },
             "gridData": {
               "h": 10,
               "i": "7",
@@ -114,17 +128,101 @@
             "panelIndex": "7",
             "panelRefName": "panel_6",
             "title": "Average command commit latency",
-            "version": "7.1.0"
+            "version": "8.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 10,
+              "i": "3b2a916c-213c-4179-93f6-067224d1f741",
+              "w": 24,
+              "x": 0,
+              "y": 30
+            },
+            "panelIndex": "3b2a916c-213c-4179-93f6-067224d1f741",
+            "panelRefName": "panel_7",
+            "title": "Live Nodes",
+            "version": "8.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 10,
+              "i": "725c9437-5d36-48bd-9328-e08637e42ac7",
+              "w": 24,
+              "x": 24,
+              "y": 30
+            },
+            "panelIndex": "725c9437-5d36-48bd-9328-e08637e42ac7",
+            "panelRefName": "panel_8",
+            "title": "Process Uptime",
+            "version": "8.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 10,
+              "i": "7d37508a-3614-4c51-b8e1-84d9101a233b",
+              "w": 24,
+              "x": 0,
+              "y": 40
+            },
+            "panelIndex": "7d37508a-3614-4c51-b8e1-84d9101a233b",
+            "panelRefName": "panel_9",
+            "title": "Capacity Usage",
+            "version": "8.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 10,
+              "i": "3b319d88-1798-433b-9ab8-783c53d24423",
+              "w": 24,
+              "x": 24,
+              "y": 40
+            },
+            "panelIndex": "3b319d88-1798-433b-9ab8-783c53d24423",
+            "panelRefName": "panel_10",
+            "title": "Disk Metrics",
+            "version": "8.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 10,
+              "i": "7cf99937-570d-4132-ab15-204a547bd986",
+              "w": 24,
+              "x": 0,
+              "y": 50
+            },
+            "panelIndex": "7cf99937-570d-4132-ab15-204a547bd986",
+            "panelRefName": "panel_11",
+            "title": "Node Clock Offset",
+            "version": "8.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat CockroachDB] Overview",
         "version": 1
       },
-      "id": "e3ba0c30-9766-11e9-9eea-6f554992ec1f",
+      "coreMigrationVersion": "8.0.0",
+      "id": "04b595b0-c1fc-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "dashboard": "7.0.0"
+        "dashboard": "7.11.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [
         {
           "id": "79691920-9766-11e9-9eea-6f554992ec1f",
@@ -160,23 +258,42 @@
           "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
           "name": "panel_6",
           "type": "visualization"
+        },
+        {
+          "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
+          "name": "panel_9",
+          "type": "visualization"
+        },
+        {
+          "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
+          "name": "panel_10",
+          "type": "visualization"
+        },
+        {
+          "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
+          "name": "panel_11",
+          "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-06-25T19:17:43.667Z",
-      "version": "WzU0LDFd"
+      "updated_at": "2021-02-17T18:31:28.566Z",
+      "version": "WzI5MTgsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Number of SQL connections [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -227,26 +344,24 @@
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:10:30.316Z",
-      "version": "WzUxLDFd"
+      "updated_at": "2021-02-17T18:10:09.109Z",
+      "version": "WzIzODAsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "SQL queries [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -259,9 +374,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -282,7 +399,7 @@
                     "field": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
                     "id": "658d2990-9762-11e9-b3d5-07b0ab7d6354",
                     "type": "derivative",
-                    "unit": ""
+                    "unit": "1s"
                   },
                   {
                     "field": "658d2990-9762-11e9-b3d5-07b0ab7d6354",
@@ -294,10 +411,12 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "stacked",
                 "terms_field": "service.address",
-                "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354"
+                "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -319,7 +438,7 @@
                     "field": "02d89101-9761-11e9-b3d5-07b0ab7d6354",
                     "id": "74eba420-9762-11e9-b3d5-07b0ab7d6354",
                     "type": "derivative",
-                    "unit": ""
+                    "unit": "1s"
                   },
                   {
                     "field": "74eba420-9762-11e9-b3d5-07b0ab7d6354",
@@ -330,8 +449,10 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
-                "stacked": "stacked"
+                "stacked": "stacked",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -353,7 +474,7 @@
                     "field": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "id": "9aa7ace0-9762-11e9-b3d5-07b0ab7d6354",
                     "type": "derivative",
-                    "unit": ""
+                    "unit": "1s"
                   },
                   {
                     "field": "9aa7ace0-9762-11e9-b3d5-07b0ab7d6354",
@@ -364,9 +485,11 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "stacked",
-                "terms_field": "service.address"
+                "terms_field": "service.address",
+                "type": "timeseries"
               },
               {
                 "axis_position": "right",
@@ -388,7 +511,7 @@
                     "field": "03f6d241-9761-11e9-b3d5-07b0ab7d6354",
                     "id": "a3ed7c30-9762-11e9-b3d5-07b0ab7d6354",
                     "type": "derivative",
-                    "unit": ""
+                    "unit": "1s"
                   },
                   {
                     "field": "a3ed7c30-9762-11e9-b3d5-07b0ab7d6354",
@@ -399,39 +522,40 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
-                "stacked": "stacked"
+                "stacked": "stacked",
+                "type": "timeseries"
               }
             ],
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "SQL queries [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:41:34.934Z",
-      "version": "WzQ0LDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4ODYsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Replicas per Store [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -443,9 +567,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -476,32 +602,31 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Replicas per Store [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "bad285b0-9769-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:06:30.737Z",
-      "version": "WzQ4LDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4ODcsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Replica leaseholders [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -513,9 +638,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -544,32 +671,31 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Replica leaseholders [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "8add0960-976a-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:34:03.281Z",
-      "version": "WzQwLDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4ODgsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Ranges [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -581,9 +707,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -603,6 +731,7 @@
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "terms_field": null
@@ -625,6 +754,7 @@
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "terms_field": null
@@ -647,6 +777,7 @@
                 ],
                 "point_size": "2",
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "terms_field": null
@@ -669,6 +800,7 @@
                 ],
                 "point_size": 1,
                 "separate_axis": 0,
+                "split_color_mode": "gradient",
                 "split_mode": "everything",
                 "stacked": "none",
                 "terms_field": null
@@ -677,32 +809,31 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Ranges [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "2af19b90-976c-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T18:38:28.645Z",
-      "version": "WzQyLDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4ODksMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Log commit latency [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -714,9 +845,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -785,32 +918,31 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Log commit latency [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "74cf44b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:08:05.279Z",
-      "version": "WzQ5LDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTAsMl0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Command commit latency [Metricbeat CockroachDB]",
         "uiStateJSON": {},
@@ -822,9 +954,11 @@
             "axis_position": "left",
             "axis_scale": "normal",
             "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
-            "interval": "auto",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
             "series": [
               {
                 "axis_position": "right",
@@ -893,21 +1027,545 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
             "type": "timeseries"
           },
           "title": "Command commit latency [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "8.0.0",
       "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.0.1"
+        "visualization": "7.12.0"
       },
+      "namespaces": [
+        "default"
+      ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-06-25T19:08:47.407Z",
-      "version": "WzUwLDFd"
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTEsMl0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "CRDB Dev Live Nodes [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "4e4d6390-c1fe-11ea-bd96-b595ac63d5e9"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "59bbdf40-c1fe-11ea-bd96-b595ac63d5e9"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "gauge_color_rules": [
+              {
+                "id": "f1642eb0-c1fe-11ea-bd96-b595ac63d5e9"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0.5",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Live Nodes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.liveness_livenodes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "kibana",
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_field": "prometheus.metrics.node_id",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "CRDB Dev Live Nodes [Metricbeat CockroachDB]",
+          "type": "metrics"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
+      "migrationVersion": {
+        "visualization": "7.12.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTIsMl0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "CRDB DEV Cockroach Process Uptime [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "s,h,2",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Cockroach Process Uptime",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.sys_uptime",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "kibana",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "service.address",
+                "type": "timeseries",
+                "value_template": "{{value}} h"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "CRDB DEV Cockroach Process Uptime [Metricbeat CockroachDB]",
+          "type": "metrics"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
+      "migrationVersion": {
+        "visualization": "7.12.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTMsMl0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "[CRDB Dev] Capacity Usage [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "68be3790-ec65-11ea-8a63-93b9b48262dc"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "6eabb420-ec65-11ea-8a63-93b9b48262dc"
+              }
+            ],
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "gauge_color_rules": [
+              {
+                "id": "71a5ba40-ec65-11ea-8a63-93b9b48262dc"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "hidden": false,
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Total Capacity",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.capacity",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_filters": [
+                  {
+                    "color": "#68BC00",
+                    "filter": {
+                      "language": "kuery",
+                      "query": ""
+                    },
+                    "id": "0464ddc0-ec66-11ea-8a63-93b9b48262dc"
+                  }
+                ],
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_direction": "desc",
+                "terms_field": "service.address",
+                "terms_order_by": "_count",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(115,216,255,1)",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "775782d0-ec64-11ea-8a63-93b9b48262dc",
+                "label": "Capacity Available",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.capacity_available",
+                    "id": "775782d1-ec64-11ea-8a63-93b9b48262dc",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_direction": "desc",
+                "terms_field": "service.address",
+                "terms_order_by": "_count",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(254,146,0,1)",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "78322b60-ec64-11ea-8a63-93b9b48262dc",
+                "label": "Capacity Used",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.capacity_used",
+                    "id": "78322b61-ec64-11ea-8a63-93b9b48262dc",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_direction": "desc",
+                "terms_field": "service.address",
+                "terms_order_by": "_count",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "[CRDB Dev] Capacity Usage [Metricbeat CockroachDB]",
+          "type": "metrics"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
+      "migrationVersion": {
+        "visualization": "7.12.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTQsMl0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "CRDB Dev Disk Metrics [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(254,146,0,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "e4489e50-976b-11e9-b3d5-07b0ab7d6354",
+                "label": "Disk IOPS in Progress",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.sys_host_disk_iopsinprogress",
+                    "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
+                    "type": "max",
+                    "unit": "1s"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "gradient",
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_field": "host.name",
+                "terms_size": "100",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(252,220,0,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "c938f9c0-976b-11e9-b3d5-07b0ab7d6354",
+                "label": "Disk Read Ops",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.sys_host_disk_read_count",
+                    "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
+                    "type": "positive_rate",
+                    "unit": "1s"
+                  },
+                  {
+                    "function": "sum",
+                    "id": "b5a57e90-ec67-11ea-8a63-93b9b48262dc",
+                    "type": "series_agg"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "gradient",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "host.name",
+                "terms_size": "100",
+                "type": "timeseries"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(244,78,59,1)",
+                "fill": "0",
+                "formatter": "number",
+                "id": "0ed1bf80-976c-11e9-b3d5-07b0ab7d6354",
+                "label": "Disk Write Ops",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.sys_host_disk_write_count",
+                    "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
+                    "type": "positive_rate",
+                    "unit": "1s"
+                  },
+                  {
+                    "function": "sum",
+                    "id": "d6fb6e10-ec67-11ea-8a63-93b9b48262dc",
+                    "type": "series_agg"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "gradient",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "service.address",
+                "terms_order_by": "_key",
+                "type": "timeseries"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "CRDB Dev Disk Metrics [Metricbeat CockroachDB]",
+          "type": "metrics"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
+      "migrationVersion": {
+        "visualization": "7.12.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTUsMl0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {}
+        },
+        "title": "CRDB Dev Clock Offset [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "default_index_pattern": "metricbeat-*",
+            "default_timefield": "@timestamp",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "\u003e=10s",
+            "isModelInvalid": false,
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(84,179,153,1)",
+                "fill": 0.5,
+                "formatter": "ns,ms,3",
+                "id": "88d6bda0-9760-11e9-b3d5-07b0ab7d6354",
+                "label": "Clock Offsets",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "prometheus.metrics.clock_offset_meannanos",
+                    "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                    "type": "max"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "stacked",
+                "terms_field": "service.address",
+                "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                "type": "timeseries",
+                "value_template": "{{value}} ms"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "tooltip_mode": "show_all",
+            "type": "timeseries"
+          },
+          "title": "CRDB Dev Clock Offset [Metricbeat CockroachDB]",
+          "type": "metrics"
+        }
+      },
+      "coreMigrationVersion": "8.0.0",
+      "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
+      "migrationVersion": {
+        "visualization": "7.12.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-17T18:14:40.449Z",
+      "version": "WzI4OTYsMl0="
     }
   ],
-  "version": "7.1.0"
+  "version": "8.0.0-SNAPSHOT"
 }
