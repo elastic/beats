@@ -1,5 +1,5 @@
 # Module: infoblox
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.12/filebeat-module-infoblox.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-infoblox.html
 
 - module: infoblox
   nios:

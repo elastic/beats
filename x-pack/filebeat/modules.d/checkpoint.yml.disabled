@@ -1,5 +1,5 @@
 # Module: checkpoint
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.12/filebeat-module-checkpoint.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-checkpoint.html
 
 - module: checkpoint
   firewall:
