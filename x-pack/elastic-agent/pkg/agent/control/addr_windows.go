@@ -17,7 +17,7 @@ import (
 // Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
 	// when installed the control address is fixed
-	if install.RunningInstalled() {
+	if info.RunningInstalled() {
 		return install.SocketPath
 	}
 
