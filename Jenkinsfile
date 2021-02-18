@@ -610,7 +610,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
   } finally {
     // If there are environmental issues then let's avoid the archiving of none files.
     if (archive && !environmentalIssue) {
-      archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: uploadGeneratedFiles)
+      dir("${env.BASE_DIR}") {
+        archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: uploadGeneratedFiles)
+      }
     }
     // Tear down the setup for the permanent workers.
     catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
@@ -624,7 +626,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
 /**
 * This method analyse if the existing stage failed with some environmental issues.
 * So far the analysis is just purely based on a boolean that detects if the installation of
-* the required tools for building and testing in the agent were successfully installed.
+* the required tools for building and testing in the agent were successfully installed or
+* some unexpected pre-building/testing errors, such as deleting the workspace.
 * We can use this method in the future to analyse the build logs for searching specific patterns
 * such as, not able to access the docker registry, or failed when pulling some docker images.
 */
