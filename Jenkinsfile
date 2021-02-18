@@ -622,7 +622,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
 }
 
 /**
-* This method analyse if the existing stage failed with some enviornmental issues.
+* This method analyse if the existing stage failed with some environmental issues.
 * So far the analysis is just purely based on a boolean that detects if the installation of
 * the required tools for building and testing in the agent were successfully installed.
 * We can use this method in the future to analyse the build logs for searching specific patterns
