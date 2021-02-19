@@ -132,9 +132,10 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 	if release.Snapshot() {
 		currentVersion = fmt.Sprintf("%s-SNAPSHOT", currentVersion)
 	}
+	artifactConfig := artifact.DefaultConfig()
 
 	for _, p := range pp {
-		descriptor := app.NewDescriptor(p.Spec, currentVersion, artifact.DefaultConfig(), nil)
+		descriptor := app.NewDescriptor(p.Spec, currentVersion, artifactConfig, nil)
 		if err := uninstaller.Uninstall(ctx, p.Spec, currentVersion, descriptor.Directory()); err != nil {
 			fmt.Printf("failed to uninstall '%s': %v\n", p.Spec.Name, err)
 		}
