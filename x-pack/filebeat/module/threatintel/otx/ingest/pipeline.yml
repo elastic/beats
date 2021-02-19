@@ -153,7 +153,7 @@ processors:
     field:
     - threatintel.otx.content
     ignore_missing: true
-    if: ctx?.threatintel?.otx?.content != ""
+    if: ctx?.threatintel?.otx?.content == ""
 - remove:
     field:
     - threatintel.otx.type
