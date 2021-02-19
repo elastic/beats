@@ -386,15 +386,9 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
-    def status = sh(label: "Change tag and push ${targetName}", script: """#!/usr/bin/env bash
-      docker images
-      if docker image inspect "${sourceName}" &> /dev/null ; then
-        docker tag ${sourceName} ${targetName}
-        docker push ${targetName}
-      else
-        echo 'docker image ${sourceName} does not exist'
-      fi
-    """, returnStatus: true)
+    def status = sh(label: "Change tag and push ${targetName}",
+                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
+                    returnStatus: true)
     if ( status > 0 && iterations < 3) {
       error("tag and push failed for ${beatName}, retry")
     } else if ( status > 0 ) {
