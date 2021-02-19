@@ -111,13 +111,13 @@ processors:
 - grok:
     field: threatintel.misp.attribute.type
     patterns: 
-      - "%{DATA}\\|%{DATA:_tmp.hashtype}"
+      - "%{WORD}\\|%{WORD:_tmp.hashtype}"
     ignore_missing: true
     if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
 - grok:
     field: threatintel.misp.attribute.value
     patterns: 
-      - "%{DATA:threatintel.indicator.file.name}\\|%{DATA:_tmp.hashvalue}"
+      - "%{DATA:threatintel.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
     ignore_missing: true
     if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
 - set:
