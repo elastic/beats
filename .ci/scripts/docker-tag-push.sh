@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 MSG="parameter missing."
-sourceName=${1:?$MSG}
-targetName=${2:?$MSG}
+SOURCE_IMAGE=${1:?$MSG}
+TARGET_IMAGE=${2:?$MSG}
 
-if docker image inspect "${sourceName}" &> /dev/null ; then
-    docker tag ${sourceName} ${targetName}
-    docker push ${targetName}
+if docker image inspect "${SOURCE_IMAGE}" &> /dev/null ; then
+    docker tag "${SOURCE_IMAGE}" "${TARGET_IMAGE}"
+    docker push "${TARGET_IMAGE}"
 else
-    echo "docker image ${sourceName} does not exist"
+    echo "docker image ${SOURCE_IMAGE} does not exist"
 fi
