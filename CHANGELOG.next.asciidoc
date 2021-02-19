@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -105,6 +106,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
 
 *Heartbeat*
+- Adds negative body match. {pull}20728[20728]
+- Refactor synthetics configuration to new syntax. {pull}23467[23467]
 
 *Journalbeat*
 
@@ -994,6 +997,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 
 *Packetbeat*
