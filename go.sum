@@ -746,8 +746,8 @@ go.elastic.co/ecszap v0.3.0/go.mod h1:HTUi+QRmr3EuZMqxPX+5fyOdMNfUu5iPebgfhgsTJY
 go.elastic.co/fastjson v1.0.0/go.mod h1:PmeUOMMtLHQr9ZS9J9owrAVg0FkaZDRZJEFTTGHtchs=
 go.elastic.co/fastjson v1.1.0 h1:3MrGBWWVIxe/xvsbpghtkFoPciPhOCmjsR/HfwEeQR4=
 go.elastic.co/fastjson v1.1.0/go.mod h1:boNGISWMjQsUPy/t6yqt2/1Wx4YNPSe+mZjlyw9vKKI=
-go.elastic.co/go-licence-detector v0.4.0 h1:it5dP+6LPxLsosdhtbAqk/zJQxzS0QSSpdNkKVuwKMs=
-go.elastic.co/go-licence-detector v0.4.0/go.mod h1:fSJQU8au4SAgDK+UQFbgUPsXKYNBDv4E/dwWevrMpXU=
+go.elastic.co/go-licence-detector v0.5.0 h1:YXPCyt9faKMdJ8uMrkcI4patk8WZ0ME5oaIhYBUsRU4=
+go.elastic.co/go-licence-detector v0.5.0/go.mod h1:fSJQU8au4SAgDK+UQFbgUPsXKYNBDv4E/dwWevrMpXU=
 go.etcd.io/bbolt v1.3.4 h1:hi1bXHMVrlQh6WwxAy+qZCV/SYIlqo+Ushwdpa4tAKg=
 go.etcd.io/bbolt v1.3.4/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=

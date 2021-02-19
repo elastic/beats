@@ -158,7 +158,7 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
 	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.elastic.co/ecszap v0.3.0
-	go.elastic.co/go-licence-detector v0.4.0
+	go.elastic.co/go-licence-detector v0.5.0
 	go.etcd.io/bbolt v1.3.4
 	go.uber.org/atomic v1.5.0
 	go.uber.org/multierr v1.3.0
