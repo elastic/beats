@@ -572,6 +572,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
