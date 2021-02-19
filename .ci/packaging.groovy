@@ -152,7 +152,9 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    pushCIDockerImages(arch: 'amd64')
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'amd64')
+                    }
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
@@ -235,7 +237,9 @@ pipeline {
                   withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
                     deleteWorkspace()
                     release()
-                    pushCIDockerImages(multiplatform: true, arch: 'arm64')
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'arm64')
+                    }
                   }
                 }
                 post {
@@ -275,26 +279,24 @@ pipeline {
 
 /**
 * @param arch what architecture
-* @param multiplatform whether to create the docker manifest multiplatform
 */
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
-  def multiplatform = args.get('multiplatform', false)
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      tagAndPush(beatName: 'auditbeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'auditbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      tagAndPush(beatName: 'filebeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      tagAndPush(beatName: 'heartbeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'heartbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      tagAndPush(beatName: 'metricbeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', multiplatform: multiplatform, arch: arch)
+      tagAndPush(beatName: 'elastic-agent', arch: arch)
     }
   }
 }
@@ -302,12 +304,10 @@ def pushCIDockerImages(Map args = [:]) {
 /**
 * @param beatName name of the Beat
 * @param arch what architecture
-* @param multiplatform whether to create the docker manifest multiplatform
 */
 def tagAndPush(Map args = [:]) {
   def beatName = args.beatName
   def arch = args.get('arch', 'amd64')
-  def multiplatform = args.get('multiplatform', false)
   def libbetaVer = env.BEAT_VERSION
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
@@ -334,17 +334,6 @@ def tagAndPush(Map args = [:]) {
   variants.each { variant ->
     tags.each { tag ->
       doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
-    }
-  }
-
-  if (multiplatform) {
-    variants.each { variant ->
-      tags.each { tag ->
-        def template = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}-ARCH"
-        def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-        sh(label: "Create multiplatform",
-          script: ".ci/scripts/docker-manifest.sh ${sourceName} ${targetName}")
-      }
     }
   }
 }
