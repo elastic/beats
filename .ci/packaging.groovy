@@ -216,7 +216,6 @@ pipeline {
               }
             }
             stages {
-              // This should always after the linux/amd64 packaging to support the multiplatform docker registry
               stage('Package Docker images for linux/arm64'){
                 agent { label 'arm' }
                 options { skipDefaultCheckout() }
