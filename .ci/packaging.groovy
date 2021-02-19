@@ -234,7 +234,7 @@ pipeline {
                   withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
                     deleteWorkspace()
                     release()
-                    pushCIDockerImages()
+                    pushCIDockerImages(multiplatform: true)
                   }
                 }
                 post {
@@ -330,7 +330,7 @@ def tagAndPush(beatName){
 def doTagAndPush(beatName, variant, sourceTag, targetTag) {
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
+  def multiplatform = false
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
@@ -342,6 +342,12 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
     } else if ( status > 0 ) {
       log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
     }
+  }
+
+  // Docker manifest for multiplaforms
+  if (multiplatform) {
+    sh(label: "Create multiplatform",
+       script: ".ci/scripts/docker-manifest.sh ${sourceName} ${targetName}")
   }
 }
 
