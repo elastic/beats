@@ -210,11 +210,6 @@ that of the `audit_rules` field.
 prevent backpressure from propagating to the kernel and impacting audited
 processes.
 
-*`reload`*:: `enabled` auditbeat check auditd rule files in fixed interval 
-`period`, reload auditd rule on host if any changes to the rule file detected.
-Its similar to the config reload, but instead of .yml files it is for .rules
-files.
-
 +
 --
 The possible values are:
@@ -233,6 +228,11 @@ option accordingly.
 time.
 - `none`: No backpressure mitigation measures are enabled.
 --
+
+*`reload`*:: `enabled` auditbeat check auditd rule files in fixed interval 
+`period`, reload auditd rule on host if any changes to the rule file detected.
+Its similar to the config reload, but instead of .yml files it is for .rules
+files.
 
 include::{docdir}/auditbeat-options.asciidoc[]
 

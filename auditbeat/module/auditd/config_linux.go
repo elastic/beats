@@ -92,7 +92,7 @@ var defaultConfig = Config{
 	StreamBufferConsumers:  0,
 	Reload: Reload{
 		Period:  10 * time.Second,
-		Enabled: true,
+		Enabled: false,
 	},
 }
 
