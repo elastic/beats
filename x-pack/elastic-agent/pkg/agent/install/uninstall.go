@@ -128,9 +128,14 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 		return err
 	}
 
+	currentVersion := release.Version()
+	if release.Snapshot() {
+		currentVersion = fmt.Sprintf("%s-SNAPSHOT", currentVersion)
+	}
+
 	for _, p := range pp {
-		descriptor := app.NewDescriptor(p.Spec, release.Version(), artifact.DefaultConfig(), nil)
-		if err := uninstaller.Uninstall(ctx, p.Spec, release.Version(), descriptor.Directory()); err != nil {
+		descriptor := app.NewDescriptor(p.Spec, currentVersion, artifact.DefaultConfig(), nil)
+		if err := uninstaller.Uninstall(ctx, p.Spec, currentVersion, descriptor.Directory()); err != nil {
 			fmt.Printf("failed to uninstall '%s': %v\n", p.Spec.Name, err)
 		}
 	}
