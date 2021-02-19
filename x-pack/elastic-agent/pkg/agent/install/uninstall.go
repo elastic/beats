@@ -46,6 +46,10 @@ func Uninstall(cfgFile string) error {
 	}
 	_ = svc.Uninstall()
 
+	if err := uninstallPrograms(context.Background(), cfgFile); err != nil {
+		return err
+	}
+
 	// remove, if present on platform
 	if paths.ShellWrapperPath != "" {
 		err = os.Remove(paths.ShellWrapperPath)
