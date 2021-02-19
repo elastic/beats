@@ -15,17 +15,18 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
-
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
@@ -84,6 +85,11 @@ type EnrollCmdOption struct {
 	Staging              string
 	FleetServerConnStr   string
 	FleetServerPolicyID  string
+	FleetServerHost   string
+	FleetServerPort      uint16
+	FleetServerCert		 string
+	FleetServerCertKey   string
+	FleetServerInsecure  bool
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -192,13 +198,21 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 }
 
 func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
-	c.log.Debug("verifying communication with running Elastic Agent daemon")
-	_, err := getDaemonStatus(ctx)
+	err := c.prepareFleetTLS()
 	if err != nil {
-		return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+		return err
 	}
 
-	fleetConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+	c.log.Debug("verifying communication with running Elastic Agent daemon")
+	//_, err = getDaemonStatus(ctx)
+	//if err != nil {
+	//	return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+	//}
+
+	fleetConfig, err := createFleetServerBootstrapConfig(
+		c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
+		c.options.FleetServerHost, c.options.FleetServerPort,
+		c.options.FleetServerCert, c.options.FleetServerCertKey)
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
@@ -218,6 +232,41 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	err = waitForFleetServer(ctx, c.log)
 	if err != nil {
 		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+	}
+	return nil
+}
+
+func (c *EnrollCmd) prepareFleetTLS() error {
+	if c.options.FleetServerCert != "" && c.options.FleetServerCertKey == "" {
+		return errors.New("certificate private key is required when certificate provided")
+	}
+	if c.options.FleetServerCertKey != "" && c.options.FleetServerCert == "" {
+		return errors.New("certificate is required when certificate private key is provided")
+	}
+	if c.options.FleetServerCert == "" && c.options.FleetServerCertKey == "" {
+		if c.options.FleetServerInsecure {
+			// running insecure, force the binding to localhost (unless specified)
+			if c.options.FleetServerHost == "" {
+				c.options.FleetServerHost = "localhost"
+			}
+			return nil
+		}
+
+		c.log.Info("generating self-signed certificate for Fleet Server")
+		hostname, err := os.Hostname()
+		if err != nil {
+			return err
+		}
+		ca, err := authority.NewCA()
+		if err != nil {
+			return err
+		}
+		pair, err := ca.GeneratePairWithName(hostname)
+		if err != nil {
+			return err
+		}
+		c.options.FleetServerCert = string(pair.Crt)
+		c.options.FleetServerCertKey = string(pair.Key)
 	}
 	return nil
 }
@@ -286,7 +335,10 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		}
 	}
 	if c.options.FleetServerConnStr != "" {
-		serverConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+		serverConfig, err := createFleetServerBootstrapConfig(
+			c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
+			c.options.FleetServerHost, c.options.FleetServerPort,
+			c.options.FleetServerCert, c.options.FleetServerCertKey)
 		if err != nil {
 			return err
 		}
