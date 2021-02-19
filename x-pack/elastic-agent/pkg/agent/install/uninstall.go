@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -128,8 +129,9 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 	}
 
 	for _, p := range pp {
-		if err := uninstaller.Uninstall(ctx, p.Spec, release.Version(), artifact.DefaultConfig().InstallPath); err != nil {
-			fmt.Printf("failed to uninstall '%s': %v", p.Spec.Name, err)
+		descriptor := app.NewDescriptor(p.Spec, release.Version(), artifact.DefaultConfig(), nil)
+		if err := uninstaller.Uninstall(ctx, p.Spec, release.Version(), descriptor.Directory()); err != nil {
+			fmt.Printf("failed to uninstall '%s': %v\n", p.Spec.Name, err)
 		}
 	}
 
