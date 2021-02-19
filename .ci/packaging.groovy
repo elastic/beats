@@ -252,7 +252,6 @@ pipeline {
             }
           }
         }
-        /*
         stage('Run E2E Tests for Packages'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
@@ -260,7 +259,6 @@ pipeline {
             runE2ETests()
           }
         }
-        */
       }
       post {
         success {
