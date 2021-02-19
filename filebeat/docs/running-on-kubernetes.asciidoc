@@ -241,4 +241,4 @@ According to https://kubernetes.io/docs/concepts/cluster-administration/logging/
 _Kubernetes is not responsible for rotating logs, but rather a deployment tool should set up a solution to address that_.
 Different logrotation strategies can cause issues that might make Filebeat losing events or even duplicating events.
 Users can find more information about Filebeat's logrotation best practises at Filebeat's
-https://www.elastic.co/guide/en/beats/filebeat/current/file-log-rotation.html#file-log-rotation[logrotation specific documentation].
+<<file-log-rotation,log rotation specific documentation>>
