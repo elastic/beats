@@ -152,7 +152,7 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    pushCIDockerImages()
+                    pushCIDockerImages(arch: 'amd64')
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
@@ -214,6 +214,7 @@ pipeline {
               }
             }
             stages {
+              // This should always after the linux/amd64 packaging to support the multiplatform docker registry
               stage('Package Docker images for linux/arm64'){
                 agent { label 'arm' }
                 options { skipDefaultCheckout() }
@@ -234,7 +235,7 @@ pipeline {
                   withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
                     deleteWorkspace()
                     release()
-                    pushCIDockerImages(multiplatform: true)
+                    pushCIDockerImages(multiplatform: true, arch: 'arm64')
                   }
                 }
                 post {
@@ -272,27 +273,41 @@ pipeline {
   }
 }
 
-def pushCIDockerImages(){
+/**
+* @param arch what architecture
+* @param multiplatform whether to create the docker manifest multiplatform
+*/
+def pushCIDockerImages(Map args = [:]) {
+  def arch = args.get('arch', 'amd64')
+  def multiplatform = args.get('multiplatform', false)
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      tagAndPush('auditbeat')
+      tagAndPush(beatName: 'auditbeat', multiplatform: multiplatform, arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      tagAndPush('filebeat')
+      tagAndPush(beatName: 'filebeat', multiplatform: multiplatform, arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      tagAndPush('heartbeat')
+      tagAndPush(beatName: 'heartbeat', multiplatform: multiplatform, arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush('journalbeat')
+      tagAndPush(beatName: 'journalbeat', multiplatform: multiplatform, arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      tagAndPush('metricbeat')
+      tagAndPush(beatName: 'metricbeat', multiplatform: multiplatform, arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush('packetbeat')
+      tagAndPush(beatName: 'packetbeat', multiplatform: multiplatform, arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush('elastic-agent')
+      tagAndPush(beatName: 'elastic-agent', multiplatform: multiplatform, arch: arch)
     }
   }
 }
 
-def tagAndPush(beatName){
+/**
+* @param beatName name of the Beat
+* @param arch what architecture
+* @param multiplatform whether to create the docker manifest multiplatform
+*/
+def tagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def arch = args.get('arch', 'amd64')
+  def multiplatform = args.get('multiplatform', false)
   def libbetaVer = env.BEAT_VERSION
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
@@ -309,14 +324,27 @@ def tagAndPush(beatName){
 
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
 
+  // supported tags
+  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
+  if (!isPR() && aliasVersion != "") {
+    tags << aliasVersion
+  }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    doTagAndPush(beatName, variant, libbetaVer, tagName)
-    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
+    tags.each { tag ->
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+    }
+  }
 
-    if (!isPR() && aliasVersion != "") {
-      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+  if (multiplatform) {
+    variants.each { variant ->
+      tags.each { tag ->
+        def template = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}-ARCH"
+        def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+        sh(label: "Create multiplatform",
+          script: ".ci/scripts/docker-manifest.sh ${sourceName} ${targetName}")
+      }
     }
   }
 }
@@ -327,10 +355,13 @@ def tagAndPush(beatName){
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
-def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+def doTagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def variant = args.variant
+  def sourceTag = args.sourceTag
+  def targetTag = args.targetTag
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-  def multiplatform = false
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
@@ -342,12 +373,6 @@ def doTagAndPush(beatName, variant, sourceTag, targetTag) {
     } else if ( status > 0 ) {
       log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
     }
-  }
-
-  // Docker manifest for multiplaforms
-  if (multiplatform) {
-    sh(label: "Create multiplatform",
-       script: ".ci/scripts/docker-manifest.sh ${sourceName} ${targetName}")
   }
 }
 
