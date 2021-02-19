@@ -29,6 +29,7 @@
 - Fix timeout issue stopping service applications {pull}20256[20256]
 - Fix incorrect hash when upgrading agent {pull}22322[22322]
 - Fixed nil pointer during unenroll {pull}23609[23609]
+- Fix reloading of log level for services {pull}[24055]24055
 
 ==== New features
 
