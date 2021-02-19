@@ -32,6 +32,10 @@ processors:
 - date:
     field: threatintel.anomali.created
     formats:
+      - "yyyy-MM-dd'T'HH:mm:ssz"
+      - "yyyy-MM-dd'T'HH:mm:ssZ"
+      - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSz"
       - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
@@ -41,20 +45,24 @@ processors:
     field: threatintel.anomali.modified
     target_field: threatintel.anomali.modified
     formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSz"
       - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
       - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-    if: "ctx?.threatintel?.anomali?.created != null"
+    if: "ctx?.threatintel?.anomali?.modified != null"
 - date:
     field: threatintel.anomali.valid_from
     target_field: threatintel.anomali.valid_from
     formats:
+      - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+      - "yyyy-MM-dd'T'HH:mm:ss.SZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSz"
       - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
       - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
       - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-    if: "ctx?.threatintel?.anomali?.created != null"
+    if: "ctx?.threatintel?.anomali?.valid_from != null"
 - grok:
     field: threatintel.anomali.pattern
     patterns: 
