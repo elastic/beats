@@ -22,6 +22,7 @@ output.file:
   #rotate_every_kb: 10000
   #number_of_files: 7
   #permissions: 0600
+  #rotate_on_startup: true
 ------------------------------------------------------------------------------
 
 ==== Configuration options
@@ -60,6 +61,10 @@ The number of files must be between 2 and 1024. The default is 7.
 ===== `permissions`
 
 Permissions to use for file creation. The default is 0600.
+
+===== `rotate_on_startup`
+
+If the output file already exists on startup, immediately rotate it and start writing to a new file instead of appending to the existing one. Defaults to true.
 
 ===== `codec`
 
