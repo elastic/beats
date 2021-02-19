@@ -48,9 +48,9 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 	}
 	if cert != "" || key != "" {
 		cfg.Server.TLS = &tlscommon.Config{
-			Certificate:      tlscommon.CertificateConfig{
+			Certificate: tlscommon.CertificateConfig{
 				Certificate: cert,
-				Key: key,
+				Key:         key,
 			},
 		}
 	}

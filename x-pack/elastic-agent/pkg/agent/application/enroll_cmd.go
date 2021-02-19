@@ -25,8 +25,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
@@ -85,9 +85,9 @@ type EnrollCmdOption struct {
 	Staging              string
 	FleetServerConnStr   string
 	FleetServerPolicyID  string
-	FleetServerHost   string
+	FleetServerHost      string
 	FleetServerPort      uint16
-	FleetServerCert		 string
+	FleetServerCert      string
 	FleetServerCertKey   string
 	FleetServerInsecure  bool
 }
