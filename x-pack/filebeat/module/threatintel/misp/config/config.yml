@@ -6,7 +6,7 @@ interval: {{ .interval }}
 
 request.method: POST
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
 {{ end }}
 request.url: {{ .url }}
 request.body:

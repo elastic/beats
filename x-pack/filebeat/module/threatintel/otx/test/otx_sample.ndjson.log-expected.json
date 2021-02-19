@@ -51,9 +51,9 @@
             "threatintel-otx",
             "forwarded"
         ],
-        "threatintel.indicator.type": "unknown",
-        "threatintel.otx.content": "",
-        "threatintel.otx.indicator": "ip.anysrc.net"
+        "threatintel.indicator.domain": "ip.anysrc.net",
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.otx.content": ""
     },
     {
         "event.category": "threat",
