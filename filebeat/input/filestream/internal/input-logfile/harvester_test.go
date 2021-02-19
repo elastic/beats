@@ -97,7 +97,8 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
-		gorountineChecker.waitIncreased()
+		// wait until harvester is stopped, so we can be sure the harvester had time to run
+		gorountineChecker.waitOriginalCount()
 
 		require.Equal(t, 1, mockHarvester.runCount)
 
@@ -111,14 +112,15 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
-		mockHarvester := &mockHarvester{onRun: correctOnRun}
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
-		goroutinesBeforeRun := runtime.NumGoroutine()
+		gorountineChecker := newGoroutineChecker()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
-		for goroutinesBeforeRun < runtime.NumGoroutine() {
+		// run commands while harvester is running
+		gorountineChecker.waitWhileMoreGoroutinesWithFunc(func() {
 			// wait until harvester is started
 			if mockHarvester.runCount == 1 {
 				// assert that it is part of the bookkeeper before it is stopped
@@ -127,10 +129,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 				// after started, stop it
 				hg.Stop(source)
 				// wait until the harvester is stopped
-				for goroutinesBeforeRun < runtime.NumGoroutine() {
-				}
+				gorountineChecker.waitOriginalCount()
 			}
-		}
+		})
 
 		// when finished removed from bookeeper
 		_, ok := hg.readers.table[source.Name()]
@@ -146,7 +147,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg.Start(inputCtx, source)
 		hg.Start(inputCtx, source)
 
-		gorountineChecker.waitIncreasedWithFunc(func() {
+		gorountineChecker.waitWhileMoreGoroutinesWithFunc(func() {
 			// error is expected as a harvester group was expected to start twice for the same source
 			err := hg.StopGroup()
 			require.Error(t, err)
@@ -168,8 +169,6 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
-		gorountineChecker.waitIncreased()
-
 		require.Nil(t, hg.StopGroup())
 		gorountineChecker.waitOriginalCount()
 	})
@@ -181,15 +180,13 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
-		gorountineChecker.waitIncreased()
+		gorountineChecker.waitOriginalCount()
 
 		_, ok := hg.readers.table[source.Name()]
 		require.False(t, ok)
 
 		err := hg.StopGroup()
 		require.Error(t, err)
-
-		gorountineChecker.waitOriginalCount()
 	})
 
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
@@ -206,14 +203,16 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg.Start(inputCtx, source)
 
 		locked := true
-		gorountineChecker.waitIncreasedWithFunc(func() {
-			if locked {
+		gorountineChecker.waitWhileMoreGoroutinesWithFunc(func() {
+			// harvester is waiting to start
+			_, ok := hg.readers.table[source.Name()]
+			if ok && locked {
 				releaseResource(r)
 				locked = false
 			}
-
 		})
 
+		gorountineChecker.waitOriginalCount()
 		require.Equal(t, 1, mockHarvester.runCount)
 		require.Nil(t, hg.StopGroup())
 	})
@@ -232,7 +231,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		hg.Start(inputCtx, source)
 
-		gorountineChecker.waitIncreasedWithFunc(func() {
+		gorountineChecker.waitWhileMoreGoroutinesWithFunc(func() {
 			err := hg.StopGroup()
 			require.Error(t, err)
 		})
@@ -265,14 +264,7 @@ func newGoroutineChecker() *gorountineChecker {
 	}
 }
 
-func (c *gorountineChecker) waitIncreased() {
-	for c.n < runtime.NumGoroutine() {
-		fmt.Println("waiting for more", c.n, runtime.NumGoroutine())
-		time.Sleep(c.wait)
-	}
-}
-
-func (c *gorountineChecker) waitIncreasedWithFunc(f func()) {
+func (c *gorountineChecker) waitWhileMoreGoroutinesWithFunc(f func()) {
 	for c.n < runtime.NumGoroutine() {
 		fmt.Println("waiting with function", c.n, runtime.NumGoroutine())
 		time.Sleep(c.wait)
@@ -283,7 +275,7 @@ func (c *gorountineChecker) waitIncreasedWithFunc(f func()) {
 
 func (c *gorountineChecker) waitOriginalCount() {
 	fmt.Println("waiting until original", c.n, runtime.NumGoroutine())
-	for c.n != runtime.NumGoroutine() {
+	for c.n < runtime.NumGoroutine() {
 		time.Sleep(c.wait)
 	}
 }
