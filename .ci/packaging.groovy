@@ -331,6 +331,12 @@ def tagAndPush(Map args = [:]) {
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
     tags.each { tag ->
+      // TODO:
+      // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
+      // they support the versioning with the architecture
+      if ("${arch}" == "amd64") {
+        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}")
+      }
       doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
     }
   }
