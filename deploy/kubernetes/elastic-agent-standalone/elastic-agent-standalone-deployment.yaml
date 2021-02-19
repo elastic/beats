@@ -20,7 +20,7 @@ spec:
           image: docker.elastic.co/beats/elastic-agent:%VERSION%
           args: [
             "-c", "/etc/agent.yml",
-            "-e", "-d", "composable.providers.kubernetes",
+            "-e",
           ]
           env:
             - name: ES_USERNAME
