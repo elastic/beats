@@ -130,16 +130,8 @@
     "foreach": {
       "field": "params",
       "processor"{
-        "lowercase": {
-          "field": "_ingest._value"
-        }
-      }
-    },
-    "foreach": {
-      "field": "params",
-      "processor"{
         "rename": {
-          "field": "_ingest._value",
+          "field": "_ingest._value.key",
           "target_field": "gitlab.production._ingest._value"
         }
       }
