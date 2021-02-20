@@ -1,0 +1,28 @@
+- key: gitlab
+  title: "Gitlab"
+  description: >
+    Gitlab Module
+  short_config: true
+  fields:
+    - name: gitlab
+      type: group
+      description: >
+        Aliases for backward compatibility with old apache2 fields
+      fields:
+        - name: production
+          type: group
+          fields:
+            - name: format
+            - name: controller
+            - name: queue_duration
+            - name: correlation_id
+            - name: queue_duration_s
+            - name: gitaly_calls
+            - name: gitaly_duration_s
+            - name: redis_calls
+            - name: redis_duration_s
+            - name: correlation_id
+            - name: cpu_s
+            - name: db_duration_s
+            - name: view_duration_s
+            - name: duration_s
