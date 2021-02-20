@@ -1,7 +1,4 @@
-description: Pipeline for pa- set:
-    field: event.type
-    value:
-rsing gitlab integrations logs
+description: Pipeline for parsing integration logs of Gitlab
 processors:
 - date:
     field: time
@@ -39,3 +36,7 @@ processors:
 - rename:
     field: error
     target_field: error.message
+# Cleaning up
+- remove:
+    field:
+      - time
