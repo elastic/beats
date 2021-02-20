@@ -51,3 +51,7 @@ processors:
 - rename:
    field: target_details
    target_field: gitlab.audit.target_details
+# Cleaning up
+- remove:
+    field:
+      - time
