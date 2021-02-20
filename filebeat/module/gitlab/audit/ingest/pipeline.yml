@@ -15,12 +15,6 @@ processors:
     field: event.kind
     value: event
 - set:
-    field: event.category
-    value:
-- set:
-    field: event.type
-    value:
-- set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
 # Rename fields to ECS

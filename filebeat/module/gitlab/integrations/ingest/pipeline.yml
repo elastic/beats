@@ -1,4 +1,7 @@
-description: Pipeline for parsing gitlab integrations logs
+description: Pipeline for pa- set:
+    field: event.type
+    value:
+rsing gitlab integrations logs
 processors:
 - date:
     field: time
@@ -14,12 +17,6 @@ processors:
 - set:
     field: event.kind
     value: event
-- set:
-    field: event.category
-    value:
-- set:
-    field: event.type
-    value:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
