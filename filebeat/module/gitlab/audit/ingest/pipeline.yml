@@ -1,0 +1,59 @@
+description: Pipeline for parsing gitlab application_json logs
+processors:
+- date:
+    field: time
+    formats:
+      - ISO8601
+# Set event fields
+- set:
+    field: event.module
+    value: gitlab
+- set:
+    field: event.dataset
+    value: gitlab.auditd
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value:
+- set:
+    field: event.type
+    value:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+# Rename fields to ECS
+- rename:
+   field: severity
+   target_field: log.level
+- rename:
+   field: author_id
+   target_field: gitlab.audit.author_id
+- rename:
+   field: entity_id
+   target_field: gitlab.audit.entity_id
+- rename:
+   field: entity_type
+   target_field: gitlab.audit.entity_type
+- rename:
+   field: change
+   target_field: gitlab.audit.change
+- rename:
+   field: from
+   target_field: gitlab.audit.from
+- rename:
+   field: to
+   target_field: gitlab.audit.to
+- rename:
+   field: author_name
+   target_field: user.name
+- rename:
+   field: target_id
+   target_field: gitlab.audit.target_id
+- rename:
+   field: target_type
+   target_field: gitlab.audit.target_type
+- rename:
+   field: target_details
+   target_field: gitlab.audit.target_details

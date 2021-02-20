@@ -1,0 +1,14 @@
+{
+  "severity":"INFO",
+  "time":"2018-10-17T17:38:22.523Z",
+  "author_id":3,
+  "entity_id":2,
+  "entity_type":"Project",
+  "change":"visibility",
+  "from":"Private",
+  "to":"Public",
+  "author_name":"John Doe4",
+  "target_id":2,
+  "target_type":"Project",
+  "target_details":"namespace2/project2"
+}
