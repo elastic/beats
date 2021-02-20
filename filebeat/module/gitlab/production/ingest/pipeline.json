@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for parsing gitlab production logs",
+  "description": "Pipeline for parsing gitlab production_json logs",
   "processors": [
     "rename": {
       "field": "method",
@@ -126,6 +126,23 @@
       "formats": [
         "ISO8601"
       ]
+    },
+    "foreach": {
+      "field": "params",
+      "processor"{
+        "lowercase": {
+          "field": "_ingest._value"
+        }
+      }
+    },
+    "foreach": {
+      "field": "params",
+      "processor"{
+        "rename": {
+          "field": "_ingest._value",
+          "target_field": "gitlab.production._ingest._value"
+        }
+      }
     }
   ],
   "on_failure" : [{
