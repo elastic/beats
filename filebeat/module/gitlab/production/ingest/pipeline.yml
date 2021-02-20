@@ -1,0 +1,109 @@
+description: Pipeline for parsing gitlab production_json logs
+processors:
+- date:
+    field: time
+    formats:
+      - ISO8601
+# Set event fields
+- set:
+    field: event.module
+    value: gitlab
+- set:
+    field: event.dataset
+    value: gitlab.production
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value: web
+- set:
+    field: event.type
+    value:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+# Rename fields to ECS
+- rename:
+    field: method
+    target_field: http.request.method
+- rename:
+    field: path
+    target_field: url.path
+- rename:
+    field: format
+    target_field: gitlab.production.format
+- rename:
+    field: controller
+    target_field: gitlab.production.controller
+- rename:
+    field: action
+    target_field: event.action
+- rename:
+    field: status
+    target_field: http.response.status_code
+- rename:
+    field: remote_ip
+    target_field: source.ip
+- rename:
+    field: user_id
+    target_field: user.id
+- rename:
+    field: username
+    target_field: user.name
+- rename:
+    field: queue_duration
+    target_field: gitlab.production.queue_duration
+- rename:
+    field: correlation_id
+    target_field: gitlab.production.correlation_id
+- rename:
+    field: queue_duration_s
+    target_field: gitlab.production.queue_duration_s
+- rename:
+    field: gitaly_calls
+    target_field: gitlab.production.gitaly_calls
+- rename:
+    field: gitaly_duration_s
+    target_field: gitlab.production.gitaly_duration_s
+- rename:
+    field: redis_calls
+    target_field: gitlab.production.redis_calls
+- rename:
+    field: redis_duration_s
+    target_field: gitlab.production.redis_duration_s
+- rename:
+    field: correlation_id
+    target_field: gitlab.production.correlation_id
+- rename:
+    field: cpu_s
+    target_field: gitlab.production.cpu_s
+- rename:
+    field: db_duration_s
+    target_field: gitlab.production.db_duration_s
+- rename:
+    field: view_duration_s
+    target_field: gitlab.production.view_duration_s
+- rename:
+    field: duration_s
+    target_field: gitlab.production.duration_s
+- rename:
+    field: exception.class
+    target_field: error.type
+- rename:
+    field: exception.message
+    target_field: error.message
+- rename:
+    field: exception.backtrace
+    target_field: error.stack_trace
+# Set destination.ip to host.ip
+- set:
+    field: destination.ip
+    copy_from: host.ip
+# Fancy enrichment
+- user_agent:
+    field: ua
+- geoip:
+    field: source.ip
+- geoip:
+    field: destination.ip
