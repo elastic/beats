@@ -1,0 +1,85 @@
+description: Pipeline for parsing gitlab api_json logs
+processors:
+- date:
+    field: time
+    formats:
+      - ISO8601
+# Set event fields
+- set:
+    field: event.module
+    value: gitlab
+- set:
+    field: event.dataset
+    value: gitlab.api
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.category
+    value: web
+- set:
+    field: event.type
+    value:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+# Rename fields to ECS
+- rename:
+    field: severity
+    target_field: log.level
+- rename:
+    field: duration
+    target_field: gitlab.api.duration
+- rename:
+    field: db
+    target_field: gitlab.api.db
+- rename:
+    field: view
+    target_field: gitlab.api.view
+- rename:
+    field: status
+    target_field: http.response.status_code
+- rename:
+    field: method
+    target_field: http.request.method
+- rename:
+    field: path
+    target_field: url.path
+- rename:
+    field: params
+    target_field: gitlab.api.params
+- rename:
+    field: host
+    target_field: gitlab.api.host
+- rename:
+    field: remote_ip
+    target_field: source.ip
+- rename:
+    field: route
+    target_field: gitlab.api.route
+- rename:
+    field: user_id
+    target_field: user.id
+- rename:
+    field: user_name
+    target_field: user.name
+- rename:
+    field: queue_duration
+    target_field: gitlab.api.queue_duration
+- rename:
+    field: gitaly_calls
+    target_field: gitlab.api.gitaly_calls
+- rename:
+    field: gitlay_duration
+    target_field: gitlab.api.gitlay_duration
+# Set destination.ip to host.ip
+- set:
+    field: destination.ip
+    copy_from: host.ip
+# Fancy enrichment
+- user_agent:
+    field: ua
+- geoip:
+    field: source.ip
+- geoip:
+    field: destination.ip
