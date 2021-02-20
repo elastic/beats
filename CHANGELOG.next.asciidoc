@@ -387,6 +387,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
+- Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 
 *Heartbeat*
 

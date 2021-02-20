@@ -17,6 +17,7 @@ var:
   - name: detect_sequence_reset
   - name: tags
     default: [forwarded]
+  - name: internal_networks
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 
