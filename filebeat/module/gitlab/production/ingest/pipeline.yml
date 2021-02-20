@@ -4,6 +4,13 @@ processors:
     field: time
     formats:
       - ISO8601
+# Dot expand fields so they are accessible
+- dot_expander:
+    field: exception.class
+- dot_expander:
+    field: exception.message
+- dot_expander:
+    field: exception.backtrace
 # Set event fields
 - set:
     field: event.module
@@ -22,75 +29,95 @@ processors:
     value: '{{_ingest.timestamp}}'
 # Rename fields to ECS
 - rename:
+    ignore_failure: true
     field: method
     target_field: http.request.method
 - rename:
+    ignore_failure: true
     field: path
     target_field: url.path
 - rename:
+    ignore_failure: true
     field: format
     target_field: gitlab.production.format
 - rename:
+    ignore_failure: true
     field: controller
     target_field: gitlab.production.controller
 - rename:
+    ignore_failure: true
     field: action
     target_field: event.action
 - rename:
+    ignore_failure: true
     field: status
     target_field: http.response.status_code
 - rename:
+    ignore_failure: true
     field: remote_ip
     target_field: source.ip
 - rename:
+    ignore_failure: true
     field: user_id
     target_field: user.id
 - rename:
+    ignore_failure: true
     field: username
     target_field: user.name
 - rename:
+    ignore_failure: true
     field: queue_duration
     target_field: gitlab.production.queue_duration
 - rename:
+    ignore_failure: true
     field: correlation_id
     target_field: gitlab.production.correlation_id
 - rename:
+    ignore_failure: true
     field: queue_duration_s
     target_field: gitlab.production.queue_duration_s
 - rename:
+    ignore_failure: true
     field: gitaly_calls
     target_field: gitlab.production.gitaly_calls
 - rename:
+    ignore_failure: true
     field: gitaly_duration_s
     target_field: gitlab.production.gitaly_duration_s
 - rename:
+    ignore_failure: true
     field: redis_calls
     target_field: gitlab.production.redis_calls
 - rename:
+    ignore_failure: true
     field: redis_duration_s
     target_field: gitlab.production.redis_duration_s
 - rename:
-    field: correlation_id
-    target_field: gitlab.production.correlation_id
-- rename:
+    ignore_failure: true
     field: cpu_s
     target_field: gitlab.production.cpu_s
 - rename:
+    ignore_failure: true
     field: db_duration_s
     target_field: gitlab.production.db_duration_s
 - rename:
+    ignore_failure: true
     field: view_duration_s
     target_field: gitlab.production.view_duration_s
 - rename:
+    ignore_failure: true
     field: duration_s
     target_field: gitlab.production.duration_s
 - rename:
+    ignore_failure: true
     field: exception.class
     target_field: error.type
 - rename:
+    ignore_failure: true
     field: exception.message
     target_field: error.message
 - rename:
+    ignore_failure: true
     field: exception.backtrace
     target_field: error.stack_trace
 # Set destination.ip to host.ip
@@ -102,5 +129,13 @@ processors:
     field: ua
 - geoip:
     field: source.ip
+    target_field: source.geoip
 - geoip:
     field: destination.ip
+    target_field: destination.geoip
+# Cleanup
+- remove:
+    field:
+      - ua
+      - exception
+      - time

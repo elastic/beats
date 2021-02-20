@@ -7,7 +7,7 @@
     - name: gitlab
       type: group
       description: >
-        Aliases for backward compatibility with old apache2 fields
+        gitlab production fields
       fields:
         - name: production
           type: group

@@ -18,11 +18,10 @@
   "gitaly_duration_s":0.16,
   "redis_calls":115,
   "redis_duration_s":0.13,
-  "correlation_id":"O1SdybnnIq7",
   "cpu_s":17.50,
   "db_duration_s":0.08,
   "view_duration_s":2.39,
-  "duration_s":20.54
+  "duration_s":20.54,
   "exception.class": "NameError",
   "exception.message": "undefined local variable or method `adsf' for #<Admin::DashboardController:0x00007ff3c9648588>",
   "exception.backtrace": [
