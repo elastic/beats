@@ -61,6 +61,7 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
+	maxRetries := config.MaxRetries
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
@@ -71,7 +72,7 @@ func newHTTPMonitorHostJob(
 			Transport:     transport,
 			Timeout:       config.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, timeout, maxRetries, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -112,6 +113,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
+	maxRetries := config.MaxRetries
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 
@@ -166,7 +168,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, end, err := execPing(event, client, request, body, timeout, maxRetries, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -225,16 +227,20 @@ func execPing(
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
+	maxRetries int,
 	validator multiValidator,
 	responseConfig responseConfig,
 ) (start, end time.Time, err reason.Reason) {
-	// default retries is 0, that means there's no retry by default
-	retries := 0
 	var (
 		ctx       context.Context
 		cancel    context.CancelFunc
 		errReason reason.Reason
+		retries int
 	)
+	// default retries is 0, that means there's no retry by default
+	if maxRetries <= 0 {
+		retries = 0
+	}
 	// total hits should be <retries + 1>
 	// the global retry threshold should be greater than inner threshold
 	// to make sure only 2 exits for this function

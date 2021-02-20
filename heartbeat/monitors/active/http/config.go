@@ -34,6 +34,7 @@ type Config struct {
 	ProxyURL     string         `config:"proxy_url"`
 	Timeout      time.Duration  `config:"timeout"`
 	MaxRedirects int            `config:"max_redirects"`
+	MaxRetries   int            `config:"max_retries"`
 	Response     responseConfig `config:"response"`
 
 	Mode monitors.IPSettings `config:",inline"`
@@ -93,6 +94,7 @@ type compressionConfig struct {
 var defaultConfig = Config{
 	Timeout:      16 * time.Second,
 	MaxRedirects: 0,
+	MaxRetries:   0,
 	Response: responseConfig{
 		IncludeBody:         "on_error",
 		IncludeBodyMaxBytes: 2048,
