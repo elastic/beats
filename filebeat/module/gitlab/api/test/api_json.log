@@ -8,7 +8,6 @@
   "method":"GET",
   "path":"/api/v4/projects",
   "params":[{"key":"action","value":"git-upload-pack"},{"key":"changes","value":"_any"},{"key":"key_id","value":"secret"},{"key":"secret_token","value":"[FILTERED]"}],
-  "host":"localhost",
   "remote_ip":"::1",
   "ua":"Ruby",
   "route":"/api/:version/projects",

@@ -110,6 +110,10 @@ processors:
     target_field: gitlab.production.duration_s
 - rename:
     ignore_failure: true
+    field: params
+    target_field: gitlab.production.params    
+- rename:
+    ignore_failure: true
     field: exception.class
     target_field: error.type
 - rename:

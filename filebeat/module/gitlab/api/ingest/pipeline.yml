@@ -22,53 +22,65 @@ processors:
     value: '{{_ingest.timestamp}}'
 # Rename fields to ECS
 - rename:
+    ignore_failure: true
     field: severity
     target_field: log.level
 - rename:
+    ignore_failure: true
     field: duration
     target_field: gitlab.api.duration
 - rename:
+    ignore_failure: true
     field: db
     target_field: gitlab.api.db
 - rename:
+    ignore_failure: true
     field: view
     target_field: gitlab.api.view
 - rename:
+    ignore_failure: true
     field: status
     target_field: http.response.status_code
 - rename:
+    ignore_failure: true
     field: method
     target_field: http.request.method
 - rename:
+    ignore_failure: true
     field: path
     target_field: url.path
 - rename:
+    ignore_failure: true
     field: params
     target_field: gitlab.api.params
 - rename:
-    field: host
-    target_field: gitlab.api.host
-- rename:
+    ignore_failure: true
     field: remote_ip
     target_field: source.ip
 - rename:
+    ignore_failure: true
     field: route
     target_field: gitlab.api.route
 - rename:
+    ignore_failure: true
     field: user_id
     target_field: user.id
 - rename:
-    field: user_name
+    ignore_failure: true
+    field: username
     target_field: user.name
 - rename:
+    ignore_failure: true
     field: queue_duration
     target_field: gitlab.api.queue_duration
 - rename:
+    ignore_failure: true
     field: gitaly_calls
     target_field: gitlab.api.gitaly_calls
 - rename:
-    field: gitlay_duration
-    target_field: gitlab.api.gitlay_duration
+    ignore_failure: true
+    field: gitaly_duration
+    target_field: gitlab.api.gitaly_duration
 # Set destination.ip to host.ip
 - set:
     field: destination.ip
@@ -78,5 +90,12 @@ processors:
     field: ua
 - geoip:
     field: source.ip
+    target_field: source.geoip
 - geoip:
     field: destination.ip
+    target_field: destination.geoip
+# Cleaning
+- remove:
+    field:
+      - time
+      - ua
