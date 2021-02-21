@@ -71,7 +71,7 @@ processors:
 - rename:
     ignore_failure: true
     field: correlation_id
-    target_field: gitlab.production.correlation_id
+    target_field: gitlab.correlation_id
 - rename:
     ignore_failure: true
     field: queue_duration_s
