@@ -49,10 +49,6 @@ processors:
     ignore_failure: true
     field: path
     target_field: url.path
-#- rename:
-#    ignore_failure: true
-#    field: params
-#    target_field: gitlab.api.params
 - rename:
     ignore_failure: true
     field: remote_ip
@@ -108,3 +104,4 @@ processors:
     field:
       - time
       - ua
+      - parameters
