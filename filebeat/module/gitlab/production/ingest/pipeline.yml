@@ -110,10 +110,6 @@ processors:
     target_field: gitlab.production.duration_s
 - rename:
     ignore_failure: true
-    field: params
-    target_field: gitlab.production.params    
-- rename:
-    ignore_failure: true
     field: exception.class
     target_field: error.type
 - rename:
@@ -124,19 +120,28 @@ processors:
     ignore_failure: true
     field: exception.backtrace
     target_field: error.stack_trace
-# Set destination.ip to host.ip
-- set:
-    field: destination.ip
-    copy_from: host.ip
 # Fancy enrichment
 - user_agent:
     field: ua
 - geoip:
     field: source.ip
     target_field: source.geoip
-- geoip:
-    field: destination.ip
-    target_field: destination.geoip
+# Script processor to go through the params field
+- rename:
+    field: params
+    target_field: parameters
+- set:
+    field: gitlab.production.params
+    value: {}
+- script:
+    lang: painless
+    source: >-
+      ArrayList gitlabparams = ctx.parameters;
+      for (item in gitlabparams) {
+        String key = item.key;
+        String value = item.value;
+        ctx.gitlab.production.params[key] = value;
+      }
 # Cleanup
 - remove:
     field:
