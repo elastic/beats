@@ -23,7 +23,7 @@ processors:
    target_field: log.level
 - rename:
    field: author_id
-   target_field: gitlab.audit.author_id
+   target_field: user.id
 - rename:
    field: entity_id
    target_field: gitlab.audit.entity_id

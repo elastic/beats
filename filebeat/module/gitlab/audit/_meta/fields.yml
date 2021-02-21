@@ -1,0 +1,21 @@
+- name: audit
+  type: group
+  description: >
+    Fields from the audit logs of Gitlab.
+  fields:
+    - name: entity_id
+      type: keyword
+    - name: entity_type
+      type: keyword
+    - name: change
+      type: keyword
+    - name: from
+      type: keyword
+    - name: to
+      type: keyword
+    - name: target_id
+      type: keyword
+    - name: target_type
+      type: keyword
+    - name: target_details
+      type: keyword

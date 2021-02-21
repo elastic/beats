@@ -1,0 +1,24 @@
+- name: api
+  type: group
+  description: >
+    Fields from the api logs of Gitlab. Not all fields are documented as the
+    gitlab.api.params field can contain a dynamic amount/keys of fields.
+  fields:
+    - name: duration
+      type: long
+    - name: db
+      type: long
+    - name: view
+      type: long
+    - name: route
+      type: keyword
+    - name: queue_duration
+      type: long
+    - name: gitaly_calls
+      type: int
+    - name: gitaly_duration
+      type: long
+    - name: params
+      description: >
+        Parameters logged by the API. Sensative values are filterd out.
+      type: group
