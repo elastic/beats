@@ -15,7 +15,7 @@
     - name: queue_duration
       type: long
     - name: gitaly_calls
-      type: int
+      type: integer
     - name: gitaly_duration
       type: long
     - name: params
