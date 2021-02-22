@@ -15,7 +15,9 @@
                     "total": 1
                 },
                 "id": "low_request_rate",
-                "model_size": {},
+                "model_size": {
+                    "memory_status": "ok"
+                },
                 "state": "opened"
             }
         },
@@ -33,7 +35,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:39631",
+        "address": "127.0.0.1:38585",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

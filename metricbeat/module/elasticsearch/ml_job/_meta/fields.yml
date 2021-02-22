@@ -18,7 +18,7 @@
       type: group
       fields:
         - name: memory_status
-          type: long
+          type: keyword
     - name: data_counts
       type: group
       fields:

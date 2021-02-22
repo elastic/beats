@@ -21319,7 +21319,7 @@ type: long
 *`elasticsearch.ml.job.model_size.memory_status`*::
 +
 --
-type: long
+type: keyword
 
 --
 

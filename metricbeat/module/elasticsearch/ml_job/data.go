@@ -41,7 +41,7 @@ var (
 			"invalid_date_count":     c.Int("invalid_date_count"),
 		}),
 		"model_size": c.Dict("model_size_stats", s.Schema{
-			"memory_status": c.Int("memory_status"),
+			"memory_status": c.Str("memory_status"),
 		}),
 		"forecasts_stats": c.Dict("forecasts_stats", s.Schema{
 			"total": c.Int("total"),
