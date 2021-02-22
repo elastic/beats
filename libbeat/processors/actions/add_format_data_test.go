@@ -101,3 +101,37 @@ func TestFormatDataLnk(t *testing.T) {
 	_, ok := data.(*lnk.Info)
 	require.True(t, ok)
 }
+
+func TestFormatDataOnly(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
+		},
+	}
+	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+		"field": "foo.bar.baz",
+		"only":  []string{"macho"},
+	}))
+	require.NoError(t, err)
+	observed, err := p.Run(&evt)
+	require.NoError(t, err)
+	_, err = observed.Fields.GetValue("file.pe")
+	require.Error(t, err)
+}
+
+func TestFormatDataExclude(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
+		},
+	}
+	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+		"field":   "foo.bar.baz",
+		"exclude": []string{"pe"},
+	}))
+	require.NoError(t, err)
+	observed, err := p.Run(&evt)
+	require.NoError(t, err)
+	_, err = observed.Fields.GetValue("file.pe")
+	require.Error(t, err)
+}
