@@ -66,7 +66,7 @@ func TestData(t *testing.T) {
 
 func TestActions(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
-	
+
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		t.Fatal(err)
