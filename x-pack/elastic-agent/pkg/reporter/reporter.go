@@ -108,7 +108,7 @@ func generateRecord(agentID string, id string, name string, s state.State) event
 	case state.Configuring:
 		subType = EventSubTypeConfig
 		subTypeText = EventSubTypeConfig
-	case state.Running:
+	case state.Healthy:
 		subType = EventSubTypeRunning
 		subTypeText = EventSubTypeRunning
 	case state.Degraded:

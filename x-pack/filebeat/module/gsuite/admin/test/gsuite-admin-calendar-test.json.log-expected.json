@@ -46,7 +46,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_BUILDING",
@@ -95,7 +98,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_BUILDING",
@@ -147,7 +153,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_CALENDAR_RESOURCE",
@@ -196,7 +205,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_CALENDAR_RESOURCE",
@@ -245,7 +257,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_CALENDAR_RESOURCE_FEATURE",
@@ -294,7 +309,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_CALENDAR_RESOURCE_FEATURE",
@@ -343,7 +361,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_CALENDAR_RESOURCE_FEATURE",
@@ -396,7 +417,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "RENAME_CALENDAR_RESOURCE",
@@ -446,7 +470,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_CALENDAR_RESOURCE",
@@ -498,7 +525,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CHANGE_CALENDAR_SETTING",
@@ -554,7 +584,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CANCEL_CALENDAR_EVENTS",
@@ -603,7 +636,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     },
     {
         "event.action": "RELEASE_CALENDAR_RESOURCES",
@@ -652,6 +691,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     }
 ]

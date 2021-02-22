@@ -58,7 +58,7 @@ func RunningInstalled() bool {
 		execDir = filepath.Dir(filepath.Dir(execDir))
 		execPath = filepath.Join(execDir, execName)
 	}
-	return expected == execPath
+	return ArePathsEqual(expected, execPath)
 }
 
 // checkService only checks the status of the service.

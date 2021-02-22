@@ -90,22 +90,25 @@ func NewApplication(
 
 	b, _ := tokenbucket.NewTokenBucket(ctx, 3, 3, 1*time.Second)
 	return &Application{
-		bgContext:      ctx,
-		id:             id,
-		name:           appName,
-		pipelineID:     pipelineID,
-		logLevel:       logLevel,
-		desc:           desc,
-		srv:            srv,
-		processConfig:  cfg.ProcessConfig,
-		logger:         logger,
-		limiter:        b,
+		bgContext:     ctx,
+		id:            id,
+		name:          appName,
+		pipelineID:    pipelineID,
+		logLevel:      logLevel,
+		desc:          desc,
+		srv:           srv,
+		processConfig: cfg.ProcessConfig,
+		logger:        logger,
+		limiter:       b,
+		state: state.State{
+			Status: state.Stopped,
+		},
 		reporter:       reporter,
 		monitor:        monitor,
 		uid:            uid,
 		gid:            gid,
 		credsPort:      credsPort,
-		statusReporter: statusController.Register(id),
+		statusReporter: statusController.RegisterApp(id, appName),
 	}, nil
 }
 
@@ -207,9 +210,7 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 		if err != nil {
 			// inject App metadata
 			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
-			a.statusReporter.Update(status.Degraded)
-		} else {
-			a.statusReporter.Update(status.Healthy)
+			a.statusReporter.Update(state.Degraded, err.Error())
 		}
 	}()
 
@@ -287,26 +288,7 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		return
 	}
 
-	a.setStateFromProto(status, msg, payload)
-}
-
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
-	var status state.Status
-	switch pstatus {
-	case proto.StateObserved_STARTING:
-		status = state.Starting
-	case proto.StateObserved_CONFIGURING:
-		status = state.Configuring
-	case proto.StateObserved_HEALTHY:
-		status = state.Running
-	case proto.StateObserved_DEGRADED:
-		status = state.Degraded
-	case proto.StateObserved_FAILED:
-		status = state.Failed
-	case proto.StateObserved_STOPPING:
-		status = state.Stopping
-	}
-	a.setState(status, msg, payload)
+	a.setState(state.FromProto(status), msg, payload)
 }
 
 func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
@@ -317,15 +299,7 @@ func (a *Application) setState(s state.Status, msg string, payload map[string]in
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
-
-		switch s {
-		case state.Configuring, state.Restarting, state.Starting, state.Stopping, state.Updating:
-			// no action
-		case state.Crashed, state.Failed, state.Degraded:
-			a.statusReporter.Update(status.Degraded)
-		default:
-			a.statusReporter.Update(status.Healthy)
-		}
+		a.statusReporter.Update(s, msg)
 	}
 }
 

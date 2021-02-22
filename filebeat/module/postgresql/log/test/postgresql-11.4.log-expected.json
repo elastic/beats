@@ -16,7 +16,7 @@
         "log.level": "LOG",
         "log.offset": 0,
         "message": "database system was interrupted; last known up at 2019-07-23 12:03:20 UTC",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.406 UTC",
         "process.pid": 25,
         "service.type": "postgresql"
@@ -59,7 +59,7 @@
         "log.level": "LOG",
         "log.offset": 189,
         "message": "database system was not properly shut down; automatic recovery in progress",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.478 UTC",
         "process.pid": 25,
         "service.type": "postgresql"
@@ -102,7 +102,7 @@
         "log.level": "LOG",
         "log.offset": 379,
         "message": "redo starts at 0/1651398",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.485 UTC",
         "process.pid": 25,
         "service.type": "postgresql"
@@ -145,7 +145,7 @@
         "log.level": "LOG",
         "log.offset": 519,
         "message": "invalid record length at 0/16513D0: wanted 24, got 0",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.485 UTC",
         "process.pid": 25,
         "service.type": "postgresql"
@@ -188,7 +188,7 @@
         "log.level": "LOG",
         "log.offset": 686,
         "message": "redo done at 0/1651398",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.485 UTC",
         "process.pid": 25,
         "service.type": "postgresql"
@@ -231,7 +231,7 @@
         "log.level": "LOG",
         "log.offset": 824,
         "message": "database system is ready to accept connections",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:24.507 UTC",
         "process.pid": 1,
         "service.type": "postgresql"
@@ -274,7 +274,7 @@
         "log.level": "LOG",
         "log.offset": 985,
         "message": "connection received: host=[local]",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:30.536 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -317,7 +317,7 @@
         "log.level": "LOG",
         "log.offset": 1146,
         "message": "connection authorized: user=postgres database=postgres",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:30.537 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -360,7 +360,7 @@
         "log.level": "LOG",
         "log.offset": 1329,
         "message": "statement: show config_filel;",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:33.732 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -396,7 +396,6 @@
         "event.module": "postgresql",
         "event.timezone": "UTC",
         "event.type": [
-            "info",
             "error"
         ],
         "fileset.name": "log",
@@ -404,7 +403,7 @@
         "log.level": "ERROR",
         "log.offset": 1483,
         "message": "unrecognized configuration parameter \"config_filel\"",
-        "postgresql.log.error.code": 42704,
+        "postgresql.log.sql_state_code": "42704",
         "postgresql.log.timestamp": "2019-07-23 12:06:33.732 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -468,7 +467,7 @@
         "log.level": "LOG",
         "log.offset": 1725,
         "message": "statement: show config_file;",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:34.877 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -511,7 +510,7 @@
         "log.level": "LOG",
         "log.offset": 1878,
         "message": "duration: 0.524 ms",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:06:34.878 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -554,7 +553,7 @@
         "log.level": "LOG",
         "log.offset": 2022,
         "message": "statement: SELECT * FROM pg_catalog.pg_tables;",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:09:57.563 UTC",
         "process.pid": 44,
         "service.type": "postgresql"
@@ -597,7 +596,7 @@
         "log.level": "LOG",
         "log.offset": 2193,
         "message": "duration: 2.139 ms",
-        "postgresql.log.error.code": 0,
+        "postgresql.log.sql_state_code": "00000",
         "postgresql.log.timestamp": "2019-07-23 12:09:57.565 UTC",
         "process.pid": 44,
         "service.type": "postgresql"

@@ -2,7 +2,8 @@
     {
         "event.action": "login_failure",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "gsuite.saml",
         "event.id": "1",
@@ -51,12 +52,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "login_success",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "gsuite.saml",
         "event.id": "1",
@@ -103,6 +108,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]
