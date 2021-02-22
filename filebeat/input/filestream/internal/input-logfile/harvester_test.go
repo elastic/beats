@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -90,14 +91,18 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	source := &testSource{"/path/to/test"}
 
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
-		mockHarvester := &mockHarvester{onRun: correctOnRun}
+		var wg sync.WaitGroup
+		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
 		gorountineChecker := newGoroutineChecker()
 
+		wg.Add(1)
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
-		// wait until harvester is stopped, so we can be sure the harvester had time to run
+		// wait until harvester.Run is done
+		wg.Wait()
+		// wait until goroutine that started `harvester.Run` is finished
 		gorountineChecker.waitOriginalCount()
 
 		require.Equal(t, 1, mockHarvester.runCount)
@@ -190,16 +195,19 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
-		mockHarvester := &mockHarvester{onRun: correctOnRun}
+		var wg sync.WaitGroup
+		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
-		gorountineChecker := newGoroutineChecker()
 
 		r, err := lock(inputCtx, hg.store, source.Name())
 		if err != nil {
 			t.Fatalf("cannot lock source")
 		}
 
+		gorountineChecker := newGoroutineChecker()
+
+		wg.Add(1)
 		hg.Start(inputCtx, source)
 
 		locked := true
@@ -212,6 +220,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			}
 		})
 
+		// wait until harvester.Run is done
+		wg.Wait()
+		// wait until goroutine that started `harvester.Run` is finished
 		gorountineChecker.waitOriginalCount()
 		require.Equal(t, 1, mockHarvester.runCount)
 		require.Nil(t, hg.StopGroup())
@@ -282,10 +293,15 @@ func (c *gorountineChecker) waitOriginalCount() {
 
 type mockHarvester struct {
 	runCount int
+	wg       *sync.WaitGroup
 	onRun    func(input.Context, Source, Cursor, Publisher) error
 }
 
 func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher) error {
+	if m.wg != nil {
+		defer m.wg.Done()
+	}
+
 	m.runCount += 1
 	if m.onRun != nil {
 		return m.onRun(ctx, s, c, p)
