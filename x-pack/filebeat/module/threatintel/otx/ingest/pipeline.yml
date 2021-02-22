@@ -89,7 +89,7 @@ processors:
     field: threatintel.otx.indicator
     target_field: threatintel.indicator.url.full
     ignore_missing: true
-    if: "ctx?.threatintel?.otx?.type == 'url' && ctx?.threatintel?.indicator?.url?.original == null"
+    if: "ctx?.threatintel?.otx?.type == 'URL' && ctx?.threatintel?.indicator?.url?.original == null"
 - rename:
     field: threatintel.otx.indicator
     target_field: threatintel.indicator.url.path
