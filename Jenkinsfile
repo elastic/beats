@@ -469,18 +469,14 @@ def target(Map args = [:]) {
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
-        // TODO:
-        // Packaging should happen only after the e2e?
+        // Publish packages shoud happen always to easily consume those artifacts if the
+        // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")
+          pushCIDockerImages("${directory}")
         }
         if(isE2E) {
           e2e(args)
-        }
-        // TODO:
-        // push docker images should happen only after the e2e?
-        if (isPackaging) {
-          pushCIDockerImages("${directory}")
         }
       }
     }
