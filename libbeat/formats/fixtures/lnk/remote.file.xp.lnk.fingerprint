@@ -1,0 +1,94 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasLinkInfo",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_NORMAL"
+    ],
+    "creationTime": "2004-11-04T09:10:42Z",
+    "accessedTime": "2010-07-09T13:53:19Z",
+    "modifiedTime": "2001-02-21T16:33:49Z",
+    "fileSize": 325120,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 88,
+      "sha256": "96abeb65d87512271bcabeac8b283506e78a94968b1d8658dd5cb31a1f40951f"
+    },
+    {
+      "size": 50,
+      "typeId": 0,
+      "sha256": "620d29be08dff63afe598819f919717bb1357d90b06e5a00d5a0d09e91626505"
+    },
+    {
+      "size": 136,
+      "typeId": 0,
+      "sha256": "3d18dc812ad70df870b6f8a81582461acf2352d59bca0bdad825e6f59495126a"
+    },
+    {
+      "size": 36,
+      "typeId": 0,
+      "sha256": "2558b29fa32b5a5da3dd4eff2c00f06ad7444b0098073b148f556e1875482f03"
+    },
+    {
+      "size": 88,
+      "typeId": 0,
+      "sha256": "cb97a3fb5034bc4a98fb7b62e09dc921ee0f731485134edee6d41f22aa3cd7bf"
+    },
+    {
+      "size": 136,
+      "typeId": 1,
+      "sha256": "da3df06592f5ce0069a83a8eea3aeda6b4e8650a05baf32f239c46ba9ada876b"
+    },
+    {
+      "size": 64,
+      "typeId": 0,
+      "sha256": "ee476d4c1256e99cbe21022ffedb5d1602a3c74e148d7c3c6f4c9d44f05d05ca"
+    },
+    {
+      "size": 80,
+      "typeId": 0,
+      "sha256": "7dc34531f388c48579b53e320e6750074510329fd0ff7fffd87efc8629b3bf7b"
+    },
+    {
+      "size": 114,
+      "typeId": 0,
+      "sha256": "42a5b872d13027882d743445de13c29673f211b01c1e66513c7e002054f0a8a2"
+    }
+  ],
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix"
+    ],
+    "commonPathSuffix": "Archives\\M\ufffdthodologie WAS\\Norme de d\ufffdveloppement JAVA.doc",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\ALS-FICHIERS3\\QUALIT\ufffd"
+    }
+  },
+  "workingDirectory": "\\\\als-fichiers3\\Qualité\\Archives\\Méthodologie WAS",
+  "extra": {
+    "tracker": {
+      "version": 0,
+      "machineId": "als-fichiers3",
+      "droid": [
+        "00000000-0000-0000-0000-000000000000",
+        "341b46ea-7798-da11-80bd-000f1ff7c0dc"
+      ],
+      "droidBirth": [
+        "00000000-0000-0000-0000-000000000000",
+        "341b46ea-7798-da11-80bd-000f1ff7c0dc"
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "ForceNoLinkInfo",
+      "HasArguments",
+      "HasExpString",
+      "HasIconLocation",
+      "HasName",
+      "HasRelativePath",
+      "IsUnicode",
+      "PreferEnvironmentPath"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2009-07-14T00:15:12Z",
+    "accessedTime": "2009-07-14T00:15:12Z",
+    "modifiedTime": "2009-07-14T01:14:45Z",
+    "fileSize": 802304,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "name": "@%windir%\\system32\\FXSRESM.dll,-121",
+  "relativePath": "..\\..\\..\\..\\..\\..\\..\\Windows\\System32\\WFS.exe",
+  "commandLine": "/SendTo",
+  "iconLocation": "%windir%\\system32\\WFSR.dll",
+  "extra": {
+    "environment": {
+      "ansi": "%windir%\\system32\\WFS.exe",
+      "unicode": "%windir%\\system32\\WFS.exe"
+    },
+    "propertyStore": {},
+    "tracker": {
+      "version": 0,
+      "machineId": "win-dc3j5p1qj61",
+      "droid": [
+        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
+        "1ac79ae2-3770-de11-816d-001c23e25b76"
+      ],
+      "droidBirth": [
+        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
+        "1ac79ae2-3770-de11-816d-001c23e25b76"
+      ]
+    }
+  }
+}

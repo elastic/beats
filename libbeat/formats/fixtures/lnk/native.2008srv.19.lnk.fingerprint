@@ -1,0 +1,24 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasIconLocation",
+      "HasName",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [],
+    "iconIndex": 4294967186,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 128,
+      "sha256": "25852b2a04726dbaed894c66d51d93ffdbcafbb4157cb9948bddd89879fa46d9"
+    }
+  ],
+  "name": "@%SystemRoot%\\system32\\shell32.dll,-10113",
+  "iconLocation": "%SystemRoot%\\system32\\imageres.dll",
+  "extra": {}
+}

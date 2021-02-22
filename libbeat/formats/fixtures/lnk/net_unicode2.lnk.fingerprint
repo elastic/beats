@@ -1,0 +1,98 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasExpString",
+      "HasLinkInfo",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_NORMAL"
+    ],
+    "creationTime": "2019-07-08T14:04:50Z",
+    "accessedTime": "2019-07-09T13:31:07Z",
+    "modifiedTime": "2019-07-08T14:04:50Z",
+    "fileSize": 10,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix"
+    ],
+    "commonPathSuffix": "\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\TEST\\??"
+    }
+  },
+  "workingDirectory": "\\\\test\\📂",
+  "extra": {
+    "environment": {
+      "ansi": "\\\\test\\??\\\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt",
+      "unicode": "\\\\test\\📂\\リンク先.txt"
+    },
+    "propertyStore": {
+      "properties": {
+        "10": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "リンク先.txt"
+          }
+        ],
+        "30": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "\\\\test\\📂\\リンク先.txt"
+          }
+        ],
+        "6": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "\\\\test\\📂"
+          }
+        ]
+      }
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "test",
+      "droid": [
+        "5337f18a-4bd4-98f1-1366-c15ed7085770",
+        "04a80000-0000-0000-3346-190000000000"
+      ],
+      "droidBirth": [
+        "5237f18a-4bd4-98f1-1366-c15ed7085770",
+        "04a80000-0000-0000-3346-190000000000"
+      ]
+    },
+    "vistaAndAboveIdList": {
+      "targets": [
+        {
+          "size": 20,
+          "typeId": 88,
+          "sha256": "0fd765c464bc0175cb0d598bbd77de8217dac435999d9261df8f384ae69d5e85"
+        },
+        {
+          "size": 171,
+          "typeId": 0,
+          "sha256": "28222bc3c9d115226224f871f30af6d5f51aaead9bb52f0e86c60bf8c03aff7e"
+        },
+        {
+          "size": 94,
+          "typeId": 1,
+          "sha256": "e834f0f99e38cfd381d40d2e46d31f973523645a460ac56accb82d6fb2612fe6"
+        },
+        {
+          "size": 94,
+          "typeId": 0,
+          "sha256": "7369db988302b83ea4845b133a25286f7beaefbda25474d8b4d5bfa1d1acd869"
+        }
+      ]
+    }
+  }
+}

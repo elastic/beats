@@ -1,0 +1,71 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasLinkInfo",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_DIRECTORY",
+      "FILE_ATTRIBUTE_READONLY"
+    ],
+    "creationTime": "2010-05-18T19:24:11Z",
+    "accessedTime": "2010-05-18T19:24:30Z",
+    "modifiedTime": "2010-05-18T19:24:30Z",
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix",
+      "VolumeIDAndLocalBasePath"
+    ],
+    "commonPathSuffix": "Juliette\\Desktop",
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0x502e1a8a",
+      "volumeLabel": "SSD-WIN7"
+    },
+    "localBasePath": "C:\\Users\\",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\NETBOOK\\Users"
+    }
+  },
+  "relativePath": "..\\Desktop",
+  "extra": {
+    "propertyStore": {
+      "properties": {
+        "10": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Bureau"
+          }
+        ],
+        "30": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "C:\\Users\\Juliette\\Desktop"
+          }
+        ]
+      }
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "netbook",
+      "droid": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "1ef183f9-b062-df11-9c95-001377d34a59"
+      ],
+      "droidBirth": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "1ef183f9-b062-df11-9c95-001377d34a59"
+      ]
+    }
+  }
+}

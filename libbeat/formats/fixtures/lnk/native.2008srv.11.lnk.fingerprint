@@ -1,0 +1,78 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasExpString",
+      "HasIconLocation",
+      "HasName",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2008-01-19T04:06:25Z",
+    "accessedTime": "2008-01-19T08:38:15Z",
+    "modifiedTime": "2006-11-02T09:47:04Z",
+    "fileSize": 991232,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 68,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 78,
+      "typeId": 0,
+      "sha256": "fece27f82c45bb2da91e051a5eef11d40b38ab0a8763b1d10e140c9c92de7465"
+    },
+    {
+      "size": 82,
+      "typeId": 0,
+      "sha256": "b580caeeb15f5ca1a896023cfb9db496f369a4153ae21c1364304bcdda351fe6"
+    },
+    {
+      "size": 94,
+      "typeId": 0,
+      "sha256": "f4951a33ecf276bad83040de196791ed4c980ede7f272fabcce11723570b5b6e"
+    }
+  ],
+  "name": "@%windir%\\system32\\shell32.dll,-22560",
+  "relativePath": "..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\Windows\\System32\\Narrator.exe",
+  "iconLocation": "%SystemRoot%\\system32\\narrator.exe",
+  "extra": {
+    "environment": {
+      "ansi": "%SystemRoot%\\system32\\narrator.exe",
+      "unicode": "%SystemRoot%\\system32\\narrator.exe"
+    },
+    "knownFolder": {
+      "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
+      "offset": 205
+    },
+    "specialFolder": {
+      "id": 37,
+      "offset": 205
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "win-hwdt97ahwff",
+      "droid": [
+        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
+        "14494f80-82c6-dc11-901d-0014220d9404"
+      ],
+      "droidBirth": [
+        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
+        "14494f80-82c6-dc11-901d-0014220d9404"
+      ]
+    }
+  }
+}

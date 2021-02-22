@@ -1,0 +1,31 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasIconLocation",
+      "HasName",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [],
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 104,
+      "sha256": "e454c954e255ac7a0021bcead81c35467cb90b962b6bcb2b1c319a118083b9e4"
+    },
+    {
+      "size": 86,
+      "typeId": 128,
+      "sha256": "56c3e94faf8577b2beab3681dff177f30462048ecb410662e2ffce5095643713"
+    }
+  ],
+  "name": "@%systemRoot%\\system32\\compatUI.dll,-117",
+  "workingDirectory": "%HOMEDRIVE%%HOMEPATH%",
+  "iconLocation": "%SystemRoot%\\system32\\compatUI.dll",
+  "extra": {}
+}

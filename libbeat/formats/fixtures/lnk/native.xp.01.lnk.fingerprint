@@ -1,0 +1,77 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasArguments",
+      "HasExpString",
+      "HasIconLocation",
+      "HasLinkInfo",
+      "HasName",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2004-08-20T01:03:44Z",
+    "accessedTime": "2004-08-19T12:00:00Z",
+    "modifiedTime": "2004-08-06T00:00:00Z",
+    "fileSize": 35840,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 60,
+      "typeId": 0,
+      "sha256": "0e62cf1b75299134613af72b61479a233bf7d8a3309c7e4b4e4713eb3c4e2ed2"
+    },
+    {
+      "size": 64,
+      "typeId": 0,
+      "sha256": "63c6a5e26cd51f340f4c3ffe91812bb812aad7752db664b5033c17e5fa623962"
+    },
+    {
+      "size": 72,
+      "typeId": 0,
+      "sha256": "04c034e4484017367cb2f6f4f294165aa73c1bd8811683d3951630be601a8903"
+    }
+  ],
+  "location": {
+    "flags": [
+      "VolumeIDAndLocalBasePath"
+    ],
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0xb832ef92"
+    },
+    "localBasePath": "C:\\WINDOWS\\system32\\rcimlby.exe"
+  },
+  "name": "@%systemroot%\\system32\\rcbdyctl.dll,-151",
+  "relativePath": "..\\..\\..\\..\\WINDOWS\\system32\\rcimlby.exe",
+  "workingDirectory": "%HOMEDRIVE%%HOMEPATH%",
+  "commandLine": "-LaunchRA",
+  "iconLocation": "%SYSTEMROOT%\\system32\\rcimlby.exe",
+  "extra": {
+    "environment": {
+      "ansi": "%SYSTEMROOT%\\system32\\rcimlby.exe",
+      "unicode": "%SYSTEMROOT%\\system32\\rcimlby.exe"
+    },
+    "specialFolder": {
+      "id": 37,
+      "offset": 169
+    }
+  }
+}

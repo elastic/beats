@@ -1,0 +1,47 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "ForceNoLinkInfo",
+      "HasExpString",
+      "HasIconLocation",
+      "HasName",
+      "HasRelativePath",
+      "HasWorkingDir",
+      "IsUnicode",
+      "PreferEnvironmentPath"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2009-07-14T00:11:56Z",
+    "accessedTime": "2009-07-14T00:11:56Z",
+    "modifiedTime": "2009-07-14T01:14:28Z",
+    "fileSize": 86016,
+    "iconIndex": 4294965857,
+    "windowStyle": "SW_NORMAL"
+  },
+  "name": "@%windir%\\system32\\odbcint.dll,-1312",
+  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\odbcad32.exe",
+  "workingDirectory": "%windir%\\system32",
+  "iconLocation": "%windir%\\system32\\odbcint.dll",
+  "extra": {
+    "environment": {
+      "ansi": "%windir%\\system32\\odbcad32.exe",
+      "unicode": "%windir%\\system32\\odbcad32.exe"
+    },
+    "propertyStore": {},
+    "tracker": {
+      "version": 0,
+      "machineId": "win-dc3j5p1qj61",
+      "droid": [
+        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
+        "fcc69ae2-3770-de11-816d-001c23e25b76"
+      ],
+      "droidBirth": [
+        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
+        "fcc69ae2-3770-de11-816d-001c23e25b76"
+      ]
+    }
+  }
+}

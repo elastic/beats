@@ -1,0 +1,92 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasLinkInfo",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2010-03-26T10:07:11Z",
+    "accessedTime": "2010-03-26T10:07:11Z",
+    "modifiedTime": "2005-09-04T20:18:26Z",
+    "fileSize": 1019392,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 136,
+      "typeId": 0,
+      "sha256": "be0bfdb8a1e17d06c03f1d309c8d201d670db88d3c2f898f7ee7ffc1a5bbf070"
+    },
+    {
+      "size": 82,
+      "typeId": 0,
+      "sha256": "526ba298e7e1cf4fd68e20af01f2d623860d2fa75c5abdfc8b9a5ff332471fa5"
+    },
+    {
+      "size": 94,
+      "typeId": 0,
+      "sha256": "4972a1d1f32b875a121605f0d353db21abe693756ca03a447ca6703a6e933791"
+    }
+  ],
+  "location": {
+    "flags": [
+      "VolumeIDAndLocalBasePath"
+    ],
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0x3e5dce88"
+    },
+    "localBasePath": "C:\\Program Files\\ConTEXT\\ConTEXT.exe"
+  },
+  "relativePath": "..\\..\\..\\Program Files\\ConTEXT\\ConTEXT.exe",
+  "workingDirectory": "C:\\Program Files\\ConTEXT",
+  "extra": {
+    "knownFolder": {
+      "id": "ef405a7c-fba0-fc4b-874a-c0f2e0b9fa8e",
+      "offset": 181
+    },
+    "propertyStore": {
+      "properties": {
+        "4": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "S-1-5-21-2092377875-1431633947-1539857752-1075"
+          }
+        ]
+      }
+    },
+    "specialFolder": {
+      "id": 42,
+      "offset": 181
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "al-0149",
+      "droid": [
+        "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
+        "bdcda631-9f31-df11-b163-001e4ff01cc7"
+      ],
+      "droidBirth": [
+        "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
+        "bdcda631-9f31-df11-b163-001e4ff01cc7"
+      ]
+    }
+  }
+}

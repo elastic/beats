@@ -1,0 +1,105 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasExpString",
+      "HasLinkInfo",
+      "HasName",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2009-07-13T23:51:37Z",
+    "accessedTime": "2009-07-13T23:51:37Z",
+    "modifiedTime": "2009-07-14T01:14:20Z",
+    "fileSize": 219648,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 82,
+      "typeId": 0,
+      "sha256": "184e677e10b73142c9acb6bc4b5db242dabebda53ff506e59d720d2cbd5be706"
+    },
+    {
+      "size": 86,
+      "typeId": 0,
+      "sha256": "8ce8fcbfca1d3b5d6838544cdb47e95443e55e56f0aff1a73199531b735d77d3"
+    },
+    {
+      "size": 94,
+      "typeId": 0,
+      "sha256": "dc814bc487fc41e03499933cac5facf8154e3b768f8d22c06ac286342037386c"
+    }
+  ],
+  "location": {
+    "flags": [
+      "VolumeIDAndLocalBasePath"
+    ],
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0x502e1a8a"
+    },
+    "localBasePath": "C:\\Windows\\System32\\fsquirt.exe"
+  },
+  "name": "@C:\\Windows\\system32\\fsquirt.exe,-2305",
+  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\fsquirt.exe",
+  "workingDirectory": "C:\\Windows\\system32",
+  "extra": {
+    "environment": {
+      "ansi": "%SystemRoot%\\system32\\fsquirt.exe",
+      "unicode": "%SystemRoot%\\system32\\fsquirt.exe"
+    },
+    "knownFolder": {
+      "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
+      "offset": 213
+    },
+    "propertyStore": {
+      "properties": {
+        "4": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "S-1-5-18"
+          }
+        ],
+        "6": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Transfère les fichiers entre les périphériques et les ordinateurs à l'aide de la technologie sans fil Bluetooth."
+          }
+        ]
+      }
+    },
+    "specialFolder": {
+      "id": 37,
+      "offset": 213
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "win-40r2agv20qa",
+      "droid": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "66d492f8-2061-df11-964c-ac3a656c3b1d"
+      ],
+      "droidBirth": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "66d492f8-2061-df11-964c-ac3a656c3b1d"
+      ]
+    }
+  }
+}

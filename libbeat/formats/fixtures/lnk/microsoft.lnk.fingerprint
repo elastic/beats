@@ -1,0 +1,69 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasLinkInfo",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2008-09-12T20:27:17Z",
+    "accessedTime": "2008-09-12T20:27:17Z",
+    "modifiedTime": "2008-09-12T20:27:17Z",
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 70,
+      "typeId": 0,
+      "sha256": "1c65aad4c1ca4ef42a6531aaa29a4b528040a6d87d576a1afbaa02c7a6be82db"
+    },
+    {
+      "size": 72,
+      "typeId": 0,
+      "sha256": "631f8dc975154983492d18f1712ff973b8425f3dcd2c9d079ed527bed6c9eee1"
+    }
+  ],
+  "location": {
+    "flags": [
+      "VolumeIDAndLocalBasePath"
+    ],
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0x307a8a81"
+    },
+    "localBasePath": "C:\\test\\a.txt"
+  },
+  "relativePath": ".\\a.txt",
+  "workingDirectory": "C:\\test",
+  "extra": {
+    "tracker": {
+      "version": 0,
+      "machineId": "chris-xps",
+      "droid": [
+        "4078c794-47fa-c746-b356-5c2dc6b6d115",
+        "ec46cd7b-227f-dd11-9499-00137216874a"
+      ],
+      "droidBirth": [
+        "4078c794-47fa-c746-b356-5c2dc6b6d115",
+        "ec46cd7b-227f-dd11-9499-00137216874a"
+      ]
+    }
+  }
+}

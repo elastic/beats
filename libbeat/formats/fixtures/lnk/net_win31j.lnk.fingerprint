@@ -1,0 +1,98 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasExpString",
+      "HasLinkInfo",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_NORMAL"
+    ],
+    "creationTime": "2019-07-08T14:04:50Z",
+    "accessedTime": "2019-07-08T14:05:30Z",
+    "modifiedTime": "2019-07-08T14:04:50Z",
+    "fileSize": 10,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix"
+    ],
+    "commonPathSuffix": "\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\TEST\\SHARE"
+    }
+  },
+  "workingDirectory": "\\\\test\\share",
+  "extra": {
+    "environment": {
+      "ansi": "\\\\test\\share\\\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt",
+      "unicode": "\\\\test\\share\\リンク先.txt"
+    },
+    "propertyStore": {
+      "properties": {
+        "10": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "リンク先.txt"
+          }
+        ],
+        "30": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "\\\\test\\share\\リンク先.txt"
+          }
+        ],
+        "6": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "\\\\test\\share"
+          }
+        ]
+      }
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "test",
+      "droid": [
+        "51369273-fde5-4eff-91cc-d50f13310bfc",
+        "04a80000-0000-0000-0ccf-180000000000"
+      ],
+      "droidBirth": [
+        "50369273-fde5-4eff-91cc-d50f13310bfc",
+        "04a80000-0000-0000-0ccf-180000000000"
+      ]
+    },
+    "vistaAndAboveIdList": {
+      "targets": [
+        {
+          "size": 20,
+          "typeId": 88,
+          "sha256": "0fd765c464bc0175cb0d598bbd77de8217dac435999d9261df8f384ae69d5e85"
+        },
+        {
+          "size": 171,
+          "typeId": 0,
+          "sha256": "28222bc3c9d115226224f871f30af6d5f51aaead9bb52f0e86c60bf8c03aff7e"
+        },
+        {
+          "size": 39,
+          "typeId": 1,
+          "sha256": "d0f317c9a1aa7d1e38f393b24b90e27c8e51e88be305c3655b43936e9d13e9ec"
+        },
+        {
+          "size": 94,
+          "typeId": 0,
+          "sha256": "a27e3a9e31dfe073c62944697d439c8aa4331d556c92ef11e21e6e486f72b69e"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasLinkInfo",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_DIRECTORY"
+    ],
+    "creationTime": "2007-02-05T14:52:40Z",
+    "accessedTime": "2008-04-17T09:12:06Z",
+    "modifiedTime": "2007-02-05T14:52:41Z",
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 88,
+      "sha256": "96abeb65d87512271bcabeac8b283506e78a94968b1d8658dd5cb31a1f40951f"
+    },
+    {
+      "size": 50,
+      "typeId": 0,
+      "sha256": "620d29be08dff63afe598819f919717bb1357d90b06e5a00d5a0d09e91626505"
+    },
+    {
+      "size": 136,
+      "typeId": 0,
+      "sha256": "3d18dc812ad70df870b6f8a81582461acf2352d59bca0bdad825e6f59495126a"
+    },
+    {
+      "size": 36,
+      "typeId": 0,
+      "sha256": "2558b29fa32b5a5da3dd4eff2c00f06ad7444b0098073b148f556e1875482f03"
+    },
+    {
+      "size": 41,
+      "typeId": 0,
+      "sha256": "cd62d04905339ebd75908eface1487a326def9797f4513a626b7f5e0cc2774d7"
+    },
+    {
+      "size": 175,
+      "typeId": 0,
+      "sha256": "70a5ac77f6b59746aabfbef46c8645499c08b622fc79ec57ffa921f9d61afa87"
+    },
+    {
+      "size": 60,
+      "typeId": 0,
+      "sha256": "19bcb8ecfc99b2b8152e9c7fd3b34335cd4b29cca0216f6482d9721c7930c227"
+    },
+    {
+      "size": 74,
+      "typeId": 0,
+      "sha256": "eb5ff2514a899d457c5e2c11cb1bb0e9fb9248c289a170c384efff7ea1533050"
+    },
+    {
+      "size": 76,
+      "typeId": 0,
+      "sha256": "79c0924b5e5a2e082f86f3672d03481a048fab6b0fb05463fef7a4586dce5ca2"
+    },
+    {
+      "size": 58,
+      "typeId": 0,
+      "sha256": "53afcfc9c2e090649738cd4b5e044f9b611b66d5400ec23aac022358f1e47eee"
+    },
+    {
+      "size": 52,
+      "typeId": 0,
+      "sha256": "432999e9d2645fdfb83af63aeae94aac516e643096fb2c865508794d7c9fb1c1"
+    }
+  ],
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix"
+    ],
+    "commonPathSuffix": "Install\\Install_Softs\\Administrateur\\Newsid\\2003",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\ALS-FICHIERS7\\D$"
+    }
+  },
+  "extra": {
+    "tracker": {
+      "version": 0,
+      "machineId": "als-fichiers7",
+      "droid": [
+        "00000000-0000-0000-0000-000000000000",
+        "06cd1d4d-e5fc-dc11-8902-0015c5fbcbe3"
+      ],
+      "droidBirth": [
+        "00000000-0000-0000-0000-000000000000",
+        "06cd1d4d-e5fc-dc11-8902-0015c5fbcbe3"
+      ]
+    }
+  }
+}

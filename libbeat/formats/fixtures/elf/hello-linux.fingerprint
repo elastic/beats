@@ -1,0 +1,310 @@
+{
+  "machine": "Advanced Micro Devices x86-64",
+  "segments": [
+    {
+      "name": "PHDR",
+      "sections": []
+    },
+    {
+      "name": "INTERP",
+      "sections": [
+        ".interp"
+      ]
+    },
+    {
+      "name": "LOAD",
+      "sections": [
+        ".interp",
+        ".hash",
+        ".gnu.hash",
+        ".dynsym",
+        ".dynstr",
+        ".rela.plt",
+        ".init",
+        ".plt",
+        ".text",
+        ".fini",
+        ".rodata",
+        ".eh_frame_hdr",
+        ".eh_frame"
+      ]
+    },
+    {
+      "name": "LOAD",
+      "sections": [
+        ".ctors",
+        ".dtors",
+        ".dynamic",
+        ".got.plt",
+        ".data",
+        ".bss",
+        ".comment",
+        ".shstrtab"
+      ]
+    },
+    {
+      "name": "DYNAMIC",
+      "sections": [
+        ".dynamic"
+      ]
+    },
+    {
+      "name": "GNU_EH_FRAME",
+      "sections": [
+        ".eh_frame_hdr"
+      ]
+    },
+    {
+      "name": "GNU_STACK",
+      "sections": []
+    },
+    {
+      "name": "GNU_RELRO",
+      "sections": [
+        ".ctors",
+        ".dtors",
+        ".dynamic"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": ".interp",
+      "type": "PROGBITS",
+      "address": 4194816,
+      "size": 25,
+      "offset": 512,
+      "entropy": 4.05,
+      "chi2": 394.84,
+      "flags": "ALLOC",
+      "md5": "09bd6bae3c649f0b7db796acb252ed8e"
+    },
+    {
+      "name": ".hash",
+      "type": "HASH",
+      "address": 4194848,
+      "size": 40,
+      "offset": 544,
+      "entropy": 0.95,
+      "chi2": 7409.6,
+      "flags": "ALLOC",
+      "md5": "3314c6875824870e88e705d17c9fd386"
+    },
+    {
+      "name": ".gnu.hash",
+      "type": "GNU_HASH",
+      "address": 4194888,
+      "size": 40,
+      "offset": 584,
+      "entropy": 2.57,
+      "chi2": 3492.8,
+      "flags": "ALLOC",
+      "md5": "7883c669be02a88af23602f9e1844d9c"
+    },
+    {
+      "name": ".dynsym",
+      "type": "DYNSYM",
+      "address": 4194928,
+      "size": 120,
+      "offset": 624,
+      "entropy": 1.14,
+      "chi2": 22147.73,
+      "flags": "ALLOC",
+      "md5": "27ad98f5d71388d30966a587909c096a"
+    },
+    {
+      "name": ".dynstr",
+      "type": "STRTAB",
+      "address": 4195048,
+      "size": 46,
+      "offset": 744,
+      "entropy": 3.68,
+      "chi2": 1067.04,
+      "flags": "ALLOC",
+      "md5": "070647007636639b24a57bfee83de833"
+    },
+    {
+      "name": ".rela.plt",
+      "type": "RELA",
+      "address": 4195096,
+      "size": 48,
+      "offset": 792,
+      "entropy": 1.31,
+      "chi2": 7738.67,
+      "flags": "ALLOC | INFO_LINK",
+      "md5": "7ad2c1e3481180009cc7f7c5a859525c"
+    },
+    {
+      "name": ".init",
+      "type": "PROGBITS",
+      "address": 4195144,
+      "size": 13,
+      "offset": 840,
+      "entropy": 2.78,
+      "chi2": 558.08,
+      "flags": "ALLOC | EXECINSTR",
+      "md5": "b3fc11cad8bf472315f13141abac6d5a"
+    },
+    {
+      "name": ".plt",
+      "type": "PROGBITS",
+      "address": 4195168,
+      "size": 48,
+      "offset": 864,
+      "entropy": 3.44,
+      "chi2": 1584,
+      "flags": "ALLOC | EXECINSTR",
+      "md5": "1823bec928baea492f590957c583d0b5"
+    },
+    {
+      "name": ".text",
+      "type": "PROGBITS",
+      "address": 4195216,
+      "size": 465,
+      "offset": 912,
+      "entropy": 5.44,
+      "chi2": 6552.7,
+      "flags": "ALLOC | EXECINSTR",
+      "md5": "ebc2192feed561951385b85af9f255de"
+    },
+    {
+      "name": ".fini",
+      "type": "PROGBITS",
+      "address": 4195681,
+      "size": 8,
+      "offset": 1377,
+      "entropy": 2.75,
+      "chi2": 312,
+      "flags": "ALLOC | EXECINSTR",
+      "md5": "5d437075a3b50fd449d03cc3f59b341b"
+    },
+    {
+      "name": ".rodata",
+      "type": "PROGBITS",
+      "address": 4195689,
+      "size": 14,
+      "offset": 1385,
+      "entropy": 3.32,
+      "chi2": 388.29,
+      "flags": "ALLOC",
+      "md5": "a79133c2466b7180a4de0fd3fe302b0b"
+    },
+    {
+      "name": ".eh_frame_hdr",
+      "type": "PROGBITS",
+      "address": 4195704,
+      "size": 28,
+      "offset": 1400,
+      "entropy": 2.86,
+      "chi2": 1617.71,
+      "flags": "ALLOC",
+      "md5": "61bd12fa18ee6e8e4bd49c72fd4c057e"
+    },
+    {
+      "name": ".eh_frame",
+      "type": "PROGBITS",
+      "address": 4195736,
+      "size": 100,
+      "offset": 1432,
+      "entropy": 3.94,
+      "chi2": 4717.92,
+      "flags": "ALLOC",
+      "md5": "58f77822288abd3346f8a680baddd3a7"
+    },
+    {
+      "name": ".ctors",
+      "type": "PROGBITS",
+      "address": 6295200,
+      "size": 16,
+      "offset": 3744,
+      "entropy": 1,
+      "chi2": 2032,
+      "flags": "WRITE | ALLOC",
+      "md5": "f858d36231ba743ad8c898d86a67a864"
+    },
+    {
+      "name": ".dtors",
+      "type": "PROGBITS",
+      "address": 6295216,
+      "size": 16,
+      "offset": 3760,
+      "entropy": 1,
+      "chi2": 2032,
+      "flags": "WRITE | ALLOC",
+      "md5": "f858d36231ba743ad8c898d86a67a864"
+    },
+    {
+      "name": ".dynamic",
+      "type": "DYNAMIC",
+      "address": 6295232,
+      "size": 320,
+      "offset": 3776,
+      "entropy": 1.22,
+      "chi2": 60276.8,
+      "flags": "WRITE | ALLOC",
+      "md5": "e0fb5e7ca80769538acb5efb27a266fa"
+    },
+    {
+      "name": ".got.plt",
+      "type": "PROGBITS",
+      "address": 6295552,
+      "size": 40,
+      "offset": 4096,
+      "entropy": 1.38,
+      "chi2": 6193.6,
+      "flags": "WRITE | ALLOC",
+      "md5": "8075570109c80fbfea0c3392fde4996a"
+    },
+    {
+      "name": ".data",
+      "type": "PROGBITS",
+      "address": 6295592,
+      "size": 8,
+      "offset": 4136,
+      "entropy": 0,
+      "chi2": 2040,
+      "flags": "WRITE | ALLOC",
+      "md5": "7dea362b3fac8e00956a4952a3d4f474"
+    },
+    {
+      "name": ".bss",
+      "type": "NOBITS",
+      "address": 6295616,
+      "size": 80,
+      "offset": 4144,
+      "entropy": 4.38,
+      "chi2": 1251.2,
+      "flags": "WRITE | ALLOC",
+      "md5": "037927a92704c28e7d7fbf79b86af579"
+    },
+    {
+      "name": ".comment",
+      "type": "PROGBITS",
+      "address": 0,
+      "size": 17,
+      "offset": 4144,
+      "entropy": 3.62,
+      "chi2": 359.47,
+      "flags": "MERGE | STRINGS",
+      "md5": "97e57f09b3f0ad65e3b218ba9812a382"
+    },
+    {
+      "name": ".shstrtab",
+      "type": "STRTAB",
+      "address": 0,
+      "size": 157,
+      "offset": 4161,
+      "entropy": 4.11,
+      "chi2": 2730.75,
+      "flags": "-",
+      "md5": "f6fd260a73c3e8adff25122e03bfc0f7"
+    }
+  ],
+  "imports": {
+    "unknown": [
+      "printf",
+      "__libc_start_main"
+    ]
+  },
+  "telfhash": "3e400000000c00000003000000000c000003000000c03000000000000000000000000c"
+}

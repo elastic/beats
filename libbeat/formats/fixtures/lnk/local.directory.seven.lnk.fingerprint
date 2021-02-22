@@ -1,0 +1,110 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasLinkInfo",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_DIRECTORY",
+      "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"
+    ],
+    "creationTime": "2009-07-14T04:53:59Z",
+    "accessedTime": "2010-05-16T19:36:08Z",
+    "modifiedTime": "2010-05-16T19:36:08Z",
+    "fileSize": 8192,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 116,
+      "typeId": 0,
+      "sha256": "694bda772b560aa1e8db78d9d436be2c5918f098b7104b5ffe1a5e619962398f"
+    },
+    {
+      "size": 96,
+      "typeId": 0,
+      "sha256": "d95bf8611fa96a435db45248eafc5ce43064d57d69d0e1a76975fd985f22fad2"
+    }
+  ],
+  "location": {
+    "flags": [
+      "CommonNetworkRelativeLinkAndPathSuffix",
+      "VolumeIDAndLocalBasePath"
+    ],
+    "commonPathSuffix": "Administrator",
+    "volume": {
+      "driveType": "DRIVE_FIXED",
+      "driveSerialNumber": "0x502e1a8a",
+      "volumeLabel": "SSD-WIN7"
+    },
+    "localBasePath": "C:\\Users\\",
+    "networkShare": {
+      "flags": [
+        "ValidNetType"
+      ],
+      "name": "\\\\NETBOOK\\Users"
+    }
+  },
+  "relativePath": "..\\..\\Administrator",
+  "extra": {
+    "knownFolder": {
+      "id": "72d26207-0ac5-b04b-a382-697dcd729b80",
+      "offset": 161
+    },
+    "propertyStore": {
+      "properties": {
+        "10": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Administrator"
+          }
+        ],
+        "100": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Utilisateurs (C:)"
+          }
+        ],
+        "30": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "C:\\Users\\Administrator"
+          }
+        ],
+        "4": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "S-1-5-21-2382555026-1982050849-604700897-1000"
+          }
+        ]
+      }
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "netbook",
+      "droid": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "ff026513-668c-df11-b6eb-001377d34a59"
+      ],
+      "droidBirth": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "ff026513-668c-df11-b6eb-001377d34a59"
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "DisableKnownFolderTracking",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [],
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 112,
+      "sha256": "4f2ef7c750b2e077b92d59dcecca8414e25706ebfe12e01016750e9af9574410"
+    },
+    {
+      "size": 12,
+      "typeId": 0,
+      "sha256": "5acc20e219f85705afbb40e1379eff5b9ed6ee025f9a07f583725038dd1926d2"
+    }
+  ],
+  "extra": {
+    "propertyStore": {}
+  }
+}

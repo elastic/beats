@@ -111,6 +111,7 @@ require (
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kardianos/service v1.1.0
+	github.com/knightsc/gapstone v4.0.1+incompatible
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
 	github.com/magefile/mage v1.11.0
@@ -119,6 +120,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/miekg/dns v1.1.15
+	github.com/minio/sha256-simd v1.0.0
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 	github.com/mitchellh/mapstructure v1.3.3

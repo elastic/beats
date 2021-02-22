@@ -1,0 +1,47 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "ForceNoLinkInfo",
+      "HasArguments",
+      "HasExpString",
+      "HasIconLocation",
+      "HasName",
+      "HasRelativePath",
+      "IsUnicode",
+      "PreferEnvironmentPath"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2009-07-13T23:39:26Z",
+    "accessedTime": "2009-07-13T23:39:26Z",
+    "modifiedTime": "2009-07-14T01:14:23Z",
+    "fileSize": 941568,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "name": "@%windir%\\system32\\mblctr.exe,-1004",
+  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\mblctr.exe",
+  "commandLine": "/open",
+  "iconLocation": "%windir%\\system32\\mblctr.exe",
+  "extra": {
+    "environment": {
+      "ansi": "%windir%\\system32\\mblctr.exe",
+      "unicode": "%windir%\\system32\\mblctr.exe"
+    },
+    "propertyStore": {},
+    "tracker": {
+      "version": 0,
+      "machineId": "win-40r2agv20qa",
+      "droid": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "fbd492f8-2061-df11-964c-ac3a656c3b1d"
+      ],
+      "droidBirth": [
+        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
+        "fbd492f8-2061-df11-964c-ac3a656c3b1d"
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "EnableTargetMetadata",
+      "HasTargetIDList",
+      "IsUnicode"
+    ],
+    "fileFlags": [],
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 128,
+      "sha256": "39dfe126408d76807afbd0057b9f4d96911391dfea30b2bbd12dd19e359b616e"
+    }
+  ],
+  "extra": {
+    "propertyStore": {
+      "properties": {
+        "10": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Emplacements récents"
+          }
+        ],
+        "30": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "::{22877A6D-37A1-461A-91B0-DBDA5AAEBC99}"
+          }
+        ]
+      }
+    }
+  }
+}

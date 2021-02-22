@@ -1,0 +1,75 @@
+{
+  "header": {
+    "guid": "01140200-0000-0000-c000-000000000046",
+    "linkFlags": [
+      "HasArguments",
+      "HasName",
+      "HasRelativePath",
+      "HasTargetIDList",
+      "HasWorkingDir",
+      "IsUnicode"
+    ],
+    "fileFlags": [
+      "FILE_ATTRIBUTE_ARCHIVE"
+    ],
+    "creationTime": "2008-01-19T05:48:02Z",
+    "accessedTime": "2008-01-19T05:48:02Z",
+    "modifiedTime": "2008-01-19T07:33:12Z",
+    "fileSize": 625664,
+    "iconIndex": 0,
+    "windowStyle": "SW_NORMAL"
+  },
+  "targets": [
+    {
+      "size": 20,
+      "typeId": 80,
+      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+    },
+    {
+      "size": 25,
+      "typeId": 67,
+      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+    },
+    {
+      "size": 132,
+      "typeId": 0,
+      "sha256": "46463e8662fedf13e7875f980e95b1323c9d5a29f95761ea11e90e13cb1c1b71"
+    },
+    {
+      "size": 100,
+      "typeId": 0,
+      "sha256": "d08e5c93e6953dd7352b577645b8e8bb820e60a162b89f9b02c5a5cb3329f04b"
+    },
+    {
+      "size": 94,
+      "typeId": 0,
+      "sha256": "2aadd8d53e7463686a436c806960bd61778d0048f6c535ecb9a90a95b7da74ae"
+    }
+  ],
+  "name": "@\"%windir%\\System32\\ie4uinit.exe\",-738",
+  "relativePath": "..\\..\\..\\..\\..\\..\\..\\..\\..\\..\\Program Files\\Internet Explorer\\iexplore.exe",
+  "workingDirectory": "%HOMEDRIVE%%HOMEPATH%",
+  "commandLine": " -extoff",
+  "extra": {
+    "knownFolder": {
+      "id": "ef405a7c-fba0-fc4b-874a-c0f2e0b9fa8e",
+      "offset": 177
+    },
+    "specialFolder": {
+      "id": 42,
+      "offset": 177
+    },
+    "tracker": {
+      "version": 0,
+      "machineId": "als-backup1",
+      "droid": [
+        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
+        "90ed08bb-1f7a-df11-a4a2-a4badb43b04f"
+      ],
+      "droidBirth": [
+        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
+        "90ed08bb-1f7a-df11-a4a2-a4badb43b04f"
+      ]
+    }
+  }
+}
