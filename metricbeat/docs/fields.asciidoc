@@ -18853,6 +18853,15 @@ alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 
 --
 
+*`ccr_auto_follow_stats.follower.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
+
+--
+
 
 *`ccr_stats.shard_id`*::
 +

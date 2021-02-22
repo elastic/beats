@@ -250,6 +250,9 @@
         - name: number_of_successful_follow_indices
           type: alias
           path: elasticsearch.ccr.auto_follow.success.follow_indices.count
+        - name: follower.failed_read_requests
+          type: alias
+          path: elasticsearch.ccr.requests.failed.read.count
     - name: ccr_stats
       type: group
       fields:
