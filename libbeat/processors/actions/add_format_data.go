@@ -22,6 +22,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/formats/elf"
@@ -31,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	"github.com/pkg/errors"
 )
 
 func init() {
