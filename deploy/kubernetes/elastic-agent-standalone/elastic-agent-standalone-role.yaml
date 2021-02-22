@@ -11,7 +11,6 @@ rules:
       - namespaces
       - events
       - pods
-      - secrets
     verbs: ["get", "list", "watch"]
   - apiGroups: ["extensions"]
     resources:
