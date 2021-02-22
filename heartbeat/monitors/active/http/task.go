@@ -61,7 +61,7 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
-	maxRetries := config.MaxRetries
+	retries := config.MaxRetries
 	timeout := config.Timeout
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
@@ -72,7 +72,7 @@ func newHTTPMonitorHostJob(
 			Transport:     transport,
 			Timeout:       config.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, maxRetries, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, timeout, retries, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -113,7 +113,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
-	maxRetries := config.MaxRetries
+	retries := config.MaxRetries
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 
@@ -168,7 +168,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, maxRetries, validator, config.Response)
+		_, end, err := execPing(event, client, request, body, timeout, retries, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -235,11 +235,13 @@ func execPing(
 		ctx       context.Context
 		cancel    context.CancelFunc
 		errReason reason.Reason
-		retries int
+		retries   int
 	)
 	// default retries is 0, that means there's no retry by default
 	if maxRetries <= 0 {
 		retries = 0
+	} else {
+		retries = maxRetries
 	}
 	// total hits should be <retries + 1>
 	// the global retry threshold should be greater than inner threshold
@@ -266,6 +268,11 @@ func execPing(
 					tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 				}
 			}
+
+			// Add total retries
+			eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+				"max_retries": retry,
+			}})
 
 			cancel()
 			return start, time.Now(), errReason
@@ -309,11 +316,13 @@ func execPing(
 			eventext.MergeEventFields(event, tlsFields)
 		}
 
-		// Add total HTTP RTT
+		// Add total HTTP RTT and max retries
 		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 			"rtt": common.MapStr{
 				"total": look.RTT(end.Sub(start)),
 			},
+			// add max_retries
+			"max_retries": retry,
 		}})
 		break
 	}

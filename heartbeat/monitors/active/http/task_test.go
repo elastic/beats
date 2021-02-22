@@ -24,6 +24,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 
 	"github.com/stretchr/testify/require"
@@ -198,4 +200,30 @@ func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, expectedUserAgent, request.Header.Get("User-Agent"))
+}
+
+func TestRequestBuildingWithMaxRetries(t *testing.T) {
+	var (
+		body      []byte
+		validator multiValidator
+	)
+	config := Config{
+		MaxRetries: 5,
+		Timeout:    10,
+	}
+	event := beat.Event{}
+
+	request, _ := buildRequest("http://localhost:80", &config, nilEncoder{})
+	client := &http.Client{
+		Timeout: config.Timeout,
+	}
+	_, _, err := execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
+	maxRetries, _ := event.GetValue("http.max_retries")
+	if err != nil {
+		// max_retries will be the same as config.MaxRetries if target is unreachable
+		assert.Equal(t, config.MaxRetries, maxRetries)
+	} else {
+		// max_retries will be as 0 if target is reachable
+		assert.Equal(t, 0, maxRetries)
+	}
 }
