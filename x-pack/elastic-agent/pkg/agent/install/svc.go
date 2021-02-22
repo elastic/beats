@@ -7,8 +7,9 @@ package install
 import (
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/kardianos/service"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 const (

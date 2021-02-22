@@ -4,11 +4,11 @@
 
 package info
 
-import(
-	"os"
+import (
 	"fmt"
-	"strings"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
