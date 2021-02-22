@@ -24,4 +24,5 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/path"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
+	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/windows"
 )

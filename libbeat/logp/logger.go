@@ -50,6 +50,12 @@ func NewLogger(selector string, options ...LogOption) *Logger {
 	return newLogger(loadLogger().rootLogger, selector, options...)
 }
 
+// WithOptions returns a clone of l with options applied.
+func (l *Logger) WithOptions(options ...LogOption) *Logger {
+	cloned := l.logger.WithOptions(options...)
+	return &Logger{cloned, cloned.Sugar()}
+}
+
 // With creates a child logger and adds structured context to it. Fields added
 // to the child don't affect the parent, and vice versa.
 func (l *Logger) With(args ...interface{}) *Logger {
@@ -211,6 +217,11 @@ func (l *Logger) Recover(msg string) {
 		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
 		l.Error(msg, zap.Any("panic", r), zap.Stack("stack"))
 	}
+}
+
+// Sync syncs the logger.
+func (l *Logger) Sync() error {
+	return l.logger.Sync()
 }
 
 // L returns an unnamed global logger.

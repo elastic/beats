@@ -33,6 +33,18 @@
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
 
+  # Use Elasticsearch histogram type to store histograms (beta, default: false)
+  # This will change the default layout and put metric type in the field name
+  #use_types: true
+
+  # Store counter rates instead of original cumulative counters (experimental, default: false)
+  #rate_counters: true
+
+  # Define patterns for counter and histogram types so as to identify metrics' types according to these patterns
+  #types_patterns:
+  #  counter_patterns: []
+  #  histogram_patterns: []
+
 # Metrics that will be collected using a PromQL
 #- module: prometheus
 #  metricsets: ["query"]

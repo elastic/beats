@@ -20,7 +20,6 @@ package dns
 import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
@@ -47,7 +46,7 @@ func (dns *dnsPlugin) ParseUDP(pkt *protos.Packet) {
 	dnsMsg := &dnsMessage{
 		ts:           pkt.Ts,
 		tuple:        pkt.Tuple,
-		cmdlineTuple: procs.ProcWatcher.FindProcessesTupleUDP(&pkt.Tuple),
+		cmdlineTuple: dns.watcher.FindProcessesTupleUDP(&pkt.Tuple),
 		data:         dnsPkt,
 		length:       packetSize,
 	}

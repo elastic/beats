@@ -81,7 +81,7 @@ endif::has_ml_jobs[]
 Omit any privileges that aren't relevant in your environment.
 +
 NOTE: These instructions assume that you are using the default name for
-{beatname_uc} indices. If you are using a custom name, modify the privileges to
+{beatname_uc} indices. If +{beat_default_index_prefix}-*+ is not listed, or you are using a custom name, enter it manually and modify the privileges to
 match your index naming pattern.
 
 . Assign the *setup role*, along with the following built-in roles, to users who
@@ -169,7 +169,7 @@ users who need to monitor {beatname_uc}:
 |====
 |Role | Purpose
 
-|`kibana_user`
+|`kibana_admin`
 |Use {kib}
 
 |`monitoring_user`
@@ -231,7 +231,7 @@ endif::serverless[]
 Users who publish events to {es} need to create and write to {beatname_uc}
 indices. To minimize the privileges required by the writer role, use the
 <<privileges-to-setup-beats,setup role>> to pre-load dependencies. This section
-assumes that you've pre-loaded dependencies.
+assumes that you've run the setup.
 
 ifndef::no_ilm[]
 When using ILM, turn off the ILM setup check in the {beatname_uc} config file before

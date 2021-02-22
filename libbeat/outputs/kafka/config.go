@@ -69,12 +69,11 @@ type kafkaConfig struct {
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
 	Sasl               saslConfig                `config:"sasl"`
+	EnableFAST         bool                      `config:"enable_krb5_fast"`
 }
 
 type saslConfig struct {
 	SaslMechanism string `config:"mechanism"`
-	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
-	//SaslPassword  string `config:"password"`
 }
 
 type metaConfig struct {
@@ -149,12 +148,16 @@ func (c *saslConfig) configureSarama(config *sarama.Config) error {
 	case saslTypePlaintext:
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
 	case saslTypeSCRAMSHA256:
+		cfgwarn.Beta("SCRAM-SHA-256 authentication for Kafka is beta.")
+
 		config.Net.SASL.Handshake = true
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
 		}
 	case saslTypeSCRAMSHA512:
+		cfgwarn.Beta("SCRAM-SHA-512 authentication for Kafka is beta.")
+
 		config.Net.SASL.Handshake = true
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
@@ -225,10 +228,11 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
-	if config.Kerberos.IsEnabled() {
+	switch {
+	case config.Kerberos.IsEnabled():
 		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
 
 		k.Net.SASL.Enable = true
@@ -241,10 +245,10 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !config.EnableFAST,
 		}
-	}
 
-	if config.Username != "" {
+	case config.Username != "":
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password

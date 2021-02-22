@@ -105,6 +105,7 @@ var timeLayouts = []string{
 	"Jan _2 15:04:05.000 MST",
 	"Jan _2 15:04:05.000 Z0700",
 	"Jan _2 15:04:05.000 Z07:00",
+	"Jan _2 15:04:05.000 GMT-07:00",
 
 	// MMM dd HH:mm:sss.SSS
 	"Jan _2 15:04:05.000",
@@ -113,6 +114,7 @@ var timeLayouts = []string{
 	"Jan _2 15:04:05 MST",
 	"Jan _2 15:04:05 Z0700",
 	"Jan _2 15:04:05 Z07:00",
+	"Jan _2 15:04:05 GMT-07:00",
 
 	// MMM dd HH:mm:ss
 	"Jan _2 15:04:05",
@@ -121,6 +123,7 @@ var timeLayouts = []string{
 	"Jan _2 2006 15:04:05.000 MST",
 	"Jan _2 2006 15:04:05.000 Z0700",
 	"Jan _2 2006 15:04:05.000 Z07:00",
+	"Jan _2 2006 15:04:05.000 GMT-07:00",
 
 	// MMM dd yyyy HH:mm:ss.SSS
 	"Jan _2 2006 15:04:05.000",
@@ -129,6 +132,7 @@ var timeLayouts = []string{
 	"Jan _2 2006 15:04:05 MST",
 	"Jan _2 2006 15:04:05 Z0700",
 	"Jan _2 2006 15:04:05 Z07:00",
+	"Jan _2 2006 15:04:05 GMT-07:00",
 
 	// MMM dd yyyy HH:mm:ss
 	"Jan _2 2006 15:04:05",

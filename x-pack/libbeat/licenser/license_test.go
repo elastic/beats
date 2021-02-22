@@ -132,6 +132,11 @@ func TestIsActive(t *testing.T) {
 			l:        License{Status: Inactive},
 			expected: false,
 		},
+		{
+			name:     "expired",
+			l:        License{Status: Expired},
+			expected: false,
+		},
 	}
 
 	for _, test := range tests {

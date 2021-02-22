@@ -1,9 +1,9 @@
 [
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "login_failure",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "gsuite.saml",
         "event.id": "1",
@@ -40,6 +40,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -51,13 +52,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:01.000Z",
         "event.action": "login_success",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "gsuite.saml",
         "event.id": "1",
@@ -92,6 +96,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -103,6 +108,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

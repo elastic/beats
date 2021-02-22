@@ -4,6 +4,9 @@
     description: >
       Fields from Office 365 Management API audit logs.
     fields:
+    - name: AADGroupId
+      type: keyword
+
     - name: Actor
       type: array
       fields:
@@ -71,6 +74,9 @@
       type: text
       norms: false
 
+    - name: CommunicationType
+      type: keyword
+
     - name: CorrelationId
       type: keyword
 
@@ -86,7 +92,13 @@
     - name: DataType
       type: keyword
 
+    - name: DoNotDistributeEvent
+      type: boolean
+
     - name: EntityType
+      type: keyword
+
+    - name: ErrorNumber
       type: keyword
 
     - name: EventData
@@ -103,6 +115,9 @@
 
     - name: ExternalAccess
       type: keyword
+
+    - name: FromApp
+      type: boolean
 
     - name: GroupName
       type: keyword
@@ -125,11 +140,17 @@
     - name: IntraSystemId
       type: keyword
 
+    - name: IsDocLib
+      type: boolean
+
     - name: Item.*
       type: object
 
     - name: Item.*.*
       type: object
+
+    - name: ItemCount
+      type: long
 
     - name: ItemName
       type: keyword
@@ -137,7 +158,22 @@
     - name: ItemType
       type: keyword
 
+    - name: ListBaseTemplateType
+      type: keyword
+
+    - name: ListBaseType
+      type: keyword
+
+    - name: ListColor
+      type: keyword
+
+    - name: ListIcon
+      type: keyword
+
     - name: ListId
+      type: keyword
+
+    - name: ListTitle
       type: keyword
 
     - name: ListItemUniqueId
@@ -264,6 +300,9 @@
       type: keyword
 
     - name: TeamGuid
+      type: keyword
+
+    - name: TemplateTypeId
       type: keyword
 
     - name: UniqueSharingId

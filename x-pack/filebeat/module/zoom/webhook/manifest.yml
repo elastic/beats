@@ -1,0 +1,43 @@
+module_version: 1.0
+
+var:
+  - name: listen_address
+    default: localhost
+  - name: listen_port
+    default: 80
+  - name: input
+    default: http_endpoint
+  - name: content_type
+    default: ""
+  - name: response_code
+  - name: response_body
+  - name: url
+  - name: prefix
+    default: zoom
+  - name: basic_auth
+    default: false
+  - name: username
+    default: ""
+  - name: password
+    default: ""
+  - name: secret
+    default:
+      header: Authorization
+      value: ""
+
+  - name: tags
+    default: [zoom-webhook, forwarded]
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/account.yml
+  - ingest/chat_channel.yml
+  - ingest/chat_message.yml
+  - ingest/meeting.yml
+  - ingest/phone.yml
+  - ingest/recording.yml
+  - ingest/user.yml
+  - ingest/webinar.yml
+  - ingest/zoomroom.yml
+
+input: config/webhook.yml

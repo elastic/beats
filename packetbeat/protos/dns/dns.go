@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
@@ -55,6 +56,7 @@ type dnsPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter // Channel where results are pushed.
+	watcher procs.ProcessesWatcher
 }
 
 var (
@@ -220,6 +222,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &dnsPlugin{}
@@ -230,13 +233,13 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (dns *dnsPlugin) init(results protos.Reporter, config *dnsConfig) error {
+func (dns *dnsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *dnsConfig) error {
 	dns.setFromConfig(config)
 	dns.transactions = common.NewCacheWithRemovalListener(
 		dns.transactionTimeout,
@@ -252,6 +255,7 @@ func (dns *dnsPlugin) init(results protos.Reporter, config *dnsConfig) error {
 	dns.transactions.StartJanitor(dns.transactionTimeout)
 
 	dns.results = results
+	dns.watcher = watcher
 
 	return nil
 }

@@ -11,8 +11,6 @@ if sys.platform.startswith("win"):
     import win32security
     import win32evtlogutil
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 
 PROVIDER = "WinlogbeatTestPython"
@@ -111,7 +109,7 @@ class WriteReadTest(BaseTest):
 
     def read_registry(self, requireBookmark=False):
         f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "r")
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.FullLoader)
         self.assertIn("update_time", data)
         self.assertIn("event_logs", data)
 
@@ -132,20 +130,21 @@ class WriteReadTest(BaseTest):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
         assert "winlog.record_id" in evt
-        self.assertDictContainsSubset({
+        expected = {
             "winlog.event_id": eventID,
             "event.code": eventID,
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,
             "winlog.api": self.api,
-        }, evt)
+        }
+        assert expected.items() <= evt.items()
 
         if msg is None:
             assert "message" not in evt
         else:
             self.assertEqual(evt["message"], msg)
-            self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
+            self.assertEqual(msg, evt.get("winlog.event_data.param1"))
 
         if sid is None:
             self.assertEqual(evt["winlog.user.identifier"], self.get_sid_string())
@@ -159,7 +158,7 @@ class WriteReadTest(BaseTest):
             assert "winlog.user.type" not in evt
 
         if extra is not None:
-            self.assertDictContainsSubset(extra, evt)
+            assert extra.items() <= evt.items()
 
 
 def host_name(fqdn):

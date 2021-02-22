@@ -10,7 +10,10 @@ beta[]
 
 This is the App Search module.
 
-
+[NOTE]
+=====
+This module does not support collecting data from App Search running on {ecloud}.
+=====
 
 [float]
 === Example configuration
@@ -29,6 +32,9 @@ metricbeat.modules:
   #username: "elastic"
   #password: "changeme"
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

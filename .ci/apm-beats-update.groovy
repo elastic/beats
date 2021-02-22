@@ -2,7 +2,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent none
+  agent { label 'master' }
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
@@ -27,11 +27,11 @@ pipeline {
   }
   triggers {
     issueCommentTrigger('(?i).*/run\\s+(?:apm-beats-update\\W+)?.*')
-    upstream("Beats/beats-beats-mbp/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
+    upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -48,51 +48,53 @@ pipeline {
           }
         }
       }
-      /**
-       Checkout the code and stash it, to use it on other stages.
-      */
-      stage('Checkout') {
-        steps {
-          deleteDir()
-          gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
-          script {
-            dir("${BEATS_DIR}"){
-              env.GO_VERSION = readFile(".go-version").trim()
-              def regexps =[
-                "^devtools/mage.*",
-                "^libbeat/scripts/Makefile",
-              ]
-              env.BEATS_UPDATED = isGitRegionMatch(patterns: regexps)
-              // Skip all the stages except docs for PR's with asciidoc changes only
-              env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
+      stages {
+        /**
+        Checkout the code and stash it, to use it on other stages.
+        */
+        stage('Checkout') {
+          options { skipDefaultCheckout() }
+          steps {
+            deleteDir()
+            gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
+            script {
+              dir("${BEATS_DIR}"){
+                env.GO_VERSION = readFile(".go-version").trim()
+                def regexps =[
+                  "^devtools/mage.*",
+                  "^libbeat/scripts/Makefile",
+                ]
+                env.BEATS_UPDATED = isGitRegionMatch(patterns: regexps)
+                // Skip all the stages except docs for PR's with asciidoc changes only
+                env.ONLY_DOCS = isGitRegionMatch(patterns: [ '.*\\.asciidoc' ], comparator: 'regexp', shouldMatchAll: true)
+              }
             }
           }
         }
-      }
-      /**
-      updates beats updates the framework part and go parts of beats.
-      Then build and test.
-      Finally archive the results.
-      */
-      stage('Update Beats') {
-        options { skipDefaultCheckout() }
-        when {
-          beforeAgent true
-          anyOf {
-            branch 'master'
-            branch "\\d+\\.\\d+"
-            branch "v\\d?"
-            tag "v\\d+\\.\\d+\\.\\d+*"
-            allOf {
-              expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() }
-              changeRequest()
+        /**
+        updates beats updates the framework part and go parts of beats.
+        Then build and test.
+        Finally archive the results.
+        */
+        stage('Update Beats') {
+          options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            anyOf {
+              branch 'master'
+              branch "\\d+\\.\\d+"
+              branch "v\\d?"
+              tag "v\\d+\\.\\d+\\.\\d+*"
+              allOf {
+                expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() || isUserTrigger() }
+                changeRequest()
+              }
             }
-
           }
-        }
-        steps {
-          withGithubNotify(context: 'Check Apm Server Beats Update') {
-            beatsUpdate()
+          steps {
+            withGithubNotify(context: 'Check Apm Server Beats Update') {
+              beatsUpdate()
+            }
           }
         }
       }
@@ -124,6 +126,7 @@ def beatsUpdate() {
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        echo '{"name": "${GOPATH}/src/github.com/elastic/beats-local", "licenceType": "Elastic"}' >> \${GOPATH}/src/github.com/elastic/beats-local/dev-tools/notice/overrides.json
         make update
         git commit -a -m beats-update
 

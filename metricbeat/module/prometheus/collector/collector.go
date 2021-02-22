@@ -111,11 +111,11 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
-		ms.excludeMetrics, err = compilePatternList(config.MetricsFilters.ExcludeMetrics)
+		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
 		}
-		ms.includeMetrics, err = compilePatternList(config.MetricsFilters.IncludeMetrics)
+		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
 			return nil, errors.Wrapf(err, "unable to compile include patterns")
 		}
@@ -237,39 +237,13 @@ func (m *MetricSet) skipFamilyName(family string) bool {
 
 	// if include_metrics are defined, check if this metric should be included
 	if len(m.includeMetrics) > 0 {
-		if !matchMetricFamily(family, m.includeMetrics) {
+		if !p.MatchMetricFamily(family, m.includeMetrics) {
 			return true
 		}
 	}
 	// now exclude the metric if it matches any of the given patterns
 	if len(m.excludeMetrics) > 0 {
-		if matchMetricFamily(family, m.excludeMetrics) {
-			return true
-		}
-	}
-	return false
-}
-
-func compilePatternList(patterns *[]string) ([]*regexp.Regexp, error) {
-	var compiledPatterns []*regexp.Regexp
-	compiledPatterns = []*regexp.Regexp{}
-	if patterns != nil {
-		for _, pattern := range *patterns {
-			r, err := regexp.Compile(pattern)
-			if err != nil {
-				return nil, errors.Wrapf(err, "compiling pattern '%s'", pattern)
-			}
-			compiledPatterns = append(compiledPatterns, r)
-		}
-		return compiledPatterns, nil
-	}
-	return []*regexp.Regexp{}, nil
-}
-
-func matchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
-	for _, checkMetric := range matchMetrics {
-		matched := checkMetric.MatchString(family)
-		if matched {
+		if p.MatchMetricFamily(family, m.excludeMetrics) {
 			return true
 		}
 	}

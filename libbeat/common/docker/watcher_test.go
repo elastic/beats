@@ -21,6 +21,7 @@ package docker
 
 import (
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -37,7 +38,7 @@ type MockClient struct {
 	containers [][]types.Container
 	// event list to send on Events call
 	events []interface{}
-
+	// done channel is closed when the client has sent all events
 	done chan interface{}
 }
 
@@ -71,7 +72,7 @@ func (m *MockClient) ContainerInspect(ctx context.Context, container string) (ty
 }
 
 func TestWatcherInitialization(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runAndWait(testWatcher(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -90,7 +91,8 @@ func TestWatcherInitialization(t *testing.T) {
 				},
 			},
 		},
-		nil)
+		nil,
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
@@ -109,7 +111,7 @@ func TestWatcherInitialization(t *testing.T) {
 }
 
 func TestWatcherInitializationShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runAndWait(testWatcherShortID(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -128,7 +130,9 @@ func TestWatcherInitializationShortID(t *testing.T) {
 				},
 			},
 		},
-		nil, true)
+		nil,
+		true,
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"1234567890123": &Container{
@@ -154,7 +158,7 @@ func TestWatcherInitializationShortID(t *testing.T) {
 }
 
 func TestWatcherAddEvents(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runAndWait(testWatcher(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -188,7 +192,7 @@ func TestWatcherAddEvents(t *testing.T) {
 				},
 			},
 		},
-	)
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
@@ -207,7 +211,7 @@ func TestWatcherAddEvents(t *testing.T) {
 }
 
 func TestWatcherAddEventsShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runAndWait(testWatcherShortID(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -242,7 +246,7 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 			},
 		},
 		true,
-	)
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"1234567890123": &Container{
@@ -261,7 +265,7 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 }
 
 func TestWatcherUpdateEvent(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runAndWait(testWatcher(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -295,7 +299,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 				},
 			},
 		},
-	)
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"0332dbd79e20": &Container{
@@ -309,7 +313,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 }
 
 func TestWatcherUpdateEventShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runAndWait(testWatcherShortID(t, true,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -344,7 +348,7 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 			},
 		},
 		true,
-	)
+	))
 
 	assert.Equal(t, map[string]*Container{
 		"1234567890123": &Container{
@@ -358,9 +362,7 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 }
 
 func TestWatcherDie(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/7906")
-
-	watcher := runWatcher(t, false,
+	watcher, clientDone := testWatcher(t, false,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -381,32 +383,37 @@ func TestWatcherDie(t *testing.T) {
 			},
 		},
 	)
+
+	clock := newTestClock()
+	watcher.clock = clock
+
+	stopListener := watcher.ListenStop()
+
+	watcher.Start()
 	defer watcher.Stop()
 
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
-		assert.Equal(t, 1, len(watcher.Containers()))
-		time.Sleep(50 * time.Millisecond)
-	}
-
-	// Checks a max of 10s for the watcher containers to be updated
-	for i := 0; i < 100; i++ {
-		// Now it should get removed
-		time.Sleep(100 * time.Millisecond)
-
-		if len(watcher.Containers()) == 0 {
+		clock.Sleep(watcher.cleanupTimeout / 2)
+		watcher.runCleanup()
+		if !assert.Equal(t, 1, len(watcher.Containers())) {
 			break
 		}
 	}
 
+	// Wait to be sure that the delete event has been processed
+	<-clientDone
+	<-stopListener.Events()
+
+	// Check that after the cleanup period the container is removed
+	clock.Sleep(watcher.cleanupTimeout + 1*time.Second)
+	watcher.runCleanup()
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
 func TestWatcherDieShortID(t *testing.T) {
-	t.Skip("flaky test: https://github.com/elastic/beats/issues/7906")
-
-	watcher := runWatcherShortID(t, false,
+	watcher, clientDone := testWatcherShortID(t, false,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -428,33 +435,40 @@ func TestWatcherDieShortID(t *testing.T) {
 		},
 		true,
 	)
+
+	clock := newTestClock()
+	watcher.clock = clock
+
+	stopListener := watcher.ListenStop()
+
+	watcher.Start()
 	defer watcher.Stop()
 
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
-		assert.Equal(t, 1, len(watcher.Containers()))
-		time.Sleep(50 * time.Millisecond)
-	}
-
-	// Checks a max of 10s for the watcher containers to be updated
-	for i := 0; i < 100; i++ {
-		// Now it should get removed
-		time.Sleep(100 * time.Millisecond)
-
-		if len(watcher.Containers()) == 0 {
+		clock.Sleep(watcher.cleanupTimeout / 2)
+		watcher.runCleanup()
+		if !assert.Equal(t, 1, len(watcher.Containers())) {
 			break
 		}
 	}
 
+	// Wait to be sure that the delete event has been processed
+	<-clientDone
+	<-stopListener.Events()
+
+	// Check that after the cleanup period the container is removed
+	clock.Sleep(watcher.cleanupTimeout + 1*time.Second)
+	watcher.runCleanup()
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
-func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
-	return runWatcherShortID(t, kill, containers, events, false)
+func testWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) (*watcher, chan interface{}) {
+	return testWatcherShortID(t, kill, containers, events, false)
 }
 
-func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, events []interface{}, enable bool) *watcher {
+func testWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, events []interface{}, enable bool) (*watcher, chan interface{}) {
 	logp.TestingSetup()
 
 	client := &MockClient{
@@ -472,16 +486,37 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 		t.Fatal("'watcher' was supposed to be pointer to the watcher structure")
 	}
 
-	err = watcher.Start()
-	if err != nil {
-		t.Fatal(err)
-	}
+	return watcher, client.done
+}
 
-	<-client.done
-	if kill {
-		watcher.Stop()
-		watcher.stopped.Wait()
-	}
+func runAndWait(w *watcher, done chan interface{}) *watcher {
+	w.Start()
+	<-done
+	w.Stop()
+	return w
+}
 
-	return watcher
+type testClock struct {
+	sync.Mutex
+
+	now time.Time
+}
+
+func newTestClock() *testClock {
+	return &testClock{now: time.Time{}}
+}
+
+func (c *testClock) Now() time.Time {
+	c.Lock()
+	defer c.Unlock()
+
+	c.now = c.now.Add(1)
+	return c.now
+}
+
+func (c *testClock) Sleep(d time.Duration) {
+	c.Lock()
+	defer c.Unlock()
+
+	c.now = c.now.Add(d)
 }

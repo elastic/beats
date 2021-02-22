@@ -1,0 +1,4 @@
+- name: istiod
+  type: group
+  release: beta
+  fields:

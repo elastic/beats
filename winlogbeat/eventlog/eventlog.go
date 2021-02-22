@@ -55,6 +55,12 @@ var (
 	readErrors = expvar.NewMap("read_errors")
 )
 
+// Keyword Constants
+const (
+	keywordAuditFailure = 0x10000000000000
+	keywordAuditSuccess = 0x20000000000000
+)
+
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
 	// Open the event log. state points to the last successfully read event
@@ -137,6 +143,12 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "host.name", e.Computer)
 
 	m.Put("event.created", time.Now())
+
+	if e.KeywordsRaw&keywordAuditFailure > 0 {
+		m.Put("event.outcome", "failure")
+	} else if e.KeywordsRaw&keywordAuditSuccess > 0 {
+		m.Put("event.outcome", "success")
+	}
 
 	addOptional(m, "log.file.path", e.File)
 	addOptional(m, "log.level", strings.ToLower(e.Level))

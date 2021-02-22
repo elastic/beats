@@ -1,0 +1,26 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/S3
+        statistic: ["Average"]
+        name:
+          - BucketSizeBytes
+          - NumberOfObjects
+
+processors:
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "aws.s3.metrics.NumberOfObjects.avg"
+          to: "aws.s3_daily_storage.number_of_objects"
+        - from: "aws.s3.metrics.BucketSizeBytes.avg"
+          to: "aws.s3_daily_storage.bucket.size.bytes"
+        - from: "aws.dimensions.BucketName"
+          to: "aws.s3.bucket.name"
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.s3.metrics"

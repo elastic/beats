@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "DROP_FROM_QUARANTINE",
         "event.category": [
             "iam"
@@ -35,6 +34,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -46,10 +46,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "EMAIL_LOG_SEARCH",
         "event.category": [
             "iam"
@@ -57,20 +59,20 @@
         "event.dataset": "gsuite.admin",
         "event.id": "1",
         "event.module": "gsuite",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_LOG_SEARCH\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_END_DATE\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"EMAIL_LOG_SEARCH_RECIPIENT\",\"value\":\"recipient\"},{\"name\":\"EMAIL_LOG_SEARCH_SENDER\",\"value\":\"sender\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_RECIPIENT_IP\",\"value\":\"1.1.1.1\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_SENDER_IP\",\"value\":\"1.1.1.1\"},{\"name\":\"EMAIL_LOG_SEARCH_START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_LOG_SEARCH\",\"parameters\":[{\"name\":\"EMAIL_LOG_SEARCH_END_DATE\",\"value\":\"2020/07/28 04:59:59 UTC\"},{\"name\":\"EMAIL_LOG_SEARCH_MSG_ID\",\"value\":\"id\"},{\"name\":\"EMAIL_LOG_SEARCH_RECIPIENT\",\"value\":\"recipient\"},{\"name\":\"EMAIL_LOG_SEARCH_SENDER\",\"value\":\"sender\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_RECIPIENT_IP\",\"value\":\"1.1.1.1\"},{\"name\":\"EMAIL_LOG_SEARCH_SMTP_SENDER_IP\",\"value\":\"1.1.1.1\"},{\"name\":\"EMAIL_LOG_SEARCH_START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info"
         ],
         "fileset.name": "admin",
         "gsuite.actor.type": "USER",
-        "gsuite.admin.email.log_search_filter.end_date": "2002-10-02T12:00:00Z",
+        "gsuite.admin.email.log_search_filter.end_date": "2020-07-28T04:59:59.000Z",
         "gsuite.admin.email.log_search_filter.message_id": "id",
         "gsuite.admin.email.log_search_filter.recipient.ip": "1.1.1.1",
         "gsuite.admin.email.log_search_filter.recipient.value": "recipient",
         "gsuite.admin.email.log_search_filter.sender.ip": "1.1.1.1",
         "gsuite.admin.email.log_search_filter.sender.value": "sender",
-        "gsuite.admin.email.log_search_filter.start_date": "2002-10-02T10:00:00Z",
+        "gsuite.admin.email.log_search_filter.start_date": "2002-10-02T10:00:00.000Z",
         "gsuite.event.type": "EMAIL_SETTINGS",
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
@@ -89,6 +91,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -100,22 +103,24 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "EMAIL_UNDELETE",
         "event.category": [
             "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.duration": 7200000000000,
-        "event.end": "2002-10-02T12:00:00Z",
+        "event.end": "2002-10-02T12:00:00.000Z",
         "event.id": "1",
         "event.module": "gsuite",
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"EMAIL_SETTINGS\",\"name\":\"EMAIL_UNDELETE\",\"parameters\":[{\"name\":\"END_DATE\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"},{\"name\":\"START_DATE\",\"value\":\"2002-10-02T10:00:00Z\"}]}}",
         "event.provider": "admin",
-        "event.start": "2002-10-02T10:00:00Z",
+        "event.start": "2002-10-02T10:00:00.000Z",
         "event.type": [
             "creation"
         ],
@@ -126,7 +131,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1185,
+        "log.offset": 1188,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -141,6 +146,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -152,13 +158,19 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_EMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -182,7 +194,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1668,
+        "log.offset": 1671,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -196,6 +208,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -207,13 +220,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -233,7 +249,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2251,
+        "log.offset": 2254,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -247,6 +263,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -258,13 +275,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CREATE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -284,7 +304,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2789,
+        "log.offset": 2792,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -298,6 +318,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -309,13 +330,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "DELETE_GMAIL_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -335,7 +359,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3327,
+        "log.offset": 3330,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -349,6 +373,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -360,10 +385,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "REJECT_FROM_QUARANTINE",
         "event.category": [
             "iam"
@@ -384,7 +411,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3865,
+        "log.offset": 3868,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -398,6 +425,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -409,10 +437,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "RELEASE_FROM_QUARANTINE",
         "event.category": [
             "iam"
@@ -433,7 +463,7 @@
         "gsuite.kind": "admin#reports#activity",
         "gsuite.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4299,
+        "log.offset": 4302,
         "organization.id": "1",
         "related.ip": [
             "98.235.162.24"
@@ -447,6 +477,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -458,6 +489,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

@@ -111,12 +111,16 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	return message, nil
 }
 
+func (r *JSONReader) Close() error {
+	return r.reader.Close()
+}
+
 func createJSONError(message string) common.MapStr {
 	return common.MapStr{"message": message, "type": "json"}
 }
 
 // MergeJSONFields writes the JSON fields in the event map,
-// respecting the KeysUnderRoot and OverwriteKeys configuration options.
+// respecting the KeysUnderRoot, ExpandKeys, and OverwriteKeys configuration options.
 // If MessageKey is defined, the Text value from the event always
 // takes precedence.
 func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string, config Config) (string, time.Time) {
@@ -160,7 +164,7 @@ func MergeJSONFields(data common.MapStr, jsonFields common.MapStr, text *string,
 			Timestamp: ts,
 			Fields:    data,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, config.OverwriteKeys, config.AddErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, config.ExpandKeys, config.OverwriteKeys, config.AddErrorKey)
 
 		return id, event.Timestamp
 	}

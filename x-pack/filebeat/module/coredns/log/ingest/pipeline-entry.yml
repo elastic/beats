@@ -1,6 +1,9 @@
 ---
 description: Pipeline for normalizing Kubernetes CoreDNS logs.
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   - pipeline:
       if: ctx.message.charAt(0) == (char)("{")
       name: '{< IngestPipeline "pipeline-json" >}'

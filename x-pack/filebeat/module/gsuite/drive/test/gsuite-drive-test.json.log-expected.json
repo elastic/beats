@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "add_to_folder",
         "event.category": [
             "file"
@@ -47,6 +46,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -58,14 +58,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_canceled",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -107,6 +110,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -118,14 +122,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_comment_added",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -167,6 +174,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -178,14 +186,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_requested",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -227,6 +238,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -238,14 +250,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "approval_reviewer_responded",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -287,6 +302,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -298,10 +314,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "create",
         "event.category": [
             "file"
@@ -346,6 +364,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -357,10 +376,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "delete",
         "event.category": [
             "file"
@@ -405,6 +426,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -416,10 +438,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "download",
         "event.category": [
             "file"
@@ -464,6 +488,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -475,10 +500,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "edit",
         "event.category": [
             "file"
@@ -523,6 +550,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -534,10 +562,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "add_lock",
         "event.category": [
             "file"
@@ -582,6 +612,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -593,10 +624,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "move",
         "event.category": [
             "file"
@@ -645,6 +678,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -656,10 +690,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "preview",
         "event.category": [
             "file"
@@ -704,6 +740,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -715,10 +752,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "print",
         "event.category": [
             "file"
@@ -763,6 +802,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -774,10 +814,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "remove_from_folder",
         "event.category": [
             "file"
@@ -824,6 +866,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -835,10 +878,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "rename",
         "event.category": [
             "file"
@@ -885,6 +930,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -896,10 +942,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "untrash",
         "event.category": [
             "file"
@@ -944,6 +992,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -955,10 +1004,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "sheets_import_range",
         "event.category": [
             "file"
@@ -1003,6 +1054,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1014,10 +1066,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "trash",
         "event.category": [
             "file"
@@ -1062,6 +1116,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1073,10 +1128,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "remove_lock",
         "event.category": [
             "file"
@@ -1121,6 +1178,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1132,10 +1190,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "upload",
         "event.category": [
             "file"
@@ -1180,6 +1240,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1191,10 +1252,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "view",
         "event.category": [
             "file"
@@ -1240,6 +1303,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1251,14 +1315,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_acl_editors",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1304,6 +1371,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1315,14 +1383,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_document_access_scope",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1369,6 +1440,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1380,14 +1452,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_document_visibility",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1434,6 +1509,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1445,14 +1521,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "shared_drive_membership_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1499,6 +1578,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1510,14 +1590,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "shared_drive_settings_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1564,6 +1647,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1575,14 +1659,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "sheets_import_range_access_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1624,6 +1711,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1635,14 +1723,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
-        "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_user_access",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1690,6 +1781,7 @@
         "source.geo.city_name": "State College",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.7957,
         "source.geo.location.lon": -77.8618,
         "source.geo.region_iso_code": "US-PA",
@@ -1701,6 +1793,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

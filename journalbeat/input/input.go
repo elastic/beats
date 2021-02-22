@@ -79,7 +79,7 @@ func New(
 		state := states[cfg.CheckpointID]
 		r, err := reader.NewLocal(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for local journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for local journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}
@@ -99,7 +99,7 @@ func New(
 		state := states[cfg.CheckpointID]
 		r, err := reader.New(cfg, done, state, logger)
 		if err != nil {
-			return nil, fmt.Errorf("error creating reader for journal: %v", err)
+			return nil, fmt.Errorf("error creating reader for journal: %+v", err)
 		}
 		readers = append(readers, r)
 	}

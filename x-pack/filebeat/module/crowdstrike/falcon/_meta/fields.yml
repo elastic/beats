@@ -8,7 +8,7 @@
     - name: eventType
       type: keyword
       description: >
-        DetectionSummaryEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
+        DetectionSummaryEvent, FirewallMatchEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
 
     - name: eventCreationTime
       type: date
@@ -36,7 +36,7 @@
     Event data fields for each event and alert.
   type: group
   default_field: false
-  fields: 
+  fields:
     - name: ProcessStartTime
       type: date
       description: >
@@ -102,11 +102,16 @@
       description: >
         Executable path with command line arguments.
 
+    - name: SHA1String
+      type: keyword
+      description: >
+        SHA1 sum of the executable associated with the detection.
+
     - name: SHA256String
       type: keyword
       description: >
         SHA256 sum of the executable associated with the detection.
- 
+
     - name: MD5String
       type: keyword
       description: >
@@ -227,6 +232,11 @@
       description: >
         Fields that were changed in this event.
 
+    - name: ExecutablesWritten
+      type: nested
+      description: >
+        Detected executables written to disk by a process.
+
     - name: SessionId
       type: keyword
       description: >
@@ -246,3 +256,206 @@
       type: date
       description: >
         End time for the remote session in UTC UNIX format.
+
+    - name: LateralMovement
+      type: long
+      description: >
+        Lateral movement field for incident.
+
+    - name: ParentImageFileName
+      type: keyword
+      description: >
+        Path to the parent process.
+
+    - name: ParentCommandLine
+      type: keyword
+      description: >
+        Parent process command line arguments.
+
+    - name: GrandparentImageFileName
+      type: keyword
+      description: >
+        Path to the grandparent process.
+
+    - name: GrandparentCommandLine
+      type: keyword
+      description: >
+        Grandparent process command line arguments.
+
+    - name: IOCType
+      type: keyword
+      description: >
+        CrowdStrike type for indicator of compromise.
+
+    - name: IOCValue
+      type: keyword
+      description: >
+        CrowdStrike value for indicator of compromise.
+
+    # FirewallMatchEvent
+    - name: CustomerId
+      type: keyword
+      description: >
+        Customer identifier.
+
+    - name: DeviceId
+      type: keyword
+      description: >
+        Device on which the event occurred.
+
+    - name: Ipv
+      type: keyword
+      description: >
+        Protocol for network request.
+
+    - name: ConnectionDirection
+      type: keyword
+      description: >
+        Direction for network connection.
+
+    - name: EventType
+      type: keyword
+      description: >
+        CrowdStrike provided event type.
+
+    - name: HostName
+      type: keyword
+      description: >
+        Host name of the local machine.
+
+    - name: ICMPCode
+      type: keyword
+      description: >
+        RFC2780 ICMP Code field.
+
+    - name: ICMPType
+      type: keyword
+      description: >
+        RFC2780 ICMP Type field.
+
+    - name: ImageFileName
+      type: keyword
+      description: >
+        File name of the associated process for the detection.
+
+    - name: PID
+      type: long
+      description: >
+        Associated process id for the detection.
+
+    - name: LocalAddress
+      type: ip
+      description: >
+        IP address of local machine.
+
+    - name: LocalPort
+      type: long
+      description: >
+        Port of local machine.
+
+    - name: RemoteAddress
+      type: ip
+      description: >
+        IP address of remote machine.
+
+    - name: RemotePort
+      type: long
+      description: >
+        Port of remote machine.
+
+    - name: RuleAction
+      type: keyword
+      description: >
+        Firewall rule action.
+
+    - name: RuleDescription
+      type: keyword
+      description: >
+        Firewall rule description.
+
+    - name: RuleFamilyID
+      type: keyword
+      description: >
+        Firewall rule family id.
+
+    - name: RuleGroupName
+      type: keyword
+      description: >
+        Firewall rule group name.
+
+    - name: RuleName
+      type: keyword
+      description: >
+        Firewall rule name.
+
+    - name: RuleId
+      type: keyword
+      description: >
+        Firewall rule id.
+
+    - name: MatchCount
+      type: long
+      description: >
+        Number of firewall rule matches.
+
+    - name: MatchCountSinceLastReport
+      type: long
+      description: >
+        Number of firewall rule matches since the last report.
+
+    - name: Timestamp
+      type: date
+      description: >
+        Firewall rule triggered timestamp.
+
+    # Not entirely sure about the descriptions of the following fields
+    - name: Flags.Audit
+      type: boolean
+      description: >
+        CrowdStrike audit flag.
+
+    - name: Flags.Log
+      type: boolean
+      description: >
+        CrowdStrike log flag.
+
+    - name: Flags.Monitor
+      type: boolean
+      description: >
+        CrowdStrike monitor flag.
+
+    - name: Protocol
+      type: keyword
+      description: >
+        CrowdStrike provided protocol.
+
+    - name: NetworkProfile
+      type: keyword
+      description: >
+        CrowdStrike network profile.
+
+    - name: PolicyName
+      type: keyword
+      description: >
+        CrowdStrike policy name.
+
+    - name: PolicyID
+      type: keyword
+      description: >
+        CrowdStrike policy id.
+
+    - name: Status
+      type: keyword
+      description: >
+        CrowdStrike status.
+
+    - name: TreeID
+      type: keyword
+      description: >
+        CrowdStrike tree id.
+
+    # RemoteResponseSessionEndEvent
+    - name: Commands
+      type: keyword
+      description: >
+        Commands run in a remote session.

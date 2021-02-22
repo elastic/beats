@@ -1,6 +1,6 @@
 BEAT_NAME=journalbeat
 BEAT_TITLE=Journalbeat
-SYSTEM_TESTS=false
+SYSTEM_TESTS=true
 TEST_ENVIRONMENT=false
 ES_BEATS?=..
 

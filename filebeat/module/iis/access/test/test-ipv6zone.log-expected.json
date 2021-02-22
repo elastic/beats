@@ -37,7 +37,7 @@
         "source.address": "::1%0",
         "source.ip": "::1",
         "url.path": "/",
-        "user_agent.device.name": "Other",
+        "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36",
         "user_agent.os.full": "Mac OS X 10.14.0",

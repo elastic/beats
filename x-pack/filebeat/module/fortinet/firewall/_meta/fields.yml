@@ -1,2154 +1,2165 @@
-- name: firewall
+- name: fortinet
   type: group
-  release: beta
-  default_field: false
   description: >
-    Module for parsing Fortinet syslog.
+    Fields from fortinet FortiOS
   fields:
-    - name: acct_stat
-      type: keyword
-      description: >
-        Accounting state (RADIUS)
-
-    - name: acktime
-      type: keyword
-      description: >
-        Alarm Acknowledge Time
-
-    - name: act
-      type: keyword
-      description: >
-        Action
-
-    - name: action
-      type: keyword
-      description: >
-        Status of the session
-
-    - name: activity
-      type: keyword
-      description: >
-        HA activity message
-
-    - name: addr
-      type: ip
-      description: >
-        IP Address
-
-    - name: addr_type
-      type: keyword
-      description: >
-        Address Type
-
-    - name: addrgrp
-      type: keyword
-      description: >
-        Address Group
-
-    - name: adgroup
-      type: keyword
-      description: >
-        AD Group Name
-
-    - name: admin
-      type: keyword
-      description: >
-        Admin User
-
-    - name: age
-      type: integer
-      description: >
-        Time in seconds - time passed since last seen
-
-    - name: agent
-      type: keyword
-      description: >
-        User agent - eg. agent="Mozilla/5.0"
-
-    - name: alarmid
-      type: integer
-      description: >
-        Alarm ID
-
-    - name: alert
-      type: keyword
-      description: >
-        Alert
-
-    - name: analyticscksum
-      type: keyword
-      description: >
-        The checksum of the file submitted for analytics
-
-    - name: analyticssubmit
-      type: keyword
-      description: >
-        The flag for analytics submission 
-
-    - name: ap
-      type: keyword
-      description: >
-        Access Point
-
-    - name: app-type
-      type: keyword
-      description: >
-        Address Type
-
-    - name: appact
-      type: keyword
-      description: >
-        The security action from app control
-
-    - name: appid
-      type: integer
-      description: >
-        Application ID
-
-    - name: applist
-      type: keyword
-      description: >
-        Application Control profile
-
-    - name: apprisk
-      type: keyword
-      description: >
-        Application Risk Level
-
-    - name: apscan
-      type: keyword
-      description: >
-        The name of the AP, which scanned and detected the rogue AP
-
-    - name: apsn
-      type: keyword
-      description: >
-        Access Point
-
-    - name: apstatus
-      type: keyword
-      description: >
-        Access Point status
-
-    - name: aptype
-      type: keyword
-      description: >
-        Access Point type
-
-    - name: assigned
-      type: ip
-      description: >
-        Assigned IP Address
-
-    - name: assignip
-      type: ip
-      description: >
-        Assigned IP Address
-
-    - name: attachment
-      type: keyword
-      description: >
-        The flag for email attachement
-
-    - name: attack
-      type: keyword
-      description: >
-        Attack Name
-
-    - name: attackcontext
-      type: keyword
-      description: >
-        The trigger patterns and the packetdata with base64 encoding
-
-    - name: attackcontextid
-      type: keyword
-      description: >
-        Attack context id / total
-
-    - name: attackid
-      type: integer
-      description: >
-        Attack ID
-
-    - name: auditid
-      type: long
-      description: >
-        Audit ID
-
-    - name: auditscore
-      type: keyword
-      description: >
-        The Audit Score
-
-    - name: audittime
-      type: long
-      description: >
-        The time of the audit
-
-    - name: authgrp
-      type: keyword
-      description: >
-        Authorization Group
-
-    - name: authid
-      type: keyword
-      description: >
-        Authentication ID
-
-    - name: authproto
-      type: keyword
-      description: >
-        The protocol that initiated the authentication
-
-    - name: authserver
-      type: keyword
-      description: >
-        Authentication server
-
-    - name: bandwidth
-      type: keyword
-      description: >
-        Bandwidth
-
-    - name: banned_rule
-      type: keyword
-      description: >
-        NAC quarantine Banned Rule Name
-
-    - name: banned_src
-      type: keyword
-      description: >
-        NAC quarantine Banned Source IP
-
-    - name: banword
-      type: keyword
-      description: >
-        Banned word
-
-    - name: botnetdomain
-      type: keyword
-      description: >
-        Botnet Domain Name
-
-    - name: botnetip
-      type: ip
-      description: >
-        Botnet IP Address
-
-    - name: bssid
-      type: keyword
-      description: >
-        Service Set ID
-
-    - name: call_id
-      type: keyword
-      description: >
-        Caller ID
-
-    - name: carrier_ep
-      type: keyword
-      description: >
-        The FortiOS Carrier end-point identification
-
-    - name: cat
-      type: integer
-      description: >
-        DNS category ID
-
-    - name: category
-      type: keyword
-      description: >
-        Authentication category
-
-    - name: cc
-      type: keyword
-      description: >
-        CC Email Address
-
-    - name: cdrcontent
-      type: keyword
-      description: >
-        Cdrcontent
-
-    - name: centralnatid
-      type: integer
-      description: >
-        Central NAT ID
-
-    - name: cert
-      type: keyword
-      description: >
-        Certificate
-
-    - name: cert-type
-      type: keyword
-      description: >
-        Certificate type
-
-    - name: certhash
-      type: keyword
-      description: >
-        Certificate hash
-
-    - name: cfgattr
-      type: keyword
-      description: >
-        Configuration attribute
-
-    - name: cfgobj
-      type: keyword
-      description: >
-        Configuration object
-
-    - name: cfgpath
-      type: keyword
-      description: >
-        Configuration path
-
-    - name: cfgtid
-      type: keyword
-      description: >
-        Configuration transaction ID
-
-    - name: cfgtxpower
-      type: integer
-      description: >
-        Configuration TX power
-
-    - name: channel
-      type: integer
-      description: >
-        Wireless Channel
-
-    - name: channeltype
-      type: keyword
-      description: >
-        SSH channel type
-
-    - name: chassisid
-      type: integer
-      description: >
-        Chassis ID
-
-    - name: checksum
-      type: keyword
-      description: >
-        The checksum of the scanned file
-
-    - name: chgheaders
-      type: keyword
-      description: >
-        HTTP Headers
-
-    - name: cldobjid
-      type: keyword
-      description: >
-        Connector object ID
-
-    - name: client_addr
-      type: keyword
-      description: >
-        Wifi client address
-
-    - name: cloudaction
-      type: keyword
-      description: >
-        Cloud Action
-
-    - name: clouduser
-      type: keyword
-      description: >
-        Cloud User
-
-    - name: column
-      type: integer
-      description: >
-        VOIP Column
-
-    - name: command
-      type: keyword
-      description: >
-        CLI Command
-
-    - name: community
-      type: keyword
-      description: >
-        SNMP Community
-
-    - name: configcountry
-      type: keyword
-      description: >
-        Configuration country
-
-    - name: connection_type
-      type: keyword
-      description: >
-        FortiClient Connection Type
-
-    - name: conserve
-      type: keyword
-      description: >
-        Flag for conserve mode
-
-    - name: constraint
-      type: keyword
-      description: >
-        WAF http protocol restrictions
-
-    - name: contentdisarmed
-      type: keyword
-      description: >
-        Email scanned content
-
-    - name: contenttype
-      type: keyword
-      description: >
-        Content Type from HTTP header
-
-    - name: cookies
-      type: keyword
-      description: >
-        VPN Cookie
-
-    - name: count
-      type: integer
-      description: >
-        Counts of action type
-
-    - name: countapp
-      type: integer
-      description: >
-        Number of App Ctrl logs associated with the session
-
-    - name: countav
-      type: integer
-      description: >
-        Number of AV logs associated with the session
-
-    - name: countcifs
-      type: integer
-      description: >
-        Number of CIFS logs associated with the session
-
-    - name: countdlp
-      type: integer
-      description: >
-        Number of DLP logs associated with the session
-
-    - name: countdns
-      type: integer
-      description: >
-        Number of DNS logs associated with the session
-
-    - name: countemail
-      type: integer
-      description: >
-        Number of email logs associated with the session
-
-    - name: countff
-      type: integer
-      description: >
-        Number of ff logs associated with the session
-
-    - name: countips
-      type: integer
-      description: >
-        Number of IPS logs associated with the session
-
-    - name: countssh
-      type: integer
-      description: >
-        Number of SSH logs associated with the session
-
-    - name: countssl
-      type: integer
-      description: >
-        Number of SSL logs associated with the session
-
-    - name: countwaf
-      type: integer
-      description: >
-        Number of WAF logs associated with the session
-
-    - name: countweb
-      type: integer
-      description: >
-        Number of Web filter logs associated with the session
-
-    - name: cpu
-      type: integer
-      description: >
-        CPU Usage
-
-    - name: craction
-      type: integer
-      description: >
-        Client Reputation Action
-
-    - name: criticalcount
-      type: integer
-      description: >
-        Number of critical ratings
-
-    - name: crl
-      type: keyword
-      description: >
-        Client Reputation Level
-
-    - name: crlevel
-      type: keyword
-      description: >
-        Client Reputation Level
-
-    - name: crscore
-      type: integer
-      description: >
-        Some description
-
-    - name: cveid
-      type: keyword
-      description: >
-        CVE ID
-
-    - name: daemon
-      type: keyword
-      description: >
-        Daemon name
-
-    - name: datarange
-      type: keyword
-      description: >
-        Data range for reports
-
-    - name: date
-      type: keyword
-      description: >
-        Date
-
-    - name: ddnsserver
-      type: ip
-      description: >
-        DDNS server
-
-    - name: desc
-      type: keyword
-      description: >
-        Description
-
-    - name: detectionmethod
-      type: keyword
-      description: >
-        Detection method
-
-    - name: devcategory
-      type: keyword
-      description: >
-        Device category
-
-    - name: devintfname
-      type: keyword
-      description: >
-        HA device Interface Name
-
-    - name: devtype
-      type: keyword
-      description: >
-        Device type
-
-    - name: dhcp_msg
-      type: keyword
-      description: >
-        DHCP Message
-
-    - name: dintf
-      type: keyword
-      description: >
-        Destination interface
-
-    - name: disk
-      type: keyword
-      description: >
-        Assosciated disk
-
-    - name: disklograte
-      type: long
-      description: >
-        Disk logging rate
-
-    - name: dlpextra
-      type: keyword
-      description: >
-        DLP extra information
-
-    - name: docsource
-      type: keyword
-      description: >
-        DLP fingerprint document source
-
-    - name: domainctrlauthstate
-      type: integer
-      description: >
-        CIFS domain auth state
-
-    - name: domainctrlauthtype
-      type: integer
-      description: >
-        CIFS domain auth type
-
-    - name: domainctrldomain
-      type: keyword
-      description: >
-        CIFS domain auth domain
-
-    - name: domainctrlip
-      type: ip
-      description: >
-        CIFS Domain IP
-
-    - name: domainctrlname
-      type: keyword
-      description: >
-        CIFS Domain name
-
-    - name: domainctrlprotocoltype
-      type: integer
-      description: >
-        CIFS Domain connection protocol
-
-    - name: domainctrlusername
-      type: keyword
-      description: >
-        CIFS Domain username
-
-    - name: domainfilteridx
-      type: integer
-      description: >
-        Domain filter ID
-
-    - name: domainfilterlist
-      type: keyword
-      description: >
-        Domain filter name
-
-    - name: ds
-      type: keyword
-      description: >
-        Direction with distribution system 
-
-    - name: dst_int
-      type: keyword
-      description: >
-        Destination interface
-
-    - name: dstintfrole
-      type: keyword
-      description: >
-        Destination interface role
-
-    - name: dstcountry
-      type: keyword
-      description: >
-        Destination country
-
-    - name: dstdevcategory
-      type: keyword
-      description: >
-        Destination device category
-
-    - name: dstdevtype
-      type: keyword
-      description: >
-        Destination device type
-
-    - name: dstfamily
-      type: keyword
-      description: >
-        Destination OS family
-
-    - name: dsthwvendor
-      type: keyword
-      description: >
-        Destination HW vendor
-
-    - name: dsthwversion
-      type: keyword
-      description: >
-        Destination HW version
-
-    - name: dstinetsvc
-      type: keyword
-      description: >
-        Destination interface service
-
-    - name: dstosname
-      type: keyword
-      description: >
-        Destination OS name
-
-    - name: dstosversion
-      type: keyword
-      description: >
-        Destination OS version
-
-    - name: dstserver
-      type: integer
-      description: >
-        Destination server
-
-    - name: dstssid
-      type: keyword
-      description: >
-        Destination SSID
-
-    - name: dstswversion
-      type: keyword
-      description: >
-        Destination software version
-
-    - name: dstunauthusersource
-      type: keyword
-      description: >
-        Destination unauthenticated source
-
-    - name: dstuuid
-      type: keyword
-      description: >
-        UUID of the Destination IP address
-
-    - name: duid
-      type: keyword
-      description: >
-        DHCP UID
-
-    - name: eapolcnt
-      type: integer
-      description: >
-        EAPOL packet count 
-
-    - name: eapoltype
-      type: keyword
-      description: >
-        EAPOL packet type
-
-    - name: encrypt
-      type: integer
-      description: >
-        Whether the packet is encrypted or not 
-
-    - name: encryption
-      type: keyword
-      description: >
-        Encryption method
-
-    - name: epoch
-      type: integer
-      description: >
-        Epoch used for locating file
-
-    - name: espauth
-      type: keyword
-      description: >
-        ESP Authentication
-
-    - name: esptransform
-      type: keyword
-      description: >
-        ESP Transform
-
-    - name: exch
-      type: keyword
-      description: >
-        Mail Exchanges from DNS response answer section
-
-    - name: exchange
-      type: keyword
-      description: >
-        Mail Exchanges from DNS response answer section
-
-    - name: expectedsignature
-      type: keyword
-      description: >
-        Expected SSL signature
-
-    - name: expiry
-      type: keyword
-      description: >
-        FortiGuard override expiry timestamp 
-
-    - name: fams_pause
-      type: integer
-      description: >
-        Fortinet Analysis and Management Service Pause
-
-    - name: fazlograte
-      type: long
-      description: >
-        FortiAnalyzer Logging Rate
-
-    - name: fctemssn
-      type: keyword
-      description: >
-        FortiClient Endpoint SSN
-
-    - name: fctuid
-      type: keyword
-      description: >
-        FortiClient UID
-
-    - name: field
-      type: keyword
-      description: >
-        NTP status field
-
-    - name: filefilter
-      type: keyword
-      description: >
-        The filter used to identify the affected file
-
-    - name: filehashsrc
-      type: keyword
-      description: >
-        Filehash source
-
-    - name: filtercat
-      type: keyword
-      description: >
-        DLP filter category
-
-    - name: filteridx
-      type: integer
-      description: >
-        DLP filter ID
-
-    - name: filtername
-      type: keyword
-      description: >
-        DLP rule name
-
-    - name: filtertype
-      type: keyword
-      description: >
-        DLP filter type
-
-    - name: fortiguardresp
-      type: keyword
-      description: >
-        Antispam ESP value
-
-    - name: forwardedfor
-      type: keyword
-      description: >
-        Email address forwarded
-
-    - name: fqdn
-      type: keyword
-      description: >
-        FQDN
-
-    - name: frametype
-      type: keyword
-      description: >
-        Wireless frametype
-
-    - name: freediskstorage
-      type: integer
-      description: >
-        Free disk integer
-
-    - name: from
-      type: keyword
-      description: >
-        From email address
-
-    - name: from_vcluster
-      type: integer
-      description: >
-        Source virtual cluster number
-
-    - name: fsaverdict
-      type: keyword
-      description: >
-        FSA verdict
-
-    - name: fwserver_name
-      type: keyword
-      description: >
-        Web proxy server name
-
-    - name: gateway
-      type: ip
-      description: >
-        Gateway ip address for PPPoE status report
-
-    - name: green
-      type: keyword
-      description: >
-        Memory status
-
-    - name: groupid
-      type: integer
-      description: >
-        User Group ID
-
-    - name: ha-prio
-      type: integer
-      description: >
-        HA Priority
-
-    - name: ha_group
-      type: keyword
-      description: >
-        HA Group
-
-    - name: ha_role
-      type: keyword
-      description: >
-        HA Role
-
-    - name: handshake
-      type: keyword
-      description: >
-        SSL Handshake
-
-    - name: hash
-      type: keyword
-      description: >
-        Hash value of downloaded file
-
-    - name: hbdn_reason
-      type: keyword
-      description: >
-        Heartbeat down reason
-
-    - name: highcount
-      type: integer
-      description: >
-        Highcount fabric summary
-
-    - name: host
-      type: keyword
-      description: >
-        Hostname
-
-    - name: iaid
-      type: keyword
-      description: >
-        DHCPv6 id
-
-    - name: icmpcode
-      type: keyword
-      description: >
-        Destination Port of the ICMP message
-
-    - name: icmpid
-      type: keyword
-      description: >
-        Source port of the ICMP message
-
-    - name: icmptype
-      type: keyword
-      description: >
-        The type of ICMP message
-
-    - name: identifier
-      type: integer
-      description: >
-        Network traffic identifier
-
-    - name: in_spi
-      type: keyword
-      description: >
-        IPSEC inbound SPI
-
-    - name: incidentserialno
-      type: integer
-      description: >
-        Incident serial number
-
-    - name: infected
-      type: integer
-      description: >
-        Infected MMS
-
-    - name: infectedfilelevel
-      type: integer
-      description: >
-        DLP infected file level
-
-    - name: informationsource
-      type: keyword
-      description: >
-        Information source
-
-    - name: init
-      type: keyword
-      description: >
-        IPSEC init stage
-
-    - name: initiator
-      type: keyword
-      description: >
-        Original login user name for Fortiguard override
-
-    - name: interface
-      type: keyword
-      description: >
-        Related interface
-
-    - name: intf
-      type: keyword
-      description: >
-        Related interface
-
-    - name: invalidmac
-      type: keyword
-      description: >
-        The MAC address with invalid OUI
-
-    - name: ip
-      type: ip
-      description: >
-        Related IP
-
-    - name: iptype
-      type: keyword
-      description: >
-        Related IP type
-
-    - name: keyword
-      type: keyword
-      description: >
-        Keyword used for search
-
-    - name: kind
-      type: keyword
-      description: >
-        VOIP kind
-
-    - name: lanin
-      type: long
-      description: >
-        LAN incoming traffic in bytes
-
-    - name: lanout
-      type: long
-      description: >
-        LAN outbound traffic in bytes
-
-    - name: lease
-      type: integer
-      description: >
-        DHCP lease
-
-    - name: license_limit
-      type: keyword
-      description: >
-        Maximum Number of FortiClients for the License
-
-    - name: limit
-      type: integer
-      description: >
-        Virtual Domain Resource Limit
-
-    - name: line
-      type: keyword
-      description: >
-        VOIP line
-
-    - name: live
-      type: integer
-      description: >
-        Time in seconds
-
-    - name: local
-      type: ip
-      description: >
-        Local IP for a PPPD Connection
-
-    - name: log
-      type: keyword
-      description: >
-        Log message
-
-    - name: login
-      type: keyword
-      description: >
-        SSH login
-
-    - name: lowcount
-      type: integer
-      description: >
-        Fabric lowcount
-
-    - name: mac
-      type: keyword
-      description: >
-        DHCP mac address
-
-    - name: malform_data
-      type: integer
-      description: >
-        VOIP malformed data
-
-    - name: malform_desc
-      type: keyword
-      description: >
-        VOIP malformed data description
-
-    - name: manuf
-      type: keyword
-      description: >
-        Manufacturer name
-
-    - name: masterdstmac
-      type: keyword
-      description: >
-        Master mac address for a host with multiple network interfaces
-
-    - name: mastersrcmac
-      type: keyword
-      description: >
-        The master MAC address for a host that has multiple network interfaces
-
-    - name: mediumcount
-      type: integer
-      description: >
-        Fabric medium count
-
-    - name: mem
-      type: keyword
-      description: >
-        Memory usage system statistics
-
-    - name: meshmode
-      type: keyword
-      description: >
-        Wireless mesh mode
-
-    - name: message_type
-      type: keyword
-      description: >
-        VOIP message type
-
-    - name: method
-      type: keyword
-      description: >
-        HTTP method
-
-    - name: mgmtcnt
-      type: integer
-      description: >
-        The number of unauthorized client flooding managemet frames
-
-    - name: mode
-      type: keyword
-      description: >
-        IPSEC mode
-
-    - name: module
-      type: keyword
-      description: >
-        PCI-DSS module
-
-    - name: monitor-name
-      type: keyword
-      description: >
-        Health Monitor Name
-
-    - name: monitor-type
-      type: keyword
-      description: >
-        Health Monitor Type
-
-    - name: mpsk
-      type: keyword
-      description: >
-        Wireless MPSK
-
-    - name: msgproto
-      type: keyword
-      description: >
-        Message Protocol Number
-
-    - name: mtu
-      type: integer
-      description: >
-        Max Transmission Unit Value
-
-    - name: name
-      type: keyword
-      description: >
-        Name
-
-    - name: nat
-      type: keyword
-      description: >
-        NAT IP Address
-
-    - name: netid
-      type: keyword
-      description: >
-        Connector NetID
-
-    - name: new_status
-      type: keyword
-      description: >
-        New status on user change
-
-    - name: new_value
-      type: keyword
-      description: >
-        New Virtual Domain Name
-
-    - name: newchannel
-      type: integer
-      description: >
-        New Channel Number
-
-    - name: newchassisid
-      type: integer
-      description: >
-        New Chassis ID
-
-    - name: newslot
-      type: integer
-      description: >
-        New Slot Number
-
-    - name: nextstat
-      type: integer
-      description: >
-        Time interval in seconds for the next statistics.
-
-    - name: nf_type
-      type: keyword
-      description: >
-        Notification Type
-
-    - name: noise
-      type: integer
-      description: >
-        Wifi Noise
-
-    - name: old_status
-      type: keyword
-      description: >
-        Original Status
-
-    - name: old_value
-      type: keyword
-      description: >
-        Original Virtual Domain name
-
-    - name: oldchannel
-      type: integer
-      description: >
-        Original channel
-
-    - name: oldchassisid
-      type: integer
-      description: >
-        Original Chassis Number
-
-    - name: oldslot
-      type: integer
-      description: >
-        Original Slot Number
-
-    - name: oldsn
-      type: keyword
-      description: >
-        Old Serial number
-
-    - name: oldwprof
-      type: keyword
-      description: >
-        Old Web Filter Profile
-
-    - name: onwire
-      type: keyword
-      description: >
-        A flag to indicate if the AP is onwire or not
-
-    - name: opercountry
-      type: keyword
-      description: >
-        Operating Country
-
-    - name: opertxpower
-      type: integer
-      description: >
-        Operating TX power
-
-    - name: osname
-      type: keyword
-      description: >
-        Operating System name
-
-    - name: osversion
-      type: keyword
-      description: >
-        Operating System version
-
-    - name: out_spi
-      type: keyword
-      description: >
-        Out SPI
-
-    - name: outintf
-      type: keyword
-      description: >
-        Out interface
-
-    - name: passedcount
-      type: integer
-      description: >
-        Fabric passed count
-
-    - name: passwd
-      type: keyword
-      description: >
-        Changed user password information
-
-    - name: path
-      type: keyword
-      description: >
-        Path of looped configuration for security fabric
-
-    - name: peer
-      type: keyword
-      description: >
-        WAN optimization peer
-
-    - name: peer_notif
-      type: keyword
-      description: >
-        VPN peer notification
-
-    - name: phase2_name
-      type: keyword
-      description: >
-        VPN phase2 name
-
-    - name: phone
-      type: keyword
-      description: >
-        VOIP Phone
-
-    - name: pid
-      type: integer
-      description: >
-        Process ID
-
-    - name: policytype
-      type: keyword
-      description: >
-        Policy Type
-
-    - name: poolname
-      type: keyword
-      description: >
-        IP Pool name
-
-    - name: port
-      type: integer
-      description: >
-        Log upload error port
-
-    - name: portbegin
-      type: integer
-      description: >
-        IP Pool port number to begin
-
-    - name: portend
-      type: integer
-      description: >
-        IP Pool port number to end
-
-    - name: probeproto
-      type: keyword
-      description: >
-        Link Monitor Probe Protocol
-
-    - name: process
-      type: keyword
-      description: >
-        URL Filter process
-
-    - name: processtime
-      type: integer
-      description: >
-        Process time for reports
-
-    - name: profile
-      type: keyword
-      description: >
-        Profile Name
-
-    - name: profile_vd
-      type: keyword
-      description: >
-        Virtual Domain Name
-
-    - name: profilegroup
-      type: keyword
-      description: >
-        Profile Group Name
-
-    - name: profiletype
-      type: keyword
-      description: >
-        Profile Type
-
-    - name: qtypeval
-      type: integer
-      description: >
-        DNS question type value
-
-    - name: quarskip
-      type: keyword
-      description: >
-        Quarantine skip explanation
-
-    - name: quotaexceeded
-      type: keyword
-      description: >
-        If quota has been exceeded
-
-    - name: quotamax
-      type: long
-      description: >
-        Maximum quota allowed - in seconds if time-based - in bytes if traffic-based
-
-    - name: quotatype
-      type: keyword
-      description: >
-        Quota type
-
-    - name: quotaused
-      type: long
-      description: >
-        Quota used - in seconds if time-based - in bytes if trafficbased)
-
-    - name: radioband
-      type: keyword
-      description: >
-        Radio band
-
-    - name: radioid
-      type: integer
-      description: >
-        Radio ID
-
-    - name: radioidclosest
-      type: integer
-      description: >
-        Radio ID on the AP closest the rogue AP
-
-    - name: radioiddetected
-      type: integer
-      description: >
-        Radio ID on the AP which detected the rogue AP
-
-    - name: rate
-      type: keyword
-      description: >
-        Wireless rogue rate value
-
-    - name: rawdata
-      type: keyword
-      description: >
-        Raw data value
-
-    - name: rawdataid
-      type: keyword
-      description: >
-        Raw data ID
-
-    - name: rcvddelta
-      type: keyword
-      description: >
-        Received bytes delta
-
-    - name: reason
-      type: keyword
-      description: >
-        Alert reason
-
-    - name: received
-      type: integer
-      description: >
-        Server key exchange received
-
-    - name: receivedsignature
-      type: keyword
-      description: >
-        Server key exchange received signature
-
-    - name: red
-      type: keyword
-      description: >
-        Memory information in red
-
-    - name: referralurl
-      type: keyword
-      description: >
-        Web filter referralurl
-
-    - name: remote
-      type: ip
-      description: >
-        Remote PPP IP address
-
-    - name: remotewtptime
-      type: keyword
-      description: >
-        Remote Wifi Radius authentication time
-
-    - name: reporttype
-      type: keyword
-      description: >
-        Report type
-
-    - name: reqtype
-      type: keyword
-      description: >
-        Request type
-
-    - name: request_name
-      type: keyword
-      description: >
-        VOIP request name
-
-    - name: result
-      type: keyword
-      description: >
-        VPN phase result
-
-    - name: role
-      type: keyword
-      description: >
-        VPN Phase 2 role
-
-    - name: rssi
-      type: integer
-      description: >
-        Received signal strength indicator
-
-    - name: rsso_key
-      type: keyword
-      description: >
-        RADIUS SSO attribute value
-
-    - name: ruledata
-      type: keyword
-      description: >
-        Rule data
-
-    - name: ruletype
-      type: keyword
-      description: >
-        Rule type
-
-    - name: scanned
-      type: integer
-      description: >
-        Number of Scanned MMSs
-
-    - name: scantime
-      type: long
-      description: >
-        Scanned time
-
-    - name: scope
-      type: keyword
-      description: >
-        FortiGuard Override Scope
-
-    - name: security
-      type: keyword
-      description: >
-        Wireless rogue security
-
-    - name: sensitivity
-      type: keyword
-      description: >
-        Sensitivity for document fingerprint
-
-    - name: sensor
-      type: keyword
-      description: >
-        NAC Sensor Name
-
-    - name: sentdelta
-      type: keyword
-      description: >
-        Sent bytes delta
-
-    - name: seq
-      type: keyword
-      description: >
-        Sequence number
-
-    - name: serial
-      type: keyword
-      description: >
-        WAN optimisation serial
-
-    - name: serialno
-      type: keyword
-      description: >
-        Serial number
-
-    - name: server
-      type: keyword
-      description: >
-        AD server FQDN or IP
-
-    - name: session_id
-      type: keyword
-      description: >
-        Session ID
-
-    - name: sessionid
-      type: integer
-      description: >
-        WAD Session ID
-
-    - name: setuprate
-      type: long
-      description: >
-        Session Setup Rate
-
-    - name: severity
-      type: keyword
-      description: >
-        Severity
-
-    - name: shaperdroprcvdbyte
-      type: integer
-      description: >
-        Received bytes dropped by shaper
-
-    - name: shaperdropsentbyte
-      type: integer
-      description: >
-        Sent bytes dropped by shaper
-
-    - name: shaperperipdropbyte
-      type: integer
-      description: >
-        Dropped bytes per IP by shaper
-
-    - name: shaperperipname
-      type: keyword
-      description: >
-        Traffic shaper name (per IP)
-
-    - name: shaperrcvdname
-      type: keyword
-      description: >
-        Traffic shaper name for received traffic
-
-    - name: shapersentname
-      type: keyword
-      description: >
-        Traffic shaper name for sent traffic 
-
-    - name: shapingpolicyid
-      type: integer
-      description: >
-        Traffic shaper policy ID
-
-    - name: signal
-      type: integer
-      description: >
-        Wireless rogue API signal
-
-    - name: size
-      type: long
-      description: >
-        Email size in bytes
-
-    - name: slot
-      type: integer
-      description: >
-        Slot number
-
-    - name: sn
-      type: keyword
-      description: >
-        Security fabric serial number
 
-    - name: snclosest
-      type: keyword
-      description: >
-        SN of the AP closest to the rogue AP
-
-    - name: sndetected
-      type: keyword
-      description: >
-        SN of the AP which detected the rogue AP
-
-    - name: snmeshparent
-      type: keyword
-      description: >
-        SN of the mesh parent
-
-    - name: spi
-      type: keyword
-      description: >
-        IPSEC SPI
-
-    - name: src_int
-      type: keyword
-      description: >
-        Source interface
-
-    - name: srcintfrole
-      type: keyword
-      description: >
-        Source interface role
-
-    - name: srccountry
-      type: keyword
-      description: >
-        Source country
-
-    - name: srcfamily
-      type: keyword
-      description: >
-        Source family
-
-    - name: srchwvendor
-      type: keyword
-      description: >
-        Source hardware vendor
-
-    - name: srchwversion
-      type: keyword
-      description: >
-        Source hardware version
-
-    - name: srcinetsvc
-      type: keyword
-      description: >
-        Source interface service
-
-    - name: srcname
-      type: keyword
-      description: >
-        Source name
-
-    - name: srcserver
-      type: integer
-      description: >
-        Source server
-
-    - name: srcssid
-      type: keyword
-      description: >
-        Source SSID
-
-    - name: srcswversion
-      type: keyword
-      description: >
-        Source software version
-
-    - name: srcuuid
-      type: keyword
-      description: >
-        Source UUID
-
-    - name: sscname
-      type: keyword
-      description: >
-        SSC name
-
-    - name: ssid
-      type: keyword
-      description: >
-        Base Service Set ID
-
-    - name: sslaction
-      type: keyword
-      description: >
-        SSL Action
-
-    - name: ssllocal
-      type: keyword
-      description: >
-        WAD SSL local
-
-    - name: sslremote
-      type: keyword
-      description: >
-        WAD SSL remote
-
-    - name: stacount
-      type: integer
-      description: >
-        Number of stations/clients
-
-    - name: stage
-      type: keyword
-      description: >
-        IPSEC stage
-
-    - name: stamac
-      type: keyword
-      description: >
-        802.1x station mac
-
-    - name: state
-      type: keyword
-      description: >
-        Admin login state
-
-    - name: status
-      type: keyword
-      description: >
-        Status
-
-    - name: stitch
-      type: keyword
-      description: >
-        Automation stitch triggered
-
-    - name: subject
-      type: keyword
-      description: >
-        Email subject
-
-    - name: submodule
-      type: keyword
-      description: >
-        Configuration Sub-Module Name
-
-    - name: subservice
-      type: keyword
-      description: >
-        AV subservice
-
-    - name: subtype
-      type: keyword
-      description: >
-        Log subtype
-
-    - name: suspicious
-      type: integer
-      description: >
-        Number of Suspicious MMSs
-
-    - name: switchproto
-      type: keyword
-      description: >
-        Protocol change information
-
-    - name: sync_status
-      type: keyword
-      description: >
-        The sync status with the master
-
-    - name: sync_type
-      type: keyword
-      description: >
-        The sync type with the master
-
-    - name: sysuptime
-      type: keyword
-      description: >
-        System uptime
-
-    - name: tamac
-      type: keyword
-      description: >
-        the MAC address of Transmitter, if none, then Receiver
-
-    - name: threattype
-      type: keyword
-      description: >
-        WIDS threat type
-
-    - name: time
-      type: keyword
-      description: >
-        Time of the event
-
-    - name: to
-      type: keyword
-      description: >
-        Email to field
-
-    - name: to_vcluster
-      type: integer
-      description: >
-        destination virtual cluster number
-
-    - name: total
-      type: integer
-      description: >
-        Total memory
-
-    - name: totalsession
-      type: integer
-      description: >
-        Total Number of Sessions 
-
-    - name: trace_id
-      type: keyword
-      description: >
-        Session clash trace ID
-
-    - name: trandisp
-      type: keyword
-      description: >
-        NAT translation type
-
-    - name: transid
-      type: integer
-      description: >
-        HTTP transaction ID
-
-    - name: translationid
-      type: keyword
-      description: >
-        DNS filter transaltion ID
-
-    - name: trigger
-      type: keyword
-      description: >
-        Automation stitch trigger
-
-    - name: trueclntip
-      type: ip
-      description: >
-        File filter true client IP
-
-    - name: tunnelid
-      type: integer
-      description: >
-        IPSEC tunnel ID
-
-    - name: tunnelip
-      type: ip
-      description: >
-        IPSEC tunnel IP
-
-    - name: tunneltype
-      type: keyword
-      description: >
-        IPSEC tunnel type
-
-    - name: type
-      type: keyword
-      description: >
-        Module type
-
-    - name: ui
-      type: keyword
-      description: >
-        Admin authentication UI type
-
-    - name: unauthusersource
-      type: keyword
-      description: >
-        Unauthenticated user source
-
-    - name: unit
-      type: integer
-      description: >
-        Power supply unit
-
-    - name: urlfilteridx
-      type: integer
-      description: >
-        URL filter ID
-
-    - name: urlfilterlist
-      type: keyword
-      description: >
-        URL filter list
-
-    - name: urlsource
-      type: keyword
-      description: >
-        URL filter source
-
-    - name: urltype
-      type: keyword
-      description: >
-        URL filter type
-
-    - name: used
-      type: integer
-      description: >
-        Number of Used IPs
-
-    - name: used_for_type
-      type: integer
-      description: >
-        Connection for the type
-
-    - name: utmaction
-      type: keyword
-      description: >
-        Security action performed by UTM
-
-    - name: vap
-      type: keyword
-      description: >
-        Virtual AP
-
-    - name: vapmode
-      type: keyword
-      description: >
-        Virtual AP mode
-
-    - name: vcluster
-      type: integer
-      description: >
-        virtual cluster id
-
-    - name: vcluster_member
-      type: integer
-      description: >
-        Virtual cluster member
-
-    - name: vcluster_state
-      type: keyword
-      description: >
-        Virtual cluster state
-
-    - name: vd
-      type: keyword
-      description: >
-        Virtual Domain Name
-
-    - name: vdname
-      type: keyword
-      description: >
-        Virtual Domain Name
-
-    - name: vendorurl
-      type: keyword
-      description: >
-        Vulnerability scan vendor name
-
-    - name: version
-      type: keyword
-      description: >
-        Version
-
-    - name: vip
-      type: keyword
-      description: >
-        Virtual IP
-
-    - name: virus
-      type: keyword
-      description: >
-        Virus name
-
-    - name: virusid
-      type: integer
-      description: >
-        Virus ID (unique virus identifier)
-
-    - name: voip_proto
-      type: keyword
-      description: >
-        VOIP protocol
-
-    - name: vpn
-      type: keyword
-      description: >
-        VPN description
-
-    - name: vpntunnel
-      type: keyword
-      description: >
-        IPsec Vpn Tunnel Name
-
-    - name: vpntype
-      type: keyword
-      description: >
-        The type of the VPN tunnel
-
-    - name: vrf
-      type: integer
-      description: >
-        VRF number
-
-    - name: vulncat
-      type: keyword
-      description: >
-        Vulnerability Category
-
-    - name: vulnid
-      type: integer
-      description: >
-        Vulnerability ID
-
-    - name: vulnname
-      type: keyword
-      description: >
-        Vulnerability name
-
-    - name: vwlid
-      type: integer
-      description: >
-        VWL ID
-
-    - name: vwlquality
-      type: keyword
-      description: >
-        VWL quality
-
-    - name: vwlservice
-      type: keyword
-      description: >
-        VWL service
-
-    - name: vwpvlanid
-      type: integer
-      description: >
-        VWP VLAN ID
-
-    - name: wanin
-      type: long
-      description: >
-        WAN incoming traffic in bytes
-
-    - name: wanoptapptype
-      type: keyword
-      description: >
-        WAN Optimization Application type
-
-    - name: wanout
-      type: long
-      description: >
-        WAN outgoing traffic in bytes
-
-    - name: weakwepiv
-      type: keyword
-      description: >
-        Weak Wep Initiation Vector
-
-    - name: xauthgroup
-      type: keyword
-      description: >
-        XAuth Group Name
-
-    - name: xauthuser
-      type: keyword
-      description: >
-        XAuth User Name
-
-    - name: xid
-      type: integer
-      description: >
-        Wireless X ID
+    - name: file.hash.crc32
+      type: keyword
+      description: >
+        CRC32 Hash of file
+
+    - name: firewall
+      type: group
+      release: beta
+      default_field: false
+      description: >
+        Module for parsing Fortinet syslog.
+      fields:
+        - name: acct_stat
+          type: keyword
+          description: >
+            Accounting state (RADIUS)
+
+        - name: acktime
+          type: keyword
+          description: >
+            Alarm Acknowledge Time
+
+        - name: act
+          type: keyword
+          description: >
+            Action
+
+        - name: action
+          type: keyword
+          description: >
+            Status of the session
+
+        - name: activity
+          type: keyword
+          description: >
+            HA activity message
+
+        - name: addr
+          type: ip
+          description: >
+            IP Address
+
+        - name: addr_type
+          type: keyword
+          description: >
+            Address Type
+
+        - name: addrgrp
+          type: keyword
+          description: >
+            Address Group
+
+        - name: adgroup
+          type: keyword
+          description: >
+            AD Group Name
+
+        - name: admin
+          type: keyword
+          description: >
+            Admin User
+
+        - name: age
+          type: integer
+          description: >
+            Time in seconds - time passed since last seen
+
+        - name: agent
+          type: keyword
+          description: >
+            User agent - eg. agent="Mozilla/5.0"
+
+        - name: alarmid
+          type: integer
+          description: >
+            Alarm ID
+
+        - name: alert
+          type: keyword
+          description: >
+            Alert
+
+        - name: analyticscksum
+          type: keyword
+          description: >
+            The checksum of the file submitted for analytics
+
+        - name: analyticssubmit
+          type: keyword
+          description: >
+            The flag for analytics submission
+
+        - name: ap
+          type: keyword
+          description: >
+            Access Point
+
+        - name: app-type
+          type: keyword
+          description: >
+            Address Type
+
+        - name: appact
+          type: keyword
+          description: >
+            The security action from app control
+
+        - name: appid
+          type: integer
+          description: >
+            Application ID
+
+        - name: applist
+          type: keyword
+          description: >
+            Application Control profile
+
+        - name: apprisk
+          type: keyword
+          description: >
+            Application Risk Level
+
+        - name: apscan
+          type: keyword
+          description: >
+            The name of the AP, which scanned and detected the rogue AP
+
+        - name: apsn
+          type: keyword
+          description: >
+            Access Point
+
+        - name: apstatus
+          type: keyword
+          description: >
+            Access Point status
+
+        - name: aptype
+          type: keyword
+          description: >
+            Access Point type
+
+        - name: assigned
+          type: ip
+          description: >
+            Assigned IP Address
+
+        - name: assignip
+          type: ip
+          description: >
+            Assigned IP Address
+
+        - name: attachment
+          type: keyword
+          description: >
+            The flag for email attachement
+
+        - name: attack
+          type: keyword
+          description: >
+            Attack Name
+
+        - name: attackcontext
+          type: keyword
+          description: >
+            The trigger patterns and the packetdata with base64 encoding
+
+        - name: attackcontextid
+          type: keyword
+          description: >
+            Attack context id / total
+
+        - name: attackid
+          type: integer
+          description: >
+            Attack ID
+
+        - name: auditid
+          type: long
+          description: >
+            Audit ID
+
+        - name: auditscore
+          type: keyword
+          description: >
+            The Audit Score
+
+        - name: audittime
+          type: long
+          description: >
+            The time of the audit
+
+        - name: authgrp
+          type: keyword
+          description: >
+            Authorization Group
+
+        - name: authid
+          type: keyword
+          description: >
+            Authentication ID
+
+        - name: authproto
+          type: keyword
+          description: >
+            The protocol that initiated the authentication
+
+        - name: authserver
+          type: keyword
+          description: >
+            Authentication server
+
+        - name: bandwidth
+          type: keyword
+          description: >
+            Bandwidth
+
+        - name: banned_rule
+          type: keyword
+          description: >
+            NAC quarantine Banned Rule Name
+
+        - name: banned_src
+          type: keyword
+          description: >
+            NAC quarantine Banned Source IP
+
+        - name: banword
+          type: keyword
+          description: >
+            Banned word
+
+        - name: botnetdomain
+          type: keyword
+          description: >
+            Botnet Domain Name
+
+        - name: botnetip
+          type: ip
+          description: >
+            Botnet IP Address
+
+        - name: bssid
+          type: keyword
+          description: >
+            Service Set ID
+
+        - name: call_id
+          type: keyword
+          description: >
+            Caller ID
+
+        - name: carrier_ep
+          type: keyword
+          description: >
+            The FortiOS Carrier end-point identification
+
+        - name: cat
+          type: integer
+          description: >
+            DNS category ID
+
+        - name: category
+          type: keyword
+          description: >
+            Authentication category
+
+        - name: cc
+          type: keyword
+          description: >
+            CC Email Address
+
+        - name: cdrcontent
+          type: keyword
+          description: >
+            Cdrcontent
+
+        - name: centralnatid
+          type: integer
+          description: >
+            Central NAT ID
+
+        - name: cert
+          type: keyword
+          description: >
+            Certificate
+
+        - name: cert-type
+          type: keyword
+          description: >
+            Certificate type
+
+        - name: certhash
+          type: keyword
+          description: >
+            Certificate hash
+
+        - name: cfgattr
+          type: keyword
+          description: >
+            Configuration attribute
+
+        - name: cfgobj
+          type: keyword
+          description: >
+            Configuration object
+
+        - name: cfgpath
+          type: keyword
+          description: >
+            Configuration path
+
+        - name: cfgtid
+          type: keyword
+          description: >
+            Configuration transaction ID
+
+        - name: cfgtxpower
+          type: integer
+          description: >
+            Configuration TX power
+
+        - name: channel
+          type: integer
+          description: >
+            Wireless Channel
+
+        - name: channeltype
+          type: keyword
+          description: >
+            SSH channel type
+
+        - name: chassisid
+          type: integer
+          description: >
+            Chassis ID
+
+        - name: checksum
+          type: keyword
+          description: >
+            The checksum of the scanned file
+
+        - name: chgheaders
+          type: keyword
+          description: >
+            HTTP Headers
+
+        - name: cldobjid
+          type: keyword
+          description: >
+            Connector object ID
+
+        - name: client_addr
+          type: keyword
+          description: >
+            Wifi client address
+
+        - name: cloudaction
+          type: keyword
+          description: >
+            Cloud Action
+
+        - name: clouduser
+          type: keyword
+          description: >
+            Cloud User
+
+        - name: column
+          type: integer
+          description: >
+            VOIP Column
+
+        - name: command
+          type: keyword
+          description: >
+            CLI Command
+
+        - name: community
+          type: keyword
+          description: >
+            SNMP Community
+
+        - name: configcountry
+          type: keyword
+          description: >
+            Configuration country
+
+        - name: connection_type
+          type: keyword
+          description: >
+            FortiClient Connection Type
+
+        - name: conserve
+          type: keyword
+          description: >
+            Flag for conserve mode
+
+        - name: constraint
+          type: keyword
+          description: >
+            WAF http protocol restrictions
+
+        - name: contentdisarmed
+          type: keyword
+          description: >
+            Email scanned content
+
+        - name: contenttype
+          type: keyword
+          description: >
+            Content Type from HTTP header
+
+        - name: cookies
+          type: keyword
+          description: >
+            VPN Cookie
+
+        - name: count
+          type: integer
+          description: >
+            Counts of action type
+
+        - name: countapp
+          type: integer
+          description: >
+            Number of App Ctrl logs associated with the session
+
+        - name: countav
+          type: integer
+          description: >
+            Number of AV logs associated with the session
+
+        - name: countcifs
+          type: integer
+          description: >
+            Number of CIFS logs associated with the session
+
+        - name: countdlp
+          type: integer
+          description: >
+            Number of DLP logs associated with the session
+
+        - name: countdns
+          type: integer
+          description: >
+            Number of DNS logs associated with the session
+
+        - name: countemail
+          type: integer
+          description: >
+            Number of email logs associated with the session
+
+        - name: countff
+          type: integer
+          description: >
+            Number of ff logs associated with the session
+
+        - name: countips
+          type: integer
+          description: >
+            Number of IPS logs associated with the session
+
+        - name: countssh
+          type: integer
+          description: >
+            Number of SSH logs associated with the session
+
+        - name: countssl
+          type: integer
+          description: >
+            Number of SSL logs associated with the session
+
+        - name: countwaf
+          type: integer
+          description: >
+            Number of WAF logs associated with the session
+
+        - name: countweb
+          type: integer
+          description: >
+            Number of Web filter logs associated with the session
+
+        - name: cpu
+          type: integer
+          description: >
+            CPU Usage
+
+        - name: craction
+          type: integer
+          description: >
+            Client Reputation Action
+
+        - name: criticalcount
+          type: integer
+          description: >
+            Number of critical ratings
+
+        - name: crl
+          type: keyword
+          description: >
+            Client Reputation Level
+
+        - name: crlevel
+          type: keyword
+          description: >
+            Client Reputation Level
+
+        - name: crscore
+          type: integer
+          description: >
+            Some description
+
+        - name: cveid
+          type: keyword
+          description: >
+            CVE ID
+
+        - name: daemon
+          type: keyword
+          description: >
+            Daemon name
+
+        - name: datarange
+          type: keyword
+          description: >
+            Data range for reports
+
+        - name: date
+          type: keyword
+          description: >
+            Date
+
+        - name: ddnsserver
+          type: ip
+          description: >
+            DDNS server
+
+        - name: desc
+          type: keyword
+          description: >
+            Description
+
+        - name: detectionmethod
+          type: keyword
+          description: >
+            Detection method
+
+        - name: devcategory
+          type: keyword
+          description: >
+            Device category
+
+        - name: devintfname
+          type: keyword
+          description: >
+            HA device Interface Name
+
+        - name: devtype
+          type: keyword
+          description: >
+            Device type
+
+        - name: dhcp_msg
+          type: keyword
+          description: >
+            DHCP Message
+
+        - name: dintf
+          type: keyword
+          description: >
+            Destination interface
+
+        - name: disk
+          type: keyword
+          description: >
+            Assosciated disk
+
+        - name: disklograte
+          type: long
+          description: >
+            Disk logging rate
+
+        - name: dlpextra
+          type: keyword
+          description: >
+            DLP extra information
+
+        - name: docsource
+          type: keyword
+          description: >
+            DLP fingerprint document source
+
+        - name: domainctrlauthstate
+          type: integer
+          description: >
+            CIFS domain auth state
+
+        - name: domainctrlauthtype
+          type: integer
+          description: >
+            CIFS domain auth type
+
+        - name: domainctrldomain
+          type: keyword
+          description: >
+            CIFS domain auth domain
+
+        - name: domainctrlip
+          type: ip
+          description: >
+            CIFS Domain IP
+
+        - name: domainctrlname
+          type: keyword
+          description: >
+            CIFS Domain name
+
+        - name: domainctrlprotocoltype
+          type: integer
+          description: >
+            CIFS Domain connection protocol
+
+        - name: domainctrlusername
+          type: keyword
+          description: >
+            CIFS Domain username
+
+        - name: domainfilteridx
+          type: integer
+          description: >
+            Domain filter ID
+
+        - name: domainfilterlist
+          type: keyword
+          description: >
+            Domain filter name
+
+        - name: ds
+          type: keyword
+          description: >
+            Direction with distribution system
+
+        - name: dst_int
+          type: keyword
+          description: >
+            Destination interface
+
+        - name: dstintfrole
+          type: keyword
+          description: >
+            Destination interface role
+
+        - name: dstcountry
+          type: keyword
+          description: >
+            Destination country
+
+        - name: dstdevcategory
+          type: keyword
+          description: >
+            Destination device category
+
+        - name: dstdevtype
+          type: keyword
+          description: >
+            Destination device type
+
+        - name: dstfamily
+          type: keyword
+          description: >
+            Destination OS family
+
+        - name: dsthwvendor
+          type: keyword
+          description: >
+            Destination HW vendor
+
+        - name: dsthwversion
+          type: keyword
+          description: >
+            Destination HW version
+
+        - name: dstinetsvc
+          type: keyword
+          description: >
+            Destination interface service
+
+        - name: dstosname
+          type: keyword
+          description: >
+            Destination OS name
+
+        - name: dstosversion
+          type: keyword
+          description: >
+            Destination OS version
+
+        - name: dstserver
+          type: integer
+          description: >
+            Destination server
+
+        - name: dstssid
+          type: keyword
+          description: >
+            Destination SSID
+
+        - name: dstswversion
+          type: keyword
+          description: >
+            Destination software version
+
+        - name: dstunauthusersource
+          type: keyword
+          description: >
+            Destination unauthenticated source
+
+        - name: dstuuid
+          type: keyword
+          description: >
+            UUID of the Destination IP address
+
+        - name: duid
+          type: keyword
+          description: >
+            DHCP UID
+
+        - name: eapolcnt
+          type: integer
+          description: >
+            EAPOL packet count
+
+        - name: eapoltype
+          type: keyword
+          description: >
+            EAPOL packet type
+
+        - name: encrypt
+          type: integer
+          description: >
+            Whether the packet is encrypted or not
+
+        - name: encryption
+          type: keyword
+          description: >
+            Encryption method
+
+        - name: epoch
+          type: integer
+          description: >
+            Epoch used for locating file
+
+        - name: espauth
+          type: keyword
+          description: >
+            ESP Authentication
+
+        - name: esptransform
+          type: keyword
+          description: >
+            ESP Transform
+
+        - name: exch
+          type: keyword
+          description: >
+            Mail Exchanges from DNS response answer section
+
+        - name: exchange
+          type: keyword
+          description: >
+            Mail Exchanges from DNS response answer section
+
+        - name: expectedsignature
+          type: keyword
+          description: >
+            Expected SSL signature
+
+        - name: expiry
+          type: keyword
+          description: >
+            FortiGuard override expiry timestamp
+
+        - name: fams_pause
+          type: integer
+          description: >
+            Fortinet Analysis and Management Service Pause
+
+        - name: fazlograte
+          type: long
+          description: >
+            FortiAnalyzer Logging Rate
+
+        - name: fctemssn
+          type: keyword
+          description: >
+            FortiClient Endpoint SSN
+
+        - name: fctuid
+          type: keyword
+          description: >
+            FortiClient UID
+
+        - name: field
+          type: keyword
+          description: >
+            NTP status field
+
+        - name: filefilter
+          type: keyword
+          description: >
+            The filter used to identify the affected file
+
+        - name: filehashsrc
+          type: keyword
+          description: >
+            Filehash source
+
+        - name: filtercat
+          type: keyword
+          description: >
+            DLP filter category
+
+        - name: filteridx
+          type: integer
+          description: >
+            DLP filter ID
+
+        - name: filtername
+          type: keyword
+          description: >
+            DLP rule name
+
+        - name: filtertype
+          type: keyword
+          description: >
+            DLP filter type
+
+        - name: fortiguardresp
+          type: keyword
+          description: >
+            Antispam ESP value
+
+        - name: forwardedfor
+          type: keyword
+          description: >
+            Email address forwarded
+
+        - name: fqdn
+          type: keyword
+          description: >
+            FQDN
+
+        - name: frametype
+          type: keyword
+          description: >
+            Wireless frametype
+
+        - name: freediskstorage
+          type: integer
+          description: >
+            Free disk integer
+
+        - name: from
+          type: keyword
+          description: >
+            From email address
+
+        - name: from_vcluster
+          type: integer
+          description: >
+            Source virtual cluster number
+
+        - name: fsaverdict
+          type: keyword
+          description: >
+            FSA verdict
+
+        - name: fwserver_name
+          type: keyword
+          description: >
+            Web proxy server name
+
+        - name: gateway
+          type: ip
+          description: >
+            Gateway ip address for PPPoE status report
+
+        - name: green
+          type: keyword
+          description: >
+            Memory status
+
+        - name: groupid
+          type: integer
+          description: >
+            User Group ID
+
+        - name: ha-prio
+          type: integer
+          description: >
+            HA Priority
+
+        - name: ha_group
+          type: keyword
+          description: >
+            HA Group
+
+        - name: ha_role
+          type: keyword
+          description: >
+            HA Role
+
+        - name: handshake
+          type: keyword
+          description: >
+            SSL Handshake
+
+        - name: hash
+          type: keyword
+          description: >
+            Hash value of downloaded file
+
+        - name: hbdn_reason
+          type: keyword
+          description: >
+            Heartbeat down reason
+
+        - name: highcount
+          type: integer
+          description: >
+            Highcount fabric summary
+
+        - name: host
+          type: keyword
+          description: >
+            Hostname
+
+        - name: iaid
+          type: keyword
+          description: >
+            DHCPv6 id
+
+        - name: icmpcode
+          type: keyword
+          description: >
+            Destination Port of the ICMP message
+
+        - name: icmpid
+          type: keyword
+          description: >
+            Source port of the ICMP message
+
+        - name: icmptype
+          type: keyword
+          description: >
+            The type of ICMP message
+
+        - name: identifier
+          type: integer
+          description: >
+            Network traffic identifier
+
+        - name: in_spi
+          type: keyword
+          description: >
+            IPSEC inbound SPI
+
+        - name: incidentserialno
+          type: integer
+          description: >
+            Incident serial number
+
+        - name: infected
+          type: integer
+          description: >
+            Infected MMS
+
+        - name: infectedfilelevel
+          type: integer
+          description: >
+            DLP infected file level
+
+        - name: informationsource
+          type: keyword
+          description: >
+            Information source
+
+        - name: init
+          type: keyword
+          description: >
+            IPSEC init stage
+
+        - name: initiator
+          type: keyword
+          description: >
+            Original login user name for Fortiguard override
+
+        - name: interface
+          type: keyword
+          description: >
+            Related interface
+
+        - name: intf
+          type: keyword
+          description: >
+            Related interface
+
+        - name: invalidmac
+          type: keyword
+          description: >
+            The MAC address with invalid OUI
+
+        - name: ip
+          type: ip
+          description: >
+            Related IP
+
+        - name: iptype
+          type: keyword
+          description: >
+            Related IP type
+
+        - name: keyword
+          type: keyword
+          description: >
+            Keyword used for search
+
+        - name: kind
+          type: keyword
+          description: >
+            VOIP kind
+
+        - name: lanin
+          type: long
+          description: >
+            LAN incoming traffic in bytes
+
+        - name: lanout
+          type: long
+          description: >
+            LAN outbound traffic in bytes
+
+        - name: lease
+          type: integer
+          description: >
+            DHCP lease
+
+        - name: license_limit
+          type: keyword
+          description: >
+            Maximum Number of FortiClients for the License
+
+        - name: limit
+          type: integer
+          description: >
+            Virtual Domain Resource Limit
+
+        - name: line
+          type: keyword
+          description: >
+            VOIP line
+
+        - name: live
+          type: integer
+          description: >
+            Time in seconds
+
+        - name: local
+          type: ip
+          description: >
+            Local IP for a PPPD Connection
+
+        - name: log
+          type: keyword
+          description: >
+            Log message
+
+        - name: login
+          type: keyword
+          description: >
+            SSH login
+
+        - name: lowcount
+          type: integer
+          description: >
+            Fabric lowcount
+
+        - name: mac
+          type: keyword
+          description: >
+            DHCP mac address
+
+        - name: malform_data
+          type: integer
+          description: >
+            VOIP malformed data
+
+        - name: malform_desc
+          type: keyword
+          description: >
+            VOIP malformed data description
+
+        - name: manuf
+          type: keyword
+          description: >
+            Manufacturer name
+
+        - name: masterdstmac
+          type: keyword
+          description: >
+            Master mac address for a host with multiple network interfaces
+
+        - name: mastersrcmac
+          type: keyword
+          description: >
+            The master MAC address for a host that has multiple network interfaces
+
+        - name: mediumcount
+          type: integer
+          description: >
+            Fabric medium count
+
+        - name: mem
+          type: integer
+          description: >
+            Memory usage system statistics
+
+        - name: meshmode
+          type: keyword
+          description: >
+            Wireless mesh mode
+
+        - name: message_type
+          type: keyword
+          description: >
+            VOIP message type
+
+        - name: method
+          type: keyword
+          description: >
+            HTTP method
+
+        - name: mgmtcnt
+          type: integer
+          description: >
+            The number of unauthorized client flooding managemet frames
+
+        - name: mode
+          type: keyword
+          description: >
+            IPSEC mode
+
+        - name: module
+          type: keyword
+          description: >
+            PCI-DSS module
+
+        - name: monitor-name
+          type: keyword
+          description: >
+            Health Monitor Name
+
+        - name: monitor-type
+          type: keyword
+          description: >
+            Health Monitor Type
+
+        - name: mpsk
+          type: keyword
+          description: >
+            Wireless MPSK
+
+        - name: msgproto
+          type: keyword
+          description: >
+            Message Protocol Number
+
+        - name: mtu
+          type: integer
+          description: >
+            Max Transmission Unit Value
+
+        - name: name
+          type: keyword
+          description: >
+            Name
+
+        - name: nat
+          type: keyword
+          description: >
+            NAT IP Address
+
+        - name: netid
+          type: keyword
+          description: >
+            Connector NetID
+
+        - name: new_status
+          type: keyword
+          description: >
+            New status on user change
+
+        - name: new_value
+          type: keyword
+          description: >
+            New Virtual Domain Name
+
+        - name: newchannel
+          type: integer
+          description: >
+            New Channel Number
+
+        - name: newchassisid
+          type: integer
+          description: >
+            New Chassis ID
+
+        - name: newslot
+          type: integer
+          description: >
+            New Slot Number
+
+        - name: nextstat
+          type: integer
+          description: >
+            Time interval in seconds for the next statistics.
+
+        - name: nf_type
+          type: keyword
+          description: >
+            Notification Type
+
+        - name: noise
+          type: integer
+          description: >
+            Wifi Noise
+
+        - name: old_status
+          type: keyword
+          description: >
+            Original Status
+
+        - name: old_value
+          type: keyword
+          description: >
+            Original Virtual Domain name
+
+        - name: oldchannel
+          type: integer
+          description: >
+            Original channel
+
+        - name: oldchassisid
+          type: integer
+          description: >
+            Original Chassis Number
+
+        - name: oldslot
+          type: integer
+          description: >
+            Original Slot Number
+
+        - name: oldsn
+          type: keyword
+          description: >
+            Old Serial number
+
+        - name: oldwprof
+          type: keyword
+          description: >
+            Old Web Filter Profile
+
+        - name: onwire
+          type: keyword
+          description: >
+            A flag to indicate if the AP is onwire or not
+
+        - name: opercountry
+          type: keyword
+          description: >
+            Operating Country
+
+        - name: opertxpower
+          type: integer
+          description: >
+            Operating TX power
+
+        - name: osname
+          type: keyword
+          description: >
+            Operating System name
+
+        - name: osversion
+          type: keyword
+          description: >
+            Operating System version
+
+        - name: out_spi
+          type: keyword
+          description: >
+            Out SPI
+
+        - name: outintf
+          type: keyword
+          description: >
+            Out interface
+
+        - name: passedcount
+          type: integer
+          description: >
+            Fabric passed count
+
+        - name: passwd
+          type: keyword
+          description: >
+            Changed user password information
+
+        - name: path
+          type: keyword
+          description: >
+            Path of looped configuration for security fabric
+
+        - name: peer
+          type: keyword
+          description: >
+            WAN optimization peer
+
+        - name: peer_notif
+          type: keyword
+          description: >
+            VPN peer notification
+
+        - name: phase2_name
+          type: keyword
+          description: >
+            VPN phase2 name
+
+        - name: phone
+          type: keyword
+          description: >
+            VOIP Phone
+
+        - name: pid
+          type: integer
+          description: >
+            Process ID
+
+        - name: policytype
+          type: keyword
+          description: >
+            Policy Type
+
+        - name: poolname
+          type: keyword
+          description: >
+            IP Pool name
+
+        - name: port
+          type: integer
+          description: >
+            Log upload error port
+
+        - name: portbegin
+          type: integer
+          description: >
+            IP Pool port number to begin
+
+        - name: portend
+          type: integer
+          description: >
+            IP Pool port number to end
+
+        - name: probeproto
+          type: keyword
+          description: >
+            Link Monitor Probe Protocol
+
+        - name: process
+          type: keyword
+          description: >
+            URL Filter process
+
+        - name: processtime
+          type: integer
+          description: >
+            Process time for reports
+
+        - name: profile
+          type: keyword
+          description: >
+            Profile Name
+
+        - name: profile_vd
+          type: keyword
+          description: >
+            Virtual Domain Name
+
+        - name: profilegroup
+          type: keyword
+          description: >
+            Profile Group Name
+
+        - name: profiletype
+          type: keyword
+          description: >
+            Profile Type
+
+        - name: qtypeval
+          type: integer
+          description: >
+            DNS question type value
+
+        - name: quarskip
+          type: keyword
+          description: >
+            Quarantine skip explanation
+
+        - name: quotaexceeded
+          type: keyword
+          description: >
+            If quota has been exceeded
+
+        - name: quotamax
+          type: long
+          description: >
+            Maximum quota allowed - in seconds if time-based - in bytes if traffic-based
+
+        - name: quotatype
+          type: keyword
+          description: >
+            Quota type
+
+        - name: quotaused
+          type: long
+          description: >
+            Quota used - in seconds if time-based - in bytes if trafficbased)
+
+        - name: radioband
+          type: keyword
+          description: >
+            Radio band
+
+        - name: radioid
+          type: integer
+          description: >
+            Radio ID
+
+        - name: radioidclosest
+          type: integer
+          description: >
+            Radio ID on the AP closest the rogue AP
+
+        - name: radioiddetected
+          type: integer
+          description: >
+            Radio ID on the AP which detected the rogue AP
+
+        - name: rate
+          type: keyword
+          description: >
+            Wireless rogue rate value
+
+        - name: rawdata
+          type: keyword
+          description: >
+            Raw data value
+
+        - name: rawdataid
+          type: keyword
+          description: >
+            Raw data ID
+
+        - name: rcvddelta
+          type: keyword
+          description: >
+            Received bytes delta
+
+        - name: reason
+          type: keyword
+          description: >
+            Alert reason
+
+        - name: received
+          type: integer
+          description: >
+            Server key exchange received
+
+        - name: receivedsignature
+          type: keyword
+          description: >
+            Server key exchange received signature
+
+        - name: red
+          type: keyword
+          description: >
+            Memory information in red
+
+        - name: referralurl
+          type: keyword
+          description: >
+            Web filter referralurl
+
+        - name: remote
+          type: ip
+          description: >
+            Remote PPP IP address
+
+        - name: remotewtptime
+          type: keyword
+          description: >
+            Remote Wifi Radius authentication time
+
+        - name: reporttype
+          type: keyword
+          description: >
+            Report type
+
+        - name: reqtype
+          type: keyword
+          description: >
+            Request type
+
+        - name: request_name
+          type: keyword
+          description: >
+            VOIP request name
+
+        - name: result
+          type: keyword
+          description: >
+            VPN phase result
+
+        - name: role
+          type: keyword
+          description: >
+            VPN Phase 2 role
+
+        - name: rssi
+          type: integer
+          description: >
+            Received signal strength indicator
+
+        - name: rsso_key
+          type: keyword
+          description: >
+            RADIUS SSO attribute value
+
+        - name: ruledata
+          type: keyword
+          description: >
+            Rule data
+
+        - name: ruletype
+          type: keyword
+          description: >
+            Rule type
+
+        - name: scanned
+          type: integer
+          description: >
+            Number of Scanned MMSs
+
+        - name: scantime
+          type: long
+          description: >
+            Scanned time
+
+        - name: scope
+          type: keyword
+          description: >
+            FortiGuard Override Scope
+
+        - name: security
+          type: keyword
+          description: >
+            Wireless rogue security
+
+        - name: sensitivity
+          type: keyword
+          description: >
+            Sensitivity for document fingerprint
+
+        - name: sensor
+          type: keyword
+          description: >
+            NAC Sensor Name
+
+        - name: sentdelta
+          type: keyword
+          description: >
+            Sent bytes delta
+
+        - name: seq
+          type: keyword
+          description: >
+            Sequence number
+
+        - name: serial
+          type: keyword
+          description: >
+            WAN optimisation serial
+
+        - name: serialno
+          type: keyword
+          description: >
+            Serial number
+
+        - name: server
+          type: keyword
+          description: >
+            AD server FQDN or IP
+
+        - name: session_id
+          type: keyword
+          description: >
+            Session ID
+
+        - name: sessionid
+          type: integer
+          description: >
+            WAD Session ID
+
+        - name: setuprate
+          type: long
+          description: >
+            Session Setup Rate
+
+        - name: severity
+          type: keyword
+          description: >
+            Severity
+
+        - name: shaperdroprcvdbyte
+          type: integer
+          description: >
+            Received bytes dropped by shaper
+
+        - name: shaperdropsentbyte
+          type: integer
+          description: >
+            Sent bytes dropped by shaper
+
+        - name: shaperperipdropbyte
+          type: integer
+          description: >
+            Dropped bytes per IP by shaper
+
+        - name: shaperperipname
+          type: keyword
+          description: >
+            Traffic shaper name (per IP)
+
+        - name: shaperrcvdname
+          type: keyword
+          description: >
+            Traffic shaper name for received traffic
+
+        - name: shapersentname
+          type: keyword
+          description: >
+            Traffic shaper name for sent traffic
+
+        - name: shapingpolicyid
+          type: integer
+          description: >
+            Traffic shaper policy ID
+
+        - name: signal
+          type: integer
+          description: >
+            Wireless rogue API signal
+
+        - name: size
+          type: long
+          description: >
+            Email size in bytes
+
+        - name: slot
+          type: integer
+          description: >
+            Slot number
+
+        - name: sn
+          type: keyword
+          description: >
+            Security fabric serial number
+
+        - name: snclosest
+          type: keyword
+          description: >
+            SN of the AP closest to the rogue AP
+
+        - name: sndetected
+          type: keyword
+          description: >
+            SN of the AP which detected the rogue AP
+
+        - name: snmeshparent
+          type: keyword
+          description: >
+            SN of the mesh parent
+
+        - name: spi
+          type: keyword
+          description: >
+            IPSEC SPI
+
+        - name: src_int
+          type: keyword
+          description: >
+            Source interface
+
+        - name: srcintfrole
+          type: keyword
+          description: >
+            Source interface role
+
+        - name: srccountry
+          type: keyword
+          description: >
+            Source country
+
+        - name: srcfamily
+          type: keyword
+          description: >
+            Source family
+
+        - name: srchwvendor
+          type: keyword
+          description: >
+            Source hardware vendor
+
+        - name: srchwversion
+          type: keyword
+          description: >
+            Source hardware version
+
+        - name: srcinetsvc
+          type: keyword
+          description: >
+            Source interface service
+
+        - name: srcname
+          type: keyword
+          description: >
+            Source name
+
+        - name: srcserver
+          type: integer
+          description: >
+            Source server
+
+        - name: srcssid
+          type: keyword
+          description: >
+            Source SSID
+
+        - name: srcswversion
+          type: keyword
+          description: >
+            Source software version
+
+        - name: srcuuid
+          type: keyword
+          description: >
+            Source UUID
+
+        - name: sscname
+          type: keyword
+          description: >
+            SSC name
+
+        - name: ssid
+          type: keyword
+          description: >
+            Base Service Set ID
+
+        - name: sslaction
+          type: keyword
+          description: >
+            SSL Action
+
+        - name: ssllocal
+          type: keyword
+          description: >
+            WAD SSL local
+
+        - name: sslremote
+          type: keyword
+          description: >
+            WAD SSL remote
+
+        - name: stacount
+          type: integer
+          description: >
+            Number of stations/clients
+
+        - name: stage
+          type: keyword
+          description: >
+            IPSEC stage
+
+        - name: stamac
+          type: keyword
+          description: >
+            802.1x station mac
+
+        - name: state
+          type: keyword
+          description: >
+            Admin login state
+
+        - name: status
+          type: keyword
+          description: >
+            Status
+
+        - name: stitch
+          type: keyword
+          description: >
+            Automation stitch triggered
+
+        - name: subject
+          type: keyword
+          description: >
+            Email subject
+
+        - name: submodule
+          type: keyword
+          description: >
+            Configuration Sub-Module Name
+
+        - name: subservice
+          type: keyword
+          description: >
+            AV subservice
+
+        - name: subtype
+          type: keyword
+          description: >
+            Log subtype
+
+        - name: suspicious
+          type: integer
+          description: >
+            Number of Suspicious MMSs
+
+        - name: switchproto
+          type: keyword
+          description: >
+            Protocol change information
+
+        - name: sync_status
+          type: keyword
+          description: >
+            The sync status with the master
+
+        - name: sync_type
+          type: keyword
+          description: >
+            The sync type with the master
+
+        - name: sysuptime
+          type: keyword
+          description: >
+            System uptime
+
+        - name: tamac
+          type: keyword
+          description: >
+            the MAC address of Transmitter, if none, then Receiver
+
+        - name: threattype
+          type: keyword
+          description: >
+            WIDS threat type
+
+        - name: time
+          type: keyword
+          description: >
+            Time of the event
+
+        - name: to
+          type: keyword
+          description: >
+            Email to field
+
+        - name: to_vcluster
+          type: integer
+          description: >
+            destination virtual cluster number
+
+        - name: total
+          type: integer
+          description: >
+            Total memory
+
+        - name: totalsession
+          type: integer
+          description: >
+            Total Number of Sessions
+
+        - name: trace_id
+          type: keyword
+          description: >
+            Session clash trace ID
+
+        - name: trandisp
+          type: keyword
+          description: >
+            NAT translation type
+
+        - name: transid
+          type: integer
+          description: >
+            HTTP transaction ID
+
+        - name: translationid
+          type: keyword
+          description: >
+            DNS filter transaltion ID
+
+        - name: trigger
+          type: keyword
+          description: >
+            Automation stitch trigger
+
+        - name: trueclntip
+          type: ip
+          description: >
+            File filter true client IP
+
+        - name: tunnelid
+          type: integer
+          description: >
+            IPSEC tunnel ID
+
+        - name: tunnelip
+          type: ip
+          description: >
+            IPSEC tunnel IP
+
+        - name: tunneltype
+          type: keyword
+          description: >
+            IPSEC tunnel type
+
+        - name: type
+          type: keyword
+          description: >
+            Module type
+
+        - name: ui
+          type: keyword
+          description: >
+            Admin authentication UI type
+
+        - name: unauthusersource
+          type: keyword
+          description: >
+            Unauthenticated user source
+
+        - name: unit
+          type: integer
+          description: >
+            Power supply unit
+
+        - name: urlfilteridx
+          type: integer
+          description: >
+            URL filter ID
+
+        - name: urlfilterlist
+          type: keyword
+          description: >
+            URL filter list
+
+        - name: urlsource
+          type: keyword
+          description: >
+            URL filter source
+
+        - name: urltype
+          type: keyword
+          description: >
+            URL filter type
+
+        - name: used
+          type: integer
+          description: >
+            Number of Used IPs
+
+        - name: used_for_type
+          type: integer
+          description: >
+            Connection for the type
+
+        - name: utmaction
+          type: keyword
+          description: >
+            Security action performed by UTM
+
+        - name: vap
+          type: keyword
+          description: >
+            Virtual AP
+
+        - name: vapmode
+          type: keyword
+          description: >
+            Virtual AP mode
+
+        - name: vcluster
+          type: integer
+          description: >
+            virtual cluster id
+
+        - name: vcluster_member
+          type: integer
+          description: >
+            Virtual cluster member
+
+        - name: vcluster_state
+          type: keyword
+          description: >
+            Virtual cluster state
+
+        - name: vd
+          type: keyword
+          description: >
+            Virtual Domain Name
+
+        - name: vdname
+          type: keyword
+          description: >
+            Virtual Domain Name
+
+        - name: vendorurl
+          type: keyword
+          description: >
+            Vulnerability scan vendor name
+
+        - name: version
+          type: keyword
+          description: >
+            Version
+
+        - name: vip
+          type: keyword
+          description: >
+            Virtual IP
+
+        - name: virus
+          type: keyword
+          description: >
+            Virus name
+
+        - name: virusid
+          type: integer
+          description: >
+            Virus ID (unique virus identifier)
+
+        - name: voip_proto
+          type: keyword
+          description: >
+            VOIP protocol
+
+        - name: vpn
+          type: keyword
+          description: >
+            VPN description
+
+        - name: vpntunnel
+          type: keyword
+          description: >
+            IPsec Vpn Tunnel Name
+
+        - name: vpntype
+          type: keyword
+          description: >
+            The type of the VPN tunnel
+
+        - name: vrf
+          type: integer
+          description: >
+            VRF number
+
+        - name: vulncat
+          type: keyword
+          description: >
+            Vulnerability Category
+
+        - name: vulnid
+          type: integer
+          description: >
+            Vulnerability ID
+
+        - name: vulnname
+          type: keyword
+          description: >
+            Vulnerability name
+
+        - name: vwlid
+          type: integer
+          description: >
+            VWL ID
+
+        - name: vwlquality
+          type: keyword
+          description: >
+            VWL quality
+
+        - name: vwlservice
+          type: keyword
+          description: >
+            VWL service
+
+        - name: vwpvlanid
+          type: integer
+          description: >
+            VWP VLAN ID
+
+        - name: wanin
+          type: long
+          description: >
+            WAN incoming traffic in bytes
+
+        - name: wanoptapptype
+          type: keyword
+          description: >
+            WAN Optimization Application type
+
+        - name: wanout
+          type: long
+          description: >
+            WAN outgoing traffic in bytes
+
+        - name: weakwepiv
+          type: keyword
+          description: >
+            Weak Wep Initiation Vector
+
+        - name: xauthgroup
+          type: keyword
+          description: >
+            XAuth Group Name
+
+        - name: xauthuser
+          type: keyword
+          description: >
+            XAuth User Name
+
+        - name: xid
+          type: integer
+          description: >
+            Wireless X ID
 
 
 

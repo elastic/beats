@@ -19,7 +19,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-const defaultConfig = "elastic-agent.yml"
+const (
+	defaultConfig     = "elastic-agent.yml"
+	hashLen           = 6
+	commitFile        = ".elastic-agent.active.commit"
+	agentLockFileName = "agent.lock"
+)
 
 type globalFlags struct {
 	PathConfigFile string
@@ -49,7 +54,6 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	// path flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
-	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
 	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "c", "c", defaultConfig, `Configuration file, relative to path.config`)
 
@@ -59,12 +63,22 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 
-	// subcommands
+	// sub-commands
 	run := newRunCommandWithArgs(flags, args, streams)
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(run)
+	cmd.AddCommand(newInstallCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newUninstallCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newUpgradeCommandWithArgs(flags, args, streams))
 	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newIntrospectCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newWatchCommandWithArgs(flags, args, streams))
+
+	// windows special hidden sub-command (only added on windows)
+	reexec := newReExecWindowsCommand(flags, args, streams)
+	if reexec != nil {
+		cmd.AddCommand(reexec)
+	}
 	cmd.Run = run.Run
 
 	return cmd

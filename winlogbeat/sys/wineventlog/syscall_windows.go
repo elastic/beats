@@ -380,9 +380,41 @@ const (
 )
 
 type EvtVariant struct {
-	Value uintptr
+	Value [8]byte // This is a union-type in the original struct.
 	Count uint32
 	Type  EvtVariantType
+}
+
+func (v EvtVariant) ValueAsUint64() uint64 {
+	return *(*uint64)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsUint32() uint32 {
+	return *(*uint32)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsUint16() uint16 {
+	return *(*uint16)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsUint8() uint8 {
+	return *(*uint8)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsUintPtr() uintptr {
+	return *(*uintptr)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsFloat32() float32 {
+	return *(*float32)(unsafe.Pointer(&v.Value))
+}
+
+func (v EvtVariant) ValueAsFloat64() float64 {
+	return *(*float64)(unsafe.Pointer(&v.Value))
+}
+
+func (v *EvtVariant) SetValue(val uintptr) {
+	*(*uintptr)(unsafe.Pointer(&v.Value)) = val
 }
 
 var sizeofEvtVariant = unsafe.Sizeof(EvtVariant{})
@@ -406,41 +438,41 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 		return nil, nil
 	case EvtVarTypeString:
 		addr := unsafe.Pointer(&buf[0])
-		offset := v.Value - uintptr(addr)
+		offset := v.ValueAsUintPtr() - uintptr(addr)
 		s, err := UTF16BytesToString(buf[offset:])
 		return s, err
 	case EvtVarTypeSByte:
-		return int8(v.Value), nil
+		return int8(v.ValueAsUint8()), nil
 	case EvtVarTypeByte:
-		return uint8(v.Value), nil
+		return v.ValueAsUint8(), nil
 	case EvtVarTypeInt16:
-		return int16(v.Value), nil
+		return int16(v.ValueAsUint16()), nil
 	case EvtVarTypeInt32:
-		return int32(v.Value), nil
+		return int32(v.ValueAsUint32()), nil
 	case EvtVarTypeHexInt32:
-		return hexInt32(v.Value), nil
+		return hexInt32(v.ValueAsUint32()), nil
 	case EvtVarTypeInt64:
-		return int64(v.Value), nil
+		return int64(v.ValueAsUint64()), nil
 	case EvtVarTypeHexInt64:
-		return hexInt64(v.Value), nil
+		return hexInt64(v.ValueAsUint64()), nil
 	case EvtVarTypeUInt16:
-		return uint16(v.Value), nil
+		return v.ValueAsUint16(), nil
 	case EvtVarTypeUInt32:
-		return uint32(v.Value), nil
+		return v.ValueAsUint32(), nil
 	case EvtVarTypeUInt64:
-		return uint64(v.Value), nil
+		return v.ValueAsUint64(), nil
 	case EvtVarTypeSingle:
-		return float32(v.Value), nil
+		return v.ValueAsFloat32(), nil
 	case EvtVarTypeDouble:
-		return float64(v.Value), nil
+		return v.ValueAsFloat64(), nil
 	case EvtVarTypeBoolean:
-		if v.Value == 0 {
+		if v.ValueAsUint8() == 0 {
 			return false, nil
 		}
 		return true, nil
 	case EvtVarTypeGuid:
 		addr := unsafe.Pointer(&buf[0])
-		offset := v.Value - uintptr(addr)
+		offset := v.ValueAsUintPtr() - uintptr(addr)
 		guid := (*windows.GUID)(unsafe.Pointer(&buf[offset]))
 		copy := *guid
 		return copy, nil
@@ -449,11 +481,11 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 		return time.Unix(0, ft.Nanoseconds()).UTC(), nil
 	case EvtVarTypeSid:
 		addr := unsafe.Pointer(&buf[0])
-		offset := v.Value - uintptr(addr)
+		offset := v.ValueAsUintPtr() - uintptr(addr)
 		sidPtr := (*windows.SID)(unsafe.Pointer(&buf[offset]))
 		return sidPtr.Copy()
 	case EvtVarTypeEvtHandle:
-		return EvtHandle(v.Value), nil
+		return EvtHandle(v.ValueAsUintPtr()), nil
 	default:
 		return nil, errors.Errorf("unhandled type: %d", typ)
 	}

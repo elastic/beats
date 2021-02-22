@@ -5,69 +5,54 @@
 <titleabbrev>Elasticsearch</titleabbrev>
 ++++
 
-When you specify Elasticsearch for the output, {beatname_uc} sends the transactions directly to Elasticsearch by using the Elasticsearch HTTP API.
+The Elasticsearch output sends events directly to Elasticsearch using the Elasticsearch HTTP API.
 
 Example configuration:
 
 ["source","yaml",subs="attributes"]
-------------------------------------------------------------------------------
-
+----
 output.elasticsearch:
-  hosts: ["https://localhost:9200"]
-  index: "{beat_default_index_prefix}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
-  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  hosts: ["https://myEShost:9200"] <1>
+----
+<1> To enable SSL, add `https` to all URLs defined under __hosts__.
+
+When sending data to a secured cluster through the `elasticsearch`
+output, {beatname_uc} can use any of the following authentication methods:
+
+* Basic authentication credentials (username and password).
+* Token-based (API key) authentication.
+* Public Key Infrastructure (PKI) certificates.
+
+*Basic authentication:*
+
+["source","yaml",subs="attributes,callouts"]
+----
+output.elasticsearch:
+  hosts: ["https://myEShost:9200"]
+  username: "{beat_default_index_prefix}_writer"
+  password: "{pwd}"
+----
+
+*API key authentication:*
+
+["source","yaml",subs="attributes,callouts"]
+----
+output.elasticsearch:
+  hosts: ["https://myEShost:9200"]
+  api_key: "KnR6yE41RrSowb0kQ0HWoA"
+----
+
+*PKI certificate authentication:*
+
+["source","yaml",subs="attributes,callouts"]
+----
+output.elasticsearch:
+  hosts: ["https://myEShost:9200"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
-------------------------------------------------------------------------------
+----
 
-Notes about the previous example and client based PKI authentication:
-
-- The `ssl.certificate` and `ssl.key` settings are ONLY needed if {es} is configured to require client based PKI authentication (with `xpack.security.http.ssl.client_authentication: required` or `xpack.security.http.ssl.client_authentication: optional`).
-- The `ssl.certificate_authorities` setting needs to include the CA used to sign the remote server certificate, not the client cert.
-- If client PKI is used, the remote server ({es}) should include the CA used for signing the client cert in the `xpack.security.http.ssl.certificate_authorities: []` list.
-
-To enable SSL, just add `https` to all URLs defined under __hosts__.
-
-["source","yaml",subs="attributes,callouts"]
-------------------------------------------------------------------------------
-
-output.elasticsearch:
-  hosts: ["https://localhost:9200"]
-  username: "{beatname_lc}_internal"
-  password: "{pwd}"
-------------------------------------------------------------------------------
-
-To use an API key to connect to {es}, use `api_key`. The value must be the ID of
-the API key and the API key joined by a colon.
-
-["source","yaml",subs="attributes,callouts"]
-------------------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["https://localhost:9200"]
-  api_key: "VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw"
-------------------------------------------------------------------------------
-
-If the Elasticsearch nodes are defined by `IP:PORT`, then add `protocol: https` to the yaml file.
-
-["source","yaml",subs="attributes,callouts"]
-------------------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost"]
-  protocol: "https"
-  username: "{beatname_lc}_internal"
-  password: "{pwd}"
-------------------------------------------------------------------------------
-
-
-For more information about securing {beatname_uc}, see
-<<securing-{beatname_lc}>>.
-
-ifndef::no_ilm[]
-If you are indexing large amounts of time-series data, you might also want to
-configure {beatname_uc} to use index lifecycle management. For more information
-about configuring and using index lifecycle management with {beatname_uc}, see
-<<ilm>>.
-endif::no_ilm[]
+See <<securing-communication-elasticsearch>> for details on each authentication method.
 
 ==== Compatibility
 
@@ -82,9 +67,9 @@ You can specify the following options in the `elasticsearch` section of the +{be
 ===== `enabled`
 
 The enabled config is a boolean setting to enable or disable the output. If set
-to false, the output is disabled.
+to `false`, the output is disabled.
 
-The default value is true.
+The default value is `true`.
 
 
 [[hosts-option]]
@@ -102,7 +87,7 @@ NOTE: When a node is defined as an `IP:PORT`, the _scheme_ and _path_ are taken 
 [source,yaml]
 ------------------------------------------------------------------------------
 output.elasticsearch:
-  hosts: ["10.45.3.2:9220", "10.45.3.1:9230"]
+  hosts: ["10.45.3.2:9220", "10.45.3.1:9230"] <1>
   protocol: https
   path: /elasticsearch
 ------------------------------------------------------------------------------
@@ -112,12 +97,12 @@ In the previous example, the Elasticsearch nodes are available at `https://10.45
 
 ===== `compression_level`
 
-The gzip compression level. Setting this value to 0 disables compression.
-The compression level must be in the range of 1 (best speed) to 9 (best compression).
+The gzip compression level. Setting this value to `0` disables compression.
+The compression level must be in the range of `1` (best speed) to `9` (best compression).
 
 Increasing the compression level will reduce the network usage but will increase the cpu usage.
 
-The default value is 0.
+The default value is `0`.
 
 ===== `escape_html`
 
@@ -132,17 +117,21 @@ The number of workers per configured host publishing events to Elasticsearch. Th
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
 3 workers, in total 6 workers are started (3 for each host).
 
-The default value is 1.
+The default value is `1`.
 
 ===== `api_key`
 
-Instead of using usernames and passwords, you can use API keys to secure communication
-with {es}. The value must be the ID of the API key and the API key joined by a colon.
-For more information, see <<beats-api-keys>>.
+Instead of using a username and password, you can use API keys to secure communication
+with {es}. The value must be the ID of the API key and the API key joined by a colon: `id:api_key`.
+
+See <<beats-api-keys>> for more information.
 
 ===== `username`
 
 The basic authentication username for connecting to Elasticsearch.
+
+This user needs the privileges required to publish events to {es}.
+To create a user like this, see <<privileges-to-publish-events>>.
 
 ===== `password`
 
@@ -178,7 +167,7 @@ output.elasticsearch.headers:
   X-My-Header: Header contents
 ------------------------------------------------------------------------------
 
-It is generally possible to specify multiple header values for the same header
+It is possible to specify multiple header values for the same header
 name by separating them with a comma.
 
 ===== `proxy_url`
@@ -193,29 +182,13 @@ for more information about the environment variables.
 [[index-option-es]]
 ===== `index`
 
+// Begin exclude for APM Server docs
 ifndef::apm-server[]
 The index name to write events to when you're using daily indices. The default is
-+"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"+ (for example,
-+"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
++"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"+, for example,
++"{beatname_lc}-{version}-{localdate}"+. If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
-endif::apm-server[]
-
-ifdef::apm-server[]
-The index name to write events to. The default is
-+"apm-%{[{beat_version_key}]}-{type}-%{+yyyy.MM.dd}"+ (for example,
-+"apm-{version}-transaction-{localdate}"+). See
-<<exploring-es-data,Exploring data in Elasticsearch>> for more information on
-default index configuration.
-
-IMPORTANT: If you change this setting,
-you need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>). You also must set the default index configuration
-in the `apm-server.yml` file.
-
-NOTE: +{beat_version_key}+ is a field managed by Beats that is added to every document.
-It holds the current version of APM Server.
-endif::apm-server[]
 
 ifndef::no_dashboards[]
 If you are using the pre-built Kibana
@@ -223,11 +196,12 @@ dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
 endif::no_dashboards[]
 
-ifndef::apm-server[]
 ifndef::no_ilm[]
-The `index` setting is ignored when index lifecycle management is enabled. If
-you’re sending events to a cluster that supports index lifecycle management, see
-<<ilm>> to learn how to change the index name.
+When <<ilm,index lifecycle management (ILM)>> is enabled, the default `index` is
++"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}-%{index_num}"+, for example,
++"{beatname_lc}-{version}-{localdate}-000001"+. Custom `index` settings are ignored
+when ILM is enabled. If you’re sending events to a cluster that supports index
+lifecycle management, see <<ilm>> to learn how to change the index name.
 endif::no_ilm[]
 
 You can set the index dynamically by using a format string to access any event
@@ -249,11 +223,23 @@ index named +normal-{version}-{localdate}+, and all events with
 `log_type: critical` are sent to an index named
 +critical-{version}-{localdate}+.
 endif::apm-server[]
+// End exclude for APM Server docs
 
+// Start include for APM Server docs
 ifdef::apm-server[]
+The index name to write events to when you're using daily indices. The default is
++"apm-%{[{beat_version_key}]}-{type}-%{+yyyy.MM.dd}"+ (for example,
++"apm-{version}-transaction-{localdate}"+). If you change this setting,
+you need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>).
+
+When <<ilm,index lifecycle management (ILM)>> is enabled, the default `index` is
++"apm-%{[{beat_version_key}]}-{type}-%{index_num}"+ (for example,
++"apm-{version}-transaction-000001"+). **Defining a custom `index` here will disable <<ilm>>**.
+
 You can set the index dynamically by using a format string to access any event
-field. For example, this configuration uses the field, `processor.event`,
-to set the index:
+field. For example, this configuration uses the field, `processor.event` to separate
+events into different indices:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -261,21 +247,19 @@ output.elasticsearch:
   hosts: ["http://localhost:9200"]
   index: "apm-%{[observer.version]}-%{[processor.event]}-%{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
-
-<1>  `observer` refers to {beatname_uc}. We recommend including
-+{beat_version_key}+ in the name to avoid mapping issues when you upgrade
+<1> +{beat_version_key}+ is a field managed by Beats that is added to every document;
+It holds the current version of APM Server. We recommend including
++{beat_version_key}+ in the index name to avoid mapping issues when you upgrade
 {beatname_uc}.
 
-With this configuration,
-all events are separated by their `processor.event` into different indices.
 endif::apm-server[]
+// End include for APM Server docs
 
 TIP: To learn how to add custom fields to events, see the
 <<libbeat-configuration-fields,`fields`>> option.
 
 See the <<indices-option-es,`indices`>> setting for other ways to set the index
 dynamically.
-
 
 [[indices-option-es]]
 ===== `indices`
@@ -285,6 +269,10 @@ events that match the rule. During publishing, {beatname_uc} uses the first
 matching rule in the array. Rules can contain conditionals, format string-based
 fields, and name mappings. If the `indices` setting is missing or no rule
 matches, the <<index-option-es,`index`>> setting is used.
+
+ifndef::no_ilm[]
+Similar to `index`, defining custom `indices` will disable <<ilm>>.
+endif::no_ilm[]
 
 Rule settings:
 
@@ -359,23 +347,23 @@ output.elasticsearch:
    - index: "apm-%{[observer.version]}-sourcemap"
       when.contains:
         processor.event: "sourcemap"
-  
+
    - index: "apm-%{[observer.version]}-error-%{+yyyy.MM.dd}"
       when.contains:
         processor.event: "error"
-  
+
    - index: "apm-%{[observer.version]}-transaction-%{+yyyy.MM.dd}"
       when.contains:
         processor.event: "transaction"
-  
+
    - index: "apm-%{[observer.version]}-span-%{+yyyy.MM.dd}"
       when.contains:
         processor.event: "span"
-  
+
    - index: "apm-%{[observer.version]}-metric-%{+yyyy.MM.dd}"
       when.contains:
         processor.event: "metric"
-  
+
    - index: "apm-%{[observer.version]}-onboarding-%{+yyyy.MM.dd}"
       when.contains:
         processor.event: "onboarding"
@@ -385,7 +373,7 @@ NOTE: `observer` refers to {beatname_uc}. We recommend including
 +{beat_version_key}+ in the name to avoid mapping issues when you upgrade
 {beatname_uc}.
 
-This is the default configuration for {beatname_uc} and results in indices
+This is the default configuration for {beatname_uc} when ILM is disabled, and results in indices
 named in the following format: +"apm-%{[{beat_version_key}]}-{type}-%{+yyyy.MM.dd}"+
 For example: +"apm-{version}-transaction-{localdate}"+.
 
@@ -452,7 +440,6 @@ output.elasticsearch:
   pipeline: "%{[fields.log_type]}_pipeline"
 ------------------------------------------------------------------------------
 
-
 With this configuration, all events with `log_type: normal` are sent to a pipeline
 named `normal_pipeline`, and all events with `log_type: critical` are sent to a
 pipeline named `critical_pipeline`.
@@ -470,13 +457,12 @@ output.elasticsearch:
   pipeline: "%{[processor.event]}_pipeline"
 ------------------------------------------------------------------------------
 
-
 With this configuration, all events with `processor.event: transaction` are sent to a pipeline
 named `transaction_pipeline`. Similarly, all events with `processor.event: error` are sent to a
 pipeline named `error_pipeline`.
 
-The default pipeline is `apm`. It adds user agent and geo ip information to events.
-To disable this, or any other pipeline, set `output.elasticsearch.pipeline: _none`.
+The default pipeline is `apm`. To disable this, or any other pipeline, set
+`output.elasticsearch.pipeline: _none`.
 endif::apm-server[]
 
 TIP: To learn how to add custom fields to events, see the
@@ -565,23 +551,23 @@ output.elasticsearch:
     - pipeline: "sourcemap_pipeline"
       when.contains:
         processor.event: "sourcemap"
-    
+
     - pipeline: "error_pipeline"
       when.contains:
         processor.event: "error"
-    
+
     - pipeline: "transaction_pipeline"
       when.contains:
         processor.event: "transaction"
-    
+
     - pipeline: "span_pipeline"
       when.contains:
         processor.event: "span"
-    
+
     - pipeline: "metric_pipeline"
       when.contains:
         processor.event: "metric"
-    
+
     - pipeline: "onboarding_pipeline"
       when.contains:
         processor.event: "onboarding"
@@ -658,13 +644,13 @@ The number of seconds to wait before trying to reconnect to Elasticsearch after
 a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
 reconnect. If the attempt fails, the backoff timer is increased exponentially up
 to `backoff.max`. After a successful connection, the backoff timer is reset. The
-default is 1s.
+default is `1s`.
 
 
 ===== `backoff.max`
 
 The maximum number of seconds to wait before attempting to connect to
-Elasticsearch after a network error. The default is 60s.
+Elasticsearch after a network error. The default is `60s`.
 
 ===== `timeout`
 
@@ -676,7 +662,8 @@ Configuration options for SSL parameters like the certificate authority to use
 for HTTPS-based connections. If the `ssl` section is missing, the host CAs are used for HTTPS connections to
 Elasticsearch.
 
-See <<configuration-ssl>> for more information.
+See the <<securing-communication-elasticsearch,secure communication with {es}>> guide
+or <<configuration-ssl,SSL configuration reference>> for more information.
 
 ===== `kerberos`
 

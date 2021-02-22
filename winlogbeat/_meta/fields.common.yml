@@ -4,13 +4,6 @@
     Fields from the Windows Event Log.
   fields:
 
-    - name: log.file.path
-      type: keyword
-      required: false
-      description: >
-        The name of the file the event was read from when Winlogbeat is
-        reading directly from an .evtx file.
-
     - name: event.original
       overwrite: true
       description: >
@@ -506,11 +499,6 @@
     - name: user.identifier
       type: alias
       path:  winlog.user.identifier
-      migration: true
-
-    - name: user.domain
-      type: alias
-      path: winlog.user.domain
       migration: true
 
     - name: user.type

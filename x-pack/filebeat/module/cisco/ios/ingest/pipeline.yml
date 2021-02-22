@@ -1,6 +1,9 @@
 description: Pipeline for Cisco IOS logs.
 
 processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
   # IP Geolocation Lookup
   - geoip:
       field: source.ip

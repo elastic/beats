@@ -34,7 +34,7 @@ const unlimited = 0
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
 type LineReader struct {
-	reader     io.Reader
+	reader     io.ReadCloser
 	bufferSize int
 	maxBytes   int // max bytes per line limit to avoid OOM with malformatted files
 	nl         []byte
@@ -48,7 +48,7 @@ type LineReader struct {
 }
 
 // New creates a new reader object
-func NewLineReader(input io.Reader, config Config) (*LineReader, error) {
+func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 	encoder := config.Codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -270,4 +270,8 @@ func (r *LineReader) decode(end int) (int, error) {
 
 	r.byteCount += start
 	return start, err
+}
+
+func (r *LineReader) Close() error {
+	return r.reader.Close()
 }

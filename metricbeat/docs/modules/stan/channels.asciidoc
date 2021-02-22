@@ -3,6 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-stan-channels]]
+[role="xpack"]
 === Stan channels metricset
 
 include::../../../../x-pack/metricbeat/module/stan/channels/_meta/docs.asciidoc[]

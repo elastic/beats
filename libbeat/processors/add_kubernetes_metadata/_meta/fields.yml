@@ -28,6 +28,11 @@
           description: >
             Kubernetes node name
 
+        - name: node.hostname
+          type: keyword
+          description: >
+            Kubernetes hostname as reported by the node’s kernel
+
         - name: labels.*
           type: object
           object_type: keyword
@@ -41,6 +46,13 @@
           object_type_mapping_type: "*"
           description: >
             Kubernetes annotations map
+
+        - name: service.selectors.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Kubernetes Service selectors map
 
         - name: replicaset.name
           type: keyword

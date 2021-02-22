@@ -39,7 +39,13 @@ type Provider struct {
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
-func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config, keystore keystore.Keystore) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(
+	beatName string,
+	bus bus.Bus,
+	uuid uuid.UUID,
+	c *common.Config,
+	keystore keystore.Keystore,
+) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_elb autodiscover is experimental")
 
 	config := awsauto.DefaultConfig()

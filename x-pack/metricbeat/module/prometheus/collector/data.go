@@ -138,7 +138,7 @@ func (g *typedGenerator) GeneratePromEvents(mf *dto.MetricFamily) []collector.Pr
 			events = append(events, collector.PromEvent{
 				Data: common.MapStr{
 					name: common.MapStr{
-						"histogram": promHistogramToES(g.counterCache, name, labels, histogram),
+						"histogram": PromHistogramToES(g.counterCache, name, labels, histogram),
 					},
 				},
 				Labels: labels,

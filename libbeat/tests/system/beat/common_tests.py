@@ -4,6 +4,12 @@ import yaml
 
 from beat.beat import INTEGRATION_TESTS
 
+# Fail if the exported index pattern is larger than 10MiB
+# This is to avoid problems with Kibana when the payload
+# of the request to install the index pattern exceeds the
+# default limit.
+index_pattern_size_limit = 10 * 1024 * 1024
+
 
 class TestExportsMixin:
 
@@ -21,16 +27,17 @@ class TestExportsMixin:
         if len(extra) != 0:
             args += extra
         exit_code = self.run_beat(extra_args=args, logging_args=[])
-        assert exit_code == 0
         output = self.get_log()
+        if exit_code != 0:
+            raise Exception("export command returned with an error: {}".format(output))
         trailer = "\nPASS\n"
         pos = output.rfind(trailer)
         if pos == -1:
             raise Exception("didn't return expected trailer:{} got:{}".format(
-                trailer.__repr__(),                                                   output[-100:].__repr__()))
+                trailer.__repr__(),
+                output[-100:].__repr__()))
         return output[:pos]
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_ilm_policy(self):
         """
         Test that the ilm-policy can be exported with `export ilm-policy`
@@ -39,7 +46,6 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "policy" in js
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_template(self):
         """
         Test that the template can be exported with `export template`
@@ -48,7 +54,6 @@ class TestExportsMixin:
         js = json.loads(output)
         assert "index_patterns" in js and "mappings" in js
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_export_index_pattern(self):
         """
         Test that the index-pattern can be exported with `export index-pattern`
@@ -56,12 +61,27 @@ class TestExportsMixin:
         output = self.run_export_cmd("index-pattern")
         js = json.loads(output)
         assert "objects" in js
+        size = len(output.encode('utf-8'))
+        assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    def test_export_index_pattern_migration(self):
+        """
+        Test that the index-pattern can be exported with `export index-pattern` (migration enabled)
+        """
+        output = self.run_export_cmd("index-pattern", extra=['-E', 'migration.6_to_7.enabled=true'])
+        js = json.loads(output)
+        assert "objects" in js
+        size = len(output.encode('utf-8'))
+        assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
+
     def test_export_config(self):
         """
         Test that the config can be exported with `export config`
         """
         output = self.run_export_cmd("config")
-        yml = yaml.load(output)
+        yml = yaml.load(output, Loader=yaml.FullLoader)
         assert isinstance(yml, dict)

@@ -142,7 +142,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			defer msw.close()
 
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
-			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time{}.String())
+			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
 			msw.run(done, out)
 		}(msw)
@@ -392,7 +392,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 	}
 
 	if event.Host == "" {
-		event.Host = r.msw.Host()
+		event.Host = r.msw.HostData().SanitizedURI
 	}
 
 	if event.Error == nil {

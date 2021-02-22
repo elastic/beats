@@ -7,53 +7,55 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/oauth2/endpoints"
 	"golang.org/x/oauth2/google"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// An OAuth2Provider represents a supported oauth provider.
-type OAuth2Provider string
+// An oauth2Provider represents a supported oauth provider.
+type oauth2Provider string
 
 const (
-	OAuth2ProviderDefault OAuth2Provider = ""       // OAuth2ProviderDefault means no specific provider is set.
-	OAuth2ProviderAzure   OAuth2Provider = "azure"  // OAuth2ProviderAzure AzureAD.
-	OAuth2ProviderGoogle  OAuth2Provider = "google" // OAuth2ProviderGoogle Google.
+	oauth2ProviderDefault oauth2Provider = ""       // OAuth2ProviderDefault means no specific provider is set.
+	oauth2ProviderAzure   oauth2Provider = "azure"  // OAuth2ProviderAzure AzureAD.
+	oauth2ProviderGoogle  oauth2Provider = "google" // OAuth2ProviderGoogle Google.
 )
 
-func (p *OAuth2Provider) Unpack(in string) error {
-	*p = OAuth2Provider(in)
+func (p *oauth2Provider) Unpack(in string) error {
+	*p = oauth2Provider(in)
 	return nil
 }
 
-func (p OAuth2Provider) canonical() OAuth2Provider {
-	return OAuth2Provider(strings.ToLower(string(p)))
+func (p oauth2Provider) canonical() oauth2Provider {
+	return oauth2Provider(strings.ToLower(string(p)))
 }
 
-// OAuth2 contains information about oauth2 authentication settings.
-type OAuth2 struct {
+// oauth2Config contains information about oauth2 authentication settings.
+type oauth2Config struct {
 	// common oauth fields
 	ClientID       string              `config:"client.id"`
 	ClientSecret   string              `config:"client.secret"`
 	Enabled        *bool               `config:"enabled"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
-	Provider       OAuth2Provider      `config:"provider"`
+	Provider       oauth2Provider      `config:"provider"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
 
 	// google specific
-	GoogleCredentialsFile  string `config:"google.credentials_file"`
-	GoogleCredentialsJSON  []byte `config:"google.credentials_json"`
-	GoogleJWTFile          string `config:"google.jwt_file"`
-	GoogleDelegatedAccount string `config:"google.delegated_account"`
+	GoogleCredentialsFile  string          `config:"google.credentials_file"`
+	GoogleCredentialsJSON  common.JSONBlob `config:"google.credentials_json"`
+	GoogleJWTFile          string          `config:"google.jwt_file"`
+	GoogleDelegatedAccount string          `config:"google.delegated_account"`
 
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
@@ -61,25 +63,26 @@ type OAuth2 struct {
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (o *OAuth2) IsEnabled() bool {
+func (o *oauth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
-func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client, error) {
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
+func (o *oauth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
+	// only required to let oauth2 library to find our custom client in the context
+	ctx = context.WithValue(context.Background(), oauth2.HTTPClient, client)
 
-	switch o.GetProvider() {
-	case OAuth2ProviderAzure, OAuth2ProviderDefault:
+	switch o.getProvider() {
+	case oauth2ProviderAzure, oauth2ProviderDefault:
 		creds := clientcredentials.Config{
 			ClientID:       o.ClientID,
 			ClientSecret:   o.ClientSecret,
-			TokenURL:       o.GetTokenURL(),
+			TokenURL:       o.getTokenURL(),
 			Scopes:         o.Scopes,
-			EndpointParams: o.GetEndpointParams(),
+			EndpointParams: o.getEndpointParams(),
 		}
 		return creds.Client(ctx), nil
-	case OAuth2ProviderGoogle:
+	case oauth2ProviderGoogle:
 		if o.GoogleJWTFile != "" {
 			cfg, err := google.JWTConfigFromJSON(o.GoogleCredentialsJSON, o.Scopes...)
 			if err != nil {
@@ -100,9 +103,9 @@ func (o *OAuth2) Client(ctx context.Context, client *http.Client) (*http.Client,
 }
 
 // GetTokenURL returns the TokenURL.
-func (o *OAuth2) GetTokenURL() string {
-	switch o.GetProvider() {
-	case OAuth2ProviderAzure:
+func (o *oauth2Config) getTokenURL() string {
+	switch o.getProvider() {
+	case oauth2ProviderAzure:
 		if o.TokenURL == "" {
 			return endpoints.AzureAD(o.AzureTenantID).TokenURL
 		}
@@ -112,14 +115,14 @@ func (o *OAuth2) GetTokenURL() string {
 }
 
 // GetProvider returns provider in its canonical form.
-func (o OAuth2) GetProvider() OAuth2Provider {
+func (o oauth2Config) getProvider() oauth2Provider {
 	return o.Provider.canonical()
 }
 
 // GetEndpointParams returns endpoint params with any provider ones combined.
-func (o OAuth2) GetEndpointParams() map[string][]string {
-	switch o.GetProvider() {
-	case OAuth2ProviderAzure:
+func (o oauth2Config) getEndpointParams() map[string][]string {
+	switch o.getProvider() {
+	case oauth2ProviderAzure:
 		if o.AzureResource != "" {
 			if o.EndpointParams == nil {
 				o.EndpointParams = map[string][]string{}
@@ -132,18 +135,18 @@ func (o OAuth2) GetEndpointParams() map[string][]string {
 }
 
 // Validate checks if oauth2 config is valid.
-func (o *OAuth2) Validate() error {
-	switch o.GetProvider() {
-	case OAuth2ProviderAzure:
+func (o *oauth2Config) Validate() error {
+	switch o.getProvider() {
+	case oauth2ProviderAzure:
 		return o.validateAzureProvider()
-	case OAuth2ProviderGoogle:
+	case oauth2ProviderGoogle:
 		return o.validateGoogleProvider()
-	case OAuth2ProviderDefault:
+	case oauth2ProviderDefault:
 		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
 			return errors.New("invalid configuration: both token_url and client credentials must be provided")
 		}
 	default:
-		return fmt.Errorf("invalid configuration: unknown provider %q", o.GetProvider())
+		return fmt.Errorf("invalid configuration: unknown provider %q", o.getProvider())
 	}
 	return nil
 }
@@ -151,7 +154,7 @@ func (o *OAuth2) Validate() error {
 // findDefaultGoogleCredentials will default to google.FindDefaultCredentials and will only be changed for testing purposes
 var findDefaultGoogleCredentials = google.FindDefaultCredentials
 
-func (o *OAuth2) validateGoogleProvider() error {
+func (o *oauth2Config) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != "" ||
 		o.AzureTenantID != "" || o.AzureResource != "" || len(o.EndpointParams) > 0 {
 		return errors.New("invalid configuration: none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead")
@@ -161,9 +164,6 @@ func (o *OAuth2) validateGoogleProvider() error {
 	if len(o.GoogleCredentialsJSON) > 0 {
 		if o.GoogleDelegatedAccount != "" {
 			return errors.New("invalid configuration: google.delegated_account can only be provided with a jwt_file")
-		}
-		if !json.Valid(o.GoogleCredentialsJSON) {
-			return errors.New("invalid configuration: google.credentials_json must be valid JSON")
 		}
 		return nil
 	}
@@ -191,7 +191,7 @@ func (o *OAuth2) validateGoogleProvider() error {
 	return fmt.Errorf("invalid configuration: no authentication credentials were configured or detected (ADC)")
 }
 
-func (o *OAuth2) populateCredentialsJSONFromFile(file string) error {
+func (o *oauth2Config) populateCredentialsJSONFromFile(file string) error {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		return fmt.Errorf("invalid configuration: the file %q cannot be found", file)
 	}
@@ -210,7 +210,7 @@ func (o *OAuth2) populateCredentialsJSONFromFile(file string) error {
 	return nil
 }
 
-func (o *OAuth2) validateAzureProvider() error {
+func (o *oauth2Config) validateAzureProvider() error {
 	if o.TokenURL == "" && o.AzureTenantID == "" {
 		return errors.New("invalid configuration: at least one of token_url or tenant_id must be provided")
 	}

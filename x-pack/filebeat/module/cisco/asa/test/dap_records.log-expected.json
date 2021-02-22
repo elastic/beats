@@ -24,6 +24,9 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
         "related.ip": [
             "1.2.3.4"
         ],
@@ -32,6 +35,7 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",

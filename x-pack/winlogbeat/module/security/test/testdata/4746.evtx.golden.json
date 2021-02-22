@@ -3,19 +3,22 @@
     "@timestamp": "2019-12-18T16:31:01.6117458Z",
     "event": {
       "action": "added-member-to-distribution-group",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4746,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "change",
-        "group"
+        "group",
+        "change"
       ]
     },
     "group": {
       "domain": "TEST",
+      "id": "S-1-5-21-1717121054-434620538-60925301-2903",
       "name": "testdistlocal1"
     },
     "host": {
@@ -33,7 +36,15 @@
     "user": {
       "domain": "TEST",
       "id": "S-1-5-21-1717121054-434620538-60925301-2794",
-      "name": "at_adm"
+      "name": "at_adm",
+      "target": {
+        "group": {
+          "domain": "TEST",
+          "id": "S-1-5-21-1717121054-434620538-60925301-2903",
+          "name": "testdistlocal1"
+        },
+        "name": "Administrator"
+      }
     },
     "winlog": {
       "api": "wineventlog",

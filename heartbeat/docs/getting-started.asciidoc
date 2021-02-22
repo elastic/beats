@@ -62,8 +62,8 @@ Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see
 
 You configure each monitor individually. In +{beatname_lc}.yml+, specify the
 list of monitors that you want to enable. Each item in the list begins with a
-dash (-). The following example configures Heartbeat to use two monitors, an
-`icmp` monitor and a `tcp` monitor:
+dash (-). The following example configures Heartbeat to use three monitors: an
+`icmp` monitor, a `tcp` monitor, and an `http` monitor.
 
 [source,yaml]
 ----------------------------------------------------------------------
@@ -81,7 +81,7 @@ heartbeat.monitors:
 - type: http
   schedule: '@every 5s'
   urls: ["http://example.net"]
-  service_name: apm-service-name <4>
+  service.name: apm-service-name <4>
   id: my-http-service
   name: My HTTP Service
 ----------------------------------------------------------------------
@@ -92,13 +92,47 @@ https://github.com/gorhill/cronexpr#implementation[this `cronexpr` implementatio
 was started. Heartbeat adds the `@every` keyword to the syntax provided by the
 `cronexpr` package.
 <3> The `mode` specifies whether to ping one IP (`any`) or all resolvable IPs
-<4> The `service_name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
+<4> The `service.name` field can be used to integrate heartbeat with elastic APM via the Uptime UI.
+
+include::{libbeat-dir}/shared/config-check.asciidoc[]
+
+[float]
+[[configurelocation]]
+=== Step 4: Configure the Heartbeat location
+
+Heartbeat can be deployed in multiple locations so that you can detect 
+differences in availability and response times across those locations.
+Configure the Heartbeat location to allow {kib} to display location-specific
+information on Uptime maps and perform Uptime anomaly detection based
+on location.
+
+To configure the location of a Heartbeat instance, modify the 
+`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
+example specifies the `geo.name` of the `add_observer_metadata` processor as
+`us-east-1a`:
+
+[source,yaml]
+----------------------------------------------------------------------
+# ============================ Processors ============================
+
+processors:
+  - add_observer_metadata:
+      # Optional, but recommended geo settings for the location Heartbeat is running in
+      geo: <1>
+        # Token describing this location
+        name: us-east-1a <2>
+        # Lat, Lon "
+        #location: "37.926868, -78.024902" <3>
+----------------------------------------------------------------------
+<1> Uncomment the `geo` setting.
+<2> Uncomment `name` and assign the name of the location of the Heartbeat server.
+<3> Optionally uncomment `location` and assign the latitude and longitude.
 
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
 [[setup-assets]]
-=== Step 4: Set up assets
+=== Step 5: Set up assets
 
 {beatname_uc} comes with predefined assets for parsing, indexing, and
 visualizing your data. To load these assets:
@@ -128,7 +162,7 @@ environment. If you're using a different output, such as {ls}, see
 
 [float]
 [[start]]
-=== Step 5: Start Heartbeat
+=== Step 6: Start Heartbeat
 
 Before starting {beatname_uc}, modify the user credentials in
 +{beatname_lc}.yml+ and specify a user who is
@@ -145,7 +179,7 @@ events to your defined output.
 
 [float]
 [[view-data]]
-=== Step 6: View your data in {kib}
+=== Step 7: View your data in {kib}
 
 {beatname_uc} comes with pre-built {kib} dashboards and UIs for visualizing the
 status of your services. The dashboards are available in the

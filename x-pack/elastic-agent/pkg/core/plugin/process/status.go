@@ -28,15 +28,12 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		return
 	}
 
-	a.setStateFromProto(status, msg, payload)
+	a.setState(state.FromProto(status), msg, payload)
 	if status == proto.StateObserved_FAILED {
 		// ignore when expected state is stopping
 		if s.Expected() == proto.StateExpected_STOPPING {
 			return
 		}
-
-		// it was a crash, cleanup anything required
-		go a.cleanUp()
 
 		// kill the process
 		if a.state.ProcessInfo != nil {

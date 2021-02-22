@@ -244,3 +244,7 @@ func stripNewLineWin(msg *reader.Message) {
 		return r == '\n' || r == '\r'
 	})
 }
+
+func (p *DockerJSONReader) Close() error {
+	return p.reader.Close()
+}

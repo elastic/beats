@@ -1,9 +1,7 @@
 import os
+import pytest
 import sys
 import unittest
-from nose.plugins.attrib import attr
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../tests/system'))
 from xpack_metricbeat import XPackTest, metricbeat
 
 
@@ -18,7 +16,7 @@ class Test(XPackTest):
     COMPOSE_SERVICES = ['mssql']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_status(self):
         """
         MSSQL module outputs an event.
@@ -47,7 +45,7 @@ class Test(XPackTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @attr('integration')
+    @pytest.mark.tag('integration')
     def test_performance(self):
         """
         MSSQL module outputs an event.

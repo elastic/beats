@@ -32,3 +32,17 @@
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
+
+# Istio istiod to monitor the Istio Daemon for versions after 1.5 of Istio.
+- module: istio
+  metricsets: ['istiod']
+  period: 10s
+  # use istiod.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
+  hosts: ['localhost:15014']
+
+# Istio proxy to monitor Envoy sidecars for versions after 1.5 of Istio.
+- module: istio
+  metricsets: ['proxy']
+  period: 10s
+  # it's recommended to deploy this metricset with autodiscovery, see metricset's docs for more info
+  hosts: ['localhost:15090']

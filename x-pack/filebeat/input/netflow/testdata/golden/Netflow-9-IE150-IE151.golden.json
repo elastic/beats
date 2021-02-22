@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-12-01T17:04:39Z",
           "kind": "event",
           "type": [
             "connection"
@@ -94,7 +93,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-12-01T17:04:39Z",
           "kind": "event",
           "type": [
             "connection"

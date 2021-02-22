@@ -37,7 +37,7 @@ const (
 	InitialCheckinTimeout = 5 * time.Second
 	// CheckinMinimumTimeoutGracePeriod is additional time added to the client.CheckinMinimumTimeout
 	// to ensure the application is checking in correctly.
-	CheckinMinimumTimeoutGracePeriod = 2 * time.Second
+	CheckinMinimumTimeoutGracePeriod = 30 * time.Second
 	// WatchdogCheckLoop is the amount of time that the watchdog will wait between checking for
 	// applications that have not checked in the correct amount of time.
 	WatchdogCheckLoop = 5 * time.Second
@@ -249,9 +249,13 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 	}()
 
 	var ok bool
+	var observedConfigStateIdx uint64
 	var firstCheckin *proto.StateObserved
 	select {
 	case firstCheckin, ok = <-firstCheckinChan:
+		if firstCheckin != nil {
+			observedConfigStateIdx = firstCheckin.ConfigStateIdx
+		}
 		break
 	case <-time.After(InitialCheckinTimeout):
 		// close connection
@@ -281,6 +285,13 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 		s.logger.Debug("check-in stream cannot connect, application is being destroyed; closing connection")
 		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
 	}
+
+	// application is running as a service and counter is already counting
+	// force config reload
+	if observedConfigStateIdx > 0 {
+		appState.expectedConfigIdx = observedConfigStateIdx + 1
+	}
+
 	checkinDone := make(chan bool)
 	appState.checkinDone = checkinDone
 	appState.checkinLock.Unlock()
@@ -526,6 +537,7 @@ func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
 // the application times out during stop and ErrApplication
 func (as *ApplicationState) Stop(timeout time.Duration) error {
 	as.checkinLock.Lock()
+	wasConn := as.checkinDone != nil
 	cfgIdx := as.statusConfigIdx
 	as.expected = proto.StateExpected_STOPPING
 	as.checkinLock.Unlock()
@@ -548,8 +560,10 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 		s := as.status
 		doneChan := as.checkinDone
 		as.checkinLock.RUnlock()
-		if s == proto.StateObserved_STOPPING && doneChan == nil {
-			// sent stopping and now is disconnected (so its stopped)
+		if (wasConn && doneChan == nil) || (!wasConn && s == proto.StateObserved_STOPPING && doneChan == nil) {
+			// either occurred
+			// * client was connected then disconnected on stop
+			// * client was not connected; connected; received stopping; then disconnected
 			as.Destroy()
 			return nil
 		}
@@ -891,11 +905,12 @@ func (s *Server) getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, err
 
 // getListenAddr returns the listening address of the server.
 func (s *Server) getListenAddr() string {
-	if s.listenAddr != ":0" {
-		return s.listenAddr
+	addr := strings.SplitN(s.listenAddr, ":", 2)
+	if len(addr) == 2 && addr[1] == "0" {
+		port := s.listener.Addr().(*net.TCPAddr).Port
+		return fmt.Sprintf("%s:%d", addr[0], port)
 	}
-	port := s.listener.Addr().(*net.TCPAddr).Port
-	return fmt.Sprintf(":%d", port)
+	return s.listenAddr
 }
 
 type pendingAction struct {

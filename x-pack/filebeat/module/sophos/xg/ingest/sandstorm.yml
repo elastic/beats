@@ -1,0 +1,131 @@
+description: Pipeline for parsing sophos firewall logs (sandbox pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.action
+    value: "{{sophos.xg.log_subtype}}"
+    if: "ctx.sophos?.xg?.log_subtype != null"
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx.sophos?.xg?.log_subtype != null"
+- set:
+    field: event.kind
+    value: alert
+    if: 'ctx.sophos?.xg?.log_subtype == "Denied"'
+- append:
+    field: event.category
+    value:
+      - malware
+      - network
+    if: 'ctx.sophos?.xg?.log_subtype == "Denied"'
+- append:
+    field: event.category
+    value: network
+    if: "ctx.sophos?.xg?.log_subtype != 'Denied'"
+- append:
+    field: event.type
+    value: allowed
+    if: "['Allowed'].contains(ctx.sophos?.xg?.log_subtype)"
+- append:
+    field: event.type
+    value:
+      - start
+      - connection
+    if: "['pending'].contains(ctx.sophos?.xg?.reason)"
+- append:
+    field: event.type
+    value:
+      - end
+      - connection
+    if: "ctx.sophos?.xg?.reason == 'eligible'"
+- append:
+    field: event.type
+    value:
+      - denied
+      - connection
+    if: "ctx.sophos?.xg?.log_subtype == 'Denied'"
+- rename:
+    field: sophos.xg.log_id
+    target_field: event.code
+    ignore_missing: true
+    if: "ctx.event?.code == null"
+
+###############################
+## ECS Client/Source Mapping ##
+###############################
+- rename:
+    field: sophos.xg.src_ip
+    target_field: source.ip
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.src_ip != null"
+- set:
+    field: client.ip
+    value: '{{source.ip}}'
+    if: "ctx.source?.ip != null"
+- rename:
+    field: sophos.xg.user_name
+    target_field: source.user.name
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.user_name != null"
+
+######################
+## ECS File Mapping ##
+######################
+- rename:
+    field: sophos.xg.filename
+    target_field: file.name
+    ignore_missing: true
+    if: "ctx.sopho?.xg?.filename != null"
+- convert:
+    field: sophos.xg.filesize
+    target_field: file.size
+    type: long
+    ignore_failure: true
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.filesize != null"
+- rename:
+    field: sophos.xg.filetype
+    target_field: file.mime_type
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.filetype != null"
+- rename:
+    field: sophos.xg.sha1sum
+    target_field: file.hash.sha1
+    ignore_missing: true
+    if: "ctx.sophos?.xg?.sha1sum != null"
+
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    allow_duplicates: false
+    if: "ctx.source?.ip != null"
+- append:
+    field: related.user
+    value: "{{source.user.name}}"
+    allow_duplicates: false
+    if: "ctx.source?.user?.name != null"
+- append:
+    field: related.hash
+    value: "{{file.hash.sha1}}"
+    allow_duplicates: false
+    if: "ctx.file?.hash?.sha1 != null"
+- remove:
+    field:
+    - sophos.xg.filesize
+    ignore_missing: true
+#############
+## Cleanup ##
+#############
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -61,3 +61,109 @@ remote_write:
         # Disable validation of the server certificate.
         #insecure_skip_verify: true
 ------------------------------------------------------------------------------
+
+
+[float]
+[role="xpack"]
+=== Histograms and types
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+metricbeat.modules:
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+-------------------------------------------------------------------------------------
+
+`use_types` parameter (default: false) enables a different layout for metrics storage, leveraging Elasticsearch
+types, including https://www.elastic.co/guide/en/elasticsearch/reference/current/histogram.html[histograms].
+
+`rate_counters` parameter (default: false) enables calculating a rate out of Prometheus counters. When enabled, Metricbeat stores
+the counter increment since the last collection. This metric should make some aggregations easier and with better
+performance. This parameter can only be enabled in combination with `use_types`.
+
+When `use_types` and `rate_counters` are enabled, metrics are stored like this:
+
+[source,json]
+----
+{
+    "prometheus": {
+        "labels": {
+            "instance": "172.27.0.2:9090",
+            "job": "prometheus"
+        },
+        "prometheus_target_interval_length_seconds_count": {
+            "counter": 1,
+            "rate": 0
+        },
+        "prometheus_target_interval_length_seconds_sum": {
+            "counter": 15.000401344,
+            "rate": 0
+        }
+        "prometheus_tsdb_compaction_chunk_range_seconds_bucket": {
+            "histogram": {
+                "values": [50, 300, 1000, 4000, 16000],
+                "counts": [10, 2, 34, 7]
+            }
+        }
+    },
+}
+----
+
+
+[float]
+==== Types' patterns
+
+Unlike `collector` metricset, `remote_write` receives metrics in raw format from the prometheus server.
+In this, the module has to internally use a heuristic in order to identify efficiently the type of each raw metric.
+For these purpose some name patterns are used in order to identify the type of each metric.
+The default patterns are the following:
+
+. `_total` suffix: the metric is of Counter type
+. `_sum` suffix: the metric is of Counter type
+. `_count` suffix: the metric is of Counter type
+. `_bucket` suffix and `le` in labels: the metric is of Histogram type
+
+Everything else is handled as a Gauge. In addition there is no special handling for Summaries so it is expected that
+Summary's quantiles are handled as Gauges and Summary's sum and count as Counters.
+
+Users have the flexibility to add their own patterns using the following configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+metricbeat.modules:
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+  types_patterns:
+    counter_patterns: ["_my_counter_suffix"]
+    histogram_patterns: ["_my_histogram_suffix"]
+-------------------------------------------------------------------------------------
+
+The configuration above will consider metrics with names that match `_my_counter_suffix` as Counters
+and those that match `_my_histogram_suffix` (and have `le` in their labels) as Histograms.
+
+
+To match only specific metrics, anchor the start and the end of the regexp of each metric:
+
+- the caret `^` matches the beginning of a text or line,
+- the dollar sign `$` matches the end of a text.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+metricbeat.modules:
+- module: prometheus
+  metricsets: ["remote_write"]
+  host: "localhost"
+  port: "9201"
+  types_patterns:
+    histogram_patterns: ["^my_histogram_metric$"]
+-------------------------------------------------------------------------------------
+
+Note that when using `types_patterns`, the provided patterns have higher priority than the default patterns.
+For instance if `_histogram_total` is a defined histogram pattern, then a metric like `network_bytes_histogram_total`
+will be handled as a histogram, even if it has the suffix `_total` which is a default pattern for counters.

@@ -56,6 +56,9 @@ type Watcher interface {
 
 	// Store returns the store object for the watcher
 	Store() cache.Store
+
+	// Client returns the kubernetes client object used by the watcher
+	Client() kubernetes.Interface
 }
 
 // WatchOptions controls watch behaviors
@@ -66,6 +69,11 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
+	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
+	// vs what does not.
+	IsUpdated func(old, new interface{}) bool
+	// HonorReSyncs allows resync events to be requeued on the worker
+	HonorReSyncs bool
 }
 
 type item struct {
@@ -100,6 +108,19 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	queue = workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), objType)
 	ctx, cancel := context.WithCancel(context.Background())
 
+	if opts.IsUpdated == nil {
+		opts.IsUpdated = func(o, n interface{}) bool {
+			old, _ := accessor.ResourceVersion(o.(runtime.Object))
+			new, _ := accessor.ResourceVersion(n.(runtime.Object))
+
+			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
+			if old != new {
+				return true
+			}
+			return false
+		}
+	}
+
 	w := &watcher{
 		client:   client,
 		informer: informer,
@@ -119,12 +140,17 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 			w.enqueue(o, delete)
 		},
 		UpdateFunc: func(o, n interface{}) {
-			old, _ := accessor.ResourceVersion(o.(runtime.Object))
-			new, _ := accessor.ResourceVersion(n.(runtime.Object))
-
-			// Only enqueue changes that have a different resource versions to avoid processing resyncs.
-			if old != new {
+			if opts.IsUpdated(o, n) {
 				w.enqueue(n, update)
+			} else if opts.HonorReSyncs {
+				// HonorReSyncs ensure that at the time when the kubernetes client does a "resync", i.e, a full list of all
+				// objects we make sure that autodiscover processes them. Why is this necessary? An effective control loop works
+				// based on two state changes, a list and a watch. A watch is triggered each time the state of the system changes.
+				// However, there is no guarantee that all events from a watch are processed by the receiver. To ensure that missed events
+				// are properly handled, a period re-list is done to ensure that every state within the system is effectively handled.
+				// In this case, we are making sure that we are enqueueing an "add" event because, an runner that is already in Running
+				// state should just be deduped by autodiscover and not stop/started periodically as would be the case with an update.
+				w.enqueue(n, add)
 			}
 		},
 	})
@@ -140,6 +166,11 @@ func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 // Store returns the store object for the resource that is being watched
 func (w *watcher) Store() cache.Store {
 	return w.store
+}
+
+// Client returns the kubernetes client object used by the watcher
+func (w *watcher) Client() kubernetes.Interface {
+	return w.client
 }
 
 // Start watching pods
@@ -175,6 +206,10 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	key, err := cache.DeletionHandlingMetaNamespaceKeyFunc(obj)
 	if err != nil {
 		return
+	}
+	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
+		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
+		obj = deleted.Obj
 	}
 	w.queue.Add(&item{key, obj, state})
 }

@@ -100,4 +100,13 @@
   period: 300s
   application_id: ''
   api_key: ''
+  metrics:
+    - id: ["requests/count", "requests/duration"]
 
+- module: azure
+  metricsets:
+    - app_state
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''

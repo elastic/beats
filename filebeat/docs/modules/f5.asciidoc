@@ -12,7 +12,11 @@ This file is generated! See scripts/docs_collector.py
 
 experimental[]
 
-This is a module for receiving Big-IP Access Policy Manager logs over Syslog or a file.
+This is a module for F5 network device's logs. It includes the following
+filesets for receiving logs over syslog or read from a file:
+
+- `bigipapm` fileset: supports F5 Big-IP Access Policy Manager.
+- `bigipafm` fileset: supports F5 Big-IP Advanced Firewall Manager.
 
 include::../include/gs-link.asciidoc[]
 
@@ -56,7 +60,7 @@ offset so that datetimes are correctly parsed. Valid values are in the form
 *`var.rsa_fields`*::
 
 Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
+which causes both ECS and custom fields under `rsa` to be added.
 
 *`var.keep_raw_fields`*::
 
@@ -68,11 +72,11 @@ will be found under `rsa.raw`. The default is false.
 :fileset_ex!:
 
 [float]
-==== `firepass` fileset settings
+==== `bigipafm` fileset settings
 
 experimental[]
 
-NOTE: This was converted from RSA NetWitness log parser XML "firepass" device revision 0.
+NOTE: This was converted from RSA NetWitness log parser XML "bigipafm" device revision 121.
 
 *`var.input`*::
 
@@ -86,7 +90,7 @@ Set to `0.0.0.0` to bind to all available interfaces.
 
 *`var.syslog_port`*::
 
-The port to listen for syslog traffic. Defaults to `9509`
+The port to listen for syslog traffic. Defaults to `9528`
 
 NOTE: Ports below 1024 require Filebeat to run as root.
 
@@ -101,7 +105,7 @@ offset so that datetimes are correctly parsed. Valid values are in the form
 *`var.rsa_fields`*::
 
 Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
+which causes both ECS and custom fields under `rsa` to be added.
 
 *`var.keep_raw_fields`*::
 

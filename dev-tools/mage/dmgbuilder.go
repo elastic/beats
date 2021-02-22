@@ -109,8 +109,16 @@ func (b *dmgBuilder) buildBeatPkg() error {
 
 	// Copy files into the packaging root and set their mode.
 	for _, f := range b.Files {
+		if f.Symlink {
+			// not supported, handling symlink in post/pre install scripts
+			continue
+		}
+
 		target := filepath.Join(beatPkgRoot, f.Target)
 		if err := Copy(f.Source, target); err != nil {
+			if f.SkipOnMissing && errors.Is(err, os.ErrNotExist) {
+				continue
+			}
 			return err
 		}
 

@@ -1,4 +1,4 @@
-FROM golang:1.14.4
+FROM golang:1.15.8
 
 RUN \
     apt-get update \
@@ -10,8 +10,6 @@ RUN \
          python3-pip \
          python3-venv \
       && rm -rf /var/lib/apt/lists/*
-
-ENV PYTHON_ENV=/tmp/python-env
 
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade setuptools==47.3.2

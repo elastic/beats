@@ -26,7 +26,8 @@ services:
       - ES_MONITORING_HOST=elasticsearch_monitoring
       - ES_MONITORING_PORT=9200
       - ES_HOST_SSL=elasticsearchssl
-      - ES_KERBEROS_HOST=elasticsearch_kerberos.elastic
+      # See https://github.com/elastic/beats/issues/21838
+      # - ES_KERBEROS_HOST=elasticsearch_kerberos.elastic
       - ES_PORT_SSL=9200
       - ES_SUPERUSER_USER=admin
       - ES_SUPERUSER_PASS=changeme
@@ -43,7 +44,8 @@ services:
     image: busybox
     depends_on:
       elasticsearch:                  { condition: service_healthy }
-      elasticsearch_kerberos.elastic: { condition: service_healthy }
+      # See https://github.com/elastic/beats/issues/21838
+      # elasticsearch_kerberos.elastic: { condition: service_healthy }
       elasticsearch_monitoring:       { condition: service_healthy }
       elasticsearchssl:               { condition: service_healthy }
       logstash:                       { condition: service_healthy }
@@ -65,8 +67,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200"]
-
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
   elasticsearchssl:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
@@ -129,34 +130,34 @@ services:
     environment:
       - ADVERTISED_HOST=kafka
 
-  elasticsearch_kerberos.elastic:
-    build: ${ES_BEATS}/testing/environments/docker/elasticsearch_kerberos
-    healthcheck:
-      test: bash -c "/healthcheck.sh"
-      retries: 1200
-      interval: 5s
-      start_period: 60s
-    environment:
-      - "TERM=linux"
-      - "ELASTIC_PASSWORD=changeme"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.security.krb5.conf=/etc/krb5.conf"
-      - "network.host="
-      - "transport.host=127.0.0.1"
-      - "http.host=0.0.0.0"
-      - "xpack.security.enabled=true"
-      - "indices.id_field_data.enabled=true"
-      - "xpack.license.self_generated.type=trial"
-      - "xpack.security.authc.realms.kerberos.ELASTIC.order=1"
-      - "xpack.security.authc.realms.kerberos.ELASTIC.keytab.path=/usr/share/elasticsearch/config/HTTP_elasticsearch_kerberos.elastic.keytab"
-    hostname: elasticsearch_kerberos.elastic
-    volumes:
-      # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
-      - /dev/urandom:/dev/random
-    ports:
-      - 1088
-      - 1749
-      - 9200
-    command: bash -c "/start.sh"
+  # elasticsearch_kerberos.elastic:
+  #   build: ${ES_BEATS}/testing/environments/docker/elasticsearch_kerberos
+  #   healthcheck:
+  #     test: bash -c "/healthcheck.sh"
+  #     retries: 1200
+  #     interval: 5s
+  #     start_period: 60s
+  #   environment:
+  #     - "TERM=linux"
+  #     - "ELASTIC_PASSWORD=changeme"
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Djava.security.krb5.conf=/etc/krb5.conf"
+  #     - "network.host="
+  #     - "transport.host=127.0.0.1"
+  #     - "http.host=0.0.0.0"
+  #     - "xpack.security.enabled=true"
+  #     - "indices.id_field_data.enabled=true"
+  #     - "xpack.license.self_generated.type=trial"
+  #     - "xpack.security.authc.realms.kerberos.ELASTIC.order=1"
+  #     - "xpack.security.authc.realms.kerberos.ELASTIC.keytab.path=/usr/share/elasticsearch/config/HTTP_elasticsearch_kerberos.elastic.keytab"
+  #   hostname: elasticsearch_kerberos.elastic
+  #   volumes:
+  #     # This is needed otherwise there won't be enough entropy to generate a new kerberos realm
+  #     - /dev/urandom:/dev/random
+  #   ports:
+  #     - 1088
+  #     - 1749
+  #     - 9200
+  #   command: bash -c "/start.sh"
 
   kibana:
     extends:

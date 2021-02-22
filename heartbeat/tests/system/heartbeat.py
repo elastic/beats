@@ -2,11 +2,6 @@ import os
 import sys
 import http.server
 import threading
-import nose.tools
-
-sys.path.append(os.path.join(os.path.dirname(
-    __file__), '../../../libbeat/tests/system'))
-
 from beat.beat import TestCase
 from time import sleep
 
@@ -69,7 +64,7 @@ class BaseTest(TestCase):
         return self.working_dir + "/monitors.d/"
 
     def assert_last_status(self, status):
-        nose.tools.eq_(self.last_output_line()["monitor.status"], status)
+        self.assertEqual(self.last_output_line()["monitor.status"], status)
 
     def setup_dynamic(self, extra_beat_args=[]):
         os.mkdir(self.monitors_dir())

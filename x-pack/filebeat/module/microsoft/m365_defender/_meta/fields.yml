@@ -1,0 +1,176 @@
+- name: microsoft.m365_defender
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for ingesting Microsoft Defender ATP.
+  fields:
+    - name: incidentId
+      type: keyword
+      description: >
+        Unique identifier to represent the incident.
+    - name: redirectIncidentId
+      type: keyword
+      description: >
+        Only populated in case an incident is being grouped together with another incident, as part of the incident processing logic.
+    - name: incidentName
+      type: keyword
+      description: >
+        Name of the Incident.
+    - name: determination
+      type: keyword
+      description: >
+        Specifies the determination of the incident. The property values are: NotAvailable, Apt, Malware, SecurityPersonnel, SecurityTesting, UnwantedSoftware, Other.
+    - name: investigationState
+      type: keyword
+      description: >
+        The current state of the Investigation.
+    - name: assignedTo
+      type: keyword
+      description: >
+        Owner of the alert.
+    - name: tags
+      type: keyword
+      description: >
+        Array of custom tags associated with an incident, for example to flag a group of incidents with a common characteristic.
+    - name: status
+      type: keyword
+      description: >
+        Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
+    - name: classification
+      type: keyword
+      description: >
+        Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
+    - name: alerts.incidentId
+      type: keyword
+      description: >
+        Unique identifier to represent the incident this alert is associated with.
+    - name: alerts.resolvedTime
+      type: date
+      description: >
+        Time when alert was resolved.
+    - name: alerts.status
+      type: keyword
+      description: >
+        Categorize alerts (as New, Active, or Resolved).
+    - name: alerts.severity
+      type: keyword
+      description: >
+        The severity of the related alert.
+    - name: alerts.creationTime
+      type: date
+      description: >
+        Time when alert was first created.
+    - name: alerts.lastUpdatedTime
+      type: date
+      description: >
+        Time when alert was last updated.
+    - name: alerts.investigationId
+      type: keyword
+      description: >
+        The automated investigation id triggered by this alert.
+    - name: alerts.userSid
+      type: keyword
+      description: >
+        The SID of the related user
+    - name: alerts.detectionSource
+      type: keyword
+      description: >
+        The service that initially detected the threat.
+    - name: alerts.classification
+      type: keyword
+      description: >
+        The specification for the incident. The property values are: Unknown, FalsePositive, TruePositive or null.
+    - name: alerts.investigationState
+      type: keyword
+      description: >
+        Information on the investigation's current status.
+    - name: alerts.determination
+      type: keyword
+      description: >
+        Specifies the determination of the incident. The property values are: NotAvailable, Apt, Malware, SecurityPersonnel, SecurityTesting, UnwantedSoftware, Other or null
+    - name: alerts.assignedTo
+      type: keyword
+      description: >
+        Owner of the incident, or null if no owner is assigned.
+    - name: alerts.actorName
+      type: keyword
+      description: >
+        The activity group, if any, the associated with this alert.
+    - name: alerts.threatFamilyName
+      type: keyword
+      description: >
+        Threat family associated with this alert.
+    - name: alerts.mitreTechniques
+      type: keyword
+      description: >
+        The attack techniques, as aligned with the MITRE ATT&CK™ framework.
+    - name: alerts.entities.entityType
+      type: keyword
+      description: >
+        Entities that have been identified to be part of, or related to, a given alert. The properties values are: User, Ip, Url, File, Process, MailBox, MailMessage, MailCluster, Registry.
+    - name: alerts.entities.accountName
+      type: keyword
+      description: >
+        Account name of the related user.
+    - name: alerts.entities.mailboxDisplayName
+      type: keyword
+      description: >
+        The display name of the related mailbox.
+    - name: alerts.entities.mailboxAddress
+      type: keyword
+      description: >
+        The mail address of the related mailbox.
+    - name: alerts.entities.clusterBy
+      type: keyword
+      description: >
+        A list of metadata if the entityType is MailCluster.
+    - name: alerts.entities.sender
+      type: keyword
+      description: >
+        The sender for the related email message.
+    - name: alerts.entities.recipient
+      type: keyword
+      description: >
+        The recipient for the related email message.
+    - name: alerts.entities.subject
+      type: keyword
+      description: >
+        The subject for the related email message.
+    - name: alerts.entities.deliveryAction
+      type: keyword
+      description: >
+        The delivery status for the related email message.
+    - name: alerts.entities.securityGroupId
+      type: keyword
+      description: >
+        The Security Group ID for the user related to the email message.
+    - name: alerts.entities.securityGroupName
+      type: keyword
+      description: >
+        The Security Group Name for the user related to the email message.
+    - name: alerts.entities.registryHive
+      type: keyword
+      description: >
+        Reference to which Hive in registry the event is related to, if eventType is registry. Example: HKEY_LOCAL_MACHINE.
+    - name: alerts.entities.registryKey
+      type: keyword
+      description: >
+        Reference to the related registry key to the event.
+    - name: alerts.entities.registryValueType
+      type: keyword
+      description: >
+        Value type of the registry key/value pair related to the event.
+    - name: alerts.entities.deviceId
+      type: keyword
+      description: >
+        The unique ID of the device related to the event.
+    - name: alerts.entities.ipAddress
+      type: keyword
+      description: >
+        The related IP address to the event.
+    - name: alerts.devices
+      type: flattened
+      description: >
+          The devices related to the investigation.
+

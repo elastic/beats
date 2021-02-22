@@ -3,13 +3,17 @@
     "@timestamp": "2020-04-06T06:38:31.1087891Z",
     "event": {
       "action": "privileged-operation",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4674,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "admin"
+      "type": [
+        "admin"
+      ]
     },
     "host": {
       "name": "DC_TEST2k12.TEST.SAAS"

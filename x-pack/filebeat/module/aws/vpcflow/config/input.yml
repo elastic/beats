@@ -1,6 +1,6 @@
-{{ if eq .input "s3" }}
+{{ if eq .input "aws-s3" }}
 
-type: s3
+type: aws-s3
 queue_url: {{ .queue_url }}
 
 {{ if .credential_profile_name }}
@@ -37,6 +37,14 @@ session_token: {{ .session_token }}
 
 {{ if .role_arn }}
 role_arn: {{ .role_arn }}
+{{ end }}
+
+{{ if .fips_enabled }}
+fips_enabled: {{ .fips_enabled }}
+{{ end }}
+
+{{ if .max_number_of_messages }}
+max_number_of_messages: {{ .max_number_of_messages }}
 {{ end }}
 
 {{ else if eq .input "file" }}
@@ -173,4 +181,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.8.0
