@@ -18535,7 +18535,7 @@ alias to: elasticsearch.ml.job.id
 --
 type: alias
 
-alias to: elasticsearch.ml.job.forecasts.stats.total
+alias to: elasticsearch.ml.job.forecasts_stats.total
 
 --
 
@@ -19824,6 +19824,13 @@ type: long
 +
 --
 type: long
+
+--
+
+*`elasticsearch.ccr.read_exceptions`*::
++
+--
+type: nested
 
 --
 
