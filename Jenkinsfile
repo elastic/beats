@@ -436,14 +436,12 @@ def e2e(Map args = [:]) {
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
-        status = sh(script: ".ci/scripts/${entrypoint}",
-                    label: "Run functional tests ${entrypoint}",
-                    returnStatus: true)
-      }
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
-      if (status != 0) {
-        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+        try {
+          sh(script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}")
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+          archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+        }
       }
     }
   }
