@@ -1,8 +1,8 @@
 [{
     "version": 1.0,
     "handlerEnvironment": {
-        "logFolder": "../../../tests/logs",
-        "configFolder": "../../../tests/config",
+        "logFolder": "/home/azureuser/sln/tests/logs",
+        "configFolder": "/home/azureuser/sln/tests/config",
         "statusFolder": "<your status folder location>",
         "heartbeatFile": "<your heartbeat file location>",
         "deploymentid": "<deployment id for the vm>",

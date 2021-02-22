@@ -3,22 +3,25 @@ set -euo pipefail
 script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
+checkOS
+
 install_dependencies
 # Install Elastic Agent
-install_es_ag_deb()
+install_es_agent_deb()
 {
     local OS_SUFFIX="-amd64"
-    local PACKAGE="elastic-agent-${STACK_VERSION}${OS_SUFFIX}.deb"
     local ALGORITHM="512"
-    local SHASUM="$PACKAGE.sha$ALGORITHM"
-    local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
-    local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
+
     get_cloud_stack_version
     if [ $STACK_VERSION = "" ]; then
        log "ERROR" "[install_es_ag_deb] Stack version could not be found"
       exit 1
     else
     log "INFO" "[install_es_ag_deb] installing Elastic Agent $STACK_VERSION"
+    local PACKAGE="elastic-agent-${STACK_VERSION}${OS_SUFFIX}.deb"
+    local SHASUM="$PACKAGE.sha$ALGORITHM"
+    local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
+    local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
@@ -47,16 +50,20 @@ install_es_ag_deb()
  fi
 }
 
-install_es_ag_rpm()
+install_es_agent_rpm()
 {
     local OS_SUFFIX="-x86_64"
-    local PACKAGE="elastic-agent-${STACK_VERSION}${OS_SUFFIX}.rpm"
     local ALGORITHM="512"
-    local SHASUM="$PACKAGE.sha$ALGORITHM"
-    local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
-    local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
-
-    log "INFO" "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION"
+    get_cloud_stack_version
+    if [ $STACK_VERSION = "" ]; then
+       log "ERROR" "[install_es_ag_deb] Stack version could not be found"
+      exit 1
+    else
+      local PACKAGE="elastic-agent-${STACK_VERSION}${OS_SUFFIX}.rpm"
+      local SHASUM="$PACKAGE.sha$ALGORITHM"
+      local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
+      local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
+      log "INFO" "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
@@ -81,9 +88,11 @@ install_es_ag_rpm()
 
     sudo rpm -vi $PACKAGE
     log "INFO" "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION"
+      fi
+
 }
 
-install_es_ag_linux()
+install_es_agent_linux()
 {
     local OS_SUFFIX="-linux-x86_64"
     local PACKAGE="elastic-agent-${STACK_VERSION}${OS_SUFFIX}.tar.gz"
@@ -119,18 +128,17 @@ install_es_ag_linux()
     log "INFO" "[install_es_ag_linux] installed Elastic Agent $STACK_VERSION"
 }
 
-checkOS
+
 
 # Enroll Elastic Agent
 enroll_es_agent() {
   get_kibana_host
   get_username
   get_password
-   if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
+   if [ "$KIBANA_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
   local ENROLLMENT_TOKEN_ID=""
   local ENROLLMENT_TOKEN=""
   jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u ${USERNAME}:${PASSWORD} )
-
       local EXITCODE=$?
       if [ $EXITCODE -ne 0 ]; then
         log "ERROR" "[enroll_es_agent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"
@@ -162,11 +170,11 @@ else
 
 
 if [ "$DISTRO_OS" = "DEB" ]; then
-    install_es_ag_deb
+    install_es_agent_deb
 elif [ "$DISTRO_OS" = "RPM" ]; then
-    install_es_ag_rpm
+    install_es_agent_rpm
 else
-  install_es_ag_linux
+  install_es_agent_linux
 fi
 
 log "INFO" "[es_agent_start] enrolling Elastic Agent $STACK_VERSION"

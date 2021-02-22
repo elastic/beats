@@ -16,21 +16,21 @@ checkOS()
   if dpkg -S /bin/ls >/dev/null 2>&1
 then
   DISTRO_OS="DEB"
-  log "[checkOS] distro is $DISTRO_OS" "INFO"
+  echo "[checkOS] distro is $DISTRO_OS" "INFO"
 elif rpm -q -f /bin/ls >/dev/null 2>&1
 then
   DISTRO_OS="RPM"
-   log "[checkOS] distro is $DISTRO_OS" "INFO"
+   echo "[checkOS] distro is $DISTRO_OS" "INFO"
 else
   DISTRO_OS="OTHER"
-   log "[checkOS] distro is $DISTRO_OS" "INFO"
+   echo "[checkOS] distro is $DISTRO_OS" "INFO"
 fi
 }
 
 install_dependencies() {
   checkOS
-
 if [ "$DISTRO_OS" = "DEB" ]; then
+  sudo apt-get update
   if [ $(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   sudo apt-get --yes install  curl;
   fi
@@ -38,8 +38,11 @@ if [ "$DISTRO_OS" = "DEB" ]; then
   sudo apt-get --yes install  jq;
   fi
 elif [ "$DISTRO_OS" = "RPM" ]; then
+   #sudo yum update -y --disablerepo='*' --enablerepo='*microsoft*'
+
    if ! rpm -qa | grep -qw jq; then
-   yum install epel-release -y
+   #yum install epel-release -y
+   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
    yum install jq -y
 fi
 else
@@ -51,8 +54,10 @@ fi
 get_logs_location()
 {
   SCRIPT=$(readlink -f "$0")
-  ES_EXT_DIR=$(dirname "$SCRIPT")
-  ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
+  cmd_path=$(dirname "$SCRIPT")
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
+  echo $ES_EXT_DIR
+  #ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
 then
     LOGS_FOLDER=$(jq -r '.[0].handlerEnvironment.logFolder' $ES_EXT_DIR/HandlerEnvironment.json)
@@ -97,12 +102,12 @@ checkShasum ()
 
 get_configuration_location()
 {
-
   SCRIPT=$(readlink -f "$0")
-  ES_EXT_DIR=$(dirname "$SCRIPT")
+  cmd_path=$(dirname "$SCRIPT")
+    ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
   log "[get_configuration_location] main directory found $ES_EXT_DIR" "INFO"
   log "[get_configuration_location] looking for HandlerEnvironment.json file" "INFO"
-  ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
+  #ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
 
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
 then
@@ -215,9 +220,6 @@ get_cloud_stack_version () {
     exit 1
 fi
 }
-
-
-
 
 
 

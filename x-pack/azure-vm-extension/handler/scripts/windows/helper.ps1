@@ -239,3 +239,43 @@ do {
 }
 while ($trials -lt $Retries)
 }
+
+function Decrypt
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param(
+        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $EncryptedBase64String,
+        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $CertThumbprint
+    )
+    # Decrypts cipher text using the private key
+    # Assumes the certificate is in the LocalMachine\My (Personal) Store
+    $Cert = Get-ChildItem cert:\LocalMachine\My | where { $_.Thumbprint -eq $CertThumbprint }
+    if($Cert) {
+        $EncryptedByteArray = [Convert]::FromBase64String($EncryptedBase64String)
+        $ClearText = [System.Text.Encoding]::UTF8.GetString($Cert.PrivateKey.Decrypt($EncryptedByteArray,$true))
+    }
+    Else {Write-Error "Certificate with thumbprint: $CertThumbprint not found!"}
+
+    Return $ClearText
+}
+
+Function Encrypt {
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param(
+        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $ClearText,
+        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][ValidateScript({Test-Path $_ -PathType Leaf})][System.String]
+        $PublicCertFilePath
+    )
+    # Encrypts a string with a public key
+    $PublicCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($PublicCertFilePath)
+    $ByteArray = [System.Text.Encoding]::UTF8.GetBytes($ClearText)
+    $EncryptedByteArray = $PublicCert.PublicKey.Key.Encrypt($ByteArray,$true)
+    $Base64String = [Convert]::ToBase64String($EncryptedByteArray)
+
+    Return $Base64String
+}
