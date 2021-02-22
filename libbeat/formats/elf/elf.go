@@ -42,7 +42,7 @@ type Info struct {
 }
 
 // Parse parses the elf file and returns information about it or errors.
-func Parse(r io.ReaderAt) (*Info, error) {
+func Parse(r io.ReaderAt) (interface{}, error) {
 	elfFile, err := elf.NewFile(r)
 	if err != nil {
 		return nil, err

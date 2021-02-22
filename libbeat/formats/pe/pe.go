@@ -70,7 +70,7 @@ func getPacker(f *pe.File) string {
 }
 
 // Parse parses the PE and returns information about it or errors.
-func Parse(r io.ReaderAt) (*Info, error) {
+func Parse(r io.ReaderAt) (interface{}, error) {
 	peFile, err := pe.NewFile(r)
 	if err != nil {
 		return nil, err

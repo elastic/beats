@@ -36,7 +36,7 @@ type Info struct {
 }
 
 // Parse parses the mach-o file and returns information about it or errors.
-func Parse(r io.ReaderAt) (*Info, error) {
+func Parse(r io.ReaderAt) (interface{}, error) {
 	machoFiles := []*macho.File{}
 	machoFatFile, err := macho.NewFatFile(r)
 	if err != nil {

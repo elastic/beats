@@ -32,6 +32,16 @@ const (
 	maxHeaderSize = 8192
 )
 
+var addedTypes = map[string]func([]byte) bool{
+	"application/x-ms-shortcut": lnk,
+}
+
+func init() {
+	for mimeType, matcher := range addedTypes {
+		filetype.AddMatcher(filetype.NewType(mimeType, mimeType), matcher)
+	}
+}
+
 // DetectBytes tries to detect a mime-type based off
 // of a chunk of bytes passed into the function
 func DetectBytes(data []byte) string {

@@ -182,7 +182,7 @@ type Info struct {
 }
 
 // Parse parses the LNK file and returns information about it or errors.
-func Parse(r io.ReaderAt) (*Info, error) {
+func Parse(r io.ReaderAt) (interface{}, error) {
 	header, offset, err := parseHeader(r)
 	if err != nil {
 		return nil, err
