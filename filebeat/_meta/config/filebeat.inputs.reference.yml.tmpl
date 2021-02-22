@@ -119,6 +119,11 @@ filebeat.inputs:
   # in case of conflicts.
   #json.overwrite_keys: false
 
+  # If this setting is enabled, then keys in the decoded JSON object will be recursively
+  # de-dotted, and expanded into a hierarchical object structure.
+  # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+  #json.expand_keys: false
+
   # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
   # be used.

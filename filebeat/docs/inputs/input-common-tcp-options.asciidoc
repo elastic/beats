@@ -17,6 +17,17 @@ The maximum size of the message received over TCP. The default is `20MiB`.
 The host and TCP port to listen on for event streams.
 
 [float]
+[id="{beatname_lc}-input-{type}-tcp-framing"]
+==== `framing`
+
+Specify the framing used to split incoming events.  Can be one of
+`delimiter` or `rfc6587`.  `delimiter` uses the characters specified
+in `line_delimiter` to split the incoming events.  `rfc6587` supports
+octet counting and non-transparent framing as described in
+https://tools.ietf.org/html/rfc6587[RFC6587].  `line_delimiter` is
+used to split the events in non-transparent framing.  The default is `delimiter`.
+
+[float]
 [id="{beatname_lc}-input-{type}-tcp-line-delimiter"]
 ==== `line_delimiter`
 

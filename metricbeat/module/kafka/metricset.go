@@ -49,7 +49,7 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 
 	var tls *tls.Config
 	if tlsCfg != nil {
-		tls = tlsCfg.BuildModuleConfig("")
+		tls = tlsCfg.BuildModuleClientConfig("")
 	}
 
 	timeout := base.Module().Config().Timeout

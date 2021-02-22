@@ -82,8 +82,7 @@ func TestInitKibanaConfig(t *testing.T) {
 	err = cfg.Unpack(&b.Config)
 	assert.NoError(t, err)
 
-	kibanaConfig, err := initKibanaConfig(b.Config)
-	assert.NoError(t, err)
+	kibanaConfig := InitKibanaConfig(b.Config)
 	username, err := kibanaConfig.String("username", -1)
 	password, err := kibanaConfig.String("password", -1)
 	protocol, err := kibanaConfig.String("protocol", -1)

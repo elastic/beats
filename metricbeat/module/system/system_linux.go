@@ -24,12 +24,12 @@ import (
 	"github.com/elastic/gosigar"
 )
 
-func initModule() {
-	configureHostFS()
+func initModule(config Config) {
+	configureHostFS(config)
 }
 
-func configureHostFS() {
-	dir := *HostFS
+func configureHostFS(config Config) {
+	dir := config.HostFS
 	if dir == "" {
 		dir = "/"
 	}

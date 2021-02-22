@@ -92,6 +92,7 @@ func GolangCrossBuild(params BuildArgs) error {
 	}
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
+	defer DockerChown(filepath.Join(params.OutputDir))
 	return Build(params)
 }
 

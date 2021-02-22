@@ -121,6 +121,21 @@ func TestParseURL(t *testing.T) {
 		}
 	})
 
+	t.Run("http+npipe short with", func(t *testing.T) {
+		rawURL := "http+npipe:///custom"
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "")
+		if assert.NoError(t, err) {
+			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
+			assert.True(t, ok)
+			assert.Equal(t, `\\.\pipe\custom`, transport.Path)
+			assert.Equal(t, "http://npipe/apath", hostData.URI)
+			assert.Equal(t, "http://npipe/apath", hostData.SanitizedURI)
+			assert.Equal(t, "npipe", hostData.Host)
+			assert.Equal(t, "", hostData.User)
+			assert.Equal(t, "", hostData.Password)
+		}
+	})
+
 	t.Run("npipe", func(t *testing.T) {
 		rawURL := "npipe://./pipe/docker_engine"
 		hostData, err := ParseURL(rawURL, "tcp", "", "", "", "")

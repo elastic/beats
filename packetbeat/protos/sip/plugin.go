@@ -178,7 +178,9 @@ func (p *plugin) buildEvent(m *message, pkt *protos.Packet) (*beat.Event, error)
 
 	src, dst := m.getEndpoints()
 	pbf.SetSource(src)
+	pbf.AddIP(src.IP)
 	pbf.SetDestination(dst)
+	pbf.AddIP(dst.IP)
 
 	p.populateEventFields(m, pbf, sipFields)
 

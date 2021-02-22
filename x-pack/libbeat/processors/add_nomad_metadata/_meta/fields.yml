@@ -1,0 +1,58 @@
+- key: nomad
+  title: Nomad
+  description: >
+    Information collected from Nomad.
+  short_config: false
+  anchor: nomad-processor
+  fields:
+    - name: nomad
+      type: group
+      fields:
+        - name: allocation.id
+          type: keyword
+          description: >
+            Unique identifier of the allocation.
+        - name: allocation.name
+          type: keyword
+          description: >
+            Name of the allocation.
+        - name: allocation.status
+          type: keyword
+          description: >
+            Status of the allocation.
+        - name: datacenter
+          type: keyword
+          description: >
+            Datacenter where the allocation is deployed.
+        - name: job.name
+          type: keyword
+          description: >
+            Name of the job to which the allocation belongs.
+        - name: job.type
+          type: keyword
+          description: >
+            Type of the job to which the allocation belongs (service, batch...).
+        - name: namespace
+          type: keyword
+          description: >
+            Namespace where the allocation is deployed.
+        - name: region
+          type: keyword
+          description: >
+            Region where the allocation is deployed.
+        - name: task.name
+          type: keyword
+          description: >
+            Name of the task.
+        - name: task.service.name
+          type: keyword
+          description: >
+            Names of the services associated to this task.
+        - name: task.service.tags
+          type: keyword
+          description: >
+            Tags of the services associated to this task.
+        - name: task.service.canary_tags
+          type: keyword
+          description: >
+            Canary tags of the services associated to this task.

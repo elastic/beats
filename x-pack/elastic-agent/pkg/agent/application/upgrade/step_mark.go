@@ -7,6 +7,7 @@ package upgrade
 import (
 	"context"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -20,7 +21,8 @@ import (
 
 const markerFilename = ".update-marker"
 
-type updateMarker struct {
+// UpdateMarker is a marker holding necessary information about ongoing upgrade.
+type UpdateMarker struct {
 	// Hash agent is updated to
 	Hash string `json:"hash" yaml:"hash"`
 	//UpdatedOn marks a date when update happened
@@ -44,7 +46,7 @@ func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) 
 		prevHash = prevHash[:hashLen]
 	}
 
-	marker := updateMarker{
+	marker := UpdateMarker{
 		Hash:        hash,
 		UpdatedOn:   time.Now(),
 		PrevVersion: prevVersion,
@@ -57,15 +59,65 @@ func (h *Upgrader) markUpgrade(ctx context.Context, hash string, action Action) 
 		return errors.New(err, errors.TypeConfig, "failed to parse marker file")
 	}
 
-	markerPath := filepath.Join(paths.Data(), markerFilename)
+	markerPath := markerFilePath()
 	if err := ioutil.WriteFile(markerPath, markerBytes, 0600); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to create update marker file", errors.M(errors.MetaKeyPath, markerPath))
 	}
 
+	if err := UpdateActiveCommit(hash); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateActiveCommit updates active.commit file to point to active version.
+func UpdateActiveCommit(hash string) error {
 	activeCommitPath := filepath.Join(paths.Top(), agentCommitFile)
 	if err := ioutil.WriteFile(activeCommitPath, []byte(hash), 0644); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to update active commit", errors.M(errors.MetaKeyPath, activeCommitPath))
 	}
 
 	return nil
+}
+
+// CleanMarker removes a marker from disk.
+func CleanMarker() error {
+	markerFile := markerFilePath()
+	if err := os.Remove(markerFile); !os.IsNotExist(err) {
+		return err
+	}
+
+	return nil
+}
+
+// LoadMarker loads marker, if it not exists,it return nil without an error
+func LoadMarker() (*UpdateMarker, error) {
+	markerFile := markerFilePath()
+	markerBytes, err := ioutil.ReadFile(markerFile)
+	if err != nil && os.IsNotExist(err) {
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
+	marker := &UpdateMarker{}
+	if err := yaml.Unmarshal(markerBytes, &marker); err != nil {
+		return nil, err
+	}
+
+	return marker, nil
+}
+
+func saveMarker(marker *UpdateMarker) error {
+	markerBytes, err := yaml.Marshal(marker)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(markerFilePath(), markerBytes, 0600)
+}
+
+func markerFilePath() string {
+	return filepath.Join(paths.Data(), markerFilename)
 }

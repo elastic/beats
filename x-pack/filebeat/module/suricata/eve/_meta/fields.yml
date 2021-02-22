@@ -182,6 +182,10 @@
     - name: alert
       type: group
       fields:
+      - name: metadata
+        type: flattened
+        description: Metadata about the alert.
+
       - name: category
         type: keyword
 
@@ -713,9 +717,6 @@
       - name: pkts_toserver
         type: alias
         path: source.packets
-
-      - name: end
-        type: date
 
       - name: alerted
         type: boolean

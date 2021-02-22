@@ -3,13 +3,17 @@
     "@timestamp": "2019-11-14T21:26:49.4961966Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 4689,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -65,13 +69,17 @@
     "@timestamp": "2019-11-14T21:27:46.9609089Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 4689,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -127,13 +135,17 @@
     "@timestamp": "2019-11-14T21:28:18.4605129Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": 4689,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"

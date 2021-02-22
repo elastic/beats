@@ -1,0 +1,184 @@
+[
+    {
+        "@timestamp": "2021-01-04T00:33:05.565Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 189000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "set log_temp_files = 0;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42798,
+        "postgresql.log.command_tag": "SET",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff26239.51",
+        "postgresql.log.session_start_time": "2021-01-04T00:32:57.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:33:05.565 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/0",
+        "process.pid": "81",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:33:15.885Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 204,
+        "message": "temporary file: path \"base/pgsql_tmp/pgsql_tmp81.3\", size 162381824",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42798,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "select * from generate_series(1, 3000) as t1(a), generate_series(1, 3000) as t2(a) order by 1 desc, 2;",
+        "postgresql.log.session_id": "5ff26239.51",
+        "postgresql.log.session_start_time": "2021-01-04T00:32:57.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:33:15.885 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/81",
+        "process.pid": "81",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:33:15.885Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 531,
+        "message": "temporary file: path \"base/pgsql_tmp/pgsql_tmp81.1\", size 42000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42798,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "select * from generate_series(1, 3000) as t1(a), generate_series(1, 3000) as t2(a) order by 1 desc, 2;",
+        "postgresql.log.session_id": "5ff26239.51",
+        "postgresql.log.session_start_time": "2021-01-04T00:32:57.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:33:15.885 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/81",
+        "process.pid": "81",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:33:15.885Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 854,
+        "message": "temporary file: path \"base/pgsql_tmp/pgsql_tmp81.2\", size 42000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42798,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query": "select * from generate_series(1, 3000) as t1(a), generate_series(1, 3000) as t2(a) order by 1 desc, 2;",
+        "postgresql.log.session_id": "5ff26239.51",
+        "postgresql.log.session_start_time": "2021-01-04T00:32:57.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:33:15.885 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/81",
+        "process.pid": "81",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:33:15.885Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 6921284096,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1177,
+        "message": "select * from generate_series(1, 3000) as t1(a), generate_series(1, 3000) as t2(a) order by 1 desc, 2;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42798,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff26239.51",
+        "postgresql.log.session_start_time": "2021-01-04T00:32:57.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:33:15.885 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/0",
+        "process.pid": "81",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    }
+]

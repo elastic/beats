@@ -61,11 +61,10 @@ func (m *ModuleV1) RunContainerReporter(reporter mb.PushReporterV2) {
 }
 
 func (m *ModuleV1) subscribe(eventType cfcommon.EventType, reporter mb.PushReporterV2) {
-	go m.run()
-	m.subscriptions <- subscription{
+	go m.run(subscription{
 		eventType: eventType,
 		reporter:  reporter,
-	}
+	})
 }
 
 func (m *ModuleV1) unsubscribe(eventType cfcommon.EventType, reporter mb.PushReporterV2) {
@@ -80,8 +79,11 @@ func (m *ModuleV1) callback(event cfcommon.Event) {
 	m.events <- event
 }
 
-func (m *ModuleV1) run() {
+// run ensures that the module is running with the passed subscription
+func (m *ModuleV1) run(s subscription) {
 	if !m.running.CAS(false, true) {
+		// Module is already running, queue subscription for current dispatcher.
+		m.subscriptions <- s
 		return
 	}
 	defer func() { m.running.Store(false) }()
@@ -90,6 +92,10 @@ func (m *ModuleV1) run() {
 	defer m.consumer.Stop()
 
 	dispatcher := newEventDispatcher(m.log)
+
+	// Ensure that the initial subscription is configured before starting the loop,
+	// this is specially relevant to make tests more deterministic.
+	dispatcher.handleSubscription(s)
 
 	for {
 		// Handle subscriptions and events dispatching on the same

@@ -18,8 +18,13 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The +{modulename}+ module was tested with logs from versions 9.5 on Ubuntu, 9.6
-on Debian, and finally 10.11, 11.4 and 12.2 on Arch Linux 9.3.
+This module comes in two flavours: a parser of log files based on Linux distribution
+defaults, and a CSV log parser, that you need to enable in database configuration.
+
+The +{modulename}+ module using `.log` was tested with logs from versions 9.5 on Ubuntu,
+ 9.6 on Debian, and finally 10.11, 11.4 and 12.2 on Arch Linux 9.3.
+
+The +{modulename}+ module using `.csv` was tested using versions 11 and 13 (distro is not relevant here).
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -70,6 +75,31 @@ The second one shows the slowlogs of PostgreSQL.
 image::./images/filebeat-postgresql-slowlog-overview.png[]
 
 :has-dashboards!:
+
+=== Using CSV logs
+
+Since the PostgreSQL CSV log file is a well-defined format,
+there is almost no configuration to be done in filebeat, just the filepath
+
+On the other hand, it's necessary to configure postgresql to emit `.csv` logs.
+The recommended parameters are:
+
+```
+logging_collector = 'on';
+log_destination = 'csvlog';
+log_statement = 'none';
+log_checkpoints = on;
+log_connections = on;
+log_disconnections = on;
+log_lock_waits = on;
+log_min_duration_statement = 0;
+```
+
+In busy servers, `log_min_duration_statement` can cause contention, so you can assign
+a value greater than 0.
+
+Both `log_connections` and `log_disconnections` can cause a lot of events if you don't have
+persistent connections, so enable with care.
 
 :fileset_ex!:
 

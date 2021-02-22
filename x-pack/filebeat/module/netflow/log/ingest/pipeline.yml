@@ -51,6 +51,26 @@ processors:
         field: destination.as.organization_name
         target_field: destination.as.organization.name
         ignore_missing: true
+  - set:
+        field: network.direction
+        value: inbound
+        if: 'ctx?.source?.locality == "external" && ctx?.destination?.locality == "internal"'
+  - set:
+        field: network.direction
+        value: outbound
+        if: 'ctx?.source?.locality == "internal" && ctx?.destination?.locality == "external"'
+  - set:
+        field: network.direction
+        value: internal
+        if: 'ctx?.source?.locality == "internal" && ctx?.destination?.locality == "internal"'
+  - set:
+        field: network.direction
+        value: external
+        if: 'ctx?.source?.locality == "external" && ctx?.destination?.locality == "external"'
+  - set:
+        field: network.direction
+        value: unknown
+        if: 'ctx?.network?.direction == null'
 
 on_failure:
   - set:

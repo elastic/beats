@@ -55,7 +55,7 @@ func Programs(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) (map
 
 	groupedPrograms := make(map[string][]Program)
 	for k, config := range grouped {
-		programs, err := detectPrograms(agentInfo, config)
+		programs, err := DetectPrograms(agentInfo, config)
 		if err != nil {
 			return nil, errors.New(err, errors.TypeConfig, "fail to generate program configuration")
 		}
@@ -65,33 +65,18 @@ func Programs(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) (map
 	return groupedPrograms, nil
 }
 
-func detectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) ([]Program, error) {
+// DetectPrograms returns the list of programs detected from the provided configuration.
+func DetectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) ([]Program, error) {
 	programs := make([]Program, 0)
 	for _, spec := range Supported {
 		specificAST := singleConfig.Clone()
-		err := spec.Rules.Apply(agentInfo, specificAST)
+		ok, err := DetectProgram(spec, agentInfo, specificAST)
 		if err != nil {
 			return nil, err
 		}
-
-		if len(spec.When) == 0 {
-			return nil, ErrMissingWhen
-		}
-
-		expression, err := eql.New(spec.When)
-		if err != nil {
-			return nil, err
-		}
-
-		ok, err := expression.Eval(specificAST)
-		if err != nil {
-			return nil, err
-		}
-
 		if !ok {
 			continue
 		}
-
 		program := Program{
 			Spec:   spec,
 			Config: specificAST,
@@ -99,7 +84,42 @@ func detectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST
 		programs = append(programs, program)
 	}
 	return programs, nil
+}
 
+// DetectProgram returns true or false if this program exists in the AST.
+//
+// Note `ast` is modified to match what the program expects. Should clone the AST before passing to
+// this function if you want to still have the original.
+func DetectProgram(spec Spec, info transpiler.AgentInfo, ast *transpiler.AST) (bool, error) {
+	if len(spec.Constraints) > 0 {
+		constraints, err := eql.New(spec.Constraints)
+		if err != nil {
+			return false, err
+		}
+		ok, err := constraints.Eval(ast)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, nil
+		}
+	}
+
+	err := spec.Rules.Apply(info, ast)
+	if err != nil {
+		return false, err
+	}
+
+	if len(spec.When) == 0 {
+		return false, ErrMissingWhen
+	}
+
+	expression, err := eql.New(spec.When)
+	if err != nil {
+		return false, err
+	}
+
+	return expression.Eval(ast)
 }
 
 // KnownProgramNames returns a list of runnable programs by the elastic-agent.
