@@ -13,6 +13,12 @@ services:
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
+    - "xpack.security.enabled=false"
+    - "indices.id_field_data.enabled=true"
+    - "script.context.template.max_compilations_rate=unlimited"
+    - "script.context.ingest.cache_max_size=2000"
+    - "script.context.processor_conditional.cache_max_size=2000"
+    - "script.context.template.cache_max_size=2000"
 
   logstash:
     image: docker.elastic.co/logstash/logstash-oss:8.0.0-SNAPSHOT
