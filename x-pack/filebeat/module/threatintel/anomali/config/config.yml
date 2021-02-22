@@ -12,7 +12,7 @@ auth.basic.password: {{ .password }}
 {{ end }}
 request.method: GET
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
 {{ end }}
 request.url: {{ .url }}
 request.redirect.forward_headers: true
@@ -32,7 +32,7 @@ request.transforms:
 - set:
     target: url.params.added_after
     value: '[[.cursor.timestamp]]'
-    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05.999Z" ]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05.000Z" ]]'
 
 response.split:
   target: body.objects
@@ -58,8 +58,10 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - decode_json_fields:
       fields: [message]
-      document_id: id
       target: json
+  - fingerprint:
+      fields: ["json.id"]
+      target_field: "@metadata._id"
   - add_fields:
       target: ''
       fields:
