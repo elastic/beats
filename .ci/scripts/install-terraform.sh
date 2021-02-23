@@ -7,8 +7,6 @@ TERRAFORM_VERSION=${TERRAFORM_VERSION:?$MSG}
 HOME=${HOME:?$MSG}
 TERRAFORM_CMD="${HOME}/bin/terraform"
 
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-
 if command -v terraform
 then
     echo "Found Terraform. Checking version.."
@@ -24,7 +22,19 @@ echo "UNMET DEP: Installing Terraform"
 
 mkdir -p "${HOME}/bin"
 
-if curl -sSLo - "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_amd64.zip" > ${TERRAFORM_CMD}.zip ; then
+OS=$(uname -s| tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m| tr '[:upper:]' '[:lower:]')
+if [ "${ARCH}" == "aarch64" ] ; then
+    ARCH_SUFFIX=arm64
+elif [ "${ARCH}" == "x86_64" ] ; then
+    ARCH_SUFFIX=amd64
+elif [ "${ARCH}" == "i686" ] ; then
+    ARCH_SUFFIX=386
+else
+    ARCH_SUFFIX=arm
+fi
+
+if curl -sSLo - "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${OS}_${ARCH_SUFFIX}.zip" > "${TERRAFORM_CMD}.zip" ; then
     unzip -o "${TERRAFORM_CMD}".zip -d "$(dirname ${TERRAFORM_CMD})"
     rm "${TERRAFORM_CMD}".zip
 
