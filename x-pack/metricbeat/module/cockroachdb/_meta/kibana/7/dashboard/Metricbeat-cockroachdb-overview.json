@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -48,7 +48,7 @@
             "panelIndex": "2",
             "panelRefName": "panel_1",
             "title": "SQL queries",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -64,7 +64,7 @@
             "panelIndex": "3",
             "panelRefName": "panel_2",
             "title": "Replicas per Store",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -80,7 +80,7 @@
             "panelIndex": "4",
             "panelRefName": "panel_3",
             "title": "Replica leaseholders",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -96,7 +96,7 @@
             "panelIndex": "5",
             "panelRefName": "panel_4",
             "title": "Ranges",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -112,7 +112,7 @@
             "panelIndex": "6",
             "panelRefName": "panel_5",
             "title": "Average log commit latency",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -128,7 +128,7 @@
             "panelIndex": "7",
             "panelRefName": "panel_6",
             "title": "Average command commit latency",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -144,7 +144,7 @@
             "panelIndex": "3b2a916c-213c-4179-93f6-067224d1f741",
             "panelRefName": "panel_7",
             "title": "Live Nodes",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -160,7 +160,7 @@
             "panelIndex": "725c9437-5d36-48bd-9328-e08637e42ac7",
             "panelRefName": "panel_8",
             "title": "Process Uptime",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -176,7 +176,7 @@
             "panelIndex": "7d37508a-3614-4c51-b8e1-84d9101a233b",
             "panelRefName": "panel_9",
             "title": "Capacity Usage",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -192,7 +192,7 @@
             "panelIndex": "3b319d88-1798-433b-9ab8-783c53d24423",
             "panelRefName": "panel_10",
             "title": "Disk Metrics",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -208,14 +208,13 @@
             "panelIndex": "7cf99937-570d-4132-ab15-204a547bd986",
             "panelRefName": "panel_11",
             "title": "Node Clock Offset",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat CockroachDB] Overview",
         "version": 1
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "04b595b0-c1fc-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
         "dashboard": "7.11.0"
@@ -286,8 +285,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-02-17T18:31:28.566Z",
-      "version": "WzI5MTgsMl0="
+      "updated_at": "2021-02-23T13:58:25.320Z",
+      "version": "WzIzNTYsMV0="
     },
     {
       "attributes": {
@@ -344,18 +343,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:10:09.109Z",
-      "version": "WzIzODAsMl0="
+      "updated_at": "2021-02-23T13:34:56.700Z",
+      "version": "WzEzOTQsMV0="
     },
     {
       "attributes": {
@@ -538,18 +536,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODYsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjQsMV0="
     },
     {
       "attributes": {
@@ -609,18 +606,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "bad285b0-9769-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODcsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjYsMV0="
     },
     {
       "attributes": {
@@ -678,18 +674,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "8add0960-976a-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODgsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjcsMV0="
     },
     {
       "attributes": {
@@ -816,18 +811,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "2af19b90-976c-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODksMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjgsMV0="
     },
     {
       "attributes": {
@@ -925,18 +919,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "74cf44b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTAsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjksMV0="
     },
     {
       "attributes": {
@@ -1034,18 +1027,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "b5ab45b0-9771-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4OTEsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MzAsMV0="
     },
     {
       "attributes": {
@@ -1104,7 +1096,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.liveness_livenodes",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -1128,18 +1120,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:34:29.612Z",
-      "version": "WzMzNTMsMl0="
+      "updated_at": "2021-02-23T13:53:25.710Z",
+      "version": "WzIwMjYsMV0="
     },
     {
       "attributes": {
@@ -1180,7 +1171,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sys_uptime",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "max"
                   }
@@ -1190,7 +1181,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "type": "timeseries",
                 "value_template": "{{value}} h"
               }
@@ -1205,18 +1196,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:32:59.495Z",
-      "version": "WzMyOTEsMl0="
+      "updated_at": "2021-02-23T13:54:51.798Z",
+      "version": "WzIxMDYsMV0="
     },
     {
       "attributes": {
@@ -1276,7 +1266,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.capacity",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "sum"
                   }
@@ -1312,7 +1302,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.capacity_available",
+                    "field": null,
                     "id": "775782d1-ec64-11ea-8a63-93b9b48262dc",
                     "type": "sum"
                   }
@@ -1338,7 +1328,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.capacity_used",
+                    "field": null,
                     "id": "78322b61-ec64-11ea-8a63-93b9b48262dc",
                     "type": "sum"
                   }
@@ -1364,18 +1354,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:34:45.059Z",
-      "version": "WzMzNjgsMl0="
+      "updated_at": "2021-02-23T13:53:40.881Z",
+      "version": "WzIwNDcsMV0="
     },
     {
       "attributes": {
@@ -1416,7 +1405,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sys_host_disk_iopsinprogress",
+                    "field": null,
                     "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "max",
                     "unit": "1s"
@@ -1442,7 +1431,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sys_host_disk_read_count",
+                    "field": null,
                     "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -1458,7 +1447,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "host.name",
+                "terms_field": null,
                 "terms_size": "100",
                 "type": "timeseries"
               },
@@ -1473,7 +1462,7 @@
                 "line_width": "2",
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sys_host_disk_write_count",
+                    "field": null,
                     "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -1489,7 +1478,7 @@
                 "split_color_mode": "gradient",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_order_by": "_key",
                 "type": "timeseries"
               }
@@ -1504,18 +1493,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:35:00.108Z",
-      "version": "WzMzODQsMl0="
+      "updated_at": "2021-02-23T13:53:59.248Z",
+      "version": "WzIwNjIsMV0="
     },
     {
       "attributes": {
@@ -1529,7 +1517,7 @@
             }
           }
         },
-        "title": "Dev Clock Offset [Metricbeat CockroachDB]",
+        "title": "Clock Offset [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1557,7 +1545,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.clock_offset_meannanos",
+                    "field": null,
                     "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
                     "type": "max"
                   }
@@ -1567,7 +1555,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "stacked",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
                 "type": "timeseries",
                 "value_template": "{{value}} ms"
@@ -1579,23 +1567,22 @@
             "tooltip_mode": "show_all",
             "type": "timeseries"
           },
-          "title": "Dev Clock Offset [Metricbeat CockroachDB]",
+          "title": "Clock Offset [Metricbeat CockroachDB]",
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:35:16.362Z",
-      "version": "WzMzOTgsMl0="
+      "updated_at": "2021-02-23T13:54:14.540Z",
+      "version": "WzIwNzYsMV0="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.11.1"
 }

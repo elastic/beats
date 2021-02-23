@@ -32,7 +32,7 @@
             "panelIndex": "1",
             "panelRefName": "panel_0",
             "title": "Number of SQL connections",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -49,7 +49,7 @@
             "panelIndex": "d5e26270-2ebe-45c2-9697-f7e24dcd8492",
             "panelRefName": "panel_1",
             "title": "SQL queries",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -66,7 +66,7 @@
             "panelIndex": "a63ed7f8-f4ea-411a-98d5-14427bf3237e",
             "panelRefName": "panel_2",
             "title": "Average Exec latency",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -83,7 +83,7 @@
             "panelIndex": "6660f8f4-c3af-4b56-9ecf-fffd8210a302",
             "panelRefName": "panel_3",
             "title": "Transactions",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -100,7 +100,7 @@
             "panelIndex": "98d6be7f-9aba-4181-a1a1-2152be085550",
             "panelRefName": "panel_4",
             "title": "SQL Bytes",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           },
           {
             "embeddableConfig": {
@@ -117,14 +117,13 @@
             "panelIndex": "f4c38787-07a3-431a-8b1e-df12214c5bec",
             "panelRefName": "panel_5",
             "title": "Schema Changes",
-            "version": "8.0.0-SNAPSHOT"
+            "version": "7.11.1"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat CockroachDB] SQL",
         "version": 1
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "3975ad70-c761-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
         "dashboard": "7.11.0"
@@ -165,8 +164,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-02-17T18:31:11.070Z",
-      "version": "WzI5MTcsMl0="
+      "updated_at": "2021-02-23T13:56:58.246Z",
+      "version": "WzIyOTQsMV0="
     },
     {
       "attributes": {
@@ -223,18 +222,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "79691920-9766-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:10:09.109Z",
-      "version": "WzIzODAsMl0="
+      "updated_at": "2021-02-23T13:34:56.700Z",
+      "version": "WzEzOTQsMV0="
     },
     {
       "attributes": {
@@ -417,18 +415,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-17T18:14:40.449Z",
-      "version": "WzI4ODYsMl0="
+      "updated_at": "2021-02-23T13:36:58.294Z",
+      "version": "WzE5MjQsMV0="
     },
     {
       "attributes": {
@@ -471,7 +468,7 @@
                 "metrics": [
                   {
                     "agg_with": "avg",
-                    "field": "prometheus.metrics.exec_latency_count",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "order": "desc",
                     "size": 1,
@@ -484,7 +481,7 @@
                     "unit": ""
                   },
                   {
-                    "field": "prometheus.metrics.exec_latency_sum",
+                    "field": null,
                     "id": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
                     "type": "max",
                     "unit": ""
@@ -518,7 +515,7 @@
                 "split_color_mode": "rainbow",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "type": "timeseries",
                 "value_template": "{{value}}ms"
               }
@@ -533,18 +530,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "89e96120-fe7a-11ea-a589-8d7d9f58c8fd",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:35:33.725Z",
-      "version": "WzM0MTAsMl0="
+      "updated_at": "2021-02-23T13:54:28.905Z",
+      "version": "WzIwOTEsMV0="
     },
     {
       "attributes": {
@@ -585,7 +581,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_txn_begin_count",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -601,7 +597,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "50",
                 "type": "timeseries"
               },
@@ -616,7 +612,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_txn_commit_count",
+                    "field": null,
                     "id": "1c074fc1-ccf0-11ea-8da4-c95c019bd9d5",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -631,7 +627,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "50",
                 "type": "timeseries"
               },
@@ -646,7 +642,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_txn_rollback_count",
+                    "field": null,
                     "id": "84ac4081-ccf0-11ea-8da4-c95c019bd9d5",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -661,7 +657,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "50",
                 "type": "timeseries"
               },
@@ -676,7 +672,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_txn_abort_count",
+                    "field": null,
                     "id": "9701db01-ccf0-11ea-8da4-c95c019bd9d5",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -691,7 +687,7 @@
                 "separate_axis": 0,
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "50",
                 "type": "timeseries"
               }
@@ -706,18 +702,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "61999c30-c766-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:33:24.171Z",
-      "version": "WzMzMTIsMl0="
+      "updated_at": "2021-02-23T13:58:36.680Z",
+      "version": "WzIzNzQsMV0="
     },
     {
       "attributes": {
@@ -758,7 +753,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_bytesin",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -774,7 +769,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "50",
                 "type": "timeseries",
                 "value_template": "{{value}}/s"
@@ -790,7 +785,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_bytesout",
+                    "field": null,
                     "id": "15553391-cd04-11ea-90ab-5112cd60bde7",
                     "type": "positive_rate",
                     "unit": "1s"
@@ -818,7 +813,7 @@
                 "split_color_mode": "kibana",
                 "split_mode": "terms",
                 "stacked": "none",
-                "terms_field": "service.address",
+                "terms_field": null,
                 "terms_size": "100",
                 "type": "timeseries",
                 "value_template": "{{value}}/s"
@@ -834,18 +829,17 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "7d13f0d0-c763-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:33:40.440Z",
-      "version": "WzMzMjgsMl0="
+      "updated_at": "2021-02-23T13:58:59.377Z",
+      "version": "WzIzOTMsMV0="
     },
     {
       "attributes": {
@@ -886,7 +880,7 @@
                 "line_width": 1,
                 "metrics": [
                   {
-                    "field": "prometheus.metrics.sql_ddl_count",
+                    "field": null,
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "type": "positive_rate",
                     "unit": ""
@@ -910,19 +904,18 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "8.0.0",
       "id": "6fdbdbe0-c767-11ea-8a94-61b423d19ae7",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-18T14:33:58.480Z",
-      "version": "WzMzNDAsMl0="
+      "updated_at": "2021-02-23T13:58:47.503Z",
+      "version": "WzIzODMsMV0="
     }
   ],
-  "version": "8.0.0-SNAPSHOT"
+  "version": "7.11.1"
 }
