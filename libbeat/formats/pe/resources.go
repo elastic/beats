@@ -163,7 +163,7 @@ func parseEntry(virtualAddress uint32, root string, global, base []byte, depth i
 		// to the locations of the compressed resouces outside of
 		// the Resource Data section
 		return []Resource{
-			Resource{Type: root, Language: languageName(language), Size: entrySize},
+			Resource{Type: root, Language: languageName(language)},
 		}, nil
 	}
 
@@ -171,7 +171,7 @@ func parseEntry(virtualAddress uint32, root string, global, base []byte, depth i
 	if err != nil {
 		// we have an invalid data reference, so just return what we can
 		return []Resource{
-			Resource{Type: root, Language: languageName(language), Size: entrySize},
+			Resource{Type: root, Language: languageName(language)},
 		}, nil
 	}
 	resourceData := data[0:entrySize]
@@ -181,7 +181,7 @@ func parseEntry(virtualAddress uint32, root string, global, base []byte, depth i
 		resourceMime = kind.MIME.Value
 	}
 	return []Resource{
-		Resource{Type: root, Language: languageName(language), Size: entrySize, data: resourceData, MIME: resourceMime, SHA256: hex.EncodeToString(hash[:])},
+		Resource{Type: root, Language: languageName(language), data: resourceData, FileType: resourceMime, SHA256: hex.EncodeToString(hash[:]), Entropy: common.Entropy(data), ChiSquare: common.ChiSquare(data)},
 	}, nil
 }
 

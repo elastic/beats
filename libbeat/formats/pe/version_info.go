@@ -109,10 +109,15 @@ func readStringFileInfo(data []byte) []VersionInfo {
 	return nil
 }
 
-func getVersionInfoForResources(resources []Resource) []VersionInfo {
+func getVersionInfoForResources(resources []Resource) map[string]string {
 	for _, resource := range resources {
 		if resource.Type == "RT_VERSION" {
-			return readStringFileInfo(resource.data)
+			versionInfo := readStringFileInfo(resource.data)
+			data := make(map[string]string, len(versionInfo))
+			for _, info := range versionInfo {
+				data[info.Name] = info.Value
+			}
+			return data
 		}
 	}
 	return nil

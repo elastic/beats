@@ -18,25 +18,14 @@
 package pe
 
 import (
-	"crypto/md5"
 	"debug/pe"
-	"encoding/hex"
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/formats/common"
+	"github.com/elastic/beats/v7/libbeat/formats/dwarf"
 )
-
-// Section contains information about a section in a PE file.
-type Section struct {
-	Name           string  `json:"name"`
-	VirtualAddress uint32  `json:"virtualAddress"`
-	VirtualSize    uint32  `json:"virtualSize"`
-	RawSize        uint32  `json:"rawSize"`
-	Entropy        float64 `json:"entropy"`
-	ChiSquare      float64 `json:"chi2"`
-	MD5            string  `json:"md5,omitempty"`
-}
 
 // Header contains information found in a PE header.
 type Header struct {
@@ -46,44 +35,89 @@ type Header struct {
 	ContainedSections    int        `json:"containedSections"`
 }
 
-// Resource represents a resource entry embedded in a PE file.
-type Resource struct {
-	Type     string `json:"type"`
-	Language string `json:"language"`
-	SHA256   string `json:"sha256,omitempty"`
-	MIME     string `json:"mime,omitempty"`
-	Size     int    `json:"size"`
-
-	data []byte
-}
-
 // VersionInfo hold keys and values parsed from the version info resource.
 type VersionInfo struct {
 	Name  string
 	Value string
 }
 
-// Info contains high level fingerprinting an analysis of a PE file.
-type Info struct {
-	Sections                     []Section           `json:"sections,omitempty"`
-	FileVersionInfo              []VersionInfo       `json:"version_info,omitempty"`
-	Header                       Header              `json:"header,omitempty"`
-	Imports                      map[string][]string `json:"imports,omitempty"`
-	Exports                      []string            `json:"exports,omitempty"`
-	ContainedResourcesByType     map[string]int      `json:"containedResourcesByType,omitempty"`
-	ContainedResourcesByLanguage map[string]int      `json:"containedResourcesByLanguage,omitempty"`
-	Resources                    []Resource          `json:"resources,omitempty"`
-	Packer                       string              `json:"packer,omitempty"`
-	ImpHash                      string              `json:"imphash,omitempty"`
+// Compiler contains compiler information about the object file
+type Compiler struct {
+	Version string `json:"version,omitempty"`
+	Name    string `json:"name,omitempty"`
 }
 
-func getPacker(f *pe.File) string {
+// ImportedSymbol contains information about where an imported symbol comes from
+type ImportedSymbol struct {
+	Library string `json:"library,omitempty"`
+	Name    string `json:"name,omitempty"`
+}
+
+// Section contains information about a section in a PE file.
+type Section struct {
+	Name           string   `json:"name"`
+	Flags          []string `json:"flags"`
+	VirtualAddress uint32   `json:"virtual_address"`
+	RawSize        uint32   `json:"raw_size,omitempty"`
+	Entropy        float64  `json:"entropy,omitempty"`
+	ChiSquare      float64  `json:"chi2,omitempty"`
+}
+
+// Resource represents a resource entry embedded in a PE file.
+type Resource struct {
+	Type      string  `json:"type"`
+	Language  string  `json:"language"`
+	SHA256    string  `json:"sha256"`
+	FileType  string  `json:"filetype,omitempty"`
+	Entropy   float64 `json:"entropy"`
+	ChiSquare float64 `json:"chi2"`
+
+	data []byte
+}
+
+// Icon holds fields that are used for fingerprinting embedded icons
+type Icon struct {
+	// leverage https://github.com/corona10/goimagehash
+	Dhash string `json:"dhash"`
+}
+
+// Info contains high level fingerprinting an analysis of a PE file.
+type Info struct {
+	CompilationTimestamp *time.Time       `json:"compile_timestamp,omitempty"`
+	Entrypoint           string           `json:"entrypoint"`
+	Exports              []string         `json:"exports,omitempty"`
+	Debug                []dwarf.DWARF    `json:"debug,omitempty"`
+	Imports              []ImportedSymbol `json:"imports,omitempty"`
+	Sections             []Section        `json:"sections,omitempty"`
+	Resources            []Resource       `json:"resources,omitempty"`
+	Packers              []string         `json:"packers,omitempty"`
+	ImpHash              string           `json:"imphash,omitempty"`
+	FileVersion          string           `json:"file_version,omitempty"`
+	Description          string           `json:"description,omitempty"`
+	Company              string           `json:"company,omitempty"`
+	OriginalFileName     string           `json:"original_file_name,omitempty"`
+	Product              string           `json:"product,omitempty"`
+	Architecture         string           `json:"architecture,omitempty"`
+
+	// Things that we should be able to get
+	// See https://github.com/lief-project/LIEF/blob/05103f55a6cb993cb20735da3c7a6333e4f600e3/src/PE/Binary.cpp#L1046
+	// Authentihash         string           `json:"authentihash,omitempty"`
+	// Compiler         *Compiler        `json:"compiler,omitempty"`
+	// RichHeaderHash   string           `json:"rich_header.hash.md5,omitempty"`
+	// Icons            []Icon           `json:"icon,omitempty"`
+
+	// Fields that are likely duplicated
+	// CreationDate         *time.Time       `json:"creation_date,omitempty"`
+	// MachineType          string           `json:"machine_type"`
+}
+
+func getPackers(f *pe.File) []string {
 	for _, section := range f.Sections {
 		if section.Name == "UPX0" {
-			return "upx"
+			return []string{"upx"}
 		}
 	}
-	return ""
+	return nil
 }
 
 // Parse parses the PE and returns information about it or errors.
@@ -112,6 +146,15 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 
 	exportSymbols := exports(peFile)
 	importSymbols, imphash := imphash(peFile)
+	imports := []ImportedSymbol{}
+	for library, symbols := range importSymbols {
+		for _, symbol := range symbols {
+			imports = append(imports, ImportedSymbol{
+				Library: library,
+				Name:    symbol,
+			})
+		}
+	}
 
 	sectionSize := len(peFile.Sections)
 	var compiledAt *time.Time
@@ -122,44 +165,57 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	}
 
 	info := &Info{
-		ImpHash: imphash,
-		Header: Header{
-			CompilationTimestamp: compiledAt,
-			Entrypoint:           entrypoint,
-			TargetMachine:        architecture,
-			ContainedSections:    sectionSize,
-		},
-		Sections:                     make([]Section, sectionSize),
-		ContainedResourcesByType:     make(map[string]int),
-		ContainedResourcesByLanguage: make(map[string]int),
-		Imports:                      importSymbols,
-		Exports:                      exportSymbols,
-		Packer:                       getPacker(peFile),
+		CompilationTimestamp: compiledAt,
+		Entrypoint:           fmt.Sprintf("%x", entrypoint),
+		Imports:              imports,
+		Exports:              exportSymbols,
+		Packers:              getPackers(peFile),
+		ImpHash:              imphash,
+		Architecture:         architecture,
+		Sections:             make([]Section, sectionSize),
 	}
-	for i, section := range peFile.Sections {
-		hashed := ""
-		data, err := section.Data()
+
+	if debug, err := peFile.DWARF(); err == nil {
+		// just ignore the error if we can't get DWARF information
+		debugSymbols, err := dwarf.Parse(debug)
 		if err == nil {
-			md5Hash := md5.Sum(data)
-			hashed = hex.EncodeToString(md5Hash[:])
+			info.Debug = debugSymbols
 		}
+	}
+
+	for i, section := range peFile.Sections {
+		data, _ := section.Data()
 		info.Sections[i] = Section{
 			Name:           section.Name,
 			VirtualAddress: section.VirtualAddress,
-			VirtualSize:    section.VirtualSize,
 			RawSize:        section.Size,
+			Flags:          translateSectionFlags(section.Characteristics),
 			Entropy:        common.Entropy(data),
 			ChiSquare:      common.ChiSquare(data),
-			MD5:            hashed,
 		}
 
 		if section.Name == ".rsrc" && len(data) > 0 {
 			info.Resources = parseDirectory(section.VirtualAddress, data)
-			for _, resource := range info.Resources {
-				countValue(info.ContainedResourcesByType, resource.Type)
-				countValue(info.ContainedResourcesByLanguage, resource.Language)
+			fileVersionInfo := getVersionInfoForResources(info.Resources)
+			if companyName, found := fileVersionInfo["CompanyName"]; found {
+				info.Company = companyName
 			}
-			info.FileVersionInfo = getVersionInfoForResources(info.Resources)
+			if fileDescription, found := fileVersionInfo["FileDescription"]; found {
+				info.Description = fileDescription
+			}
+			if fileVersion, found := fileVersionInfo["FileVersion"]; found {
+				info.FileVersion = fileVersion
+			}
+			if originalFilename, found := fileVersionInfo["OriginalFilename"]; found {
+				info.OriginalFileName = originalFilename
+			}
+			productName := fileVersionInfo["ProductName"]
+			if productVersion, found := fileVersionInfo["ProductVersion"]; productName != "" && found {
+				productName += " (" + productVersion + ")"
+			}
+			if productName != "" {
+				info.Product = productName
+			}
 		}
 	}
 	return info, nil

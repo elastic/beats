@@ -1,156 +1,425 @@
 {
+  "entrypoint": "14e0",
+  "imports": [
+    {
+      "library": "KERNEL32.dll",
+      "name": "DeleteCriticalSection"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "EnterCriticalSection"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "GetLastError"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "GetStartupInfoA"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "InitializeCriticalSection"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "IsDBCSLeadByteEx"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "LeaveCriticalSection"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "MultiByteToWideChar"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "SetUnhandledExceptionFilter"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "Sleep"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "TlsGetValue"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "VirtualProtect"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "VirtualQuery"
+    },
+    {
+      "library": "KERNEL32.dll",
+      "name": "WideCharToMultiByte"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__C_specific_handler"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "___lc_codepage_func"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "___mb_cur_max_func"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__getmainargs"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__initenv"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__iob_func"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__lconv_init"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__set_app_type"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "__setusermatherr"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_acmdln"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_amsg_exit"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_cexit"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_commode"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_errno"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_fmode"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_initterm"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_lock"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_onexit"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "_unlock"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "abort"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "calloc"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "exit"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "fprintf"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "fputc"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "free"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "fwrite"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "localeconv"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "malloc"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "memcpy"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "memset"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "signal"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "strerror"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "strlen"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "strncmp"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "vfprintf"
+    },
+    {
+      "library": "msvcrt.dll",
+      "name": "wcslen"
+    }
+  ],
   "sections": [
     {
       "name": ".text",
-      "virtualAddress": 4096,
-      "virtualSize": 27640,
-      "rawSize": 27648,
+      "flags": [
+        "IMAGE_SCN_CNT_CODE",
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_EXECUTE",
+        "IMAGE_SCN_MEM_READ"
+      ],
+      "virtual_address": 4096,
+      "raw_size": 27648,
       "entropy": 6.29,
-      "chi2": 225694.72,
-      "md5": "51e08255c411dc9a70cf264ce3759661"
+      "chi2": 225694.72
     },
     {
       "name": ".data",
-      "virtualAddress": 32768,
-      "virtualSize": 240,
-      "rawSize": 512,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ",
+        "IMAGE_SCN_MEM_WRITE"
+      ],
+      "virtual_address": 32768,
+      "raw_size": 512,
       "entropy": 0.95,
-      "chi2": 101000,
-      "md5": "f949bb1e31e9e86f683276c781b888f0"
+      "chi2": 101000
     },
     {
       "name": ".rdata",
-      "virtualAddress": 36864,
-      "virtualSize": 3488,
-      "rawSize": 3584,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ"
+      ],
+      "virtual_address": 36864,
+      "raw_size": 3584,
       "entropy": 4.4,
-      "chi2": 168406.57,
-      "md5": "665cbc21d76c304121bec35c0580b5e1"
+      "chi2": 168406.57
     },
     {
       "name": ".pdata",
-      "virtualAddress": 40960,
-      "virtualSize": 1152,
-      "rawSize": 1536,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ"
+      ],
+      "virtual_address": 40960,
+      "raw_size": 1536,
       "entropy": 3.34,
-      "chi2": 157780.33,
-      "md5": "c3b5c11cb92a79955c0da333ef10c693"
+      "chi2": 157780.33
     },
     {
       "name": ".xdata",
-      "virtualAddress": 45056,
-      "virtualSize": 1068,
-      "rawSize": 1536,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ"
+      ],
+      "virtual_address": 45056,
+      "raw_size": 1536,
       "entropy": 3.5,
-      "chi2": 89461.33,
-      "md5": "59455bf68d2c06503c957bda56cf1dcd"
+      "chi2": 89461.33
     },
     {
       "name": ".bss",
-      "virtualAddress": 49152,
-      "virtualSize": 2976,
-      "rawSize": 0,
-      "entropy": 0,
-      "chi2": 0,
-      "md5": "d41d8cd98f00b204e9800998ecf8427e"
+      "flags": [
+        "IMAGE_SCN_CNT_UNINITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ",
+        "IMAGE_SCN_MEM_WRITE"
+      ],
+      "virtual_address": 49152
     },
     {
       "name": ".idata",
-      "virtualAddress": 53248,
-      "virtualSize": 1844,
-      "rawSize": 2048,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ",
+        "IMAGE_SCN_MEM_WRITE"
+      ],
+      "virtual_address": 53248,
+      "raw_size": 2048,
       "entropy": 3.68,
-      "chi2": 152175,
-      "md5": "c0f302e044780a30e2b6196eadbc2738"
+      "chi2": 152175
     },
     {
       "name": ".CRT",
-      "virtualAddress": 57344,
-      "virtualSize": 104,
-      "rawSize": 512,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ",
+        "IMAGE_SCN_MEM_WRITE"
+      ],
+      "virtual_address": 57344,
+      "raw_size": 512,
       "entropy": 0.34,
-      "chi2": 120559,
-      "md5": "136383d4876c87c3e594ab86b9e86a25"
+      "chi2": 120559
     },
     {
       "name": ".tls",
-      "virtualAddress": 61440,
-      "virtualSize": 16,
-      "rawSize": 512,
-      "entropy": 0,
-      "chi2": 130560,
-      "md5": "bf619eac0cdf3f68d496ea9344137e8b"
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_8BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_2048BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_READ",
+        "IMAGE_SCN_MEM_WRITE"
+      ],
+      "virtual_address": 61440,
+      "raw_size": 512,
+      "chi2": 130560
     },
     {
       "name": ".reloc",
-      "virtualAddress": 65536,
-      "virtualSize": 140,
-      "rawSize": 512,
+      "flags": [
+        "IMAGE_SCN_CNT_INITIALIZED_DATA",
+        "IMAGE_SCN_ALIGN_1BYTES",
+        "IMAGE_SCN_ALIGN_2BYTES",
+        "IMAGE_SCN_ALIGN_4BYTES",
+        "IMAGE_SCN_ALIGN_16BYTES",
+        "IMAGE_SCN_ALIGN_32BYTES",
+        "IMAGE_SCN_ALIGN_64BYTES",
+        "IMAGE_SCN_ALIGN_256BYTES",
+        "IMAGE_SCN_ALIGN_512BYTES",
+        "IMAGE_SCN_ALIGN_1024BYTES",
+        "IMAGE_SCN_ALIGN_4096BYTES",
+        "IMAGE_SCN_ALIGN_8192BYTES",
+        "IMAGE_SCN_MEM_DISCARDABLE",
+        "IMAGE_SCN_MEM_READ"
+      ],
+      "virtual_address": 65536,
+      "raw_size": 512,
       "entropy": 1.61,
-      "chi2": 81624,
-      "md5": "41150a7033476b722bd47a9dbf5238b0"
+      "chi2": 81624
     }
   ],
-  "header": {
-    "entrypoint": 5344,
-    "targetMachine": "x64",
-    "containedSections": 10
-  },
-  "imports": {
-    "KERNEL32.dll": [
-      "DeleteCriticalSection",
-      "EnterCriticalSection",
-      "GetLastError",
-      "GetStartupInfoA",
-      "InitializeCriticalSection",
-      "IsDBCSLeadByteEx",
-      "LeaveCriticalSection",
-      "MultiByteToWideChar",
-      "SetUnhandledExceptionFilter",
-      "Sleep",
-      "TlsGetValue",
-      "VirtualProtect",
-      "VirtualQuery",
-      "WideCharToMultiByte"
-    ],
-    "msvcrt.dll": [
-      "__C_specific_handler",
-      "___lc_codepage_func",
-      "___mb_cur_max_func",
-      "__getmainargs",
-      "__initenv",
-      "__iob_func",
-      "__lconv_init",
-      "__set_app_type",
-      "__setusermatherr",
-      "_acmdln",
-      "_amsg_exit",
-      "_cexit",
-      "_commode",
-      "_errno",
-      "_fmode",
-      "_initterm",
-      "_lock",
-      "_onexit",
-      "_unlock",
-      "abort",
-      "calloc",
-      "exit",
-      "fprintf",
-      "fputc",
-      "free",
-      "fwrite",
-      "localeconv",
-      "malloc",
-      "memcpy",
-      "memset",
-      "signal",
-      "strerror",
-      "strlen",
-      "strncmp",
-      "vfprintf",
-      "wcslen"
-    ]
-  },
-  "imphash": "8eb8d513fcdab15ac9a267576668cb1c"
+  "imphash": "8eb8d513fcdab15ac9a267576668cb1c",
+  "architecture": "x64"
 }
