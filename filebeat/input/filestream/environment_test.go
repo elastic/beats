@@ -105,10 +105,32 @@ func (e *inputTestingEnvironment) mustWriteLinesToFile(filename string, lines []
 	}
 }
 
+func (e *inputTestingEnvironment) mustAppendLinesToFile(filename string, lines []byte) {
+	path := e.abspath(filename)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		e.t.Fatalf("failed to open file '%s': %+v", path, err)
+	}
+	defer f.Close()
+
+	_, err = f.Write(lines)
+	if err != nil {
+		e.t.Fatalf("append lines to file '%s': %+v", path, err)
+	}
+}
+
 func (e *inputTestingEnvironment) mustRenameFile(oldname, newname string) {
 	err := os.Rename(e.abspath(oldname), e.abspath(newname))
 	if err != nil {
 		e.t.Fatalf("failed to rename file '%s': %+v", oldname, err)
+	}
+}
+
+func (e *inputTestingEnvironment) mustRemoveFile(filename string) {
+	path := e.abspath(filename)
+	err := os.Remove(path)
+	if err != nil {
+		e.t.Fatalf("failed to rename file '%s': %+v", path, err)
 	}
 }
 
@@ -127,6 +149,32 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 	identifier, _ := newINodeDeviceIdentifier(nil)
 	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
 	entry := e.getRegistryState(src.Name())
+
+	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+}
+
+func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
+	filepath := e.abspath(filename)
+	fi, err := os.Stat(filepath)
+	if err != nil {
+		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
+	}
+
+	inputStore, _ := e.stateStore.Access()
+
+	identifier, _ := newINodeDeviceIdentifier(nil)
+	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+
+	var entry registryEntry
+	err = inputStore.Get(src.Name(), &entry)
+	if err == nil {
+		e.t.Fatalf("key is not expected to be present '%s'", src.Name())
+	}
+}
+
+// requireOffsetInRegistry checks if the expected offset is set for a file.
+func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expectedOffset int) {
+	entry := e.getRegistryState(key)
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
@@ -155,6 +203,30 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+}
+
+// requireEventReceived requires that the list of messages has made it into the output.
+func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
+	foundEvents := make([]bool, len(events))
+	checkedEventCount := 0
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			message := evt.Fields["message"].(string)
+			if message == events[checkedEventCount] {
+				foundEvents[checkedEventCount] = true
+			}
+			checkedEventCount += 1
+		}
+	}
+
+	var missingEvents []string
+	for i, found := range foundEvents {
+		if !found {
+			missingEvents = append(missingEvents, events[i])
+		}
+	}
+
+	require.Equal(e.t, 0, len(missingEvents), "following events are missing: %+v", missingEvents)
 }
 
 type testInputStore struct {
