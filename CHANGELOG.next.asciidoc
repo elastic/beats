@@ -165,6 +165,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Suricata EVE: Convert `suricata.eve.flow_id` to string because the field is a keyword in the mapping. {pull}23424[23424]
 - Zeek DNS: Ignore failures in data type conversions. And change `dns.id` JSON field to a string to match its `keyword` mapping. {pull}23424[23424]
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
+- Add check for empty values in azure module. {pull}24156[24156]
+
+*Filebeat*
+
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
