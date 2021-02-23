@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -114,12 +115,19 @@ func (a *addFileDataProcessor) applyParser(event *beat.Event, path string) error
 			}
 			target := a.Target + "." + parser.target
 			event.Fields.DeepUpdate(common.MapStr{
-				target: data,
+				target: honorStructTagsHack(data),
 			})
 			return nil
 		}
 	}
 	return nil
+}
+
+func honorStructTagsHack(data interface{}) map[string]interface{} {
+	unmarshaled := make(map[string]interface{})
+	marshaled, _ := json.Marshal(data)
+	json.Unmarshal(marshaled, &unmarshaled)
+	return unmarshaled
 }
 
 func (a *addFileDataProcessor) Run(event *beat.Event) (*beat.Event, error) {

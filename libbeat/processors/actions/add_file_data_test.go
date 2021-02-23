@@ -24,10 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/formats/elf"
-	"github.com/elastic/beats/v7/libbeat/formats/lnk"
-	"github.com/elastic/beats/v7/libbeat/formats/macho"
-	"github.com/elastic/beats/v7/libbeat/formats/pe"
 )
 
 func TestFileDataPE(t *testing.T) {
@@ -42,10 +38,8 @@ func TestFileDataPE(t *testing.T) {
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
-	data, err := observed.Fields.GetValue("file.pe")
+	_, err = observed.Fields.GetValue("file.pe")
 	require.NoError(t, err)
-	_, ok := data.(*pe.Info)
-	require.True(t, ok)
 }
 
 func TestFileDataMachO(t *testing.T) {
@@ -60,10 +54,8 @@ func TestFileDataMachO(t *testing.T) {
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
-	data, err := observed.Fields.GetValue("file.macho")
+	_, err = observed.Fields.GetValue("file.macho")
 	require.NoError(t, err)
-	_, ok := data.(*macho.Info)
-	require.True(t, ok)
 }
 
 func TestFileDataElf(t *testing.T) {
@@ -78,10 +70,8 @@ func TestFileDataElf(t *testing.T) {
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
-	data, err := observed.Fields.GetValue("file.elf")
+	_, err = observed.Fields.GetValue("file.elf")
 	require.NoError(t, err)
-	_, ok := data.(*elf.Info)
-	require.True(t, ok)
 }
 
 func TestFileDataLnk(t *testing.T) {
@@ -96,10 +86,8 @@ func TestFileDataLnk(t *testing.T) {
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
-	data, err := observed.Fields.GetValue("file.lnk")
+	_, err = observed.Fields.GetValue("file.lnk")
 	require.NoError(t, err)
-	_, ok := data.(*lnk.Info)
-	require.True(t, ok)
 }
 
 func TestFileDataOnly(t *testing.T) {
@@ -166,10 +154,8 @@ func TestFileDataTarget(t *testing.T) {
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
-	data, err := observed.Fields.GetValue("zoiks.pe")
+	_, err = observed.Fields.GetValue("zoiks.pe")
 	require.NoError(t, err)
-	_, ok := data.(*pe.Info)
-	require.True(t, ok)
 }
 
 func TestFileDataIgnoreFailure(t *testing.T) {
