@@ -121,44 +121,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- system/package: Fix librpm loading on Fedora 31/32. {pull}NNNN[NNNN]
-- file_integrity: Create fsnotify watcher only when starting file_integrity module {pull}19505[19505]
-- auditd: Fix spelling of anomaly in `event.category`.
-- auditd: Fix typo in `event.action` of `removed-user-role-from`. {pull}19300[19300]
-- auditd: Fix typo in `event.action` of `used-suspicious-link`. {pull}19300[19300]
-- system/socket: Fix kprobe grouping to allow running more than one instance. {pull}20325[20325]
-- system/socket: Fixed a crash due to concurrent map read and write. {issue}21192[21192] {pull}21690[21690]
-- file_integrity: stop monitoring excluded paths {issue}21278[21278] {pull}21282[21282]
-- auditd: Fix an error condition causing a lot of `audit_send_reply` kernel threads being created. {pull}22673[22673]
-- system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
-- system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
-- Note incompatibility of system/socket on ARM. {pull}23381[23381]
-
-*Filebeat*
-
-- Fix mapping of fortinet.firewall.mem as integer. {pull}19335[19335]
-- Ensure all zeek timestamps include millisecond precision. {issue}14599[14599] {pull}16766[16766]
-- Fix s3 input hanging with GetObjectRequest API call by adding context_timeout config. {issue}15502[15502] {pull}15590[15590]
-- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
-- Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
-- Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
-- Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
-- Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
-- Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
-- Fix a connection error in httpjson input. {pull}16123[16123]
-- Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
-- Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
-- CheckPoint Firewall module: Change event.severity JSON data type to a number because the field mapping is a `long`. {pull}23424[23424]
-- Cisco IOS: Change icmp.type/code and igmp.type JSON data types to strings because the fields mappings are `keyword`. {pull}23424[23424]
-- CrowdStrike Falcon: Change JSON field types to match the field mappings. {pull}23424[23424]
-- Fortinet Firewall: Drop `fortinet.firewall.assignip` when the value is "N/A". {pull}23424[23424]
-- Juniper SRX: Change JSON field types to match the field mappings. {pull}23424[23424]
-- Suricata EVE: Convert `suricata.eve.flow_id` to string because the field is a keyword in the mapping. {pull}23424[23424]
-- Zeek DNS: Ignore failures in data type conversions. And change `dns.id` JSON field to a string to match its `keyword` mapping. {pull}23424[23424]
-- Change the `event.created` in Netflow events to be the time the event was created by Filebeat
-  to be consistent with ECS. {pull}23094[23094]
-- Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
-- Add check for empty values in azure module. {pull}24156[24156]
 
 *Filebeat*
 
@@ -206,6 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
 - Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- Add check for empty values in azure module. {pull}24156[24156]
 
 *Heartbeat*
 
