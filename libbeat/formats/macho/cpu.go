@@ -19,177 +19,195 @@ package macho
 
 import "debug/macho"
 
-// /// Get the cputype and cpusubtype from a name
-// pub fn get_arch_from_flag(name: &str) -> Option<(CpuType, CpuSubType)> {
-//     get_arch_from_flag_no_alias(name).or_else(|| {
-//         // we also handle some common aliases
-//         match name {
-//             // these are used by apple
-//             "pentium" => Some((CPU_TYPE_I386, CPU_SUBTYPE_PENT)),
-//             "pentpro" => Some((CPU_TYPE_I386, CPU_SUBTYPE_PENTPRO)),
-//             // these are used commonly for consistency
-//             "x86" => Some((CPU_TYPE_I386, CPU_SUBTYPE_I386_ALL)),
-//             _ => None,
-//         }
-//     })
-// }
+const (
+	CPU_SUBTYPE_MASK  uint32 = 0x00ffffff
+	CPU_ARCH_ABI64    uint32 = 0x01000000
+	CPU_ARCH_ABI64_32 uint32 = 0x02000000
 
-// /// An alias for u32
-// pub type CpuType = u32;
-// /// An alias for u32
-// pub type CpuSubType = u32;
+	// cpu types
+	CPU_TYPE_VAX       uint32 = 1
+	CPU_TYPE_MC680X0   uint32 = 6
+	CPU_TYPE_X86       uint32 = 7
+	CPU_TYPE_I386      uint32 = CPU_TYPE_X86
+	CPU_TYPE_X86_64    uint32 = CPU_TYPE_X86 | CPU_ARCH_ABI64
+	CPU_TYPE_MIPS      uint32 = 8
+	CPU_TYPE_MC98000   uint32 = 10
+	CPU_TYPE_HPPA      uint32 = 11
+	CPU_TYPE_ARM       uint32 = 12
+	CPU_TYPE_ARM64     uint32 = CPU_TYPE_ARM | CPU_ARCH_ABI64
+	CPU_TYPE_ARM64_32  uint32 = CPU_TYPE_ARM | CPU_ARCH_ABI64_32
+	CPU_TYPE_MC88000   uint32 = 13
+	CPU_TYPE_SPARC     uint32 = 14
+	CPU_TYPE_I860      uint32 = 15
+	CPU_TYPE_ALPHA     uint32 = 16
+	CPU_TYPE_POWERPC   uint32 = 18
+	CPU_TYPE_POWERPC64 uint32 = CPU_TYPE_POWERPC | CPU_ARCH_ABI64
 
-// /// the mask for CPU feature flags
-// pub const CPU_SUBTYPE_MASK: u32 = 0xff00_0000;
-// /// mask for architecture bits
-// pub const CPU_ARCH_MASK: CpuType = 0xff00_0000;
-// /// the mask for 64 bit ABI
-// pub const CPU_ARCH_ABI64: CpuType = 0x0100_0000;
-// /// the mask for ILP32 ABI on 64 bit hardware
-// pub const CPU_ARCH_ABI64_32: CpuType = 0x0200_0000;
+	// cpu sub-types
+	CPU_SUBTYPE_LITTLE_ENDIAN    uint32 = 0
+	CPU_SUBTYPE_BIG_ENDIAN       uint32 = 1
+	CPU_SUBTYPE_VAX_ALL          uint32 = 0
+	CPU_SUBTYPE_VAX780           uint32 = 1
+	CPU_SUBTYPE_VAX785           uint32 = 2
+	CPU_SUBTYPE_VAX750           uint32 = 3
+	CPU_SUBTYPE_VAX730           uint32 = 4
+	CPU_SUBTYPE_UVAXI            uint32 = 5
+	CPU_SUBTYPE_UVAXII           uint32 = 6
+	CPU_SUBTYPE_VAX8200          uint32 = 7
+	CPU_SUBTYPE_VAX8500          uint32 = 8
+	CPU_SUBTYPE_VAX8600          uint32 = 9
+	CPU_SUBTYPE_VAX8650          uint32 = 10
+	CPU_SUBTYPE_VAX8800          uint32 = 11
+	CPU_SUBTYPE_UVAXIII          uint32 = 12
+	CPU_SUBTYPE_MC680X0_ALL      uint32 = 1
+	CPU_SUBTYPE_MC68030          uint32 = 1
+	CPU_SUBTYPE_MC68040          uint32 = 2
+	CPU_SUBTYPE_MC68030_ONLY     uint32 = 3
+	CPU_SUBTYPE_I386_ALL         uint32 = 3
+	CPU_SUBTYPE_386              uint32 = 3
+	CPU_SUBTYPE_486              uint32 = 4
+	CPU_SUBTYPE_486SX            uint32 = 4 + (8 << 4)
+	CPU_SUBTYPE_586              uint32 = 5
+	CPU_SUBTYPE_PENT             uint32 = 5
+	CPU_SUBTYPE_PENTPRO          uint32 = 6 + (1 << 4)
+	CPU_SUBTYPE_PENTII_M3        uint32 = 6 + (3 << 4)
+	CPU_SUBTYPE_PENTII_M5        uint32 = 6 + (5 << 4)
+	CPU_SUBTYPE_CELERON          uint32 = 7 + (6 << 4)
+	CPU_SUBTYPE_CELERON_MOBILE   uint32 = 7 + (7 << 4)
+	CPU_SUBTYPE_PENTIUM_3        uint32 = 8
+	CPU_SUBTYPE_PENTIUM_3_M      uint32 = 8 + (1 << 4)
+	CPU_SUBTYPE_PENTIUM_3_XEON   uint32 = 8 + (2 << 4)
+	CPU_SUBTYPE_PENTIUM_M        uint32 = 9
+	CPU_SUBTYPE_PENTIUM_4        uint32 = 10
+	CPU_SUBTYPE_PENTIUM_4_M      uint32 = 10 + (1 << 4)
+	CPU_SUBTYPE_ITANIUM          uint32 = 11
+	CPU_SUBTYPE_ITANIUM_2        uint32 = 11 + (1 << 4)
+	CPU_SUBTYPE_XEON             uint32 = 12
+	CPU_SUBTYPE_XEON_MP          uint32 = 12 + (1 << 4)
+	CPU_SUBTYPE_INTEL_FAMILY_MAX uint32 = 15
+	CPU_SUBTYPE_INTEL_MODEL_ALL  uint32 = 0
+	CPU_SUBTYPE_X86_ALL          uint32 = 3
+	CPU_SUBTYPE_X86_64_ALL       uint32 = 3
+	CPU_SUBTYPE_X86_ARCH1        uint32 = 4
+	CPU_SUBTYPE_X86_64_H         uint32 = 8
+	CPU_SUBTYPE_MIPS_ALL         uint32 = 0
+	CPU_SUBTYPE_MIPS_R2300       uint32 = 1
+	CPU_SUBTYPE_MIPS_R2600       uint32 = 2
+	CPU_SUBTYPE_MIPS_R2800       uint32 = 3
+	CPU_SUBTYPE_MIPS_R2000A      uint32 = 4
+	CPU_SUBTYPE_MIPS_R2000       uint32 = 5
+	CPU_SUBTYPE_MIPS_R3000A      uint32 = 6
+	CPU_SUBTYPE_MIPS_R3000       uint32 = 7
+	CPU_SUBTYPE_MC98000_ALL      uint32 = 0
+	CPU_SUBTYPE_MC98601          uint32 = 1
+	CPU_SUBTYPE_HPPA_ALL         uint32 = 0
+	CPU_SUBTYPE_HPPA_7100        uint32 = 0
+	CPU_SUBTYPE_HPPA_7100LC      uint32 = 1
+	CPU_SUBTYPE_MC88000_ALL      uint32 = 0
+	CPU_SUBTYPE_MC88100          uint32 = 1
+	CPU_SUBTYPE_MC88110          uint32 = 2
+	CPU_SUBTYPE_SPARC_ALL        uint32 = 0
+	CPU_SUBTYPE_I860_ALL         uint32 = 0
+	CPU_SUBTYPE_I860_860         uint32 = 1
+	CPU_SUBTYPE_POWERPC_ALL      uint32 = 0
+	CPU_SUBTYPE_POWERPC_601      uint32 = 1
+	CPU_SUBTYPE_POWERPC_602      uint32 = 2
+	CPU_SUBTYPE_POWERPC_603      uint32 = 3
+	CPU_SUBTYPE_POWERPC_603E     uint32 = 4
+	CPU_SUBTYPE_POWERPC_603EV    uint32 = 5
+	CPU_SUBTYPE_POWERPC_604      uint32 = 6
+	CPU_SUBTYPE_POWERPC_604E     uint32 = 7
+	CPU_SUBTYPE_POWERPC_620      uint32 = 8
+	CPU_SUBTYPE_POWERPC_750      uint32 = 9
+	CPU_SUBTYPE_POWERPC_7400     uint32 = 10
+	CPU_SUBTYPE_POWERPC_7450     uint32 = 11
+	CPU_SUBTYPE_POWERPC_970      uint32 = 100
+	CPU_SUBTYPE_ARM_ALL          uint32 = 0
+	CPU_SUBTYPE_ARM_V4T          uint32 = 5
+	CPU_SUBTYPE_ARM_V6           uint32 = 6
+	CPU_SUBTYPE_ARM_V5TEJ        uint32 = 7
+	CPU_SUBTYPE_ARM_XSCALE       uint32 = 8
+	CPU_SUBTYPE_ARM_V7           uint32 = 9
+	CPU_SUBTYPE_ARM_V7F          uint32 = 10
+	CPU_SUBTYPE_ARM_V7S          uint32 = 11
+	CPU_SUBTYPE_ARM_V7K          uint32 = 12
+	CPU_SUBTYPE_ARM_V6M          uint32 = 14
+	CPU_SUBTYPE_ARM_V7M          uint32 = 15
+	CPU_SUBTYPE_ARM_V7EM         uint32 = 16
+	CPU_SUBTYPE_ARM_V8           uint32 = 13
+	CPU_SUBTYPE_ARM64_ALL        uint32 = 0
+	CPU_SUBTYPE_ARM64_V8         uint32 = 1
+	CPU_SUBTYPE_ARM64_E          uint32 = 2
+	CPU_SUBTYPE_ARM64_32_ALL     uint32 = 0
+	CPU_SUBTYPE_ARM64_32_V8      uint32 = 1
+)
 
-// // CPU Types
-// pub const CPU_TYPE_ANY: CpuType = !0;
-// pub const CPU_TYPE_VAX: CpuType = 1;
-// pub const CPU_TYPE_MC680X0: CpuType = 6;
-// pub const CPU_TYPE_X86: CpuType = 7;
-// pub const CPU_TYPE_I386: CpuType = CPU_TYPE_X86;
-// pub const CPU_TYPE_X86_64: CpuType = CPU_TYPE_X86 | CPU_ARCH_ABI64;
-// pub const CPU_TYPE_MIPS: CpuType = 8;
-// pub const CPU_TYPE_MC98000: CpuType = 10;
-// pub const CPU_TYPE_HPPA: CpuType = 11;
-// pub const CPU_TYPE_ARM: CpuType = 12;
-// pub const CPU_TYPE_ARM64: CpuType = CPU_TYPE_ARM | CPU_ARCH_ABI64;
-// pub const CPU_TYPE_ARM64_32: CpuType = CPU_TYPE_ARM | CPU_ARCH_ABI64_32;
-// pub const CPU_TYPE_MC88000: CpuType = 13;
-// pub const CPU_TYPE_SPARC: CpuType = 14;
-// pub const CPU_TYPE_I860: CpuType = 15;
-// pub const CPU_TYPE_ALPHA: CpuType = 16;
-// pub const CPU_TYPE_POWERPC: CpuType = 18;
-// pub const CPU_TYPE_POWERPC64: CpuType = CPU_TYPE_POWERPC | CPU_ARCH_ABI64;
-
-// // CPU Subtypes
-// pub const CPU_SUBTYPE_MULTIPLE: CpuSubType = !0;
-// pub const CPU_SUBTYPE_LITTLE_ENDIAN: CpuSubType = 0;
-// pub const CPU_SUBTYPE_BIG_ENDIAN: CpuSubType = 1;
-// pub const CPU_SUBTYPE_VAX_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_VAX780: CpuSubType = 1;
-// pub const CPU_SUBTYPE_VAX785: CpuSubType = 2;
-// pub const CPU_SUBTYPE_VAX750: CpuSubType = 3;
-// pub const CPU_SUBTYPE_VAX730: CpuSubType = 4;
-// pub const CPU_SUBTYPE_UVAXI: CpuSubType = 5;
-// pub const CPU_SUBTYPE_UVAXII: CpuSubType = 6;
-// pub const CPU_SUBTYPE_VAX8200: CpuSubType = 7;
-// pub const CPU_SUBTYPE_VAX8500: CpuSubType = 8;
-// pub const CPU_SUBTYPE_VAX8600: CpuSubType = 9;
-// pub const CPU_SUBTYPE_VAX8650: CpuSubType = 10;
-// pub const CPU_SUBTYPE_VAX8800: CpuSubType = 11;
-// pub const CPU_SUBTYPE_UVAXIII: CpuSubType = 12;
-// pub const CPU_SUBTYPE_MC680X0_ALL: CpuSubType = 1;
-// pub const CPU_SUBTYPE_MC68030: CpuSubType = 1; /* compat */
-// pub const CPU_SUBTYPE_MC68040: CpuSubType = 2;
-// pub const CPU_SUBTYPE_MC68030_ONLY: CpuSubType = 3;
-
-// macro_rules! CPU_SUBTYPE_INTEL {
-//     ($f:expr, $m:expr) => {{
-//         ($f) + (($m) << 4)
-//     }};
-// }
-
-// pub const CPU_SUBTYPE_I386_ALL: CpuSubType = CPU_SUBTYPE_INTEL!(3, 0);
-// pub const CPU_SUBTYPE_386: CpuSubType = CPU_SUBTYPE_INTEL!(3, 0);
-// pub const CPU_SUBTYPE_486: CpuSubType = CPU_SUBTYPE_INTEL!(4, 0);
-// pub const CPU_SUBTYPE_486SX: CpuSubType = CPU_SUBTYPE_INTEL!(4, 8); // 8 << 4 = 128
-// pub const CPU_SUBTYPE_586: CpuSubType = CPU_SUBTYPE_INTEL!(5, 0);
-// pub const CPU_SUBTYPE_PENT: CpuSubType = CPU_SUBTYPE_INTEL!(5, 0);
-// pub const CPU_SUBTYPE_PENTPRO: CpuSubType = CPU_SUBTYPE_INTEL!(6, 1);
-// pub const CPU_SUBTYPE_PENTII_M3: CpuSubType = CPU_SUBTYPE_INTEL!(6, 3);
-// pub const CPU_SUBTYPE_PENTII_M5: CpuSubType = CPU_SUBTYPE_INTEL!(6, 5);
-// pub const CPU_SUBTYPE_CELERON: CpuSubType = CPU_SUBTYPE_INTEL!(7, 6);
-// pub const CPU_SUBTYPE_CELERON_MOBILE: CpuSubType = CPU_SUBTYPE_INTEL!(7, 7);
-// pub const CPU_SUBTYPE_PENTIUM_3: CpuSubType = CPU_SUBTYPE_INTEL!(8, 0);
-// pub const CPU_SUBTYPE_PENTIUM_3_M: CpuSubType = CPU_SUBTYPE_INTEL!(8, 1);
-// pub const CPU_SUBTYPE_PENTIUM_3_XEON: CpuSubType = CPU_SUBTYPE_INTEL!(8, 2);
-// pub const CPU_SUBTYPE_PENTIUM_M: CpuSubType = CPU_SUBTYPE_INTEL!(9, 0);
-// pub const CPU_SUBTYPE_PENTIUM_4: CpuSubType = CPU_SUBTYPE_INTEL!(10, 0);
-// pub const CPU_SUBTYPE_PENTIUM_4_M: CpuSubType = CPU_SUBTYPE_INTEL!(10, 1);
-// pub const CPU_SUBTYPE_ITANIUM: CpuSubType = CPU_SUBTYPE_INTEL!(11, 0);
-// pub const CPU_SUBTYPE_ITANIUM_2: CpuSubType = CPU_SUBTYPE_INTEL!(11, 1);
-// pub const CPU_SUBTYPE_XEON: CpuSubType = CPU_SUBTYPE_INTEL!(12, 0);
-// pub const CPU_SUBTYPE_XEON_MP: CpuSubType = CPU_SUBTYPE_INTEL!(12, 1);
-// pub const CPU_SUBTYPE_INTEL_FAMILY_MAX: CpuSubType = 15;
-// pub const CPU_SUBTYPE_INTEL_MODEL_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_X86_ALL: CpuSubType = 3;
-// pub const CPU_SUBTYPE_X86_64_ALL: CpuSubType = 3;
-// pub const CPU_SUBTYPE_X86_ARCH1: CpuSubType = 4;
-// pub const CPU_SUBTYPE_X86_64_H: CpuSubType = 8;
-// pub const CPU_SUBTYPE_MIPS_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_MIPS_R2300: CpuSubType = 1;
-// pub const CPU_SUBTYPE_MIPS_R2600: CpuSubType = 2;
-// pub const CPU_SUBTYPE_MIPS_R2800: CpuSubType = 3;
-// pub const CPU_SUBTYPE_MIPS_R2000A: CpuSubType = 4;
-// pub const CPU_SUBTYPE_MIPS_R2000: CpuSubType = 5;
-// pub const CPU_SUBTYPE_MIPS_R3000A: CpuSubType = 6;
-// pub const CPU_SUBTYPE_MIPS_R3000: CpuSubType = 7;
-// pub const CPU_SUBTYPE_MC98000_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_MC98601: CpuSubType = 1;
-// pub const CPU_SUBTYPE_HPPA_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_HPPA_7100: CpuSubType = 0;
-// pub const CPU_SUBTYPE_HPPA_7100LC: CpuSubType = 1;
-// pub const CPU_SUBTYPE_MC88000_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_MC88100: CpuSubType = 1;
-// pub const CPU_SUBTYPE_MC88110: CpuSubType = 2;
-// pub const CPU_SUBTYPE_SPARC_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_I860_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_I860_860: CpuSubType = 1;
-// pub const CPU_SUBTYPE_POWERPC_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_POWERPC_601: CpuSubType = 1;
-// pub const CPU_SUBTYPE_POWERPC_602: CpuSubType = 2;
-// pub const CPU_SUBTYPE_POWERPC_603: CpuSubType = 3;
-// pub const CPU_SUBTYPE_POWERPC_603E: CpuSubType = 4;
-// pub const CPU_SUBTYPE_POWERPC_603EV: CpuSubType = 5;
-// pub const CPU_SUBTYPE_POWERPC_604: CpuSubType = 6;
-// pub const CPU_SUBTYPE_POWERPC_604E: CpuSubType = 7;
-// pub const CPU_SUBTYPE_POWERPC_620: CpuSubType = 8;
-// pub const CPU_SUBTYPE_POWERPC_750: CpuSubType = 9;
-// pub const CPU_SUBTYPE_POWERPC_7400: CpuSubType = 10;
-// pub const CPU_SUBTYPE_POWERPC_7450: CpuSubType = 11;
-// pub const CPU_SUBTYPE_POWERPC_970: CpuSubType = 100;
-// pub const CPU_SUBTYPE_ARM_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_ARM_V4T: CpuSubType = 5;
-// pub const CPU_SUBTYPE_ARM_V6: CpuSubType = 6;
-// pub const CPU_SUBTYPE_ARM_V5TEJ: CpuSubType = 7;
-// pub const CPU_SUBTYPE_ARM_XSCALE: CpuSubType = 8;
-// pub const CPU_SUBTYPE_ARM_V7: CpuSubType = 9;
-// pub const CPU_SUBTYPE_ARM_V7F: CpuSubType = 10;
-// pub const CPU_SUBTYPE_ARM_V7S: CpuSubType = 11;
-// pub const CPU_SUBTYPE_ARM_V7K: CpuSubType = 12;
-// pub const CPU_SUBTYPE_ARM_V6M: CpuSubType = 14;
-// pub const CPU_SUBTYPE_ARM_V7M: CpuSubType = 15;
-// pub const CPU_SUBTYPE_ARM_V7EM: CpuSubType = 16;
-// pub const CPU_SUBTYPE_ARM_V8: CpuSubType = 13;
-// pub const CPU_SUBTYPE_ARM64_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_ARM64_V8: CpuSubType = 1;
-// pub const CPU_SUBTYPE_ARM64_E: CpuSubType = 2;
-// pub const CPU_SUBTYPE_ARM64_32_ALL: CpuSubType = 0;
-// pub const CPU_SUBTYPE_ARM64_32_V8: CpuSubType = 1;
+var flagMaps = []struct {
+	name       string
+	cpuType    uint32
+	cpuSubtype uint32
+}{
+	{"ppc64", CPU_TYPE_POWERPC64, CPU_SUBTYPE_POWERPC_ALL},
+	{"x86_64", CPU_TYPE_X86_64, CPU_SUBTYPE_X86_64_ALL},
+	{"x86_64h", CPU_TYPE_X86_64, CPU_SUBTYPE_X86_64_H},
+	{"arm64", CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_ALL},
+	{"arm64_32", CPU_TYPE_ARM64_32, CPU_SUBTYPE_ARM64_32_ALL},
+	{"ppc970-64", CPU_TYPE_POWERPC64, CPU_SUBTYPE_POWERPC_970},
+	{"ppc", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_ALL},
+	{"i386", CPU_TYPE_I386, CPU_SUBTYPE_I386_ALL},
+	{"m68k", CPU_TYPE_MC680X0, CPU_SUBTYPE_MC680X0_ALL},
+	{"hppa", CPU_TYPE_HPPA, CPU_SUBTYPE_HPPA_ALL},
+	{"sparc", CPU_TYPE_SPARC, CPU_SUBTYPE_SPARC_ALL},
+	{"m88k", CPU_TYPE_MC88000, CPU_SUBTYPE_MC88000_ALL},
+	{"i860", CPU_TYPE_I860, CPU_SUBTYPE_I860_ALL},
+	{"arm", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_ALL},
+	{"ppc601", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_601},
+	{"ppc603", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603},
+	{"ppc603e", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603E},
+	{"ppc603ev", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_603EV},
+	{"ppc604", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_604},
+	{"ppc604e", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_604E},
+	{"ppc750", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_750},
+	{"ppc7400", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_7400},
+	{"ppc7450", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_7450},
+	{"ppc970", CPU_TYPE_POWERPC, CPU_SUBTYPE_POWERPC_970},
+	{"i486", CPU_TYPE_I386, CPU_SUBTYPE_486},
+	{"i486SX", CPU_TYPE_I386, CPU_SUBTYPE_486SX},
+	{"i586", CPU_TYPE_I386, CPU_SUBTYPE_586},
+	{"i686", CPU_TYPE_I386, CPU_SUBTYPE_PENTPRO},
+	{"pentIIm3", CPU_TYPE_I386, CPU_SUBTYPE_PENTII_M3},
+	{"pentIIm5", CPU_TYPE_I386, CPU_SUBTYPE_PENTII_M5},
+	{"pentium4", CPU_TYPE_I386, CPU_SUBTYPE_PENTIUM_4},
+	{"m68030", CPU_TYPE_MC680X0, CPU_SUBTYPE_MC68030_ONLY},
+	{"m68040", CPU_TYPE_MC680X0, CPU_SUBTYPE_MC68040},
+	{"hppa7100LC", CPU_TYPE_HPPA, CPU_SUBTYPE_HPPA_7100LC},
+	{"armv4t", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V4T},
+	{"armv5", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V5TEJ},
+	{"xscale", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_XSCALE},
+	{"armv6", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V6},
+	{"armv6m", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V6M},
+	{"armv7", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7},
+	{"armv7f", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7F},
+	{"armv7s", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7S},
+	{"armv7k", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7K},
+	{"armv7m", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7M},
+	{"armv7em", CPU_TYPE_ARM, CPU_SUBTYPE_ARM_V7EM},
+	{"arm64v8", CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_V8},
+	{"arm64e", CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_E},
+	{"arm64_32_v8", CPU_TYPE_ARM64_32, CPU_SUBTYPE_ARM64_32_V8},
+	// others
+	{"pentium", CPU_TYPE_I386, CPU_SUBTYPE_PENT},
+	{"pentpro", CPU_TYPE_I386, CPU_SUBTYPE_PENTPRO},
+	{"x86", CPU_TYPE_I386, CPU_SUBTYPE_I386_ALL},
+}
 
 // the default string translations are gross
-func translateCPU(cpu macho.Cpu) string {
-	switch cpu {
-	case macho.Cpu386:
-		return "x86"
-	case macho.CpuAmd64:
-		return "x86_64"
-	case macho.CpuArm:
-		return "arm"
-	case macho.CpuArm64:
-		return "arm64"
-	case macho.CpuPpc:
-		return "ppc"
-	case macho.CpuPpc64:
-		return "ppc64"
-	default:
-		return "unknown"
+func translateCPU(cpu macho.Cpu, subtype uint32) string {
+	cputype := uint32(cpu)
+	for _, cpuMapping := range flagMaps {
+		if cpuMapping.cpuType == cputype && cpuMapping.cpuSubtype == (CPU_SUBTYPE_MASK&subtype) {
+			return cpuMapping.name
+		}
 	}
+	return "unknown"
 }

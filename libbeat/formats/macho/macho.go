@@ -174,8 +174,8 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 	}
 
 	info := &Architecture{
-		CPU:       translateCPU(machoFile.Cpu),
-		ByteOrder: machoFile.ByteOrder.String(),
+		CPU:       translateCPU(machoFile.Cpu, machoFile.SubCpu),
+		ByteOrder: translateByteOrder(machoFile.ByteOrder.String()),
 		Type:      machoFile.Type.String(),
 		Header: Header{
 			Magic:    fmt.Sprintf("0x%x", machoFile.Magic),
@@ -197,6 +197,17 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 		}
 	}
 	return info, nil
+}
+
+func translateByteOrder(order string) string {
+	switch order {
+	case "BigEndian":
+		return "big-endian"
+	case "LittleEndian":
+		return "little-endian"
+	default:
+		return "unknown"
+	}
 }
 
 func getPackers(machoFile *macho.File) []string {

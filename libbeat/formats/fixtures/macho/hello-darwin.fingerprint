@@ -2,7 +2,7 @@
   "architectures": [
     {
       "cpu": "x86_64",
-      "byte_order": "LittleEndian",
+      "byte_order": "little-endian",
       "type": "Exec",
       "header": {
         "commands": [
@@ -145,8 +145,7 @@
               "offset": 4010,
               "size": 14,
               "entropy": 3.32,
-              "chi2": 388.29,
-              "flags": []
+              "chi2": 388.29
             },
             {
               "name": "__unwind_info",
@@ -154,8 +153,7 @@
               "offset": 4024,
               "size": 72,
               "entropy": 1.58,
-              "chi2": 10452.44,
-              "flags": []
+              "chi2": 10452.44
             }
           ]
         },
@@ -172,8 +170,7 @@
               "offset": 4096,
               "size": 8,
               "entropy": 0,
-              "chi2": 2040,
-              "flags": []
+              "chi2": 2040
             }
           ]
         },
@@ -190,8 +187,7 @@
               "offset": 8192,
               "size": 8,
               "entropy": 1.55,
-              "chi2": 888,
-              "flags": []
+              "chi2": 888
             },
             {
               "name": "__data",
@@ -199,8 +195,7 @@
               "offset": 8200,
               "size": 8,
               "entropy": 0,
-              "chi2": 2040,
-              "flags": []
+              "chi2": 2040
             }
           ]
         }
