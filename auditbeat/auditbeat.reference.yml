@@ -39,7 +39,7 @@ auditbeat.modules:
   include_raw_message: false
   include_warnings: false
   reload:
-    enabled: true
+    enabled: false
     period: 30s
 
   # Set to true to publish fields with null values in events.

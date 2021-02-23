@@ -137,7 +137,7 @@ following example shows all configuration options with their default values.
   backpressure_strategy: auto
   reload:
     period: 30s
-    enabled: true
+    enabled: false
 ----
 
 This module also supports the

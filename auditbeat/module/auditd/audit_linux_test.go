@@ -324,8 +324,8 @@ func TestRuleReload(t *testing.T) {
 	logp.Info("end beat")
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)
-
 }
+
 func TestKernelVersion(t *testing.T) {
 	major, minor, full, err := kernelVersion()
 	if err != nil {
