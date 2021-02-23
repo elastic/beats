@@ -612,7 +612,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
 - system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
 - Update Auditbeat auditd module to ECS 1.8 {pull}23594[23594] {issue}23118[23118]
-- Add enrichment of auditd seccomp events with name of the architecture, syscall, and signal. {issue}14055[14055] {pull}19300[19300]
 - Add auditd rule reload for Auditd module. {pull}10835[10835]
 
 *Filebeat*
