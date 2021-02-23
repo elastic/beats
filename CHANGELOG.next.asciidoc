@@ -387,6 +387,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
+- Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
+- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
 
 *Heartbeat*
 
@@ -572,6 +574,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add keystore support for autodiscover static configurations. {pull]16306[16306]
 - Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
 - Add support for multiple sets of hints on autodiscover {pull}18883[18883]
+- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
 - Add a configurable delay between retries when an app metadata cannot be retrieved by `add_cloudfoundry_metadata`. {pull}19181[19181]
 - Added the `max_cached_sessions` option to the script processor. {pull}19562[19562]
 - Add support for DNS over TLS for the dns_processor. {pull}19321[19321]
@@ -996,6 +999,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 
 *Packetbeat*

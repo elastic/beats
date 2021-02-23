@@ -63,7 +63,7 @@ function enroll(){
       insecure_flag="--insecure"
     fi
 
-    ./{{ .BeatName }} enroll ${insecure_flag} ${KIBANA_HOST:-http://localhost:5601} $apikey -f
+    ./{{ .BeatName }} enroll ${insecure_flag} -f --url=${KIBANA_HOST:-http://localhost:5601} --enrollment-token=$apikey
 }
 
 if [[ -n "${FLEET_SETUP}" ]] && [[ ${FLEET_SETUP} == 1 ]]; then setup; fi

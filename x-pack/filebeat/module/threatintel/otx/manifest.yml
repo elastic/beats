@@ -9,7 +9,10 @@ var:
     default: 24h
   - name: api_token
   - name: ssl
+  - name: http_client_timeout
+    default: 120s
   - name: types
+    default: "domain,IPv4,hostname,url,FileHash-SHA256,FileHash-MD5"
   - name: lookback_range
     default: 2h
   - name: url
