@@ -25,7 +25,49 @@ data:
       node: ${NODE_NAME}
       scope: node
     inputs:
-      - name: log-1
+      - name: system-logs
+        type: logfile
+        use_output: default
+        meta:
+          package:
+            name: system
+            version: 0.10.7
+        data_stream:
+          namespace: default
+        streams:
+          - data_stream:
+              dataset: system.auth
+              type: logs
+            paths:
+              - /var/log/auth.log*
+              - /var/log/secure*
+            exclude_files:
+              - .gz$
+            multiline:
+              pattern: ^\s
+              match: after
+            processors:
+              - add_fields:
+                  target: ''
+                  fields:
+                    ecs.version: 1.5.0
+          - data_stream:
+              dataset: system.syslog
+              type: logs
+            paths:
+              - /var/log/messages*
+              - /var/log/syslog*
+            exclude_files:
+              - .gz$
+            multiline:
+              pattern: ^\s
+              match: after
+            processors:
+              - add_fields:
+                  target: ''
+                  fields:
+                    ecs.version: 1.5.0
+      - name: container-log
         type: logfile
         use_output: default
         meta:
@@ -40,7 +82,7 @@ data:
             symlinks: true
             paths:
               - /var/log/containers/*${kubernetes.container.id}.log
-      - name: system-3
+      - name: system-metrics
         type: system/metrics
         use_output: default
         meta:
