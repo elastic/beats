@@ -19,27 +19,14 @@ package elf
 
 import (
 	"bytes"
-	"crypto/md5"
 	"debug/elf"
-	"encoding/hex"
+	"fmt"
 	"io"
 	"io/ioutil"
 
 	"github.com/elastic/beats/v7/libbeat/formats/common"
+	"github.com/elastic/beats/v7/libbeat/formats/dwarf"
 )
-
-// Section contains information about a section in a mach-o file.
-type Section struct {
-	Name      string  `json:"name"`
-	Type      string  `json:"type"`
-	Address   uint64  `json:"address"`
-	Size      uint64  `json:"size"`
-	Offset    uint64  `json:"offset"`
-	Entropy   float64 `json:"entropy"`
-	ChiSquare float64 `json:"chi2"`
-	Flags     string  `json:"flags"`
-	MD5       string  `json:"md5,omitempty"`
-}
 
 // Segment represents a program segment
 type Segment struct {
@@ -47,15 +34,59 @@ type Segment struct {
 	Sections []string `json:"sections"`
 }
 
-// Info contains high level fingerprinting an analysis of a mach-o file.
+// Symbol contains information about a symbol
+type Symbol struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+// Header contains information inside the elf header.
+type Header struct {
+	Class      string `json:"class"`
+	Data       string `json:"data"`
+	Machine    string `json:"machine"`
+	OSAbi      string `json:"os_abi"`
+	Type       string `json:"type"`
+	Version    string `json:"version"`
+	AbiVersion string `json:"abi_version"`
+	Entrypoint string `json:"entrypoint"`
+
+	// Is this either Version or AbiVersion?
+	// ObjectVersion string `json:"object_version"`
+}
+
+// Section contains information about a section in an elf file.
+type Section struct {
+	Flags          []string `json:"flags,omitempty"`
+	Name           string   `json:"name"`
+	PhysicalOffset int64    `json:"physical_offset"`
+	Type           string   `json:"type"`
+	PhysicalSize   int64    `json:"physical_size"`
+	VirtualAddress int64    `json:"virtual_address"`
+	VirtualSize    int64    `json:"virtual_size"`
+	Entropy        float64  `json:"entropy"`
+	ChiSquare      float64  `json:"chi2"`
+}
+
+// Info contains high level fingerprinting an analysis of a elf file.
 type Info struct {
-	Machine  string              `json:"machine"`
-	Segments []Segment           `json:"segments,omitempty"`
-	Sections []Section           `json:"sections,omitempty"`
-	Imports  map[string][]string `json:"imports,omitempty"`
-	Exports  []string            `json:"exports,omitempty"`
-	Packer   string              `json:"packer,omitempty"`
-	Telfhash string              `json:"telfhash,omitempty"`
+	Imports         []Symbol      `json:"imports,omitempty"`
+	Exports         []Symbol      `json:"exports,omitempty"`
+	Telfhash        string        `json:"telfhash,omitempty"`
+	Segments        []Segment     `json:"segments,omitempty"`
+	SharedLibraries []string      `json:"shared_libraries,omitempty"`
+	Header          Header        `json:"header"`
+	Sections        []Section     `json:"sections,omitempty"`
+	Packers         []string      `json:"packers,omitempty"`
+	Debug           []dwarf.DWARF `json:"debug,omitempty"`
+
+	// This isn't in ELF
+	// CreationDate    time.Time  `json:"creation_date"`
+
+	// These are already contained in Header
+	// Architecture string     `json:"architecture"`
+	// ByteOrder    string     `json:"byte_order"`
+	// CPUType      string     `json:"cpu_type"`
 }
 
 // Parse parses the elf file and returns information about it or errors.
@@ -68,25 +99,56 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	groupedSymbols := make(map[string][]string)
-	importSymbols, err := elfFile.ImportedSymbols()
+	dynamicSymbols, err := elfFile.DynamicSymbols()
 	if err != nil {
 		if err != elf.ErrNoSymbols {
 			return nil, err
 		}
 	}
-	for _, symbol := range importSymbols {
-		library := symbol.Library
-		if library == "" {
-			library = "unknown"
+	exports := []Symbol{}
+	imports := []Symbol{}
+	librarySet := make(map[string]struct{})
+	for _, symbol := range dynamicSymbols {
+		binding := elf.ST_BIND(symbol.Info)
+		if binding == elf.STB_GLOBAL && symbol.Section == elf.SHN_UNDEF {
+			// symbol is imported
+			library := symbol.Library
+			if library != "" {
+				librarySet[library] = struct{}{}
+			}
+			imports = append(imports, Symbol{
+				Name: symbol.Name,
+				Type: elf.ST_TYPE(symbol.Info).String(),
+			})
+		} else if elf.ST_VISIBILITY(symbol.Other) == elf.STV_DEFAULT {
+			// if we have a weak or globally bound symbol, it's exported
+			if binding == elf.STB_GLOBAL || binding == elf.STB_WEAK {
+				exports = append(exports, Symbol{
+					Name: symbol.Name,
+					Type: elf.ST_TYPE(symbol.Info).String(),
+				})
+			}
 		}
-		groupedSymbols[library] = append(groupedSymbols[library], symbol.Name)
+	}
+	libraries := []string{}
+	for library := range librarySet {
+		libraries = append(libraries, library)
+	}
+
+	header := Header{
+		Class:      translateClass(elfFile.Class),
+		Data:       translateData(elfFile.Data),
+		Machine:    translateMachine(elfFile.Machine),
+		OSAbi:      translateOSABI(elfFile.OSABI),
+		Type:       translateType(elfFile.Type),
+		Version:    translateVersion(elfFile.Version),
+		AbiVersion: fmt.Sprintf("%d", elfFile.ABIVersion),
+		Entrypoint: fmt.Sprintf("%x", elfFile.Entry),
 	}
 
 	segments := make(map[*elf.Prog][]string)
 	sections := []Section{}
 	for _, section := range elfFile.Sections {
-		var md5String string
 		var entropy float64
 		var chiSquare float64
 
@@ -106,21 +168,19 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 
 		data, err := section.Data()
 		if err == nil {
-			md5hash := md5.Sum(data)
-			md5String = hex.EncodeToString(md5hash[:])
 			entropy = common.Entropy(data)
 			chiSquare = common.ChiSquare(data)
 		}
 		sections = append(sections, Section{
-			Name:      name,
-			Type:      translateSectionType(section.Type),
-			Address:   section.Addr,
-			Size:      section.Size,
-			Offset:    section.Offset,
-			Entropy:   entropy,
-			ChiSquare: chiSquare,
-			Flags:     translateSectionFlags(section.Flags),
-			MD5:       md5String,
+			Flags:          translateSectionFlags(section.Flags),
+			Name:           name,
+			PhysicalOffset: int64(section.Offset),
+			Type:           translateSectionType(section.Type),
+			PhysicalSize:   int64(section.FileSize),
+			VirtualAddress: int64(section.Addr),
+			VirtualSize:    int64(section.Size),
+			Entropy:        entropy,
+			ChiSquare:      chiSquare,
 		})
 	}
 	translatedSegments := make([]Segment, len(elfFile.Progs))
@@ -135,25 +195,37 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 		}
 	}
 
-	return &Info{
-		Machine:  translateMachine(elfFile.Machine),
-		Sections: sections,
-		Segments: translatedSegments,
-		Imports:  groupedSymbols,
-		Packer:   getPacker(elfFile),
-		Telfhash: telfhash,
-	}, nil
+	info := &Info{
+		Imports:         imports,
+		Exports:         exports,
+		Telfhash:        telfhash,
+		Segments:        translatedSegments,
+		SharedLibraries: libraries,
+		Header:          header,
+		Sections:        sections,
+		Packers:         getPackers(elfFile),
+	}
+
+	if debug, err := elfFile.DWARF(); err == nil {
+		// just ignore the error if we can't get DWARF information
+		debugSymbols, err := dwarf.Parse(debug)
+		if err == nil {
+			info.Debug = debugSymbols
+		}
+	}
+
+	return info, nil
 }
 
-func getPacker(elfFile *elf.File) string {
+func getPackers(elfFile *elf.File) []string {
 	// this is expensive, figure out a way of making it less so
 	for _, prog := range elfFile.Progs {
 		data, err := ioutil.ReadAll(prog.Open())
 		if err == nil {
 			if bytes.Contains(data, []byte("UPX!")) {
-				return "upx"
+				return []string{"upx"}
 			}
 		}
 	}
-	return ""
+	return nil
 }

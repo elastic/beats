@@ -1,5 +1,25 @@
 {
-  "machine": "Advanced Micro Devices x86-64",
+  "imports": [
+    {
+      "name": "printf",
+      "type": "STT_FUNC"
+    },
+    {
+      "name": "__libc_start_main",
+      "type": "STT_FUNC"
+    }
+  ],
+  "exports": [
+    {
+      "name": "_init",
+      "type": "STT_FUNC"
+    },
+    {
+      "name": "_fini",
+      "type": "STT_FUNC"
+    }
+  ],
+  "telfhash": "3e400000000c00000003000000000c000003000000c03000000000000000000000000c",
   "segments": [
     {
       "name": "PHDR",
@@ -67,244 +87,298 @@
       ]
     }
   ],
+  "header": {
+    "class": "64-bit architecture",
+    "data": "little-endian",
+    "machine": "Advanced Micro Devices x86-64",
+    "os_abi": "UNIX System V ABI",
+    "type": "Executable",
+    "version": "current",
+    "abi_version": "0",
+    "entrypoint": "400390"
+  },
   "sections": [
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".interp",
+      "physical_offset": 512,
       "type": "PROGBITS",
-      "address": 4194816,
-      "size": 25,
-      "offset": 512,
+      "physical_size": 25,
+      "virtual_address": 4194816,
+      "virtual_size": 25,
       "entropy": 4.05,
-      "chi2": 394.84,
-      "flags": "ALLOC",
-      "md5": "09bd6bae3c649f0b7db796acb252ed8e"
+      "chi2": 394.84
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".hash",
+      "physical_offset": 544,
       "type": "HASH",
-      "address": 4194848,
-      "size": 40,
-      "offset": 544,
+      "physical_size": 40,
+      "virtual_address": 4194848,
+      "virtual_size": 40,
       "entropy": 0.95,
-      "chi2": 7409.6,
-      "flags": "ALLOC",
-      "md5": "3314c6875824870e88e705d17c9fd386"
+      "chi2": 7409.6
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".gnu.hash",
+      "physical_offset": 584,
       "type": "GNU_HASH",
-      "address": 4194888,
-      "size": 40,
-      "offset": 584,
+      "physical_size": 40,
+      "virtual_address": 4194888,
+      "virtual_size": 40,
       "entropy": 2.57,
-      "chi2": 3492.8,
-      "flags": "ALLOC",
-      "md5": "7883c669be02a88af23602f9e1844d9c"
+      "chi2": 3492.8
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".dynsym",
+      "physical_offset": 624,
       "type": "DYNSYM",
-      "address": 4194928,
-      "size": 120,
-      "offset": 624,
+      "physical_size": 120,
+      "virtual_address": 4194928,
+      "virtual_size": 120,
       "entropy": 1.14,
-      "chi2": 22147.73,
-      "flags": "ALLOC",
-      "md5": "27ad98f5d71388d30966a587909c096a"
+      "chi2": 22147.73
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".dynstr",
+      "physical_offset": 744,
       "type": "STRTAB",
-      "address": 4195048,
-      "size": 46,
-      "offset": 744,
+      "physical_size": 46,
+      "virtual_address": 4195048,
+      "virtual_size": 46,
       "entropy": 3.68,
-      "chi2": 1067.04,
-      "flags": "ALLOC",
-      "md5": "070647007636639b24a57bfee83de833"
+      "chi2": 1067.04
     },
     {
+      "flags": [
+        "ALLOC",
+        "INFO_LINK"
+      ],
       "name": ".rela.plt",
+      "physical_offset": 792,
       "type": "RELA",
-      "address": 4195096,
-      "size": 48,
-      "offset": 792,
+      "physical_size": 48,
+      "virtual_address": 4195096,
+      "virtual_size": 48,
       "entropy": 1.31,
-      "chi2": 7738.67,
-      "flags": "ALLOC | INFO_LINK",
-      "md5": "7ad2c1e3481180009cc7f7c5a859525c"
+      "chi2": 7738.67
     },
     {
+      "flags": [
+        "ALLOC",
+        "EXECINSTR"
+      ],
       "name": ".init",
+      "physical_offset": 840,
       "type": "PROGBITS",
-      "address": 4195144,
-      "size": 13,
-      "offset": 840,
+      "physical_size": 13,
+      "virtual_address": 4195144,
+      "virtual_size": 13,
       "entropy": 2.78,
-      "chi2": 558.08,
-      "flags": "ALLOC | EXECINSTR",
-      "md5": "b3fc11cad8bf472315f13141abac6d5a"
+      "chi2": 558.08
     },
     {
+      "flags": [
+        "ALLOC",
+        "EXECINSTR"
+      ],
       "name": ".plt",
+      "physical_offset": 864,
       "type": "PROGBITS",
-      "address": 4195168,
-      "size": 48,
-      "offset": 864,
+      "physical_size": 48,
+      "virtual_address": 4195168,
+      "virtual_size": 48,
       "entropy": 3.44,
-      "chi2": 1584,
-      "flags": "ALLOC | EXECINSTR",
-      "md5": "1823bec928baea492f590957c583d0b5"
+      "chi2": 1584
     },
     {
+      "flags": [
+        "ALLOC",
+        "EXECINSTR"
+      ],
       "name": ".text",
+      "physical_offset": 912,
       "type": "PROGBITS",
-      "address": 4195216,
-      "size": 465,
-      "offset": 912,
+      "physical_size": 465,
+      "virtual_address": 4195216,
+      "virtual_size": 465,
       "entropy": 5.44,
-      "chi2": 6552.7,
-      "flags": "ALLOC | EXECINSTR",
-      "md5": "ebc2192feed561951385b85af9f255de"
+      "chi2": 6552.7
     },
     {
+      "flags": [
+        "ALLOC",
+        "EXECINSTR"
+      ],
       "name": ".fini",
+      "physical_offset": 1377,
       "type": "PROGBITS",
-      "address": 4195681,
-      "size": 8,
-      "offset": 1377,
+      "physical_size": 8,
+      "virtual_address": 4195681,
+      "virtual_size": 8,
       "entropy": 2.75,
-      "chi2": 312,
-      "flags": "ALLOC | EXECINSTR",
-      "md5": "5d437075a3b50fd449d03cc3f59b341b"
+      "chi2": 312
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".rodata",
+      "physical_offset": 1385,
       "type": "PROGBITS",
-      "address": 4195689,
-      "size": 14,
-      "offset": 1385,
+      "physical_size": 14,
+      "virtual_address": 4195689,
+      "virtual_size": 14,
       "entropy": 3.32,
-      "chi2": 388.29,
-      "flags": "ALLOC",
-      "md5": "a79133c2466b7180a4de0fd3fe302b0b"
+      "chi2": 388.29
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".eh_frame_hdr",
+      "physical_offset": 1400,
       "type": "PROGBITS",
-      "address": 4195704,
-      "size": 28,
-      "offset": 1400,
+      "physical_size": 28,
+      "virtual_address": 4195704,
+      "virtual_size": 28,
       "entropy": 2.86,
-      "chi2": 1617.71,
-      "flags": "ALLOC",
-      "md5": "61bd12fa18ee6e8e4bd49c72fd4c057e"
+      "chi2": 1617.71
     },
     {
+      "flags": [
+        "ALLOC"
+      ],
       "name": ".eh_frame",
+      "physical_offset": 1432,
       "type": "PROGBITS",
-      "address": 4195736,
-      "size": 100,
-      "offset": 1432,
+      "physical_size": 100,
+      "virtual_address": 4195736,
+      "virtual_size": 100,
       "entropy": 3.94,
-      "chi2": 4717.92,
-      "flags": "ALLOC",
-      "md5": "58f77822288abd3346f8a680baddd3a7"
+      "chi2": 4717.92
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".ctors",
+      "physical_offset": 3744,
       "type": "PROGBITS",
-      "address": 6295200,
-      "size": 16,
-      "offset": 3744,
+      "physical_size": 16,
+      "virtual_address": 6295200,
+      "virtual_size": 16,
       "entropy": 1,
-      "chi2": 2032,
-      "flags": "WRITE | ALLOC",
-      "md5": "f858d36231ba743ad8c898d86a67a864"
+      "chi2": 2032
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".dtors",
+      "physical_offset": 3760,
       "type": "PROGBITS",
-      "address": 6295216,
-      "size": 16,
-      "offset": 3760,
+      "physical_size": 16,
+      "virtual_address": 6295216,
+      "virtual_size": 16,
       "entropy": 1,
-      "chi2": 2032,
-      "flags": "WRITE | ALLOC",
-      "md5": "f858d36231ba743ad8c898d86a67a864"
+      "chi2": 2032
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".dynamic",
+      "physical_offset": 3776,
       "type": "DYNAMIC",
-      "address": 6295232,
-      "size": 320,
-      "offset": 3776,
+      "physical_size": 320,
+      "virtual_address": 6295232,
+      "virtual_size": 320,
       "entropy": 1.22,
-      "chi2": 60276.8,
-      "flags": "WRITE | ALLOC",
-      "md5": "e0fb5e7ca80769538acb5efb27a266fa"
+      "chi2": 60276.8
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".got.plt",
+      "physical_offset": 4096,
       "type": "PROGBITS",
-      "address": 6295552,
-      "size": 40,
-      "offset": 4096,
+      "physical_size": 40,
+      "virtual_address": 6295552,
+      "virtual_size": 40,
       "entropy": 1.38,
-      "chi2": 6193.6,
-      "flags": "WRITE | ALLOC",
-      "md5": "8075570109c80fbfea0c3392fde4996a"
+      "chi2": 6193.6
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".data",
+      "physical_offset": 4136,
       "type": "PROGBITS",
-      "address": 6295592,
-      "size": 8,
-      "offset": 4136,
+      "physical_size": 8,
+      "virtual_address": 6295592,
+      "virtual_size": 8,
       "entropy": 0,
-      "chi2": 2040,
-      "flags": "WRITE | ALLOC",
-      "md5": "7dea362b3fac8e00956a4952a3d4f474"
+      "chi2": 2040
     },
     {
+      "flags": [
+        "WRITE",
+        "ALLOC"
+      ],
       "name": ".bss",
+      "physical_offset": 4144,
       "type": "NOBITS",
-      "address": 6295616,
-      "size": 80,
-      "offset": 4144,
+      "physical_size": 80,
+      "virtual_address": 6295616,
+      "virtual_size": 80,
       "entropy": 4.38,
-      "chi2": 1251.2,
-      "flags": "WRITE | ALLOC",
-      "md5": "037927a92704c28e7d7fbf79b86af579"
+      "chi2": 1251.2
     },
     {
+      "flags": [
+        "MERGE",
+        "STRINGS"
+      ],
       "name": ".comment",
+      "physical_offset": 4144,
       "type": "PROGBITS",
-      "address": 0,
-      "size": 17,
-      "offset": 4144,
+      "physical_size": 17,
+      "virtual_address": 0,
+      "virtual_size": 17,
       "entropy": 3.62,
-      "chi2": 359.47,
-      "flags": "MERGE | STRINGS",
-      "md5": "97e57f09b3f0ad65e3b218ba9812a382"
+      "chi2": 359.47
     },
     {
       "name": ".shstrtab",
+      "physical_offset": 4161,
       "type": "STRTAB",
-      "address": 0,
-      "size": 157,
-      "offset": 4161,
+      "physical_size": 157,
+      "virtual_address": 0,
+      "virtual_size": 157,
       "entropy": 4.11,
-      "chi2": 2730.75,
-      "flags": "-",
-      "md5": "f6fd260a73c3e8adff25122e03bfc0f7"
+      "chi2": 2730.75
     }
-  ],
-  "imports": {
-    "unknown": [
-      "printf",
-      "__libc_start_main"
-    ]
-  },
-  "telfhash": "3e400000000c00000003000000000c000003000000c03000000000000000000000000c"
+  ]
 }

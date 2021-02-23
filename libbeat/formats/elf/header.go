@@ -215,3 +215,87 @@ func translateMachine(machine elf.Machine) string {
 	}
 	return "Unknown machine"
 }
+
+func translateVersion(version elf.Version) string {
+	switch version {
+	case elf.EV_NONE:
+		return "none"
+	case elf.EV_CURRENT:
+		return "current"
+	default:
+		return "unknown"
+	}
+}
+
+var osABINames = map[elf.OSABI]string{
+	elf.ELFOSABI_NONE:       "UNIX System V ABI",
+	elf.ELFOSABI_HPUX:       "HP-UX operating system",
+	elf.ELFOSABI_NETBSD:     "NetBSD",
+	elf.ELFOSABI_LINUX:      "GNU/Linux",
+	elf.ELFOSABI_HURD:       "GNU/Hurd",
+	elf.ELFOSABI_86OPEN:     "86Open common IA32 ABI",
+	elf.ELFOSABI_SOLARIS:    "Solaris",
+	elf.ELFOSABI_AIX:        "AIX",
+	elf.ELFOSABI_IRIX:       "IRIX",
+	elf.ELFOSABI_FREEBSD:    "FreeBSD",
+	elf.ELFOSABI_TRU64:      "TRU64 UNIX",
+	elf.ELFOSABI_MODESTO:    "Novell Modesto",
+	elf.ELFOSABI_OPENBSD:    "OpenBSD",
+	elf.ELFOSABI_OPENVMS:    "Open VMS",
+	elf.ELFOSABI_NSK:        "HP Non-Stop Kernel",
+	elf.ELFOSABI_AROS:       "Amiga Research OS",
+	elf.ELFOSABI_FENIXOS:    "The FenixOS highly scalable multi-core OS",
+	elf.ELFOSABI_CLOUDABI:   "Nuxi CloudABI",
+	elf.ELFOSABI_ARM:        "ARM",
+	elf.ELFOSABI_STANDALONE: "Standalone (embedded) application",
+}
+
+func translateOSABI(abi elf.OSABI) string {
+	if found, ok := osABINames[abi]; ok {
+		return found
+	}
+	return "Unknown OS ABI"
+}
+
+func translateType(t elf.Type) string {
+	switch t {
+	case elf.ET_REL:
+		return "Relocatable"
+	case elf.ET_EXEC:
+		return "Executable"
+	case elf.ET_DYN:
+		return "Shared object"
+	case elf.ET_CORE:
+		return "Core file"
+	default:
+		if t >= elf.ET_LOOS && t <= elf.ET_HIOS {
+			return "OS specific"
+		}
+		if t >= elf.ET_LOPROC && t <= elf.ET_HIPROC {
+			return "Processor specific"
+		}
+		return "unknown type"
+	}
+}
+
+func translateClass(c elf.Class) string {
+	switch c {
+	case elf.ELFCLASS32:
+		return "32-bit architecture"
+	case elf.ELFCLASS64:
+		return "64-bit architecture"
+	default:
+		return "unknown architecture class"
+	}
+}
+
+func translateData(d elf.Data) string {
+	switch d {
+	case elf.ELFDATA2LSB:
+		return "little-endian"
+	case elf.ELFDATA2MSB:
+		return "big-endian"
+	default:
+		return "unknown data format"
+	}
+}

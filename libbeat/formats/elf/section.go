@@ -19,7 +19,6 @@ package elf
 
 import (
 	"debug/elf"
-	"strings"
 )
 
 var sectionNames = map[elf.SectionType]string{
@@ -55,7 +54,7 @@ func translateSectionType(sectionType elf.SectionType) string {
 	return "UNKNOWN"
 }
 
-func translateSectionFlags(flags elf.SectionFlag) string {
+func translateSectionFlags(flags elf.SectionFlag) []string {
 	active := []string{}
 	if flags&elf.SHF_WRITE > 0 {
 		active = append(active, "WRITE")
@@ -96,8 +95,5 @@ func translateSectionFlags(flags elf.SectionFlag) string {
 	if flags&elf.SHF_MASKPROC > 0 {
 		active = append(active, "MASKPROC")
 	}
-	if len(active) == 0 {
-		return "-"
-	}
-	return strings.Join(active, " | ")
+	return active
 }
