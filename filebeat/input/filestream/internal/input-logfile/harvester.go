@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -30,6 +31,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
+)
+
+var (
+	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
+	ErrReaderGroupTimeout      = errors.New("timeout while waiting for new harvester to start")
 )
 
 // Harvester is the reader which collects the lines from
@@ -66,13 +72,27 @@ func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Co
 	defer r.mu.Unlock()
 
 	if _, ok := r.table[id]; ok {
-		return nil, nil, fmt.Errorf("harvester is already running for file")
+		return nil, nil, ErrHarvesterAlreadyRunning
 	}
 
 	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))
 
 	r.table[id] = cancel
 	return ctx, cancel, nil
+}
+
+func (r *readerGroup) waitUntilNewContext(id string, cancelation v2.Canceler, timeout time.Duration) (context.Context, context.CancelFunc, error) {
+	stoppingTime := time.Now().Add(timeout)
+	for cancelation.Err() == nil && time.Now().Before(stoppingTime) {
+		context, cancel, err := r.newContext(id, cancelation)
+		if err != nil {
+			if err == ErrHarvesterAlreadyRunning {
+				continue
+			}
+		}
+		return context, cancel, err
+	}
+	return nil, nil, ErrReaderGroupTimeout
 }
 
 func (r *readerGroup) remove(id string) {
@@ -93,6 +113,8 @@ func (r *readerGroup) remove(id string) {
 type HarvesterGroup interface {
 	// Start starts a Harvester and adds it to the readers list.
 	Start(input.Context, Source)
+	// Restart starts a Harvester if it might be already running.
+	Restart(input.Context, Source)
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
 	// StopGroup cancels all running Harvesters.
@@ -110,12 +132,27 @@ type defaultHarvesterGroup struct {
 
 // Start starts the Harvester for a Source. It does not block.
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
-	sourceName := s.Name()
-
-	ctx.Logger = ctx.Logger.With("source", sourceName)
+	ctx.Logger = ctx.Logger.With("source", s.Name())
 	ctx.Logger.Debug("Starting harvester for file")
 
-	hg.tg.Go(func(canceler unison.Canceler) error {
+	hg.tg.Go(startHarvester(ctx, hg, s, 0))
+}
+
+// Restart starts the Harvester for a Source if a Harvester is already running it waits for it
+// to shut down for a specified timeout. It does not block.
+func (hg *defaultHarvesterGroup) Restart(ctx input.Context, s Source) {
+
+	ctx.Logger = ctx.Logger.With("source", s.Name())
+	ctx.Logger.Debug("Restarting harvester for file")
+
+	// we are waiting for five seconds so harvester has enough time to shut down
+	hg.tg.Go(startHarvester(ctx, hg, s, 5*time.Second))
+}
+
+func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, timeout time.Duration) func(canceler unison.Canceler) error {
+	sourceName := s.Name()
+
+	return func(canceler unison.Canceler) error {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -126,8 +163,16 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(sourceName, canceler)
 		if err != nil {
-			return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
+			if err == ErrHarvesterAlreadyRunning && 0 < timeout {
+				harvesterCtx, cancelHarvester, err = hg.readers.waitUntilNewContext(sourceName, canceler, timeout)
+				if err != nil {
+					return fmt.Errorf("error while waiting for new reader to the bookkeeper %v", err)
+				}
+			} else {
+				return fmt.Errorf("error while adding new reader to the bookkeeper %v", err)
+			}
 		}
+
 		ctx.Cancelation = harvesterCtx
 		defer cancelHarvester()
 		defer hg.readers.remove(sourceName)
@@ -155,8 +200,9 @@ func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 		if err != nil && err != context.Canceled {
 			return fmt.Errorf("error while running harvester: %v", err)
 		}
+
 		return nil
-	})
+	}
 }
 
 // Stop stops the running Harvester for a given Source.

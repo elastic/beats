@@ -29,6 +29,7 @@ const (
 	OpWrite
 	OpDelete
 	OpRename
+	OpTruncate
 )
 
 // Operation describes what happened to a file.

@@ -76,7 +76,7 @@ func TestFileScanner(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			cfg := fileScannerConfig{
+			cfg := FileScannerConfig{
 				ExcludedFiles: test.excludedFiles,
 				Symlinks:      test.symlinks,
 				RecursiveGlob: false,

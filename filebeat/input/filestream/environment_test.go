@@ -134,8 +134,38 @@ func (e *inputTestingEnvironment) mustRemoveFile(filename string) {
 	}
 }
 
+func (e *inputTestingEnvironment) mustSymlink(filename, symlinkname string) {
+	err := os.Symlink(e.abspath(filename), e.abspath(symlinkname))
+	if err != nil {
+		e.t.Fatalf("failed to create symlink to file '%s': %+v", filename, err)
+	}
+}
+
+func (e *inputTestingEnvironment) mustTruncateFile(filename string, size int64) {
+	path := e.abspath(filename)
+	err := os.Truncate(path, size)
+	if err != nil {
+		e.t.Fatalf("failed to truncate file '%s': %+v", path, err)
+	}
+}
+
 func (e *inputTestingEnvironment) abspath(filename string) string {
 	return filepath.Join(e.workingDir, filename)
+}
+
+func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
+	inputStore, _ := e.stateStore.Access()
+
+	actual := 0
+	err := inputStore.Each(func(_ string, _ statestore.ValueDecoder) (bool, error) {
+		actual += 1
+		return true, nil
+	})
+	if err != nil {
+		e.t.Fatalf("error while iterating through registry: %+v", err)
+	}
+
+	require.Equal(e.t, actual, expectedCount)
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
@@ -205,12 +235,23 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}
 }
 
+// waitUntilHarvesterIsDone detects Harvester stop by checking if the last client has been closed
+// as when a Harvester stops the client is closed.
+func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
+	for !e.pipeline.clients[len(e.pipeline.clients)-1].closed {
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
 // requireEventReceived requires that the list of messages has made it into the output.
 func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	foundEvents := make([]bool, len(events))
 	checkedEventCount := 0
 	for _, c := range e.pipeline.clients {
 		for _, evt := range c.GetEvents() {
+			if len(events) == checkedEventCount {
+				e.t.Fatalf("not enough expected elements")
+			}
 			message := evt.Fields["message"].(string)
 			if message == events[checkedEventCount] {
 				foundEvents[checkedEventCount] = true
@@ -227,6 +268,16 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	}
 
 	require.Equal(e.t, 0, len(missingEvents), "following events are missing: %+v", missingEvents)
+}
+
+func (e *inputTestingEnvironment) getOutputMessages() []string {
+	messages := make([]string, 0)
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			messages = append(messages, evt.Fields["message"].(string))
+		}
+	}
+	return messages
 }
 
 type testInputStore struct {

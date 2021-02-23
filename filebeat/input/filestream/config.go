@@ -30,7 +30,7 @@ import (
 
 // Config stores the options of a file stream.
 type config struct {
-	readerConfig
+	ReaderConfig `config:",inline"`
 
 	Paths          []string                `config:"paths"`
 	Close          closerConfig            `config:"close"`
@@ -59,7 +59,7 @@ type stateChangeCloserConfig struct {
 	Renamed       bool          `config:"renamed"`
 }
 
-type readerConfig struct {
+type ReaderConfig struct {
 	Backoff        backoffConfig           `config:"backoff"`
 	BufferSize     int                     `config:"buffer_size"`
 	Encoding       string                  `config:"encoding"`
@@ -79,7 +79,7 @@ type backoffConfig struct {
 
 func defaultConfig() config {
 	return config{
-		readerConfig:   defaultReaderConfig(),
+		ReaderConfig:   defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
 		CleanInactive:  0,
@@ -104,8 +104,8 @@ func defaultCloserConfig() closerConfig {
 	}
 }
 
-func defaultReaderConfig() readerConfig {
-	return readerConfig{
+func defaultReaderConfig() ReaderConfig {
+	return ReaderConfig{
 		Backoff: backoffConfig{
 			Init: 1 * time.Second,
 			Max:  10 * time.Second,

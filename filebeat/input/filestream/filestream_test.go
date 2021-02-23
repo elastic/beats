@@ -63,7 +63,7 @@ func TestLogFileTimedClosing(t *testing.T) {
 				logp.L(),
 				context.TODO(),
 				f,
-				readerConfig{},
+				ReaderConfig{},
 				closerConfig{
 					OnStateChange: stateChangeCloserConfig{
 						CheckInterval: 1 * time.Second,
@@ -91,7 +91,7 @@ func TestLogFileTruncated(t *testing.T) {
 	defer f.Close()
 	defer os.Remove(f.Name())
 
-	reader, err := newFileReader(logp.L(), context.TODO(), f, readerConfig{}, closerConfig{})
+	reader, err := newFileReader(logp.L(), context.TODO(), f, ReaderConfig{}, closerConfig{})
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)
 	}

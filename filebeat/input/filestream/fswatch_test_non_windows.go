@@ -82,7 +82,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 		test := test
 
 		t.Run(name, func(t *testing.T) {
-			cfg := fileScannerConfig{
+			cfg := FileScannerConfig{
 				ExcludedFiles: test.excludedFiles,
 				Symlinks:      true,
 				RecursiveGlob: false,
@@ -115,7 +115,7 @@ func TestFileWatcherRenamedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cfg := fileScannerConfig{
+	cfg := FileScannerConfig{
 		ExcludedFiles: nil,
 		Symlinks:      false,
 		RecursiveGlob: false,
