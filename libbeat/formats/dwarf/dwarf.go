@@ -130,7 +130,7 @@ func Parse(data *dwarf.Data) ([]DWARF, error) {
 		var compiledAt *time.Time
 		if entry.Tag == dwarf.TagCompileUnit {
 			lreader, err := data.LineReader(entry)
-			if err == nil {
+			if err == nil && lreader != nil {
 				// just skip if we can't read the data
 				for _, f := range lreader.Files() {
 					if f != nil && f.Mtime != 0 {

@@ -48,7 +48,7 @@ const (
 func init() {
 	processors.RegisterPlugin(addFileDataName,
 		checks.ConfigChecked(NewAddFileData,
-			checks.AllowedFields("field", "target", "exclude", "only", "pattern")))
+			checks.AllowedFields("field", "target", "exclude", "only", "pattern", "ignore_failure")))
 }
 
 type addFileDataProcessor struct {
