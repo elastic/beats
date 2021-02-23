@@ -45,6 +45,7 @@ type addFormatDataProcessor struct {
 	Field   string    `config:"field"`
 	Exclude *[]string `config:"exclude"`
 	Only    *[]string `config:"only"`
+	parsers []*parser
 }
 
 const defaultFilePathField = "file.path"
@@ -57,6 +58,15 @@ func NewAddFormatData(cfg *common.Config) (processors.Processor, error) {
 	if err := cfg.Unpack(addFormatData); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the add_format_data configuration")
 	}
+	parsers := allParsers
+	// only takes precedence to exclude
+	if addFormatData.Only != nil {
+		parsers = onlyParsers(*addFormatData.Only)
+	}
+	if addFormatData.Exclude != nil {
+		parsers = filterParsers(*addFormatData.Exclude)
+	}
+	addFormatData.parsers = parsers
 
 	return addFormatData, nil
 }
@@ -71,15 +81,7 @@ func (a *addFormatDataProcessor) applyParser(event *beat.Event, path string) err
 		// we couldn't identify the file, don't parse it
 		return nil
 	}
-	parsers := allParsers
-	// only takes precedence to exclude
-	if a.Only != nil {
-		parsers = onlyParsers(*a.Only)
-	}
-	if a.Exclude != nil {
-		parsers = filterParsers(*a.Exclude)
-	}
-	for _, parser := range parsers {
+	for _, parser := range a.parsers {
 		if mimeType == parser.mimeType {
 			data, err := parser.parse(file)
 			if err != nil {
