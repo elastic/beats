@@ -936,7 +936,15 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
     }
     if(args?.content?.containsKey('packaging-arm')) {
-      steps.packagingArm(context: args.context, command: args.content.get('packaging-arm'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
+      steps.packagingArm(context: args.context,
+                         command: args.content.get('packaging-arm'),
+                         directory: args.project,
+                         label: args.label,
+                         isMage: true,
+                         id: args.id,
+                         e2e: args.content.get('e2e'),
+                         package: true,
+                         dockerArch: 'arm64')
     }
     if(args?.content?.containsKey('packaging-linux')) {
       steps.packagingLinux(context: args.context,
