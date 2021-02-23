@@ -84,7 +84,6 @@ type EnrollCmdOption struct {
 	Staging              string
 	FleetServerConnStr   string
 	FleetServerPolicyID  string
-	NoRestart            bool
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -178,16 +177,11 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 		// enroll should use localhost as fleet-server is now running
 		// it must also restart
 		c.options.URL = "http://localhost:8000"
-		c.options.NoRestart = false
 	}
 
 	err := c.enrollWithBackoff(ctx)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
-	}
-
-	if c.options.NoRestart {
-		return nil
 	}
 
 	if c.daemonReload(ctx) != nil {
