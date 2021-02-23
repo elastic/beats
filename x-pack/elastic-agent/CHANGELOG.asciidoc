@@ -33,6 +33,9 @@
 - Fixed reenroll scenario {pull}23686[23686]
 - Fixed Monitoring filebeat and metricbeat not connecting to Agent over GRPC {pull}23843[23843]
 - Fixed make status readable in the log. {pull}23849[23849]
+- Windows agent doesn't uninstall with a lowercase `c:` drive in the path {pull}23998[23998]
+- Fix reloading of log level for services {pull}[24055]24055
+- Fix: Successfully installed and enrolled agent running standalone{pull}[24128]24128
 
 ==== New features
 
@@ -52,6 +55,7 @@
 - Add --staging option to enroll command {pull}20026[20026]
 - Add `event.dataset` to all events {pull}20076[20076]
 - Send datastreams fields {pull}20416[20416]
+- Agent supports capabilities definition {pull}23848[23848]
 
 [[release-notes-7.8.0]]
 === Elastic Agent version 7.8.0

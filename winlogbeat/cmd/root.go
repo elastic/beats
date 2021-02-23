@@ -37,7 +37,7 @@ const (
 	Name = "winlogbeat"
 
 	// ecsVersion specifies the version of ECS that Winlogbeat is implementing.
-	ecsVersion = "1.7.0"
+	ecsVersion = "1.8.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.

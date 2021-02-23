@@ -1,0 +1,34 @@
+processors:
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: [authentication]
+  - append:
+      field: event.type
+      value: [change]
+  - set:
+      field: event.dataset
+      value: crowdstrike.falcon_audit
+  - convert:
+      field: crowdstrike.event.ServiceName
+      type: string
+      target_field: message
+      ignore_failure: true
+      ignore_missing: true
+  - convert:
+      field: crowdstrike.event.UserIp
+      target_field: source.ip
+      type: string
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""
+  - script:
+      lang: painless
+      source: |
+        def regex = /([a-z0-9])([A-Z])/;
+        def replacement = "$1_$2";
+        def action = ctx?.crowdstrike?.event?.OperationName;
+        if (action == null || action == "") return;
+        ctx["event.action"] = regex.matcher(action).replaceAll(replacement).toLowerCase();

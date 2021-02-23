@@ -40,6 +40,9 @@
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.47.71",
             "46.161.30.47"
@@ -112,6 +115,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.22"
@@ -180,6 +186,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.22"
@@ -245,6 +254,9 @@
         "observer.serial_number": "C30006T22TGR89B",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.89",
             "82.211.30.202"

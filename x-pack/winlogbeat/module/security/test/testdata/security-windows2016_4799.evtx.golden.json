@@ -18,6 +18,7 @@
     },
     "group": {
       "domain": "Builtin",
+      "id": "S-1-5-32-544",
       "name": "Administrators"
     },
     "host": {

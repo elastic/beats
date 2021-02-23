@@ -335,6 +335,18 @@ filebeat.modules:
     # of the document. The default is true.
     #var.use_namespace: true
 
+#------------------------------- Pensando Module -------------------------------
+- module: pensando
+# Firewall logs
+  dfw:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # var.paths:
+
 #------------------------------ PostgreSQL Module ------------------------------
 #- module: postgresql
   # Logs
@@ -1983,7 +1995,9 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
+  # Configure automatic file rotation on every startup. The default is true.
+  #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.

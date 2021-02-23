@@ -43,7 +43,7 @@ const (
 	Name = "metricbeat"
 
 	// ecsVersion specifies the version of ECS that this beat is implementing.
-	ecsVersion = "1.7.0"
+	ecsVersion = "1.8.0"
 )
 
 // RootCmd to handle beats cli
