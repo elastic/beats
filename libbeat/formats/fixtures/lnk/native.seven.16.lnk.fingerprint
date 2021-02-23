@@ -1,32 +1,32 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "ForceNoLinkInfo",
       "HasIconLocation",
       "HasName",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [],
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "file_flags": [],
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 128,
+      "type_id": 128,
       "sha256": "b784138ea9c6c6076de1bfb17a04afc1bc18431cf6cf9ff707e6bfebfd428ed2"
     },
     {
       "size": 32,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "a4064e1cb728a90a91be50f60bfcd4e5c3a8ac6f44d2b911ee873580c591440f"
     }
   ],
   "name": "@%SystemRoot%\\system32\\gameux.dll,-10311",
-  "iconLocation": "%ProgramFiles%\\Microsoft Games\\More Games\\MoreGames.dll",
+  "icon_location": "%ProgramFiles%\\Microsoft Games\\More Games\\MoreGames.dll",
   "extra": {
-    "propertyStore": {}
+    "property_store": {}
   }
 }

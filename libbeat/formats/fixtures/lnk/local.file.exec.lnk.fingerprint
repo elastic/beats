@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasArguments",
       "HasIconLocation",
       "HasLinkInfo",
@@ -11,61 +11,61 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2010-07-12T09:45:31Z",
-    "accessedTime": "2010-07-12T09:59:58Z",
-    "modifiedTime": "2010-07-12T09:55:36Z",
-    "fileSize": 5120,
-    "iconIndex": 27,
-    "windowStyle": "SW_NORMAL",
+    "creation_time": "2010-07-12T09:45:31Z",
+    "accessed_time": "2010-07-12T09:59:58Z",
+    "modified_time": "2010-07-12T09:55:36Z",
+    "file_size": 5120,
+    "icon_index": 27,
+    "window_style": "SW_NORMAL",
     "hotKey": "HOTKEYF_ALT+G"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 68,
+      "type_id": 68,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 64,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "af2aa63827c0a19bb40eb90e1e36d29dfebcc9615f550aedec805d0f46ec2e6d"
     },
     {
       "size": 58,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "60d3eafdaecb7dcf21f68c1af22052f9519419ae77ea2b4b91d187519a07047b"
     },
     {
       "size": 64,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "7e199b495493900dcabae0891a57762af90e08623979852291b6d6a14b143ce4"
     },
     {
       "size": 72,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "09e05071911f51a15ffd453abf4f1825b20909ee3aa3898aaad086d28d356791"
     },
     {
       "size": 48,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "4b4782ce717aaf5477a3c9330f00b8c3f4a797db5c991f29e7fd40e8cb6b692a"
     },
     {
       "size": 54,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "648e071b1e752a5588ec8953007fdd3a1ca6a003c7f34bda208a3547ce0355da"
     },
     {
       "size": 84,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "c787c3eabf63fe8f045a8e711bc92185318d9d15a37be8e8cc6442170320ce16"
     }
   ],
@@ -74,27 +74,27 @@
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0xd0d576f3",
-      "volumeLabel": "DATA"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0xd0d576f3",
+      "volume_label": "DATA"
     },
-    "localBasePath": "D:\\Devl.Net\\@Perso\\Shellify\\ShellifyTool\\bin\\Debug\\ShellifyTool.exe"
+    "local_base_path": "D:\\Devl.Net\\@Perso\\Shellify\\ShellifyTool\\bin\\Debug\\ShellifyTool.exe"
   },
   "name": "ExecTesting",
-  "relativePath": "..\\..\\ShellifyTool\\bin\\Debug\\ShellifyTool.exe",
-  "workingDirectory": "D:\\Devl.Net\\@Perso\\Shellify\\ShellifyTool\\bin\\Debug",
-  "commandLine": "argument1 argument2 argument3",
-  "iconLocation": "%SystemRoot%\\system32\\SHELL32.dll",
+  "relative_path": "..\\..\\ShellifyTool\\bin\\Debug\\ShellifyTool.exe",
+  "working_directory": "D:\\Devl.Net\\@Perso\\Shellify\\ShellifyTool\\bin\\Debug",
+  "command_line": "argument1 argument2 argument3",
+  "icon_location": "%SystemRoot%\\system32\\SHELL32.dll",
   "extra": {
     "console": {
-      "fillAttributes": [
+      "fill_attributes": [
         "BACKGROUND_BLUE",
         "BACKGROUND_GREEN",
         "FOREGROUND_BLUE",
         "FOREGROUND_GREEN",
         "FOREGROUND_RED"
       ],
-      "popupFillAttributes": [
+      "popup_fill_attributes": [
         "BACKGROUND_BLUE",
         "BACKGROUND_GREEN",
         "BACKGROUND_INTENSITY",
@@ -102,25 +102,25 @@
         "FOREGROUND_BLUE",
         "FOREGROUND_RED"
       ],
-      "screenBufferSizeX": 80,
-      "screenBufferSizeY": 300,
-      "windowSizeX": 79,
-      "windowSizeY": 24,
-      "windowOriginX": 0,
-      "windowOriginY": 0,
-      "fontSize": 1048576,
-      "fontFamily": "FF_MODERN | TMPF_DEVICE | TMPF_TRUETYPE | TMPF_VECTOR",
-      "fontWeight": 400,
-      "faceName": "Lucida Console",
-      "cursorSize": 100,
-      "fullScreen": true,
-      "quickEdit": false,
-      "insertMode": true,
-      "autoPosition": true,
-      "historyBufferSize": 50,
-      "numberOfHistoryBuffers": 4,
-      "historyNoDup": false,
-      "colorTable": [
+      "screen_buffer_size_x": 80,
+      "screen_buffer_size_y": 300,
+      "window_size_x": 79,
+      "window_size_y": 24,
+      "window_origin_x": 0,
+      "window_origin_y": 0,
+      "font_size": 1048576,
+      "font_family": "FF_MODERN | TMPF_DEVICE | TMPF_TRUETYPE | TMPF_VECTOR",
+      "font_weight": 400,
+      "face_name": "Lucida Console",
+      "cursor_size": 100,
+      "full_screen": true,
+      "quick_edit": false,
+      "insert_mode": true,
+      "auto_position": true,
+      "history_buffer_size": 50,
+      "number_of_history_buffers": 4,
+      "history_no_dup": false,
+      "color_table": [
         "0x000000",
         "0x800000",
         "0x008000",
@@ -141,12 +141,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "al-0145",
+      "machine_id": "al-0145",
       "droid": [
         "06f31514-5a0c-904f-8d72-20c497b6ddb0",
         "dedee424-bb8c-df11-ba00-001c234bc396"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "06f31514-5a0c-904f-8d72-20c497b6ddb0",
         "dedee424-bb8c-df11-ba00-001c234bc396"
       ]

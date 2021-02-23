@@ -1,36 +1,36 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
       "HasRelativePath",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_DIRECTORY",
       "FILE_ATTRIBUTE_READONLY"
     ],
-    "creationTime": "2009-09-16T09:31:55Z",
-    "accessedTime": "2009-09-16T09:32:12Z",
-    "modifiedTime": "2009-09-16T09:32:12Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-09-16T09:31:55Z",
+    "accessed_time": "2009-09-16T09:32:12Z",
+    "modified_time": "2009-09-16T09:32:12Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "location": {
     "flags": [
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0x3e5dce88"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0x3e5dce88"
     },
-    "localBasePath": "C:\\Users\\Aldheris\\Desktop"
+    "local_base_path": "C:\\Users\\Aldheris\\Desktop"
   },
-  "relativePath": "..\\Desktop",
+  "relative_path": "..\\Desktop",
   "extra": {
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "10": [
           {
@@ -48,12 +48,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "al-0149",
+      "machine_id": "al-0149",
       "droid": [
         "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
         "e81a541f-a3a2-de11-b558-001e4ff01cc7"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
         "e81a541f-a3a2-de11-b558-001e4ff01cc7"
       ]

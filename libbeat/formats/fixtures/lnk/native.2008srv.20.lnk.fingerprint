@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasExpString",
       "HasIconLocation",
       "HasName",
@@ -9,62 +9,62 @@
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2008-01-19T05:45:08Z",
-    "accessedTime": "2008-01-19T05:45:08Z",
-    "modifiedTime": "2008-01-19T07:33:10Z",
-    "fileSize": 2927104,
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2008-01-19T05:45:08Z",
+    "accessed_time": "2008-01-19T05:45:08Z",
+    "modified_time": "2008-01-19T07:33:10Z",
+    "file_size": 2927104,
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 68,
+      "type_id": 68,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 78,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "d388526f94e64db09ca8ad1e27366bdd87e94d1909273a6cd0aa3328bdd9ad30"
     },
     {
       "size": 94,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "a925d96d0dc0fa9a669f6796f5ddc972e09bfbeca048f69435d791be383fd764"
     }
   ],
   "name": "@%SystemRoot%\\system32\\Shell32.dll,-22579",
-  "relativePath": "..\\..\\..\\..\\..\\..\\..\\..\\..\\Windows\\explorer.exe",
-  "iconLocation": "%SystemRoot%\\explorer.exe",
+  "relative_path": "..\\..\\..\\..\\..\\..\\..\\..\\..\\Windows\\explorer.exe",
+  "icon_location": "%SystemRoot%\\explorer.exe",
   "extra": {
     "environment": {
       "ansi": "%SystemRoot%\\explorer.exe",
       "unicode": "%SystemRoot%\\explorer.exe"
     },
-    "knownFolder": {
+    "known_folder": {
       "id": "04f48bf3-431d-f242-9305-67de0b28fc23",
       "offset": 123
     },
-    "specialFolder": {
+    "special_folder": {
       "id": 36,
       "offset": 123
     },
     "tracker": {
       "version": 0,
-      "machineId": "win-hwdt97ahwff",
+      "machine_id": "win-hwdt97ahwff",
       "droid": [
         "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
         "f6484f80-82c6-dc11-901d-b3d7e32f3e9f"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
         "f6484f80-82c6-dc11-901d-b3d7e32f3e9f"
       ]

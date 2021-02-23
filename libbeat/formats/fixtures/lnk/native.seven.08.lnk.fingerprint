@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasDarwinID",
       "HasExpIcon",
       "HasIconLocation",
@@ -10,55 +10,55 @@
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [],
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "file_flags": [],
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 82,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "adb0bd79a80a54398d17e2ccdab84c03e2231e531e7ab5e2f9dbb30568b12a5b"
     },
     {
       "size": 88,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "1e58de9fc1d34050c497b08eaf7fcd03df9aa8d7b34aac88736e6189502c1121"
     },
     {
       "size": 176,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "ff90de58070d4797d0e32a5349466c9a385cd908aaf70bee4d3c613847adf13a"
     },
     {
       "size": 94,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "cc81ce35eb86e8c41d89c988c14966f9f500594e9e4d51ff68e2e65fe0e427e2"
     }
   ],
   "name": "Importez et organisez des photos, des images clip art, des fichiers sons et animation à l'aide de la Bibliothèque multimédia Microsoft.",
-  "relativePath": "..\\..\\..\\..\\..\\..\\..\\Windows\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe",
-  "iconLocation": "C:\\Windows\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe",
+  "relative_path": "..\\..\\..\\..\\..\\..\\..\\Windows\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe",
+  "icon_location": "C:\\Windows\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe",
   "extra": {
     "darwin": {
       "ansi": "xb'BV5!!!!!!!!!MKKSkCAGFiles\u003eFJGjc2{CeAz+$QTBrVhU",
       "unicode": "xb'BV5!!!!!!!!!MKKSkCAGFiles\u003eFJGjc2{CeAz+$QTBrVhU"
     },
-    "iconEnvironment": {
+    "icon_environment": {
       "ansi": "%SystemRoot%\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe",
       "unicode": "%SystemRoot%\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe"
     },
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "6": [
           {

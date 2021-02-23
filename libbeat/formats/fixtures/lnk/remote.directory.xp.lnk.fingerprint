@@ -1,54 +1,54 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasLinkInfo",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_DIRECTORY"
     ],
-    "creationTime": "2009-10-08T13:48:55Z",
-    "accessedTime": "2010-07-09T13:52:31Z",
-    "modifiedTime": "2010-07-08T12:36:01Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-10-08T13:48:55Z",
+    "accessed_time": "2010-07-09T13:52:31Z",
+    "modified_time": "2010-07-08T12:36:01Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 88,
+      "type_id": 88,
       "sha256": "96abeb65d87512271bcabeac8b283506e78a94968b1d8658dd5cb31a1f40951f"
     },
     {
       "size": 50,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "620d29be08dff63afe598819f919717bb1357d90b06e5a00d5a0d09e91626505"
     },
     {
       "size": 136,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "3d18dc812ad70df870b6f8a81582461acf2352d59bca0bdad825e6f59495126a"
     },
     {
       "size": 36,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "2558b29fa32b5a5da3dd4eff2c00f06ad7444b0098073b148f556e1875482f03"
     },
     {
       "size": 88,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "cb97a3fb5034bc4a98fb7b62e09dc921ee0f731485134edee6d41f22aa3cd7bf"
     },
     {
       "size": 136,
-      "typeId": 1,
+      "type_id": 1,
       "sha256": "da3df06592f5ce0069a83a8eea3aeda6b4e8650a05baf32f239c46ba9ada876b"
     },
     {
       "size": 68,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "4c365273e81fc9ae17a9b83d85ae17e9fb0e4b7bd5766ea36f8f0bc33758fa66"
     }
   ],
@@ -56,8 +56,8 @@
     "flags": [
       "CommonNetworkRelativeLinkAndPathSuffix"
     ],
-    "commonPathSuffix": "GMAldheris",
-    "networkShare": {
+    "common_path_suffix": "GMAldheris",
+    "network_share": {
       "flags": [
         "ValidNetType"
       ],
@@ -67,12 +67,12 @@
   "extra": {
     "tracker": {
       "version": 0,
-      "machineId": "als-fichiers3",
+      "machine_id": "als-fichiers3",
       "droid": [
         "00000000-0000-0000-0000-000000000000",
         "c5e0b78a-c875-de11-b8c9-000f1ff7c0dd"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "00000000-0000-0000-0000-000000000000",
         "c5e0b78a-c875-de11-b8c9-000f1ff7c0dd"
       ]

@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasIconLocation",
       "HasLinkInfo",
@@ -11,36 +11,36 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE",
       "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"
     ],
-    "creationTime": "2019-06-30T13:51:53Z",
-    "accessedTime": "2019-06-30T13:51:53Z",
-    "modifiedTime": "2019-06-30T13:52:01Z",
-    "fileSize": 10,
-    "iconIndex": 70,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2019-06-30T13:51:53Z",
+    "accessed_time": "2019-06-30T13:51:53Z",
+    "modified_time": "2019-06-30T13:52:01Z",
+    "file_size": 10,
+    "icon_index": 70,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 78,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "931c046b62479296dfc72fc30b862c0eec0e3c215619366629a6710408584fb3"
     },
     {
       "size": 98,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "f52818a36aca20ddbad0a86a50838e2d629046074b02fd8369a25cb009c6087a"
     }
   ],
@@ -49,18 +49,18 @@
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0xce9c0987",
-      "volumeLabel": "System"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0xce9c0987",
+      "volume_label": "System"
     },
-    "localBasePath": "C:\\Temp\\\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt"
+    "local_base_path": "C:\\Temp\\\ufffd\ufffd\ufffd\ufffd\ufffdN\ufffd\ufffd.txt"
   },
   "name": "コメント",
-  "relativePath": ".\\リンク先.txt",
-  "workingDirectory": "C:\\Temp",
-  "iconLocation": "%SystemRoot%\\system32\\SHELL32.dll",
+  "relative_path": ".\\リンク先.txt",
+  "working_directory": "C:\\Temp",
+  "icon_location": "%SystemRoot%\\system32\\SHELL32.dll",
   "extra": {
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "10": [
           {
@@ -84,12 +84,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "test012345",
+      "machine_id": "test012345",
       "droid": [
         "04c26c4d-cace-1647-8fa4-b334de43dd91",
         "8cf0e23d-7e9a-e911-8328-bcee7b5dda94"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "04c26c4d-cace-1647-8fa4-b334de43dd91",
         "8cf0e23d-7e9a-e911-8328-bcee7b5dda94"
       ]

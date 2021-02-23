@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasExpString",
       "HasLinkInfo",
       "HasName",
@@ -10,40 +10,40 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2009-07-13T23:51:37Z",
-    "accessedTime": "2009-07-13T23:51:37Z",
-    "modifiedTime": "2009-07-14T01:14:20Z",
-    "fileSize": 219648,
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-07-13T23:51:37Z",
+    "accessed_time": "2009-07-13T23:51:37Z",
+    "modified_time": "2009-07-14T01:14:20Z",
+    "file_size": 219648,
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 82,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "184e677e10b73142c9acb6bc4b5db242dabebda53ff506e59d720d2cbd5be706"
     },
     {
       "size": 86,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "8ce8fcbfca1d3b5d6838544cdb47e95443e55e56f0aff1a73199531b735d77d3"
     },
     {
       "size": 94,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "dc814bc487fc41e03499933cac5facf8154e3b768f8d22c06ac286342037386c"
     }
   ],
@@ -52,24 +52,24 @@
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0x502e1a8a"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0x502e1a8a"
     },
-    "localBasePath": "C:\\Windows\\System32\\fsquirt.exe"
+    "local_base_path": "C:\\Windows\\System32\\fsquirt.exe"
   },
   "name": "@C:\\Windows\\system32\\fsquirt.exe,-2305",
-  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\fsquirt.exe",
-  "workingDirectory": "C:\\Windows\\system32",
+  "relative_path": "..\\..\\..\\..\\..\\..\\Windows\\System32\\fsquirt.exe",
+  "working_directory": "C:\\Windows\\system32",
   "extra": {
     "environment": {
       "ansi": "%SystemRoot%\\system32\\fsquirt.exe",
       "unicode": "%SystemRoot%\\system32\\fsquirt.exe"
     },
-    "knownFolder": {
+    "known_folder": {
       "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
       "offset": 213
     },
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "4": [
           {
@@ -85,18 +85,18 @@
         ]
       }
     },
-    "specialFolder": {
+    "special_folder": {
       "id": 37,
       "offset": 213
     },
     "tracker": {
       "version": 0,
-      "machineId": "win-40r2agv20qa",
+      "machine_id": "win-40r2agv20qa",
       "droid": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "66d492f8-2061-df11-964c-ac3a656c3b1d"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "66d492f8-2061-df11-964c-ac3a656c3b1d"
       ]

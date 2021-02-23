@@ -1,24 +1,24 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasIconLocation",
       "HasName",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [],
-    "iconIndex": 4294967038,
-    "windowStyle": "SW_NORMAL"
+    "file_flags": [],
+    "icon_index": 4294967038,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 128,
+      "type_id": 128,
       "sha256": "5adf040358900b7b886aebf682ef8ebefb25dcfc2b4f4cd7fb076bfc2317cbe3"
     }
   ],
   "name": "@%SystemRoot%\\system32\\shell32.dll,-10114",
-  "iconLocation": "%SystemRoot%\\explorer.exe",
+  "icon_location": "%SystemRoot%\\explorer.exe",
   "extra": {}
 }

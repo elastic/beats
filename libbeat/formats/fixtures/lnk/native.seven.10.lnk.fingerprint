@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "ForceNoLinkInfo",
       "HasExpString",
       "HasIconLocation",
@@ -10,33 +10,33 @@
       "IsUnicode",
       "PreferEnvironmentPath"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2009-07-13T23:41:28Z",
-    "accessedTime": "2009-07-13T23:41:28Z",
-    "modifiedTime": "2009-07-14T01:14:13Z",
-    "fileSize": 776192,
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-07-13T23:41:28Z",
+    "accessed_time": "2009-07-13T23:41:28Z",
+    "modified_time": "2009-07-14T01:14:13Z",
+    "file_size": 776192,
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "name": "@%SystemRoot%\\system32\\shell32.dll,-22531",
-  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\calc.exe",
-  "iconLocation": "%windir%\\system32\\calc.exe",
+  "relative_path": "..\\..\\..\\..\\..\\..\\Windows\\System32\\calc.exe",
+  "icon_location": "%windir%\\system32\\calc.exe",
   "extra": {
     "environment": {
       "ansi": "%windir%\\system32\\calc.exe",
       "unicode": "%windir%\\system32\\calc.exe"
     },
-    "propertyStore": {},
+    "property_store": {},
     "tracker": {
       "version": 0,
-      "machineId": "win-dc3j5p1qj61",
+      "machine_id": "win-dc3j5p1qj61",
       "droid": [
         "a6b30b54-1b3f-044f-b746-9c5af7c07867",
         "1bc79ae2-3770-de11-816d-001c23e25b76"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "a6b30b54-1b3f-044f-b746-9c5af7c07867",
         "1bc79ae2-3770-de11-816d-001c23e25b76"
       ]

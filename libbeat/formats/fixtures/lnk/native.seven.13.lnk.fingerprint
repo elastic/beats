@@ -1,45 +1,45 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
       "HasRelativePath",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_DIRECTORY",
       "FILE_ATTRIBUTE_READONLY"
     ],
-    "creationTime": "2010-05-18T19:24:11Z",
-    "accessedTime": "2010-05-18T19:24:30Z",
-    "modifiedTime": "2010-05-18T19:24:30Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2010-05-18T19:24:11Z",
+    "accessed_time": "2010-05-18T19:24:30Z",
+    "modified_time": "2010-05-18T19:24:30Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "location": {
     "flags": [
       "CommonNetworkRelativeLinkAndPathSuffix",
       "VolumeIDAndLocalBasePath"
     ],
-    "commonPathSuffix": "Juliette\\Desktop",
+    "common_path_suffix": "Juliette\\Desktop",
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0x502e1a8a",
-      "volumeLabel": "SSD-WIN7"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0x502e1a8a",
+      "volume_label": "SSD-WIN7"
     },
-    "localBasePath": "C:\\Users\\",
-    "networkShare": {
+    "local_base_path": "C:\\Users\\",
+    "network_share": {
       "flags": [
         "ValidNetType"
       ],
       "name": "\\\\NETBOOK\\Users"
     }
   },
-  "relativePath": "..\\Desktop",
+  "relative_path": "..\\Desktop",
   "extra": {
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "10": [
           {
@@ -57,12 +57,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "netbook",
+      "machine_id": "netbook",
       "droid": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "1ef183f9-b062-df11-9c95-001377d34a59"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "1ef183f9-b062-df11-9c95-001377d34a59"
       ]

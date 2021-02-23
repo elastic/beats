@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasExpString",
       "HasIconLocation",
       "HasName",
@@ -10,69 +10,69 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE",
       "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"
     ],
-    "creationTime": "2008-01-19T05:46:11Z",
-    "accessedTime": "2008-01-19T05:46:11Z",
-    "modifiedTime": "2008-01-19T07:33:18Z",
-    "fileSize": 151040,
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2008-01-19T05:46:11Z",
+    "accessed_time": "2008-01-19T05:46:11Z",
+    "modified_time": "2008-01-19T07:33:18Z",
+    "file_size": 151040,
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 68,
+      "type_id": 68,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 78,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "ffd0f85e19747c2bff4141e1e95b3f75928a6ca4a5c2aa143ba3ac6bf45a9189"
     },
     {
       "size": 82,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "b580caeeb15f5ca1a896023cfb9db496f369a4153ae21c1364304bcdda351fe6"
     },
     {
       "size": 90,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "f03efa059ed9d8a90809826fe09df1ff94b1a4e7d376efa89742e74f86bda53a"
     }
   ],
   "name": "@%SystemRoot%\\system32\\Shell32.dll,-22563",
-  "relativePath": "..\\..\\..\\..\\..\\..\\..\\..\\..\\Windows\\System32\\notepad.exe",
-  "workingDirectory": "%HOMEDRIVE%%HOMEPATH%",
-  "iconLocation": "%SystemRoot%\\system32\\notepad.exe",
+  "relative_path": "..\\..\\..\\..\\..\\..\\..\\..\\..\\Windows\\System32\\notepad.exe",
+  "working_directory": "%HOMEDRIVE%%HOMEPATH%",
+  "icon_location": "%SystemRoot%\\system32\\notepad.exe",
   "extra": {
     "environment": {
       "ansi": "%SystemRoot%\\system32\\notepad.exe",
       "unicode": "%SystemRoot%\\system32\\notepad.exe"
     },
-    "knownFolder": {
+    "known_folder": {
       "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
       "offset": 205
     },
-    "specialFolder": {
+    "special_folder": {
       "id": 37,
       "offset": 205
     },
     "tracker": {
       "version": 0,
-      "machineId": "win-hwdt97ahwff",
+      "machine_id": "win-hwdt97ahwff",
       "droid": [
         "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
         "20494f80-82c6-dc11-901d-0014220d9404"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
         "20494f80-82c6-dc11-901d-0014220d9404"
       ]

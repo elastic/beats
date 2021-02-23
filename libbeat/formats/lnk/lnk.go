@@ -26,32 +26,32 @@ import (
 
 // Console contains LNK extra console data block info
 type Console struct {
-	FillAttributes         []string `json:"fillAttributes,omitempty"`
-	PopupFillAttributes    []string `json:"popupFillAttributes,omitempty"`
-	ScreenBufferSizeX      uint16   `json:"screenBufferSizeX"`
-	ScreenBufferSizeY      uint16   `json:"screenBufferSizeY"`
-	WindowSizeX            uint16   `json:"windowSizeX"`
-	WindowSizeY            uint16   `json:"windowSizeY"`
-	WindowOriginX          uint16   `json:"windowOriginX"`
-	WindowOriginY          uint16   `json:"windowOriginY"`
-	FontSize               uint32   `json:"fontSize"`
-	FontFamily             string   `json:"fontFamily,omitempty"`
-	FontWeight             uint32   `json:"fontWeight"`
-	FaceName               string   `json:"faceName,omitempty"`
-	CursorSize             uint32   `json:"cursorSize"`
-	FullScreen             bool     `json:"fullScreen"`
-	QuickEdit              bool     `json:"quickEdit"`
-	InsertMode             bool     `json:"insertMode"`
-	AutoPosition           bool     `json:"autoPosition"`
-	HistoryBufferSize      uint32   `json:"historyBufferSize"`
-	NumberOfHistoryBuffers uint32   `json:"numberOfHistoryBuffers"`
-	HistoryNoDup           bool     `json:"historyNoDup"`
-	ColorTable             []string `json:"colorTable"`
+	FillAttributes         []string `json:"fill_attributes,omitempty"`
+	PopupFillAttributes    []string `json:"popup_fill_attributes,omitempty"`
+	ScreenBufferSizeX      uint16   `json:"screen_buffer_size_x"`
+	ScreenBufferSizeY      uint16   `json:"screen_buffer_size_y"`
+	WindowSizeX            uint16   `json:"window_size_x"`
+	WindowSizeY            uint16   `json:"window_size_y"`
+	WindowOriginX          uint16   `json:"window_origin_x"`
+	WindowOriginY          uint16   `json:"window_origin_y"`
+	FontSize               uint32   `json:"font_size"`
+	FontFamily             string   `json:"font_family,omitempty"`
+	FontWeight             uint32   `json:"font_weight"`
+	FaceName               string   `json:"face_name,omitempty"`
+	CursorSize             uint32   `json:"cursor_size"`
+	FullScreen             bool     `json:"full_screen"`
+	QuickEdit              bool     `json:"quick_edit"`
+	InsertMode             bool     `json:"insert_mode"`
+	AutoPosition           bool     `json:"auto_position"`
+	HistoryBufferSize      uint32   `json:"history_buffer_size"`
+	NumberOfHistoryBuffers uint32   `json:"number_of_history_buffers"`
+	HistoryNoDup           bool     `json:"history_no_dup"`
+	ColorTable             []string `json:"color_table"`
 }
 
 // ConsoleFE contains LNK extra console data block info
 type ConsoleFE struct {
-	CodePage string `json:"codePage"`
+	CodePage string `json:"code_page"`
 }
 
 // Darwin contains LNK extra darwin data block info
@@ -87,13 +87,13 @@ type Property struct {
 // PropertyStore contains LNK extra property store data block info
 type PropertyStore struct {
 	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-propstore/3453fb82-0e4f-4c2c-bc04-64b4bd2c51ec
-	NamedProperties map[string][]Property `json:"namedProperties,omitempty"`
+	NamedProperties map[string][]Property `json:"named_properties,omitempty"`
 	Properties      map[uint32][]Property `json:"properties,omitempty"`
 }
 
 // Shim contains LNK extra shim data block info
 type Shim struct {
-	LayerName string `json:"layerName,omitempty"`
+	LayerName string `json:"layer_name,omitempty"`
 }
 
 // SpecialFolder contains LNK extra special folder data block info
@@ -105,9 +105,9 @@ type SpecialFolder struct {
 // Tracker contains LNK extra tracker data block info
 type Tracker struct {
 	Version    uint32   `json:"version"`
-	MachineID  string   `json:"machineId"`
+	MachineID  string   `json:"machine_id"`
 	Droid      []string `json:"droid,omitempty"`
-	DroidBirth []string `json:"droidBirth,omitempty"`
+	DroidBirth []string `json:"droid_birth,omitempty"`
 }
 
 // VistaAndAboveIDList contains LNK extra vista and above id list data block info
@@ -119,33 +119,33 @@ type VistaAndAboveIDList struct {
 type Extra struct {
 	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/c41e062d-f764-4f13-bd4f-ea812ab9a4d1
 	Console             *Console             `json:"console,omitempty"`
-	ConsoleFE           *ConsoleFE           `json:"consoleFE,omitempty"`
+	ConsoleFE           *ConsoleFE           `json:"console_fe,omitempty"`
 	Darwin              *Darwin              `json:"darwin,omitempty"`
 	Environment         *Environment         `json:"environment,omitempty"`
-	IconEnvironment     *IconEnvironment     `json:"iconEnvironment,omitempty"`
-	KnownFolder         *KnownFolder         `json:"knownFolder,omitempty"`
-	PropertyStore       *PropertyStore       `json:"propertyStore,omitempty"`
+	IconEnvironment     *IconEnvironment     `json:"icon_environment,omitempty"`
+	KnownFolder         *KnownFolder         `json:"known_folder,omitempty"`
+	PropertyStore       *PropertyStore       `json:"property_store,omitempty"`
 	Shim                *Shim                `json:"shim,omitempty"`
-	SpecialFolder       *SpecialFolder       `json:"specialFolder,omitempty"`
+	SpecialFolder       *SpecialFolder       `json:"special_folder,omitempty"`
 	Tracker             *Tracker             `json:"tracker,omitempty"`
-	VistaAndAboveIDList *VistaAndAboveIDList `json:"vistaAndAboveIdList,omitempty"`
+	VistaAndAboveIDList *VistaAndAboveIDList `json:"vista_and_above_id_list,omitempty"`
 }
 
 // Volume contains LNK location volume info
 type Volume struct {
 	// https://github.com/libyal/liblnk/blob/master/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#42-volume-information
-	DriveType         string `json:"driveType,omitempty"`
-	DriveSerialNumber string `json:"driveSerialNumber,omitempty"`
-	VolumeLabel       string `json:"volumeLabel,omitempty"`
+	DriveType         string `json:"drive_type,omitempty"`
+	DriveSerialNumber string `json:"drive_serial_number,omitempty"`
+	VolumeLabel       string `json:"volume_label,omitempty"`
 }
 
 // NetworkShare contains LNK location network share info
 type NetworkShare struct {
 	// https://github.com/libyal/liblnk/blob/master/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#43-network-share-information
 	Flags        []string `json:"flags,omitempty"`
-	ProviderType string   `json:"providerType,omitempty"`
+	ProviderType string   `json:"provider_type,omitempty"`
 	Name         string   `json:"name,omitempty"`
-	DeviceName   string   `json:"deviceName,omitempty"`
+	DeviceName   string   `json:"device_name,omitempty"`
 }
 
 // Location contains LNK location info
@@ -153,32 +153,32 @@ type Location struct {
 	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink/6813269d-0cc8-4be2-933f-e96e8e3412dc
 	// https://github.com/libyal/liblnk/blob/master/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#4-location-information
 	Flags            []string `json:"flags"`
-	CommonPathSuffix string   `json:"commonPathSuffix,omitempty"`
+	CommonPathSuffix string   `json:"common_path_suffix,omitempty"`
 	// Location information data
 	Volume        *Volume `json:"volume,omitempty"`
-	LocalBasePath string  `json:"localBasePath,omitempty"`
+	LocalBasePath string  `json:"local_base_path,omitempty"`
 	// The network share information
-	NetworkShare *NetworkShare `json:"networkShare,omitempty"`
+	NetworkShare *NetworkShare `json:"network_share,omitempty"`
 }
 
 // Target contains LNK target info
 type Target struct {
 	Size   uint16 `json:"size"`
-	TypeID uint8  `json:"typeId"`
+	TypeID uint8  `json:"type_id"`
 	SHA256 string `json:"sha256"`
 }
 
 // Header contains LNK header info
 type Header struct {
 	GUID         string     `json:"guid"`
-	LinkFlags    []string   `json:"linkFlags"`
-	FileFlags    []string   `json:"fileFlags"`
-	CreationTime *time.Time `json:"creationTime,omitempty"`
-	AccessedTime *time.Time `json:"accessedTime,omitempty"`
-	ModfiedTime  *time.Time `json:"modifiedTime,omitempty"`
-	FileSize     uint32     `json:"fileSize,omitempty"`
-	IconIndex    uint32     `json:"iconIndex"`
-	WindowStyle  string     `json:"windowStyle"`
+	LinkFlags    []string   `json:"link_flags"`
+	FileFlags    []string   `json:"file_flags"`
+	CreationTime *time.Time `json:"creation_time,omitempty"`
+	AccessedTime *time.Time `json:"accessed_time,omitempty"`
+	ModfiedTime  *time.Time `json:"modified_time,omitempty"`
+	FileSize     uint32     `json:"file_size,omitempty"`
+	IconIndex    uint32     `json:"icon_index"`
+	WindowStyle  string     `json:"window_style"`
 	HotKey       string     `json:"hotKey,omitempty"`
 
 	rawLinkFlags uint32
@@ -191,10 +191,10 @@ type Info struct {
 	Targets          []Target  `json:"targets,omitempty"`
 	Location         *Location `json:"location,omitempty"`
 	Name             string    `json:"name,omitempty"`
-	RelativePath     string    `json:"relativePath,omitempty"`
-	WorkingDirectory string    `json:"workingDirectory,omitempty"`
-	CommandLine      string    `json:"commandLine,omitempty"`
-	IconLocation     string    `json:"iconLocation,omitempty"`
+	RelativePath     string    `json:"relative_path,omitempty"`
+	WorkingDirectory string    `json:"working_directory,omitempty"`
+	CommandLine      string    `json:"command_line,omitempty"`
+	IconLocation     string    `json:"icon_location,omitempty"`
 	Extra            *Extra    `json:"extra,omitempty"`
 }
 

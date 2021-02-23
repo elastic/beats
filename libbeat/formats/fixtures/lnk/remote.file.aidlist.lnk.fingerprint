@@ -1,27 +1,27 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "DisableKnownFolderTracking",
       "HasExpString",
       "HasLinkInfo",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_DIRECTORY"
     ],
-    "creationTime": "2009-07-26T15:39:33Z",
-    "accessedTime": "2009-07-26T15:41:16Z",
-    "modifiedTime": "2009-07-26T15:41:16Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-07-26T15:39:33Z",
+    "accessed_time": "2009-07-26T15:41:16Z",
+    "modified_time": "2009-07-26T15:41:16Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "location": {
     "flags": [
       "CommonNetworkRelativeLinkAndPathSuffix"
     ],
-    "commonPathSuffix": "Encoding\\@Films\\AAA AAA AAAAA 1",
-    "networkShare": {
+    "common_path_suffix": "Encoding\\@Films\\AAA AAA AAAAA 1",
+    "network_share": {
       "flags": [
         "ValidNetType"
       ],
@@ -33,49 +33,49 @@
       "ansi": "\\\\fatality\\k$\\Encoding\\@Films\\AAA AAA AAAAA 1",
       "unicode": "\\\\fatality\\k$\\Encoding\\@Films\\AAA AAA AAAAA 1"
     },
-    "propertyStore": {},
+    "property_store": {},
     "tracker": {
       "version": 0,
-      "machineId": "fatality",
+      "machine_id": "fatality",
       "droid": [
         "d6f88e11-2d40-8641-b384-3527d35fb1eb",
         "1f268538-7491-df11-9091-8fae47a32577"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "d6f88e11-2d40-8641-b384-3527d35fb1eb",
         "1f268538-7491-df11-9091-8fae47a32577"
       ]
     },
-    "vistaAndAboveIdList": {
+    "vista_and_above_id_list": {
       "targets": [
         {
           "size": 20,
-          "typeId": 88,
+          "type_id": 88,
           "sha256": "0fd765c464bc0175cb0d598bbd77de8217dac435999d9261df8f384ae69d5e85"
         },
         {
           "size": 179,
-          "typeId": 0,
+          "type_id": 0,
           "sha256": "a4924888c786d4acf9e3c42c824563e5fdec6cd93042dbebadc1fd3227199ef4"
         },
         {
           "size": 160,
-          "typeId": 0,
+          "type_id": 0,
           "sha256": "e1f098b643c47bdee4c734acd2ff6f2a5b3332fed6566870f937c8717a07f4af"
         },
         {
           "size": 86,
-          "typeId": 0,
+          "type_id": 0,
           "sha256": "223d3713713681f8fbc798cdd4e7c027c3dfc0d5733a9009299b6e698d2b20a5"
         },
         {
           "size": 80,
-          "typeId": 0,
+          "type_id": 0,
           "sha256": "b1727773baaf9441c2f87f6b39f73978df4e861a0e97ce3d6fcc1178ad986b56"
         },
         {
           "size": 100,
-          "typeId": 0,
+          "type_id": 0,
           "sha256": "6ed7a47644a27ed26d689a4fda0144dbed91dfacb0d45a658c0e0e2b3c1a2894"
         }
       ]

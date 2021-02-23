@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasExpString",
       "HasIconLocation",
       "HasLinkInfo",
@@ -11,35 +11,35 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2004-08-20T01:03:28Z",
-    "accessedTime": "2004-08-19T12:00:00Z",
-    "modifiedTime": "2004-08-06T00:00:00Z",
-    "fileSize": 1036288,
-    "iconIndex": 1,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2004-08-20T01:03:28Z",
+    "accessed_time": "2004-08-19T12:00:00Z",
+    "modified_time": "2004-08-06T00:00:00Z",
+    "file_size": 1036288,
+    "icon_index": 1,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 60,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "0e62cf1b75299134613af72b61479a233bf7d8a3309c7e4b4e4713eb3c4e2ed2"
     },
     {
       "size": 76,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "7ef9845c2cc80f31c36a39241a1ba49cf9c78cf5efadbba3aa99acad06ab0c14"
     }
   ],
@@ -48,21 +48,21 @@
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0xb832ef92"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0xb832ef92"
     },
-    "localBasePath": "C:\\WINDOWS\\explorer.exe"
+    "local_base_path": "C:\\WINDOWS\\explorer.exe"
   },
   "name": "@%SystemRoot%\\system32\\shell32.dll,-22579",
-  "relativePath": "..\\..\\..\\..\\..\\WINDOWS\\explorer.exe",
-  "workingDirectory": "%HOMEDRIVE%%HOMEPATH%",
-  "iconLocation": "%SystemRoot%\\explorer.exe",
+  "relative_path": "..\\..\\..\\..\\..\\WINDOWS\\explorer.exe",
+  "working_directory": "%HOMEDRIVE%%HOMEPATH%",
+  "icon_location": "%SystemRoot%\\explorer.exe",
   "extra": {
     "environment": {
       "ansi": "%SystemRoot%\\explorer.exe",
       "unicode": "%SystemRoot%\\explorer.exe"
     },
-    "specialFolder": {
+    "special_folder": {
       "id": 36,
       "offset": 105
     }

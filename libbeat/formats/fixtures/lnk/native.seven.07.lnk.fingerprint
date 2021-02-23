@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "ForceNoLinkInfo",
       "HasArguments",
       "HasExpString",
@@ -11,34 +11,34 @@
       "IsUnicode",
       "PreferEnvironmentPath"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE"
     ],
-    "creationTime": "2009-07-13T23:40:14Z",
-    "accessedTime": "2009-07-13T23:40:14Z",
-    "modifiedTime": "2009-07-14T01:14:15Z",
-    "fileSize": 113152,
-    "iconIndex": 4294967295,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2009-07-13T23:40:14Z",
+    "accessed_time": "2009-07-13T23:40:14Z",
+    "modified_time": "2009-07-14T01:14:15Z",
+    "file_size": 113152,
+    "icon_index": 4294967295,
+    "window_style": "SW_NORMAL"
   },
   "name": "@%systemroot%\\system32\\sdcpl.dll,-100",
-  "relativePath": "..\\..\\..\\..\\..\\..\\Windows\\System32\\control.exe",
-  "commandLine": "/name Microsoft.BackupAndRestore",
-  "iconLocation": "%systemroot%\\system32\\sdcpl.dll",
+  "relative_path": "..\\..\\..\\..\\..\\..\\Windows\\System32\\control.exe",
+  "command_line": "/name Microsoft.BackupAndRestore",
+  "icon_location": "%systemroot%\\system32\\sdcpl.dll",
   "extra": {
     "environment": {
       "ansi": "%SystemRoot%\\System32\\control.exe",
       "unicode": "%SystemRoot%\\System32\\control.exe"
     },
-    "propertyStore": {},
+    "property_store": {},
     "tracker": {
       "version": 0,
-      "machineId": "win-dc3j5p1qj61",
+      "machine_id": "win-dc3j5p1qj61",
       "droid": [
         "a6b30b54-1b3f-044f-b746-9c5af7c07867",
         "05c79ae2-3770-de11-816d-001c23e25b76"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "a6b30b54-1b3f-044f-b746-9c5af7c07867",
         "05c79ae2-3770-de11-816d-001c23e25b76"
       ]

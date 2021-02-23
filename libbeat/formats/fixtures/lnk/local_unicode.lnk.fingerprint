@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
       "HasRelativePath",
@@ -9,35 +9,35 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE",
       "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"
     ],
-    "creationTime": "2019-07-08T14:05:42Z",
-    "accessedTime": "2019-07-08T14:05:42Z",
-    "modifiedTime": "2019-07-08T14:05:42Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2019-07-08T14:05:42Z",
+    "accessed_time": "2019-07-08T14:05:42Z",
+    "modified_time": "2019-07-08T14:05:42Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 78,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "a154c245be75662c7e902023315c2e1213a17a623645d87096cf888760b290d0"
     },
     {
       "size": 88,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "f87251a348e83e143d759541bd3cd4dce270b6cfaefee702c54aa29b0b2dd5ad"
     }
   ],
@@ -46,16 +46,16 @@
       "VolumeIDAndLocalBasePath"
     ],
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0xce9c0987",
-      "volumeLabel": "System"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0xce9c0987",
+      "volume_label": "System"
     },
-    "localBasePath": "C:\\Temp\\??.txt"
+    "local_base_path": "C:\\Temp\\??.txt"
   },
-  "relativePath": ".\\💎.txt",
-  "workingDirectory": "C:\\Temp",
+  "relative_path": ".\\💎.txt",
+  "working_directory": "C:\\Temp",
   "extra": {
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "10": [
           {
@@ -79,12 +79,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "test012345",
+      "machine_id": "test012345",
       "droid": [
         "04c26c4d-cace-1647-8fa4-b334de43dd91",
         "85b4edc2-68a1-e911-8328-bcee7b5dda94"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "04c26c4d-cace-1647-8fa4-b334de43dd91",
         "85b4edc2-68a1-e911-8328-bcee7b5dda94"
       ]

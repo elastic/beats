@@ -1,52 +1,52 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasRelativePath",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_DIRECTORY",
       "FILE_ATTRIBUTE_READONLY"
     ],
-    "creationTime": "2010-06-21T14:55:25Z",
-    "accessedTime": "2010-06-21T14:55:33Z",
-    "modifiedTime": "2010-06-21T14:55:33Z",
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2010-06-21T14:55:25Z",
+    "accessed_time": "2010-06-21T14:55:33Z",
+    "modified_time": "2010-06-21T14:55:33Z",
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 68,
+      "type_id": 68,
       "sha256": "9193c3d2d24cd3be01e287b81dc4373db0e51b5167c48799ed0ff396bd4d42a2"
     },
     {
       "size": 32,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "fc79a99570cb829bdfe1fc9d98d34509af46e4f1b9db55604bd2be872355ca89"
     }
   ],
-  "relativePath": "..\\Pictures",
+  "relative_path": "..\\Pictures",
   "extra": {
-    "knownFolder": {
+    "known_folder": {
       "id": "3081e233-1e4e-7646-835a-98395c3bc3bb",
       "offset": 52
     },
-    "specialFolder": {
+    "special_folder": {
       "id": 39,
       "offset": 52
     },
     "tracker": {
       "version": 0,
-      "machineId": "als-backup1",
+      "machine_id": "als-backup1",
       "droid": [
         "325a35a3-6ed8-2049-adfd-dc842d90c45f",
         "12a09673-447d-df11-a3ad-a4badb43b04f"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "325a35a3-6ed8-2049-adfd-dc842d90c45f",
         "12a09673-447d-df11-a3ad-a4badb43b04f"
       ]

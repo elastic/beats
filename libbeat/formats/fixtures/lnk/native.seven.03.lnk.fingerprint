@@ -1,24 +1,24 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [],
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "file_flags": [],
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 128,
+      "type_id": 128,
       "sha256": "39dfe126408d76807afbd0057b9f4d96911391dfea30b2bbd12dd19e359b616e"
     }
   ],
   "extra": {
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "10": [
           {

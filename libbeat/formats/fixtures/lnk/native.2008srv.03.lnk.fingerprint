@@ -1,24 +1,24 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "HasIconLocation",
       "HasName",
       "HasTargetIDList",
       "IsUnicode"
     ],
-    "fileFlags": [],
-    "iconIndex": 4294967269,
-    "windowStyle": "SW_NORMAL"
+    "file_flags": [],
+    "icon_index": 4294967269,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 128,
+      "type_id": 128,
       "sha256": "fe665801103b090a9f447cb365a4acb589b5e2aed6473da23290967de2fcbbf9"
     }
   ],
   "name": "@%windir%\\explorer.exe,-307",
-  "iconLocation": "%SystemRoot%\\system32\\imageres.dll",
+  "icon_location": "%SystemRoot%\\system32\\imageres.dll",
   "extra": {}
 }

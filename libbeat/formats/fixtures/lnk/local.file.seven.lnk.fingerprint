@@ -1,7 +1,7 @@
 {
   "header": {
     "guid": "01140200-0000-0000-c000-000000000046",
-    "linkFlags": [
+    "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
       "HasRelativePath",
@@ -9,46 +9,46 @@
       "HasWorkingDir",
       "IsUnicode"
     ],
-    "fileFlags": [
+    "file_flags": [
       "FILE_ATTRIBUTE_ARCHIVE",
       "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"
     ],
-    "creationTime": "2010-06-06T18:06:55Z",
-    "accessedTime": "2010-06-06T18:06:55Z",
-    "modifiedTime": "2010-06-06T18:08:09Z",
-    "fileSize": 2034,
-    "iconIndex": 0,
-    "windowStyle": "SW_NORMAL"
+    "creation_time": "2010-06-06T18:06:55Z",
+    "accessed_time": "2010-06-06T18:06:55Z",
+    "modified_time": "2010-06-06T18:08:09Z",
+    "file_size": 2034,
+    "icon_index": 0,
+    "window_style": "SW_NORMAL"
   },
   "targets": [
     {
       "size": 20,
-      "typeId": 80,
+      "type_id": 80,
       "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
     },
     {
       "size": 25,
-      "typeId": 67,
+      "type_id": 67,
       "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
     },
     {
       "size": 116,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "694bda772b560aa1e8db78d9d436be2c5918f098b7104b5ffe1a5e619962398f"
     },
     {
       "size": 74,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "6f130cb5a33a554a10e16efc399472fa6ee40de4330712ba3d437cc07dab4b57"
     },
     {
       "size": 122,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "5f5ae18c3c0ff67b459a0e8d532587a6e09ef7f69c3f74ae80344ea49d29dbd1"
     },
     {
       "size": 98,
-      "typeId": 0,
+      "type_id": 0,
       "sha256": "b4f1ac18eb87007ff1c35192f8b4185035735485bca35359444ecf2685f98363"
     }
   ],
@@ -57,28 +57,28 @@
       "CommonNetworkRelativeLinkAndPathSuffix",
       "VolumeIDAndLocalBasePath"
     ],
-    "commonPathSuffix": "root\\Desktop\\Fatality.rdp",
+    "common_path_suffix": "root\\Desktop\\Fatality.rdp",
     "volume": {
-      "driveType": "DRIVE_FIXED",
-      "driveSerialNumber": "0x502e1a8a",
-      "volumeLabel": "SSD-WIN7"
+      "drive_type": "DRIVE_FIXED",
+      "drive_serial_number": "0x502e1a8a",
+      "volume_label": "SSD-WIN7"
     },
-    "localBasePath": "C:\\Users\\",
-    "networkShare": {
+    "local_base_path": "C:\\Users\\",
+    "network_share": {
       "flags": [
         "ValidNetType"
       ],
       "name": "\\\\NETBOOK\\Users"
     }
   },
-  "relativePath": ".\\Fatality.rdp",
-  "workingDirectory": "C:\\Users\\root\\Desktop",
+  "relative_path": ".\\Fatality.rdp",
+  "working_directory": "C:\\Users\\root\\Desktop",
   "extra": {
-    "knownFolder": {
+    "known_folder": {
       "id": "3accbfb4-2cdb-4c42-b029-7fe99a87c641",
       "offset": 357
     },
-    "propertyStore": {
+    "property_store": {
       "properties": {
         "4": [
           {
@@ -90,12 +90,12 @@
     },
     "tracker": {
       "version": 0,
-      "machineId": "netbook",
+      "machine_id": "netbook",
       "droid": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "00036513-668c-df11-b6eb-001377d34a59"
       ],
-      "droidBirth": [
+      "droid_birth": [
         "da667c4f-20d3-c44c-8d50-165dd98ebc01",
         "00036513-668c-df11-b6eb-001377d34a59"
       ]
