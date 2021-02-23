@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
+- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
 
 *Heartbeat*
 
