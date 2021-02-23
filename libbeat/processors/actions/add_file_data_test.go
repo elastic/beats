@@ -30,13 +30,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/formats/pe"
 )
 
-func TestFormatDataPE(t *testing.T) {
+func TestFileDataPE(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field": "foo.bar.baz",
 	}))
 	require.NoError(t, err)
@@ -48,13 +48,13 @@ func TestFormatDataPE(t *testing.T) {
 	require.True(t, ok)
 }
 
-func TestFormatDataMachO(t *testing.T) {
+func TestFileDataMachO(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/macho/hello-darwin",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field": "foo.bar.baz",
 	}))
 	require.NoError(t, err)
@@ -66,13 +66,13 @@ func TestFormatDataMachO(t *testing.T) {
 	require.True(t, ok)
 }
 
-func TestFormatDataElf(t *testing.T) {
+func TestFileDataElf(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/elf/hello-linux",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field": "foo.bar.baz",
 	}))
 	require.NoError(t, err)
@@ -84,13 +84,13 @@ func TestFormatDataElf(t *testing.T) {
 	require.True(t, ok)
 }
 
-func TestFormatDataLnk(t *testing.T) {
+func TestFileDataLnk(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/lnk/local_cmd.lnk",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field": "foo.bar.baz",
 	}))
 	require.NoError(t, err)
@@ -102,13 +102,13 @@ func TestFormatDataLnk(t *testing.T) {
 	require.True(t, ok)
 }
 
-func TestFormatDataOnly(t *testing.T) {
+func TestFileDataOnly(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field": "foo.bar.baz",
 		"only":  []string{"macho"},
 	}))
@@ -119,13 +119,13 @@ func TestFormatDataOnly(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestFormatDataExclude(t *testing.T) {
+func TestFileDataExclude(t *testing.T) {
 	evt := beat.Event{
 		Fields: common.MapStr{
 			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
 		},
 	}
-	p, err := NewAddFormatData(common.MustNewConfigFrom(map[string]interface{}{
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
 		"field":   "foo.bar.baz",
 		"exclude": []string{"pe"},
 	}))
@@ -134,4 +134,40 @@ func TestFormatDataExclude(t *testing.T) {
 	require.NoError(t, err)
 	_, err = observed.Fields.GetValue("file.pe")
 	require.Error(t, err)
+}
+
+func TestFileDataPattern(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
+		},
+	}
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
+		"field":   "foo.bar.baz",
+		"pattern": "^$", // don't match anything
+	}))
+	require.NoError(t, err)
+	observed, err := p.Run(&evt)
+	require.NoError(t, err)
+	_, err = observed.Fields.GetValue("file.pe")
+	require.Error(t, err)
+}
+
+func TestFileDataTarget(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"foo.bar.baz": "../../formats/fixtures/pe/hello-windows",
+		},
+	}
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
+		"field":  "foo.bar.baz",
+		"target": "zoiks",
+	}))
+	require.NoError(t, err)
+	observed, err := p.Run(&evt)
+	require.NoError(t, err)
+	data, err := observed.Fields.GetValue("zoiks.pe")
+	require.NoError(t, err)
+	_, ok := data.(*pe.Info)
+	require.True(t, ok)
 }

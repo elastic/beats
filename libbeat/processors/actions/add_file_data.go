@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 
 	"github.com/pkg/errors"
 
@@ -36,27 +37,41 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("add_format_data",
-		checks.ConfigChecked(NewAddFormatData,
-			checks.AllowedFields("field", "exclude", "only")))
+	processors.RegisterPlugin("add_file_data",
+		checks.ConfigChecked(NewAddFileData,
+			checks.AllowedFields("field", "target", "exclude", "only", "pattern")))
 }
 
-type addFormatDataProcessor struct {
-	Field   string    `config:"field"`
-	Exclude *[]string `config:"exclude"`
-	Only    *[]string `config:"only"`
-	parsers []*parser
+type addFileDataProcessor struct {
+	Field    string    `config:"field"`
+	Target   string    `config:"target"`
+	Exclude  *[]string `config:"exclude"`
+	Only     *[]string `config:"only"`
+	Pattern  string    `config:"pattern"`
+	parsers  []*parser
+	compiled *regexp.Regexp
 }
 
-const defaultFilePathField = "file.path"
+const (
+	defaultFilePathField = "file.path"
+	defaultTargetField   = "file"
+)
 
-// NewAddFormatData constructs a add format data processor.
-func NewAddFormatData(cfg *common.Config) (processors.Processor, error) {
-	addFormatData := &addFormatDataProcessor{
-		Field: defaultFilePathField,
+// NewAddFileData constructs a add format data processor.
+func NewAddFileData(cfg *common.Config) (processors.Processor, error) {
+	addFormatData := &addFileDataProcessor{
+		Field:  defaultFilePathField,
+		Target: defaultTargetField,
 	}
 	if err := cfg.Unpack(addFormatData); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the add_format_data configuration")
+		return nil, errors.Wrapf(err, "fail to unpack the add_file_data configuration")
+	}
+	if addFormatData.Pattern != "" {
+		compiled, err := regexp.Compile(addFormatData.Pattern)
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("invalid pattern for add_file_data: '%s'", addFormatData.Pattern))
+		}
+		addFormatData.compiled = compiled
 	}
 	parsers := allParsers
 	// only takes precedence to exclude
@@ -71,7 +86,7 @@ func NewAddFormatData(cfg *common.Config) (processors.Processor, error) {
 	return addFormatData, nil
 }
 
-func (a *addFormatDataProcessor) applyParser(event *beat.Event, path string) error {
+func (a *addFileDataProcessor) applyParser(event *beat.Event, path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
@@ -87,8 +102,9 @@ func (a *addFormatDataProcessor) applyParser(event *beat.Event, path string) err
 			if err != nil {
 				return err
 			}
+			target := a.Target + "." + parser.target
 			event.Fields.DeepUpdate(common.MapStr{
-				parser.target: data,
+				target: data,
 			})
 			return nil
 		}
@@ -96,7 +112,7 @@ func (a *addFormatDataProcessor) applyParser(event *beat.Event, path string) err
 	return nil
 }
 
-func (a *addFormatDataProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (a *addFileDataProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	valI, err := event.GetValue(a.Field)
 	if err != nil {
 		// doesn't have the required fieldd value to analyze
@@ -107,14 +123,20 @@ func (a *addFormatDataProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		// wrong type or not set
 		return event, nil
 	}
+	if a.compiled != nil {
+		if !a.compiled.MatchString(val) {
+			// we filtered out this event
+			return event, nil
+		}
+	}
 	if err := a.applyParser(event, val); err != nil {
 		return event, err
 	}
 	return event, nil
 }
 
-func (a *addFormatDataProcessor) String() string {
-	return fmt.Sprintf("add_format_data=%+v,%+v,%+v", a.Field, a.Exclude, a.Only)
+func (a *addFileDataProcessor) String() string {
+	return fmt.Sprintf("add_file_data=%+v,%+v,%+v", a.Field, a.Exclude, a.Only)
 }
 
 type parser struct {
@@ -125,10 +147,10 @@ type parser struct {
 }
 
 var allParsers = []*parser{
-	makeParser("pe", "file.pe", "application/vnd.microsoft.portable-executable", pe.Parse),
-	makeParser("macho", "file.macho", "application/x-mach-binary", macho.Parse),
-	makeParser("elf", "file.elf", "application/x-executable", elf.Parse),
-	makeParser("lnk", "file.lnk", "application/x-ms-shortcut", lnk.Parse),
+	makeParser("pe", "pe", "application/vnd.microsoft.portable-executable", pe.Parse),
+	makeParser("macho", "macho", "application/x-mach-binary", macho.Parse),
+	makeParser("elf", "elf", "application/x-executable", elf.Parse),
+	makeParser("lnk", "lnk", "application/x-ms-shortcut", lnk.Parse),
 }
 
 func makeParser(name, target, mimeType string, parse func(r io.ReaderAt) (interface{}, error)) *parser {
