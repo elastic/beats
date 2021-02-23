@@ -313,6 +313,31 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+      # Add extra input blocks here, based on conditions
+      # so as to automatically identify targeted Pods and start monitoring them
+      # using a predefined integration. For instance:
+      #- name: redis
+      #  type: redis/metrics
+      #  use_output: default
+      #  meta:
+      #    package:
+      #      name: redis
+      #      version: 0.3.6
+      #  data_stream:
+      #    namespace: default
+      #  streams:
+      #    - data_stream:
+      #        dataset: redis.info
+      #        type: metrics
+      #      metricsets:
+      #        - info
+      #      hosts:
+      #        - '${kubernetes.pod.ip}:6379'
+      #      idle_timeout: 20s
+      #      maxconn: 10
+      #      network: tcp
+      #      period: 10s
+      #      condition: ${kubernetes.pod.labels.app} == 'redis'
 ---
 apiVersion: apps/v1
 kind: Deployment
