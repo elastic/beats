@@ -11730,6 +11730,597 @@ type: keyword
 
 --
 
+[float]
+=== file
+
+Extensions to the ECS File field set
+
+
+[float]
+=== elf
+
+These fields contain Linux Executable Linkable Format (ELF) metadata.
+
+
+*`file.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.data`*::
++
+--
+Data type of the ELF header.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.machine`*::
++
+--
+Machine type of the ELF header.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+
+type: keyword
+
+--
+
+*`file.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+
+type: keyword
+
+--
+
+*`file.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+
+type: long
+
+format: string
+
+--
+
+*`file.elf.sections`*::
++
+--
+Section information of the ELF file.
+
+
+type: nested
+
+--
+
+*`file.elf.exports`*::
++
+--
+List of exported element names and types.
+
+
+type: flattened
+
+--
+
+*`file.elf.imports`*::
++
+--
+List of imported element names and types.
+
+
+type: flattened
+
+--
+
+*`file.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object
+
+
+type: keyword
+
+--
+
+*`file.elf.telfhash`*::
++
+--
+telfhash is symbol hash for ELF files, just like imphash is imports hash for PE files. Learn more at https://github.com/trendmicro/telfhash.
+
+
+type: keyword
+
+--
+
+*`file.elf.segments`*::
++
+--
+ELF object segment list.
+
+
+type: nested
+
+--
+
+*`file.elf.debug`*::
++
+--
+Debug information, if present
+
+type: nested
+
+--
+
+*`file.elf.packers`*::
++
+--
+List of packers and tools used.
+
+
+type: keyword
+
+example: ["ASPack v2.12", ".NET executable"]
+
+--
+
+[float]
+=== pe
+
+PE ECS field extensions
+
+
+*`file.pe.debug`*::
++
+--
+Debug information, if present
+
+type: nested
+
+--
+
+*`file.pe.imports`*::
++
+--
+List of all imported functions
+
+type: flattened
+
+example: { "library" : "mscoree.dll", "name" : "GetFileVersionInfoSizeA" }
+
+--
+
+*`file.pe.sections`*::
++
+--
+Data about sections of compiled binary PE
+
+
+type: nested
+
+--
+
+*`file.pe.resources`*::
++
+--
+If the PE contains resources, some info about them
+
+
+type: nested
+
+--
+
+*`file.pe.exports`*::
++
+--
+List of symbols exported by PE
+
+
+type: keyword
+
+example: ["DllInstall", "DllRegisterServer", "DllUnregisterServer"]
+
+--
+
+*`file.pe.icons`*::
++
+--
+If the PE contains icons, some info about them
+
+
+type: flattened
+
+--
+
+*`file.pe.authentihash`*::
++
+--
+Authentihash of the PE file.
+
+
+type: keyword
+
+example: ac9555d914bbb112ecc5f15bb9887ca8371f493ab0941344e976bb8410c8aa78
+
+--
+
+*`file.pe.compile_timestamp`*::
++
+--
+Compile timestamp of the PE file.
+
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`file.pe.compiler.name`*::
++
+--
+Name of the compiler
+
+
+type: keyword
+
+example: Clang
+
+--
+
+*`file.pe.compiler.version`*::
++
+--
+Version of the compiler.
+
+
+type: keyword
+
+example: 11.0.0
+
+--
+
+*`file.pe.rich_header.hash.md5`*::
++
+--
+MD5 hash of the header for the PE file.
+
+
+type: keyword
+
+example: 5aa1aa0f2b4be70397a1e9e2b87627cd
+
+--
+
+*`file.pe.entrypoint`*::
++
+--
+Relative byte offset to the base of the PE file.
+
+
+type: keyword
+
+example: 25856
+
+--
+
+*`file.pe.packers`*::
++
+--
+List of packers and tools used.
+
+
+type: keyword
+
+example: ["ASPack v2.12", ".NET executable"]
+
+--
+
+[float]
+=== macho
+
+These fields contain macOS Mach Object (Mach-O) metadata.
+
+
+*`file.macho.architectures`*::
++
+--
+Object files contained inside this file by architecture
+
+type: nested
+
+--
+
+[float]
+=== lnk
+
+These fields contain windows LNK metadata.
+
+
+*`file.lnk.name`*::
++
+--
+LNK name
+
+type: keyword
+
+--
+
+*`file.lnk.relative_path`*::
++
+--
+LNK relative path
+
+type: keyword
+
+--
+
+*`file.lnk.working_directory`*::
++
+--
+LNK working directory
+
+type: keyword
+
+--
+
+*`file.lnk.command_line`*::
++
+--
+LNK command line
+
+type: keyword
+
+--
+
+*`file.lnk.icon_location`*::
++
+--
+LNK icon location
+
+type: keyword
+
+--
+
+*`file.lnk.extra`*::
++
+--
+Extra fields in the LNK, type specific
+
+type: flattened
+
+--
+
+*`file.lnk.header.guid`*::
++
+--
+LNK guid
+
+type: keyword
+
+--
+
+*`file.lnk.header.link_flags`*::
++
+--
+LNK link flags
+
+type: keyword
+
+--
+
+*`file.lnk.header.file_flags`*::
++
+--
+LNK file flags
+
+type: keyword
+
+--
+
+*`file.lnk.header.creation_time`*::
++
+--
+LNK creation time
+
+type: date
+
+--
+
+*`file.lnk.header.accessed_time`*::
++
+--
+LNK accessed time
+
+type: date
+
+--
+
+*`file.lnk.header.modified_time`*::
++
+--
+LNK modified time
+
+type: date
+
+--
+
+*`file.lnk.header.file_size`*::
++
+--
+LNK file size
+
+type: long
+
+--
+
+*`file.lnk.header.icon_index`*::
++
+--
+LNK icon index
+
+type: long
+
+--
+
+*`file.lnk.header.window_style`*::
++
+--
+LNK window style
+
+type: keyword
+
+--
+
+*`file.lnk.header.hot_key`*::
++
+--
+LNK hot key
+
+type: keyword
+
+--
+
+*`file.lnk.targets`*::
++
+--
+LNK targets
+
+type: nested
+
+--
+
+*`file.lnk.location.flags`*::
++
+--
+LNK location flags
+
+type: keyword
+
+--
+
+*`file.lnk.location.common_path_suffix`*::
++
+--
+LNK common path suffix
+
+type: keyword
+
+--
+
+*`file.lnk.location.local_base_path`*::
++
+--
+LNK local base path
+
+type: keyword
+
+--
+
+*`file.lnk.location.volume.drive_type`*::
++
+--
+LNK volume drive type
+
+type: keyword
+
+--
+
+*`file.lnk.location.volume.drive_serial_number`*::
++
+--
+LNK volume drive serial number
+
+type: keyword
+
+--
+
+*`file.lnk.location.volume.volume_label`*::
++
+--
+LNK volume label
+
+type: keyword
+
+--
+
+*`file.lnk.location.network_share.flags`*::
++
+--
+LNK network share flags
+
+type: keyword
+
+--
+
+*`file.lnk.location.network_share.provider_type`*::
++
+--
+LNK network share provider type
+
+type: keyword
+
+--
+
+*`file.lnk.location.network_share.name`*::
++
+--
+LNK network share name
+
+type: keyword
+
+--
+
+*`file.lnk.location.network_share.device_name`*::
++
+--
+LNK network share device name
+
+type: keyword
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 

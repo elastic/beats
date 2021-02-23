@@ -175,11 +175,11 @@ type Header struct {
 	FileFlags    []string   `json:"file_flags"`
 	CreationTime *time.Time `json:"creation_time,omitempty"`
 	AccessedTime *time.Time `json:"accessed_time,omitempty"`
-	ModfiedTime  *time.Time `json:"modified_time,omitempty"`
+	ModifiedTime *time.Time `json:"modified_time,omitempty"`
 	FileSize     uint32     `json:"file_size,omitempty"`
 	IconIndex    uint32     `json:"icon_index"`
 	WindowStyle  string     `json:"window_style"`
-	HotKey       string     `json:"hotKey,omitempty"`
+	HotKey       string     `json:"hot_key,omitempty"`
 
 	rawLinkFlags uint32
 	rawFileFlags uint32

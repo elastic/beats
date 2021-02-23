@@ -59,6 +59,7 @@ type Segment struct {
 	FileOffset int64     `json:"fileoff"`
 	FileSize   int64     `json:"filesize"`
 	Sections   []Section `json:"sections,omitempty"`
+	Flags      []string  `json:"flags,omitempty"`
 }
 
 // Architecture represents a fat file architecture
@@ -74,7 +75,7 @@ type Architecture struct {
 	Packers   []string      `json:"packers,omitempty"`
 	Symhash   string        `json:"symhash,omitempty"`
 	// Exports   []string      `json:"exports,omitempty"`
-	// CDHash    string        `json:"cdhash"`
+	// CDHash    string        `json:"cdhash,omitempty"`
 }
 
 // Info contains high level fingerprinting an analysis of a mach-o file.

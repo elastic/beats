@@ -201,7 +201,7 @@ func parseHeader(r io.ReaderAt) (*Header, int64, error) {
 		FileFlags:    parseFlags(fileFlags, rawFileFlags),
 		CreationTime: normalizeTime(binary.LittleEndian.Uint64(header[28:36])),
 		AccessedTime: normalizeTime(binary.LittleEndian.Uint64(header[36:44])),
-		ModfiedTime:  normalizeTime(binary.LittleEndian.Uint64(header[44:52])),
+		ModifiedTime: normalizeTime(binary.LittleEndian.Uint64(header[44:52])),
 		FileSize:     binary.LittleEndian.Uint32(header[52:56]),
 		IconIndex:    binary.LittleEndian.Uint32(header[56:60]),
 		WindowStyle:  normalizeWindowStyle(binary.LittleEndian.Uint32(header[60:64])),
