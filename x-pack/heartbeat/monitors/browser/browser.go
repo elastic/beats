@@ -55,8 +55,6 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 	extraArgs := []string{}
 	if ss.suiteCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
-	} else {
-		extraArgs = append(extraArgs, "--no-sandbox")
 	}
 
 	var j jobs.Job
