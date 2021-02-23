@@ -1,0 +1,34 @@
+[[add-file-data]]
+=== Add file data
+
+++++
+<titleabbrev>add_file_data</titleabbrev>
+++++
+
+beta[]
+
+The `add_file_data` processor adds file format specific data based
+off of a file at a given path in `field`. If the processor
+supports the file's file type, the extracted information is added
+under the `target` field with a sub-key based off of the type. The
+supported file types are `pe`, `macho`, `elf`, and `lnk`.
+
+`field`:: Use the given field as a file path.
+`target`:: Use the given field as the location for dumping the file data.
+`exclude`:: Exclude the specified file parsers.
+`only`:: Use only the specified file parsers.
+`pattern`:: Only attempt to parse files that match the given regex.
+`ignore_failure`:: No-op if the file could not successfully be parsed.
+
+[source,yaml]
+-------
+processors:
+  - add_file_data:
+      field: dll.path
+      target: dll
+      only:
+        - pe
+      pattern: "^.*\.dll$"
+-------
+
+See <<conditions>> for a list of supported conditions.

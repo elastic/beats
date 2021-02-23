@@ -27,63 +27,73 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/formats/elf"
 	"github.com/elastic/beats/v7/libbeat/formats/lnk"
 	"github.com/elastic/beats/v7/libbeat/formats/macho"
 	"github.com/elastic/beats/v7/libbeat/formats/pe"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 )
 
+const (
+	addFileDataName      = "add_file_data"
+	addFileDataLogName   = "processor." + addFileDataName
+	defaultFilePathField = "file.path"
+	defaultTargetField   = "file"
+)
+
 func init() {
-	processors.RegisterPlugin("add_file_data",
+	processors.RegisterPlugin(addFileDataName,
 		checks.ConfigChecked(NewAddFileData,
 			checks.AllowedFields("field", "target", "exclude", "only", "pattern")))
 }
 
 type addFileDataProcessor struct {
-	Field    string    `config:"field"`
-	Target   string    `config:"target"`
-	Exclude  *[]string `config:"exclude"`
-	Only     *[]string `config:"only"`
-	Pattern  string    `config:"pattern"`
+	Field         string    `config:"field"`
+	Target        string    `config:"target"`
+	Exclude       *[]string `config:"exclude"`
+	Only          *[]string `config:"only"`
+	Pattern       string    `config:"pattern"`
+	IgnoreFailure bool      `config:"ignore_failure"`
+
 	parsers  []*parser
 	compiled *regexp.Regexp
+	log      *logp.Logger
 }
-
-const (
-	defaultFilePathField = "file.path"
-	defaultTargetField   = "file"
-)
 
 // NewAddFileData constructs a add format data processor.
 func NewAddFileData(cfg *common.Config) (processors.Processor, error) {
-	addFormatData := &addFileDataProcessor{
+	cfgwarn.Beta("The " + addFileDataName + " processor is beta.")
+	log := logp.NewLogger(addFileDataLogName)
+	addFileData := &addFileDataProcessor{
 		Field:  defaultFilePathField,
 		Target: defaultTargetField,
+		log:    log,
 	}
-	if err := cfg.Unpack(addFormatData); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the add_file_data configuration")
+	if err := cfg.Unpack(addFileData); err != nil {
+		return nil, errors.Wrapf(err, "fail to unpack the "+addFileDataName+" configuration")
 	}
-	if addFormatData.Pattern != "" {
-		compiled, err := regexp.Compile(addFormatData.Pattern)
+	if addFileData.Pattern != "" {
+		compiled, err := regexp.Compile(addFileData.Pattern)
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("invalid pattern for add_file_data: '%s'", addFormatData.Pattern))
+			return nil, errors.Wrap(err, fmt.Sprintf("invalid pattern for "+addFileDataName+": '%s'", addFileData.Pattern))
 		}
-		addFormatData.compiled = compiled
+		addFileData.compiled = compiled
 	}
 	parsers := allParsers
 	// only takes precedence to exclude
-	if addFormatData.Only != nil {
-		parsers = onlyParsers(*addFormatData.Only)
+	if addFileData.Only != nil {
+		parsers = onlyParsers(*addFileData.Only)
 	}
-	if addFormatData.Exclude != nil {
-		parsers = filterParsers(*addFormatData.Exclude)
+	if addFileData.Exclude != nil {
+		parsers = filterParsers(*addFileData.Exclude)
 	}
-	addFormatData.parsers = parsers
+	addFileData.parsers = parsers
 
-	return addFormatData, nil
+	return addFileData, nil
 }
 
 func (a *addFileDataProcessor) applyParser(event *beat.Event, path string) error {
@@ -130,13 +140,17 @@ func (a *addFileDataProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 	if err := a.applyParser(event, val); err != nil {
+		if a.IgnoreFailure {
+			a.log.Debugf("failed to parse file because of error: %v", err)
+			return event, nil
+		}
 		return event, err
 	}
 	return event, nil
 }
 
 func (a *addFileDataProcessor) String() string {
-	return fmt.Sprintf("add_file_data=%+v,%+v,%+v", a.Field, a.Exclude, a.Only)
+	return fmt.Sprintf("%s=%+v,%+v,%+v", addFileDataName, a.Field, a.Exclude, a.Only)
 }
 
 type parser struct {

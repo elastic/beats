@@ -171,3 +171,29 @@ func TestFileDataTarget(t *testing.T) {
 	_, ok := data.(*pe.Info)
 	require.True(t, ok)
 }
+
+func TestFileDataIgnoreFailure(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"file.path": "./doesnotexist",
+		},
+	}
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{
+		"ignore_failure": true,
+	}))
+	require.NoError(t, err)
+	_, err = p.Run(&evt)
+	require.NoError(t, err)
+}
+
+func TestFileDataNoIgnoreFailure(t *testing.T) {
+	evt := beat.Event{
+		Fields: common.MapStr{
+			"file.path": "./doesnotexist",
+		},
+	}
+	p, err := NewAddFileData(common.MustNewConfigFrom(map[string]interface{}{}))
+	require.NoError(t, err)
+	_, err = p.Run(&evt)
+	require.Error(t, err)
+}

@@ -116,6 +116,12 @@ auditbeat.modules:
   # Set to true to publish fields with null values in events.
   #keep_null: false
 
+  # Uncomment the following to parse object files that trigger events
+  #processors:
+  #  - add_file_data:
+  #      ignore_failure: true
+
+
 # The system module collects security related information about a host.
 # All datasets send both periodic state information (e.g. all currently
 # running processes) and real-time changes (e.g. when a new process starts

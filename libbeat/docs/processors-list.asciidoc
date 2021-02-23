@@ -14,6 +14,9 @@ endif::[]
 ifndef::no_add_fields_processor[]
 * <<add-fields, `add_fields`>>
 endif::[]
+ifndef::no_add_file_data_processor[]
+* <<add-file-data,`add_file_data`>>
+endif::[]
 ifndef::no_add_host_metadata_processor[]
 * <<add-host-metadata,`add_host_metadata`>>
 endif::[]
@@ -127,6 +130,9 @@ include::{libbeat-processors-dir}/add_docker_metadata/docs/add_docker_metadata.a
 endif::[]
 ifndef::no_add_fields_processor[]
 include::{libbeat-processors-dir}/actions/docs/add_fields.asciidoc[]
+endif::[]
+ifndef::no_add_file_data_processor[]
+include::{libbeat-processors-dir}/actions/docs/add_file_data.asciidoc[]
 endif::[]
 ifndef::no_add_host_metadata_processor[]
 include::{libbeat-processors-dir}/add_host_metadata/docs/add_host_metadata.asciidoc[]
