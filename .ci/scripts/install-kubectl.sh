@@ -22,7 +22,15 @@ echo "UNMET DEP: Installing kubectl"
 
 mkdir -p "${HOME}/bin"
 
-if curl -sSLo "${KUBECTL_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl" ; then
+OS=$(uname -s| tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m| tr '[:upper:]' '[:lower:]')
+if [ "${ARCH}" == "aarch64" ] ; then
+    ARCH_SUFFIX=arm64
+else
+    ARCH_SUFFIX=amd64
+fi
+
+if curl -sSLo "${KUBECTL_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/${OS}/${ARCH_SUFFIX}/kubectl" ; then
     chmod +x "${KUBECTL_CMD}"
 else
     echo "Something bad with the download, let's delete the corrupted binary"
