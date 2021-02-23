@@ -25,8 +25,8 @@
             "gridData": {
               "h": 11,
               "i": "1",
-              "w": 24,
-              "x": 0,
+              "w": 18,
+              "x": 6,
               "y": 0
             },
             "panelIndex": "1",
@@ -132,6 +132,23 @@
           },
           {
             "embeddableConfig": {
+              "enhancements": {},
+              "hidePanelTitles": false
+            },
+            "gridData": {
+              "h": 11,
+              "i": "b9cf2afd-ae8b-409b-93f2-b69ba1e1f064",
+              "w": 6,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "b9cf2afd-ae8b-409b-93f2-b69ba1e1f064",
+            "panelRefName": "panel_7",
+            "title": "Dashboards Navigation",
+            "version": "7.11.1"
+          },
+          {
+            "embeddableConfig": {
               "enhancements": {}
             },
             "gridData": {
@@ -142,7 +159,7 @@
               "y": 30
             },
             "panelIndex": "3b2a916c-213c-4179-93f6-067224d1f741",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_8",
             "title": "Live Nodes",
             "version": "7.11.1"
           },
@@ -158,7 +175,7 @@
               "y": 30
             },
             "panelIndex": "725c9437-5d36-48bd-9328-e08637e42ac7",
-            "panelRefName": "panel_8",
+            "panelRefName": "panel_9",
             "title": "Process Uptime",
             "version": "7.11.1"
           },
@@ -174,7 +191,7 @@
               "y": 40
             },
             "panelIndex": "7d37508a-3614-4c51-b8e1-84d9101a233b",
-            "panelRefName": "panel_9",
+            "panelRefName": "panel_10",
             "title": "Capacity Usage",
             "version": "7.11.1"
           },
@@ -190,7 +207,7 @@
               "y": 40
             },
             "panelIndex": "3b319d88-1798-433b-9ab8-783c53d24423",
-            "panelRefName": "panel_10",
+            "panelRefName": "panel_11",
             "title": "Disk Metrics",
             "version": "7.11.1"
           },
@@ -206,7 +223,7 @@
               "y": 50
             },
             "panelIndex": "7cf99937-570d-4132-ab15-204a547bd986",
-            "panelRefName": "panel_11",
+            "panelRefName": "panel_12",
             "title": "Node Clock Offset",
             "version": "7.11.1"
           }
@@ -259,34 +276,39 @@
           "type": "visualization"
         },
         {
-          "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
+          "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
           "name": "panel_7",
           "type": "visualization"
         },
         {
-          "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
+          "id": "643353f0-c202-11ea-8a94-61b423d19ae7",
           "name": "panel_8",
           "type": "visualization"
         },
         {
-          "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
+          "id": "bbd18b20-ccf4-11ea-8a94-61b423d19ae7",
           "name": "panel_9",
           "type": "visualization"
         },
         {
-          "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
+          "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
           "name": "panel_10",
           "type": "visualization"
         },
         {
-          "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
+          "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
           "name": "panel_11",
+          "type": "visualization"
+        },
+        {
+          "id": "f2d065e0-ee11-11ea-b088-6f3c0066a551",
+          "name": "panel_12",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-02-23T13:58:25.320Z",
-      "version": "WzIzNTYsMV0="
+      "updated_at": "2021-02-23T14:27:14.764Z",
+      "version": "WzMxODIsMV0="
     },
     {
       "attributes": {
@@ -1038,6 +1060,44 @@
       "type": "visualization",
       "updated_at": "2021-02-23T13:36:58.294Z",
       "version": "WzE5MzAsMV0="
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "[Metricbeat CockroachDB] Navigation",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 12,
+            "markdown": "[Overview](#/dashboard/04b595b0-c1fc-11ea-8a94-61b423d19ae7) | [SQL](#/dashboard/3975ad70-c761-11ea-8a94-61b423d19ae7)\n",
+            "openLinksInNewTab": false
+          },
+          "title": "[Metricbeat CockroachDB] Navigation",
+          "type": "markdown"
+        }
+      },
+      "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "visualization",
+      "updated_at": "2021-02-23T17:51:06.678Z",
+      "version": "WzQwMTUsMl0="
     },
     {
       "attributes": {
