@@ -2,70 +2,207 @@
   "architectures": [
     {
       "cpu": "x86_64",
-      "sections": [
+      "byte_order": "LittleEndian",
+      "type": "Exec",
+      "header": {
+        "commands": [
+          {
+            "number": 25,
+            "size": 72,
+            "type": "LC_SEGMENT_64"
+          },
+          {
+            "number": 25,
+            "size": 472,
+            "type": "LC_SEGMENT_64"
+          },
+          {
+            "number": 25,
+            "size": 152,
+            "type": "LC_SEGMENT_64"
+          },
+          {
+            "number": 25,
+            "size": 232,
+            "type": "LC_SEGMENT_64"
+          },
+          {
+            "number": 25,
+            "size": 72,
+            "type": "LC_SEGMENT_64"
+          },
+          {
+            "number": 2147483682,
+            "size": 48,
+            "type": "LC_DYLD_INFO_ONLY"
+          },
+          {
+            "number": 2,
+            "size": 24,
+            "type": "LC_SYMTAB"
+          },
+          {
+            "number": 11,
+            "size": 80,
+            "type": "LC_DYSYMTAB"
+          },
+          {
+            "number": 14,
+            "size": 32,
+            "type": "LC_LOAD_DYLINKER"
+          },
+          {
+            "number": 27,
+            "size": 24,
+            "type": "LC_UUID"
+          },
+          {
+            "number": 50,
+            "size": 32,
+            "type": "LC_UNKNOWN"
+          },
+          {
+            "number": 42,
+            "size": 16,
+            "type": "LC_SOURCE_VERSION"
+          },
+          {
+            "number": 2147483688,
+            "size": 24,
+            "type": "LC_MAIN"
+          },
+          {
+            "number": 12,
+            "size": 56,
+            "type": "LC_LOAD_DYLIB"
+          },
+          {
+            "number": 38,
+            "size": 16,
+            "type": "LC_FUNCTION_STARTS"
+          },
+          {
+            "number": 41,
+            "size": 16,
+            "type": "LC_DATA_IN_CODE"
+          }
+        ],
+        "magic": "0xfeedfacf",
+        "flags": [
+          "MH_NOUNDEFS",
+          "MH_DYLDLINK",
+          "MH_TWOLEVEL",
+          "MH_PIE"
+        ]
+      },
+      "segments": [
         {
-          "name": "__text",
-          "address": 4294971232,
-          "size": 42,
-          "entropy": 4.04,
-          "chi2": 1030.76,
-          "md5": "77166fb4124bfa15ceebf0b9425cda23"
+          "vmaddr": "100000000",
+          "name": "__TEXT",
+          "vmsize": 4096,
+          "fileoff": 0,
+          "filesize": 4096,
+          "sections": [
+            {
+              "name": "__text",
+              "type": "S_REGULAR",
+              "offset": 3936,
+              "size": 42,
+              "entropy": 4.04,
+              "chi2": 1030.76,
+              "flags": [
+                "S_ATTR_PURE_INSTRUCTIONS",
+                "S_ATTR_SOME_INSTRUCTIONS"
+              ]
+            },
+            {
+              "name": "__stubs",
+              "type": "S_SYMBOL_STUBS",
+              "offset": 3978,
+              "size": 6,
+              "entropy": 2.25,
+              "chi2": 335.33,
+              "flags": [
+                "S_ATTR_PURE_INSTRUCTIONS",
+                "S_ATTR_SOME_INSTRUCTIONS"
+              ]
+            },
+            {
+              "name": "__stub_helper",
+              "type": "S_REGULAR",
+              "offset": 3984,
+              "size": 26,
+              "entropy": 3.3,
+              "chi2": 1057.08,
+              "flags": [
+                "S_ATTR_PURE_INSTRUCTIONS",
+                "S_ATTR_SOME_INSTRUCTIONS"
+              ]
+            },
+            {
+              "name": "__cstring",
+              "type": "S_CSTRING_LITERALS",
+              "offset": 4010,
+              "size": 14,
+              "entropy": 3.32,
+              "chi2": 388.29,
+              "flags": []
+            },
+            {
+              "name": "__unwind_info",
+              "type": "S_REGULAR",
+              "offset": 4024,
+              "size": 72,
+              "entropy": 1.58,
+              "chi2": 10452.44,
+              "flags": []
+            }
+          ]
         },
         {
-          "name": "__stubs",
-          "address": 4294971274,
-          "size": 6,
-          "entropy": 2.25,
-          "chi2": 335.33,
-          "md5": "f9e07e9c40c24082fdf9f1eab3c8137c"
+          "vmaddr": "100001000",
+          "name": "__DATA_CONST",
+          "vmsize": 4096,
+          "fileoff": 4096,
+          "filesize": 4096,
+          "sections": [
+            {
+              "name": "__got",
+              "type": "S_NON_LAZY_SYMBOL_POINTERS",
+              "offset": 4096,
+              "size": 8,
+              "entropy": 0,
+              "chi2": 2040,
+              "flags": []
+            }
+          ]
         },
         {
-          "name": "__stub_helper",
-          "address": 4294971280,
-          "size": 26,
-          "entropy": 3.3,
-          "chi2": 1057.08,
-          "md5": "7277b077b4cc51c5284ccaf6077babca"
-        },
-        {
-          "name": "__cstring",
-          "address": 4294971306,
-          "size": 14,
-          "entropy": 3.32,
-          "chi2": 388.29,
-          "md5": "a79133c2466b7180a4de0fd3fe302b0b"
-        },
-        {
-          "name": "__unwind_info",
-          "address": 4294971320,
-          "size": 72,
-          "entropy": 1.58,
-          "chi2": 10452.44,
-          "md5": "5a85d345ab9f929bf8ee00e141401105"
-        },
-        {
-          "name": "__got",
-          "address": 4294971392,
-          "size": 8,
-          "entropy": 0,
-          "chi2": 2040,
-          "md5": "7dea362b3fac8e00956a4952a3d4f474"
-        },
-        {
-          "name": "__la_symbol_ptr",
-          "address": 4294975488,
-          "size": 8,
-          "entropy": 1.55,
-          "chi2": 888,
-          "md5": "a8f250ea011781d751ad55c91ce4d39c"
-        },
-        {
-          "name": "__data",
-          "address": 4294975496,
-          "size": 8,
-          "entropy": 0,
-          "chi2": 2040,
-          "md5": "7dea362b3fac8e00956a4952a3d4f474"
+          "vmaddr": "100002000",
+          "name": "__DATA",
+          "vmsize": 4096,
+          "fileoff": 8192,
+          "filesize": 4096,
+          "sections": [
+            {
+              "name": "__la_symbol_ptr",
+              "type": "S_LAZY_SYMBOL_POINTERS",
+              "offset": 8192,
+              "size": 8,
+              "entropy": 1.55,
+              "chi2": 888,
+              "flags": []
+            },
+            {
+              "name": "__data",
+              "type": "S_REGULAR",
+              "offset": 8200,
+              "size": 8,
+              "entropy": 0,
+              "chi2": 2040,
+              "flags": []
+            }
+          ]
         }
       ],
       "libraries": [

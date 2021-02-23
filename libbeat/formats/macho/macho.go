@@ -18,33 +18,63 @@
 package macho
 
 import (
-	"crypto/md5"
 	"debug/macho"
-	"encoding/hex"
+	"fmt"
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/formats/common"
+	"github.com/elastic/beats/v7/libbeat/formats/dwarf"
 )
+
+// Command contains info about a load command
+type Command struct {
+	Number int64  `json:"number"`
+	Size   int64  `json:"size"`
+	Type   string `json:"type,omitempty"`
+}
+
+// Header contains info about the overall file structure
+type Header struct {
+	Commands []Command `json:"commands"`
+	Magic    string    `json:"magic"`
+	Flags    []string  `json:"flags"`
+}
 
 // Section contains information about a section in a mach-o file.
 type Section struct {
-	Name      string  `json:"name"`
-	Address   uint64  `json:"address"`
-	Size      uint64  `json:"size"`
-	Entropy   float64 `json:"entropy"`
-	ChiSquare float64 `json:"chi2"`
-	MD5       string  `json:"md5,omitempty"`
+	Name      string   `json:"name"`
+	Type      string   `json:"type"`
+	Offset    int64    `json:"offset"`
+	Size      int64    `json:"size"`
+	Entropy   float64  `json:"entropy"`
+	ChiSquare float64  `json:"chi2"`
+	Flags     []string `json:"flags,omitempty"`
+}
+
+// Segment contains info about a segment
+type Segment struct {
+	VMAddress  string    `json:"vmaddr"`
+	Name       string    `json:"name"`
+	VMSize     int64     `json:"vmsize"`
+	FileOffset int64     `json:"fileoff"`
+	FileSize   int64     `json:"filesize"`
+	Sections   []Section `json:"sections,omitempty"`
 }
 
 // Architecture represents a fat file architecture
 type Architecture struct {
-	CPU       string    `json:"cpu"`
-	Sections  []Section `json:"sections,omitempty"`
-	Libraries []string  `json:"libraries,omitempty"`
-	Imports   []string  `json:"imports,omitempty"`
-	Exports   []string  `json:"exports,omitempty"`
-	Packer    string    `json:"packer,omitempty"`
-	Symhash   string    `json:"symhash,omitempty"`
+	CPU       string        `json:"cpu"`
+	ByteOrder string        `json:"byte_order"`
+	Type      string        `json:"type,omitempty"`
+	Header    Header        `json:"header"`
+	Debug     []dwarf.DWARF `json:"debug,omitempty"`
+	Segments  []Segment     `json:"segments,omitempty"`
+	Libraries []string      `json:"libraries,omitempty"`
+	Imports   []string      `json:"imports,omitempty"`
+	Packers   []string      `json:"packers,omitempty"`
+	Symhash   string        `json:"symhash,omitempty"`
+	// Exports   []string      `json:"exports,omitempty"`
+	// CDHash    string        `json:"cdhash"`
 }
 
 // Info contains high level fingerprinting an analysis of a mach-o file.
@@ -84,26 +114,6 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	}, nil
 }
 
-// the default string translations are gross
-func translateCPU(cpu macho.Cpu) string {
-	switch cpu {
-	case macho.Cpu386:
-		return "x86"
-	case macho.CpuAmd64:
-		return "x86_64"
-	case macho.CpuArm:
-		return "arm"
-	case macho.CpuArm64:
-		return "arm64"
-	case macho.CpuPpc:
-		return "ppc"
-	case macho.CpuPpc64:
-		return "ppc64"
-	default:
-		return "unknown"
-	}
-}
-
 func parse(machoFile *macho.File) (*Architecture, error) {
 	symhash, err := symhash(machoFile)
 	if err != nil {
@@ -120,9 +130,8 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 		}
 	}
 
-	sections := make([]Section, len(machoFile.Sections))
-	for i, section := range machoFile.Sections {
-		var md5String string
+	segmentMap := make(map[string]Segment)
+	for _, section := range machoFile.Sections {
 		var entropy float64
 		var chiSquare float64
 
@@ -132,36 +141,69 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 				return nil, err
 			}
 		} else {
-			md5hash := md5.Sum(data)
-			md5String = hex.EncodeToString(md5hash[:])
 			entropy = common.Entropy(data)
 			chiSquare = common.ChiSquare(data)
 		}
-		sections[i] = Section{
+		segment, found := segmentMap[section.Seg]
+		if !found {
+			segment = Segment{
+				Name: section.Seg,
+			}
+			mSegment := machoFile.Segment(section.Seg)
+			if mSegment != nil {
+				segment.VMAddress = fmt.Sprintf("%x", mSegment.Addr)
+				segment.VMSize = int64(mSegment.Memsz)
+				segment.FileOffset = int64(mSegment.Offset)
+				segment.FileSize = int64(mSegment.Filesz)
+			}
+		}
+		segment.Sections = append(segment.Sections, Section{
 			Name:      section.Name,
-			Address:   section.Addr,
-			Size:      section.Size,
+			Size:      int64(section.Size),
+			Offset:    int64(section.Offset),
 			Entropy:   entropy,
 			ChiSquare: chiSquare,
-			MD5:       md5String,
-		}
+			Type:      sectionType(section.Flags),
+			Flags:     sectionFlags(section.Flags),
+		})
+		segmentMap[section.Seg] = segment
+	}
+	segments := []Segment{}
+	for _, segment := range segmentMap {
+		segments = append(segments, segment)
 	}
 
-	return &Architecture{
+	info := &Architecture{
 		CPU:       translateCPU(machoFile.Cpu),
+		ByteOrder: machoFile.ByteOrder.String(),
+		Type:      machoFile.Type.String(),
+		Header: Header{
+			Magic:    fmt.Sprintf("0x%x", machoFile.Magic),
+			Flags:    headerFlags(machoFile.Flags),
+			Commands: loadCommands(machoFile),
+		},
 		Symhash:   symhash,
 		Libraries: libraries,
 		Imports:   importSymbols,
-		Sections:  sections,
-		Packer:    getPacker(machoFile),
-	}, nil
-}
+		Segments:  segments,
+		Packers:   getPackers(machoFile),
+	}
 
-func getPacker(machoFile *macho.File) string {
-	for _, section := range machoFile.Sections {
-		if section.Name == "upxTEXT" {
-			return "upx"
+	if debug, err := machoFile.DWARF(); err == nil {
+		// just ignore the error if we can't get DWARF information
+		debugSymbols, err := dwarf.Parse(debug)
+		if err == nil {
+			info.Debug = debugSymbols
 		}
 	}
-	return ""
+	return info, nil
+}
+
+func getPackers(machoFile *macho.File) []string {
+	for _, section := range machoFile.Sections {
+		if section.Name == "upxTEXT" {
+			return []string{"upx"}
+		}
+	}
+	return nil
 }
