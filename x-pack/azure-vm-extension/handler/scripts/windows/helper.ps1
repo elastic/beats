@@ -56,7 +56,7 @@ function Get-Password($powershellVersion) {
 function Get-Elasticsearch-URL($powershellVersion) {
   $powershellVersion = Get-PowershellVersion
   $cloud_id = Get-CloudId $powershellVersion
-  if ( $cloud_id != ""){
+  if ( $cloud_id -ne ""){
     $cloud_hash=$cloud_id.split(":")[-1]
     $cloud_tokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloud_hash))
     cloud_elem=$cloud_tokens.split("$")
@@ -69,7 +69,7 @@ function Get-Elasticsearch-URL($powershellVersion) {
 }
 function Get-Kibana-URL ($powershellVersion){
   $cloud_id = Get-CloudId $powershellVersion
-  if ( $cloud_id!= ""){
+  if ( $cloud_id -ne ""){
     $cloud_hash=$cloud_id.split(":")[-1]
     $cloud_tokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloud_hash))
     cloud_elem=$cloud_tokens.split("$")
@@ -88,7 +88,7 @@ function Get-Stack-Version {
   $elasticsearch_url = Get-Elasticsearch-URL $powershellVersion
   $username = Get-Username $powershellVersion
   $password = Get-Password $powershellVersion
-  if ( $elasticsearch_url!= "" && $username != "" $password!= ""){
+  if ( $elasticsearch_url -ne "" -and $username -ne "" -and $password -ne ""){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
         $headers.Add("Accept","Application/Json")
         $pair = "$($username):$($password)"

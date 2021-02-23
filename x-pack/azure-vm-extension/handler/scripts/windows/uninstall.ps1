@@ -6,7 +6,12 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 $INSTALL_LOCATION="C:\Program Files"
 
 function unenroll-elastic-agent {
-echo "$INSTALL_LOCATION\Elastic-Agent\elastic-agent.exe" inspect
+& $INSTALL_LOCATION\Elastic-Agent\elastic-agent.exe inspect
+[string[]]$fileContent = Get-Content "$INSTALL_LOCATION\Elastic\Agent\fleet.yml"
+$content = ''
+foreach ($line in $fileContent) { $content = $content + "`n" + $line }
+$yaml = ConvertFrom-YAML $content
+echo $yaml
 
 Write-Log "Unenroll elastic agent" "INFO"
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
