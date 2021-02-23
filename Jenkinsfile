@@ -167,6 +167,9 @@ VERSION=${env.VERSION}-SNAPSHOT""")
                           analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
       }
     }
+    always {
+      notifyEnvironmentalIssues()
+    }
   }
 }
 
@@ -651,6 +654,26 @@ def withBeatsEnv(Map args = [:], Closure body) {
 def analyseEnvironmentalIssues(args) {
   environmentalIssues[args.id] = args.environmentalIssue
 }
+
+/**
+* This method runs only as a post build action to notify when there are environmental issues.
+* Archive the file with the environmental issues details in case there are any
+* reported environmental issues.
+* TODO: Create JSON file to upload those details to elasticsearch
+*/
+def notifyEnvironmentalIssues(Map args = [:]) {
+  stage('Notify environmental issues'){
+    def content = ''
+    environmentalIssues?.findAll { k, v -> return v }.each { k, v ->
+      content += "${k} failed with some environmental issues (${v})\n"
+    }
+    if (content?.trim()) {
+      writeFile file: 'environmental.issues.txt', text: content
+      archiveArtifacts artifacts: 'environmental.issues.txt'
+    }
+  }
+}
+
 
 /**
 * This method fixes the filesystem permissions after the build has happenend. The reason is to
