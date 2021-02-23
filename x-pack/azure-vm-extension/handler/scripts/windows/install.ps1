@@ -41,7 +41,7 @@ function install-elastic-agent {
 function enroll-elastic-agent {
   try {
     Write-Log "Start retrieving KIBANA_URL" "INFO"
-      $powershellVersion = Get-PowershellVersion
+     $powershellVersion = Get-PowershellVersion
     $kibana_url = Get-Kibana-URL $powershellVersion
     $username = Get-Username $powershellVersion
     $password = Get-Password $powershellVersion

@@ -56,7 +56,7 @@ function Get-Password($powershellVersion) {
 function Get-Elasticsearch-URL($powershellVersion) {
   $powershellVersion = Get-PowershellVersion
   $cloud_id = Get-CloudId $powershellVersion
-  if ( $cloud_id!= ""){
+  if ( $cloud_id != ""){
     $cloud_hash=$cloud_id.split(":")[-1]
     $cloud_tokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloud_hash))
     cloud_elem=$cloud_tokens.split("$")

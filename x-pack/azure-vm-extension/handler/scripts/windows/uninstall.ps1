@@ -3,6 +3,28 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
 
+$INSTALL_LOCATION="C:\Program Files"
+
+function unenroll-elastic-agent {
+echo "$INSTALL_LOCATION\Elastic-Agent\elastic-agent.exe" inspect
+
+Write-Log "Unenroll elastic agent" "INFO"
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Accept","Application/Json")
+$headers.Add("kbn-xsrf", "true")
+$pair = "$($username):$($password)"
+$encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
+$headers.Add('Authorization', "Basic $encodedCredentials")
+$jsonResult = Invoke-WebRequest -Uri "$($kibana_url)/api/fleet/agents/${enrollmentResponse.item.id}/unenroll"  -Method 'POST' -Headers $headers -UseBasicParsing
+if ($jsonResult.statuscode -eq '200') {
+$keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "item"
+$enrollment_token=$keyValue.api_key
+Write-Log "Found enrollment_token $enrollment_token" "INFO"
+Write-Log "Installing Elastic Agent and enrolling to Fleet $kibana_url" "INFO"
+}else {
+
+      }
+}
 
 
 function uninstall-elastic-agent {
@@ -18,5 +40,8 @@ catch{
     Write-Log $_ "ERROR"
     Write-Log $_.ScriptStackTrace "ERROR"
 }
+}
 
-uninstall-elastic-agent
+#uninstall-elastic-agent
+
+unenroll-elastic-agent
