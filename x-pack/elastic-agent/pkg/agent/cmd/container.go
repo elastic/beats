@@ -193,10 +193,11 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 			args = append(args, "--insecure")
 		}
 	} else {
-		url := envWithDefault("", "FLEET_SERVER_URL")
+		url := envWithDefault("", "FLEET_URL")
 		if url == "" {
-			return nil, errors.New("FLEET_SERVER_URL is required when FLEET_ENROLL is true without FLEET_SERVER_ENABLE")
+			return nil, errors.New("FLEET_URL is required when FLEET_ENROLL is true without FLEET_SERVER_ENABLE")
 		}
+		args = append(args, "--url", url)
 		if envBool("FLEET_INSECURE") {
 			args = append(args, "--insecure")
 		}
