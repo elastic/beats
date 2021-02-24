@@ -66,6 +66,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 				Step: &Step{
 					Name:  "Go to home page",
 					Index: 0,
+					Status: "succeeded",
 				},
 				Payload: map[string]interface{}{
 					"source":      "async ({page, params}) => {await page.goto('http://www.elastic.co')}",

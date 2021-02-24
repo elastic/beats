@@ -97,12 +97,14 @@ func (se *SynthError) toMap() common.MapStr {
 type Step struct {
 	Name  string `json:"name"`
 	Index int    `json:"index"`
+	Status string
 }
 
 func (s *Step) ToMap() common.MapStr {
 	return common.MapStr{
 		"name":  s.Name,
 		"index": s.Index,
+		"status": s.Status,
 	}
 }
 
