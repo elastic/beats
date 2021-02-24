@@ -281,6 +281,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change the `event.created` in Netflow events to be the time the event was created by Filebeat
   to be consistent with ECS. {pull}23094[23094]
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
+- Add check for empty values in azure module. {pull}24156[24156]
 
 *Filebeat*
 
@@ -387,7 +388,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
-- Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
+- Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
+- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
 
 *Heartbeat*
 

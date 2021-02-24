@@ -40,6 +40,7 @@
 - Fix libbeat from reporting back degraded on config update {pull}23537[23537]
 - Fix issues with dynamic inputs and conditions {pull}23886[23886]
 - Fix bad substitution of API key. {pull}24036[24036]
+- Fix docker enrollment issue related to Fleet Server change. {pull}24155[24155]
 
 ==== New features
 
@@ -70,3 +71,4 @@
 - Add metrics collection for Agent {pull}22793[22793]
 - Add support for Fleet Server {pull}23736[23736]
 - Add support for enrollment with local bootstrap of Fleet Server {pull}23865[23865]
+- Add TLS support for Fleet Server {pull}24142[24142]
