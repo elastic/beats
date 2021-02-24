@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-oracle>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
+* <<exported-fields-pensando>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-proofpoint>>
@@ -84,6 +85,7 @@ grouped in the following categories:
 * <<exported-fields-squid>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
+* <<exported-fields-threatintel>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
@@ -522,54 +524,6 @@ type: keyword
 --
 Name of the group.
 
-
-type: keyword
-
---
-
-[float]
-=== effective
-
-Effective user information.
-
-
-*`user.effective.id`*::
-+
---
-Effective user ID.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Effective user name.
-
-type: keyword
-
---
-
-[float]
-=== group
-
-Effective group information.
-
-
-*`user.effective.group.id`*::
-+
---
-Effective group ID.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Effective group name.
 
 type: keyword
 
@@ -20808,6 +20762,543 @@ Module for handling Cisco network device logs.
 
 
 [float]
+=== cisco.amp
+
+Module for parsing Cisco AMP logs.
+
+
+
+*`cisco.amp.timestamp_nanoseconds`*::
++
+--
+The timestamp in Epoch nanoseconds.
+
+
+type: date
+
+--
+
+*`cisco.amp.event_type_id`*::
++
+--
+A sub ID of the event, depending on event type.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.detection`*::
++
+--
+The name of the malware detected.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.detection_id`*::
++
+--
+The ID of the detection.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.connector_guid`*::
++
+--
+The GUID of the connector sending information to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.group_guids`*::
++
+--
+An array of group GUIDS related to the connector sending information to AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.vulnerabilities`*::
++
+--
+An array of related vulnerabilities to the malicious event.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.scan.description`*::
++
+--
+Description of an event related to a scan being initiated, for example the specific directory name.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.scan.clean`*::
++
+--
+Boolean value if a scanned file was clean or not.
+
+
+type: boolean
+
+--
+
+*`cisco.amp.scan.scanned_files`*::
++
+--
+Count of files scanned in a directory.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.scanned_processes`*::
++
+--
+Count of processes scanned related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.scanned_paths`*::
++
+--
+Count of different directories scanned related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.scan.malicious_detections`*::
++
+--
+Count of malicious files or documents detected related to a single scan event.
+
+
+type: long
+
+--
+
+*`cisco.amp.computer.connector_guid`*::
++
+--
+The GUID of the connector, similar to top level connector_guid, but unique if multiple connectors are involved.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.computer.external_ip`*::
++
+--
+The external IP of the related host.
+
+
+type: ip
+
+--
+
+*`cisco.amp.computer.active`*::
++
+--
+If the current endpoint is active or not.
+
+
+type: boolean
+
+--
+
+*`cisco.amp.computer.network_addresses`*::
++
+--
+All network interface information on the related host.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.file.disposition`*::
++
+--
+Categorization of file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.disposition`*::
++
+--
+Categorization of a network event related to a file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.nfm.direction`*::
++
+--
+The current direction based on source and destination IP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.related.mac`*::
++
+--
+An array of all related MAC addresses.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.related.cve`*::
++
+--
+An array of all related MAC addresses.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.cloud_ioc.description`*::
++
+--
+Description of the related IOC for specific IOC events from AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.cloud_ioc.short_description`*::
++
+--
+Short description of the related IOC for specific IOC events from AMP.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.disposition`*::
++
+--
+Categorization of a IOC for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identity.md5`*::
++
+--
+MD5 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identity.sha1`*::
++
+--
+SHA1 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.network_info.parent.identify.sha256`*::
++
+--
+SHA256 hash of the related IOC.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.disposition`*::
++
+--
+Categorization of a file archive related to a file, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identity.md5`*::
++
+--
+MD5 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identity.sha1`*::
++
+--
+SHA1 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.archived_file.identify.sha256`*::
++
+--
+SHA256 hash of the archived file related to the malicious event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.application`*::
++
+--
+The application name related to Exploit Prevention events.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.attacked_module`*::
++
+--
+Path to the executable or dll that was attacked and detected by Exploit Prevention.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.base_address`*::
++
+--
+The base memory address related to the exploit detected.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.attack_details.suspicious_files`*::
++
+--
+An array of related files when an attack is detected by Exploit Prevention.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.file.parent.disposition`*::
++
+--
+Categorization of parrent, for example "Malicious" or "Clean".
+
+
+type: keyword
+
+--
+
+*`cisco.amp.error.description`*::
++
+--
+Description of an endpoint error event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.error.error_code`*::
++
+--
+The error code describing the related error event.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.severity`*::
++
+--
+Severity result of the threat hunt registered to the malicious event. Can be Low-Critical.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_report_guid`*::
++
+--
+The GUID of the related threat hunting report.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_hunt_guid`*::
++
+--
+The GUID of the related investigation tracking issue.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_title`*::
++
+--
+Title of the incident related to the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_summary`*::
++
+--
+Summary of the outcome on the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_remediation`*::
++
+--
+Recommendations to resolve the vulnerability or exploited host.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_id`*::
++
+--
+The id of the related incident for the threat hunting activity.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.threat_hunting.incident_end_time`*::
++
+--
+When the threat hunt finalized or closed.
+
+
+type: date
+
+--
+
+*`cisco.amp.threat_hunting.incident_start_time`*::
++
+--
+When the threat hunt was initiated.
+
+
+type: date
+
+--
+
+*`cisco.amp.file.attack_details.indicators`*::
++
+--
+Different indicator types that matches the exploit detected, for example different MITRE tactics.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.threat_hunting.tactics`*::
++
+--
+List of all MITRE tactics related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.threat_hunting.techniques`*::
++
+--
+List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.tactics`*::
++
+--
+List of all MITRE tactics related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.techniques`*::
++
+--
+List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+[float]
 === cisco.asa
 
 Fields for Cisco ASA Firewall.
@@ -40793,7 +41284,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -40846,7 +41337,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -42037,6 +42528,19 @@ example: darwin
 
 --
 
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`host.os.version`*::
 +
 --
@@ -43111,6 +43615,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -43278,6 +43795,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -46432,6 +46962,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -46607,6 +47138,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -46614,6 +47258,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -46710,6 +47467,119 @@ type: text
 --
 
 *`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -46833,6 +47703,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -47421,11 +48304,6 @@ example: 0
 
 --
 
-[float]
-=== audit
-
-
-
 
 *`elasticsearch.audit.layer`*::
 +
@@ -47486,6 +48364,27 @@ Roles to which the principal belongs
 type: keyword
 
 example: ['kibana_admin', 'beats_admin']
+
+--
+
+*`elasticsearch.audit.user.run_as.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.user.run_as.realm`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.component`*::
++
+--
+type: keyword
 
 --
 
@@ -47582,6 +48481,13 @@ alias to: user.name
 +
 --
 type: text
+
+--
+
+*`elasticsearch.audit.invalidate.apikeys.owned_by_authenticated_user`*::
++
+--
+type: boolean
 
 --
 
@@ -86064,6 +86970,13 @@ type: object
 
 --
 
+*`logstash.log.log_event.action`*::
++
+--
+type: keyword
+
+--
+
 *`logstash.log.pipeline_id`*::
 +
 --
@@ -103570,6 +104483,13 @@ Fields from Office 365 Management API audit logs.
 
 
 
+*`o365.audit.AADGroupId`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.Actor`*::
 +
 --
@@ -103710,6 +104630,13 @@ type: text
 
 --
 
+*`o365.audit.CommunicationType`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.CorrelationId`*::
 +
 --
@@ -103745,7 +104672,21 @@ type: keyword
 
 --
 
+*`o365.audit.DoNotDistributeEvent`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ErrorNumber`*::
 +
 --
 type: keyword
@@ -103784,6 +104725,13 @@ type: object
 +
 --
 type: keyword
+
+--
+
+*`o365.audit.FromApp`*::
++
+--
+type: boolean
 
 --
 
@@ -103836,6 +104784,13 @@ type: keyword
 
 --
 
+*`o365.audit.IsDocLib`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.Item.*`*::
 +
 --
@@ -103847,6 +104802,13 @@ type: object
 +
 --
 type: object
+
+--
+
+*`o365.audit.ItemCount`*::
++
+--
+type: long
 
 --
 
@@ -103864,7 +104826,42 @@ type: keyword
 
 --
 
+*`o365.audit.ListBaseTemplateType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListBaseType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListColor`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListIcon`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListTitle`*::
 +
 --
 type: keyword
@@ -104145,6 +105142,13 @@ type: keyword
 --
 
 *`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TemplateTypeId`*::
 +
 --
 type: keyword
@@ -105287,6 +106291,147 @@ Specifies the sub type of the log
 
 --
 
+[[exported-fields-pensando]]
+== Pensando fields
+
+pensando Module
+
+
+
+[float]
+=== pensando
+
+Fields from Pensando logs.
+
+
+
+[float]
+=== dfw
+
+Fields for Pensando DFW
+
+
+
+*`pensando.dfw.action`*::
++
+--
+Action on the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.app_id`*::
++
+--
+Application ID 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.destination_address`*::
++
+--
+Address of destination. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.destination_port`*::
++
+--
+Port of destination. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.direction`*::
++
+--
+Direction of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.protocol`*::
++
+--
+Protocol of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.rule_id`*::
++
+--
+Rule ID that was matched. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.session_id`*::
++
+--
+Session ID of the flow 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.session_state`*::
++
+--
+Session state of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_address`*::
++
+--
+Source address of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_port`*::
++
+--
+Source port of the flow. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.timestamp`*::
++
+--
+Timestamp of the log. 
+
+
+type: date
+
+--
+
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
@@ -105322,7 +106467,52 @@ The timestamp from the log line.
 *`postgresql.log.core_id`*::
 +
 --
-Core id
+
+deprecated:[8.0.0]
+
+Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
+
+
+type: alias
+
+alias to: postgresql.log.session_line_number
+
+--
+
+*`postgresql.log.client_addr`*::
++
+--
+Host where the connection originated from.
+
+
+example: 127.0.0.1
+
+--
+
+*`postgresql.log.client_port`*::
++
+--
+Port where the connection originated from.
+
+
+example: 59700
+
+--
+
+*`postgresql.log.session_id`*::
++
+--
+PostgreSQL session.
+
+
+example: 5ff1dd98.22
+
+--
+
+*`postgresql.log.session_line_number`*::
++
+--
+Line number inside a session. (%l in `log_line_prefix`).
 
 
 type: long
@@ -105332,17 +106522,17 @@ type: long
 *`postgresql.log.database`*::
 +
 --
-Name of database
+Name of database.
 
 
-example: mydb
+example: postgres
 
 --
 
 *`postgresql.log.query`*::
 +
 --
-Query statement.
+Query statement. In the case of CSV parse, look at command_tag to get more context.
 
 
 example: SELECT * FROM users;
@@ -105352,7 +106542,7 @@ example: SELECT * FROM users;
 *`postgresql.log.query_step`*::
 +
 --
-Statement step when using extended query protocol (one of statement, parse, bind or execute)
+Statement step when using extended query protocol (one of statement, parse, bind or execute).
 
 
 example: parse
@@ -105369,12 +106559,144 @@ example: pdo_stmt_00000001
 
 --
 
+*`postgresql.log.command_tag`*::
++
+--
+Type of session's current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
+
+
+example: SELECT
+
+--
+
+*`postgresql.log.session_start_time`*::
++
+--
+Time when this session started.
+
+
+type: date
+
+--
+
+*`postgresql.log.virtual_transaction_id`*::
++
+--
+Backend local transaction id.
+
+
+--
+
+*`postgresql.log.transaction_id`*::
++
+--
+The id of current transaction.
+
+
+type: long
+
+--
+
+*`postgresql.log.sql_state_code`*::
++
+--
+State code returned by Postgres (if any). See also https://www.postgresql.org/docs/current/errcodes-appendix.html
+
+
+type: keyword
+
+--
+
+*`postgresql.log.detail`*::
++
+--
+More information about the message, parameters in case of a parametrized query. e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
+
+
+--
+
+*`postgresql.log.hint`*::
++
+--
+A possible solution to solve an error.
+
+
+--
+
+*`postgresql.log.internal_query`*::
++
+--
+Internal query that led to the error (if any).
+
+
+--
+
+*`postgresql.log.internal_query_pos`*::
++
+--
+Character count of the internal query (if any).
+
+
+type: long
+
+--
+
+*`postgresql.log.context`*::
++
+--
+Error context.
+
+
+--
+
+*`postgresql.log.query_pos`*::
++
+--
+Character count of the error position (if any).
+
+
+type: long
+
+--
+
+*`postgresql.log.location`*::
++
+--
+Location of the error in the PostgreSQL source code (if log_error_verbosity is set to verbose).
+
+
+--
+
+*`postgresql.log.application_name`*::
++
+--
+Name of the application of this event. It is defined by the client.
+
+
+--
+
+*`postgresql.log.backend_type`*::
++
+--
+Type of backend of this event. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. In addition, background workers registered by extensions may have additional types.
+
+
+example: client backend
+
+--
+
 *`postgresql.log.error.code`*::
 +
 --
-Error code returned by Postgres (if any)
 
-type: long
+deprecated:[8.0.0]
+
+Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
+
+
+type: alias
+
+alias to: postgresql.log.sql_state_code
 
 --
 
@@ -105384,15 +106706,6 @@ type: long
 type: alias
 
 alias to: event.timezone
-
---
-
-*`postgresql.log.thread_id`*::
-+
---
-type: alias
-
-alias to: process.pid
 
 --
 
@@ -105408,7 +106721,12 @@ alias to: user.name
 *`postgresql.log.level`*::
 +
 --
+Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
+
+
 type: alias
+
+example: LOG
 
 alias to: log.level
 
@@ -140981,6 +142299,15 @@ type: keyword
 --
 
 
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
+
 *`suricata.eve.alert.category`*::
 +
 --
@@ -142481,6 +143808,1423 @@ alias to: process.pid
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-threatintel]]
+== threatintel fields
+
+Threat intelligence Filebeat Module.
+
+
+
+[float]
+=== threatintel
+
+Fields from the threatintel Filebeat module.
+
+
+
+*`threatintel.indicator.first_seen`*::
++
+--
+The date and time when intelligence source first reported sighting this indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.last_seen`*::
++
+--
+The date and time when intelligence source last reported sighting this indicator.
+
+
+type: date
+
+--
+
+*`threatintel.indicator.sightings`*::
++
+--
+Number of times this indicator was observed conducting threat activity.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.type`*::
++
+--
+Type of indicator as represented by Cyber Observable in STIX 2.0. Expected values
+  * autonomous-system
+  * artifact
+  * directory
+  * domain-name
+  * email-addr
+  * file
+  * ipv4-addr
+  * ipv6-addr
+  * mac-addr
+  * mutex
+  * process
+  * software
+  * url
+  * user-account
+  * windows-registry-key
+  * x-509-certificate
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.description`*::
++
+--
+Describes the type of action conducted by the threat.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.scanner_stats`*::
++
+--
+Count of AV/EDR vendors that successfully detected malicious file or URL.
+
+
+type: long
+
+--
+
+*`threatintel.indicator.provider`*::
++
+--
+Identifies the name of the intelligence provider.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.confidence`*::
++
+--
+Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values
+  * Not Specified, None, Low, Medium, High
+  * 0-10
+  * Admirality Scale (1-6)
+  * DNI Scale (5-95)
+  * WEP Scale (Impossible - Certain)
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.module`*::
++
+--
+Identifies the name of specific module this data is coming from.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.dataset`*::
++
+--
+Identifies the name of specific dataset from the intelligence source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.ip`*::
++
+--
+Identifies a threat indicator as an IP address (irrespective of direction).
+
+
+type: ip
+
+--
+
+*`threatintel.indicator.domain`*::
++
+--
+Identifies a threat indicator as a domain (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.port`*::
++
+--
+Identifies a threat indicator as a port number (irrespective of direction).
+
+
+type: long
+
+--
+
+*`threatintel.indicator.email.address`*::
++
+--
+Identifies a threat indicator as an email address (irrespective of direction).
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.marking.tlp`*::
++
+--
+Traffic Light Protocol sharing markings. Expected values are:
+  * White
+  * Green
+  * Amber
+  * Red
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.matched.atomic`*::
++
+--
+Identifies the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.field`*::
++
+--
+Identifies the field of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.matched.type`*::
++
+--
+Identifies the type of the atomic indicator that matched a local environment endpoint or network event.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`threatintel.indicator.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`threatintel.indicator.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+
+*`threatintel.indicator.registry.data.strings`*::
++
+--
+Content when writing string types. Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`threatintel.indicator.registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`threatintel.indicator.registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
+*`threatintel.indicator.registry.key`*::
++
+--
+Registry key value
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.geo.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`threatintel.indicator.geo.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`threatintel.indicator.geo.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`threatintel.indicator.geo.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`threatintel.indicator.geo.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`threatintel.indicator.geo.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`threatintel.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+
+
+*`threatintel.indicator.file.hash.tlsh`*::
++
+--
+The file's import tlsh, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.ssdeep`*::
++
+--
+The file's ssdeep hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.md5`*::
++
+--
+The file's md5 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha1`*::
++
+--
+The file's sha1 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha256`*::
++
+--
+The file's sha256 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.hash.sha512`*::
++
+--
+The file's sha512 hash, if available.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.type`*::
++
+--
+The file type
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.file.size`*::
++
+--
+The file's total size
+
+
+type: long
+
+--
+
+*`threatintel.indicator.file.name`*::
++
+--
+The file's name
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.extension`*::
++
+--
+The field contains the file extension from the original request
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.original`*::
++
+--
+Unmodified original url as seen in the event source. Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.password`*::
++
+--
+Password of the request.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.path`*::
++
+--
+Path of the request, such as "/search".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.port`*::
++
+--
+Port of the request, such as 443.
+
+
+type: long
+
+format: string
+
+--
+
+*`threatintel.indicator.url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch". The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain. For example, the registered domain for "foo.example.com" is "example.com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain. For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+
+type: keyword
+
+--
+
+*`threatintel.indicator.url.username`*::
++
+--
+Username of the request.
+
+
+type: keyword
+
+--
+
+
+*`threatintel.indicator.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threatintel.indicator.x509.issuer`*::
++
+--
+Name of issuing certificate authority. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threatintel.indicator.x509.subject`*::
++
+--
+Name of the certificate subject entity. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threatintel.indicator.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+[float]
+=== abusemalware
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abusemalware.file_type`*::
++
+--
+File type guessed by URLhaus.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.signature`*::
++
+--
+Malware familiy.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.urlhaus_download`*::
++
+--
+Location (URL) where you can download a copy of this file.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.result`*::
++
+--
+AV detection ration.
+
+
+type: keyword
+
+--
+
+*`threatintel.abusemalware.virustotal.percent`*::
++
+--
+AV detection in percent.
+
+
+type: float
+
+--
+
+*`threatintel.abusemalware.virustotal.link`*::
++
+--
+Link to the Virustotal report.
+
+
+type: keyword
+
+--
+
+[float]
+=== abuseurl
+
+Fields for AbuseCH Malware Threat Intel
+
+
+
+*`threatintel.abuseurl.id`*::
++
+--
+The ID of the url.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.urlhaus_reference`*::
++
+--
+Link to URLhaus entry.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.url_status`*::
++
+--
+The current status of the URL. Possible values are: online, offline and unknown.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.threat`*::
++
+--
+The threat corresponding to this malware URL.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.surbl`*::
++
+--
+SURBL blacklist status. Possible values are: listed and not_listed
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.blacklists.spamhaus_dbl`*::
++
+--
+Spamhaus DBL blacklist status.
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.reporter`*::
++
+--
+The Twitter handle of the reporter that has reported this malware URL (or anonymous).
+
+
+type: keyword
+
+--
+
+*`threatintel.abuseurl.larted`*::
++
+--
+Indicates whether the malware URL has been reported to the hosting provider (true or false)
+
+
+type: boolean
+
+--
+
+*`threatintel.abuseurl.tags`*::
++
+--
+A list of tags associated with the queried malware URL
+
+
+type: keyword
+
+--
+
+[float]
+=== anomali
+
+Fields for Anomali Threat Intel
+
+
+
+*`threatintel.anomali.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.name`*::
++
+--
+The name of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.pattern`*::
++
+--
+The pattern ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.valid_from`*::
++
+--
+When the indicator was first found or is considered valid.
+
+
+type: date
+
+--
+
+*`threatintel.anomali.modified`*::
++
+--
+When the indicator was last modified
+
+
+type: date
+
+--
+
+*`threatintel.anomali.labels`*::
++
+--
+The labels related to the indicator
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomali.object_marking_refs`*::
++
+--
+The STIX reference object.
+
+
+type: keyword
+
+--
+
+[float]
+=== misp
+
+Fields for MISP Threat Intel
+
+
+
+*`threatintel.misp.id`*::
++
+--
+Attribute ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc_id`*::
++
+--
+Organization Community ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org_id`*::
++
+--
+Organization ID of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.threat_level_id`*::
++
+--
+Threat level from 5 to 1, where 1 is the most critical.
+
+
+type: long
+
+--
+
+*`threatintel.misp.info`*::
++
+--
+Additional text or information related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.published`*::
++
+--
+When the event was published.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.uuid`*::
++
+--
+The UUID of the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.date`*::
++
+--
+The date of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute_count`*::
++
+--
+How many attributes are included in a single event object.
+
+
+type: long
+
+--
+
+*`threatintel.misp.timestamp`*::
++
+--
+The timestamp of when the event object was created.
+
+
+type: date
+
+--
+
+*`threatintel.misp.distribution`*::
++
+--
+Distribution type related to MISP.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.proposal_email_lock`*::
++
+--
+Settings configured on MISP for email lock on this event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.locked`*::
++
+--
+If the current MISP event object is locked or not.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.publish_timestamp`*::
++
+--
+At what time the event object was published
+
+
+type: date
+
+--
+
+*`threatintel.misp.sharing_group_id`*::
++
+--
+The ID of the grouped events or sources of the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.disable_correlation`*::
++
+--
+If correlation is disabled on the MISP event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.extends_uuid`*::
++
+--
+The UUID of the event object it might extend.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.id`*::
++
+--
+The organization ID related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.name`*::
++
+--
+The organization name related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.uuid`*::
++
+--
+The UUID of the organization related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.org.local`*::
++
+--
+If the event object is local or from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.orgc.id`*::
++
+--
+The Organization Community ID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.name`*::
++
+--
+The Organization Community name in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.uuid`*::
++
+--
+The Organization Community UUID in which the event object was reported from.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.orgc.local`*::
++
+--
+If the Organization Community was local or synced from a remote source.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.id`*::
++
+--
+The ID of the attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.type`*::
++
+--
+The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.category`*::
++
+--
+The category of the attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.to_ids`*::
++
+--
+If the attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.uuid`*::
++
+--
+The UUID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.event_id`*::
++
+--
+The local event ID of the attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.distribution`*::
++
+--
+How the attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.attribute.timestamp`*::
++
+--
+The timestamp in which the attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.attribute.comment`*::
++
+--
+Comments made to the attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.deleted`*::
++
+--
+If the attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.attribute.object_id`*::
++
+--
+The ID of the Object in which the attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.object_relation`*::
++
+--
+The type of relation the attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
+[float]
+=== otx
+
+Fields for OTX Threat Intel
+
+
+
+*`threatintel.otx.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.indicator`*::
++
+--
+The value of the indicator, for example if the type is domain, this would be the value.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.description`*::
++
+--
+A description of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.title`*::
++
+--
+Title describing the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.content`*::
++
+--
+Extra text or descriptive content related to the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.otx.type`*::
++
+--
+The indicator type, can for example be "domain, email, FileHash-SHA256".
+
+
+type: keyword
 
 --
 
@@ -151175,6 +153919,73 @@ type: integer
 +
 --
 Height of the screen that is being shared.
+
+
+type: integer
+
+--
+
+[float]
+=== signature
+
+Fields exported by the Zeek Signature log.
+
+
+
+*`zeek.signature.note`*::
++
+--
+Notice associated with signature event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_id`*::
++
+--
+The name of the signature that matched.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.event_msg`*::
++
+--
+A more descriptive message of the signature-matching event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sub_msg`*::
++
+--
+Extracted payload data or extra message.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_count`*::
++
+--
+Number of sigs, usually from summary count.
+
+
+type: integer
+
+--
+
+*`zeek.signature.host_count`*::
++
+--
+Number of hosts, from a summary count.
 
 
 type: integer

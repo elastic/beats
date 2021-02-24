@@ -1,0 +1,134 @@
+[
+  {
+    "auditd": {
+      "data": {
+        "a0": "ffffffffffffff9c",
+        "a1": "12d6210",
+        "a2": "3e9",
+        "a3": "ffffffff",
+        "arch": "x86_64",
+        "exit": "0",
+        "syscall": "fchownat",
+        "tty": "pts2"
+      },
+      "message_type": "syscall",
+      "paths": [
+        {
+          "cap_fe": "0",
+          "cap_fi": "0000000000000000",
+          "cap_fp": "0000000000000000",
+          "cap_fver": "0",
+          "dev": "fd:02",
+          "inode": "921833",
+          "item": "0",
+          "mode": "0100664",
+          "name": "test",
+          "obj_domain": "user_home_t",
+          "obj_level": "s0",
+          "obj_role": "object_r",
+          "obj_user": "unconfined_u",
+          "objtype": "NORMAL",
+          "ogid": "1000",
+          "ouid": "9999",
+          "rdev": "00:00"
+        }
+      ],
+      "result": "success",
+      "sequence": 263,
+      "session": "8",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "root"
+        },
+        "how": "/usr/bin/chown",
+        "object": {
+          "primary": "test",
+          "type": "file"
+        }
+      }
+    },
+    "event": {
+      "action": "changed-file-ownership-of",
+      "category": [
+        "file"
+      ],
+      "kind": "event",
+      "original": [
+        "type=SYSCALL msg=audit(1611091464.740:263): arch=c000003e syscall=260 success=yes exit=0 a0=ffffffffffffff9c a1=12d6210 a2=3e9 a3=ffffffff items=1 ppid=9492 pid=9494 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts2 ses=8 comm=\"chown\" exe=\"/usr/bin/chown\" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=\"access\"",
+        "type=CWD msg=audit(1611091464.740:263):  cwd=\"/home/vagrant\"",
+        "type=PATH msg=audit(1611091464.740:263): item=0 name=\"test\" inode=921833 dev=fd:02 mode=0100664 ouid=9999 ogid=1000 rdev=00:00 obj=unconfined_u:object_r:user_home_t:s0 objtype=NORMAL cap_fp=0000000000000000 cap_fi=0000000000000000 cap_fe=0 cap_fver=0",
+        "type=PROCTITLE msg=audit(1611091464.740:263): proctitle=63686F776E002D5200616C6963650074657374"
+      ],
+      "outcome": "success",
+      "type": [
+        "change"
+      ]
+    },
+    "file": {
+      "device": "00:00",
+      "gid": "1000",
+      "group": "vagrant",
+      "inode": "921833",
+      "mode": "0664",
+      "owner": "bob",
+      "path": "test",
+      "selinux": {
+        "domain": "user_home_t",
+        "level": "s0",
+        "role": "object_r",
+        "user": "unconfined_u"
+      },
+      "uid": "9999"
+    },
+    "process": {
+      "executable": "/usr/bin/chown",
+      "name": "chown",
+      "pid": 9494,
+      "ppid": 9492,
+      "title": "chown -R alice test",
+      "working_directory": "/home/vagrant"
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "tags": [
+      "access"
+    ],
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "filesystem": {
+        "group": {
+          "id": "0",
+          "name": "root"
+        },
+        "id": "0",
+        "name": "root"
+      },
+      "group": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "0",
+      "name": "root",
+      "saved": {
+        "group": {
+          "id": "0",
+          "name": "root"
+        },
+        "id": "0",
+        "name": "root"
+      },
+      "selinux": {
+        "category": "c0.c1023",
+        "domain": "unconfined_t",
+        "level": "s0-s0",
+        "role": "unconfined_r",
+        "user": "unconfined_u"
+      }
+    }
+  }
+]

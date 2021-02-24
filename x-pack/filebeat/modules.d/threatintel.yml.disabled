@@ -1,0 +1,105 @@
+# Module: threatintel
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.x/filebeat-module-threatintel.html
+
+- module: threatintel
+  abuseurl:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
+  abusemalware:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
+  misp:
+    enabled: true
+
+    # Input used for ingesting threat intel data, defaults to JSON.
+    var.input: httpjson
+
+    # The URL of the MISP instance, should end with "/events/restSearch".
+    var.url: https://SERVER/events/restSearch
+
+    # The authentication token used to contact the MISP API. Found when looking at user account in the MISP UI.
+    var.api_token: API_KEY
+
+    # Configures the type of SSL verification done, if MISP is running on self signed certificates
+    # then the certificate would either need to be trusted, or verification_mode set to none.
+    #var.ssl.verification_mode: none
+
+    # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
+    # For examples please reference the filebeat module documentation.
+    #var.filters:
+    #  - threat_level: [4, 5] 
+    #  - to_ids: true
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours. Each request afterwards will filter on any event newer
+    # than the last event that was already ingested.
+    var.first_interval: 300h
+
+    # The interval to poll the API for updates.
+    var.interval: 5m
+
+  otx:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for OTX Threat Intel API calls.
+    var.url: https://otx.alienvault.com/api/v1/indicators/export
+
+    # The authentication token used to contact the OTX API, can be found on the OTX UI.
+    var.api_token: API_KEY
+
+    # Optional filters that can be applied to retrieve only specific indicators.
+    #var.types: "domain,IPv4,hostname,url,FileHash-SHA256"
+
+    # The timeout of the HTTP client connecting to the OTX API
+    #var.http_client_timeout: 120s
+
+    # How many hours to look back for each request, should be close to the configured interval. Deduplication of events is handled by the module.
+    var.lookback_range: 1h
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 400h
+
+    # The interval to poll the API for updates
+    var.interval: 5m
+  
+  anomali:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls. Limo has multiple different possibilities for URL's depending
+    # on the type of threat intel source that is needed.
+    var.url: https://limo.anomali.com/api/v1/taxii2/feeds/collections/41/objects
+
+    # The Username used by anomali Limo, defaults to guest.
+    #var.username: guest
+
+    # The password used by anomali Limo, defaults to guest.
+    #var.password: guest
+
+    # How far back to look once the beat starts up for the first time, the value has to be in hours.
+    var.first_interval: 400h
+
+    # The interval to poll the API for updates
+    var.interval: 5m

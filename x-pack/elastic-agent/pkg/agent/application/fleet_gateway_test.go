@@ -105,7 +105,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{})}
 }
 
-type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
+type withGatewayFunc func(*testing.T, FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -179,7 +179,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send no event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -203,7 +203,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -296,7 +296,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -407,7 +407,7 @@ func TestRetriesOnFailures(t *testing.T) {
 	t.Run("When the gateway fails to communicate with the checkin API we will retry",
 		withGateway(agentInfo, settings, func(
 			t *testing.T,
-			gateway *fleetGateway,
+			gateway FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
@@ -461,7 +461,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			Backoff:  backoffSettings{Init: 10 * time.Minute, Max: 20 * time.Minute},
 		}, func(
 			t *testing.T,
-			gateway *fleetGateway,
+			gateway FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,

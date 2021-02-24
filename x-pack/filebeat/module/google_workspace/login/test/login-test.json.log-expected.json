@@ -47,7 +47,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "elastic.co",
+        "user.target.email": "foo@elastic.co",
+        "user.target.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -97,7 +103,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "elastic.co",
+        "user.target.email": "foo@elastic.co",
+        "user.target.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -147,7 +159,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "elastic.co",
+        "user.target.email": "foo@elastic.co",
+        "user.target.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -197,7 +215,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "elastic.co",
+        "user.target.email": "foo@elastic.co",
+        "user.target.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -245,13 +269,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "login_failure",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "google_workspace.login",
         "event.id": "1",
@@ -297,7 +325,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -348,7 +379,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
@@ -400,13 +434,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "logout",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "google_workspace.login",
         "event.id": "1",
@@ -449,13 +487,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "login_success",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "google_workspace.login",
         "event.id": "1",
@@ -501,6 +543,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

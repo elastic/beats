@@ -422,6 +422,17 @@ var login = (function () {
         }
 
         evt.AppendTo("related.user", data[0]);
+        evt.Put("user.target.name", data[0]);
+        evt.Put("user.target.domain", data[1]);
+        evt.Put("user.target.email", email);
+        var groupName = evt.Get("group.name");
+        if (groupName) {
+            evt.Put("user.target.group.name", groupName);
+        }
+        var groupDomain = evt.Get("group.domain");
+        if (groupDomain) {
+            evt.Put("user.target.group.domain", groupDomain);
+        }
     };
 
     var setEventDuration = function(evt) {

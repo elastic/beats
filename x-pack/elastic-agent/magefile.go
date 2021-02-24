@@ -608,15 +608,7 @@ func selectedPackageTypes() string {
 		return ""
 	}
 
-	envVar := "PACKAGES="
-	for _, p := range devtools.SelectedPackageTypes {
-		if p == devtools.Docker {
-			envVar += "targz,"
-		} else {
-			envVar += p.String() + ","
-		}
-	}
-	return envVar[:len(envVar)-1]
+	return "PACKAGES=targz,zip"
 }
 
 func copyAll(from, to string) error {

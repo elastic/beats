@@ -25,12 +25,7 @@ func endsWith(args []interface{}) (interface{}, error) {
 	if len(args) != 2 {
 		return nil, fmt.Errorf("endsWith: accepts exactly 2 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	suffix, sOk := args[1].(string)
-	if !iOk || !sOk {
-		return nil, fmt.Errorf("endsWith: accepts exactly 2 string arguments; recieved %T and %T", args[0], args[1])
-	}
-	return strings.HasSuffix(input, suffix), nil
+	return strings.HasSuffix(toString(args[0]), toString(args[1])), nil
 }
 
 // indexOf returns the starting index of substring
@@ -38,11 +33,8 @@ func indexOf(args []interface{}) (interface{}, error) {
 	if len(args) < 2 || len(args) > 3 {
 		return nil, fmt.Errorf("indexOf: accepts 2-3 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	substring, sOk := args[1].(string)
-	if !iOk || !sOk {
-		return nil, fmt.Errorf("indexOf: argument 0 and 1 must be a string; recieved %T and %T", args[0], args[1])
-	}
+	input := toString(args[0])
+	substring := toString(args[1])
 	start := 0
 	if len(args) > 2 {
 		s, sOk := args[2].(int)
@@ -59,10 +51,7 @@ func match(args []interface{}) (interface{}, error) {
 	if len(args) < 2 {
 		return nil, fmt.Errorf("match: accepts minimum of 2 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	if !iOk {
-		return nil, fmt.Errorf("match: argument 0 must be a string; recieved %T", args[0])
-	}
+	input := toString(args[0])
 	for i, reg := range args[1:] {
 		switch r := reg.(type) {
 		case string:
@@ -85,10 +74,7 @@ func number(args []interface{}) (interface{}, error) {
 	if len(args) < 1 || len(args) > 2 {
 		return nil, fmt.Errorf("number: accepts between 1-2 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	if !iOk {
-		return nil, fmt.Errorf("number: argument 0 must be a string; recieved %T", args[0])
-	}
+	input := toString(args[0])
 	base := 10
 	if len(args) > 1 {
 		switch a := args[1].(type) {
@@ -113,12 +99,7 @@ func startsWith(args []interface{}) (interface{}, error) {
 	if len(args) != 2 {
 		return nil, fmt.Errorf("startsWith: accepts exactly 2 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	prefix, pOk := args[1].(string)
-	if !iOk || !pOk {
-		return nil, fmt.Errorf("startsWith: accepts exactly 2 string arguments; recieved %T and %T", args[0], args[1])
-	}
-	return strings.HasPrefix(input, prefix), nil
+	return strings.HasPrefix(toString(args[0]), toString(args[1])), nil
 }
 
 // str converts the argument into a string
@@ -134,12 +115,7 @@ func stringContains(args []interface{}) (interface{}, error) {
 	if len(args) != 2 {
 		return nil, fmt.Errorf("stringContains: accepts exactly 2 arguments; recieved %d", len(args))
 	}
-	input, iOk := args[0].(string)
-	substr, sOk := args[1].(string)
-	if !iOk || !sOk {
-		return nil, fmt.Errorf("stringContains: accepts exactly 2 string arguments; recieved %T and %T", args[0], args[1])
-	}
-	return strings.Contains(input, substr), nil
+	return strings.Contains(toString(args[0]), toString(args[1])), nil
 }
 
 func toString(arg interface{}) string {

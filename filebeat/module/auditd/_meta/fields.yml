@@ -36,26 +36,6 @@
               description: >
                     Name of the group.
 
-        - name: effective
-          type: group
-          description: Effective user information.
-          fields:
-          - name: id
-            type: keyword
-            description: Effective user ID.
-          - name: name
-            type: keyword
-            description: Effective user name.
-          - name: group
-            type: group
-            description: Effective group information.
-            fields:
-            - name: id
-              type: keyword
-              description: Effective group ID.
-            - name: name
-              type: keyword
-              description: Effective group name.
 
         - name: filesystem
           type: group

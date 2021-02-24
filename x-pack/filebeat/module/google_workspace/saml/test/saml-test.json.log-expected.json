@@ -3,7 +3,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "login_failure",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "google_workspace.saml",
         "event.id": "1",
@@ -52,13 +53,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "@timestamp": "2020-10-02T15:00:01.000Z",
         "event.action": "login_success",
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.dataset": "google_workspace.saml",
         "event.id": "1",
@@ -105,6 +110,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]
