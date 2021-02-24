@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -35,31 +36,31 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 // test_close_renamed from test_harvester.py
 func TestFilestreamCloseRenamed(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "TestFilestreamCloseRenamed")
-	if err != nil {
-		t.Fatalf("cannot create temporary folder for test file: %+v", err)
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
 	}
-	defer os.RemoveAll(tmpDir)
+
+	tmpDir := t.TempDir()
 
 	testlogPath := filepath.Join(tmpDir, "test.log")
-	err = ioutil.WriteFile(testlogPath, []byte("first log line\n"), 0644)
+	err := ioutil.WriteFile(testlogPath, []byte("first log line\n"), 0644)
 	if err != nil {
 		t.Fatalf("cannot write log lines to test file: %+v", err)
 	}
 
-	testStore := openTestStatestore(t, tmpDir)
+	testStore := openTestStatestore()
 	inp := getInputFromConfig(
 		t,
 		testStore,
 		map[string]interface{}{
-			"paths":                                []string{testlogPath},
-			"prospector.scanner.check_interval":    "1s",
-			"close.on_state_change.check_interval": "1s",
+			"paths":                                []string{testlogPath + "*"},
+			"prospector.scanner.check_interval":    "1ms",
+			"close.on_state_change.check_interval": "1ms",
 			"close.on_state_change.renamed":        "true",
 		},
 	)
@@ -69,8 +70,8 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	pipeline := &mockPipelineConnector{}
 
 	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 
 		inp.Run(inputCtx, pipeline)
@@ -86,9 +87,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to rename file '%s': %+v", testlogPath, err)
 	}
-
-	// wait enough time so renaming of file can be detected
-	time.Sleep(2 * time.Second)
 
 	err = ioutil.WriteFile(testlogPath, []byte("new first log line\nnew second log line\n"), 0644)
 	if err != nil {
@@ -107,19 +105,15 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 
 // test_close_eof from test_harvester.py
 func TestFilestreamCloseEOF(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "TestFilestreamCloseEOF")
-	if err != nil {
-		t.Fatalf("cannot create temporary folder for test file: %+v", err)
-	}
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	testlogPath := filepath.Join(tmpDir, "test.log")
-	err = ioutil.WriteFile(testlogPath, []byte("first log line\n"), 0644)
+	err := ioutil.WriteFile(testlogPath, []byte("first log line\n"), 0644)
 	if err != nil {
 		t.Fatalf("cannot write log lines to test file: %+v", err)
 	}
 
-	testStore := openTestStatestore(t, tmpDir)
+	testStore := openTestStatestore()
 	inp := getInputFromConfig(
 		t,
 		testStore,
@@ -135,8 +129,8 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	pipeline := &mockPipelineConnector{}
 
 	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 
 		inp.Run(inputCtx, pipeline)
@@ -152,7 +146,6 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot write log lines to test file: %+v", err)
 	}
-	time.Sleep(1 * time.Second)
 
 	// only one event is read
 	waitUntilEventCount(1, pipeline)
@@ -224,18 +217,9 @@ type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func openTestStatestore(t *testing.T, tmpDir string) loginp.StateStore {
-	memlog, err := memlog.New(logp.L(), memlog.Settings{
-		Root:     tmpDir,
-		FileMode: 0644,
-	})
-	if err != nil {
-		t.Fatalf("cannot open statestore: %+v", err)
-	}
-
-	r := statestore.NewRegistry(memlog)
+func openTestStatestore() loginp.StateStore {
 	return &testInputStore{
-		registry: r,
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
 	}
 }
 
