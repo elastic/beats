@@ -16,11 +16,10 @@ const (
 
 // Metricsets / GCP services names
 const (
-	ServiceCompute        = "compute"
-	ServicePubsub         = "pubsub"
-	ServiceLoadBalancing  = "loadbalancing"
 	ServiceCloudFunctions = "cloudfunctions"
-	ServiceFirestore      = "firestore"
+	ServiceCompute        = "compute"
+	ServiceLoadBalancing  = "loadbalancing"
+	ServicePubsub         = "pubsub"
 	ServiceStorage        = "storage"
 )
 
