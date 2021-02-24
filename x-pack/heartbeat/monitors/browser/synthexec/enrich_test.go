@@ -61,12 +61,12 @@ func TestJourneyEnricher(t *testing.T) {
 
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1,"succeeded", "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1,"", url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "","", nil),
-		makeStepEvent("step/end", 30, "Step2", 1,"failed", url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1,"", "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1,"", url3, nil),
+		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
+		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", 1, "", url3, nil),
 		journeyEnd,
 	}
 

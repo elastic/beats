@@ -33,8 +33,8 @@ func TestExecMultiplexer(t *testing.T) {
 
 		for sIdx := 0; sIdx < 3; sIdx++ {
 			step := &Step{
-				Name:  fmt.Sprintf("S%d", sIdx),
-				Index: sIdx,
+				Name:   fmt.Sprintf("S%d", sIdx),
+				Index:  sIdx,
 				Status: fmt.Sprintf("failed%d", sIdx),
 			}
 

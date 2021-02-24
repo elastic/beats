@@ -64,8 +64,8 @@ func TestJsonToSynthEvent(t *testing.T) {
 					Id:   "inline",
 				},
 				Step: &Step{
-					Name:  "Go to home page",
-					Index: 0,
+					Name:   "Go to home page",
+					Index:  0,
 					Status: "succeeded",
 				},
 				Payload: map[string]interface{}{
