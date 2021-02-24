@@ -21,6 +21,7 @@ import (
 	"debug/pe"
 	"fmt"
 	"io"
+	"sort"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/formats/common"
@@ -155,6 +156,9 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 			})
 		}
 	}
+	sort.Slice(imports, func(i, j int) bool {
+		return (imports[i].Library < imports[j].Library && imports[i].Name < imports[j].Name)
+	})
 
 	sectionSize := len(peFile.Sections)
 	var compiledAt *time.Time

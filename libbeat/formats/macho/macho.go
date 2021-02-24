@@ -21,6 +21,7 @@ import (
 	"debug/macho"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/elastic/beats/v7/libbeat/formats/common"
 	"github.com/elastic/beats/v7/libbeat/formats/dwarf"
@@ -173,6 +174,9 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 	for _, segment := range segmentMap {
 		segments = append(segments, segment)
 	}
+	sort.Slice(segments, func(i, j int) bool {
+		return segments[i].FileOffset < segments[j].FileOffset
+	})
 
 	info := &Architecture{
 		CPU:       translateCPU(machoFile.Cpu, machoFile.SubCpu),
