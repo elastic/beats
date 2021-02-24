@@ -15,16 +15,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
-
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
@@ -32,8 +33,9 @@ import (
 )
 
 const (
-	waitingForAgent       = "waiting for Elastic Agent to start"
-	waitingForFleetServer = "waiting for Elastic Agent to start Fleet Server"
+	waitingForAgent        = "waiting for Elastic Agent to start"
+	waitingForFleetServer  = "waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerPort = 8220
 )
 
 var (
@@ -84,6 +86,11 @@ type EnrollCmdOption struct {
 	Staging              string
 	FleetServerConnStr   string
 	FleetServerPolicyID  string
+	FleetServerHost      string
+	FleetServerPort      uint16
+	FleetServerCert      string
+	FleetServerCertKey   string
+	FleetServerInsecure  bool
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -140,46 +147,40 @@ func NewEnrollCmdWithStore(
 	configPath string,
 	store store,
 ) (*EnrollCmd, error) {
-
-	cfg, err := options.kibanaConfig()
-	if err != nil {
-		return nil, errors.New(
-			err, "Error",
-			errors.TypeConfig,
-			errors.M(errors.MetaKeyURI, options.URL))
-	}
-
-	client, err := fleetapi.NewWithConfig(log, cfg)
-	if err != nil {
-		return nil, errors.New(
-			err, "Error",
-			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, options.URL))
-	}
-
 	return &EnrollCmd{
-		log:          log,
-		client:       client,
-		options:      options,
-		kibanaConfig: cfg,
-		configStore:  store,
+		log:         log,
+		options:     options,
+		configStore: store,
 	}, nil
 }
 
 // Execute tries to enroll the agent into Fleet.
 func (c *EnrollCmd) Execute(ctx context.Context) error {
+	var err error
 	if c.options.FleetServerConnStr != "" {
-		err := c.fleetServerBootstrap(ctx)
+		err = c.fleetServerBootstrap(ctx)
 		if err != nil {
 			return err
 		}
-
-		// enroll should use localhost as fleet-server is now running
-		// it must also restart
-		c.options.URL = "http://localhost:8000"
 	}
 
-	err := c.enrollWithBackoff(ctx)
+	c.kibanaConfig, err = c.options.kibanaConfig()
+	if err != nil {
+		return errors.New(
+			err, "Error",
+			errors.TypeConfig,
+			errors.M(errors.MetaKeyURI, c.options.URL))
+	}
+
+	c.client, err = fleetapi.NewWithConfig(c.log, c.kibanaConfig)
+	if err != nil {
+		return errors.New(
+			err, "Error",
+			errors.TypeNetwork,
+			errors.M(errors.MetaKeyURI, c.options.URL))
+	}
+
+	err = c.enrollWithBackoff(ctx)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
@@ -198,7 +199,15 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
 	}
 
-	fleetConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+	err = c.prepareFleetTLS()
+	if err != nil {
+		return err
+	}
+
+	fleetConfig, err := createFleetServerBootstrapConfig(
+		c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
+		c.options.FleetServerHost, c.options.FleetServerPort,
+		c.options.FleetServerCert, c.options.FleetServerCertKey)
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
@@ -218,6 +227,53 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	err = waitForFleetServer(ctx, c.log)
 	if err != nil {
 		return errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+	}
+	return nil
+}
+
+func (c *EnrollCmd) prepareFleetTLS() error {
+	host := c.options.FleetServerHost
+	if host == "" {
+		host = "localhost"
+	}
+	port := c.options.FleetServerPort
+	if port == 0 {
+		port = defaultFleetServerPort
+	}
+	if c.options.FleetServerCert != "" && c.options.FleetServerCertKey == "" {
+		return errors.New("certificate private key is required when certificate provided")
+	}
+	if c.options.FleetServerCertKey != "" && c.options.FleetServerCert == "" {
+		return errors.New("certificate is required when certificate private key is provided")
+	}
+	if c.options.FleetServerCert == "" && c.options.FleetServerCertKey == "" {
+		if c.options.FleetServerInsecure {
+			// running insecure, force the binding to localhost (unless specified)
+			if c.options.FleetServerHost == "" {
+				c.options.FleetServerHost = "localhost"
+			}
+			c.options.URL = fmt.Sprintf("http://%s:%d", host, port)
+			c.options.Insecure = true
+			return nil
+		}
+
+		c.log.Info("Generating self-signed certificate for Fleet Server")
+		hostname, err := os.Hostname()
+		if err != nil {
+			return err
+		}
+		ca, err := authority.NewCA()
+		if err != nil {
+			return err
+		}
+		pair, err := ca.GeneratePairWithName(hostname)
+		if err != nil {
+			return err
+		}
+		c.options.FleetServerCert = string(pair.Crt)
+		c.options.FleetServerCertKey = string(pair.Key)
+		c.options.URL = fmt.Sprintf("https://%s:%d", hostname, port)
+		c.options.CAs = []string{string(ca.Crt())}
 	}
 	return nil
 }
@@ -276,6 +332,9 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 	}
 
 	fleetConfig, err := createFleetConfigFromEnroll(resp.Item.AccessAPIKey, c.kibanaConfig)
+	if err != nil {
+		return err
+	}
 	agentConfig := map[string]interface{}{
 		"id": resp.Item.ID,
 	}
@@ -286,7 +345,10 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		}
 	}
 	if c.options.FleetServerConnStr != "" {
-		serverConfig, err := createFleetServerBootstrapConfig(c.options.FleetServerConnStr, c.options.FleetServerPolicyID)
+		serverConfig, err := createFleetServerBootstrapConfig(
+			c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
+			c.options.FleetServerHost, c.options.FleetServerPort,
+			c.options.FleetServerCert, c.options.FleetServerCertKey)
 		if err != nil {
 			return err
 		}
@@ -400,10 +462,12 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 				resChan <- waitResult{}
 				break
 			}
-			appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
-			if msg != appMsg {
-				msg = appMsg
-				log.Info(appMsg)
+			if app.Message != "" {
+				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
+				if msg != appMsg {
+					msg = appMsg
+					log.Info(appMsg)
+				}
 			}
 		}
 	}()
