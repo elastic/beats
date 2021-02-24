@@ -118,6 +118,11 @@ func newMonitorUnsafe(
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
 ) (*Monitor, error) {
+	config, err := stdfields.UnnestStream(config)
+	if err != nil {
+		return nil, err
+	}
+
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
 	// monitor we have

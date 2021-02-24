@@ -18,6 +18,7 @@
 package stdfields
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -31,6 +32,24 @@ var ErrPluginDisabled = errors.New("monitor not loaded, plugin is disabled")
 
 type ServiceFields struct {
 	Name string `config:"name"`
+}
+
+type OptionalStream struct {
+	Streams []*common.Config `config:"streams"`
+}
+
+func UnnestStream(config *common.Config) (*common.Config, error) {
+	optS := &OptionalStream{}
+	err := config.Unpack(optS)
+	if err != nil {
+		return nil, fmt.Errorf("could not unnest stream: %w", err)
+	}
+
+	if len(optS.Streams) > 0 {
+		return optS.Streams[0], nil
+	}
+
+	return config, nil
 }
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.

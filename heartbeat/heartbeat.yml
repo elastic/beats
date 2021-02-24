@@ -21,19 +21,34 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- type: http
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
-  id: my-monitor
-  # Human readable display name for this service in Uptime UI and elsewhere
-  name: My Monitor
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-  # Configure task schedule
-  schedule: '@every 10s'
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service.name: my-apm-service-name
+- id: 4ae879a9-b5da-4132-94ba-ab6e1fcbdc6e
+  name: Sample monitor 2
+  revision: 1
+  type: synthetics/http
+  use_output: default
+  meta:
+    package:
+    name: synthetics
+    version: 0.1.28
+  data_stream:
+    namespace: default
+  streams:
+   - id: synthetics/http-http-4ae879a9-b5da-4132-94ba-ab6e1fcbdc6e
+     name: Sample monitor 2
+     type: http
+     data_stream:
+       dataset: http
+       type: synthetics
+     urls: 'http://elastic.co'
+     service.name: APM Service Name
+     schedule: '@every 5s'
+     timeout: 1600
+     max_redirects: 1
+     proxy_url: 'http://elastic.co'
+     tags:
+       - tag
+       - tag2 
+
 
 # ======================= Elasticsearch template setting =======================
 
@@ -57,6 +72,7 @@ setup.template.settings:
 #fields:
 #  env: staging
 
+output.console: ~
 
 # =================================== Kibana ===================================
 
@@ -93,9 +109,9 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
+#output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+#  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
