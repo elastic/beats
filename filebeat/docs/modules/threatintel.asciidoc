@@ -66,7 +66,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 | URL Threat Intel Fields    | ECS Fields
 | url                        | threat.indicator.url.full
 | date_added                 | @timestamp
-| host                       | threat.indicator.ip/domain
+| host                       | threatintel.indicator.ip/domain
 |==============================================================
 
 [float]
@@ -103,9 +103,9 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threat.indicator.file.hash.md5
-| sha256_hash                | threat.indicator.file.hash.sha256
-| file_size                  | threat.indicator.file.size
+| md5_hash                   | threatintel.indicator.file.hash.md5
+| sha256_hash                | threatintel.indicator.file.hash.sha256
+| file_size                  | threatintel.indicator.file.size
 |================================================================
 
 [float]
@@ -177,10 +177,10 @@ MISP Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | Malware Threat IntelFields | ECS Fields
-| misp.first_seen            | threat.indicator.first_seen
-| misp.last_seen             | threat.indicator.last_seen
+| misp.first_seen            | threatintel.indicator.first_seen
+| misp.last_seen             | threatintel.indicator.last_seen
 | misp.tag                   | tag
-| misp.value                 | threat.indicator.*
+| misp.value                 | threatintel.indicator.*
 |==============================================================
 
 `misp.value` is mapped to the appropriate field dependent on attribute type.
@@ -253,9 +253,9 @@ OTX Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |============================================================
 | Malware Threat Intel  Fields | ECS Fields
-| otx.type                     | threat.indicator.type
-| otx.description              | threat.indicator.description
-| otx.indicator                | threat.indicator.*
+| otx.type                     | threatintel.indicator.type
+| otx.description              | threatintel.indicator.description
+| otx.indicator                | threatintel.indicator.*
 |============================================================
 
 `otx.indicator` is mapped to the appropriate field dependent on attribute type.
@@ -332,10 +332,10 @@ Anomali Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |=============================================================
 | Malware Threat Intel Fields | ECS Fields
-| anomali.description         | threat.indicator.description
-| anomali.created             | threat.indicator.first_seen
-| anomali.modified            | threat.indicator.last_seen
-| anomali.pattern             | threat.indicator.*
+| anomali.description         | threatintel.indicator.description
+| anomali.created             | threatintel.indicator.first_seen
+| anomali.modified            | threatintel.indicator.last_seen
+| anomali.pattern             | threatintel.indicator.*
 | anomali.labels              | tags
 |=============================================================
 
@@ -349,3 +349,4 @@ Anomali Threat Intel is mapped to the following ECS fields.
 
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
+
