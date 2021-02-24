@@ -103,7 +103,7 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threat.indicato.file.hash.md5
+| md5_hash                   | threat.indicator.file.hash.md5
 | sha256_hash                | threat.indicator.file.hash.sha256
 | file_size                  | threat.indicator.file.size
 |================================================================
@@ -349,4 +349,3 @@ Anomali Threat Intel is mapped to the following ECS fields.
 
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
-
