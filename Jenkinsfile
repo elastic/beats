@@ -21,7 +21,7 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats-build"
     SNAPSHOT = 'true'
-    TERRAFORM_VERSION = "0.12.24"
+    TERRAFORM_VERSION = "0.12.30"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
@@ -262,7 +262,20 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
-* This method runs the packaging
+* This method runs the packaging for ARM
+*/
+def packagingArm(Map args = [:]) {
+  def PLATFORMS = [ 'linux/arm64' ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}",
+    "PACKAGES=docker"
+  ]) {
+    target(args)
+  }
+}
+
+/**
+* This method runs the packaging for Linux
 */
 def packagingLinux(Map args = [:]) {
   def PLATFORMS = [ '+all',
@@ -285,7 +298,6 @@ def packagingLinux(Map args = [:]) {
     target(args)
   }
 }
-
 
 /**
 * Upload the packages to their snapshot or pull request buckets
@@ -321,23 +333,26 @@ def uploadPackages(bucketUri, beatsFolder){
 /**
 * Push the docker images for the given beat.
 * @param beatsFolder beats folder
+* @param arch what architecture
 */
-def pushCIDockerImages(beatsFolder){
+def pushCIDockerImages(Map args = [:]) {
+  def arch = args.get('arch', 'amd64')
+  def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if (beatsFolder.endsWith('auditbeat')) {
-      tagAndPush('auditbeat')
+      tagAndPush(beatName: 'auditbeat', arch: arch)
     } else if (beatsFolder.endsWith('filebeat')) {
-      tagAndPush('filebeat')
+      tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (beatsFolder.endsWith('heartbeat')) {
-      tagAndPush('heartbeat')
+      tagAndPush(beatName: 'heartbeat', arch: arch)
     } else if ("${beatsFolder}" == "journalbeat"){
-      tagAndPush('journalbeat')
+      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (beatsFolder.endsWith('metricbeat')) {
-      tagAndPush('metricbeat')
+      tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${beatsFolder}" == "packetbeat"){
-      tagAndPush('packetbeat')
+      tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush('elastic-agent')
+      tagAndPush(beatName: 'elastic-agent', arch: arch)
     }
   }
 }
@@ -346,7 +361,9 @@ def pushCIDockerImages(beatsFolder){
 * Tag and push all the docker images for the given beat.
 * @param beatName name of the Beat
 */
-def tagAndPush(beatName){
+def tagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def arch = args.get('arch', 'amd64')
   def libbetaVer = env.VERSION
   if("${env?.SNAPSHOT.trim()}" == "true"){
     aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
@@ -360,41 +377,40 @@ def tagAndPush(beatName){
     tagName = "pr-${env.CHANGE_ID}"
   }
 
+  // supported tags
+  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
+  if (!isPR() && aliasVersion != "") {
+    tags << aliasVersion
+  }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    doTagAndPush(beatName, variant, libbetaVer, tagName)
-    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
-
-    if (!isPR() && aliasVersion != "") {
-      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    tags.each { tag ->
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
     }
   }
 }
 
 /**
-* Tag and push the given sourceTag docker image with the tag name targetTag.
 * @param beatName name of the Beat
 * @param variant name of the variant used to build the docker image name
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
-def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+def doTagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def variant = args.variant
+  def sourceTag = args.sourceTag
+  def targetTag = args.targetTag
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
 
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
-    def status = sh(label: "Change tag and push ${targetName}", script: """#!/usr/bin/env bash
-      docker images
-      if docker image inspect "${sourceName}" &> /dev/null ; then
-        docker tag ${sourceName} ${targetName}
-        docker push ${targetName}
-      else
-        echo 'docker image ${sourceName} does not exist'
-      fi
-    """, returnStatus: true)
+    def status = sh(label: "Change tag and push ${targetName}",
+                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
+                    returnStatus: true)
     if ( status > 0 && iterations < 3) {
       error("tag and push failed for ${beatName}, retry")
     } else if ( status > 0 ) {
@@ -462,6 +478,7 @@ def target(Map args = [:]) {
   def isMage = args.get('isMage', false)
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
+  def dockerArch = args.get('dockerArch', 'amd64')
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -482,7 +499,7 @@ def target(Map args = [:]) {
         // TODO:
         // push docker images should happen only after the e2e?
         if (isPackaging) {
-          pushCIDockerImages("${directory}")
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
     }
@@ -917,8 +934,27 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
     }
+    if(args?.content?.containsKey('packaging-arm')) {
+      steps.packagingArm(context: args.context,
+                         command: args.content.get('packaging-arm'),
+                         directory: args.project,
+                         label: args.label,
+                         isMage: true,
+                         id: args.id,
+                         e2e: args.content.get('e2e'),
+                         package: true,
+                         dockerArch: 'arm64')
+    }
     if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context, command: args.content.get('packaging-linux'), directory: args.project, label: args.label, isMage: true, id: args.id, e2e: args.content.get('e2e'), package: true)
+      steps.packagingLinux(context: args.context,
+                           command: args.content.get('packaging-linux'),
+                           directory: args.project,
+                           label: args.label,
+                           isMage: true,
+                           id: args.id,
+                           e2e: args.content.get('e2e'),
+                           package: true,
+                           dockerArch: 'amd64')
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
