@@ -39,3 +39,7 @@ func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg 
 func isInt32(val int) bool {
 	return val >= 0 && val <= math.MaxInt32
 }
+
+func terminateCmd(proc *os.Process) error {
+	return proc.Signal(syscall.SIGTERM)
+}

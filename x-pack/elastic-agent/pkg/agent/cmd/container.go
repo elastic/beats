@@ -1,0 +1,390 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package cmd
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/url"
+	"os"
+	"os/exec"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/kibana"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+)
+
+const (
+	defaultKibanaHost = "http://localhost:5601"
+	defaultESHost     = "http://localhost:9200"
+	defaultUsername   = "elastic"
+	defaultPassword   = "changeme"
+	defaultTokenName  = "Default"
+)
+
+func newContainerCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+	return &cobra.Command{
+		Hidden: true, // not exposed over help; used by container entrypoint only
+		Use:    "container",
+		Short:  "Bootstrap Elastic Agent to run inside of a container",
+		Long: `This should only be used as an entrypoint for a container. This will prepare the Elastic Agent using
+environment variables to run inside of the container.
+
+The following actions are possible and grouped based on the actions.
+
+* Preparing Kibana for Fleet
+  This prepares the Fleet plugin that exists inside of Kibana. This must either be enabled here or done externally
+  before Fleet Server will actually successfully start.
+
+  KIBANA_FLEET_SETUP - set to 1 enables this setup
+  KIBANA_FLEET_HOST - kibana host to enable Fleet on [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
+
+* Bootstrapping Fleet Server
+  This bootstraps the Fleet Server to be run by this Elastic Agent. At least one Fleet Server is required in a Fleet
+  deployment for other Elastic Agent to bootstrap.
+
+  FLEET_SERVER_ENABLE - set to 1 enables bootstrapping of Fleet Server (forces FLEET_ENROLL enabled)
+  FLEET_SERVER_ELASTICSEARCH_HOST - elasticsearch host for Fleet Server to communicate with [$ELASTICSEARCH_HOST]
+  FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
+  FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
+  FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
+  FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
+  FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
+  FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
+  FLEET_SERVER_CERT - path to certificate to use for HTTPS endpoint
+  FLEET_SERVER_CERT_KEY - path to private key for certificate to use for HTTPS endpoint
+  FLEET_SERVER_INSECURE_HTTP - expose Fleet Server over HTTP (not recommended; insecure)
+
+* Elastic Agent Fleet Enrollment
+  This enrolls the Elastic Agent into a Fleet Server. It is also possible to have this create a new enrollment token
+  for this specific Elastic Agent.
+
+  FLEET_ENROLL - set to 1 for enrollment to occur
+  FLEET_URL - URL of the Fleet Server to enroll into
+  FLEET_ENROLLMENT_TOKEN - token to use for enrollment
+  FLEET_TOKEN_NAME - token name to use for fetching token from Kibana
+  FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana
+  FLEET_INSECURE - communicate with Fleet with either insecure HTTP or un-verified HTTPS
+  KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to create enrollment token [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to create enrollment token [$KIBANA_PASSWORD]
+
+The following environment variables are provided as a convenience to prevent a large number of environment variable to
+be used when the same credentials will be used across all the possible actions above.
+
+  ELASTICSEARCH_HOST - elasticsearch host [http://elasticsearch:9200]
+  ELASTICSEARCH_USERNAME - elasticsearch username [elastic]
+  ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
+  KIBANA_HOST - kibana host [http://kibana:5601]
+  KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
+  KIBANA_PASSWORD - kibana password [$ELASTICSEARCH_PASSWORD]
+`,
+		Run: func(c *cobra.Command, args []string) {
+			if err := containerCmd(streams, c, flags, args); err != nil {
+				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				os.Exit(1)
+			}
+		},
+	}
+}
+
+func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+	var err error
+	var client *kibana.Client
+	executable, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	if envBool("KIBANA_FLEET_SETUP") {
+		client, err = kibanaClient()
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(streams.Out, "Performing setup of Fleet in Kibana\n")
+		err = kibanaSetup(client)
+		if err != nil {
+			return err
+		}
+	}
+	if envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE") {
+		if client == nil {
+			client, err = kibanaClient()
+			if err != nil {
+				return err
+			}
+		}
+		var policy *kibanaPolicy
+		token := envWithDefault("", "FLEET_ENROLLMENT_TOKEN")
+		if token == "" {
+			policy, err = kibanaFetchPolicy(client)
+			if err != nil {
+				return err
+			}
+			token, err = kibanaFetchToken(client, policy)
+			if err != nil {
+				return err
+			}
+		}
+		policyID := ""
+		if policy != nil {
+			policyID = policy.ID
+		}
+		cmdArgs, err := buildEnrollArgs(token, policyID)
+		if err != nil {
+			return err
+		}
+		enroll := exec.Command(executable, cmdArgs...)
+		enroll.Stdout = os.Stdout
+		enroll.Stderr = os.Stderr
+		err = enroll.Start()
+		if err != nil {
+			return errors.New("failed to execute enrollment command", err)
+		}
+		err = enroll.Wait()
+		if err != nil {
+			return errors.New("enrollment failed", err)
+		}
+	}
+
+	return run(flags, streams)
+}
+
+func buildEnrollArgs(token string, policyID string) ([]string, error) {
+	args := []string{"enroll", "-f"}
+	if envBool("FLEET_SERVER_ENABLE") {
+		connStr, err := buildFleetServerConnStr()
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, "--fleet-server", connStr)
+		if policyID == "" {
+			policyID = envWithDefault("", "FLEET_SERVER_POLICY_ID")
+		}
+		if policyID != "" {
+			args = append(args, "--fleet-server-policy", policyID)
+		}
+		host := envWithDefault("", "FLEET_SERVER_HOST")
+		if host != "" {
+			args = append(args, "--fleet-server-host", host)
+		}
+		port := envWithDefault("", "FLEET_SERVER_PORT")
+		if port != "" {
+			args = append(args, "--fleet-server-port", port)
+		}
+		cert := envWithDefault("", "FLEET_SERVER_CERT")
+		if cert != "" {
+			args = append(args, "--fleet-server-cert", cert)
+		}
+		certKey := envWithDefault("", "FLEET_SERVER_CERT_KEY")
+		if certKey != "" {
+			args = append(args, "--fleet-server-cert-key", certKey)
+		}
+		if envBool("FLEET_SERVER_INSECURE_HTTP") {
+			args = append(args, "--fleet-server--insecure-http")
+			args = append(args, "--insecure")
+		}
+	} else {
+		url := envWithDefault("", "FLEET_SERVER_URL")
+		if url == "" {
+			return nil, errors.New("FLEET_SERVER_URL is required when FLEET_ENROLL is true without FLEET_SERVER_ENABLE")
+		}
+		if envBool("FLEET_INSECURE") {
+			args = append(args, "--insecure")
+		}
+	}
+	args = append(args, "--enrollment-token", token)
+	return args, nil
+}
+
+func buildFleetServerConnStr() (string, error) {
+	host := envWithDefault(defaultESHost, "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST")
+	username := envWithDefault(defaultUsername, "FLEET_SERVER_ELASTICSEARCH_USERNAME", "$ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	u, err := url.Parse(host)
+	if err != nil {
+		return "", err
+	}
+	path := ""
+	if u.Path != "" {
+		path += "/" + strings.TrimLeft(u.Path, "/")
+	}
+	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, username, password, u.Host, path), nil
+}
+
+func kibanaSetup(client *kibana.Client) error {
+	err := performPOST(client, "/api/fleet/setup")
+	if err != nil {
+		return err
+	}
+	err = performPOST(client, "/api/fleet/agents/setup")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func kibanaFetchPolicy(client *kibana.Client) (*kibanaPolicy, error) {
+	var policies kibanaPolicies
+	err := performGET(client, "/api/fleet/agent_policies", &policies)
+	if err != nil {
+		return nil, err
+	}
+	return findPolicy(policies.Items)
+}
+
+func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy) (string, error) {
+	var keys kibanaAPIKeys
+	err := performGET(client, "/api/fleet/enrollment-api-keys", &keys)
+	if err != nil {
+		return "", err
+	}
+	key, err := findKey(keys.List, policy)
+	if err != nil {
+		return "", err
+	}
+	return key.APIKey, nil
+}
+
+func kibanaClient() (*kibana.Client, error) {
+	host := envWithDefault(defaultKibanaHost, "KIBANA_FLEET_HOST", "KIBANA_HOST")
+	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "$ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	return kibana.NewClientWithConfig(&kibana.ClientConfig{
+		Host:     host,
+		Username: username,
+		Password: password,
+	})
+}
+
+func findPolicy(policies []kibanaPolicy) (*kibanaPolicy, error) {
+	fleetServerEnabled := envBool("FLEET_SERVER_ENABLE")
+	policyName := envWithDefault("", "FLEET_TOKEN_POLICY_NAME")
+	if fleetServerEnabled {
+		policyName = envWithDefault("", "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME")
+	}
+	for _, policy := range policies {
+		if policy.Status != "active" {
+			continue
+		}
+		if policyName != "" {
+			if policyName == policy.Name {
+				return &policy, nil
+			}
+		} else if fleetServerEnabled {
+			if policy.IsDefaultFleetServer {
+				return &policy, nil
+			}
+		} else {
+			if policy.IsDefault {
+				return &policy, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
+}
+
+func findKey(keys []kibanaAPIKey, policy *kibanaPolicy) (*kibanaAPIKey, error) {
+	tokenName := envWithDefault(defaultTokenName, "FLEET_TOKEN_NAME")
+	for _, key := range keys {
+		name := strings.TrimSpace(strings.Replace(key.Name, fmt.Sprintf(" (%s)", key.ID), "", 1))
+		if name == tokenName && key.PolicyID == policy.ID {
+			return &key, nil
+		}
+	}
+	return nil, fmt.Errorf(`unable to find enrollment token named "%s" in policy "%s"`, tokenName, policy.Name)
+}
+
+func envWithDefault(def string, keys ...string) string {
+	for _, key := range keys {
+		val, ok := os.LookupEnv(key)
+		if ok {
+			return val
+		}
+	}
+	return def
+}
+
+func envBool(keys ...string) bool {
+	for _, key := range keys {
+		val, ok := os.LookupEnv(key)
+		if ok && isTrue(val) {
+			return true
+		}
+	}
+	return false
+}
+
+func isTrue(val string) bool {
+	trueVals := []string{"1", "true", "yes", "y"}
+	val = strings.ToLower(val)
+	for _, v := range trueVals {
+		if val == v {
+			return true
+		}
+	}
+	return false
+}
+
+func performGET(client *kibana.Client, path string, response interface{}) error {
+	code, result, err := client.Connection.Request("GET", path, nil, nil, nil)
+	if err != nil || code != 200 {
+		return fmt.Errorf("HTTP GET request to %s%s fails: %v. Response: %s.",
+			client.Connection.URL, path, err, truncateString(result))
+	}
+	if response == nil {
+		return nil
+	}
+	return json.Unmarshal(result, response)
+}
+
+func performPOST(client *kibana.Client, path string) error {
+	code, result, err := client.Connection.Request("POST", path, nil, nil, nil)
+	if err != nil || code >= 400 {
+		return fmt.Errorf("HTTP POST request to %s%s fails: %v. Response: %s.",
+			client.Connection.URL, path, err, truncateString(result))
+	}
+	return nil
+}
+
+func truncateString(b []byte) string {
+	const maxLength = 250
+	runes := bytes.Runes(b)
+	if len(runes) > maxLength {
+		runes = append(runes[:maxLength], []rune("... (truncated)")...)
+	}
+
+	return strings.Replace(string(runes), "\n", " ", -1)
+}
+
+type kibanaPolicy struct {
+	ID                   string `json:"id"`
+	Name                 string `json:"name"`
+	Status               string `json:"status"`
+	IsDefault            bool   `json:"is_default"`
+	IsDefaultFleetServer bool   `json:"is_default_fleet_server"`
+}
+
+type kibanaPolicies struct {
+	Items []kibanaPolicy `json:"items"`
+}
+
+type kibanaAPIKey struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Active   bool   `json:"active"`
+	PolicyID string `json:"policy_id"`
+	APIKey   string `json:"api_key"`
+}
+
+type kibanaAPIKeys struct {
+	List []kibanaAPIKey `json:"list"`
+}
