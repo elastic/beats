@@ -276,7 +276,12 @@ func hash2Partition(hash uint32, numPartitions int32) (int32, error) {
 	if p < 0 {
 		p = -p
 	}
-	return p % numPartitions, nil
+
+	r := p % numPartitions
+	if r < 0 {
+		r = -r
+	}
+	return r, nil
 }
 
 func hashFieldValue(h hash.Hash32, event common.MapStr, field string) error {
