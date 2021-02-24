@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	defaultKibanaHost = "http://localhost:5601"
-	defaultESHost     = "http://localhost:9200"
+	defaultKibanaHost = "http://kibana:5601"
+	defaultESHost     = "http://elasticsearch:9200"
 	defaultUsername   = "elastic"
 	defaultPassword   = "changeme"
 	defaultTokenName  = "Default"
@@ -337,7 +337,7 @@ func isTrue(val string) bool {
 func performGET(client *kibana.Client, path string, response interface{}) error {
 	code, result, err := client.Connection.Request("GET", path, nil, nil, nil)
 	if err != nil || code != 200 {
-		return fmt.Errorf("HTTP GET request to %s%s fails: %v. Response: %s.",
+		return fmt.Errorf("http GET request to %s%s fails: %v. Response: %s",
 			client.Connection.URL, path, err, truncateString(result))
 	}
 	if response == nil {
@@ -349,7 +349,7 @@ func performGET(client *kibana.Client, path string, response interface{}) error 
 func performPOST(client *kibana.Client, path string) error {
 	code, result, err := client.Connection.Request("POST", path, nil, nil, nil)
 	if err != nil || code >= 400 {
-		return fmt.Errorf("HTTP POST request to %s%s fails: %v. Response: %s.",
+		return fmt.Errorf("http POST request to %s%s fails: %v. Response: %s",
 			client.Connection.URL, path, err, truncateString(result))
 	}
 	return nil
