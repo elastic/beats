@@ -5,6 +5,7 @@
 package application
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
@@ -27,7 +28,7 @@ func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*conf
 	return cfg, nil
 }
 
-func createFleetServerBootstrapConfig(connStr string, policyID string) (*configuration.FleetAgentConfig, error) {
+func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string) (*configuration.FleetAgentConfig, error) {
 	es, err := configuration.ElasticsearchFromConnStr(connStr)
 	if err != nil {
 		return nil, err
@@ -39,9 +40,19 @@ func createFleetServerBootstrapConfig(connStr string, policyID string) (*configu
 		Output: configuration.FleetServerOutputConfig{
 			Elasticsearch: es,
 		},
+		Host: host,
+		Port: port,
 	}
 	if policyID != "" {
 		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
+	}
+	if cert != "" || key != "" {
+		cfg.Server.TLS = &tlscommon.Config{
+			Certificate: tlscommon.CertificateConfig{
+				Certificate: cert,
+				Key:         key,
+			},
+		}
 	}
 
 	if err := cfg.Valid(); err != nil {
