@@ -72,7 +72,6 @@ type Section struct {
 type Info struct {
 	Imports         []Symbol      `json:"imports,omitempty"`
 	Exports         []Symbol      `json:"exports,omitempty"`
-	Telfhash        string        `json:"telfhash,omitempty"`
 	Segments        []Segment     `json:"segments,omitempty"`
 	SharedLibraries []string      `json:"shared_libraries,omitempty"`
 	Header          Header        `json:"header"`
@@ -87,15 +86,16 @@ type Info struct {
 	// Architecture string     `json:"architecture"`
 	// ByteOrder    string     `json:"byte_order"`
 	// CPUType      string     `json:"cpu_type"`
+
+	// Calculating this requires disassembly of non-exported
+	// function call sites, consider re-adding it if we can
+	// find a native go disassembler
+	// Telfhash        string        `json:"telfhash,omitempty"`
 }
 
 // Parse parses the elf file and returns information about it or errors.
 func Parse(r io.ReaderAt) (interface{}, error) {
 	elfFile, err := elf.NewFile(r)
-	if err != nil {
-		return nil, err
-	}
-	telfhash, err := telfhash(elfFile)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,6 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	info := &Info{
 		Imports:         imports,
 		Exports:         exports,
-		Telfhash:        telfhash,
 		Segments:        translatedSegments,
 		SharedLibraries: libraries,
 		Header:          header,
