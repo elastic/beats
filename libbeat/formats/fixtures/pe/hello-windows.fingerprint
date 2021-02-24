@@ -59,7 +59,7 @@
     },
     {
       "library": "msvcrt.dll",
-      "name": "_cexit"
+      "name": "__C_specific_handler"
     },
     {
       "library": "msvcrt.dll",
@@ -103,7 +103,7 @@
     },
     {
       "library": "msvcrt.dll",
-      "name": "__C_specific_handler"
+      "name": "_cexit"
     },
     {
       "library": "msvcrt.dll",

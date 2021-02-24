@@ -148,7 +148,7 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 		}
 	}
 	sort.Slice(imports, func(i, j int) bool {
-		return (imports[i].Library < imports[j].Library && imports[i].Name < imports[j].Name)
+		return (imports[i].Library < imports[j].Library || imports[i].Name < imports[j].Name)
 	})
 
 	sectionSize := len(peFile.Sections)
