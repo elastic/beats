@@ -97,7 +97,7 @@
       },
       "segments": [
         {
-          "vmaddr": "100000000",
+          "vmaddr": "0x100000000",
           "name": "__TEXT",
           "vmsize": 4096,
           "fileoff": 0,
@@ -158,7 +158,7 @@
           ]
         },
         {
-          "vmaddr": "100001000",
+          "vmaddr": "0x100001000",
           "name": "__DATA_CONST",
           "vmsize": 4096,
           "fileoff": 4096,
@@ -175,7 +175,7 @@
           ]
         },
         {
-          "vmaddr": "100002000",
+          "vmaddr": "0x100002000",
           "name": "__DATA",
           "vmsize": 4096,
           "fileoff": 8192,

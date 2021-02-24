@@ -94,7 +94,7 @@
     "type": "Executable",
     "version": "current",
     "abi_version": "0",
-    "entrypoint": "400390"
+    "entrypoint": "0x400390"
   },
   "sections": [
     {

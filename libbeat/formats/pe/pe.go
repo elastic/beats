@@ -78,8 +78,7 @@ type Resource struct {
 
 // Icon holds fields that are used for fingerprinting embedded icons
 type Icon struct {
-	// leverage https://github.com/corona10/goimagehash
-	Dhash string `json:"dhash"`
+	Dhash string `json:"dhash"` // https://github.com/corona10/goimagehash
 }
 
 // Info contains high level fingerprinting an analysis of a PE file.
@@ -100,16 +99,11 @@ type Info struct {
 	Product              string           `json:"product,omitempty"`
 	Architecture         string           `json:"architecture,omitempty"`
 
-	// Things that we should be able to get
-	// See https://github.com/lief-project/LIEF/blob/05103f55a6cb993cb20735da3c7a6333e4f600e3/src/PE/Binary.cpp#L1046
-	// Authentihash         string           `json:"authentihash,omitempty"`
-	// Compiler         *Compiler        `json:"compiler,omitempty"`
-	// RichHeaderHash   string           `json:"rich_header.hash.md5,omitempty"`
-	// Icons            []Icon           `json:"icon,omitempty"`
-
-	// Fields that are likely duplicated
-	// CreationDate         *time.Time       `json:"creation_date,omitempty"`
-	// MachineType          string           `json:"machine_type"`
+	// TODO: Things that we should be able to get
+	// Authentihash   string    `json:"authentihash,omitempty"` // https://github.com/lief-project/LIEF/blob/05103f55a6cb993cb20735da3c7a6333e4f600e3/src/PE/Binary.cpp#L1046
+	// Compiler       *Compiler `json:"compiler,omitempty"`
+	// RichHeaderHash string    `json:"rich_header.hash.md5,omitempty"`
+	// Icons          []Icon    `json:"icon,omitempty"`
 }
 
 func getPackers(f *pe.File) []string {
@@ -127,9 +121,6 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	// IsDLL:        (peFile.Characteristics & 0x2000) == 0x2000,
-	// IsSys:        (peFile.Characteristics & 0x1000) == 0x1000,
-
 	var architecture string
 	var entrypoint uint32
 	switch header := peFile.OptionalHeader.(type) {
@@ -170,7 +161,7 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 
 	info := &Info{
 		CompilationTimestamp: compiledAt,
-		Entrypoint:           fmt.Sprintf("%x", entrypoint),
+		Entrypoint:           fmt.Sprintf("0x%x", entrypoint),
 		Imports:              imports,
 		Exports:              exportSymbols,
 		Packers:              getPackers(peFile),

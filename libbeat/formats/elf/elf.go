@@ -50,9 +50,6 @@ type Header struct {
 	Version    string `json:"version"`
 	AbiVersion string `json:"abi_version"`
 	Entrypoint string `json:"entrypoint"`
-
-	// Is this either Version or AbiVersion?
-	// ObjectVersion string `json:"object_version"`
 }
 
 // Section contains information about a section in an elf file.
@@ -79,18 +76,10 @@ type Info struct {
 	Packers         []string      `json:"packers,omitempty"`
 	Debug           []dwarf.DWARF `json:"debug,omitempty"`
 
-	// This isn't in ELF
-	// CreationDate    time.Time  `json:"creation_date"`
-
-	// These are already contained in Header
-	// Architecture string     `json:"architecture"`
-	// ByteOrder    string     `json:"byte_order"`
-	// CPUType      string     `json:"cpu_type"`
-
-	// Calculating this requires disassembly of non-exported
+	// TODO: Calculating this requires disassembly of non-exported
 	// function call sites, consider re-adding it if we can
 	// find a native go disassembler
-	// Telfhash        string        `json:"telfhash,omitempty"`
+	// Telfhash string `json:"telfhash,omitempty"`
 }
 
 // Parse parses the elf file and returns information about it or errors.
@@ -143,7 +132,7 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 		Type:       translateType(elfFile.Type),
 		Version:    translateVersion(elfFile.Version),
 		AbiVersion: fmt.Sprintf("%d", elfFile.ABIVersion),
-		Entrypoint: fmt.Sprintf("%x", elfFile.Entry),
+		Entrypoint: fmt.Sprintf("0x%x", elfFile.Entry),
 	}
 
 	segments := make(map[*elf.Prog][]string)

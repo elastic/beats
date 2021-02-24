@@ -75,6 +75,7 @@ type Architecture struct {
 	Imports   []string      `json:"imports,omitempty"`
 	Packers   []string      `json:"packers,omitempty"`
 	Symhash   string        `json:"symhash,omitempty"`
+	// TODO: Add the following
 	// Exports   []string      `json:"exports,omitempty"`
 	// CDHash    string        `json:"cdhash,omitempty"`
 }
@@ -153,7 +154,7 @@ func parse(machoFile *macho.File) (*Architecture, error) {
 			}
 			mSegment := machoFile.Segment(section.Seg)
 			if mSegment != nil {
-				segment.VMAddress = fmt.Sprintf("%x", mSegment.Addr)
+				segment.VMAddress = fmt.Sprintf("0x%x", mSegment.Addr)
 				segment.VMSize = int64(mSegment.Memsz)
 				segment.FileOffset = int64(mSegment.Offset)
 				segment.FileSize = int64(mSegment.Filesz)

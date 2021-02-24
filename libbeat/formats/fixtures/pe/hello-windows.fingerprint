@@ -1,5 +1,5 @@
 {
-  "entrypoint": "14e0",
+  "entrypoint": "0x14e0",
   "imports": [
     {
       "library": "KERNEL32.dll",
