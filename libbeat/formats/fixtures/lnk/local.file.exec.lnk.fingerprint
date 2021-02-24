@@ -20,7 +20,7 @@
     "file_size": 5120,
     "icon_index": 27,
     "window_style": "SW_NORMAL",
-    "hotKey": "HOTKEYF_ALT+G"
+    "hot_key": "HOTKEYF_ALT+G"
   },
   "targets": [
     {
