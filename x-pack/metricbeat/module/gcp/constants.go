@@ -19,6 +19,7 @@ const (
 	ServiceCompute       = "compute"
 	ServicePubsub        = "pubsub"
 	ServiceLoadBalancing = "loadbalancing"
+	ServiceCloudFunctions = "cloudfunctions"
 	ServiceFirestore     = "firestore"
 	ServiceStorage       = "storage"
 )
