@@ -25,8 +25,8 @@
             "gridData": {
               "h": 11,
               "i": "1",
-              "w": 18,
-              "x": 6,
+              "w": 19,
+              "x": 5,
               "y": 0
             },
             "panelIndex": "1",
@@ -138,7 +138,7 @@
             "gridData": {
               "h": 11,
               "i": "b9cf2afd-ae8b-409b-93f2-b69ba1e1f064",
-              "w": 6,
+              "w": 5,
               "x": 0,
               "y": 0
             },
@@ -307,8 +307,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-02-23T14:27:14.764Z",
-      "version": "WzMxODIsMV0="
+      "updated_at": "2021-02-23T18:01:10.249Z",
+      "version": "WzQwNzIsMl0="
     },
     {
       "attributes": {
@@ -1073,7 +1073,7 @@
             }
           }
         },
-        "title": "[Metricbeat CockroachDB] Navigation",
+        "title": "Navigation [Metricbeat CockroachDB]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1083,7 +1083,7 @@
             "markdown": "[Overview](#/dashboard/04b595b0-c1fc-11ea-8a94-61b423d19ae7) | [SQL](#/dashboard/3975ad70-c761-11ea-8a94-61b423d19ae7)\n",
             "openLinksInNewTab": false
           },
-          "title": "[Metricbeat CockroachDB] Navigation",
+          "title": "Navigation [Metricbeat CockroachDB]",
           "type": "markdown"
         }
       },
@@ -1096,8 +1096,8 @@
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2021-02-23T17:51:06.678Z",
-      "version": "WzQwMTUsMl0="
+      "updated_at": "2021-02-24T14:44:24.373Z",
+      "version": "WzQyMTUsM10="
     },
     {
       "attributes": {
