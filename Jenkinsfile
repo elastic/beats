@@ -660,6 +660,7 @@ def analyseEnvironmentalIssues(args) {
 * Archive the file with the environmental issues details in case there are any
 * reported environmental issues.
 * TODO: Create JSON file to upload those details to elasticsearch
+* This won't be needed as soon as we use the APM transactions
 */
 def notifyEnvironmentalIssues(Map args = [:]) {
   stage('Notify environmental issues'){
