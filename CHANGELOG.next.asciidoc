@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
 - Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
 - Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}[23905]
+- Store `cloudfoundry.container.cpu.pct` in decimal form and as `scaled_float`. {pull}24219[24219]
 
 *Packetbeat*
 
