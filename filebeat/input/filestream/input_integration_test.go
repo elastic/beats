@@ -49,7 +49,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
-	// check registry
 	env.requireOffsetInRegistry(testlogName, len(testlines))
 
 	testlogNameRotated := "test.log.rotated"
@@ -88,7 +87,6 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
-	// check registry
 	env.requireOffsetInRegistry(testlogName, expectedOffset)
 
 	// the second log line will not be picked up as scan_interval is set to one day.
