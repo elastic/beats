@@ -11,9 +11,10 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"github.com/hashicorp/go-multierror"
 )
 
 type embeddedInstaller interface {
