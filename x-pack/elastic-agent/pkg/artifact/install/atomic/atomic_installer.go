@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -66,6 +67,14 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	}
 
 	if err := os.Rename(tempInstallDir, installDir); err != nil {
+		os.RemoveAll(installDir)
+		os.RemoveAll(tempInstallDir)
+		return err
+	}
+
+	// on windows rename is not atomic so if we were in cancellation process let's start over
+	// after restart
+	if err := ctx.Err(); runtime.GOOS == "windows" && err != nil {
 		os.RemoveAll(installDir)
 		os.RemoveAll(tempInstallDir)
 		return err
