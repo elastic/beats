@@ -38,8 +38,10 @@
 - Fix issue of missing log messages from filebeat monitor {pull}23514[23514]
 - Increase checkin grace period to 30 seconds {pull}23568[23568]
 - Fix libbeat from reporting back degraded on config update {pull}23537[23537]
+- Rewrite check if agent is running with admin rights on Windows {pull}23970[23970]
 - Fix issues with dynamic inputs and conditions {pull}23886[23886]
 - Fix bad substitution of API key. {pull}24036[24036]
+- Fix docker enrollment issue related to Fleet Server change. {pull}24155[24155]
 
 ==== New features
 
@@ -70,3 +72,4 @@
 - Add metrics collection for Agent {pull}22793[22793]
 - Add support for Fleet Server {pull}23736[23736]
 - Add support for enrollment with local bootstrap of Fleet Server {pull}23865[23865]
+- Add TLS support for Fleet Server {pull}24142[24142]

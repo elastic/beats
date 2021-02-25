@@ -36,7 +36,7 @@ type journeyEnricher struct {
 	journey         *Journey
 	checkGroup      string
 	errorCount      int
-	lastError       error
+	firstError      error
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
@@ -69,7 +69,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case "journey/start":
-			je.lastError = nil
+			je.firstError = nil
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
@@ -121,7 +121,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
 		je.errorCount++
-		je.lastError = jobErr
+		if je.firstError == nil {
+			je.firstError = jobErr
+		}
 	}
 
 	return jobErr
@@ -154,7 +156,7 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 				"down": down,
 			},
 		})
-		return je.lastError
+		return je.firstError
 	}
 
 	return fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
