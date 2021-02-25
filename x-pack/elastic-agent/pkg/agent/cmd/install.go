@@ -44,8 +44,11 @@ would like the Agent to operate.
 }
 
 func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	var err error
-	if !install.HasRoot() {
+	isAdmin, err := install.HasRoot()
+	if err != nil {
+		return fmt.Errorf("unable to perform install command while checking for administrator rights, %v", err)
+	}
+	if !isAdmin {
 		return fmt.Errorf("unable to perform install command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
