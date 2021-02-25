@@ -64,9 +64,6 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 		if err := os.Rename(rootDir, installDir); err != nil {
 			return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
 		}
-
-		// sync dir
-		os.Open(installDir)
 	}
 
 	return nil
