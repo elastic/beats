@@ -7078,7 +7078,7 @@ type: long
 CPU usage percentage.
 
 
-type: float
+type: scaled_float
 
 --
 
