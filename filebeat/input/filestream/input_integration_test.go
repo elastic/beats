@@ -22,13 +22,7 @@ package filestream
 import (
 	"context"
 	"runtime"
-	"sync"
 	"testing"
-
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // test_close_renamed from test_harvester.py
@@ -40,34 +34,15 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	inp, err := (&loginp.InputManager{
-		Logger:     logp.L(),
-		StateStore: env.stateStore,
-		Type:       pluginName,
-		Configure:  configure,
-	}).Create(common.MustNewConfigFrom(
-		map[string]interface{}{
-			"paths":                                []string{env.abspath(testlogName) + "*"},
-			"prospector.scanner.check_interval":    "1ms",
-			"close.on_state_change.check_interval": "1ms",
-			"close.on_state_change.renamed":        "true",
-		},
-	))
-
-	if err != nil {
-		t.Fatalf("cannot create filestream input: %+v", err)
-	}
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":    "1ms",
+		"close.on_state_change.check_interval": "1ms",
+		"close.on_state_change.renamed":        "true",
+	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		inp.Run(inputCtx, env.pipeline)
-	}()
+	env.startInput(ctx, inp)
 
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
@@ -87,7 +62,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.waitUntilEventCount(3)
 
 	cancelInput()
-	wg.Wait()
+	env.waitUntilInputStops()
 
 	env.requireOffsetInRegistry(testlogNameRotated, len(testlines))
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
@@ -98,29 +73,14 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
-	inp, _ := (&loginp.InputManager{
-		Logger:     logp.L(),
-		StateStore: env.stateStore,
-		Type:       pluginName,
-		Configure:  configure,
-	}).Create(common.MustNewConfigFrom(
-		map[string]interface{}{
-			"paths":                             []string{env.abspath(testlogName)},
-			"prospector.scanner.check_interval": "24h",
-			"close.reader.on_eof":               "true",
-		},
-	))
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "24h",
+		"close.reader.on_eof":               "true",
+	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		inp.Run(inputCtx, env.pipeline)
-	}()
+	env.startInput(ctx, inp)
 
 	testlines := []byte("first log line\n")
 	expectedOffset := len(testlines)
@@ -138,7 +98,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.waitUntilEventCount(1)
 
 	cancelInput()
-	wg.Wait()
+	env.waitUntilInputStops()
 
 	env.requireOffsetInRegistry(testlogName, expectedOffset)
 }

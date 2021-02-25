@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -29,7 +30,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
@@ -39,6 +44,11 @@ type inputTestingEnvironment struct {
 	workingDir string
 	stateStore loginp.StateStore
 	pipeline   *mockPipelineConnector
+
+	pluginInitOnce sync.Once
+	plugin         v2.Plugin
+
+	wg sync.WaitGroup
 }
 
 type registryEntry struct {
@@ -54,6 +64,37 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 		stateStore: openTestStatestore(),
 		pipeline:   &mockPipelineConnector{},
 	}
+}
+
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+	manager := e.getManager()
+	c := common.MustNewConfigFrom(config)
+	inp, err := manager.Create(c)
+	if err != nil {
+		e.t.Fatalf("failed to create input using manager: %+v", err)
+	}
+	return inp
+}
+
+func (e *inputTestingEnvironment) getManager() v2.InputManager {
+	e.pluginInitOnce.Do(func() {
+		e.plugin = Plugin(logp.L(), e.stateStore)
+	})
+	return e.plugin.Manager
+}
+
+func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
+	e.wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done()
+
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
+		inp.Run(inputCtx, e.pipeline)
+	}(&e.wg)
+}
+
+func (e *inputTestingEnvironment) waitUntilInputStops() {
+	e.wg.Wait()
 }
 
 func (e *inputTestingEnvironment) mustWriteLinesToFile(filename string, lines []byte) {
