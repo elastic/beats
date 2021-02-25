@@ -10,3 +10,23 @@
 2021/02/23 16:50:49:045 INFO Unenroll elastic agent
 2021/02/23 16:54:25:670 INFO Unenroll elastic agent
 2021/02/23 16:57:22:586 INFO Unenroll elastic agent
+2021/02/24 12:39:22:907 ERROR An error occurred:
+2021/02/24 12:39:22:922 ERROR Error in Get-PublicSettings-From-Config-Json. Couldn't parse 
+2021/02/24 12:39:22:924 ERROR at Get-PublicSettings-From-Config-Json, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 137
+at Get-CloudId, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 29
+at Get-Elasticsearch-URL, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 58
+at Get-Stack-Version, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 88
+at install-elastic-agent, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 13
+at install, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 88
+at <ScriptBlock>, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 92
+at <ScriptBlock>, <No file>: line 1
+2021/02/24 12:39:22:924 INFO Start retrieving KIBANA_URL
+2021/02/24 12:39:22:924 ERROR An error occurred:
+2021/02/24 12:39:22:940 ERROR Error in Get-PublicSettings-From-Config-Json. Couldn't parse 
+2021/02/24 12:39:22:940 ERROR at Get-PublicSettings-From-Config-Json, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 137
+at Get-CloudId, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 29
+at Get-Kibana-URL, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\helper.ps1: line 71
+at enroll-elastic-agent, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 45
+at install, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 89
+at <ScriptBlock>, C:\Work\beats\x-pack\azure-vm-extension\handler\scripts\windows\install.ps1: line 92
+at <ScriptBlock>, <No file>: line 1

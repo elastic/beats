@@ -11,7 +11,7 @@ function install-elastic-agent {
     $INSTALL_LOCATION="C:\Program Files"
     try {
         $STACK_VERSION= Get-Stack-Version
-        if $STACK_VERSION=="" {
+        if ( $STACK_VERSION -eq "" ) {
         throw "Elastic stack version could not be found"
         }
         $INSTALL= "elastic-agent-${STACK_VERSION}${OS_SUFFIX}"
@@ -45,7 +45,7 @@ function enroll-elastic-agent {
     $kibana_url = Get-Kibana-URL $powershellVersion
     $username = Get-Username $powershellVersion
     $password = Get-Password $powershellVersion
-    if $kibana_url == "" {
+    if ( $kibana_url -eq "") {
     throw "Kibana url could not be found"
     }
     $enrollment_token=""

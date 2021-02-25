@@ -6,7 +6,7 @@ function GetDirectory
 
 $scriptDir = GetDirectory
 
-$extensionRoot = [System.IO.Path]::GetFullPath("$scriptDir\\..")
+$extensionRoot = [System.IO.Path]::GetFullPath("$scriptDir\\..\\..")
 
 function Get-PowershellVersion {
   if(!$powershellVersion)
@@ -121,9 +121,12 @@ function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
       $global:normalized_json = normalize_json($json_contents)
     }
     if ( $powershellVersion -ge 3 ) {
+    echo "sjsj 1"
       $value = ($normalized_json | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
+
     }
     else {
+     echo "sjsj 2"
       $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
       $value = $ser.DeserializeObject($normalized_json).runtimeSettings[0].handlerSettings.publicSettings.$key
     }
@@ -138,9 +141,10 @@ function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
   }
 }
 
-function Get-Azure-Logs-Path($powershellVersion) {
+function Get-Azure-Logs-Path() {
   try
   {
+    $powershellVersion = Get-PowershellVersion
     $handler_file = "$extensionRoot\\HandlerEnvironment.json"
 
     if ( $powershellVersion -ge 3 ) {

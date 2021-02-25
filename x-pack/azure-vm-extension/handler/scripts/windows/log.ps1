@@ -1,11 +1,21 @@
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
 # all logging settins are here on top
-$logFile = "log-$(gc env:computername).log"
+$logFile = ""
 $logLevel = "DEBUG" # ("DEBUG","INFO","WARN","ERROR","FATAL")
 $logSize = 1mb # 30kb
 $logCount = 10
+$logDir = ""
 # end of settings
+
+function Get-LogFile {
+if ($logDir -eq "") {
+   $logDir = Get-Azure-Logs-Path
+}
+$logFile = "$logDir/log-es-agent.log"
+}
+
+
 
 function Write-Log-Line ($line) {
     Add-Content $logFile -Value $Line
@@ -24,6 +34,10 @@ Function Write-Log {
     [String]
     $Level = "DEBUG"
     )
+
+    if ($logFile -eq "") {
+    Get-LogFile
+    }
 
     $levels = ("DEBUG","INFO","WARN","ERROR","FATAL")
     $logLevelPos = [array]::IndexOf($levels, $logLevel)

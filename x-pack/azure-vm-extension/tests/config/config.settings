@@ -5,9 +5,9 @@
                 "protectedSettingsCertThumbprint": "a811c3f4058542418abb",
             "protectedSettings": "ICB7DQogICAgInN0b3JhZ2VhY2NvdW50IiA6ICJbcGFyYW1ldGVycy5TdG9yYWdlQWNjb3VudF0iLA0KICB9LA0K",
             "publicSettings": {
-                "username": "",
+                "username": "elastic",
                 "password": "",
-                "cloud_id": "elastic-observability-deployment:"
+                 "cloud_id": "elastic-observability-deployment:"
             }
         }
     }

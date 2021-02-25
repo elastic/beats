@@ -25,27 +25,28 @@ install_es_agent_deb()
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "ERROR" "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
+        log "ERROR" "[install_es_agent_deb] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
         exit $EXIT_CODE
     fi
-    log "[install_es_ag_deb] download location - $DOWNLOAD_URL" "INFO"
+    log "[install_es_agent_deb] download location - $DOWNLOAD_URL" "INFO"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-    log "ERROR" "[install_es_ag_deb] error downloading Elastic Agent $STACK_VERSION"
+    log "ERROR" "[install_es_agent_deb] error downloading Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
-    log "INFO" "[install_es_ag_deb] downloaded Elastic Agent $STACK_VERSION"
+    log "INFO" "[install_es_agent_deb] downloaded Elastic Agent $STACK_VERSION"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "ERROR" "[install_es_ag_deb] error validating checksum for Elastic Agent $STACK_VERSION"
+        log "ERROR" "[install_es_agent_deb] error validating checksum for Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
 
     sudo dpkg -i $PACKAGE
-    log "INFO" "[install_es_ag_deb] installed Elastic Agent $STACK_VERSION"
+    sudo apt-get install -f
+    log "INFO" "[install_es_agent_deb] installed Elastic Agent $STACK_VERSION"
 
  fi
 }
@@ -63,31 +64,31 @@ install_es_agent_rpm()
       local SHASUM="$PACKAGE.sha$ALGORITHM"
       local DOWNLOAD_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}"
       local SHASUM_URL="https://artifacts.elastic.co/downloads/beats/elastic-agent/${PACKAGE}.sha512"
-      log "INFO" "[install_es_ag_rpm] installing Elastic Agent $STACK_VERSION"
+      log "INFO" "[install_es_agent_rpm] installing Elastic Agent $STACK_VERSION"
     wget --retry-connrefused --waitretry=1 "$SHASUM_URL" -O "$SHASUM"
     local EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "ERROR" "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
+        log "ERROR" "[install_es_agent_rpm] error downloading Elastic Agent $STACK_VERSION sha$ALGORITHM checksum"
         exit $EXIT_CODE
     fi
-    log "INFO" "[install_es_ag_rpm] download location - $DOWNLOAD_URL"
+    log "INFO" "[install_es_agent_rpm] download location - $DOWNLOAD_URL"
     wget --retry-connrefused --waitretry=1 "$DOWNLOAD_URL" -O $PACKAGE
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "ERROR" "[install_es_ag_rpm] error downloading Elastic Agent $STACK_VERSION"
+        log "ERROR" "[install_es_agent_rpm] error downloading Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
-    log "INFO" "[install_es_ag_rpm] downloaded Elastic Agent $STACK_VERSION"
+    log "INFO" "[install_es_agent_rpm] downloaded Elastic Agent $STACK_VERSION"
 
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
-        log "ERROR" "[install_es_ag_rpm] error validating checksum for Elastic Agent $STACK_VERSION"
+        log "ERROR" "[install_es_agent_rpm] error validating checksum for Elastic Agent $STACK_VERSION"
         exit $EXIT_CODE
     fi
 
     sudo rpm -vi $PACKAGE
-    log "INFO" "[install_es_ag_rpm] installed Elastic Agent $STACK_VERSION"
+    log "INFO" "[install_es_agent_rpm] installed Elastic Agent $STACK_VERSION"
       fi
 
 }
@@ -160,7 +161,7 @@ enroll_es_agent() {
       ENROLLMENT_TOKEN=$(echo $jsonResult | jq -r '.item.api_key')
       log "INFO" "[enroll_es_agent] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN"
       log "INFO" "[enroll_es_agent] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}"
-      elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
+      sudo elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
 else
    log "ERROR" "[enroll_es_agent] error retrieving user credentials"
    exit 1
