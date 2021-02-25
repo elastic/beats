@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -22,6 +23,7 @@ type embeddedInstaller interface {
 // successful finish.
 type Installer struct {
 	installer embeddedInstaller
+	wg        sync.WaitGroup
 }
 
 // NewInstaller creates a new AtomicInstaller
@@ -31,8 +33,16 @@ func NewInstaller(i embeddedInstaller) (*Installer, error) {
 	}, nil
 }
 
+// Allows caller to wait for install to be finished
+func (i *Installer) Wait() {
+	i.wg.Wait()
+}
+
 // Install performs installation of program in a specific version.
 func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
+	i.wg.Add(1)
+	defer i.wg.Done()
+
 	// tar installer uses Dir of installDir to determine location of unpack
 	tempDir, err := ioutil.TempDir(paths.TempDir(), "elastic-agent-install")
 	if err != nil {
