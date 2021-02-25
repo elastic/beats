@@ -37,8 +37,12 @@ Unless -f is used this command will ask confirmation before performing removal.
 }
 
 func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	if !install.HasRoot() {
-		return fmt.Errorf("unable to perform uninstall command, not executed with %s permissions", install.PermissionUser)
+	isAdmin, err := install.HasRoot()
+	if err != nil {
+		return fmt.Errorf("unable to perform command while checking for administrator rights, %v", err)
+	}
+	if !isAdmin {
+		return fmt.Errorf("unable to perform command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
 	if status == install.NotInstalled {
@@ -72,7 +76,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	}
 
-	err := install.Uninstall()
+	err = install.Uninstall()
 	if err != nil {
 		return err
 	}
