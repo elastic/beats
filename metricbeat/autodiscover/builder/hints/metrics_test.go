@@ -548,13 +548,46 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
+		{
+			message: "exclude/exclude in metrics filters are parsed as a list",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"hints": common.MapStr{
+					"metrics": common.MapStr{
+						"module":    "prometheus",
+						"namespace": "test",
+						"hosts":     "${data.host}:9090",
+						"metrics_filters": common.MapStr{
+							"exclude": "foo, bar",
+							"include": "xxx, yyy",
+						},
+					},
+				},
+			},
+			len: 1,
+			result: []common.MapStr{
+				{
+					"module":     "prometheus",
+					"namespace":  "test",
+					"metricsets": []string{"collector"},
+					"timeout":    "3s",
+					"period":     "1m",
+					"enabled":    true,
+					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"metrics_filters": map[string]interface{}{
+						"exclude": []interface{}{"foo", "bar"},
+						"include": []interface{}{"xxx", "yyy"},
+					},
+				},
+			},
+		},
 	}
 	for _, test := range tests {
 		mockRegister := mb.NewRegister()
-		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
+		mockRegister.MustAddMetricSet("prometheus", "collector", NewMockMetricSet)
 
 		m := metricHints{
 			Key:      defaultConfig().Key,
@@ -679,8 +712,16 @@ func (ms *MockMetricSet) Fetch(report mb.Reporter) {
 
 }
 
+type MockPrometheus struct {
+	*MockMetricSet
+}
+
+func NewMockPrometheus(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	return &MockPrometheus{}, nil
+}
+
 // create a keystore with an existing key
-/// `PASSWORD` with the value of `secret` variable.
+// `PASSWORD` with the value of `secret` variable.
 func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite
