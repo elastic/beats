@@ -7080,7 +7080,7 @@ type: long
 CPU usage percentage.
 
 
-type: float
+type: scaled_float
 
 --
 
@@ -30206,40 +30206,40 @@ type: boolean
 *`kubernetes.node.status.memory_pressure`*::
 +
 --
-Node MemoryPressure status
+Node MemoryPressure status (true, false or unknown)
 
 
-type: boolean
+type: keyword
 
 --
 
 *`kubernetes.node.status.disk_pressure`*::
 +
 --
-Node DiskPressure status
+Node DiskPressure status (true, false or unknown)
 
 
-type: boolean
+type: keyword
 
 --
 
 *`kubernetes.node.status.out_of_disk`*::
 +
 --
-Node OutOfDisk status
+Node OutOfDisk status (true, false or unknown)
 
 
-type: boolean
+type: keyword
 
 --
 
 *`kubernetes.node.status.pid_pressure`*::
 +
 --
-Node PIDPressure status
+Node PIDPressure status (true, false or unknown)
 
 
-type: boolean
+type: keyword
 
 --
 

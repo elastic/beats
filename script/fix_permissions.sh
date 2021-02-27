@@ -15,4 +15,6 @@ else
   set -e
   # Change ownership of all files inside the specific folder from root/root to current user/group
   docker run -v "${LOCATION}":/beat ${DOCKER_IMAGE} sh -c "find /beat -user 0 -exec chown -h $(id -u):$(id -g) {} \;"
+  # Change permissions with write access of all files inside the specific folder
+  chmod -R +w "${LOCATION}"
 fi
