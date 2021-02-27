@@ -1,0 +1,9 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /car/log/gitlab/gitlab-rails/api_json.log*
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/api.yml

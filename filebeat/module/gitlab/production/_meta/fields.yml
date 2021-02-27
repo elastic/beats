@@ -1,0 +1,32 @@
+- name: production
+  type: group
+  description: >
+    Fields from the production logs of Gitlab. Not all fields are documented as the
+    gitlab.api.params field can contain a dynamic amount/keys of fields.
+  fields:
+    - name: format
+      type: keyword
+    - name: controller
+      type: keyword
+    - name: queue_duration
+      type: keyword
+    - name: queue_duration_s
+      type: keyword
+    - name: gitaly_calls
+      type: keyword
+    - name: gitaly_duration_s
+      type: keyword
+    - name: redis_calls
+      type: keyword
+    - name: redis_duration_s
+      type: keyword
+    - name: cpu_s
+      type: keyword
+    - name: db_duration_s
+      type: keyword
+    - name: view_duration_s
+      type: keyword
+    - name: duration_s
+      type: keyword
+    - name: params
+      type: group

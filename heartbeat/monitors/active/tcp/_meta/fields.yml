@@ -1,0 +1,39 @@
+- key: tcp
+  title: "TCP layer"
+  description:
+  fields:
+    - name: tcp
+      type: group
+      description: >
+        TCP network layer related fields.
+      fields:
+        - name: port
+          type: alias
+          path: url.port
+          migration: true
+          description: >
+            Service port number.
+
+        - name: rtt
+          type: group
+          description: >
+            TCP layer round trip times.
+          fields:
+            - name: connect
+              type: group
+              description: >
+                Duration required to establish a TCP connection based on already
+                available IP address.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds
+
+            - name: validate
+              type: group
+              description: >
+                Duration of validation step based on existing TCP connection.
+              fields:
+                - name: us
+                  type: long
+                  description: Duration in microseconds

@@ -1,0 +1,11 @@
+dashboards:
+- id: Filebeat-gitlab-production-Dashboard
+  file: Filebeat-gitlab-production.json
+- id: Filebeat-gitlab-api-Dashboard
+  file: Filebeat-gitlab-api.json
+- id: Filebeat-gitlab-application-Dashboard
+  file: Filebeat-gitlab-application.json
+- id: Filebeat-gitlab-integrations-Dashboard
+  file: Filebeat-gitlab-integrations.json
+- id: Filebeat-gitlab-audit-Dashboard
+  file: Filebeat-gitlab-audit.json

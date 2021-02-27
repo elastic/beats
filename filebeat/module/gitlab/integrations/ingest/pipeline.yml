@@ -1,0 +1,42 @@
+description: Pipeline for parsing integration logs of Gitlab
+processors:
+- date:
+    field: time
+    formats:
+      - ISO8601
+# Set event fields
+- set:
+    field: event.module
+    value: gitlab
+- set:
+    field: event.dataset
+    value: gitlab.integrations
+- set:
+    field: event.kind
+    value: event
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+# Rename fields to ECS
+- rename:
+    field: severity
+    target_field: log.level
+- rename:
+    field: service_class
+    target_field: gitlab.integrations.service_class
+- rename:
+    field: project_id
+    target_field: gitlab.integrations.project_id
+- rename:
+    field: project_path
+    target_field: gitlab.integrations.project_path
+- rename:
+    field: client_url
+    target_field: gitlab.integrations.client_url
+- rename:
+    field: error
+    target_field: error.message
+# Cleaning up
+- remove:
+    field:
+      - time

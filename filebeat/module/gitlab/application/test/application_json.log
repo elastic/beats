@@ -1,0 +1,12 @@
+{
+  "severity":"INFO",
+  "time":"2020-01-14T13:35:15.466Z",
+  "correlation_id":"3823a1550b64417f9c9ed8ee0f48087e",
+  "message":"User \"Administrator\" (admin@example.com) was created"
+}
+{
+  "severity":"INFO",
+  "time":"2020-01-14T13:35:15.466Z",
+  "correlation_id":"78e3df10c9a18745243d524540bd5be4",
+  "message":"Project \"project133\" was removed"
+}

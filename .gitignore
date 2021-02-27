@@ -13,8 +13,10 @@
 x-pack/functionbeat/pkg
 x-pack/elastic-agent/data
 x-pack/elastic-agent/pkg/agent/operation/tests/downloads
+env/
 
 # Files
+.gitignore
 .DS_Store
 /beats.iml
 *.dev.yml

@@ -1,0 +1,13 @@
+- name: integrations
+  type: group
+  description: >
+    Fields from the integrations logs of Gitlab.
+  fields:
+    - name: service_class
+      type: keyword
+    - name: project_id
+      type: keyword
+    - name: project_path
+      type: keyword
+    - name: client_url
+      type: keyword

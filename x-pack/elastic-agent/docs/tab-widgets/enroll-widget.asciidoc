@@ -1,0 +1,92 @@
+++++
+<div class="tabs" data-tab-group="os">
+  <div role="tablist" aria-label="Enroll">
+    <button role="tab"
+            aria-selected="true"
+            aria-controls="deb-tab-enroll"
+            id="deb-enroll">
+      DEB
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="rpm-tab-enroll"
+            id="rpm-enroll">
+      RPM
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="mac-tab-enroll"
+            id="mac-enroll">
+      MacOS
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="linux-tab-enroll"
+            id="linux-enroll"
+            tabindex="-1">
+      Linux
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="win-tab-enroll"
+            id="win-enroll"
+            tabindex="-1">
+      Windows
+    </button>
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="deb-tab-enroll"
+       aria-labelledby="deb-enroll">
+++++
+
+include::enroll.asciidoc[tag=deb]
+
+++++
+  </div> 
+  <div tabindex="0"
+       role="tabpanel"
+       id="rpm-tab-enroll"
+       aria-labelledby="rpm-enroll"
+       hidden="">
+++++
+
+include::enroll.asciidoc[tag=rpm]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="mac-tab-enroll"
+       aria-labelledby="mac-enroll"
+       hidden="">
+++++
+
+include::enroll.asciidoc[tag=mac]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-enroll"
+       aria-labelledby="linux-enroll"
+       hidden="">
+++++
+
+include::enroll.asciidoc[tag=linux]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="win-tab-enroll"
+       aria-labelledby="win-enroll"
+       hidden="">
+++++
+
+include::enroll.asciidoc[tag=win]
+
+++++
+  </div>
+</div>
+++++
