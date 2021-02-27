@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -114,8 +113,6 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		logp.Info("Client connection with: %#v", clientCfg)
-
 		fields := clientCfg.Processing.Fields.Clone()
 		fields.Put("event.dataset", dataset)
 
