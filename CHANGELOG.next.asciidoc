@@ -1004,6 +1004,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
 - Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
+- support defining metrics_filters for prometheus module in annotations. {pull}24264[24264]
 
 *Packetbeat*
 
