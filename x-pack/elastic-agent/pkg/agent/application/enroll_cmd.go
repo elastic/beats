@@ -202,7 +202,6 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 		c.log.Info("Successfully triggered restart on running Elastic Agent.")
 		return nil
 	}
-	c.stopAgent()
 	c.log.Info("Elastic Agent has been enrolled; start Elastic Agent")
 	return nil
 }

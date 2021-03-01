@@ -8,10 +8,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -27,6 +29,9 @@ const (
 	defaultUsername   = "elastic"
 	defaultPassword   = "changeme"
 	defaultTokenName  = "Default"
+
+	requestRetrySleep = 1 * time.Second // sleep 1 sec between retries for HTTP requests
+	maxRequestRetries = 30              // maximum number of retries for HTTP requests
 )
 
 func newContainerCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -104,13 +109,16 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 	if err != nil {
 		return err
 	}
-	if envBool("KIBANA_FLEET_SETUP") {
+	// Remove FLEET_SETUP in 8.x
+	// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
+	// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
+	if envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP") {
 		client, err = kibanaClient()
 		if err != nil {
 			return err
 		}
 		fmt.Fprintf(streams.Out, "Performing setup of Fleet in Kibana\n")
-		err = kibanaSetup(client)
+		err = kibanaSetup(client, streams)
 		if err != nil {
 			return err
 		}
@@ -125,11 +133,11 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		var policy *kibanaPolicy
 		token := envWithDefault("", "FLEET_ENROLLMENT_TOKEN")
 		if token == "" {
-			policy, err = kibanaFetchPolicy(client)
+			policy, err = kibanaFetchPolicy(client, streams)
 			if err != nil {
 				return err
 			}
-			token, err = kibanaFetchToken(client, policy)
+			token, err = kibanaFetchToken(client, policy, streams)
 			if err != nil {
 				return err
 			}
@@ -221,30 +229,30 @@ func buildFleetServerConnStr() (string, error) {
 	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, username, password, u.Host, path), nil
 }
 
-func kibanaSetup(client *kibana.Client) error {
-	err := performPOST(client, "/api/fleet/setup")
+func kibanaSetup(client *kibana.Client, streams *cli.IOStreams) error {
+	err := performPOST(client, "/api/fleet/setup", streams.Err, "Kibana Fleet setup")
 	if err != nil {
 		return err
 	}
-	err = performPOST(client, "/api/fleet/agents/setup")
+	err = performPOST(client, "/api/fleet/agents/setup", streams.Err, "Kibana Fleet Agents setup")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func kibanaFetchPolicy(client *kibana.Client) (*kibanaPolicy, error) {
+func kibanaFetchPolicy(client *kibana.Client, streams *cli.IOStreams) (*kibanaPolicy, error) {
 	var policies kibanaPolicies
-	err := performGET(client, "/api/fleet/agent_policies", &policies)
+	err := performGET(client, "/api/fleet/agent_policies", &policies, streams.Err, "Kibana fetch policy")
 	if err != nil {
 		return nil, err
 	}
 	return findPolicy(policies.Items)
 }
 
-func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy) (string, error) {
+func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.IOStreams) (string, error) {
 	var keys kibanaAPIKeys
-	err := performGET(client, "/api/fleet/enrollment-api-keys", &keys)
+	err := performGET(client, "/api/fleet/enrollment-api-keys", &keys, streams.Err, "Kibana fetch token")
 	if err != nil {
 		return "", err
 	}
@@ -260,9 +268,10 @@ func kibanaClient() (*kibana.Client, error) {
 	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "$ELASTICSEARCH_USERNAME")
 	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "$ELASTICSEARCH_PASSWORD")
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
-		Host:     host,
-		Username: username,
-		Password: password,
+		Host:          host,
+		Username:      username,
+		Password:      password,
+		IgnoreVersion: true,
 	})
 }
 
@@ -335,25 +344,40 @@ func isTrue(val string) bool {
 	return false
 }
 
-func performGET(client *kibana.Client, path string, response interface{}) error {
-	code, result, err := client.Connection.Request("GET", path, nil, nil, nil)
-	if err != nil || code != 200 {
-		return fmt.Errorf("http GET request to %s%s fails: %v. Response: %s",
-			client.Connection.URL, path, err, truncateString(result))
+func performGET(client *kibana.Client, path string, response interface{}, writer io.Writer, msg string) error {
+	var lastErr error
+	for i := 0; i < maxRequestRetries; i++ {
+		code, result, err := client.Connection.Request("GET", path, nil, nil, nil)
+		if err != nil || code != 200 {
+			err = fmt.Errorf("http GET request to %s%s fails: %v. Response: %s",
+				client.Connection.URL, path, err, truncateString(result))
+			fmt.Fprintf(writer, "%s failed: %s\n", msg, err)
+			<-time.After(requestRetrySleep)
+			continue
+		}
+		if response == nil {
+			return nil
+		}
+		return json.Unmarshal(result, response)
 	}
-	if response == nil {
-		return nil
-	}
-	return json.Unmarshal(result, response)
+	return lastErr
 }
 
-func performPOST(client *kibana.Client, path string) error {
-	code, result, err := client.Connection.Request("POST", path, nil, nil, nil)
-	if err != nil || code >= 400 {
-		return fmt.Errorf("http POST request to %s%s fails: %v. Response: %s",
-			client.Connection.URL, path, err, truncateString(result))
+func performPOST(client *kibana.Client, path string, writer io.Writer, msg string) error {
+	var lastErr error
+	for i := 0; i < maxRequestRetries; i++ {
+		code, result, err := client.Connection.Request("POST", path, nil, nil, nil)
+		if err != nil || code >= 400 {
+			err = fmt.Errorf("http POST request to %s%s fails: %v. Response: %s",
+				client.Connection.URL, path, err, truncateString(result))
+			lastErr = err
+			fmt.Fprintf(writer, "%s failed: %s\n", msg, err)
+			<-time.After(requestRetrySleep)
+			continue
+		}
+		return nil
 	}
-	return nil
+	return lastErr
 }
 
 func truncateString(b []byte) string {
