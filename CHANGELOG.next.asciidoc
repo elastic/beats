@@ -391,6 +391,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 - Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 
 *Heartbeat*
 
