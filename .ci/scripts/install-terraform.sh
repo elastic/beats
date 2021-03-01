@@ -9,6 +9,7 @@ TERRAFORM_CMD="${HOME}/bin/terraform"
 
 if command -v terraform
 then
+    set +e
     echo "Found Terraform. Checking version.."
     FOUND_TERRAFORM_VERSION=$(terraform --version | awk '{print $2}' | sed s/v//)
     if [ "$FOUND_TERRAFORM_VERSION" == "$TERRAFORM_VERSION" ]
@@ -16,6 +17,7 @@ then
         echo "Versions match. No need to install Terraform. Exiting."
         exit 0
     fi
+    set -e
 fi
 
 echo "UNMET DEP: Installing Terraform"

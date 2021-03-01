@@ -9,6 +9,7 @@ KUBECTL_CMD="${HOME}/bin/kubectl"
 
 if command -v kubectl
 then
+    set +e
     echo "Found kubectl. Checking version.."
     FOUND_KUBECTL_VERSION=$(kubectl version --client --short 2>&1 >/dev/null | awk '{print $3}')
     if [ "${FOUND_KUBECTL_VERSION}" == "${K8S_VERSION}" ]
@@ -16,6 +17,7 @@ then
         echo "Versions match. No need to install kubectl. Exiting."
         exit 0
     fi
+    set -e
 fi
 
 echo "UNMET DEP: Installing kubectl"
