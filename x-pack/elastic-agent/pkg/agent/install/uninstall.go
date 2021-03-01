@@ -12,9 +12,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/kardianos/service"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -22,9 +24,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/uninstall"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -113,7 +119,17 @@ func delayedRemoval(path string) {
 }
 
 func uninstallPrograms(ctx context.Context, cfgFile string) error {
+	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel)
+	if err != nil {
+		return err
+	}
+
 	cfg, err := operations.LoadFullAgentConfig(cfgFile)
+	if err != nil {
+		return err
+	}
+
+	cfg, err = applyDynamics(ctx, log, cfg)
 	if err != nil {
 		return err
 	}
@@ -176,4 +192,148 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 	}
 
 	return pp, nil
+}
+
+func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) (*config.Config, error) {
+	cfgMap, err := cfg.ToMapStr()
+	ast, err := transpiler.NewAST(cfgMap)
+	if err != nil {
+		return nil, err
+	}
+
+	// apply dynamic inputs
+	inputs, ok := transpiler.Lookup(ast, "inputs")
+	if ok {
+		varsArray := make([]*transpiler.Vars, 0, 0)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		varsCallback := func(vv []*transpiler.Vars) {
+			varsArray = vv
+			wg.Done()
+		}
+
+		ctrl, err := composable.New(log, cfg)
+		if err != nil {
+			return nil, err
+		}
+		ctrl.Run(ctx, varsCallback)
+		wg.Wait()
+
+		renderedInputs, err := renderInputs(inputs, varsArray)
+		if err != nil {
+			return nil, err
+		}
+		err = transpiler.Insert(ast, renderedInputs, "inputs")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// apply caps
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, status.NewController(log))
+	if err != nil {
+		return nil, err
+	}
+
+	astIface, err := caps.Apply(ast)
+	if err != nil {
+		return nil, err
+	}
+
+	newAst, ok := astIface.(*transpiler.AST)
+	if ok {
+		ast = newAst
+	}
+
+	finalConfig, err := newAst.Map()
+	return config.NewConfigFrom(finalConfig)
+}
+
+// Dynamic inputs section
+// TODO(michal): move to shared code during refactoring
+func renderInputs(inputs transpiler.Node, varsArray []*transpiler.Vars) (transpiler.Node, error) {
+	l, ok := inputs.Value().(*transpiler.List)
+	if !ok {
+		return nil, fmt.Errorf("inputs must be an array")
+	}
+	nodes := []*transpiler.Dict{}
+	nodesMap := map[string]*transpiler.Dict{}
+	for _, vars := range varsArray {
+		for _, node := range l.Value().([]transpiler.Node) {
+			dict, ok := node.Clone().(*transpiler.Dict)
+			if !ok {
+				continue
+			}
+			n, err := dict.Apply(vars)
+			if err == transpiler.ErrNoMatch {
+				// has a variable that didn't exist, so we ignore it
+				continue
+			}
+			if err != nil {
+				// another error that needs to be reported
+				return nil, err
+			}
+			if n == nil {
+				// condition removed it
+				continue
+			}
+			dict = n.(*transpiler.Dict)
+			hash := string(dict.Hash())
+			_, exists := nodesMap[hash]
+			if !exists {
+				nodesMap[hash] = dict
+				nodes = append(nodes, dict)
+			}
+		}
+	}
+	nInputs := []transpiler.Node{}
+	for _, node := range nodes {
+		nInputs = append(nInputs, promoteProcessors(node))
+	}
+	return transpiler.NewList(nInputs), nil
+}
+
+func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
+	p := dict.Processors()
+	if p == nil {
+		return dict
+	}
+	var currentList *transpiler.List
+	current, ok := dict.Find("processors")
+	if ok {
+		currentList, ok = current.Value().(*transpiler.List)
+		if !ok {
+			return dict
+		}
+	}
+	ast, _ := transpiler.NewAST(map[string]interface{}{
+		"processors": p,
+	})
+	procs, _ := transpiler.Lookup(ast, "processors")
+	nodes := nodesFromList(procs.Value().(*transpiler.List))
+	if ok && currentList != nil {
+		nodes = append(nodes, nodesFromList(currentList)...)
+	}
+	dictNodes := dict.Value().([]transpiler.Node)
+	set := false
+	for i, node := range dictNodes {
+		switch n := node.(type) {
+		case *transpiler.Key:
+			if n.Name() == "processors" {
+				dictNodes[i] = transpiler.NewKey("processors", transpiler.NewList(nodes))
+				set = true
+			}
+		}
+		if set {
+			break
+		}
+	}
+	if !set {
+		dictNodes = append(dictNodes, transpiler.NewKey("processors", transpiler.NewList(nodes)))
+	}
+	return transpiler.NewDict(dictNodes)
+}
+
+func nodesFromList(list *transpiler.List) []transpiler.Node {
+	return list.Value().([]transpiler.Node)
 }
