@@ -30,6 +30,11 @@ func TestJourneyEnricher(t *testing.T) {
 		Name:    "my-errname",
 		Stack:   "my\nerr\nstack",
 	}
+	otherErr := &SynthError{
+		Message: "last-errmsg",
+		Name:    "last-errname",
+		Stack:   "last\nerr\nstack",
+	}
 	journeyStart := &SynthEvent{
 		Type:                 "journey/start",
 		TimestampEpochMicros: 1000,
@@ -66,7 +71,7 @@ func TestJourneyEnricher(t *testing.T) {
 		makeStepEvent("step/start", 21, "Step2", 1, "", nil),
 		makeStepEvent("step/end", 30, "Step2", 1, url2, syntherr),
 		makeStepEvent("step/start", 31, "Step3", 1, "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, url3, nil),
+		makeStepEvent("step/end", 40, "Step3", 1, url3, otherErr),
 		journeyEnd,
 	}
 
