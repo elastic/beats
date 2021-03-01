@@ -15,6 +15,7 @@ fi
 
 if command -v docker-compose
 then
+    set +e
     echo "Found docker-compose. Checking version.."
     FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
     if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]
@@ -22,6 +23,7 @@ then
         echo "Versions match. No need to install docker-compose. Exiting."
         exit 0
     fi
+    set -e
 fi
 
 echo "UNMET DEP: Installing docker-compose"
