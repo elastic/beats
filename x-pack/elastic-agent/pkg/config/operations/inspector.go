@@ -96,7 +96,6 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 			continue
 		}
 
-		fmt.Println("Action ID:", cfgChange.ID())
 		return cfgChange.Policy, nil
 	}
 	return nil, nil
