@@ -18,6 +18,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/24205")
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)

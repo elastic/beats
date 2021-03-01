@@ -17,6 +17,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/24200")
 	config := mtest.GetConfigForTest(t, "cloudwatch", "300s")
 
 	config = addCloudwatchMetricsToConfig(config)

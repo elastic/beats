@@ -18,6 +18,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/24202")
 	config := mtest.GetConfigForTest(t, "s3_daily_storage", "86400s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
