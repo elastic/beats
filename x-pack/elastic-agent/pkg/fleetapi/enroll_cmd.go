@@ -9,7 +9,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/hashicorp/go-multierror"
@@ -23,6 +25,9 @@ type EnrollType string
 
 // ErrTooManyRequests is received when the remote server is overloaded.
 var ErrTooManyRequests = errors.New("too many requests received (429)")
+
+// ErrConnRefused is returned when the connection to the server is refused.
+var ErrConnRefused = errors.New("connection refused")
 
 const (
 	// PermanentEnroll is default enrollment type, by default an Agent is permanently enroll to Agent.
@@ -187,6 +192,15 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 
 	resp, err := e.client.Send(ctx, "POST", p, nil, headers, bytes.NewBuffer(b))
 	if err != nil {
+		// connection refused is returned as a clean type
+		switch et := err.(type) {
+		case *url.Error:
+			err = et.Err
+		}
+		switch err.(type) {
+		case *net.OpError:
+			return nil, ErrConnRefused
+		}
 		return nil, err
 	}
 	defer resp.Body.Close()

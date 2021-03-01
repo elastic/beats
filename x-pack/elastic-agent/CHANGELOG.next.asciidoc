@@ -73,3 +73,4 @@
 - Add support for Fleet Server {pull}23736[23736]
 - Add support for enrollment with local bootstrap of Fleet Server {pull}23865[23865]
 - Add TLS support for Fleet Server {pull}24142[24142]
+- Add support for Fleet Server running under Elastic Agent {pull}24220[24220]
