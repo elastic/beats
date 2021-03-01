@@ -19,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/kibana"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -92,6 +93,10 @@ be used when the same credentials will be used across all the possible actions a
   KIBANA_HOST - kibana host [http://kibana:5601]
   KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
   KIBANA_PASSWORD - kibana password [$ELASTICSEARCH_PASSWORD]
+
+By default when this command starts it will check for an existing fleet.yml. If that file already exists then
+all the above actions will be skipped, because the Elastic Agent has already been enrolled. To ensure that enrollment
+occurs on every start of the container set FLEET_FORCE to 1.
 `,
 		Run: func(c *cobra.Command, args []string) {
 			if err := containerCmd(streams, c, flags, args); err != nil {
@@ -109,6 +114,13 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 	if err != nil {
 		return err
 	}
+
+	_, err = os.Stat(info.AgentConfigFile())
+	if !os.IsNotExist(err) && !envBool("FLEET_FORCE") {
+		// already enrolled, just run the standard run
+		return run(flags, streams)
+	}
+
 	// Remove FLEET_SETUP in 8.x
 	// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
 	// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
