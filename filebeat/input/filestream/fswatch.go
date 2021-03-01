@@ -115,6 +115,9 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
+	// run initial scan before starting regular
+	w.watch(ctx)
+
 	ticker := time.NewTicker(w.interval)
 	defer ticker.Stop()
 	for {
