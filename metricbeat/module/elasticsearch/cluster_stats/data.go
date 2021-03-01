@@ -39,8 +39,9 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"count":  c.Int("count.total"),
-			"master": c.Int("count.master"),
+			"versions": c.Ifc("versions"),
+			"count":    c.Int("count.total"),
+			"master":   c.Int("count.master"),
 			"fs": c.Dict("fs", s.Schema{
 				"total": s.Object{
 					"bytes": c.Int("total_in_bytes"),
