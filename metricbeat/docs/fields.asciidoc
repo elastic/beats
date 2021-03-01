@@ -20901,6 +20901,65 @@ index
 
 
 
+
+
+*`elasticsearch.index.recovery.index.files.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.index.files.recovered`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.reused`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.total`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.recovery.index.size.recovered_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.reused_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.name`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.total_time.ms`*::
 +
 --
@@ -20962,6 +21021,35 @@ type: keyword
 
 --
 
+
+*`elasticsearch.index.recovery.translog.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.translog.total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.translog.total_on_start`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.target.transport_address`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.target.id`*::
 +
 --
@@ -20988,6 +21076,13 @@ type: keyword
 Target node name.
 
 
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.source.transport_address`*::
++
+--
 type: keyword
 
 --

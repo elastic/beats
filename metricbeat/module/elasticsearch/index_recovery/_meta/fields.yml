@@ -4,6 +4,31 @@
     index
   release: ga
   fields:
+    - name: index
+      type: group
+      fields:
+        - name: files
+          type: group
+          fields:
+            - name: percent
+              type: keyword
+            - name: recovered
+              type: long
+            - name: reused
+              type: long
+            - name: total
+              type: long
+        - name: size
+          type: group
+          fields:
+            - name: recovered_in_bytes
+              type: long
+            - name: reused_in_bytes
+              type: long
+            - name: total_in_bytes
+              type: long
+    - name: name
+      type: keyword
     - name: total_time.ms
       type: long
     - name: stop_time.ms
@@ -26,7 +51,17 @@
       type: keyword
       description: >
         Recovery stage.
-
+    - name: translog
+      type: group
+      fields:
+        - name: percent
+          type: keyword
+        - name: total
+          type: long
+        - name: total_on_start
+          type: long
+    - name: target.transport_address
+      type: keyword
     - name: target.id
       type: keyword
       description: >
@@ -40,6 +75,8 @@
       description: >
         Target node name.
 
+    - name: source.transport_address
+      type: keyword
     - name: source.id
       type: keyword
       description: >
