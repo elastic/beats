@@ -20,7 +20,7 @@ import (
 
 // LoadFullAgentConfig load agent config based on provided paths and defined capabilities.
 // In case fleet is used, config from policy action is returned.
-func LoadFullAgentConfig(log *logger.Logger, cfgPath string) (*config.Config, error) {
+func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
 	rawConfig, err := loadConfig(cfgPath)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func LoadFullAgentConfig(log *logger.Logger, cfgPath string) (*config.Config, er
 	if err != nil {
 		return nil, err
 	} else if fleetConfig == nil {
-		log.Debug("resolving fleet config but not fleet config retrieved yet")
+		// resolving fleet config but not fleet config retrieved yet, returning last applied config
 		return rawConfig, nil
 	}
 
