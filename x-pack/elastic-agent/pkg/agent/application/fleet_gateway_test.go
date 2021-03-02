@@ -20,11 +20,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
+	fleetreporterConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
@@ -119,7 +121,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -248,7 +250,7 @@ func TestFleetGateway(t *testing.T) {
 		defer cancel()
 
 		log, _ := logger.New("tst")
-		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -339,7 +341,7 @@ func TestFleetGateway(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New("tst")
 
-		stateStore, err := newStateStore(log, storage.NewDiskStore(info.AgentStateStoreFile()))
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -487,7 +489,7 @@ func TestRetriesOnFailures(t *testing.T) {
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
-	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultConfig())
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporterConfig.DefaultConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
 	}
