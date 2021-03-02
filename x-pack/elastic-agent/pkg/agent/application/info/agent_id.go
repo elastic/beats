@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"path/filepath"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/yaml.v2"
@@ -20,14 +19,7 @@ import (
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
-const defaultAgentCapabilitiesFile = "capabilities.yml"
-const defaultAgentConfigFile = "fleet.yml"
 const agentInfoKey = "agent"
-
-// defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
-const defaultAgentActionStoreFile = "action_store.yml"
-const defaultAgentStateStoreFile = "state.yml"
-
 const defaultLogLevel = "info"
 
 type persistentAgentInfo struct {
@@ -38,26 +30,6 @@ type persistentAgentInfo struct {
 type ioStore interface {
 	Save(io.Reader) error
 	Load() (io.ReadCloser, error)
-}
-
-// AgentConfigFile is a name of file used to store agent information
-func AgentConfigFile() string {
-	return filepath.Join(paths.Config(), defaultAgentConfigFile)
-}
-
-// AgentCapabilitiesPath is a name of file used to store agent capabilities
-func AgentCapabilitiesPath() string {
-	return filepath.Join(paths.Config(), defaultAgentCapabilitiesFile)
-}
-
-// AgentActionStoreFile is the file that contains the action that can be replayed after restart.
-func AgentActionStoreFile() string {
-	return filepath.Join(paths.Home(), defaultAgentActionStoreFile)
-}
-
-// AgentStateStoreFile is the file that contains the persisted state of the agent including the action that can be replayed after restart.
-func AgentStateStoreFile() string {
-	return filepath.Join(paths.Home(), defaultAgentStateStoreFile)
 }
 
 // updateLogLevel updates log level and persists it to disk.
@@ -72,7 +44,7 @@ func updateLogLevel(level string) error {
 		return nil
 	}
 
-	agentConfigFile := AgentConfigFile()
+	agentConfigFile := paths.AgentConfigFile()
 	s := storage.NewDiskStore(agentConfigFile)
 
 	ai.LogLevel = level
@@ -89,7 +61,7 @@ func generateAgentID() (string, error) {
 }
 
 func loadAgentInfo(forceUpdate bool, logLevel string) (*persistentAgentInfo, error) {
-	agentConfigFile := AgentConfigFile()
+	agentConfigFile := paths.AgentConfigFile()
 	s := storage.NewDiskStore(agentConfigFile)
 
 	agentinfo, err := getInfoFromStore(s, logLevel)
@@ -114,7 +86,7 @@ func loadAgentInfo(forceUpdate bool, logLevel string) (*persistentAgentInfo, err
 }
 
 func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) {
-	agentConfigFile := AgentConfigFile()
+	agentConfigFile := paths.AgentConfigFile()
 	reader, err := s.Load()
 	if err != nil {
 		return nil, err
@@ -159,7 +131,7 @@ func getInfoFromStore(s ioStore, logLevel string) (*persistentAgentInfo, error) 
 }
 
 func updateAgentInfo(s ioStore, agentInfo *persistentAgentInfo) error {
-	agentConfigFile := AgentConfigFile()
+	agentConfigFile := paths.AgentConfigFile()
 	reader, err := s.Load()
 	if err != nil {
 		return err

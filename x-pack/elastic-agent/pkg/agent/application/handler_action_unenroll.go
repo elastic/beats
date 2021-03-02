@@ -20,7 +20,7 @@ type handlerUnenroll struct {
 	emitter    emitterFunc
 	dispatcher programsDispatcher
 	closers    []context.CancelFunc
-	stateStore *stateStore
+	stateStore stateStore
 }
 
 func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker) error {

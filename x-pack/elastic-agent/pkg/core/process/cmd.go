@@ -23,3 +23,7 @@ func getCmd(logger *logger.Logger, path string, env []string, uid, gid int, arg 
 
 	return cmd
 }
+
+func terminateCmd(proc *os.Process) error {
+	return proc.Kill()
+}

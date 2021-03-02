@@ -6,7 +6,6 @@ package application
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"sync"
 
@@ -123,7 +122,7 @@ func (e *emitterController) update() error {
 	ast := rawAst.Clone()
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		renderedInputs, err := renderInputs(inputs, varsArray)
+		renderedInputs, err := transpiler.RenderInputs(inputs, varsArray)
 		if err != nil {
 			return err
 		}
@@ -190,91 +189,4 @@ func readfiles(files []string, emitter emitterFunc) error {
 	}
 
 	return emitter(c)
-}
-
-func renderInputs(inputs transpiler.Node, varsArray []*transpiler.Vars) (transpiler.Node, error) {
-	l, ok := inputs.Value().(*transpiler.List)
-	if !ok {
-		return nil, fmt.Errorf("inputs must be an array")
-	}
-	nodes := []*transpiler.Dict{}
-	nodesMap := map[string]*transpiler.Dict{}
-	for _, vars := range varsArray {
-		for _, node := range l.Value().([]transpiler.Node) {
-			dict, ok := node.Clone().(*transpiler.Dict)
-			if !ok {
-				continue
-			}
-			n, err := dict.Apply(vars)
-			if err == transpiler.ErrNoMatch {
-				// has a variable that didn't exist, so we ignore it
-				continue
-			}
-			if err != nil {
-				// another error that needs to be reported
-				return nil, err
-			}
-			if n == nil {
-				// condition removed it
-				continue
-			}
-			dict = n.(*transpiler.Dict)
-			hash := string(dict.Hash())
-			_, exists := nodesMap[hash]
-			if !exists {
-				nodesMap[hash] = dict
-				nodes = append(nodes, dict)
-			}
-		}
-	}
-	nInputs := []transpiler.Node{}
-	for _, node := range nodes {
-		nInputs = append(nInputs, promoteProcessors(node))
-	}
-	return transpiler.NewList(nInputs), nil
-}
-
-func promoteProcessors(dict *transpiler.Dict) *transpiler.Dict {
-	p := dict.Processors()
-	if p == nil {
-		return dict
-	}
-	var currentList *transpiler.List
-	current, ok := dict.Find("processors")
-	if ok {
-		currentList, ok = current.Value().(*transpiler.List)
-		if !ok {
-			return dict
-		}
-	}
-	ast, _ := transpiler.NewAST(map[string]interface{}{
-		"processors": p,
-	})
-	procs, _ := transpiler.Lookup(ast, "processors")
-	nodes := nodesFromList(procs.Value().(*transpiler.List))
-	if ok && currentList != nil {
-		nodes = append(nodes, nodesFromList(currentList)...)
-	}
-	dictNodes := dict.Value().([]transpiler.Node)
-	set := false
-	for i, node := range dictNodes {
-		switch n := node.(type) {
-		case *transpiler.Key:
-			if n.Name() == "processors" {
-				dictNodes[i] = transpiler.NewKey("processors", transpiler.NewList(nodes))
-				set = true
-			}
-		}
-		if set {
-			break
-		}
-	}
-	if !set {
-		dictNodes = append(dictNodes, transpiler.NewKey("processors", transpiler.NewList(nodes)))
-	}
-	return transpiler.NewDict(dictNodes)
-}
-
-func nodesFromList(list *transpiler.List) []transpiler.Node {
-	return list.Value().([]transpiler.Node)
 }
