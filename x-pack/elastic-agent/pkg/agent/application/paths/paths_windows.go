@@ -2,33 +2,33 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build darwin
+// +build windows
 
-package install
+package paths
+
+import "strings"
 
 const (
 	// BinaryName is the name of the installed binary.
-	BinaryName = "elastic-agent"
+	BinaryName = "elastic-agent.exe"
 
 	// InstallPath is the installation path using for install command.
-	InstallPath = "/Library/Elastic/Agent"
+	InstallPath = `C:\Program Files\Elastic\Agent`
 
 	// SocketPath is the socket path used when installed.
-	SocketPath = "unix:///var/run/elastic-agent.sock"
+	SocketPath = `\\.\pipe\elastic-agent-system`
 
 	// ServiceName is the service name when installed.
-	ServiceName = "co.elastic.elastic-agent"
+	ServiceName = "Elastic Agent"
 
 	// ShellWrapperPath is the path to the installed shell wrapper.
-	ShellWrapperPath = "/usr/local/bin/elastic-agent"
+	ShellWrapperPath = "" // no wrapper on Windows
 
 	// ShellWrapper is the wrapper that is installed.
-	ShellWrapper = `#!/bin/sh
-exec /Library/Elastic/Agent/elastic-agent $@
-`
+	ShellWrapper = "" // no wrapper on Windows
 )
 
 // ArePathsEqual determines whether paths are equal taking case sensitivity of os into account.
 func ArePathsEqual(expected, actual string) bool {
-	return expected == actual
+	return strings.EqualFold(expected, actual)
 }

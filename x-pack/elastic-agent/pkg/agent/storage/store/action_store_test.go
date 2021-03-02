@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package store
 
 import (
 	"io/ioutil"
@@ -32,7 +32,7 @@ func TestActionStore(t *testing.T) {
 	t.Run("action returns empty when no action is saved on disk",
 		withFile(func(t *testing.T, file string) {
 			s := storage.NewDiskStore(file)
-			store, err := newActionStore(log, s)
+			store, err := NewActionStore(log, s)
 			require.NoError(t, err)
 			require.Equal(t, 0, len(store.Actions()))
 		}))
@@ -44,7 +44,7 @@ func TestActionStore(t *testing.T) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newActionStore(log, s)
+			store, err := NewActionStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -65,7 +65,7 @@ func TestActionStore(t *testing.T) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newActionStore(log, s)
+			store, err := NewActionStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -75,7 +75,7 @@ func TestActionStore(t *testing.T) {
 			require.Equal(t, 1, len(store.Actions()))
 
 			s = storage.NewDiskStore(file)
-			store1, err := newActionStore(log, s)
+			store1, err := NewActionStore(log, s)
 			require.NoError(t, err)
 
 			actions := store1.Actions()
