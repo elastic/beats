@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/kardianos/service"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 const (
@@ -20,19 +22,19 @@ const (
 
 // ExecutablePath returns the path for the installed Agents executable.
 func ExecutablePath() string {
-	exec := filepath.Join(InstallPath, BinaryName)
-	if ShellWrapperPath != "" {
-		exec = ShellWrapperPath
+	exec := filepath.Join(paths.InstallPath, paths.BinaryName)
+	if paths.ShellWrapperPath != "" {
+		exec = paths.ShellWrapperPath
 	}
 	return exec
 }
 
 func newService() (service.Service, error) {
 	return service.New(nil, &service.Config{
-		Name:             ServiceName,
+		Name:             paths.ServiceName,
 		DisplayName:      ServiceDisplayName,
 		Description:      ServiceDescription,
 		Executable:       ExecutablePath(),
-		WorkingDirectory: InstallPath,
+		WorkingDirectory: paths.InstallPath,
 	})
 }
