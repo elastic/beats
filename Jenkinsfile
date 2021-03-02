@@ -507,12 +507,16 @@ def target(Map args = [:]) {
 }
 
 /**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+* This method wraps the node call for two reasons:
+*  1. with some latency to avoid the known issue with the scalabitity in gobld.
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
   node(label) {
-    body()
+    ws(env.BUILD_TAG) {
+      body()
+    }
   }
 }
 
