@@ -6,6 +6,7 @@ package value
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -51,11 +52,11 @@ type valueReporter struct {
 }
 
 func (r *valueReporter) Event(event mb.Event) bool {
-	found, err := cloudfoundry.HasNonNumericFloat(event.RootFields, "cloudfoundry.value.value")
+	value, err := event.RootFields.GetValue("cloudfoundry.value.value")
 	if err != nil {
 		r.logger.Debugf("Unexpected failure while checking for non-numeric values: %v", err)
 	}
-	if found {
+	if value, ok := value.(float64); ok && (math.IsNaN(value) || math.IsInf(value, 0)) {
 		r.logger.Debugf("Ignored event with float value that is not a number: %+v", event)
 		return true
 	}
