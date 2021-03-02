@@ -54,7 +54,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 		},
 		"data stream should be type-namespace-dataset": {
 			publishSettings{
-				DataStream: &datastream{
+				DataStream: &DataStream{
 					Type:      "myType",
 					Dataset:   "myDataset",
 					Namespace: "myNamespace",
@@ -66,7 +66,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 		},
 		"data stream should use defaults": {
 			publishSettings{
-				DataStream: &datastream{},
+				DataStream: &DataStream{},
 			},
 			"synthetics-generic-default",
 			true,
