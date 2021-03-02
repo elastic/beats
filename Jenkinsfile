@@ -514,7 +514,7 @@ def target(Map args = [:]) {
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
   node(label) {
-    ws(env.BUILD_TAG) {
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}") {
       body()
     }
   }
