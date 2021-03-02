@@ -55,7 +55,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 		},
 		{
 			name: "a valid line",
-			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
+			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0,"status":"succeeded"},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
 			synthEvent: &SynthEvent{
 				TimestampEpochMicros: 7165676811882692608,
 				Type:                 "step/end",

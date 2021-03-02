@@ -244,12 +244,6 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	res = &SynthEvent{}
 	err = json.Unmarshal(bytes, res)
-	stepStatus, _ := res.Payload.GetValue("status")
-	if res.Step != nil && res.Type == "step/end" {
-		if str, ok := stepStatus.(string); ok {
-			res.Step.Status = str
-		}
-	}
 
 	if err != nil {
 		return nil, err
