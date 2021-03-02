@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
@@ -70,7 +71,7 @@ func createApplication(
 		return nil, err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
 		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
@@ -78,8 +79,11 @@ func createApplication(
 	// not in standalone; both modes require reading the fleet.yml configuration file
 	var store storage.Store
 	store, cfg, err = mergeFleetConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
 
-	if IsFleetServerBootstrap(cfg.Fleet) {
+	if configuration.IsFleetServerBootstrap(cfg.Fleet) {
 		log.Info("Agent is in Fleet Server bootstrap mode")
 		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo)
 	}
@@ -88,18 +92,8 @@ func createApplication(
 	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo)
 }
 
-// IsStandalone decides based on missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func IsStandalone(cfg *configuration.FleetAgentConfig) bool {
-	return cfg == nil || !cfg.Enabled
-}
-
-// IsFleetServerBootstrap decides if Elastic Agent is started in bootstrap mode.
-func IsFleetServerBootstrap(cfg *configuration.FleetAgentConfig) bool {
-	return cfg != nil && cfg.Server != nil && cfg.Server.Bootstrap
-}
-
 func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {
-	path := info.AgentConfigFile()
+	path := paths.AgentConfigFile()
 	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
 	if err != nil {

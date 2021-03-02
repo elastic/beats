@@ -2,13 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package store
 
 import (
 	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -44,7 +45,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 	t.Run("action returns empty when no action is saved on disk",
 		withFile(func(t *testing.T, file string) {
 			s := storage.NewDiskStore(file)
-			store, err := newStateStore(log, s)
+			store, err := NewStateStore(log, s)
 			require.NoError(t, err)
 			require.Equal(t, 0, len(store.Actions()))
 		}))
@@ -56,7 +57,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newStateStore(log, s)
+			store, err := NewStateStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -79,7 +80,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newStateStore(log, s)
+			store, err := NewStateStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -91,7 +92,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			require.Equal(t, ackToken, store.AckToken())
 
 			s = storage.NewDiskStore(file)
-			store1, err := newStateStore(log, s)
+			store1, err := NewStateStore(log, s)
 			require.NoError(t, err)
 
 			actions := store1.Actions()
@@ -109,7 +110,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newStateStore(log, s)
+			store, err := NewStateStore(log, s)
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(store.Actions()))
@@ -121,7 +122,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			require.Equal(t, ackToken, store.AckToken())
 
 			s = storage.NewDiskStore(file)
-			store1, err := newStateStore(log, s)
+			store1, err := NewStateStore(log, s)
 			require.NoError(t, err)
 
 			actions := store1.Actions()
@@ -138,11 +139,11 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			}
 
 			s := storage.NewDiskStore(file)
-			store, err := newStateStore(log, s)
+			store, err := NewStateStore(log, s)
 			require.NoError(t, err)
 			store.SetAckToken(ackToken)
 
-			acker := newStateStoreActionAcker(&testAcker{}, store)
+			acker := NewStateStoreActionAcker(&testAcker{}, store)
 			require.Equal(t, 0, len(store.Actions()))
 
 			require.NoError(t, acker.Ack(context.Background(), ActionPolicyChange))
@@ -155,7 +156,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			withFile(func(t *testing.T, stateStorePath string) {
 				err := migrateStateStore(log, actionStorePath, stateStorePath)
 				require.NoError(t, err)
-				stateStore, err := newStateStore(log, storage.NewDiskStore(stateStorePath))
+				stateStore, err := NewStateStore(log, storage.NewDiskStore(stateStorePath))
 				require.NoError(t, err)
 				stateStore.SetAckToken(ackToken)
 				require.Equal(t, 0, len(stateStore.Actions()))
@@ -173,7 +174,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 				},
 			}
 
-			actionStore, err := newActionStore(log, storage.NewDiskStore(actionStorePath))
+			actionStore, err := NewActionStore(log, storage.NewDiskStore(actionStorePath))
 			require.NoError(t, err)
 
 			require.Equal(t, 0, len(actionStore.Actions()))
@@ -186,7 +187,7 @@ func runTestStateStore(t *testing.T, ackToken string) {
 				err = migrateStateStore(log, actionStorePath, stateStorePath)
 				require.NoError(t, err)
 
-				stateStore, err := newStateStore(log, storage.NewDiskStore(stateStorePath))
+				stateStore, err := NewStateStore(log, storage.NewDiskStore(stateStorePath))
 				require.NoError(t, err)
 				stateStore.SetAckToken(ackToken)
 				diff := cmp.Diff(actionStore.Actions(), stateStore.Actions())
@@ -197,4 +198,38 @@ func runTestStateStore(t *testing.T, ackToken string) {
 			})
 		}))
 
+}
+
+type testAcker struct {
+	acked     []string
+	ackedLock sync.Mutex
+}
+
+func (t *testAcker) Ack(_ context.Context, action fleetapi.Action) error {
+	t.ackedLock.Lock()
+	defer t.ackedLock.Unlock()
+
+	if t.acked == nil {
+		t.acked = make([]string, 0)
+	}
+
+	t.acked = append(t.acked, action.ID())
+	return nil
+}
+
+func (t *testAcker) Commit(_ context.Context) error {
+	return nil
+}
+
+func (t *testAcker) Clear() {
+	t.ackedLock.Lock()
+	defer t.ackedLock.Unlock()
+
+	t.acked = make([]string, 0)
+}
+
+func (t *testAcker) Items() []string {
+	t.ackedLock.Lock()
+	defer t.ackedLock.Unlock()
+	return t.acked
 }

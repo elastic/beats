@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -37,14 +39,18 @@ Unless -f is used this command will ask confirmation before performing removal.
 }
 
 func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	if !install.HasRoot() {
-		return fmt.Errorf("unable to perform uninstall command, not executed with %s permissions", install.PermissionUser)
+	isAdmin, err := install.HasRoot()
+	if err != nil {
+		return fmt.Errorf("unable to perform command while checking for administrator rights, %v", err)
+	}
+	if !isAdmin {
+		return fmt.Errorf("unable to perform command, not executed with %s permissions", install.PermissionUser)
 	}
 	status, reason := install.Status()
 	if status == install.NotInstalled {
 		return fmt.Errorf("not installed")
 	}
-	if status == install.Installed && !install.RunningInstalled() {
+	if status == install.Installed && !info.RunningInstalled() {
 		return fmt.Errorf("can only be uninstall by executing the installed Elastic Agent at: %s", install.ExecutablePath())
 	}
 
@@ -52,7 +58,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
-			confirm, err := c.Confirm(fmt.Sprintf("Continuing will uninstall the broken Elastic Agent at %s. Do you want to continue?", install.InstallPath), true)
+			confirm, err := c.Confirm(fmt.Sprintf("Continuing will uninstall the broken Elastic Agent at %s. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -62,7 +68,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	} else {
 		if !force {
-			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be uninstalled from your system at %s. Do you want to continue?", install.InstallPath), true)
+			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be uninstalled from your system at %s. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -72,12 +78,12 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	}
 
-	err := install.Uninstall()
+	err = install.Uninstall(flags.Config())
 	if err != nil {
 		return err
 	}
 	fmt.Fprintf(streams.Out, "Elastic Agent has been uninstalled.\n")
 
-	install.RemovePath(install.InstallPath)
+	install.RemovePath(paths.InstallPath)
 	return nil
 }

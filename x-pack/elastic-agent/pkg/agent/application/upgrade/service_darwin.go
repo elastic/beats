@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
@@ -50,13 +49,13 @@ func (p *darwinPidProvider) Close() {}
 
 func (p *darwinPidProvider) PID(ctx context.Context) (int, error) {
 	piders := []func(context.Context) (int, error){
-		p.piderFromCmd(ctx, "launchctl", "list", install.ServiceName),
+		p.piderFromCmd(ctx, "launchctl", "list", paths.ServiceName),
 	}
 
 	// if release is specifically built to be upgradeable (using DEV flag)
 	// we dont require to run as a service and will need sudo fallback
 	if release.Upgradeable() {
-		piders = append(piders, p.piderFromCmd(ctx, "sudo", "launchctl", "list", install.ServiceName))
+		piders = append(piders, p.piderFromCmd(ctx, "sudo", "launchctl", "list", paths.ServiceName))
 	}
 
 	var pidErrors error
@@ -96,7 +95,7 @@ func (p *darwinPidProvider) piderFromCmd(ctx context.Context, name string, args 
 		}
 
 		if pidLine == "" {
-			return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", install.ServiceName))
+			return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", paths.ServiceName))
 		}
 
 		re := regexp.MustCompile(`"PID" = ([0-9]+);`)

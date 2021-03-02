@@ -4,7 +4,7 @@
 
 // +build windows
 
-package install
+package operations
 
 import (
 	"golang.org/x/sys/windows"
