@@ -9,6 +9,7 @@ KIND_CMD="${HOME}/bin/kind"
 
 if command -v kind
 then
+    set +e
     echo "Found Kind. Checking version.."
     FOUND_KIND_VERSION=$(kind --version 2>&1 >/dev/null | awk '{print $3}')
     if [ "$FOUND_KIND_VERSION" == "$KIND_VERSION" ]
@@ -16,6 +17,7 @@ then
         echo "Versions match. No need to install Kind. Exiting."
         exit 0
     fi
+    set -e
 fi
 
 echo "UNMET DEP: Installing Kind"
