@@ -48,3 +48,18 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, arg
 		Stdin:   stdin,
 	}, err
 }
+
+// Stop stops the process cleanly.
+func (i *Info) Stop() error {
+	return terminateCmd(i.Process)
+}
+
+// StopWait stops the process and waits for it to exit.
+func (i *Info) StopWait() error {
+	err := i.Stop()
+	if err != nil {
+		return err
+	}
+	_, err = i.Process.Wait()
+	return err
+}
