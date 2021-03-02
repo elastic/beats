@@ -54,11 +54,11 @@ type publishSettings struct {
 	// Output meta data settings
 	Pipeline   string                   `config:"pipeline"` // ES Ingest pipeline name
 	Index      fmtstr.EventFormatString `config:"index"`    // ES output index pattern
-	DataStream *DataStream              `config:"data_stream"`
+	DataStream *datastream              `config:"data_stream"`
 	DataSet    string                   `config:"dataset"`
 }
 
-type DataStream struct {
+type datastream struct {
 	Namespace string `config:"namespace"`
 	Dataset   string `config:"dataset"`
 	Type      string `config:"type"`
@@ -172,7 +172,7 @@ func setupIndexProcessor(info beat.Info, settings publishSettings) (processors.P
 		)
 		compiled, err := fmtstr.CompileEvent(index)
 		if err != nil {
-			return nil, fmt.Errorf("could not compile DataStream: '%s', this should never happen: %w", index, err)
+			return nil, fmt.Errorf("could not compile datastream: '%s', this should never happen: %w", index, err)
 		} else {
 			settings.Index = *compiled
 		}

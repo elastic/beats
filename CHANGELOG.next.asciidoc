@@ -266,7 +266,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix typos in zeek notice fileset config file. {issue}15764[15764] {pull}15765[15765]
 - Fix mapping error when zeek weird logs do not contain IP addresses. {pull}15906[15906]
-- Improve `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
+- Impr CEF: Fixed decoding errors caused by trailing spaces in messages. {pull}17253[17253]
+- Fixed activemq module causing "regular expression has redundant nested repeat operator" warning in Elasticsearch. {pull}17428[17428]
+- Remove migrationVersion map 7.7.0 reference from Kibana dashboard file to fix backward compatibility issues. {pull}17425[17425]
+- Fix issue 17734 to retry on rate-limit error in the Filebeat httpjson input. {issue}17734[17734] {pull}17735[17735]
+- Fixed `cloudfoundry.access` to have the correct `cloudfoundry.app.id` contents. {pull}17847[17847]
+- Fixing `ingress_controller.` fields to be of type keyword instead of text. {issue}17834[17834]
+- Fixed typo in log message. {pull}17897[17897]ove `elasticsearch/audit` fileset to handle timestamps correctly. {pull}15942[15942]
 - Prevent Elasticsearch from spewing log warnings about redundant wildcards when setting up ingest pipelines for the `elasticsearch` module. {issue}15840[15840] {pull}15900[15900]
 - Fix mapping error for cloudtrail additionalEventData field {pull}16088[16088]
 - Fix a connection error in httpjson input. {pull}16123[16123]
@@ -877,6 +883,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add mime type detection for http responses. {pull}22976[22976]
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
+- Handle datastreams for fleet. {pull}24223[24223]
 
 *Journalbeat*
 
