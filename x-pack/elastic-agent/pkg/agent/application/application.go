@@ -79,6 +79,9 @@ func createApplication(
 	// not in standalone; both modes require reading the fleet.yml configuration file
 	var store storage.Store
 	store, cfg, err = mergeFleetConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	if configuration.IsFleetServerBootstrap(cfg.Fleet) {
 		log.Info("Agent is in Fleet Server bootstrap mode")
