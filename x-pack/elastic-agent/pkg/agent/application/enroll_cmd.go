@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -45,12 +46,12 @@ var (
 	daemonTimeout = 30 * time.Second // max amount of for communication to running Agent daemon
 )
 
-type store interface {
+type saver interface {
 	Save(io.Reader) error
 }
 
 type storeLoad interface {
-	store
+	saver
 	Load() (io.ReadCloser, error)
 }
 
@@ -72,7 +73,7 @@ type EnrollCmd struct {
 	log          *logger.Logger
 	options      *EnrollCmdOption
 	client       clienter
-	configStore  store
+	configStore  saver
 	kibanaConfig *kibana.Config
 	agentProc    *process.Info
 }
@@ -138,7 +139,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewDiskStore(info.AgentConfigFile()),
+		storage.NewDiskStore(paths.AgentConfigFile()),
 	)
 
 	return NewEnrollCmdWithStore(
@@ -154,7 +155,7 @@ func NewEnrollCmdWithStore(
 	log *logger.Logger,
 	options *EnrollCmdOption,
 	configPath string,
-	store store,
+	store saver,
 ) (*EnrollCmd, error) {
 	return &EnrollCmd{
 		log:         log,
@@ -414,13 +415,13 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 
 	// clear action store
 	// fail only if file exists and there was a failure
-	if err := os.Remove(info.AgentActionStoreFile()); !os.IsNotExist(err) {
+	if err := os.Remove(paths.AgentActionStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 
 	// clear action store
 	// fail only if file exists and there was a failure
-	if err := os.Remove(info.AgentStateStoreFile()); !os.IsNotExist(err) {
+	if err := os.Remove(paths.AgentStateStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 

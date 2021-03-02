@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package store
 
 import (
 	"fmt"
@@ -14,24 +14,25 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-// actionStore receives multiples actions to persist to disk, the implementation of the store only
+// ActionStore receives multiples actions to persist to disk, the implementation of the store only
 // take care of action policy change every other action are discarded. The store will only keep the
 // last good action on disk, we assume that the action is added to the store after it was ACK with
 // Fleet. The store is not threadsafe.
 // ATTN!!!: THE actionStore is deprecated, please use and extend the stateStore instead. The actionStore will be eventually removed.
-type actionStore struct {
+type ActionStore struct {
 	log    *logger.Logger
 	store  storeLoad
 	dirty  bool
 	action action
 }
 
-func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
+// NewActionStore creates a new action store.
+func NewActionStore(log *logger.Logger, store storeLoad) (*ActionStore, error) {
 	// If the store exists we will read it, if any errors is returned we assume we do not have anything
 	// persisted and we return an empty store.
 	reader, err := store.Load()
 	if err != nil {
-		return &actionStore{log: log, store: store}, nil
+		return &ActionStore{log: log, store: store}, nil
 	}
 	defer reader.Close()
 
@@ -40,7 +41,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 	dec := yaml.NewDecoder(reader)
 	err = dec.Decode(&action)
 	if err == io.EOF {
-		return &actionStore{
+		return &ActionStore{
 			log:   log,
 			store: store,
 		}, nil
@@ -51,7 +52,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 
 	apc := fleetapi.ActionPolicyChange(action)
 
-	return &actionStore{
+	return &ActionStore{
 		log:    log,
 		store:  store,
 		action: &apc,
@@ -60,7 +61,7 @@ func newActionStore(log *logger.Logger, store storeLoad) (*actionStore, error) {
 
 // Add is only taking care of ActionPolicyChange for now and will only keep the last one it receive,
 // any other type of action will be silently ignored.
-func (s *actionStore) Add(a action) {
+func (s *ActionStore) Add(a action) {
 	switch v := a.(type) {
 	case *fleetapi.ActionPolicyChange, *fleetapi.ActionUnenroll:
 		// Only persist the action if the action is different.
@@ -72,7 +73,8 @@ func (s *actionStore) Add(a action) {
 	}
 }
 
-func (s *actionStore) Save() error {
+// Save saves actions to backing store.
+func (s *ActionStore) Save() error {
 	defer func() { s.dirty = false }()
 	if !s.dirty {
 		return nil
@@ -112,7 +114,7 @@ func (s *actionStore) Save() error {
 
 // Actions returns a slice of action to execute in order, currently only a action policy change is
 // persisted.
-func (s *actionStore) Actions() []action {
+func (s *ActionStore) Actions() []action {
 	if s.action == nil {
 		return []action{}
 	}

@@ -206,7 +206,7 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
-	path := info.AgentConfigFile()
+	path := paths.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
@@ -239,7 +239,7 @@ func getOverwrites(rawConfig *config.Config) error {
 }
 
 func defaultLogLevel(cfg *configuration.Configuration) string {
-	if application.IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		// for standalone always take the one from config and don't override
 		return ""
 	}
