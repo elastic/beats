@@ -606,8 +606,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
         // Tear down the setup for the permanent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           fixPermissions("${WORKSPACE}")
-          dir("${WORKSPACE}") {
-            deleteDir()
+          // TODO: Somehow windows workers got a different opinion regarding removing the workspace
+          // IMPORTANT: windows workers are ephemerals, so this should not really affect us.
+          if (isUnix()) {
+            dir("${WORKSPACE}") {
+              deleteDir()
+            }
           }
         }
       }
