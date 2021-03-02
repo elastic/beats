@@ -603,10 +603,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
+        // Tear down the setup for the permanent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           fixPermissions("${WORKSPACE}")
-          deleteDir()
+          dir("${WORKSPACE}") {
+            deleteDir()
+          }
         }
       }
     }
