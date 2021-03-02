@@ -28,6 +28,13 @@ rules:
       selectors: [ fleet.server.policy.id ]
       path: inputs.0.policy
 
+  - select_into:
+      selectors:
+        - fleet.server.host
+        - fleet.server.port
+        - fleet.server.ssl
+      path: inputs.0.server
+
   - map:
       path: fleet
       rules:
