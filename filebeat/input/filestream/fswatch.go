@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -115,16 +116,14 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
-	ticker := time.NewTicker(w.interval)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			w.watch(ctx)
-		}
-	}
+	// run initial scan before starting regular
+	w.watch(ctx)
+
+	timed.Periodic(ctx, w.interval, func() error {
+		w.watch(ctx)
+
+		return nil
+	})
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
