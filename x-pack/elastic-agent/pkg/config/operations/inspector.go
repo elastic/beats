@@ -39,7 +39,8 @@ func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	} else if fleetConfig == nil {
-		return nil, fmt.Errorf("no fleet config retrieved yet")
+		// resolving fleet config but not fleet config retrieved yet, returning last applied config
+		return rawConfig, nil
 	}
 
 	return config.NewConfigFrom(fleetConfig)
