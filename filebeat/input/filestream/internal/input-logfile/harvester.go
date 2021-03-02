@@ -34,7 +34,7 @@ import (
 )
 
 var (
-	HarvesterAlreadyRunning = errors.New("harvester is already running for file")
+	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
 )
 
 // Harvester is the reader which collects the lines from
@@ -71,7 +71,7 @@ func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Co
 	defer r.mu.Unlock()
 
 	if _, ok := r.table[id]; ok {
-		return nil, nil, HarvesterAlreadyRunning
+		return nil, nil, ErrHarvesterAlreadyRunning
 	}
 
 	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))

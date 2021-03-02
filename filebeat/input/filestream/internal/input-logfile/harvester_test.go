@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"context"
 	"fmt"
+	"log"
 	"runtime"
 	"sync"
 	"testing"
@@ -96,6 +97,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		wg.Add(1)
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
@@ -112,8 +114,6 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		require.False(t, ok)
 		// stopped source can be stopped
 		require.Nil(t, hg.StopGroup())
-
-		gorountineChecker.waitOriginalCount()
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
@@ -121,6 +121,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
@@ -147,7 +148,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		hg.Start(inputCtx, source)
 		hg.Start(inputCtx, source)
@@ -171,17 +174,19 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		}()
 
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
 		require.Nil(t, hg.StopGroup())
-		gorountineChecker.waitOriginalCount()
 	})
 
 	t.Run("assert a harvester error is handled", func(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: errorOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
+
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
@@ -232,7 +237,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		mockHarvester := &mockHarvester{onRun: correctOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
 		gorountineChecker := newGoroutineChecker()
+		defer gorountineChecker.waitOriginalCount()
 
 		r, err := lock(inputCtx, hg.store, source.Name())
 		if err != nil {
@@ -248,8 +255,6 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		})
 
 		require.Equal(t, 0, mockHarvester.runCount)
-
-		gorountineChecker.waitOriginalCount()
 	})
 }
 
@@ -277,7 +282,7 @@ func newGoroutineChecker() *gorountineChecker {
 
 func (c *gorountineChecker) waitWhileMoreGoroutinesWithFunc(f func()) {
 	for c.n < runtime.NumGoroutine() {
-		fmt.Println("waiting with function", c.n, runtime.NumGoroutine())
+		log.Println("waiting with function", c.n, runtime.NumGoroutine())
 		time.Sleep(c.wait)
 
 		f()
@@ -285,7 +290,7 @@ func (c *gorountineChecker) waitWhileMoreGoroutinesWithFunc(f func()) {
 }
 
 func (c *gorountineChecker) waitOriginalCount() {
-	fmt.Println("waiting until original", c.n, runtime.NumGoroutine())
+	log.Println("waiting until original", c.n, runtime.NumGoroutine())
 	for c.n < runtime.NumGoroutine() {
 		time.Sleep(c.wait)
 	}
