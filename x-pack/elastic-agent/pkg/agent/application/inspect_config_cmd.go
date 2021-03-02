@@ -9,6 +9,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -16,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -39,7 +41,12 @@ func (c *InspectConfigCmd) Execute() error {
 }
 
 func (c *InspectConfigCmd) inspectConfig() error {
-	fullCfg, err := operations.LoadFullAgentConfig(c.cfgPath)
+	log, err := logger.NewWithLogpLevel("", logp.ErrorLevel)
+	if err != nil {
+		return err
+	}
+
+	fullCfg, err := operations.LoadFullAgentConfig(log, c.cfgPath)
 	if err != nil {
 		return err
 	}

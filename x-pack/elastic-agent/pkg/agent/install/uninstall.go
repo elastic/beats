@@ -124,7 +124,7 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 		return err
 	}
 
-	cfg, err := operations.LoadFullAgentConfig(cfgFile)
+	cfg, err := operations.LoadFullAgentConfig(log, cfgFile)
 	if err != nil {
 		return err
 	}
