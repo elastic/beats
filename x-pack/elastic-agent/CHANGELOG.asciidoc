@@ -37,6 +37,7 @@
 - Fix reloading of log level for services {pull}[24055]24055
 - Fix: Successfully installed and enrolled agent running standalone{pull}[24128]24128
 - Remove installed services on agent uninstall {pull}[24151]24151
+- Make installer atomic on windows {pull}[24253]24253
 
 ==== New features
 

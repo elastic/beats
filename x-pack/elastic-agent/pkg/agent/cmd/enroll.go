@@ -222,13 +222,16 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
-		FleetServerConnStr:   fServer,
-		FleetServerPolicyID:  fPolicy,
-		FleetServerHost:      fHost,
-		FleetServerPort:      fPort,
-		FleetServerCert:      fCert,
-		FleetServerCertKey:   fCertKey,
-		FleetServerInsecure:  fInsecure,
+		FleetServer: application.EnrollCmdFleetServerOption{
+			ConnStr:    fServer,
+			PolicyID:   fPolicy,
+			Host:       fHost,
+			Port:       fPort,
+			Cert:       fCert,
+			CertKey:    fCertKey,
+			Insecure:   fInsecure,
+			SpawnAgent: !fromInstall,
+		},
 	}
 
 	c, err := application.NewEnrollCmd(

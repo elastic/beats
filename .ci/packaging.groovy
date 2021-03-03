@@ -434,9 +434,7 @@ def triggerE2ETests(String suite) {
     string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
   ]
   if (isPR()) {
-    def version = "pr-${env.CHANGE_ID}"
-    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
-    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
+    parameters.push(string(name: 'BEAT_VERSION', value: "pr-${env.CHANGE_ID}"))
   }
 
   build(job: "${e2eTestsPipeline}",

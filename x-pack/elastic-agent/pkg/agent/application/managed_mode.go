@@ -187,7 +187,10 @@ func newManaged(
 		agentInfo: agentInfo,
 		config:    cfg,
 		store:     storeSaver,
-		setters:   []clientSetter{acker},
+	}
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.setters = []clientSetter{acker}
 	}
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
