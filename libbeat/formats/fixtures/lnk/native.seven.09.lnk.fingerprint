@@ -22,29 +22,34 @@
   },
   "targets": [
     {
+      "name": "Root folder: GUID",
       "size": 20,
-      "type_id": 80,
-      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+      "type_id": 31,
+      "sha256": "e0e4d0b44f5795d50c6143686d84d5293d3c178c2e9321cf030c1c12d9b0ba6b"
     },
     {
+      "name": "Drive letter",
       "size": 25,
-      "type_id": 67,
-      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+      "type_id": 47,
+      "sha256": "3648262ce8730d814cd1125280e270291159f9ca471fbc5fd2a438aa3116edca"
     },
     {
+      "name": "Directory",
       "size": 82,
-      "type_id": 0,
-      "sha256": "184e677e10b73142c9acb6bc4b5db242dabebda53ff506e59d720d2cbd5be706"
+      "type_id": 49,
+      "sha256": "7cc98221fb355ac3c98eea9ed0bf25157463c069d09e01241079f0a8c6d5d3dd"
     },
     {
+      "name": "Directory",
       "size": 86,
-      "type_id": 0,
-      "sha256": "8ce8fcbfca1d3b5d6838544cdb47e95443e55e56f0aff1a73199531b735d77d3"
+      "type_id": 49,
+      "sha256": "5f6b27f32ca26e1c1f0fda319c20675c7e632175be08ecd6c185364a4d217ff3"
     },
     {
+      "name": "File",
       "size": 94,
-      "type_id": 0,
-      "sha256": "dc814bc487fc41e03499933cac5facf8154e3b768f8d22c06ac286342037386c"
+      "type_id": 50,
+      "sha256": "c63ae8934e29d153b90528c8b4f7b710b7a286b3ac6ee76ce64f3e58c61f325c"
     }
   ],
   "location": {

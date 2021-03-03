@@ -49,34 +49,39 @@
     "vista_and_above_id_list": {
       "targets": [
         {
+          "name": "Users property view",
           "size": 20,
-          "type_id": 88,
-          "sha256": "0fd765c464bc0175cb0d598bbd77de8217dac435999d9261df8f384ae69d5e85"
+          "type_id": 31,
+          "sha256": "39a497e3b1e2d328ec88df1bbe8de598540d152c29b2a56627cff92f624c4bb3"
         },
         {
           "size": 179,
           "type_id": 0,
-          "sha256": "a4924888c786d4acf9e3c42c824563e5fdec6cd93042dbebadc1fd3227199ef4"
+          "sha256": "bd32f1a3508b0655a5fa4cffae5d9be54c17767902c3999b400485241282732c"
         },
         {
+          "name": "Network location",
           "size": 160,
-          "type_id": 0,
-          "sha256": "e1f098b643c47bdee4c734acd2ff6f2a5b3332fed6566870f937c8717a07f4af"
+          "type_id": 195,
+          "sha256": "a4fe40ed41a8840627455ec68e9e3a6f1400a73acd140338e333007f08399d71"
         },
         {
+          "name": "Directory",
           "size": 86,
-          "type_id": 0,
-          "sha256": "223d3713713681f8fbc798cdd4e7c027c3dfc0d5733a9009299b6e698d2b20a5"
+          "type_id": 49,
+          "sha256": "71eb7827f93da2318a811d0afea6a95733a17ad260e4bbe94e275d2e9bdbaccf"
         },
         {
+          "name": "Directory",
           "size": 80,
-          "type_id": 0,
-          "sha256": "b1727773baaf9441c2f87f6b39f73978df4e861a0e97ce3d6fcc1178ad986b56"
+          "type_id": 49,
+          "sha256": "39acd6f749a39479e5e0c7ed9e819b50a7a0c9e9d901a3673bbb37612fd3abf2"
         },
         {
+          "name": "Directory",
           "size": 100,
-          "type_id": 0,
-          "sha256": "6ed7a47644a27ed26d689a4fda0144dbed91dfacb0d45a658c0e0e2b3c1a2894"
+          "type_id": 49,
+          "sha256": "c2a944702c66a098636fe43c60e349c2ea357aea459c5ce92d57e734d33b26b6"
         }
       ]
     }

@@ -20,14 +20,15 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 68,
-      "sha256": "9193c3d2d24cd3be01e287b81dc4373db0e51b5167c48799ed0ff396bd4d42a2"
+      "type_id": 31,
+      "sha256": "fdc480a4bb8842fd0a3f686a5d8738d66c525442be3e08414a78a1216ceac8e0"
     },
     {
       "size": 32,
       "type_id": 0,
-      "sha256": "4231fd1104c96daf3bbe8a2bff7b105845c84c63b69a8c8872dcf6e644c55295"
+      "sha256": "91da9f1c8377c19ae3dcb208ccecda47a6a01643001408f757793ddfd87d068a"
     }
   ],
   "relative_path": "..\\Searches",

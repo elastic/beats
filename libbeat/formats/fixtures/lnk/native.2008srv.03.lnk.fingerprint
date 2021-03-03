@@ -13,9 +13,10 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 128,
-      "sha256": "fe665801103b090a9f447cb365a4acb589b5e2aed6473da23290967de2fcbbf9"
+      "type_id": 31,
+      "sha256": "b88204e884efad7cc3a304a1eb4f91b38824b9fb23d8c042484368296447a512"
     }
   ],
   "name": "@%windir%\\explorer.exe,-307",

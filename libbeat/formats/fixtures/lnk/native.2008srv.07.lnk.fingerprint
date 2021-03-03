@@ -13,9 +13,10 @@
   },
   "targets": [
     {
+      "name": "Root folder: GUID",
       "size": 20,
-      "type_id": 128,
-      "sha256": "16d0e14f639e9764cece0da2d07db14c9bd498fa3bc66fd559ac00d26d24cc2c"
+      "type_id": 31,
+      "sha256": "8db1287718d91d57c60da1c79fbc3067e006a4f0be2f88b4f551c8d7120514a5"
     }
   ],
   "name": "@%windir%\\explorer.exe,-7001",

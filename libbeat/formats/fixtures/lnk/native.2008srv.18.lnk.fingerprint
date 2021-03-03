@@ -13,9 +13,10 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 128,
-      "sha256": "5adf040358900b7b886aebf682ef8ebefb25dcfc2b4f4cd7fb076bfc2317cbe3"
+      "type_id": 31,
+      "sha256": "08f7df35a94d580703a76f2c82de60e7d7d45ce9a6640f8df2b1ef5271b33cba"
     }
   ],
   "name": "@%SystemRoot%\\system32\\shell32.dll,-10114",

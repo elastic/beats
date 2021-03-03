@@ -70,24 +70,27 @@
     "vista_and_above_id_list": {
       "targets": [
         {
+          "name": "Users property view",
           "size": 20,
-          "type_id": 88,
-          "sha256": "0fd765c464bc0175cb0d598bbd77de8217dac435999d9261df8f384ae69d5e85"
+          "type_id": 31,
+          "sha256": "39a497e3b1e2d328ec88df1bbe8de598540d152c29b2a56627cff92f624c4bb3"
         },
         {
           "size": 171,
           "type_id": 0,
-          "sha256": "28222bc3c9d115226224f871f30af6d5f51aaead9bb52f0e86c60bf8c03aff7e"
+          "sha256": "4bc6ed31b49e4b6f2482b2a5bfc44ec3401841d3cb8aaca5b1df8b7b87380f09"
         },
         {
+          "name": "Network location",
           "size": 39,
-          "type_id": 1,
-          "sha256": "d0f317c9a1aa7d1e38f393b24b90e27c8e51e88be305c3655b43936e9d13e9ec"
+          "type_id": 195,
+          "sha256": "8275bc1e94cec22e8e079b9c2b2731b8fb6ff1e36b0d0d4c6d5d3e9ba133afea"
         },
         {
+          "name": "File",
           "size": 94,
-          "type_id": 0,
-          "sha256": "a27e3a9e31dfe073c62944697d439c8aa4331d556c92ef11e21e6e486f72b69e"
+          "type_id": 50,
+          "sha256": "a517f117fcf3c38ac660e8cdd2f9c6f3d34a050462cadf3330f8f0ea2eada281"
         }
       ]
     }

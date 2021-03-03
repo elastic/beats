@@ -14,14 +14,16 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 104,
-      "sha256": "e454c954e255ac7a0021bcead81c35467cb90b962b6bcb2b1c319a118083b9e4"
+      "type_id": 31,
+      "sha256": "b6d6b0fc4575980bd03dbbb68eb13e12b1b823988a4b57a4edab2bb2c2930cf9"
     },
     {
+      "name": "URI",
       "size": 86,
-      "type_id": 128,
-      "sha256": "56c3e94faf8577b2beab3681dff177f30462048ecb410662e2ffce5095643713"
+      "type_id": 97,
+      "sha256": "5bf61e9176461c9988fa66440347677a800e489a08c7839cc8011b629bfc87f4"
     }
   ],
   "name": "@%systemRoot%\\system32\\compatUI.dll,-117",

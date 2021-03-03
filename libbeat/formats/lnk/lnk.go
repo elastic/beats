@@ -163,6 +163,7 @@ type Location struct {
 
 // Target contains LNK target info
 type Target struct {
+	Name   string `json:"name,omitempty"`
 	Size   uint16 `json:"size"`
 	TypeID uint8  `json:"type_id"`
 	SHA256 string `json:"sha256"`

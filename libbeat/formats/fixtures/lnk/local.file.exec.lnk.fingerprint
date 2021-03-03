@@ -24,49 +24,58 @@
   },
   "targets": [
     {
+      "name": "Root folder: GUID",
       "size": 20,
-      "type_id": 80,
-      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+      "type_id": 31,
+      "sha256": "e0e4d0b44f5795d50c6143686d84d5293d3c178c2e9321cf030c1c12d9b0ba6b"
     },
     {
+      "name": "Drive letter",
       "size": 25,
-      "type_id": 68,
-      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+      "type_id": 47,
+      "sha256": "67bcf1dbcf03183937b51fb3e0be2c1a0d12ac3b3349d39650e65dd7e7991ee9"
     },
     {
+      "name": "Directory",
       "size": 64,
-      "type_id": 0,
-      "sha256": "af2aa63827c0a19bb40eb90e1e36d29dfebcc9615f550aedec805d0f46ec2e6d"
+      "type_id": 49,
+      "sha256": "60f07666cf8f95d45c113e5b9c05b10600ca3271fefd4f38b37a43d21df6a05d"
     },
     {
+      "name": "Directory",
       "size": 58,
-      "type_id": 0,
-      "sha256": "60d3eafdaecb7dcf21f68c1af22052f9519419ae77ea2b4b91d187519a07047b"
+      "type_id": 49,
+      "sha256": "e2866081c76085e7ae84ec96313f54e053f3a58f1675300c38594b743783b022"
     },
     {
+      "name": "Directory",
       "size": 64,
-      "type_id": 0,
-      "sha256": "7e199b495493900dcabae0891a57762af90e08623979852291b6d6a14b143ce4"
+      "type_id": 49,
+      "sha256": "6649788de17203194be295fe532f33645963c55cc991371ddab890ffa6b85b19"
     },
     {
+      "name": "Directory",
       "size": 72,
-      "type_id": 0,
-      "sha256": "09e05071911f51a15ffd453abf4f1825b20909ee3aa3898aaad086d28d356791"
+      "type_id": 49,
+      "sha256": "c44fbc11152540e01bc5de14510b51f2187c3080e3cd740eb5f4dfc090fe2858"
     },
     {
+      "name": "Directory",
       "size": 48,
-      "type_id": 0,
-      "sha256": "4b4782ce717aaf5477a3c9330f00b8c3f4a797db5c991f29e7fd40e8cb6b692a"
+      "type_id": 49,
+      "sha256": "60ac6e91f4ff666354577d111d987cbb4c934af387bb111afc1b2408e4226209"
     },
     {
+      "name": "Directory",
       "size": 54,
-      "type_id": 0,
-      "sha256": "648e071b1e752a5588ec8953007fdd3a1ca6a003c7f34bda208a3547ce0355da"
+      "type_id": 49,
+      "sha256": "5dec5b7c3d205cc117c64ad91081575b2787d8af02d8a6944e6cd1f7f20af038"
     },
     {
+      "name": "File",
       "size": 84,
-      "type_id": 0,
-      "sha256": "c787c3eabf63fe8f045a8e711bc92185318d9d15a37be8e8cc6442170320ce16"
+      "type_id": 50,
+      "sha256": "866b54e6bbf760b626d80661f219f7e296c649dc97d0f031cca82c7416161e64"
     }
   ],
   "location": {

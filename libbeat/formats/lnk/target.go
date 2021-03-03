@@ -72,9 +72,10 @@ func parseTargetList(data []byte) ([]Target, error) {
 			return targets, nil
 		}
 		targetData = targetData[:targetSize]
-		targetType := targetData[3]
-		hash := sha256.Sum256(targetData[4:])
+		targetType := targetData[2]
+		hash := sha256.Sum256(targetData[3:])
 		targets = append(targets, Target{
+			Name:   getTargetName(targetType, targetData[3:]),
 			Size:   targetSize,
 			TypeID: targetType,
 			SHA256: hex.EncodeToString(hash[:]),

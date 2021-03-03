@@ -21,24 +21,28 @@
   },
   "targets": [
     {
+      "name": "Root folder: GUID",
       "size": 20,
-      "type_id": 80,
-      "sha256": "df3ab5fa5bfd571b68b5a1fdf4889a3c43a80391809dbc7e3cdf97d471b4bcee"
+      "type_id": 31,
+      "sha256": "e0e4d0b44f5795d50c6143686d84d5293d3c178c2e9321cf030c1c12d9b0ba6b"
     },
     {
+      "name": "Drive letter",
       "size": 25,
-      "type_id": 68,
-      "sha256": "03ebea9a4d6ab5842ebe07b818f2a8b31c70a04c7704364bb874c991443e3d6e"
+      "type_id": 47,
+      "sha256": "67bcf1dbcf03183937b51fb3e0be2c1a0d12ac3b3349d39650e65dd7e7991ee9"
     },
     {
+      "name": "Directory",
       "size": 78,
-      "type_id": 0,
-      "sha256": "d388526f94e64db09ca8ad1e27366bdd87e94d1909273a6cd0aa3328bdd9ad30"
+      "type_id": 49,
+      "sha256": "9136014a2f33dd37fd52591b7f69dd411f807398b3154677b2aadf9d6568f3d7"
     },
     {
+      "name": "File",
       "size": 94,
-      "type_id": 0,
-      "sha256": "a925d96d0dc0fa9a669f6796f5ddc972e09bfbeca048f69435d791be383fd764"
+      "type_id": 50,
+      "sha256": "d536a3e92540146875923c64bf2f48a787cc9ac78c44790e8caf68f6f6b53ac6"
     }
   ],
   "name": "@%SystemRoot%\\system32\\Shell32.dll,-22579",

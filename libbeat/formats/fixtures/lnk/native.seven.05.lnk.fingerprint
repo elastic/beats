@@ -12,19 +12,21 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 112,
-      "sha256": "4f2ef7c750b2e077b92d59dcecca8414e25706ebfe12e01016750e9af9574410"
+      "type_id": 31,
+      "sha256": "f60454d9b322749cf4092847b9e81572fa4f9aa4df272c462866ef55c0b46657"
     },
     {
+      "name": "Control Panel Category",
       "size": 12,
-      "type_id": 0,
-      "sha256": "ba3853104050fa0a1b1c6902ab5f00d91143d95955927624727ae16547273a82"
+      "type_id": 1,
+      "sha256": "4a6262d4f1d9b6d3342ca0d20934f6e2e39f28314313e7dd0b1751c8558e884d"
     },
     {
       "size": 30,
-      "type_id": 128,
-      "sha256": "7f57d0f9f1a4cba5e9db241ecfa85a0fd9e4b5819d95870da37dc7b7210e81e5"
+      "type_id": 113,
+      "sha256": "15078e6b9eb879d2c4cbc741a2fbc512212eeec68e656892fae4dd6ab26c6ebb"
     }
   ],
   "extra": {

@@ -20,9 +20,10 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 76,
-      "sha256": "82fe82afa3005892e74781cbae9bc9ecf682ea56ce765f650d6d402aa2cc7253"
+      "type_id": 31,
+      "sha256": "980319fa30c13a88eadfd58c70287f37f62f47a3cbae58d4523148e8d0e870b9"
     }
   ],
   "relative_path": "..\\..\\Public",

@@ -14,14 +14,15 @@
   },
   "targets": [
     {
+      "name": "Users property view",
       "size": 20,
-      "type_id": 128,
-      "sha256": "b784138ea9c6c6076de1bfb17a04afc1bc18431cf6cf9ff707e6bfebfd428ed2"
+      "type_id": 31,
+      "sha256": "2b67f98d3d1de6745ab00ce99bf56db5a9ed94ff2e0bf9393a9c54a821eae7da"
     },
     {
       "size": 32,
       "type_id": 0,
-      "sha256": "a4064e1cb728a90a91be50f60bfcd4e5c3a8ac6f44d2b911ee873580c591440f"
+      "sha256": "94756e66587275bbf78c7d0caa3800da26570d172745df23e7ed4f14746e09f8"
     }
   ],
   "name": "@%SystemRoot%\\system32\\gameux.dll,-10311",
