@@ -276,7 +276,7 @@ func (w *watcher) watch() {
 			select {
 			case event := <-events:
 				w.log.Debugf("Got a new docker event: %v", event)
-				lastValidTimestamp = time.Unix(event.Time, event.TimeNano)
+				lastValidTimestamp = time.Unix(0, event.TimeNano)
 				lastReceivedEventTime = w.clock.Now()
 
 				switch event.Action {
