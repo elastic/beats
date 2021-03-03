@@ -507,12 +507,16 @@ def target(Map args = [:]) {
 }
 
 /**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+* This method wraps the node call for two reasons:
+*  1. with some latency to avoid the known issue with the scalabitity in gobld.
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
   node(label) {
-    body()
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}") {
+      body()
+    }
   }
 }
 
@@ -599,10 +603,16 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
+        // Tear down the setup for the permanent workers.
         catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
           fixPermissions("${WORKSPACE}")
-          deleteDir()
+          // TODO: Somehow windows workers got a different opinion regarding removing the workspace
+          // IMPORTANT: windows workers are ephemerals, so this should not really affect us.
+          if (isUnix()) {
+            dir("${WORKSPACE}") {
+              deleteDir()
+            }
+          }
         }
       }
     }
@@ -618,6 +628,7 @@ def fixPermissions(location) {
   if(isUnix()) {
     sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
       set +x
+      echo "Cleaning up ${location}"
       source ./dev-tools/common.bash
       docker_setup
       script/fix_permissions.sh ${location}""", returnStatus: true)
