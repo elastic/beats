@@ -584,6 +584,7 @@ func TestGenerateHints(t *testing.T) {
 	}
 	for _, test := range tests {
 		mockRegister := mb.NewRegister()
+		mockRegister.MustAddMetricSet("mockmodule", "one", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmodule", "two", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmoduledefaults", "default", NewMockMetricSet, mb.DefaultMetricSet())
 		mockRegister.MustAddMetricSet("mockmoduledefaults", "other", NewMockMetricSet)
