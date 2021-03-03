@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
@@ -33,6 +34,10 @@ const (
 
 	requestRetrySleep = 1 * time.Second // sleep 1 sec between retries for HTTP requests
 	maxRequestRetries = 30              // maximum number of retries for HTTP requests
+)
+
+var (
+	tokenNameStrip = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\)$`)
 )
 
 func newContainerCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -272,7 +277,12 @@ func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.
 	if err != nil {
 		return "", err
 	}
-	return key.APIKey, nil
+	var keyDetail kibanaAPIKeyDetail
+	err = performGET(client, fmt.Sprintf("/api/fleet/enrollment-api-keys/%s", key.ID), &keyDetail, streams.Err, "Kibana fetch token detail")
+	if err != nil {
+		return "", err
+	}
+	return keyDetail.Item.APIKey, nil
 }
 
 func kibanaClient() (*kibana.Client, error) {
@@ -317,7 +327,7 @@ func findPolicy(policies []kibanaPolicy) (*kibanaPolicy, error) {
 func findKey(keys []kibanaAPIKey, policy *kibanaPolicy) (*kibanaAPIKey, error) {
 	tokenName := envWithDefault(defaultTokenName, "FLEET_TOKEN_NAME")
 	for _, key := range keys {
-		name := strings.TrimSpace(strings.Replace(key.Name, fmt.Sprintf(" (%s)", key.ID), "", 1))
+		name := tokenNameStrip.ReplaceAllString(key.Name, "")
 		if name == tokenName && key.PolicyID == policy.ID {
 			return &key, nil
 		}
@@ -424,4 +434,8 @@ type kibanaAPIKey struct {
 
 type kibanaAPIKeys struct {
 	List []kibanaAPIKey `json:"list"`
+}
+
+type kibanaAPIKeyDetail struct {
+	Item kibanaAPIKey `json:"item"`
 }
