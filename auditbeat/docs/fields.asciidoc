@@ -12222,10 +12222,10 @@ type: keyword
 
 --
 
-*`file.lnk.targets`*::
+*`file.lnk.shellbags`*::
 +
 --
-LNK targets
+LNK shellbags
 
 type: nested
 

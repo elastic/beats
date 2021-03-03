@@ -659,20 +659,24 @@
               description: LNK hot key
               type: keyword
 
-            - name: targets
-              description: LNK targets
+            - name: shellbags
+              description: LNK shellbags
               type: nested
               fields:
+                - name: name
+                  description: LNK shellbag name
+                  type: integer
+
                 - name: size
-                  description: LNK target size
+                  description: LNK shellbag size
                   type: integer
 
                 - name: type_id
-                  description: LNK target type id
+                  description: LNK shellbag type id
                   type: integer
 
                 - name: sha256
-                  description: LNK target sha256
+                  description: LNK shellbag sha256
                   type: keyword
 
             - name: location.flags
