@@ -513,8 +513,10 @@ def target(Map args = [:]) {
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
+  // this should workaround the existing issue with reusing workers with the Gobld
+  def uuid = UUID.randomUUID().toString()
   node(label) {
-    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}") {
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
       body()
     }
   }
