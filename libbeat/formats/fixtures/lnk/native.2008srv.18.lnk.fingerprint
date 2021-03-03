@@ -13,7 +13,7 @@
   },
   "targets": [
     {
-      "name": "Users property view",
+      "name": "INTERNET_EXPLORER",
       "size": 20,
       "type_id": 31,
       "sha256": "08f7df35a94d580703a76f2c82de60e7d7d45ce9a6640f8df2b1ef5271b33cba"

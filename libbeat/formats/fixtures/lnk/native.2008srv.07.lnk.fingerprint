@@ -13,7 +13,7 @@
   },
   "targets": [
     {
-      "name": "Root folder: GUID",
+      "name": "MY_COMPUTER",
       "size": 20,
       "type_id": 31,
       "sha256": "8db1287718d91d57c60da1c79fbc3067e006a4f0be2f88b4f551c8d7120514a5"

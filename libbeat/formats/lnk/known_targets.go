@@ -74,7 +74,30 @@ func parseTarget0x1f(data []byte) string {
 		return "Users property view: Drive letter"
 	}
 	maskedBit := data[3] & 0x70
-	if maskedBit == 0x40 || maskedBit == 0x50 || maskedBit == 0x70 {
+	switch maskedBit {
+	// https://github.com/williballenthin/shellbags/blob/fee76eb25c2b80c33caf8ab9013de5cba113dcd2/ShellItems.py#L54
+	case 0x00:
+		return "INTERNET_EXPLORER"
+	case 0x42:
+		return "LIBRARIES"
+	case 0x44:
+		return "USERS"
+	case 0x48:
+		return "MY_DOCUMENTS"
+	case 0x50:
+		return "MY_COMPUTER"
+	case 0x58:
+		return "NETWORK"
+	case 0x60:
+		return "RECYCLE_BIN"
+	case 0x68:
+		return "INTERNET_EXPLORER"
+	case 0x80:
+		return "MY_GAMES"
+		// unknown
+	case 0x40:
+		fallthrough
+	case 0x70:
 		return "Root folder: GUID"
 	}
 	signature := binary.LittleEndian.Uint32(data[6:])
@@ -136,6 +159,12 @@ var knownTargets = map[byte]targetParser{
 }
 
 func getTargetName(targetType byte, data []byte) string {
+	if len(data) >= 20 {
+		uuid := encodeUUID(data[4:20])
+		if name, known := knownShellbagGuids[uuid]; known {
+			return name
+		}
+	}
 	if parser, known := knownTargets[targetType]; known {
 		return parser(data)
 	}

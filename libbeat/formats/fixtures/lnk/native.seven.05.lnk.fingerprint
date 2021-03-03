@@ -12,7 +12,7 @@
   },
   "targets": [
     {
-      "name": "Users property view",
+      "name": "RECYCLE_BIN",
       "size": 20,
       "type_id": 31,
       "sha256": "f60454d9b322749cf4092847b9e81572fa4f9aa4df272c462866ef55c0b46657"
