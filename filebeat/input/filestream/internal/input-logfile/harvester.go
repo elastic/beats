@@ -93,6 +93,14 @@ func (r *readerGroup) remove(id string) {
 	delete(r.table, id)
 }
 
+func (r *readerGroup) isIDAdded(id string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	_, ok := r.table[id]
+	return ok
+}
+
 // HarvesterGroup is responsible for running the
 // Harvesters started by the Prospector.
 type HarvesterGroup interface {

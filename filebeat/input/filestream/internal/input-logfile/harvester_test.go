@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -105,11 +106,10 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		// wait until goroutine that started `harvester.Run` is finished
 		gorountineChecker.WaitUntilOriginalCount()
 
-		require.Equal(t, 1, mockHarvester.runCount)
+		require.Equal(t, 1, mockHarvester.getRunCount())
 
 		// when finished removed from bookeeper
-		_, ok := hg.readers.table[source.Name()]
-		require.False(t, ok)
+		require.False(t, hg.readers.isIDAdded(source.Name()))
 		// stopped source can be stopped
 		require.Nil(t, hg.StopGroup())
 	})
@@ -126,10 +126,9 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		// run commands while harvester is running
 		gorountineChecker.RunFuncWhenNewGoroutinesAreStarted(func() {
 			// wait until harvester is started
-			if mockHarvester.runCount == 1 {
+			if mockHarvester.getRunCount() == 1 {
 				// assert that it is part of the bookkeeper before it is stopped
-				_, ok := hg.readers.table[source.Name()]
-				require.True(t, ok)
+				require.True(t, hg.readers.isIDAdded(source.Name()))
 				// after started, stop it
 				hg.Stop(source)
 				// wait until the harvester is stopped
@@ -138,8 +137,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		})
 
 		// when finished removed from bookeeper
-		_, ok := hg.readers.table[source.Name()]
-		require.False(t, ok)
+		require.False(t, hg.readers.isIDAdded(source.Name()))
 	})
 
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
@@ -155,11 +153,17 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		gorountineChecker.RunFuncWhenNewGoroutinesAreStarted(func() {
 			// error is expected as a harvester group was expected to start twice for the same source
-			err := hg.StopGroup()
-			require.Error(t, err)
+			for !hg.readers.isIDAdded(source.Name()) {
+			}
+			time.Sleep(3 * time.Millisecond)
 		})
 
-		require.Equal(t, 1, mockHarvester.runCount)
+		hg.Stop(source)
+
+		err := hg.StopGroup()
+		require.Error(t, err)
+
+		require.Equal(t, 1, mockHarvester.getRunCount())
 	})
 
 	t.Run("assert a harvester panic is handled", func(t *testing.T) {
@@ -190,8 +194,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		gorountineChecker.WaitUntilOriginalCount()
 
-		_, ok := hg.readers.table[source.Name()]
-		require.False(t, ok)
+		require.False(t, hg.readers.isIDAdded(source.Name()))
 
 		err := hg.StopGroup()
 		require.Error(t, err)
@@ -213,15 +216,13 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		wg.Add(1)
 		hg.Start(inputCtx, source)
 
-		locked := true
 		gorountineChecker.RunFuncWhenNewGoroutinesAreStarted(func() {
 			ok := false
 			for !ok {
 				// wait until harvester is added to the bookeeper
-				_, ok = hg.readers.table[source.Name()]
-				if ok && locked {
+				ok = hg.readers.isIDAdded(source.Name())
+				if ok {
 					releaseResource(r)
-					locked = false
 				}
 			}
 		})
@@ -230,7 +231,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		wg.Wait()
 		// wait until goroutine that started `harvester.Run` is finished
 		gorountineChecker.WaitUntilOriginalCount()
-		require.Equal(t, 1, mockHarvester.runCount)
+		require.Equal(t, 1, mockHarvester.getRunCount())
 		require.Nil(t, hg.StopGroup())
 	})
 
@@ -255,7 +256,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			require.Error(t, err)
 		})
 
-		require.Equal(t, 0, mockHarvester.runCount)
+		require.Equal(t, 0, mockHarvester.getRunCount())
 	})
 }
 
@@ -270,23 +271,33 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 }
 
 type mockHarvester struct {
+	mu       sync.Mutex
 	runCount int
-	wg       *sync.WaitGroup
-	onRun    func(input.Context, Source, Cursor, Publisher) error
+
+	wg    *sync.WaitGroup
+	onRun func(input.Context, Source, Cursor, Publisher) error
 }
 
 func (m *mockHarvester) Run(ctx input.Context, s Source, c Cursor, p Publisher) error {
 	if m.wg != nil {
 		defer m.wg.Done()
-		defer fmt.Println("done")
 	}
 
-	defer fmt.Println("iver")
+	m.mu.Lock()
 	m.runCount += 1
+	m.mu.Unlock()
+
 	if m.onRun != nil {
 		return m.onRun(ctx, s, c, p)
 	}
 	return nil
+}
+
+func (m *mockHarvester) getRunCount() int {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	return m.runCount
 }
 
 func (m *mockHarvester) Test(_ Source, _ input.TestContext) error { return nil }
@@ -294,7 +305,6 @@ func (m *mockHarvester) Test(_ Source, _ input.TestContext) error { return nil }
 func (m *mockHarvester) Name() string { return "mock" }
 
 func correctOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
-	fmt.Println("correct on run")
 	return nil
 }
 
@@ -308,5 +318,5 @@ func errorOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 }
 
 func panicOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
-	panic(fmt.Errorf("don't panic"))
+	panic("don't panic")
 }

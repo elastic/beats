@@ -94,6 +94,12 @@ func (c *GoroutinesChecker) RunFuncWhenNewGoroutinesAreStarted(f func()) {
 	for runtime.NumGoroutine() == c.before {
 		time.Sleep(10 * time.Millisecond)
 	}
-	fmt.Println("vege")
 	f()
+}
+
+func (c *GoroutinesChecker) WaitUntilIncreased(n int) {
+	for runtime.NumGoroutine() < c.before+n {
+		fmt.Println("before", c.before+n, "now", runtime.NumGoroutine())
+		time.Sleep(10 * time.Millisecond)
+	}
 }
