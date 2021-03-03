@@ -21,7 +21,7 @@
     "icon_index": 1,
     "window_style": "SW_NORMAL"
   },
-  "targets": [
+  "shellbags": [
     {
       "name": "MY_COMPUTER",
       "size": 20,

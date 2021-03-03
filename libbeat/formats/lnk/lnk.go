@@ -112,7 +112,7 @@ type Tracker struct {
 
 // VistaAndAboveIDList contains LNK extra vista and above id list data block info
 type VistaAndAboveIDList struct {
-	Targets []Target `json:"targets,omitempty"`
+	Shellbags []Shellbag `json:"shellbags,omitempty"`
 }
 
 // Extra contains LNK extra block info
@@ -161,8 +161,8 @@ type Location struct {
 	NetworkShare *NetworkShare `json:"network_share,omitempty"`
 }
 
-// Target contains LNK target info
-type Target struct {
+// Shellbag contains LNK shellbag info
+type Shellbag struct {
 	Name   string `json:"name,omitempty"`
 	Size   uint16 `json:"size"`
 	TypeID uint8  `json:"type_id"`
@@ -188,15 +188,15 @@ type Header struct {
 
 // Info contains high level fingerprinting an analysis of an LNK file.
 type Info struct {
-	Header           *Header   `json:"header"`
-	Targets          []Target  `json:"targets,omitempty"`
-	Location         *Location `json:"location,omitempty"`
-	Name             string    `json:"name,omitempty"`
-	RelativePath     string    `json:"relative_path,omitempty"`
-	WorkingDirectory string    `json:"working_directory,omitempty"`
-	CommandLine      string    `json:"command_line,omitempty"`
-	IconLocation     string    `json:"icon_location,omitempty"`
-	Extra            *Extra    `json:"extra,omitempty"`
+	Header           *Header    `json:"header"`
+	Shellbags        []Shellbag `json:"shellbags,omitempty"`
+	Location         *Location  `json:"location,omitempty"`
+	Name             string     `json:"name,omitempty"`
+	RelativePath     string     `json:"relative_path,omitempty"`
+	WorkingDirectory string     `json:"working_directory,omitempty"`
+	CommandLine      string     `json:"command_line,omitempty"`
+	IconLocation     string     `json:"icon_location,omitempty"`
+	Extra            *Extra     `json:"extra,omitempty"`
 }
 
 // Parse parses the LNK file and returns information about it or errors.
@@ -205,7 +205,7 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	targets, offset, err := parseTargets(header, offset, r)
+	shellbags, offset, err := parseShellbags(header, offset, r)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func Parse(r io.ReaderAt) (interface{}, error) {
 	}
 	return &Info{
 		Header:           header,
-		Targets:          targets,
+		Shellbags:        shellbags,
 		Location:         location,
 		Name:             name,
 		RelativePath:     relativePath,

@@ -11,7 +11,7 @@
     "icon_index": 4294967186,
     "window_style": "SW_NORMAL"
   },
-  "targets": [
+  "shellbags": [
     {
       "name": "INTERNET_EXPLORER",
       "size": 20,

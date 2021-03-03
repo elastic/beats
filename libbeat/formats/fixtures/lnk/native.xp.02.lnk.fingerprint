@@ -12,7 +12,7 @@
     "icon_index": 0,
     "window_style": "SW_NORMAL"
   },
-  "targets": [
+  "shellbags": [
     {
       "name": "Users property view",
       "size": 20,

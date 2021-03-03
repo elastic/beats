@@ -22,7 +22,7 @@
     "window_style": "SW_NORMAL",
     "hot_key": "HOTKEYF_ALT+G"
   },
-  "targets": [
+  "shellbags": [
     {
       "name": "MY_COMPUTER",
       "size": 20,

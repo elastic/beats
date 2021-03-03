@@ -68,7 +68,7 @@
       ]
     },
     "vista_and_above_id_list": {
-      "targets": [
+      "shellbags": [
         {
           "name": "Users property view",
           "size": 20,

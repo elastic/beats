@@ -22,9 +22,9 @@ import (
 	"fmt"
 )
 
-type targetParser func(data []byte) string
+type shellbagParser func(data []byte) string
 
-func simpleTargetParser(name string) targetParser {
+func simpleShellbagParser(name string) shellbagParser {
 	return func(data []byte) string {
 		return name
 	}
@@ -40,11 +40,11 @@ func checkKnownGUIDs(offset int, data []byte) string {
 	return ""
 }
 
-func parseTarget0x00(data []byte) string {
+func parseShellbag0x00(data []byte) string {
 	return checkKnownGUIDs(0xE, data)
 }
 
-func parseTarget0x01(data []byte) string {
+func parseShellbag0x01(data []byte) string {
 	if data[8] == 0x3A && data[9] == 0x00 {
 		return "Hyper-V storage volume"
 	}
@@ -82,7 +82,7 @@ func parseTarget0x01(data []byte) string {
 	}
 }
 
-func parseTarget0x2e(data []byte) string {
+func parseShellbag0x2e(data []byte) string {
 	if known := checkKnownGUIDs(0x4, data); known != "" {
 		return known
 	}
@@ -101,7 +101,7 @@ func parseTarget0x2e(data []byte) string {
 	return "Users property view"
 }
 
-func parseTarget0x1f(data []byte) string {
+func parseShellbag0x1f(data []byte) string {
 	if known := checkKnownGUIDs(4, data); known != "" {
 		return known
 	}
@@ -148,7 +148,7 @@ func parseTarget0x1f(data []byte) string {
 	return "Users property view"
 }
 
-func parseTarget0x40(data []byte) string {
+func parseShellbag0x40(data []byte) string {
 	switch data[2] {
 	case 0x47:
 		return "Entire Network"
@@ -165,45 +165,45 @@ func parseTarget0x40(data []byte) string {
 	}
 }
 
-func parseTarget0x71(data []byte) string {
+func parseShellbag0x71(data []byte) string {
 	return checkKnownGUIDs(0xE, data)
 }
 
 // Have a better look at
 // https://github.com/williballenthin/shellbags/blob/fee76eb25c2b80c33caf8ab9013de5cba113dcd2/ShellItems.py
-var knownTargets = map[byte]targetParser{
+var knownShellbags = map[byte]shellbagParser{
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0X23.cs
-	0x23: simpleTargetParser("Drive letter"),
+	0x23: simpleShellbagParser("Drive letter"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0X4C.cs
-	0x4C: simpleTargetParser("Sharepoint directory"),
+	0x4C: simpleShellbagParser("Sharepoint directory"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x00.cs
-	0x00: parseTarget0x00,
+	0x00: parseShellbag0x00,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x01.cs
-	0x01: parseTarget0x01,
+	0x01: parseShellbag0x01,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x1f.cs
-	0x1f: parseTarget0x1f,
+	0x1f: parseShellbag0x1f,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x2e.cs
-	0x2e: parseTarget0x2e,
+	0x2e: parseShellbag0x2e,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x2f.cs
-	0x2f: simpleTargetParser("Drive letter"),
+	0x2f: simpleShellbagParser("Drive letter"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x31.cs
-	0x31: simpleTargetParser("Directory"),
+	0x31: simpleShellbagParser("Directory"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x32.cs
-	0x32: simpleTargetParser("File"),
+	0x32: simpleShellbagParser("File"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x40.cs
-	0x40: parseTarget0x40,
+	0x40: parseShellbag0x40,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x61.cs
-	0x61: simpleTargetParser("URI"),
+	0x61: simpleShellbagParser("URI"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x71.cs
-	0x71: parseTarget0x71,
+	0x71: parseShellbag0x71,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x74.cs
 	// 0x74:
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0xc3.cs
-	0xc3: simpleTargetParser("Network location"),
+	0xc3: simpleShellbagParser("Network location"),
 }
 
-func getTargetName(targetType byte, data []byte) string {
-	if parser, known := knownTargets[targetType]; known {
+func getShellbagName(shellbagType byte, data []byte) string {
+	if parser, known := knownShellbags[shellbagType]; known {
 		return parser(data)
 	}
 	return ""
