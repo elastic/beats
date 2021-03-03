@@ -87,8 +87,7 @@ type Property struct {
 // PropertyStore contains LNK extra property store data block info
 type PropertyStore struct {
 	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-propstore/3453fb82-0e4f-4c2c-bc04-64b4bd2c51ec
-	NamedProperties map[string][]Property `json:"named_properties,omitempty"`
-	Properties      map[uint32][]Property `json:"properties,omitempty"`
+	Properties map[string][]Property `json:"properties,omitempty"`
 }
 
 // Shim contains LNK extra shim data block info

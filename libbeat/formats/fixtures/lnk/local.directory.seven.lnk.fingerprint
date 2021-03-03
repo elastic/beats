@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
@@ -63,30 +63,30 @@
   "relative_path": "..\\..\\Administrator",
   "extra": {
     "known_folder": {
-      "id": "72d26207-0ac5-b04b-a382-697dcd729b80",
+      "id": "0762d272-c50a-4bb0-a382-697dcd729b80",
       "offset": 161
     },
     "property_store": {
       "properties": {
-        "10": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Administrator"
-          }
-        ],
-        "100": [
+        "Item Folder Path Display Narrow": [
           {
             "type": "VT_LPWSTR",
             "value": "Utilisateurs (C:)"
           }
         ],
-        "30": [
+        "Item Name Display": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "Administrator"
+          }
+        ],
+        "Parsing Path": [
           {
             "type": "VT_LPWSTR",
             "value": "C:\\Users\\Administrator"
           }
         ],
-        "4": [
+        "SID": [
           {
             "type": "VT_LPWSTR",
             "value": "S-1-5-21-2382555026-1982050849-604700897-1000"
@@ -98,12 +98,12 @@
       "version": 0,
       "machine_id": "netbook",
       "droid": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "ff026513-668c-df11-b6eb-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "136502ff-8c66-11df-b6eb-001377d34a59"
       ],
       "droid_birth": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "ff026513-668c-df11-b6eb-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "136502ff-8c66-11df-b6eb-001377d34a59"
       ]
     }
   }

@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasExpString",
@@ -37,22 +37,22 @@
     },
     "property_store": {
       "properties": {
-        "10": [
+        "Item Folder Path Display": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "\\\\test\\share"
+          }
+        ],
+        "Item Name Display": [
           {
             "type": "VT_LPWSTR",
             "value": "💎.txt"
           }
         ],
-        "30": [
+        "Parsing Path": [
           {
             "type": "VT_LPWSTR",
             "value": "\\\\test\\share\\💎.txt"
-          }
-        ],
-        "6": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "\\\\test\\share"
           }
         ]
       }
@@ -61,12 +61,12 @@
       "version": 0,
       "machine_id": "test",
       "droid": [
-        "51369273-fde5-4eff-91cc-d50f13310bfc",
-        "04a80000-0000-0000-0dcf-180000000000"
+        "73923651-e5fd-ff4e-91cc-d50f13310bfc",
+        "0000a804-0000-0000-0dcf-180000000000"
       ],
       "droid_birth": [
-        "50369273-fde5-4eff-91cc-d50f13310bfc",
-        "04a80000-0000-0000-0dcf-180000000000"
+        "73923650-e5fd-ff4e-91cc-d50f13310bfc",
+        "0000a804-0000-0000-0dcf-180000000000"
       ]
     },
     "vista_and_above_id_list": {

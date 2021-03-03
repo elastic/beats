@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasArguments",
@@ -66,30 +66,30 @@
   "command_line": "arg1 \"arg 2\"",
   "extra": {
     "known_folder": {
-      "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
+      "id": "1ac14e77-02e7-4e5d-b744-2eb1ae5198b7",
       "offset": 221
     },
     "property_store": {
       "properties": {
-        "10": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "cmd with space.exe"
-          }
-        ],
-        "100": [
+        "Item Folder Path Display Narrow": [
           {
             "type": "VT_LPWSTR",
             "value": "System32 (C:\\Windows)"
           }
         ],
-        "30": [
+        "Item Name Display": [
+          {
+            "type": "VT_LPWSTR",
+            "value": "cmd with space.exe"
+          }
+        ],
+        "Parsing Path": [
           {
             "type": "VT_LPWSTR",
             "value": "C:\\Windows\\System32\\cmd with space.exe"
           }
         ],
-        "4": [
+        "SID": [
           {
             "type": "VT_LPWSTR",
             "value": "S-1-5-21-2899541433-556809949-1686860144-1001"
@@ -105,12 +105,12 @@
       "version": 0,
       "machine_id": "test012345",
       "droid": [
-        "04c26c4d-cace-1647-8fa4-b334de43dd91",
-        "5501e33d-7e9a-e911-8328-bcee7b5dda94"
+        "4d6cc204-ceca-4716-8fa4-b334de43dd91",
+        "3de30155-9a7e-11e9-8328-bcee7b5dda94"
       ],
       "droid_birth": [
-        "04c26c4d-cace-1647-8fa4-b334de43dd91",
-        "5501e33d-7e9a-e911-8328-bcee7b5dda94"
+        "4d6cc204-ceca-4716-8fa4-b334de43dd91",
+        "3de30155-9a7e-11e9-8328-bcee7b5dda94"
       ]
     }
   }

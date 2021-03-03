@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "ForceNoLinkInfo",
       "HasExpString",
@@ -33,12 +33,12 @@
       "version": 0,
       "machine_id": "win-dc3j5p1qj61",
       "droid": [
-        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
-        "04c79ae2-3770-de11-816d-001c23e25b76"
+        "540bb3a6-3f1b-4f04-b746-9c5af7c07867",
+        "e29ac704-7037-11de-816d-001c23e25b76"
       ],
       "droid_birth": [
-        "a6b30b54-1b3f-044f-b746-9c5af7c07867",
-        "04c79ae2-3770-de11-816d-001c23e25b76"
+        "540bb3a6-3f1b-4f04-b746-9c5af7c07867",
+        "e29ac704-7037-11de-816d-001c23e25b76"
       ]
     }
   }

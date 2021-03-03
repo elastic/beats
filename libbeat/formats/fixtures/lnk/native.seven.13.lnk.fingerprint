@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
@@ -41,13 +41,13 @@
   "extra": {
     "property_store": {
       "properties": {
-        "10": [
+        "Item Name Display": [
           {
             "type": "VT_LPWSTR",
             "value": "Bureau"
           }
         ],
-        "30": [
+        "Parsing Path": [
           {
             "type": "VT_LPWSTR",
             "value": "C:\\Users\\Juliette\\Desktop"
@@ -59,12 +59,12 @@
       "version": 0,
       "machine_id": "netbook",
       "droid": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "1ef183f9-b062-df11-9c95-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "f983f11e-62b0-11df-9c95-001377d34a59"
       ],
       "droid_birth": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "1ef183f9-b062-df11-9c95-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "f983f11e-62b0-11df-9c95-001377d34a59"
       ]
     }
   }

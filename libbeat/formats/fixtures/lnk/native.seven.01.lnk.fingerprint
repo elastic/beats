@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasLinkInfo",
       "HasRelativePath",
@@ -59,12 +59,12 @@
   "working_directory": "C:\\Program Files\\ConTEXT",
   "extra": {
     "known_folder": {
-      "id": "ef405a7c-fba0-fc4b-874a-c0f2e0b9fa8e",
+      "id": "7c5a40ef-a0fb-4bfc-874a-c0f2e0b9fa8e",
       "offset": 181
     },
     "property_store": {
       "properties": {
-        "4": [
+        "SID": [
           {
             "type": "VT_LPWSTR",
             "value": "S-1-5-21-2092377875-1431633947-1539857752-1075"
@@ -80,12 +80,12 @@
       "version": 0,
       "machine_id": "al-0149",
       "droid": [
-        "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
-        "bdcda631-9f31-df11-b163-001e4ff01cc7"
+        "a0e5ed1e-0d61-4fed-a6e2-afca43a5c04c",
+        "31a6cdbd-319f-11df-b163-001e4ff01cc7"
       ],
       "droid_birth": [
-        "1eede5a0-610d-ed4f-a6e2-afca43a5c04c",
-        "bdcda631-9f31-df11-b163-001e4ff01cc7"
+        "a0e5ed1e-0d61-4fed-a6e2-afca43a5c04c",
+        "31a6cdbd-319f-11df-b163-001e4ff01cc7"
       ]
     }
   }

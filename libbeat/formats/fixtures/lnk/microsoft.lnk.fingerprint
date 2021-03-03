@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
@@ -57,12 +57,12 @@
       "version": 0,
       "machine_id": "chris-xps",
       "droid": [
-        "4078c794-47fa-c746-b356-5c2dc6b6d115",
-        "ec46cd7b-227f-dd11-9499-00137216874a"
+        "94c77840-fa47-46c7-b356-5c2dc6b6d115",
+        "7bcd46ec-7f22-11dd-9499-00137216874a"
       ],
       "droid_birth": [
-        "4078c794-47fa-c746-b356-5c2dc6b6d115",
-        "ec46cd7b-227f-dd11-9499-00137216874a"
+        "94c77840-fa47-46c7-b356-5c2dc6b6d115",
+        "7bcd46ec-7f22-11dd-9499-00137216874a"
       ]
     }
   }

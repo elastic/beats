@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasRelativePath",
@@ -28,19 +28,19 @@
   "relative_path": "..\\..\\Public",
   "extra": {
     "known_folder": {
-      "id": "a276dfdf-2ac8-634d-906a-5644ac457385",
+      "id": "dfdf76a2-c82a-4d63-906a-5644ac457385",
       "offset": 20
     },
     "tracker": {
       "version": 0,
       "machine_id": "als-backup1",
       "droid": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "8aed08bb-1f7a-df11-a4a2-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "bb08ed8a-7a1f-11df-a4a2-a4badb43b04f"
       ],
       "droid_birth": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "8aed08bb-1f7a-df11-a4a2-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "bb08ed8a-7a1f-11df-a4a2-a4badb43b04f"
       ]
     }
   }

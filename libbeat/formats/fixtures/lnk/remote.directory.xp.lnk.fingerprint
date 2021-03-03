@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasLinkInfo",
       "HasTargetIDList",
@@ -70,11 +70,11 @@
       "machine_id": "als-fichiers3",
       "droid": [
         "00000000-0000-0000-0000-000000000000",
-        "c5e0b78a-c875-de11-b8c9-000f1ff7c0dd"
+        "8ab7e0c5-75c8-11de-b8c9-000f1ff7c0dd"
       ],
       "droid_birth": [
         "00000000-0000-0000-0000-000000000000",
-        "c5e0b78a-c875-de11-b8c9-000f1ff7c0dd"
+        "8ab7e0c5-75c8-11de-b8c9-000f1ff7c0dd"
       ]
     }
   }

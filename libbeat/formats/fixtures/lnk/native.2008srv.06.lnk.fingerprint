@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasExpIcon",
       "HasIconLocation",
@@ -62,7 +62,7 @@
       "unicode": "%SystemRoot%\\Installer\\{8EF9D7FC-A940-4794-8346-7C15EEBEBF54}\\BrightStorManager1_319B2AA96D38499581EEE0912B18CF57.exe"
     },
     "known_folder": {
-      "id": "ef405a7c-fba0-fc4b-874a-c0f2e0b9fa8e",
+      "id": "7c5a40ef-a0fb-4bfc-874a-c0f2e0b9fa8e",
       "offset": 177
     },
     "special_folder": {
@@ -73,12 +73,12 @@
       "version": 0,
       "machine_id": "als-projets1",
       "droid": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "7c48b2fb-b37a-df11-8161-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "fbb2487c-7ab3-11df-8161-a4badb43b04f"
       ],
       "droid_birth": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "7c48b2fb-b37a-df11-8161-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "fbb2487c-7ab3-11df-8161-a4badb43b04f"
       ]
     }
   }

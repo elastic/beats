@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasLinkInfo",
@@ -75,12 +75,12 @@
   "working_directory": "C:\\Users\\root\\Desktop",
   "extra": {
     "known_folder": {
-      "id": "3accbfb4-2cdb-4c42-b029-7fe99a87c641",
+      "id": "b4bfcc3a-db2c-424c-b029-7fe99a87c641",
       "offset": 357
     },
     "property_store": {
       "properties": {
-        "4": [
+        "SID": [
           {
             "type": "VT_LPWSTR",
             "value": "S-1-5-21-2382555026-1982050849-604700897-1000"
@@ -92,12 +92,12 @@
       "version": 0,
       "machine_id": "netbook",
       "droid": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "00036513-668c-df11-b6eb-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "13650300-8c66-11df-b6eb-001377d34a59"
       ],
       "droid_birth": [
-        "da667c4f-20d3-c44c-8d50-165dd98ebc01",
-        "00036513-668c-df11-b6eb-001377d34a59"
+        "4f7c66da-d320-4cc4-8d50-165dd98ebc01",
+        "13650300-8c66-11df-b6eb-001377d34a59"
       ]
     }
   }

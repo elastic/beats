@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasExpString",
       "HasIconLocation",
@@ -55,7 +55,7 @@
       "unicode": "%SystemRoot%\\system32\\narrator.exe"
     },
     "known_folder": {
-      "id": "774ec11a-e702-5d4e-b744-2eb1ae5198b7",
+      "id": "1ac14e77-02e7-4e5d-b744-2eb1ae5198b7",
       "offset": 205
     },
     "special_folder": {
@@ -66,12 +66,12 @@
       "version": 0,
       "machine_id": "win-hwdt97ahwff",
       "droid": [
-        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
-        "14494f80-82c6-dc11-901d-0014220d9404"
+        "fd0db6ba-82b5-4dae-9e57-00eb13c2fc0f",
+        "804f4914-c682-11dc-901d-0014220d9404"
       ],
       "droid_birth": [
-        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
-        "14494f80-82c6-dc11-901d-0014220d9404"
+        "fd0db6ba-82b5-4dae-9e57-00eb13c2fc0f",
+        "804f4914-c682-11dc-901d-0014220d9404"
       ]
     }
   }

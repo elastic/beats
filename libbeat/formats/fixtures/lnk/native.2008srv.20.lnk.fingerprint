@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasExpString",
       "HasIconLocation",
@@ -50,7 +50,7 @@
       "unicode": "%SystemRoot%\\explorer.exe"
     },
     "known_folder": {
-      "id": "04f48bf3-431d-f242-9305-67de0b28fc23",
+      "id": "f38bf404-1d43-42f2-9305-67de0b28fc23",
       "offset": 123
     },
     "special_folder": {
@@ -61,12 +61,12 @@
       "version": 0,
       "machine_id": "win-hwdt97ahwff",
       "droid": [
-        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
-        "f6484f80-82c6-dc11-901d-b3d7e32f3e9f"
+        "fd0db6ba-82b5-4dae-9e57-00eb13c2fc0f",
+        "804f48f6-c682-11dc-901d-b3d7e32f3e9f"
       ],
       "droid_birth": [
-        "bab60dfd-b582-ae4d-9e57-00eb13c2fc0f",
-        "f6484f80-82c6-dc11-901d-b3d7e32f3e9f"
+        "fd0db6ba-82b5-4dae-9e57-00eb13c2fc0f",
+        "804f48f6-c682-11dc-901d-b3d7e32f3e9f"
       ]
     }
   }

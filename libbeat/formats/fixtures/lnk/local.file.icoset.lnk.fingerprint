@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "HasIconLocation",
       "HasLinkInfo",
@@ -85,12 +85,12 @@
       "version": 0,
       "machine_id": "al-0145",
       "droid": [
-        "06f31514-5a0c-904f-8d72-20c497b6ddb0",
-        "dddee424-bb8c-df11-ba00-001c234bc396"
+        "1415f306-0c5a-4f90-8d72-20c497b6ddb0",
+        "24e4dedd-8cbb-11df-ba00-001c234bc396"
       ],
       "droid_birth": [
-        "06f31514-5a0c-904f-8d72-20c497b6ddb0",
-        "dddee424-bb8c-df11-ba00-001c234bc396"
+        "1415f306-0c5a-4f90-8d72-20c497b6ddb0",
+        "24e4dedd-8cbb-11df-ba00-001c234bc396"
       ]
     }
   }

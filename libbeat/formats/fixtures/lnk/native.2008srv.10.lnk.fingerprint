@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasRelativePath",
@@ -32,7 +32,7 @@
   "relative_path": "..\\Music",
   "extra": {
     "known_folder": {
-      "id": "71d5d84b-196d-d348-be97-422220080e43",
+      "id": "4bd8d571-6d19-48d3-be97-422220080e43",
       "offset": 52
     },
     "special_folder": {
@@ -43,12 +43,12 @@
       "version": 0,
       "machine_id": "als-backup1",
       "droid": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "11a09673-447d-df11-a3ad-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "7396a011-7d44-11df-a3ad-a4badb43b04f"
       ],
       "droid_birth": [
-        "325a35a3-6ed8-2049-adfd-dc842d90c45f",
-        "11a09673-447d-df11-a3ad-a4badb43b04f"
+        "a3355a32-d86e-4920-adfd-dc842d90c45f",
+        "7396a011-7d44-11df-a3ad-a4badb43b04f"
       ]
     }
   }

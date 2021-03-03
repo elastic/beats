@@ -1,6 +1,6 @@
 {
   "header": {
-    "guid": "01140200-0000-0000-c000-000000000046",
+    "guid": "00021401-0000-0000-c000-000000000046",
     "link_flags": [
       "EnableTargetMetadata",
       "HasTargetIDList",
@@ -20,13 +20,13 @@
   "extra": {
     "property_store": {
       "properties": {
-        "10": [
+        "Item Name Display": [
           {
             "type": "VT_LPWSTR",
             "value": "Emplacements récents"
           }
         ],
-        "30": [
+        "Parsing Path": [
           {
             "type": "VT_LPWSTR",
             "value": "::{22877A6D-37A1-461A-91B0-DBDA5AAEBC99}"

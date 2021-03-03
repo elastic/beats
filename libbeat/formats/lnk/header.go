@@ -263,11 +263,17 @@ func parseFlags(flagset map[uint32]string, value uint32) []string {
 
 func encodeUUID(uuid []byte) string {
 	dst := make([]byte, 36)
-	hex.Encode(dst, uuid[:4])
+	swapped := make([]byte, 8)
+	binary.BigEndian.PutUint16(swapped[2:4], binary.LittleEndian.Uint16(uuid[0:2]))
+	binary.BigEndian.PutUint16(swapped[0:2], binary.LittleEndian.Uint16(uuid[2:4]))
+	binary.BigEndian.PutUint16(swapped[4:6], binary.LittleEndian.Uint16(uuid[4:6]))
+	binary.BigEndian.PutUint16(swapped[6:8], binary.LittleEndian.Uint16(uuid[6:8]))
+
+	hex.Encode(dst, swapped[:4])
 	dst[8] = '-'
-	hex.Encode(dst[9:13], uuid[4:6])
+	hex.Encode(dst[9:13], swapped[4:6])
 	dst[13] = '-'
-	hex.Encode(dst[14:18], uuid[6:8])
+	hex.Encode(dst[14:18], swapped[6:8])
 	dst[18] = '-'
 	hex.Encode(dst[19:23], uuid[8:10])
 	dst[23] = '-'
