@@ -56,26 +56,23 @@
   "working_directory": "C:\\Temp",
   "extra": {
     "property_store": {
-      "properties": {
-        "Item Folder Path Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Temp"
-          }
-        ],
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "💎.txt"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Temp\\💎.txt"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "💎.txt"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Temp\\💎.txt"
+        },
+        {
+          "name": "Item Folder Path Display",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Temp"
+        }
+      ]
     },
     "tracker": {
       "version": 0,

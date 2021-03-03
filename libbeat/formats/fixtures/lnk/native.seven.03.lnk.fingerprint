@@ -19,20 +19,18 @@
   ],
   "extra": {
     "property_store": {
-      "properties": {
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Emplacements récents"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "::{22877A6D-37A1-461A-91B0-DBDA5AAEBC99}"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "Emplacements récents"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "::{22877A6D-37A1-461A-91B0-DBDA5AAEBC99}"
+        }
+      ]
     }
   }
 }

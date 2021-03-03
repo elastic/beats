@@ -59,20 +59,18 @@
       "unicode": "%SystemRoot%\\Installer\\{90140000-0011-0000-0000-0000000FF1CE}\\cagicon.exe"
     },
     "property_store": {
-      "properties": {
-        "App User Model Exclude From Show In New Install": [
-          {
-            "type": "VT_BOOL",
-            "value": true
-          }
-        ],
-        "Comment": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Importez et organisez des photos, des images clip art, des fichiers sons et animation à l'aide de la Bibliothèque multimédia Microsoft."
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Comment",
+          "type": "VT_LPWSTR",
+          "value": "Importez et organisez des photos, des images clip art, des fichiers sons et animation à l'aide de la Bibliothèque multimédia Microsoft."
+        },
+        {
+          "name": "App User Model Exclude From Show In New Install",
+          "type": "VT_BOOL",
+          "value": true
+        }
+      ]
     }
   }
 }

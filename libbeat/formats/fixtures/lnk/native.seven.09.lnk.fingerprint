@@ -70,20 +70,18 @@
       "offset": 213
     },
     "property_store": {
-      "properties": {
-        "Comment": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Transfère les fichiers entre les périphériques et les ordinateurs à l'aide de la technologie sans fil Bluetooth."
-          }
-        ],
-        "SID": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "S-1-5-18"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Comment",
+          "type": "VT_LPWSTR",
+          "value": "Transfère les fichiers entre les périphériques et les ordinateurs à l'aide de la technologie sans fil Bluetooth."
+        },
+        {
+          "name": "SID",
+          "type": "VT_LPWSTR",
+          "value": "S-1-5-18"
+        }
+      ]
     },
     "special_folder": {
       "id": 37,

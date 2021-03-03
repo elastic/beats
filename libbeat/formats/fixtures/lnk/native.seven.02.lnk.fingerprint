@@ -31,20 +31,18 @@
   "relative_path": "..\\Desktop",
   "extra": {
     "property_store": {
-      "properties": {
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Bureau"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Users\\Aldheris\\Desktop"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "Bureau"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Users\\Aldheris\\Desktop"
+        }
+      ]
     },
     "tracker": {
       "version": 0,

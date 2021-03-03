@@ -70,32 +70,28 @@
       "offset": 221
     },
     "property_store": {
-      "properties": {
-        "Item Folder Path Display Narrow": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "System32 (C:\\Windows)"
-          }
-        ],
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "cmd with space.exe"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Windows\\System32\\cmd with space.exe"
-          }
-        ],
-        "SID": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "S-1-5-21-2899541433-556809949-1686860144-1001"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Folder Path Display Narrow",
+          "type": "VT_LPWSTR",
+          "value": "System32 (C:\\Windows)"
+        },
+        {
+          "name": "SID",
+          "type": "VT_LPWSTR",
+          "value": "S-1-5-21-2899541433-556809949-1686860144-1001"
+        },
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "cmd with space.exe"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Windows\\System32\\cmd with space.exe"
+        }
+      ]
     },
     "special_folder": {
       "id": 37,

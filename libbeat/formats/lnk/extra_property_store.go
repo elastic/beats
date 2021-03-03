@@ -180,7 +180,7 @@ func parseExtraPropertyStore(size uint32, data []byte) (*PropertyStore, error) {
 	if size < 0x0000000C {
 		return nil, errors.New("invalid extra property store block size")
 	}
-	props := make(map[string][]Property)
+	props := []Property{}
 	store := data[8:]
 	offset := 0
 	for {
@@ -200,12 +200,13 @@ func parseExtraPropertyStore(size uint32, data []byte) (*PropertyStore, error) {
 			return nil, errors.New("invalid property version")
 		}
 		format := encodeUUID(propertyData[8:24])
-		name, properties, err := parseProperties(format, propertyData[24:propertySize])
+		name, property, err := parseProperties(format, propertyData[24:propertySize])
 		if err != nil {
 			return nil, err
 		}
-		if properties != nil {
-			props[name] = properties
+		if property != nil {
+			property.Name = name
+			props = append(props, *property)
 		}
 		offset += int(propertySize)
 	}
@@ -215,7 +216,7 @@ func parseExtraPropertyStore(size uint32, data []byte) (*PropertyStore, error) {
 	}, nil
 }
 
-func parseProperties(identifier string, data []byte) (string, []Property, error) {
+func parseProperties(identifier string, data []byte) (string, *Property, error) {
 	propertySize := binary.LittleEndian.Uint32(data[0:4])
 	if propertySize == 0 {
 		return "", nil, nil
@@ -237,7 +238,7 @@ func parseProperties(identifier string, data []byte) (string, []Property, error)
 	return name, value, nil
 }
 
-func parseTypedValue(data []byte) (uint32, []Property, error) {
+func parseTypedValue(data []byte) (uint32, *Property, error) {
 	if len(data) < 4 {
 		return 0, nil, errors.New("invalid properties")
 	}
@@ -246,79 +247,59 @@ func parseTypedValue(data []byte) (uint32, []Property, error) {
 	case vtEmpty:
 		fallthrough
 	case vtNull:
-		return valueType, []Property{
-			Property{
-				Type: propertyTypes[valueType],
-			},
+		return valueType, &Property{
+			Type: propertyTypes[valueType],
 		}, nil
 	case vtI2:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: int16(binary.LittleEndian.Uint16(data[4:8])),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: int16(binary.LittleEndian.Uint16(data[4:8])),
 		}, nil
 	case vtI4:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: int32(binary.LittleEndian.Uint32(data[4:8])),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: int32(binary.LittleEndian.Uint32(data[4:8])),
 		}, nil
 	case vtR4:
 		bits := binary.LittleEndian.Uint32(data[4:8])
 		float := math.Float32frombits(bits)
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: float,
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: float,
 		}, nil
 	case vtR8:
 		bits := binary.LittleEndian.Uint64(data[4:12])
 		float := math.Float64frombits(bits)
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: float,
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: float,
 		}, nil
 	case vtCY:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: binary.LittleEndian.Uint64(data[4:12]),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: binary.LittleEndian.Uint64(data[4:12]),
 		}, nil
 	case vtDate:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: normalizeTime(binary.LittleEndian.Uint64(data[4:12])),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: normalizeTime(binary.LittleEndian.Uint64(data[4:12])),
 		}, nil
 	case vtBStr:
 		codePageSize := binary.LittleEndian.Uint32(data[4:8])
 		codePage := common.ReadString(data[8:8+codePageSize], 0)
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: codePage,
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: codePage,
 		}, nil
 	case vtError:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: binary.LittleEndian.Uint32(data[4:8]),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: binary.LittleEndian.Uint32(data[4:8]),
 		}, nil
 	case vtBool:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: binary.LittleEndian.Uint16(data[4:6]) == 0xFFFF,
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: binary.LittleEndian.Uint16(data[4:6]) == 0xFFFF,
 		}, nil
 	// case vtDecimal:
 	// case vtI1:
@@ -332,11 +313,9 @@ func parseTypedValue(data []byte) (uint32, []Property, error) {
 	// case vtLPStr:
 	case vtLPWStr:
 		length := binary.LittleEndian.Uint32(data[4:8]) * 2
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: common.ReadUnicode(data[8:8+length], 0),
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: common.ReadUnicode(data[8:8+length], 0),
 		}, nil
 	// case vtFiletime:
 	// case vtBlob:
@@ -387,11 +366,9 @@ func parseTypedValue(data []byte) (uint32, []Property, error) {
 	// case vtArrayInt:
 	// case vtArrayUint:
 	default:
-		return valueType, []Property{
-			Property{
-				Type:  propertyTypes[valueType],
-				Value: data[4:],
-			},
+		return valueType, &Property{
+			Type:  propertyTypes[valueType],
+			Value: data[4:],
 		}, nil
 	}
 }

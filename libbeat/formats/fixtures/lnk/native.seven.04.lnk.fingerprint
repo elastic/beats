@@ -63,14 +63,13 @@
       "offset": 181
     },
     "property_store": {
-      "properties": {
-        "SID": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "S-1-5-21-2092377875-1431633947-1539857752-1075"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "SID",
+          "type": "VT_LPWSTR",
+          "value": "S-1-5-21-2092377875-1431633947-1539857752-1075"
+        }
+      ]
     },
     "special_folder": {
       "id": 42,

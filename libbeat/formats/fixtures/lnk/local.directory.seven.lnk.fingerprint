@@ -67,32 +67,28 @@
       "offset": 161
     },
     "property_store": {
-      "properties": {
-        "Item Folder Path Display Narrow": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Utilisateurs (C:)"
-          }
-        ],
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "Administrator"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Users\\Administrator"
-          }
-        ],
-        "SID": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "S-1-5-21-2382555026-1982050849-604700897-1000"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "Administrator"
+        },
+        {
+          "name": "SID",
+          "type": "VT_LPWSTR",
+          "value": "S-1-5-21-2382555026-1982050849-604700897-1000"
+        },
+        {
+          "name": "Item Folder Path Display Narrow",
+          "type": "VT_LPWSTR",
+          "value": "Utilisateurs (C:)"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Users\\Administrator"
+        }
+      ]
     },
     "tracker": {
       "version": 0,

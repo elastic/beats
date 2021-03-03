@@ -36,26 +36,23 @@
       "unicode": "\\\\test\\share\\💎.txt"
     },
     "property_store": {
-      "properties": {
-        "Item Folder Path Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "\\\\test\\share"
-          }
-        ],
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "💎.txt"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "\\\\test\\share\\💎.txt"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "💎.txt"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "\\\\test\\share\\💎.txt"
+        },
+        {
+          "name": "Item Folder Path Display",
+          "type": "VT_LPWSTR",
+          "value": "\\\\test\\share"
+        }
+      ]
     },
     "tracker": {
       "version": 0,

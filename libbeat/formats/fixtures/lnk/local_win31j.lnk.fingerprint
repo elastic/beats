@@ -61,26 +61,23 @@
   "icon_location": "%SystemRoot%\\system32\\SHELL32.dll",
   "extra": {
     "property_store": {
-      "properties": {
-        "Item Folder Path Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Temp"
-          }
-        ],
-        "Item Name Display": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "リンク先.txt"
-          }
-        ],
-        "Parsing Path": [
-          {
-            "type": "VT_LPWSTR",
-            "value": "C:\\Temp\\リンク先.txt"
-          }
-        ]
-      }
+      "properties": [
+        {
+          "name": "Item Name Display",
+          "type": "VT_LPWSTR",
+          "value": "リンク先.txt"
+        },
+        {
+          "name": "Parsing Path",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Temp\\リンク先.txt"
+        },
+        {
+          "name": "Item Folder Path Display",
+          "type": "VT_LPWSTR",
+          "value": "C:\\Temp"
+        }
+      ]
     },
     "tracker": {
       "version": 0,
