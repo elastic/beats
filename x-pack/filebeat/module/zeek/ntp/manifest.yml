@@ -11,7 +11,7 @@ var:
   - name: tags
     default: [zeek.ntp]
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/ntp.yml
 
 requires.processors:

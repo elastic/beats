@@ -136,6 +136,14 @@ processors:
       ignore_missing: true
       field: zeek.ntp.ref_id
       type: string
+  - set:
+      field: network.type
+      value: ipv4
+      if: ctx.source?.ip.contains('.')
+  - set:
+      field: network.type
+      value: ipv6
+      if: ctx.source?.ip.contains(':')
 on_failure:
 - set:
     field: error.message

@@ -53,7 +53,7 @@
       type: date
       description: >
         Time at the server when the request arrived from the NTP client.
-    - name: xxmt_time
+    - name: xmt_time
       type: date
       description: >
         Time at the server when the response departed for the NTP client.

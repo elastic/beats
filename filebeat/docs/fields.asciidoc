@@ -159457,7 +159457,7 @@ type: date
 
 --
 
-*`zeek.ntp.xxmt_time`*::
+*`zeek.ntp.xmt_time`*::
 +
 --
 Time at the server when the response departed for the NTP client.
