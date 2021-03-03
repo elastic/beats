@@ -286,8 +286,12 @@ def target(Map args = [:]) {
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
+  // this should workaround the existing issue with reusing workers with the Gobld
+  def uuid = UUID.randomUUID().toString()
   node(label) {
-    body()
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
+      body()
+    }
   }
 }
 
@@ -330,7 +334,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
     gox_flags = '-arch 386'
   }
 
-  deleteDir()
+  // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+  //            Windows workers are ephemerals, so this should not really affect us.
+  if(isUnix()) {
+    deleteDir()
+  }
+
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
@@ -374,11 +383,24 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
-        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-          fixPermissions("${WORKSPACE}")
-          deleteDir()
-        }
+        tearDown()
+      }
+    }
+  }
+}
+
+/**
+* Tear down the setup for the permanent workers.
+*/
+def tearDown() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    cmd(label: 'Remove the entire module cache', script: 'go clean -modcache', returnStatus: true)
+    fixPermissions("${WORKSPACE}")
+    // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+    //            Windows workers are ephemerals, so this should not really affect us.
+    if (isUnix()) {
+      dir("${WORKSPACE}") {
+        deleteDir()
       }
     }
   }
