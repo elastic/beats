@@ -90,6 +90,14 @@ func TestReaderGroup(t *testing.T) {
 func TestDefaultHarvesterGroup(t *testing.T) {
 	source := &testSource{"/path/to/test"}
 
+	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+		require.True(t, hg.readers.isIDAdded(s.Name()))
+	}
+
+	requireSourceRemovedFromBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
+		require.False(t, hg.readers.isIDAdded(s.Name()))
+	}
+
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
@@ -108,8 +116,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 1, mockHarvester.getRunCount())
 
-		// when finished removed from bookeeper
-		require.False(t, hg.readers.isIDAdded(source.Name()))
+		requireSourceRemovedFromBookkeeper(t, hg, source)
 		// stopped source can be stopped
 		require.Nil(t, hg.StopGroup())
 	})
@@ -119,7 +126,6 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
 		gorountineChecker := resources.NewGoroutinesChecker()
-		defer gorountineChecker.WaitUntilOriginalCount()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
 
@@ -127,17 +133,14 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		gorountineChecker.RunFuncWhenNewGoroutinesAreStarted(func() {
 			// wait until harvester is started
 			if mockHarvester.getRunCount() == 1 {
-				// assert that it is part of the bookkeeper before it is stopped
-				require.True(t, hg.readers.isIDAdded(source.Name()))
+				requireSourceAddedToBookkeeper(t, hg, source)
 				// after started, stop it
 				hg.Stop(source)
-				// wait until the harvester is stopped
 				gorountineChecker.WaitUntilOriginalCount()
 			}
 		})
 
-		// when finished removed from bookeeper
-		require.False(t, hg.readers.isIDAdded(source.Name()))
+		requireSourceRemovedFromBookkeeper(t, hg, source)
 	})
 
 	t.Run("assert a harvester for same source cannot be started", func(t *testing.T) {
@@ -176,9 +179,15 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		}()
 
 		gorountineChecker := resources.NewGoroutinesChecker()
-		defer gorountineChecker.WaitUntilOriginalCount()
 
 		hg.Start(input.Context{Logger: logp.L(), Cancelation: context.Background()}, source)
+
+		// wait until harvester is stopped
+		gorountineChecker.WaitUntilOriginalCount()
+
+		// make sure harvester had run once
+		require.Equal(t, 1, mockHarvester.getRunCount())
+		requireSourceRemovedFromBookkeeper(t, hg, source)
 
 		require.Nil(t, hg.StopGroup())
 	})
@@ -194,7 +203,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		gorountineChecker.WaitUntilOriginalCount()
 
-		require.False(t, hg.readers.isIDAdded(source.Name()))
+		requireSourceRemovedFromBookkeeper(t, hg, source)
 
 		err := hg.StopGroup()
 		require.Error(t, err)
