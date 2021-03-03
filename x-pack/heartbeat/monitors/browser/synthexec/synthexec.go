@@ -244,6 +244,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	res = &SynthEvent{}
 	err = json.Unmarshal(bytes, res)
+
 	if err != nil {
 		return nil, err
 	}
