@@ -621,6 +621,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
 */
 def tearDown() {
   catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    cmd(label: 'Remove the entire module cache', script: 'go clean -modcache', returnStatus: true)
     fixPermissions("${WORKSPACE}")
     // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
     //            Windows workers are ephemerals, so this should not really affect us.
