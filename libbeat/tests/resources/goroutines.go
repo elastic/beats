@@ -56,15 +56,11 @@ func (c GoroutinesChecker) Check(t testing.TB) {
 }
 
 func (c GoroutinesChecker) check(t testing.TB) error {
-	timeout := time.Now().Add(c.FinalizationTimeout)
-	var after int
-	for time.Now().Before(timeout) {
-		after = runtime.NumGoroutine()
-		if after <= c.before {
-			return nil
-		}
-		time.Sleep(10 * time.Millisecond)
+	after := c.WaitUntilOriginalCount()
+	if after == 0 {
+		return nil
 	}
+
 	profile := pprof.Lookup("goroutine")
 	profile.WriteTo(os.Stdout, 2)
 	return fmt.Errorf("Possible goroutines leak, before: %d, after: %d", c.before, after)
@@ -77,4 +73,27 @@ func CallAndCheckGoroutines(t testing.TB, f func()) {
 	c := NewGoroutinesChecker()
 	f()
 	c.Check(t)
+}
+
+// WaitUntilOriginalCount waits until the original number of goroutines are
+// present before we has created the resource checker.
+func (c GoroutinesChecker) WaitUntilOriginalCount() int {
+	timeout := time.Now().Add(c.FinalizationTimeout)
+	var after int
+	for time.Now().Before(timeout) {
+		after = runtime.NumGoroutine()
+		if after <= c.before {
+			return 0
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	return after
+}
+
+func (c *GoroutinesChecker) RunFuncWhenNewGoroutinesAreStarted(f func()) {
+	for runtime.NumGoroutine() == c.before {
+		time.Sleep(10 * time.Millisecond)
+	}
+	fmt.Println("vege")
+	f()
 }
