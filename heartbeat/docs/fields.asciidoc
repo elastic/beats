@@ -9786,7 +9786,7 @@ type: integer
 *`synthetics.step.status`*::
 +
 --
-type: text
+type: keyword
 
 --
 
