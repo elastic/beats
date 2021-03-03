@@ -30,6 +30,20 @@ func simpleTargetParser(name string) targetParser {
 	}
 }
 
+func checkKnownGUIDs(offset int, data []byte) string {
+	if len(data) >= 16+offset {
+		uuid := encodeUUID(data[offset : 16+offset])
+		if name, known := knownShellbagGuids[uuid]; known {
+			return name
+		}
+	}
+	return ""
+}
+
+func parseTarget0x00(data []byte) string {
+	return checkKnownGUIDs(0xE, data)
+}
+
 func parseTarget0x01(data []byte) string {
 	if data[8] == 0x3A && data[9] == 0x00 {
 		return "Hyper-V storage volume"
@@ -69,6 +83,10 @@ func parseTarget0x01(data []byte) string {
 }
 
 func parseTarget0x2e(data []byte) string {
+	if known := checkKnownGUIDs(0x4, data); known != "" {
+		return known
+	}
+
 	if len(data) == 0x16 && data[3] == 0x80 {
 		return "Root folder: GUID"
 	}
@@ -84,6 +102,9 @@ func parseTarget0x2e(data []byte) string {
 }
 
 func parseTarget0x1f(data []byte) string {
+	if known := checkKnownGUIDs(4, data); known != "" {
+		return known
+	}
 	if data[0] == 0x14 || data[0] == 0x32 || data[0] == 0x3A {
 		return "Root folder: GUID"
 	}
@@ -144,13 +165,19 @@ func parseTarget0x40(data []byte) string {
 	}
 }
 
+func parseTarget0x71(data []byte) string {
+	return checkKnownGUIDs(0xE, data)
+}
+
+// Have a better look at
+// https://github.com/williballenthin/shellbags/blob/fee76eb25c2b80c33caf8ab9013de5cba113dcd2/ShellItems.py
 var knownTargets = map[byte]targetParser{
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0X23.cs
 	0x23: simpleTargetParser("Drive letter"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0X4C.cs
 	0x4C: simpleTargetParser("Sharepoint directory"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x00.cs
-	// 0x00:
+	0x00: parseTarget0x00,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x01.cs
 	0x01: parseTarget0x01,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x1f.cs
@@ -168,7 +195,7 @@ var knownTargets = map[byte]targetParser{
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x61.cs
 	0x61: simpleTargetParser("URI"),
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x71.cs
-	// 0x71:
+	0x71: parseTarget0x71,
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0x74.cs
 	// 0x74:
 	// https://github.com/EricZimmerman/Lnk/blob/master/Lnk/ShellItems/ShellBag0xc3.cs
@@ -176,12 +203,6 @@ var knownTargets = map[byte]targetParser{
 }
 
 func getTargetName(targetType byte, data []byte) string {
-	if len(data) >= 20 {
-		uuid := encodeUUID(data[4:20])
-		if name, known := knownShellbagGuids[uuid]; known {
-			return name
-		}
-	}
 	if parser, known := knownTargets[targetType]; known {
 		return parser(data)
 	}
