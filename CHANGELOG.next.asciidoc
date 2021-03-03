@@ -514,6 +514,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Unskip s3_request integration test. {pull}23887[23887]
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
+- Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
 *Packetbeat*
 
