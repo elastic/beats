@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -71,6 +72,11 @@ func NewFactory(info beat.Info, sched *scheduler.Scheduler, allowWatches bool) *
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runner, error) {
+	c, err := stdfields.UnnestStream(c)
+	if err != nil {
+		return nil, err
+	}
+
 	configEditor, err := newCommonPublishConfigs(f.info, c)
 	if err != nil {
 		return nil, err
