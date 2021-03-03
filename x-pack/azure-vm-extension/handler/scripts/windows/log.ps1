@@ -1,21 +1,17 @@
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
 # all logging settins are here on top
-$logFile = ""
+
 $logLevel = "DEBUG" # ("DEBUG","INFO","WARN","ERROR","FATAL")
 $logSize = 1mb # 30kb
 $logCount = 10
-$logDir = ""
 # end of settings
 
 function Get-LogFile {
-if ($logDir -eq "") {
-   $logDir = Get-Azure-Logs-Path
+ $logDir = Get-Azure-Logs-Path
+return "$logDir\es-agent.log"
 }
-$logFile = "$logDir/log-es-agent.log"
-}
-
-
+$logFile = Get-LogFile
 
 function Write-Log-Line ($line) {
     Add-Content $logFile -Value $Line
@@ -34,10 +30,6 @@ Function Write-Log {
     [String]
     $Level = "DEBUG"
     )
-
-    if ($logFile -eq "") {
-    Get-LogFile
-    }
 
     $levels = ("DEBUG","INFO","WARN","ERROR","FATAL")
     $logLevelPos = [array]::IndexOf($levels, $logLevel)
@@ -68,7 +60,6 @@ function Reset-Log
     # function checks to see if file in question is larger than the paramater specified
     # if it is it will roll a log and delete the oldes log if there are more than x logs.
     param([string]$fileName, [int64]$filesize = 1mb , [int] $logcount = 5)
-
     $logRollStatus = $true
     if(test-path $filename)
     {

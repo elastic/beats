@@ -4,18 +4,18 @@ script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
 # Start Elastic Agent
-start_es_agent()
+Start_ElasticAgent()
 {
   if [ "$(pidof systemd && echo "systemd" || echo "other")" = "other" ]; then
-    log "INFO" "[start_es_agent] starting Elastic Agent"
+    log "INFO" "[Start_ElasticAgent] starting Elastic Agent"
     sudo service elastic-agent start
-    log "INFO" "[start_es_agent] Elastic Agent $STACK_VERSION started"
+    log "INFO" "[Start_ElasticAgent] Elastic Agent started"
   else
-    log "INFO" "[start_es_agent] enabling and starting Elastic Agent"
+    log "INFO" "[Start_ElasticAgent] enabling and starting Elastic Agent"
     sudo systemctl enable elastic-agent
     sudo systemctl start elastic-agent
-    log "INFO" "[start_es_agent] Elastic Agent $STACK_VERSION started"
+    log "INFO" "[Start_ElasticAgent] Elastic Agent started"
   fi
 }
 
-start_es_agent
+retry_backoff Start_ElasticAgent

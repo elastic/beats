@@ -34,6 +34,7 @@ function Get-CloudId($powershellVersion) {
   }
   return ""
 }
+
 function Get-Username($powershellVersion) {
   $cloud_id = Get-PublicSettings-From-Config-Json "username"  $powershellVersion
   if ( $cloud_id){
@@ -43,8 +44,19 @@ function Get-Username($powershellVersion) {
   }
   return ""
 }
+
 function Get-Password($powershellVersion) {
   $cloud_id = Get-PublicSettings-From-Config-Json "password"  $powershellVersion
+  if ( $cloud_id){
+    return $cloud_id
+  } else {
+    echo "Cloud ID not found."
+  }
+  return ""
+}
+
+function Get-ApiKey($powershellVersion) {
+  $cloud_id = Get-PublicSettings-From-Config-Json "api_key"  $powershellVersion
   if ( $cloud_id){
     return $cloud_id
   } else {
@@ -59,7 +71,7 @@ function Get-Elasticsearch-URL($powershellVersion) {
   if ( $cloud_id -ne ""){
     $cloud_hash=$cloud_id.split(":")[-1]
     $cloud_tokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloud_hash))
-    cloud_elem=$cloud_tokens.split("$")
+    $cloud_elem=$cloud_tokens.split("$")
     $host_port= $cloud_elem[0]
     return "https://$($cloud_elem[1]).$(${host_port})"
   } else {
@@ -67,12 +79,13 @@ function Get-Elasticsearch-URL($powershellVersion) {
   }
   return ""
 }
+
 function Get-Kibana-URL ($powershellVersion){
   $cloud_id = Get-CloudId $powershellVersion
   if ( $cloud_id -ne ""){
     $cloud_hash=$cloud_id.split(":")[-1]
     $cloud_tokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloud_hash))
-    cloud_elem=$cloud_tokens.split("$")
+    $cloud_elem=$cloud_tokens.split("$")
     $host_port= $cloud_elem[0]
     return "https://$($cloud_elem[2]).$(${host_port})"
   } else {
@@ -81,22 +94,22 @@ function Get-Kibana-URL ($powershellVersion){
   return ""
 }
 
-
-
 function Get-Stack-Version {
   $powershellVersion = Get-PowershellVersion
   $elasticsearch_url = Get-Elasticsearch-URL $powershellVersion
   $username = Get-Username $powershellVersion
   $password = Get-Password $powershellVersion
+  #$api_key = Get-ApiKey $powershellVersion
   if ( $elasticsearch_url -ne "" -and $username -ne "" -and $password -ne ""){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
         $headers.Add("Accept","Application/Json")
         $pair = "$($username):$($password)"
         $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
         $headers.Add('Authorization', "Basic $encodedCredentials")
+        #$headers.Add('Authorization', "ApiKey $api_key")
         $jsonResult = Invoke-WebRequest -Uri "$($elasticsearch_url)"  -Method 'GET' -Headers $headers -UseBasicParsing
         if ($jsonResult.statuscode -eq '200') {
-            $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "item"
+            $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand ""
             $stack_version=$keyValue.version.number
             Write-Log "Found stack version  $stack_version" "INFO"
             return $stack_version
@@ -110,7 +123,6 @@ function Get-Stack-Version {
   return ""
 }
 
-
 function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
   Try
   {
@@ -121,12 +133,10 @@ function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
       $global:normalized_json = normalize_json($json_contents)
     }
     if ( $powershellVersion -ge 3 ) {
-    echo "sjsj 1"
       $value = ($normalized_json | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
 
     }
     else {
-     echo "sjsj 2"
       $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
       $value = $ser.DeserializeObject($normalized_json).runtimeSettings[0].handlerSettings.publicSettings.$key
     }
@@ -146,22 +156,21 @@ function Get-Azure-Logs-Path() {
   {
     $powershellVersion = Get-PowershellVersion
     $handler_file = "$extensionRoot\\HandlerEnvironment.json"
-
     if ( $powershellVersion -ge 3 ) {
-      $config_folder = (((Get-Content $handler_file) | ConvertFrom-Json)[0] | Select -expand handlerEnvironment).logsFolder
+      $config_folder = (((Get-Content $handler_file) | ConvertFrom-Json)[0] | Select -expand handlerEnvironment).logFolder
     }
     else {
       add-type -assembly system.web.extensions
       $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-      $config_folder = ($ser.DeserializeObject($(Get-Content $handler_file)))[0].handlerEnvironment.logsFolder
+      $config_folder = ($ser.DeserializeObject($(Get-Content $handler_file)))[0].handlerEnvironment.logFolder
     }
-    return $config_file
+    return $config_folder
   }
   catch
   {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
-    echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+    Write-Host "Failed to read file: $FailedItem. The error message was $ErrorMessage"
     throw "Error in Get-Azure-Config-Path. Couldn't parse the HandlerEnvironment.json file"
   }
 }
@@ -191,7 +200,7 @@ function Get-Azure-Config-Path($powershellVersion) {
     # folder of the new extension. Hence using the n.settings file copied into
     # the C:\Chef folder during enable
     if ( $config_file_is_a_folder ) {
-      Write-Host "n.settings file doesn't exist in the extension folder. Reading from C:\Elastic."
+      Write-Log "n.settings file doesn't exist in the extension folder. Reading from C:\Elastic." "ERROR"
       $config_folder = "C:\Elastic"
       $config_file_name = Get-Lastest-Settings-File($config_folder)
       $azure_config_file = "$config_folder\$config_file_name"
@@ -202,7 +211,7 @@ function Get-Azure-Config-Path($powershellVersion) {
   {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
-    echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+    Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
     throw "Error in Get-Azure-Config-Path. Couldn't parse the HandlerEnvironment.json file"
   }
 }
@@ -283,3 +292,32 @@ Function Encrypt {
 
     Return $Base64String
 }
+
+
+# write status to file N.status
+function Write-Status ($operation, $statusType, $message)
+{
+  $sequenceNumber = $json_handlerSettingsFileName.Split(".")[0]
+  $statusFile = $json_statusFolder + "\\" + $sequenceNumber + ".status"
+  $timestampUTC = (Get-Date -Format u).Replace(" ", "T")
+  $formattedMessageHash = @{lang = "en-US"; message = "$message" }
+  $statusHash = @{name = "Elastic Agent Extension Handler"; operation = "$operation"; status = "$statusType"; code = 0; formattedMessage = $formattedMessageHash; }
+  $hash = @(@{version = "1"; timestampUTC = "$timestampUTC"; status = $statusHash})
+  if ( $(Get-PowershellVersion) -ge 3) {
+    ConvertTo-Json -Compress $hash -Depth 4 | Out-File -filePath $statusFile
+  }
+}
+
+function normalize_json($json) {
+  $json -Join " "
+}
+
+function Get-Agent-Id($fileLocation){
+$text = Get-Content -Path "$fileLocation"
+$regex = '(?ms)(^)agent:(?:.+?)id:\s?(.*?)(?:[\r\n]|$)'
+$text = $text -join "`n"
+$OutputText = [regex]::Matches($text, $regex) |
+              foreach {$_.Groups[2].Value -split $regex}
+return $OutputText
+}
+

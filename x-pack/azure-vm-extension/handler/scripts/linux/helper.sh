@@ -32,17 +32,19 @@ install_dependencies() {
 if [ "$DISTRO_OS" = "DEB" ]; then
   sudo apt-get update
   if [ $(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  sudo apt-get --yes install  curl;
+  #sudo apt-get --yes install  curl;
+  (sudo apt-get --yes install  curl || (sleep 15; sudo apt-get --yes install  curl))
   fi
   if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  sudo apt-get --yes install  jq;
+  #sudo apt-get --yes install  jq;
+  (sudo apt-get --yes install  jq || (sleep 15; apt-get --yes install  jq))
   fi
 elif [ "$DISTRO_OS" = "RPM" ]; then
    #sudo yum update -y --disablerepo='*' --enablerepo='*microsoft*'
 
    if ! rpm -qa | grep -qw jq; then
    #yum install epel-release -y
-   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
    yum install jq -y
 fi
 else
@@ -73,7 +75,7 @@ log()
     fi
 
     echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2"
-    echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2" >> $LOGS_FOLDER/es-agent-install.log
+    echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2" >> $LOGS_FOLDER/es-agent.log
 }
 
 
@@ -105,33 +107,30 @@ get_configuration_location()
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
     ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
-  log "[get_configuration_location] main directory found $ES_EXT_DIR" "INFO"
-  log "[get_configuration_location] looking for HandlerEnvironment.json file" "INFO"
-  #ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
-
-   if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
-then
-    log "[get_configuration_location] HandlerEnvironment.json file found" "INFO"
-    config_folder=$(jq -r '.[0].handlerEnvironment.configFolder' $ES_EXT_DIR/HandlerEnvironment.json)
-    log "[get_configuration_location]  configuration folder $config_folder found" "INFO"
+  log "INFO" "[get_configuration_location] main directory found $ES_EXT_DIR"
+  log "INFO" "[get_configuration_location] looking for HandlerEnvironment.json file"
+  if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
+    log "INFO" "[get_configuration_location] HandlerEnvironment.json file found"
+    config_folder=$(jq -r '.[0].handlerEnvironment.configFolder' "$ES_EXT_DIR/HandlerEnvironment.json")
+    log "INFO" "[get_configuration_location]  configuration folder $config_folder found"
     config_files_path="$config_folder/*.settings"
     CONFIG_FILE=$(ls $config_files_path 2>/dev/null | sort -V | tail -1)
-    log "[get_configuration_location] configuration file $CONFIG_FILE found" "INFO"
-else
-    log "[get_configuration_location] HandlerEnvironment.json file not found" "ERROR"
+    log "INFO" "[get_configuration_location] configuration file $CONFIG_FILE found"
+  else
+    log "ERROR" "[get_configuration_location] HandlerEnvironment.json file not found"
     exit 1
-fi
+  fi
 }
 
 
 get_cloud_id()
 {
-get_configuration_location
-log "INFO" "[get_cloud_id] Found configuration file $CONFIG_FILE"
-if [ "$CONFIG_FILE" != "" ]; then
-  CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloud_id' $CONFIG_FILE)
- log "INFO" "[get_cloud_id] Found cloud id $CLOUD_ID"
-else
+  get_configuration_location
+  if [ "$CONFIG_FILE" != "" ]; then
+    log "INFO" "[get_cloud_id] Found configuration file $CONFIG_FILE"
+    CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloud_id' $CONFIG_FILE)
+    log "INFO" "[get_cloud_id] Found cloud id $CLOUD_ID"
+  else
     log "[get_cloud_id] Configuration file not found" "ERROR"
     exit 1
   fi
@@ -140,13 +139,13 @@ else
 
 get_username()
 {
-get_configuration_location
-log "INFO" "[get_username] Found configuration file $CONFIG_FILE"
-if [ "$CONFIG_FILE" != "" ]; then
- USERNAME=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.username' $CONFIG_FILE)
- log "INFO" "[get_cloud_id] Found username  $USERNAME"
- else
-    log "[get_username] Configuration file not found" "ERROR"
+  get_configuration_location
+  log "INFO" "[get_username] Found configuration file $CONFIG_FILE"
+  if [ "$CONFIG_FILE" != "" ]; then
+    USERNAME=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.username' $CONFIG_FILE)
+    log "INFO" "[get_username] Found username  $USERNAME"
+  else
+    log "ERROR" "[get_username] Configuration file not found"
     exit 1
   fi
 }
@@ -154,18 +153,15 @@ if [ "$CONFIG_FILE" != "" ]; then
 
 get_password()
 {
-get_configuration_location
-log "INFO" "[get_username] Found configuration file $CONFIG_FILE"
-if [ "$CONFIG_FILE" != "" ]; then
- cert=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $CONFIG_FILE)
- settings=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $CONFIG_FILE)
- echo $settings
- echo $cert
-  PASSWORD=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.password' $CONFIG_FILE)
-  log "INFO" "[get_cloud_id] Found password  $PASSWORD"
-
- else
-    log "[get_cloud_id] Configuration file not found" "ERROR"
+  get_configuration_location
+  log "INFO" "[get_password] Found configuration file $CONFIG_FILE"
+  if [ "$CONFIG_FILE" != "" ]; then
+    cert=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $CONFIG_FILE)
+    settings=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $CONFIG_FILE)
+    PASSWORD=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.password' $CONFIG_FILE)
+    log "INFO" "[get_password] Found password  $PASSWORD"
+  else
+    log "ERROR" "[get_password] Configuration file not found"
     exit 1
   fi
 }
@@ -174,30 +170,30 @@ if [ "$CONFIG_FILE" != "" ]; then
 get_kibana_host () {
   get_cloud_id
   if [ "$CLOUD_ID" != "" ]; then
- cloud_hash=$(echo $CLOUD_ID | cut -f2 -d:)
-  cloud_tokens=$(echo $cloud_hash | base64 -d -)
-  host_port=$(echo $cloud_tokens | cut -f1 -d$)
-  KIBANA_URL="https://$(echo $cloud_tokens | cut -f3 -d$).${host_port}"
-  log "INFO" "[es_agent_enroll] Found Kibana uri $KIBANA_URL"
+    cloud_hash=$(echo $CLOUD_ID | cut -f2 -d:)
+    cloud_tokens=$(echo $cloud_hash | base64 -d -)
+    host_port=$(echo $cloud_tokens | cut -f1 -d$)
+    KIBANA_URL="https://$(echo $cloud_tokens | cut -f3 -d$).${host_port}"
+    log "INFO" "[get_kibana_host] Found Kibana uri $KIBANA_URL"
  else
     log "ERROR" "[get_kibana_host] Cloud ID could not be parsed"
     exit 1
-fi
+  fi
 
 }
 
 get_elasticsearch_host () {
-   get_cloud_id
+  get_cloud_id
   if [ "$CLOUD_ID" != "" ]; then
-  cloud_hash=$(echo $CLOUD_ID | cut -f2 -d:)
-  cloud_tokens=$(echo $cloud_hash | base64 -d -)
-  host_port=$(echo $cloud_tokens | cut -f1 -d$)
-  ELASTICSEARCH_URL="https://$(echo $cloud_tokens | cut -f2 -d$).${host_port}"
-  log "[get_elasticsearch_host] Found ES uri $ELASTICSEARCH_URL" "INFO"
-   else
-    log "[get_elasticsearch_host] Cloud ID could not be parsed" "ERROR"
+    cloud_hash=$(echo $CLOUD_ID | cut -f2 -d:)
+    cloud_tokens=$(echo $cloud_hash | base64 -d -)
+    host_port=$(echo $cloud_tokens | cut -f1 -d$)
+    ELASTICSEARCH_URL="https://$(echo $cloud_tokens | cut -f2 -d$).${host_port}"
+    log "INFO" "[get_elasticsearch_host] Found ES uri $ELASTICSEARCH_URL"
+  else
+    log "ERROR" "[get_elasticsearch_host] Cloud ID could not be parsed"
     exit 1
-fi
+  fi
 }
 
 get_cloud_stack_version () {
@@ -205,20 +201,19 @@ get_cloud_stack_version () {
   get_elasticsearch_host
   get_username
   get_password
-   if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
+  if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
     jsonResult=$(curl "${ELASTICSEARCH_URL}"  -H 'Content-Type: application/json' -u ${USERNAME}:${PASSWORD})
-      local EXITCODE=$?
-      if [ $EXITCODE -ne 0 ]; then
-        log "ERROR" "[get_cloud_stack_version] error pinging $ELASTICSEARCH_URL"
-        exit $EXITCODE
-      fi
-      echo $jsonResult
+    local EXITCODE=$?
+    if [ $EXITCODE -ne 0 ]; then
+      log "ERROR" "[get_cloud_stack_version] error pinging $ELASTICSEARCH_URL"
+      exit $EXITCODE
+    fi
    STACK_VERSION=$(echo $jsonResult | jq -r '.version.number')
    log "INFO" "[get_cloud_stack_version] Stack version found is $STACK_VERSION"
-   else
+  else
     log "ERROR" "[get_cloud_stack_version] Elasticsearch URL could not be found"
     exit 1
-fi
+  fi
 }
 
 function parse_yaml {
@@ -237,3 +232,23 @@ function parse_yaml {
    }'
 }
 
+function retry_backoff() {
+  local attempts=3
+  local sleep_millis=20000
+  # shift 3
+  for attempt in `seq 1 $attempts`; do
+    if [[ $attempt -gt 1 ]]; then
+      log "ERROR" "[retry_backoff] Function failed on attempt $attempt, retrying in 20 sec ..."
+    fi
+    "$@" && local rc=$? || local rc=$?
+    if [[ ! $rc -gt 0 ]]; then
+      return $rc
+    fi
+    if [[ $attempt -eq $attempts ]]; then
+      log "ERROR" "[retry_backoff] Function failed on last attempt $attempt."
+      exit 1
+    fi
+    local sleep_ms="$(($sleep_millis))"
+    sleep "${sleep_ms:0:-3}.${sleep_ms: -3}"
+  done
+}

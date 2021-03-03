@@ -4,17 +4,17 @@ script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
 # Stop Elastic Agent
-stop_es_agent()
+Stop_ElasticAgent()
 {
   if [ "$(pidof systemd && echo "systemd" || echo "other")" = "other" ]; then
-    log "INFO" "[stop_es_agent] stopping Elastic Agent"
+    log "INFO" "[Stop_ElasticAgent] stopping Elastic Agent"
     sudo service elastic-agent stop
-    log "INFO" "[stop_es_agent] Elastic Agent stopped"
+    log "INFO" "[Stop_ElasticAgent] Elastic Agent stopped"
   else
-    log "INFO" "[stop_es_agent] stopping  Elastic Agent"
+    log "INFO" "[Stop_ElasticAgent] stopping  Elastic Agent"
     sudo systemctl stop elastic-agent
-    log "INFO" "[stop_es_agent] Elastic Agent stopped"
+    log "INFO" "[Stop_ElasticAgent] Elastic Agent stopped"
   fi
 }
 
-stop_es_agent
+retry_backoff Stop_ElasticAgent

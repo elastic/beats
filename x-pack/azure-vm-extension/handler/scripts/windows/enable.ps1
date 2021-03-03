@@ -3,19 +3,35 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
 
-function enable-elastic-agent {
-try {
-    Write-Log "Starting the elastic agent" "INFO"
-Start-Service elastic-agent
-Write-Log "The elastic agent is started" "INFO"
-}
-catch{
-Write-Log "An error occurred:" "ERROR"
-        Write-Log $_ "ERROR"
-        Write-Log $_.ScriptStackTrace "ERROR"
+function Enable-ElasticAgent {
+    $retries = 3
+    $retryCount = 0
+    $completed = $false
+    while (-not $completed) {
+        Try {
+            Write-Log "Starting the elastic agent" "INFO"
+            Start-Service "elastic agent"
+            Write-Log "The elastic agent is started" "INFO"
+            $completed = $true
+           }
+        Catch {
+            if ($retryCount -ge $retries) {
+               Write-Log "Starting the Elastic Agent failed after 3 retries" "ERROR"
+               Write-Log $_ "ERROR"
+               Write-Log $_.ScriptStackTrace "ERROR"
+               exit 1
+            } else {
+               Write-Log "Starting the Elastic Agent has failed. retrying in 20s" "ERROR"
+               Write-Log $_ "ERROR"
+               Write-Log $_.ScriptStackTrace "ERROR"
+               sleep 20
+               $retryCount++
+            }
+        }
+    }
 }
 
-enable-elastic-agent
+Enable-ElasticAgent
 
 
 

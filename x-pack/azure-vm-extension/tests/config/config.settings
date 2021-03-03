@@ -7,7 +7,8 @@
             "publicSettings": {
                 "username": "elastic",
                 "password": "",
-                 "cloud_id": "elastic-observability-deployment:"
+                "api_key": "",
+                "cloud_id": ""
             }
         }
     }
