@@ -160,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
 - Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
