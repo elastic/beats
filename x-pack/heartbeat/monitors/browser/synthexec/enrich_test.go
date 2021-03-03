@@ -49,12 +49,12 @@ func TestJourneyEnricher(t *testing.T) {
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
-	makeStepEvent := func(typ string, ts float64, name string, index int, urlstr string, err *SynthError) *SynthEvent {
+	makeStepEvent := func(typ string, ts float64, name string, index int, status string, urlstr string, err *SynthError) *SynthEvent {
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: 1000 + ts,
 			PackageVersion:       "1.0.0",
-			Step:                 &Step{Name: name, Index: index},
+			Step:                 &Step{Name: name, Index: index, Status: status},
 			Error:                err,
 			Payload:              common.MapStr{},
 			URL:                  urlstr,
@@ -66,12 +66,12 @@ func TestJourneyEnricher(t *testing.T) {
 
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "", nil),
-		makeStepEvent("step/end", 30, "Step2", 1, url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1, "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, url3, otherErr),
+		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
+		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", 1, "", url3, otherErr),
 		journeyEnd,
 	}
 
