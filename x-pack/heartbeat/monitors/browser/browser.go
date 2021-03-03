@@ -59,14 +59,14 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 
 	var j jobs.Job
 	if src, ok := ss.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := ss.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs)
+			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs...)
 			if err != nil {
 				return nil, err
 			}
