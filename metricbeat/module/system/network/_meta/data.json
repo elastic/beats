@@ -15,17 +15,17 @@
     "system": {
         "network": {
             "in": {
-                "bytes": 0,
+                "bytes": 2595422773,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 0
+                "packets": 18264437
             },
-            "name": "br-18285ad7f418",
+            "name": "lo0",
             "out": {
-                "bytes": 0,
+                "bytes": 2595422773,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 0
+                "packets": 18264437
             }
         }
     }

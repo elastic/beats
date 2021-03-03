@@ -103,7 +103,7 @@ func collectCPUMetrics(selectors []string, sample *cpu.Metrics) mb.Event {
 	//generate the host fields here, since we don't want users disabling it.
 	normalizedPct := sample.NormalizedPercentages()
 	hostFields := common.MapStr{}
-	hostFields.Put("host.cpu.pct", normalizedPct.Total)
+	hostFields.Put("host.cpu.usage", normalizedPct.Total)
 
 	return mb.Event{
 		RootFields:      hostFields,

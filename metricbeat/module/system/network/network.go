@@ -121,11 +121,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			RootFields: common.MapStr{
 				"host": common.MapStr{
 					"network": common.MapStr{
-						"in": common.MapStr{
+						"ingress": common.MapStr{
 							"bytes":   networkInBytes - m.prevCounters.prevNetworkInBytes,
 							"packets": networkInPackets - m.prevCounters.prevNetworkInPackets,
 						},
-						"out": common.MapStr{
+						"egress": common.MapStr{
 							"bytes":   networkOutBytes - m.prevCounters.prevNetworkOutBytes,
 							"packets": networkOutPackets - m.prevCounters.prevNetworkOutPackets,
 						},
