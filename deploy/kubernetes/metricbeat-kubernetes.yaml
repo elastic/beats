@@ -238,16 +238,16 @@ metadata:
 rules:
 - apiGroups: [""]
   resources:
-    - nodes
-    - namespaces
-    - events
-    - pods
-    - services
+  - nodes
+  - namespaces
+  - events
+  - pods
+  - services
   verbs: ["get", "list", "watch"]
 # Enable this rule only if planing to use Kubernetes keystore
 #- apiGroups: [""]
 #  resources:
-#    - secrets
+#  - secrets
 #  verbs: ["get"]
 - apiGroups: ["extensions"]
   resources:
