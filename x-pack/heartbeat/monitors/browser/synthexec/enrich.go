@@ -6,8 +6,9 @@ package synthexec
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
 
