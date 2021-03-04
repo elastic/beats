@@ -44,6 +44,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 var (
@@ -134,6 +136,7 @@ func (paths *Path) initPaths(cfg *Path) error {
 	}
 
 	if *hostFS != "" {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
 		paths.Hostfs = *hostFS
 	}
 
