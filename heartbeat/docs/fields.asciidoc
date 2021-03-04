@@ -9783,6 +9783,13 @@ type: integer
 
 --
 
+*`synthetics.step.status`*::
++
+--
+type: keyword
+
+--
+
 
 *`synthetics.journey.name`*::
 +
