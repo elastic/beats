@@ -3,9 +3,6 @@ set -euo pipefail
 script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
-
-
-
 write_status() {
   get_status_location
   if [[ "$STATUS_FOLDER" != "" ]]; then

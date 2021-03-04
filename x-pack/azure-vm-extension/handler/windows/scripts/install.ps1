@@ -35,7 +35,7 @@ function Install-ElasticAgent {
       Write-Log "Starting download of elastic agent package with version $STACK_VERSION" "INFO"
       DownloadFile -Params @{'Uri'="$DOWNLOAD_URL";'OutFile'="$SAVEDFILE"}
       # write status
-      Write-status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded"
+      Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded" 1
       Write-Log "Unzip elastic agent archive" "INFO"
       Expand-Archive -LiteralPath $SAVEDFILE -DestinationPath $INSTALL_LOCATION -Force
       Write-Log "Elastic agent unzipped location $INSTALL_LOCATION" "INFO"
@@ -91,8 +91,8 @@ function Install-ElasticAgent {
       }
       $completed = $true
       # write status for both install and enroll
-      Write-status "$name" "$firstOperation" "success" "$message" "$subName" "success" "Elastic Agent has been installed"
-      Write-status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent has been enrolled"
+      Write-Status "$name" "$firstOperation" "success" "$message" "$subName" "success" "Elastic Agent has been installed" 1
+      Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent has been enrolled" 1
     }
     Catch {
       if ($retryCount -ge $retries) {
@@ -100,7 +100,7 @@ function Install-ElasticAgent {
         Write-Log $_ "ERROR"
         Write-Log $_.ScriptStackTrace "ERROR"
         # write status for fail
-        Write-status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent has not been installed"
+        Write-Status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent has not been installed" 1
         exit 1
       } else {
         Write-Log "Elastic Agent installation failed. retrying in 20s" "ERROR"

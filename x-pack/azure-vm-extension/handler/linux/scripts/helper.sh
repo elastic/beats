@@ -16,63 +16,60 @@ POLICY_ID=""
 checkOS()
 {
   if dpkg -S /bin/ls >/dev/null 2>&1
-then
-  DISTRO_OS="DEB"
-  echo "[checkOS] distro is $DISTRO_OS" "INFO"
-elif rpm -q -f /bin/ls >/dev/null 2>&1
-then
-  DISTRO_OS="RPM"
-   echo "[checkOS] distro is $DISTRO_OS" "INFO"
-else
-  DISTRO_OS="OTHER"
-   echo "[checkOS] distro is $DISTRO_OS" "INFO"
-fi
+  then
+    DISTRO_OS="DEB"
+    echo "[checkOS] distro is $DISTRO_OS" "INFO"
+  elif rpm -q -f /bin/ls >/dev/null 2>&1
+  then
+    DISTRO_OS="RPM"
+    echo "[checkOS] distro is $DISTRO_OS" "INFO"
+  else
+    DISTRO_OS="OTHER"
+    echo "[checkOS] distro is $DISTRO_OS" "INFO"
+  fi
 }
 
 install_dependencies() {
   checkOS
-if [ "$DISTRO_OS" = "DEB" ]; then
-  sudo apt-get update
+  if [ "$DISTRO_OS" = "DEB" ]; then
+    sudo apt-get update
   if [ $(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  #sudo apt-get --yes install  curl;
-  (sudo apt-get --yes install  curl || (sleep 15; sudo apt-get --yes install  curl))
+    #sudo apt-get --yes install  curl;
+    (sudo apt-get --yes install  curl || (sleep 15; sudo apt-get --yes install  curl))
   fi
   if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  #sudo apt-get --yes install  jq;
-  (sudo apt-get --yes install  jq || (sleep 15; apt-get --yes install  jq))
+    #sudo apt-get --yes install  jq;
+    (sudo apt-get --yes install  jq || (sleep 15; apt-get --yes install  jq))
   fi
-elif [ "$DISTRO_OS" = "RPM" ]; then
-   #sudo yum update -y --disablerepo='*' --enablerepo='*microsoft*'
-
-   if ! rpm -qa | grep -qw jq; then
-   #yum install epel-release -y
-   yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
-   yum install jq -y
-fi
-else
-  pacman -Qq | grep -qw jq || pacman -S jq
-fi
-
+  elif [ "$DISTRO_OS" = "RPM" ]; then
+    #sudo yum update -y --disablerepo='*' --enablerepo='*microsoft*'
+    if ! rpm -qa | grep -qw jq; then
+      #yum install epel-release -y
+      yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+      yum install jq -y
+    fi
+  else
+    pacman -Qq | grep -qw jq || pacman -S jq
+  fi
 }
 
 get_logs_location()
 {
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
-   if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
-then
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
+   if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]; then
     LOGS_FOLDER=$(jq -r '.[0].handlerEnvironment.logFolder' $ES_EXT_DIR/HandlerEnvironment.json)
-else
+  else
     exit 1
-fi
+  fi
 }
 
 get_status_location()
 {
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
 then
     STATUS_FOLDER=$(jq -r '.[0].handlerEnvironment.statusFolder' $ES_EXT_DIR/HandlerEnvironment.json)
@@ -128,7 +125,7 @@ get_configuration_location()
 {
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
   log "INFO" "[get_configuration_location] main directory found $ES_EXT_DIR"
   log "INFO" "[get_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then

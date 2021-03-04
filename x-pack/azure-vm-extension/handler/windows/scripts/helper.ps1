@@ -6,7 +6,7 @@ function GetDirectory
 
 $scriptDir = GetDirectory
 
-$extensionRoot = [System.IO.Path]::GetFullPath("$scriptDir\\..\\..")
+$extensionRoot = [System.IO.Path]::GetFullPath("$scriptDir\\..")
 
 function Get-PowershellVersion {
   if(!$powershellVersion)
@@ -78,8 +78,6 @@ function Get-Kibana-URL ($powershellVersion){
      $cloudElems=$cloudTokens.split("$")
      $hostPort= $cloudElems[0]
     return "https://$($cloudElems[2]).$(${hostPort})"
-  } else {
-    echo "Cloud ID not found."
   }
   return ""
 }
@@ -116,19 +114,19 @@ function Get-Stack-Version {
 function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
   Try
   {
-    if(!$normalized_json)
+    if(!$normalizedJson)
     {
       $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
       $jsonContents = Get-Content $azureConfigFile
-      $global:normalized_json = normalize-json($jsonContents)
+      $global:normalizedJson = normalize-json($jsonContents)
     }
     if ( $powershellVersion -ge 3 ) {
-      $value = ($normalized_json | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
+      $value = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
 
     }
     else {
       $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-      $value = $ser.DeserializeObject($normalized_json).runtimeSettings[0].handlerSettings.publicSettings.$key
+      $value = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.publicSettings.$key
     }
     $value
   }
@@ -137,7 +135,7 @@ function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
     echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
-    throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azure_config_file"
+    throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
   }
 }
 
@@ -165,11 +163,10 @@ function Get-Azure-Logs-Path() {
   }
 }
 
-
 function Get-Azure-Config-Path($powershellVersion) {
   Try
   {
-    $handlerFile = "$extensionRoot\\HandlerEnvironment.json"
+    $handlerFile = "$extensionRoot\HandlerEnvironment.json"
 
     if ( $powershellVersion -ge 3 ) {
       $configFolder = (((Get-Content $handlerFile) | ConvertFrom-Json)[0] | Select -expand handlerEnvironment).configFolder
@@ -182,7 +179,6 @@ function Get-Azure-Config-Path($powershellVersion) {
 
     # Get the last .settings file
     $configFileName = Get-Lastest-Settings-File($configFolder)
-
     $azureConfigFile = "$configFolder\$configFileName"
     $configFileIsFolder = (Get-Item $azureConfigFile) -is [System.IO.DirectoryInfo]
 
@@ -195,7 +191,7 @@ function Get-Azure-Config-Path($powershellVersion) {
       $configFileName = Get-Lastest-Settings-File($configFolder)
       $azureConfigFile = "$configFolder\$configFileName"
     }
-    return $azure_config_file
+    return $azureConfigFile
   }
   Catch
   {
@@ -244,28 +240,27 @@ function Get-Lastest-Settings-File($configFolder) {
 }
 
 function DownloadFile {
-Param(
+    Param(
         [Parameter(Mandatory=$True)]
         [hashtable]$Params,
         [int]$Retries = 3
     )
     $url = $Params['Uri']
     $outFile = $Params['OutFile']
-[int]$trials = 0
-echo $url
-$webClient = New-Object net.webclient
-do {
-    try {
-        $trials +=1
-        $webClient.DownloadFile($url, $outFile)
-         Write-Log "Elastic Agent downloaded" "INFO"
-        break
-    } catch [System.Net.WebException] {
-    Write-Log "Problem downloading $url `tTrial $trials `n` tException:  $_.Exception.Message" "ERROR"
-    throw "Problem downloading $url `tTrial $trials `n` tException:  $_.Exception.Message"
+    [int]$trials = 0
+    $webClient = New-Object net.webclient
+    do {
+        try {
+            $trials +=1
+            $webClient.DownloadFile($url, $outFile)
+            Write-Log "Elastic Agent downloaded" "INFO"
+            break
+        } catch [System.Net.WebException] {
+            Write-Log "Problem downloading $url `tTrial $trials `n` tException:  $_.Exception.Message" "ERROR"
+            throw "Problem downloading $url `tTrial $trials `n` tException:  $_.Exception.Message"
+        }
     }
-}
-while ($trials -lt $Retries)
+    while ($trials -lt $Retries)
 }
 
 function Decrypt
@@ -338,17 +333,19 @@ function Write-Status
          [Parameter(Mandatory=$true, Position=5)]
          [string] $subStatus,
          [Parameter(Mandatory=$true, Position=6)]
-         [string] $subMessage
+         [string] $subMessage,
+         [Parameter(Mandatory=$true, Position=7)]
+         [string] $sequenceNumber
     )
-  $sequenceNumber = 1
+  #$sequenceNumber = 1
   $code = 0
   $statusPath = Get-Azure-Status-Path
   if ( $statusPath) {
-    $lastStatusFile = Get-Lastest-Status-File($statusPath)
-    if ($lastStatusFile) {
-        $lastSequence =  $lastStatusFile.Split(".")[0]
-        $sequenceNumber = [int]$lastSequence  + 1
-    }
+#    $lastStatusFile = Get-Lastest-Status-File($statusPath)
+#    if ($lastStatusFile) {
+#        $lastSequence =  $lastStatusFile.Split(".")[0]
+#        $sequenceNumber = [int]$lastSequence  + 1
+#    }
     $statusFile = $statusPath + "\\" + $sequenceNumber + ".status"
     #transitioning, error, success and warning
     if ($subStatus -eq "error") {
@@ -390,12 +387,12 @@ function normalize-json($json) {
 }
 
 function Get-Agent-Id($fileLocation){
-$text = Get-Content -Path "$fileLocation"
-$regex = '(?ms)(^)agent:(?:.+?)id:\s?(.*?)(?:[\r\n]|$)'
-$text = $text -join "`n"
-$OutputText = [regex]::Matches($text, $regex) |
+    $text = Get-Content -Path "$fileLocation"
+    $regex = '(?ms)(^)agent:(?:.+?)id:\s?(.*?)(?:[\r\n]|$)'
+    $text = $text -join "`n"
+    $OutputText = [regex]::Matches($text, $regex) |
               foreach {$_.Groups[2].Value -split $regex}
-return $OutputText
+    return $OutputText
 }
 
 function Get-Default-Policy($content){

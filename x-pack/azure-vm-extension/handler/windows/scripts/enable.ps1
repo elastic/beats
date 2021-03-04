@@ -19,14 +19,14 @@ function Enable-ElasticAgent {
             Start-Service "elastic agent"
             Write-Log "The elastic agent is started" "INFO"
             $completed = $true
-            Write-status "$name" "$operation" "success" "$message" "$subName" "success" "Elastic Agent service has started"
+            Write-Status "$name" "$operation" "success" "$message" "$subName" "success" "Elastic Agent service has started" 2
            }
         Catch {
             if ($retryCount -ge $retries) {
                 Write-Log "Starting the Elastic Agent failed after 3 retries" "ERROR"
                 Write-Log $_ "ERROR"
                 Write-Log $_.ScriptStackTrace "ERROR"
-                Write-status "$name" "$operation" "error" "$message" "$subName" "error" "Elastic Agent service has not started"
+                Write-Status "$name" "$operation" "error" "$message" "$subName" "error" "Elastic Agent service has not started" 2
                 exit 1
             } else {
                 Write-Log "Starting the Elastic Agent has failed. retrying in 20s" "ERROR"

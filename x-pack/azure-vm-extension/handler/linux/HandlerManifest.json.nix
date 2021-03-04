@@ -1,11 +1,11 @@
 [{
   "version": 1.0,
   "handlerManifest": {
-    "installCommand": "scripts\\linux\\install.sh",
-    "uninstallCommand": "scripts\\linux\\uninstall.sh",
-    "updateCommand": "scripts\\linux\\update.sh",
-    "enableCommand": "scripts\\linux\\enable.sh",
-    "disableCommand": "scripts\\linux\\disable.sh",
+    "installCommand": "scripts\\install.sh",
+    "uninstallCommand": "scripts\\uninstall.sh",
+    "updateCommand": "scripts\\update.sh",
+    "enableCommand": "scripts\\enable.sh",
+    "disableCommand": "scripts\\disable.sh",
     "rebootAfterInstall": false,
     "reportHeartbeat": false,
     "updateMode": "UpdateWithInstall"
