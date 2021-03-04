@@ -188,9 +188,6 @@ func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 // Other status codes or IO errors during the request are reported as error.
 func (l *ESLoader) checkExistsComponentTemplate(name string) (bool, error) {
 	status, _, err := l.client.Request("GET", "/_component_template/"+name, "", nil, nil)
-	if err != nil {
-		return false, err
-	}
 
 	switch status {
 	case http.StatusNotFound:
@@ -198,7 +195,10 @@ func (l *ESLoader) checkExistsComponentTemplate(name string) (bool, error) {
 	case http.StatusOK:
 		return true, nil
 	default:
-		return false, &StatusError{status: status}
+		if err == nil {
+			err = &StatusError{status: status}
+		}
+		return false, err
 	}
 }
 
