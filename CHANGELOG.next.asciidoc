@@ -237,6 +237,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
+- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 
 *Auditbeat*
 
