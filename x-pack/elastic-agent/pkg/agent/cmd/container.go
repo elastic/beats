@@ -37,6 +37,8 @@ const (
 )
 
 var (
+	// Used to strip the appended ({uuid}) from the name of an enrollment token. This makes much easier for
+	// a container to reference a token by name, without having to know what the generated UUID is for that name.
 	tokenNameStrip = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$`)
 )
 
@@ -327,7 +329,7 @@ func findPolicy(policies []kibanaPolicy) (*kibanaPolicy, error) {
 func findKey(keys []kibanaAPIKey, policy *kibanaPolicy) (*kibanaAPIKey, error) {
 	tokenName := envWithDefault(defaultTokenName, "FLEET_TOKEN_NAME")
 	for _, key := range keys {
-		name := tokenNameStrip.ReplaceAllString(key.Name, "")
+		name := strings.TrimSpace(tokenNameStrip.ReplaceAllString(key.Name, ""))
 		if name == tokenName && key.PolicyID == policy.ID {
 			return &key, nil
 		}
