@@ -29,7 +29,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	//testdata := "./_meta/testdata"
 	testPath := paths.Path{
 		Hostfs: "./_meta/testdata",
 	}
