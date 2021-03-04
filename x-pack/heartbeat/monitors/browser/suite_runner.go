@@ -23,7 +23,7 @@ type SyntheticSuite struct {
 func NewSuite(rawCfg *common.Config) (*SyntheticSuite, error) {
 	ss := &SyntheticSuite{
 		rawCfg:   rawCfg,
-		suiteCfg: &Config{},
+		suiteCfg: DefaultConfig(),
 	}
 	err := rawCfg.Unpack(ss.suiteCfg)
 	if err != nil {
