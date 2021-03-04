@@ -938,6 +938,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move IIS module to GA and map fields. {issue}22609[22609] {pull}23024[23024]
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
+- Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Add support for Darwin/arm M1. {pull}24019[24019]
+- Check fields are documented in aws metricsets. {pull}23887[23887]
+- Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 
 *Packetbeat*
 
