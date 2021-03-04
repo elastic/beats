@@ -9,6 +9,8 @@ heartbeat.monitors:
   enabled: true
   id: todos-suite
   name: Todos Suite
+  data_stream:
+    namespace: myns
   source:
     local:
       path: "/home/andrewvc/projects/synthetics/examples/todos/"
@@ -19,10 +21,14 @@ heartbeat.monitors:
   urls: http://www.google.com
   schedule: "@every 15s"
   name: Simple HTTP
+  data_stream:
+    namespace: myns
 - type: browser
-  enabled: true
+  enabled: false
   id: my-monitor
   name: My Monitor
+  data_stream:
+    namespace: myns
   source:
     inline:
       script:
