@@ -20,14 +20,13 @@ package monitors
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 )
 
 func TestSetupIndexProcessor(t *testing.T) {
