@@ -1,0 +1,12 @@
+- module: cyberarkpas
+  log:
+    enabled: true
+
+    # Set which input to use between udp (default), tcp, tls or file.
+    # var.input: udp
+    # var.syslog_host: localhost
+    # var.syslog_port: 9527
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+

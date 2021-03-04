@@ -1,0 +1,32 @@
+[role="xpack"]
+
+:modulename: cyberarkpas
+:has-dashboards: false
+
+== Cyberark PAS module
+
+experimental[]
+
+This is a module for receiving CyberArk Privileged Account Security (PAS) logs over Syslog or a file.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+experimental[]
+
+TODO
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+

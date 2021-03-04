@@ -1,0 +1,40 @@
+---
+description: Pipeline for CyberArk PAS
+
+processors:
+  # ECS event.ingested
+  - set:
+        field: event.ingested
+        value: '{{_ingest.timestamp}}'
+
+  # Parse syslog headers (if any) and extract JSON payload.
+  - grok:
+      field: message
+      patterns:
+        # RFC5424 from Cyberark.
+        # <5>1 2021-03-04T17:28:23Z VAULT {"format":"elastic","version":"1.0",...}
+        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:@timestamp} %{SYSLOGHOST:observer.hostname} %{JSON_PAYLOAD:_json}"
+        - "%{JSON_PAYLOAD:_json}"
+      pattern_definitions:
+        JSON_PAYLOAD: '{"format":"elastic","version":"1.0",.*}'
+
+  - rename:
+      field: message
+      target_field: event.original
+
+  - json:
+      field: _json
+      target_field: json
+
+  - rename:
+      field: json.syslog.audit_record
+      target_field: cyberarkpas.audit
+
+  - remove:
+      field:
+       - _json
+       - json
+on_failure:
+  - append:
+        field: error.message
+        value: "{{ _ingest.on_failure_message }}"
