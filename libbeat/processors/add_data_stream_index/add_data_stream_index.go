@@ -50,6 +50,12 @@ type AddDataStreamIndex struct {
 
 // New returns a new AddDataStreamIndex processor.
 func New(ds DataStream) *AddDataStreamIndex {
+	if ds.Namespace == "" {
+		ds.Namespace = "default"
+	}
+	if ds.Dataset == "" {
+		ds.Dataset = "generic"
+	}
 	return &AddDataStreamIndex{
 		DataStream: ds,
 		dsCached: ds.indexName(),

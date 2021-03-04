@@ -24,7 +24,7 @@ heartbeat.monitors:
   data_stream:
     namespace: myns
 - type: browser
-  enabled: true
+  enabled: false
   id: my-monitor
   name: My Monitor
   data_stream:
