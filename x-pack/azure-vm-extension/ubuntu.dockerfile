@@ -4,5 +4,5 @@ RUN apt-get update && apt-get -y install sudo wget
 WORKDIR /sln
 
 COPY ./handler ./handler
-COPY ./tests ./tests
+COPY settings ./tests
 

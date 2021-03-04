@@ -4,12 +4,14 @@ set -euo pipefail
 DISTRO_OS=""
 LOGS_FOLDER=""
 CONFIG_FILE=""
+STATUS_FOLDER=""
 CLOUD_ID=""
 USERNAME=""
 PASSWORD=""
 ELASTICSEARCH_URL=""
 STACK_VERSION=""
 KIBANA_URL=""
+POLICY_ID=""
 
 checkOS()
 {
@@ -58,11 +60,22 @@ get_logs_location()
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
   ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
-  echo $ES_EXT_DIR
-  #ES_EXT_DIR="/mnt/c/work/beats/x-pack/azure-vm-extension/handler/"
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
 then
     LOGS_FOLDER=$(jq -r '.[0].handlerEnvironment.logFolder' $ES_EXT_DIR/HandlerEnvironment.json)
+else
+    exit 1
+fi
+}
+
+get_status_location()
+{
+  SCRIPT=$(readlink -f "$0")
+  cmd_path=$(dirname "$SCRIPT")
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
+   if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
+then
+    STATUS_FOLDER=$(jq -r '.[0].handlerEnvironment.statusFolder' $ES_EXT_DIR/HandlerEnvironment.json)
 else
     exit 1
 fi
@@ -77,8 +90,6 @@ log()
     echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2"
     echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2" >> $LOGS_FOLDER/es-agent.log
 }
-
-
 
 checkShasum ()
 {
@@ -99,6 +110,17 @@ checkShasum ()
   fi
 }
 
+write_status() {
+  get_status_location
+  if [[ "$STATUS_FOLDER" != "" ]]; then
+    status_files_path="$STATUS_FOLDER/*.status"
+    latest_status_file=$(ls $status_files_path 2>/dev/null | sort -V | tail -1)
+    if [[ $latest_status_file = "" ]]; then
+      echo ""
+      fi
+    fi
+}
+
 
 # configuration
 
@@ -106,7 +128,7 @@ get_configuration_location()
 {
   SCRIPT=$(readlink -f "$0")
   cmd_path=$(dirname "$SCRIPT")
-    ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
+  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && cd ../ && pwd)
   log "INFO" "[get_configuration_location] main directory found $ES_EXT_DIR"
   log "INFO" "[get_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
@@ -202,13 +224,13 @@ get_cloud_stack_version () {
   get_username
   get_password
   if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
-    jsonResult=$(curl "${ELASTICSEARCH_URL}"  -H 'Content-Type: application/json' -u ${USERNAME}:${PASSWORD})
+    json_result=$(curl "${ELASTICSEARCH_URL}"  -H 'Content-Type: application/json' -u ${USERNAME}:${PASSWORD})
     local EXITCODE=$?
     if [ $EXITCODE -ne 0 ]; then
       log "ERROR" "[get_cloud_stack_version] error pinging $ELASTICSEARCH_URL"
       exit $EXITCODE
     fi
-   STACK_VERSION=$(echo $jsonResult | jq -r '.version.number')
+   STACK_VERSION=$(echo $json_result | jq -r '.version.number')
    log "INFO" "[get_cloud_stack_version] Stack version found is $STACK_VERSION"
   else
     log "ERROR" "[get_cloud_stack_version] Elasticsearch URL could not be found"
@@ -251,4 +273,33 @@ function retry_backoff() {
     local sleep_ms="$(($sleep_millis))"
     sleep "${sleep_ms:0:-3}.${sleep_ms: -3}"
   done
+}
+
+get_default_policy() {
+   eval result="$1"
+   list=$(echo "$result" | jq -r '.list')
+   for row in $(echo "${list}" | jq -r '.[] | @base64'); do
+   _jq() {
+     echo ${row} | base64 --decode | jq -r ${1}
+    }
+  name=$(_jq '.name')
+  is_active=$(_jq '.active')
+  if [[ "$name" == *"Default"* ]]  && [[ "$is_active" = "true" ]]; then
+  POLICY_ID=$(_jq '.id')
+  fi
+done
+}
+
+get_any_active_policy() {
+   eval result="$1"
+   list=$(echo "$result" | jq -r '.list')
+   for row in $(echo "${list}" | jq -r '.[] | @base64'); do
+   _jq() {
+     echo ${row} | base64 --decode | jq -r ${1}
+    }
+  is_active=$(_jq '.active')
+  if [[ "$is_active" = "true" ]]; then
+  POLICY_ID=$(_jq '.id')
+  fi
+done
 }

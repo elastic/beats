@@ -4,5 +4,5 @@ RUN yum install sudo wget -y
 WORKDIR /sln
 
 COPY ./handler ./handler
-COPY ./tests ./tests
+COPY settings ./tests
 

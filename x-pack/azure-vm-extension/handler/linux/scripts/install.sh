@@ -144,21 +144,24 @@ Enroll_ElasticAgent() {
      log "ERROR" "[Enroll_ElasticAgent] Password could not be found/parsed"
      return 1
    fi
-  local ENROLLMENT_TOKEN_ID=""
   local ENROLLMENT_TOKEN=""
   jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u ${USERNAME}:${PASSWORD} )
   local EXITCODE=$?
   if [ $EXITCODE -ne 0 ]; then
     log "ERROR" "[Enroll_ElasticAgent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"
     return $EXITCODE
-    fi
-  ENROLLMENT_TOKEN_ID=$(echo $jsonResult | jq -r '.list[0].id')
-  if [[ "$ENROLLMENT_TOKEN_ID" = "" ]]; then
-    log "ERROR" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN_ID could not be found/parsed"
+  fi
+  get_default_policy "\${jsonResult}"
+  if [[ "$POLICY_ID" = "" ]]; then
+    log "WARN" "[Enroll_ElasticAgent] Default policy could not be found or is not active. Will select any active policy instead"
+    get_any_active_policy "\${jsonResult}"
+  fi
+  if [[ "$POLICY_ID" = "" ]]; then
+    log "ERROR" "[Enroll_ElasticAgent] No active policies were found. Please create a policy in Kibana Fleet"
     return 1
-   fi
-  log "INFO" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN_ID is $ENROLLMENT_TOKEN_ID"
-  jsonResult=$(curl ${KIBANA_URL}/api/fleet/enrollment-api-keys/$ENROLLMENT_TOKEN_ID \
+  fi
+  log "INFO" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN_ID is $POLICY_ID"
+  jsonResult=$(curl ${KIBANA_URL}/api/fleet/enrollment-api-keys/$POLICY_ID \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
         -u ${USERNAME}:${PASSWORD} )

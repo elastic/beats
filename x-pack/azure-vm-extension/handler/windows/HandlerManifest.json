@@ -1,0 +1,13 @@
+[{
+    "version": 1.0,
+    "handlerManifest": {
+        "installCommand": "scripts\\install.cmd",
+        "uninstallCommand": "scripts\\uninstall.cmd",
+        "updateCommand": "scripts\\update.cmd",
+        "enableCommand": "scripts\\enable.cmd",
+        "disableCommand": "scripts\\disable.cmd",
+        "rebootAfterInstall": false,
+        "reportHeartbeat": false,
+        "updateMode": "UpdateWithInstall"
+    }
+}]

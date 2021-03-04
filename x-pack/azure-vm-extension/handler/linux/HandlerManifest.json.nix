@@ -7,6 +7,7 @@
     "enableCommand": "scripts\\linux\\enable.sh",
     "disableCommand": "scripts\\linux\\disable.sh",
     "rebootAfterInstall": false,
-    "reportHeartbeat": false
+    "reportHeartbeat": false,
+    "updateMode": "UpdateWithInstall"
   }
 }]
