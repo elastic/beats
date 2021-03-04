@@ -114,14 +114,9 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		templateName = config.JSON.Name
 	}
 
-	var exists bool
-	if config.Type == IndexTemplateComponent {
-		exists, err = l.existsComponentTemplate(templateName)
-	} else {
-		exists, err = l.existsTemplate(templateName)
-	}
+	exists, err := l.templateExists(templateName, config.Type)
 	if err != nil {
-		return err
+		return fmt.Errorf("failure while checking if template exists: %w", err)
 	}
 
 	if exists && !config.Overwrite {
@@ -159,12 +154,19 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 	return nil
 }
 
+func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) (bool, error) {
+	if templateType == IndexTemplateComponent {
+		return l.checkExistsComponentTemplate(templateName)
+	}
+	return l.checkExistsTemplate(templateName)
+}
+
 // existsTemplate checks if a given template already exist, using the
 // `_cat/templates/<name>` API.
 //
 // An error is returned if the loader failed to execute the request, or a
 // status code indicating some problems is encountered.
-func (l *ESLoader) existsTemplate(name string) (bool, error) {
+func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 	status, body, err := l.client.Request("GET", "/_cat/templates/"+name, "", nil, nil)
 	if err != nil {
 		return false, err
@@ -184,7 +186,7 @@ func (l *ESLoader) existsTemplate(name string) (bool, error) {
 //
 // The resource is assumed as present if a 200 OK status is returned and missing if a 404 is returned.
 // Other status codes or IO errors during the request are reported as error.
-func (l *ESLoader) existsComponentTemplate(name string) (bool, error) {
+func (l *ESLoader) checkExistsComponentTemplate(name string) (bool, error) {
 	status, _, err := l.client.Request("GET", "/_component_template/"+name, "", nil, nil)
 	if err != nil {
 		return false, err
