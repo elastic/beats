@@ -43,10 +43,9 @@ func SetEventDataset(event *beat.Event, ds string) {
 type AddDataStreamIndex struct {
 	DataStream DataStream
 	// cached, compiled version of the index name derived from the data stream
-	dsCached string
+	dsCached      string
 	customDsCache string
 }
-
 
 // New returns a new AddDataStreamIndex processor.
 func New(ds DataStream) *AddDataStreamIndex {
@@ -57,8 +56,8 @@ func New(ds DataStream) *AddDataStreamIndex {
 		ds.Dataset = "generic"
 	}
 	return &AddDataStreamIndex{
-		DataStream: ds,
-		dsCached: ds.indexName(),
+		DataStream:    ds,
+		dsCached:      ds.indexName(),
 		customDsCache: ds.datasetFmtString(),
 	}
 }
@@ -92,7 +91,6 @@ type DataStream struct {
 	Dataset   string `config:"dataset"`
 	Type      string `config:"type"`
 }
-
 
 func (ds DataStream) datasetFmtString() string {
 	return fmt.Sprintf("%s-%%s-%s", ds.Type, ds.Namespace)
