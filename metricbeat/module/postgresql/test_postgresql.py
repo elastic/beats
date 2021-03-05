@@ -137,6 +137,9 @@ class Test(metricbeat.BaseTest):
         self.common_checks(output)
 
         for evt in output:
-            assert "user" in evt["postgresql"]["statement"]
-            assert "database" in evt["postgresql"]["statement"]
-            assert "query" in evt["postgresql"]["statement"]
+            statement = evt["postgresql"]["statement"]
+            assert "user" in statement
+            assert "database" in statement
+            assert "query" in statement
+            assert "ms" in statement["query"]["time"]["max"]
+            assert "ms" in statement["query"]["time"]["total"]

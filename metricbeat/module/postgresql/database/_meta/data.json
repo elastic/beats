@@ -12,8 +12,8 @@
     "postgresql": {
         "database": {
             "blocks": {
-                "hit": 36859,
-                "read": 370,
+                "hit": 43969,
+                "read": 381,
                 "time": {
                     "read": {
                         "ms": 0
@@ -27,27 +27,27 @@
             "deadlocks": 0,
             "name": "postgres",
             "number_of_backends": 2,
-            "oid": 13408,
+            "oid": 13395,
             "rows": {
-                "deleted": 4,
-                "fetched": 21477,
-                "inserted": 49,
-                "returned": 42742,
-                "updated": 11
+                "deleted": 42,
+                "fetched": 26418,
+                "inserted": 98,
+                "returned": 53201,
+                "updated": 14
             },
-            "stats_reset": "2021-03-05T17:33:58.438Z",
+            "stats_reset": "2021-03-05T18:39:18.089Z",
             "temporary": {
                 "bytes": 0,
                 "files": 0
             },
             "transactions": {
-                "commit": 393,
-                "rollback": 0
+                "commit": 445,
+                "rollback": 5
             }
         }
     },
     "service": {
-        "address": "172.19.0.2:5432",
+        "address": "192.168.128.2:5432",
         "type": "postgresql"
     }
 }

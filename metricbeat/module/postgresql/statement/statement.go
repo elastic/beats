@@ -66,6 +66,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, result := range results {
 		data, _ := schema.Apply(result)
+		if _, ok := result["total_time"]; ok {
+			execTimes, _ := schemaTime.Apply(result)
+			data.DeepUpdate(execTimes)
+		}
 		reporter.Event(mb.Event{
 			MetricSetFields: data,
 		})

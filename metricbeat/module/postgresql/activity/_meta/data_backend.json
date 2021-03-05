@@ -11,15 +11,15 @@
     },
     "postgresql": {
         "activity": {
-            "backend_start": "2021-03-05T17:33:58.680Z",
-            "backend_type": "autovacuum launcher",
+            "backend_start": "2021-03-05T18:39:18.347Z",
+            "backend_type": "logical replication launcher",
             "pid": 81,
-            "wait_event": "AutoVacuumMain",
+            "wait_event": "LogicalLauncherMain",
             "wait_event_type": "Activity"
         }
     },
     "service": {
-        "address": "172.19.0.2:5432",
+        "address": "192.168.128.2:5432",
         "type": "postgresql"
     }
 }
