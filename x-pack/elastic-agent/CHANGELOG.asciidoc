@@ -39,6 +39,7 @@
 - Make installer atomic on windows {pull}[24253]24253
 - Remove installed services on agent uninstall {pull}[24151]24151
 - Fix failing installation on windows 7 {pull}[24387]24387
+- Fix windows installer during enroll {pull}[24343]24343
 
 ==== New features
 
