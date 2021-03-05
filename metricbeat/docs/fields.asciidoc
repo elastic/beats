@@ -38969,6 +38969,14 @@ type: long
 
 --
 
+*`postgresql.activity.backend_type`*::
++
+--
+Type of the current backend. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. Extensions may register workers with additional backend types.
+
+
+--
+
 *`postgresql.activity.backend_start`*::
 +
 --
@@ -39041,6 +39049,22 @@ Current overall state of this backend. Possible values are:
 +
 --
 Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+--
+
+*`postgresql.activity.wait_event`*::
++
+--
+Wait event name if the backend is currently waiting.
+
+
+--
+
+*`postgresql.activity.wait_event_type`*::
++
+--
+The type of event for which the backend is waiting.
 
 
 --
