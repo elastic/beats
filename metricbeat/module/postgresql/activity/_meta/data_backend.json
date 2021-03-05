@@ -11,7 +11,7 @@
     },
     "postgresql": {
         "activity": {
-            "backend_start": "2021-03-05T16:38:20.923Z",
+            "backend_start": "2021-03-05T17:33:58.680Z",
             "backend_type": "autovacuum launcher",
             "pid": 81,
             "wait_event": "AutoVacuumMain",
@@ -19,7 +19,7 @@
         }
     },
     "service": {
-        "address": "192.168.240.2:5432",
+        "address": "172.19.0.2:5432",
         "type": "postgresql"
     }
 }

@@ -39172,7 +39172,7 @@ One row per database, showing database-wide statistics. Collected by querying pg
 *`postgresql.database.oid`*::
 +
 --
-OID of the database this backend is connected to.
+OID of the database this backend is connected to, or 0 for shared resources.
 
 
 type: long
@@ -39182,7 +39182,7 @@ type: long
 *`postgresql.database.name`*::
 +
 --
-Name of the database this backend is connected to.
+Name of the database this backend is connected to, empty for shared resources.
 
 
 type: keyword

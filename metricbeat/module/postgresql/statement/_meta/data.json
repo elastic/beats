@@ -12,11 +12,11 @@
     "postgresql": {
         "statement": {
             "database": {
-                "oid": 12994
+                "oid": 13408
             },
             "query": {
-                "calls": 32,
-                "id": 40179716,
+                "calls": 19,
+                "id": -185051394160740490,
                 "memory": {
                     "local": {
                         "dirtied": 0,
@@ -26,7 +26,7 @@
                     },
                     "shared": {
                         "dirtied": 0,
-                        "hit": 148,
+                        "hit": 0,
                         "read": 0,
                         "written": 0
                     },
@@ -35,23 +35,23 @@
                         "written": 0
                     }
                 },
-                "rows": 205,
-                "text": "SELECT * FROM pg_stat_activity",
+                "rows": 118,
+                "text": "SELECT * FROM pg_stat_statements",
                 "time": {
                     "max": {
-                        "ms": 0.7016140000000001
+                        "ms": 0.228242
                     },
                     "mean": {
-                        "ms": 0.17686590625
+                        "ms": 0.12617657894736842
                     },
                     "min": {
-                        "ms": 0.103633
+                        "ms": 0.09997500000000001
                     },
                     "stddev": {
-                        "ms": 0.12307264350637581
+                        "ms": 0.030821125680996264
                     },
                     "total": {
-                        "ms": 5.659708999999999
+                        "ms": 2.397355
                     }
                 }
             },
@@ -61,7 +61,7 @@
         }
     },
     "service": {
-        "address": "192.168.240.2:5432",
+        "address": "172.19.0.2:5432",
         "type": "postgresql"
     }
 }

@@ -12,30 +12,30 @@
     "postgresql": {
         "bgwriter": {
             "buffers": {
-                "allocated": 250,
+                "allocated": 271,
                 "backend": 0,
                 "backend_fsync": 0,
-                "checkpoints": 6,
+                "checkpoints": 5,
                 "clean": 0,
                 "clean_full": 0
             },
             "checkpoints": {
                 "requested": 0,
-                "scheduled": 10,
+                "scheduled": 3,
                 "times": {
                     "sync": {
                         "ms": 6
                     },
                     "write": {
-                        "ms": 605
+                        "ms": 504
                     }
                 }
             },
-            "stats_reset": "2021-03-05T16:38:20.516Z"
+            "stats_reset": "2021-03-05T17:33:58.292Z"
         }
     },
     "service": {
-        "address": "192.168.240.2:5432",
+        "address": "172.19.0.2:5432",
         "type": "postgresql"
     }
 }
