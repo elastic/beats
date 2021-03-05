@@ -22,6 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 )
@@ -56,13 +57,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
+
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_activity")
 	if err != nil {
 		return errors.Wrap(err, "error in QueryStats")
 	}
 
 	for _, result := range results {
-		data, _ := schema.Apply(result)
+		var data common.MapStr
+		if datid, ok := result["datid"].(string); ok && datid != "" {
+			data, _ = schema.Apply(result)
+		} else {
+			data, _ = backendSchema.Apply(result)
+		}
 		reporter.Event(mb.Event{
 			MetricSetFields: data,
 		})

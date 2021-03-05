@@ -5,6 +5,7 @@ import sys
 import unittest
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['postgresql']
