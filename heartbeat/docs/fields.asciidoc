@@ -9555,7 +9555,9 @@ type: keyword
 Kubernetes container name
 
 
-type: keyword
+type: alias
+
+alias to: container.name
 
 --
 
@@ -9565,7 +9567,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 

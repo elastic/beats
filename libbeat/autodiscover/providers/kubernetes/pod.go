@@ -356,7 +356,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		)
 
 		cmeta := common.MapStr{
-			"id": cid,
+			"id":      cid,
 			"runtime": runtimes[c.Name],
 		}
 
