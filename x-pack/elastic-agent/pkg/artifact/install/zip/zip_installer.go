@@ -69,7 +69,7 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	return nil
 }
 
-func (i *Installer) unzip(ctx context.Context, artifactPath string) error {
+func (i *Installer) unzip(_ context.Context, artifactPath string) error {
 	r, err := zip.OpenReader(artifactPath)
 	if err != nil {
 		return err
@@ -120,11 +120,6 @@ func (i *Installer) unzip(ctx context.Context, artifactPath string) error {
 	}
 
 	for _, f := range r.File {
-		// if we were cancelled in between
-		if err := ctx.Err(); err != nil {
-			return err
-		}
-
 		if err := unpackFile(f); err != nil {
 			return err
 		}
