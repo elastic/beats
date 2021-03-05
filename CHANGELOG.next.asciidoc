@@ -239,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
 - Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
+- Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
 *Auditbeat*
 
@@ -516,7 +517,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Unskip s3_request integration test. {pull}23887[23887]
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
-- Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
 *Packetbeat*
 
