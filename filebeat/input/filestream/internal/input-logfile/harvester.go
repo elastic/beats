@@ -93,7 +93,7 @@ func (r *readerGroup) remove(id string) {
 	delete(r.table, id)
 }
 
-func (r *readerGroup) isIDAdded(id string) bool {
+func (r *readerGroup) hasID(id string) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
