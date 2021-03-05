@@ -26,11 +26,12 @@ import (
 )
 
 const (
-	defaultKibanaHost = "http://kibana:5601"
-	defaultESHost     = "http://elasticsearch:9200"
-	defaultUsername   = "elastic"
-	defaultPassword   = "changeme"
-	defaultTokenName  = "Default"
+	defaultKibanaHost      = "http://kibana:5601"
+	defaultESHost          = "http://elasticsearch:9200"
+	defaultUsername        = "elastic"
+	defaultPassword        = "changeme"
+	defaultTokenName       = "Default"
+	defaultAgentPolicyName = "Default policy"
 
 	requestRetrySleep = 1 * time.Second // sleep 1 sec between retries for HTTP requests
 	maxRequestRetries = 30              // maximum number of retries for HTTP requests
@@ -301,9 +302,9 @@ func kibanaClient() (*kibana.Client, error) {
 
 func findPolicy(policies []kibanaPolicy) (*kibanaPolicy, error) {
 	fleetServerEnabled := envBool("FLEET_SERVER_ENABLE")
-	policyName := envWithDefault("", "FLEET_TOKEN_POLICY_NAME")
+	policyName := envWithDefault(defaultAgentPolicyName, "FLEET_TOKEN_POLICY_NAME")
 	if fleetServerEnabled {
-		policyName = envWithDefault("", "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME")
+		policyName = envWithDefault(defaultAgentPolicyName, "FLEET_SERVER_POLICY_NAME", "FLEET_TOKEN_POLICY_NAME")
 	}
 	for _, policy := range policies {
 		if policy.Status != "active" {
