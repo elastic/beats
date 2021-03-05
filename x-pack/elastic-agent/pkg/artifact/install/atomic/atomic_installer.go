@@ -9,6 +9,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -51,14 +54,27 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 
 	if err := i.installer.Install(ctx, spec, version, tempInstallDir); err != nil {
 		// cleanup unfinished install
-		os.RemoveAll(tempInstallDir)
+		if rerr := os.RemoveAll(tempInstallDir); rerr != nil {
+			err = multierror.Append(err, rerr)
+		}
 		return err
 	}
 
 	if err := os.Rename(tempInstallDir, installDir); err != nil {
-		os.RemoveAll(installDir)
-		os.RemoveAll(tempInstallDir)
+		if rerr := os.RemoveAll(installDir); rerr != nil {
+			err = multierror.Append(err, rerr)
+		}
+		if rerr := os.RemoveAll(tempInstallDir); rerr != nil {
+			err = multierror.Append(err, rerr)
+		}
 		return err
+	}
+
+	// on windows rename is not atomic, let's force it to flush the cache
+	if runtime.GOOS == "windows" {
+		if f, err := os.OpenFile(installDir, os.O_SYNC|os.O_RDWR, 0755); err == nil {
+			f.Sync()
+		}
 	}
 
 	return nil
