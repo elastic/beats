@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   consul:
-    image: docker.elastic.co/integrations-ci/beats-consul:${CONSUL_VERSION:-1.4.2}-1
+    image: docker.elastic.co/integrations-ci/beats-consul:${CONSUL_VERSION:-1.9.3}-1
     build:
       context: ./_meta
       args:
-        CONSUL_VERSION: ${CONSUL_VERSION:-1.4.2}
+        CONSUL_VERSION: ${CONSUL_VERSION:-1.9.3}
     ports:
       - 8500

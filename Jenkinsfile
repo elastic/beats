@@ -507,12 +507,18 @@ def target(Map args = [:]) {
 }
 
 /**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+* This method wraps the node call for two reasons:
+*  1. with some latency to avoid the known issue with the scalabitity in gobld.
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
+  // this should workaround the existing issue with reusing workers with the Gobld
+  def uuid = UUID.randomUUID().toString()
   node(label) {
-    body()
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
+      body()
+    }
   }
 }
 
@@ -555,7 +561,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
     gox_flags = '-arch 386'
   }
 
-  deleteDir()
+  // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+  //            Windows workers are ephemerals, so this should not really affect us.
+  if(isUnix()) {
+    deleteDir()
+  }
+
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
@@ -599,11 +610,24 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
-        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-          fixPermissions("${WORKSPACE}")
-          deleteDir()
-        }
+        tearDown()
+      }
+    }
+  }
+}
+
+/**
+* Tear down the setup for the permanent workers.
+*/
+def tearDown() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    cmd(label: 'Remove the entire module cache', script: 'go clean -modcache', returnStatus: true)
+    fixPermissions("${WORKSPACE}")
+    // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+    //            Windows workers are ephemerals, so this should not really affect us.
+    if (isUnix()) {
+      dir("${WORKSPACE}") {
+        deleteDir()
       }
     }
   }
@@ -618,6 +642,7 @@ def fixPermissions(location) {
   if(isUnix()) {
     sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
       set +x
+      echo "Cleaning up ${location}"
       source ./dev-tools/common.bash
       docker_setup
       script/fix_permissions.sh ${location}""", returnStatus: true)
