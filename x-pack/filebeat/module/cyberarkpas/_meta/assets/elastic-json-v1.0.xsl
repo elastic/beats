@@ -96,9 +96,16 @@
         <xsl:with-param name="to" select="'\\'"/>
       </xsl:call-template>
   </xsl:variable>
+  <xsl:variable name="tmp2">
+    <xsl:call-template name="string-replace">
+      <xsl:with-param name="string" select="$tmp"/>
+      <xsl:with-param name="from" select="'&#xa;'"/>
+      <xsl:with-param name="to" select="'\n'"/>
+    </xsl:call-template>
+  </xsl:variable>
   <xsl:text>&quot;</xsl:text>
   <xsl:call-template name="string-replace">
-    <xsl:with-param name="string" select="$tmp"/>
+    <xsl:with-param name="string" select="translate($tmp2,'&#9;&#xd;','  ')"/>
     <xsl:with-param name="from" select="'&quot;'"/>
     <xsl:with-param name="to" select="'\&quot;'"/>
   </xsl:call-template>
