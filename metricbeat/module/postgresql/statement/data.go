@@ -22,7 +22,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 )
 
-// Based on: https://www.postgresql.org/docs/9.2/static/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
+// Based on: https://www.postgresql.org/docs/9.6/pgstatstatements.html
 var schema = s.Schema{
 	"user": s.Object{
 		"id": c.Int("userid"),
@@ -31,7 +31,7 @@ var schema = s.Schema{
 		"oid": c.Int("dbid"),
 	},
 	"query": s.Object{
-		"id":    c.Str("queryid"),
+		"id":    c.Int("queryid"),
 		"text":  c.Str("query"),
 		"calls": c.Int("calls"),
 		"rows":  c.Int("rows"),
