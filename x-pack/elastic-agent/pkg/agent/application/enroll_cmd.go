@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
@@ -234,8 +233,9 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save fleet server bootstrap information", errors.TypeFilesystem)
+
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
+		return err
 	}
 
 	if agentRunning {
@@ -405,11 +405,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		return err
 	}
 
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
-	}
-
-	if _, err := info.NewAgentInfo(); err != nil {
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
 		return err
 	}
 
@@ -555,5 +551,33 @@ func getAppFromStatus(status *client.AgentStatus, name string) *client.Applicati
 			return app
 		}
 	}
+	return nil
+}
+
+func safelyStoreAgentInfo(s saver, reader io.Reader) error {
+	err := storeAgentInfo(s, reader)
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 200*time.Millisecond, 15*time.Second)
+
+	for err != nil {
+		backExp.Wait()
+		err = storeAgentInfo(s, reader)
+	}
+
+	close(signal)
+	return err
+}
+
+func storeAgentInfo(s saver, reader io.Reader) error {
+	fileLock := paths.AgentConfigFileLock()
+	if err := fileLock.TryLock(); err != nil {
+		return err
+	}
+	defer fileLock.Unlock()
+
+	if err := s.Save(reader); err != nil {
+		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
+	}
+
 	return nil
 }
