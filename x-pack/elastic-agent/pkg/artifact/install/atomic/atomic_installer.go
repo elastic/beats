@@ -52,6 +52,21 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 		os.RemoveAll(tempInstallDir)
 	}
 
+	// on windows rename is not atomic, let's force it to flush the cache
+	defer func() {
+		if runtime.GOOS == "windows" {
+			if f, err := os.OpenFile(installDir, os.O_RDWR, 0777); err == nil {
+				f.Sync()
+				f.Close()
+			}
+
+			if f, err := os.OpenFile(tempInstallDir, os.O_RDWR, 0777); err == nil {
+				f.Sync()
+				f.Close()
+			}
+		}
+	}()
+
 	if err := i.installer.Install(ctx, spec, version, tempInstallDir); err != nil {
 		// cleanup unfinished install
 		if rerr := os.RemoveAll(tempInstallDir); rerr != nil {
@@ -68,13 +83,6 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 			err = multierror.Append(err, rerr)
 		}
 		return err
-	}
-
-	// on windows rename is not atomic, let's force it to flush the cache
-	if runtime.GOOS == "windows" {
-		if f, err := os.OpenFile(installDir, os.O_SYNC|os.O_RDWR, 0755); err == nil {
-			f.Sync()
-		}
 	}
 
 	return nil
