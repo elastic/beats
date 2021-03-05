@@ -26,6 +26,7 @@ func AgentConfigFile() string {
 
 // AgentConfigFileLock is a locker for agent config file updates.
 func AgentConfigFileLock() *filelock.AppLocker {
+	fmt.Println(">>>", filepath.Join(Config(), fmt.Sprintf("%s.lock", defaultAgentConfigFile)))
 	return filelock.NewAppLocker(
 		Config(),
 		fmt.Sprintf("%s.lock", defaultAgentConfigFile),

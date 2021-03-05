@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
@@ -35,9 +36,10 @@ import (
 )
 
 const (
-	waitingForAgent        = "waiting for Elastic Agent to start"
-	waitingForFleetServer  = "waiting for Elastic Agent to start Fleet Server"
-	defaultFleetServerPort = 8220
+	maxRetriesstoreAgentInfo = 5
+	waitingForAgent          = "waiting for Elastic Agent to start"
+	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerPort   = 8220
 )
 
 var (
@@ -555,13 +557,16 @@ func getAppFromStatus(status *client.AgentStatus, name string) *client.Applicati
 }
 
 func safelyStoreAgentInfo(s saver, reader io.Reader) error {
-	err := storeAgentInfo(s, reader)
+	var err error
 	signal := make(chan struct{})
-	backExp := backoff.NewExpBackoff(signal, 200*time.Millisecond, 15*time.Second)
+	backExp := backoff.NewExpBackoff(signal, 100*time.Millisecond, 3*time.Second)
 
-	for err != nil {
+	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
 		backExp.Wait()
 		err = storeAgentInfo(s, reader)
+		if err != filelock.ErrAppAlreadyRunning {
+			break
+		}
 	}
 
 	close(signal)

@@ -14,6 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -23,6 +24,7 @@ import (
 // defaultAgentConfigFile is a name of file used to store agent information
 const agentInfoKey = "agent"
 const defaultLogLevel = "info"
+const maxRetriesloadAgentInfo = 5
 
 type persistentAgentInfo struct {
 	ID       string `json:"id" yaml:"id" config:"id"`
@@ -159,13 +161,18 @@ func yamlToReader(in interface{}) (io.Reader, error) {
 }
 
 func loadAgentInfoWithBackoff(forceUpdate bool, logLevel string) (*persistentAgentInfo, error) {
-	ai, err := loadAgentInfo(forceUpdate, logLevel)
-	signal := make(chan struct{})
-	backExp := backoff.NewExpBackoff(signal, 200*time.Millisecond, 5*time.Second)
+	var err error
+	var ai *persistentAgentInfo
 
-	for err != nil {
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 100*time.Millisecond, 3*time.Second)
+
+	for i := 0; i <= maxRetriesloadAgentInfo; i++ {
 		backExp.Wait()
 		ai, err = loadAgentInfo(forceUpdate, logLevel)
+		if err != filelock.ErrAppAlreadyRunning {
+			break
+		}
 	}
 
 	close(signal)
