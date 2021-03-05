@@ -11,9 +11,13 @@ rules:
   - namespaces
   - events
   - pods
-  - secrets
   - services
   verbs: ["get", "list", "watch"]
+# Enable this rule only if planing to use Kubernetes keystore
+#- apiGroups: [""]
+#  resources:
+#  - secrets
+#  verbs: ["get"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets
