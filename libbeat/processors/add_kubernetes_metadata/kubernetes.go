@@ -257,12 +257,10 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	metaClone := metadata.Clone()
+	// image and name will be added to ECS fields through alias type
+	// id and runtime need to be added explicitly
 	metaClone.Delete("container.name")
-	containerImage, err := metadata.GetValue("container.image")
-	if err == nil {
-		metaClone.Delete("container.image")
-		metaClone.Put("container.image.name", containerImage)
-	}
+	metaClone.Delete("container.image")
 	cmeta, err := metaClone.Clone().GetValue("container")
 	if err == nil {
 		event.Fields.DeepUpdate(common.MapStr{
@@ -271,6 +269,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	kubeMeta := metadata.Clone()
+	// remove id and runtime from kubernetes meta (their place is under container meta)
 	kubeMeta.Delete("container.id")
 	kubeMeta.Delete("container.runtime")
 	event.Fields.DeepUpdate(common.MapStr{

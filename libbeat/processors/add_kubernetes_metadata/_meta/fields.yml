@@ -70,11 +70,13 @@
             Kubernetes statefulset name
 
         - name: container.name
-          type: keyword
+          type: alias
+          path: container.name
           description: >
             Kubernetes container name
 
         - name: container.image
-          type: keyword
+          type: alias
+          path: container.image.name
           description: >
             Kubernetes container image

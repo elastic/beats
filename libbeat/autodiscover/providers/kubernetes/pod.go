@@ -357,9 +357,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 
 		cmeta := common.MapStr{
 			"id": cid,
-			"image": common.MapStr{
-				"name": c.Image,
-			},
 			"runtime": runtimes[c.Name],
 		}
 
@@ -387,8 +384,9 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"host":       host,
 				"port":       0,
 				"kubernetes": kubemeta,
+				//Actual metadata that will enrich the event
 				"meta": common.MapStr{
-					"kubernetes": meta,
+					"kubernetes": meta, // these will be moved to ECS (container.name and container.image.name) through alias type
 					"container":  cmeta,
 				},
 			}
