@@ -216,7 +216,7 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 			args = append(args, "--fleet-server-cert-key", certKey)
 		}
 		if envBool("FLEET_SERVER_INSECURE_HTTP") {
-			args = append(args, "--fleet-server--insecure-http")
+			args = append(args, "--fleet-server-insecure-http")
 			args = append(args, "--insecure")
 		}
 	} else {
