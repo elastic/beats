@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "postgresql.statement",
         "duration": 115000,
         "module": "postgresql"
     },
     "metricset": {
-        "name": "statement"
+        "name": "statement",
+        "period": 10000
     },
     "postgresql": {
         "statement": {
@@ -19,7 +16,7 @@
             },
             "query": {
                 "calls": 2,
-                "id": "1592910677",
+                "id": 1592910677,
                 "memory": {
                     "local": {
                         "dirtied": 0,
@@ -42,19 +39,19 @@
                 "text": "SELECT * FROM pg_stat_statements",
                 "time": {
                     "max": {
-                        "ms": 0.388
+                        "ms": 0.161
                     },
                     "mean": {
-                        "ms": 0.235
+                        "ms": 0.1595
                     },
                     "min": {
-                        "ms": 0.082
+                        "ms": 0.158
                     },
                     "stddev": {
-                        "ms": 0.153
+                        "ms": 0.0015000000000000013
                     },
                     "total": {
-                        "ms": 0.47000000000000003
+                        "ms": 0.319
                     }
                 }
             },
@@ -64,7 +61,7 @@
         }
     },
     "service": {
-        "address": "172.26.0.2:5432",
+        "address": "192.168.144.2:5432",
         "type": "postgresql"
     }
 }
