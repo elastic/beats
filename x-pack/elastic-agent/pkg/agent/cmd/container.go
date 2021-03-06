@@ -216,7 +216,7 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 			args = append(args, "--fleet-server-cert-key", certKey)
 		}
 		if envBool("FLEET_SERVER_INSECURE_HTTP") {
-			args = append(args, "--fleet-server--insecure-http")
+			args = append(args, "--fleet-server-insecure-http")
 			args = append(args, "--insecure")
 		}
 	} else {
@@ -235,8 +235,8 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 
 func buildFleetServerConnStr() (string, error) {
 	host := envWithDefault(defaultESHost, "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST")
-	username := envWithDefault(defaultUsername, "FLEET_SERVER_ELASTICSEARCH_USERNAME", "$ELASTICSEARCH_USERNAME")
-	password := envWithDefault(defaultPassword, "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	username := envWithDefault(defaultUsername, "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD")
 	u, err := url.Parse(host)
 	if err != nil {
 		return "", err
@@ -289,8 +289,8 @@ func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.
 
 func kibanaClient() (*kibana.Client, error) {
 	host := envWithDefault(defaultKibanaHost, "KIBANA_FLEET_HOST", "KIBANA_HOST")
-	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "$ELASTICSEARCH_USERNAME")
-	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD")
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Host:          host,
 		Username:      username,
