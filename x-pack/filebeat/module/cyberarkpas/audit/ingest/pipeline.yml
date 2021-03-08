@@ -30,28 +30,22 @@ processors:
       pattern_definitions:
         JSON_PAYLOAD: '{"format":"elastic","version":"1.0",.*}'
       on_failure:
-        - append:
-            field: error.message
-            value: "unexpected event format: {{ _ingest.on_failure_message }}"
-        - drop: {}
+        - fail:
+            message: "unexpected event format: {{ _ingest.on_failure_message }}"
 
   - json:
       field: _tmp.payload
       target_field: _tmp.json
       on_failure:
-        - append:
-            field: error.message
-            value: "malformed JSON event: {{ _ingest.on_failure_message }}"
-        - drop: {}
+        - fail:
+            message: "malformed JSON event: {{ _ingest.on_failure_message }}"
 
   - rename:
       field: _tmp.json.syslog.audit_record
       target_field: cyberarkpas.audit
       on_failure:
-        - append:
-            field: error.message
-            value: "unexpected event structure: {{ _ingest.on_failure_message }}"
-        - drop: {}
+        - fail:
+            message: "unexpected event structure: {{ _ingest.on_failure_message }}"
 
   # Parse the syslog timestamp when the logs are emitted in legacy format.
   # In this case, this is the only timestamp present in the event, and in the
@@ -132,4 +126,4 @@ processors:
 on_failure:
   - append:
         field: error.message
-        value: "generic failure: {{ _ingest.on_failure_message }}"
+        value: "{{ _ingest.on_failure_message }}"
