@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -63,7 +64,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), agentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
