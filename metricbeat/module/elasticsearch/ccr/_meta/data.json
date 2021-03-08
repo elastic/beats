@@ -41,6 +41,24 @@
                 "index": "leader_index",
                 "max_seq_no": 1536
             },
+            "read_exceptions": [
+                {
+                    "exception": {
+                        "reason": "my_reason",
+                        "type": "my_warn"
+                    },
+                    "from_seq_no": 1234,
+                    "retries": 5
+                },
+                {
+                    "exception": {
+                        "reason": "my_reason",
+                        "type": "my_warn"
+                    },
+                    "from_seq_no": 1234,
+                    "retries": 5
+                }
+            ],
             "requests": {
                 "failed": {
                     "read": {
@@ -102,7 +120,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:53293",
+        "address": "127.0.0.1:37735",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

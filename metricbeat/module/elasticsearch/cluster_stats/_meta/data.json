@@ -56,7 +56,10 @@
                             }
                         }
                     },
-                    "master": 1
+                    "master": 1,
+                    "versions": [
+                        "8.0.0"
+                    ]
                 },
                 "stack": {
                     "xpack": {
@@ -99,7 +102,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:34983",
+        "address": "127.0.0.1:39279",
         "type": "elasticsearch"
     }
 }

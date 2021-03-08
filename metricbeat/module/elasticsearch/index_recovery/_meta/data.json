@@ -6,16 +6,41 @@
             "name": "docker-cluster"
         },
         "index": {
-            "name": ".apm-custom-link",
+            "name": ".kibana-event-log-8.0.0-000001",
             "recovery": {
                 "id": 0,
+                "index": {
+                    "files": {
+                        "percent": "0.0%",
+                        "recovered": 0,
+                        "reused": 0,
+                        "total": 0
+                    },
+                    "size": {
+                        "recovered_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "total_in_bytes": 0
+                    }
+                },
                 "primary": true,
                 "source": {},
                 "stage": "DONE",
+                "start_time": {
+                    "ms": 1605819056123
+                },
+                "stop_time": {
+                    "ms": 1605819058696
+                },
                 "target": {
                     "host": "127.0.0.1",
                     "id": "Fkj12lAFQOex0DwK0HMwHw",
-                    "name": "082618b4bb36"
+                    "name": "082618b4bb36",
+                    "transport_address": "127.0.0.1:9300"
+                },
+                "translog": {
+                    "percent": "100.0%",
+                    "total": 0,
+                    "total_on_start": 0
                 },
                 "type": "EMPTY_STORE"
             }
@@ -31,7 +56,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:33785",
+        "address": "127.0.0.1:43035",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

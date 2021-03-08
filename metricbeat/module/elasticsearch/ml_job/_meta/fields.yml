@@ -12,11 +12,13 @@
       type: keyword
       description: >
         Job state.
+    - name: forecasts_stats.total
+      type: long
     - name: model_size
       type: group
       fields:
         - name: memory_status
-          type: long
+          type: keyword
     - name: data_counts
       type: group
       fields:

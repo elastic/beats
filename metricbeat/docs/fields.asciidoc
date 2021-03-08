@@ -18530,6 +18530,15 @@ alias to: elasticsearch.ml.job.id
 
 --
 
+*`job_stats.forecasts_stats.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.forecasts_stats.total
+
+--
+
 
 *`index_stats.index`*::
 +
@@ -18841,6 +18850,15 @@ alias to: elasticsearch.ccr.auto_follow.failed.remote_cluster_state_requests.cou
 type: alias
 
 alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
+
+--
+
+*`ccr_auto_follow_stats.follower.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
 
 --
 
@@ -19806,6 +19824,13 @@ type: long
 +
 --
 type: long
+
+--
+
+*`elasticsearch.ccr.read_exceptions`*::
++
+--
+type: nested
 
 --
 
@@ -20876,6 +20901,65 @@ index
 
 
 
+
+
+*`elasticsearch.index.recovery.index.files.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.index.files.recovered`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.reused`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.total`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.recovery.index.size.recovered_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.reused_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.name`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.total_time.ms`*::
 +
 --
@@ -20937,6 +21021,35 @@ type: keyword
 
 --
 
+
+*`elasticsearch.index.recovery.translog.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.translog.total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.translog.total_on_start`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.target.transport_address`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.target.id`*::
 +
 --
@@ -20963,6 +21076,13 @@ type: keyword
 Target node name.
 
 
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.source.transport_address`*::
++
+--
 type: keyword
 
 --
@@ -21299,11 +21419,18 @@ type: keyword
 
 --
 
+*`elasticsearch.ml.job.forecasts_stats.total`*::
++
+--
+type: long
+
+--
+
 
 *`elasticsearch.ml.job.model_size.memory_status`*::
 +
 --
-type: long
+type: keyword
 
 --
 
@@ -29453,51 +29580,14 @@ Kibana module
 
 
 
-*`kibana_stats.timestamp`*::
+*`kibana.stats.usage.name`*::
 +
 --
 type: alias
 
-alias to: @timestamp
+alias to: kibana.stats.usage.index
 
 --
-
-*`kibana_stats.kibana.response_time.max`*::
-+
---
-type: alias
-
-alias to: kibana.stats.response_time.max.ms
-
---
-
-*`kibana_stats.kibana.status`*::
-+
---
-type: alias
-
-alias to: kibana.stats.kibana.status
-
---
-
-*`kibana_stats.os.memory.free_in_bytes`*::
-+
---
-type: alias
-
-alias to: kibana.stats.os.memory.free_in_bytes
-
---
-
-*`kibana_stats.process.uptime_in_millis`*::
-+
---
-type: alias
-
-alias to: kibana.stats.process.uptime.ms
-
---
-
 
 [float]
 === settings
@@ -29511,6 +29601,7 @@ Kibana stats and run-time metrics.
 --
 Kibana instance UUID
 
+
 type: keyword
 
 --
@@ -29519,6 +29610,7 @@ type: keyword
 +
 --
 Kibana instance name
+
 
 type: keyword
 
@@ -29598,14 +29690,6 @@ type: integer
 Kibana stats and run-time metrics.
 
 
-
-
-*`kibana.stats.kibana.status`*::
-+
---
-type: keyword
-
---
 
 
 *`kibana.stats.usage.index`*::
@@ -29701,12 +29785,6 @@ type: keyword
 
 --
 
-
-*`kibana.stats.os.memory.free_in_bytes`*::
-+
---
---
-
 *`kibana.stats.concurrent_connections`*::
 +
 --
@@ -29723,13 +29801,6 @@ type: long
 Process metrics
 
 
-
-*`kibana.stats.process.uptime.ms`*::
-+
---
-type: long
-
---
 
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
@@ -29827,10 +29898,12 @@ type: long
 Response times metrics
 
 
+
 *`kibana.stats.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
+
 
 type: long
 
@@ -29840,6 +29913,7 @@ type: long
 +
 --
 Maximum response time in milliseconds
+
 
 type: long
 

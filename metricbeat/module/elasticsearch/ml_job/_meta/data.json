@@ -9,12 +9,20 @@
             "job": {
                 "data_counts": {
                     "invalid_date_count": 0,
-                    "processed_record_count": 14
+                    "processed_record_count": 1216
                 },
-                "id": "55",
-                "model_size": {},
-                "state": "closed"
+                "forecasts_stats": {
+                    "total": 1
+                },
+                "id": "low_request_rate",
+                "model_size": {
+                    "memory_status": "ok"
+                },
+                "state": "opened"
             }
+        },
+        "node": {
+            "id": "a14cf47ef7f2"
         }
     },
     "event": {
@@ -27,7 +35,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:46763",
+        "address": "127.0.0.1:38585",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

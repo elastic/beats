@@ -108,7 +108,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 					continue
 				}
 				if nodeID != nil { // shard has not been allocated yet
-					event.ModuleFields.Put("node.name", nodeID)
+					event.ModuleFields.Put("node.id", nodeID)
 					delete(fields, "node")
 
 					sourceNode, err := getSourceNode(nodeID.(string), stateData)

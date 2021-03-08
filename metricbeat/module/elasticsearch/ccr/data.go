@@ -19,11 +19,11 @@ package ccr
 
 import (
 	"encoding/json"
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -77,6 +77,7 @@ var (
 			"settings_version":  c.Int("follower_settings_version"),
 			"aliases_version":   c.Int("follower_aliases_version"),
 		},
+		"read_exceptions": c.Ifc("read_exceptions"),
 		"requests": s.Object{
 			"successful": s.Object{
 				"read": s.Object{
@@ -143,9 +144,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
 			event.ModuleFields = common.MapStr{}
+
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 

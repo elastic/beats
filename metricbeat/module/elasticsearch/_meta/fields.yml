@@ -120,6 +120,9 @@
     - name: job_stats.job_id
       type: alias
       path: elasticsearch.ml.job.id
+    - name: job_stats.forecasts_stats.total
+      type: alias
+      path: elasticsearch.ml.job.forecasts_stats.total
     - name: index_stats
       type: group
       fields:
@@ -247,6 +250,9 @@
         - name: number_of_successful_follow_indices
           type: alias
           path: elasticsearch.ccr.auto_follow.success.follow_indices.count
+        - name: follower.failed_read_requests
+          type: alias
+          path: elasticsearch.ccr.requests.failed.read.count
     - name: ccr_stats
       type: group
       fields:
