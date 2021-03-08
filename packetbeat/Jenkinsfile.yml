@@ -49,6 +49,19 @@ stages:
                 - "macosTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+    macosArm:
+        mage: "mage build unitTest"
+        platforms:             ## override default label in this specific stage.
+          - "macosx&&arm64"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test packetbeat for macosArm"
+            labels:
+                - "macOSArm"
+            parameters:
+                - "macosArmTest"
+            branches: true     ## for all the branches
+            tags: true         ## for all the tags
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
