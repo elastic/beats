@@ -62,7 +62,6 @@ function Install-ElasticAgent {
       $pair = "$($username):$($password)"
       $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
       $headers.Add('Authorization', "Basic $encodedCredentials")
-      #$headers.Add('Authorization', "ApiKey $api_key")
       $jsonResult = Invoke-WebRequest -Uri "$($kibana_url)/api/fleet/enrollment-api-keys"  -Method 'GET' -Headers $headers -UseBasicParsing
       if ($jsonResult.statuscode -eq '200') {
       $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "list"

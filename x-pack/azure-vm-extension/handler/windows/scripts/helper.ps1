@@ -26,7 +26,7 @@ function Run-Powershell2-With-Dot-Net4 {
 }
 
 function Get-CloudId($powershellVersion) {
-  $cloudId = Get-PublicSettings-From-Config-Json "cloud_id"  $powershellVersion
+  $cloudId = Get-PublicSettings-From-Config-Json "cloudId"  $powershellVersion
   if ( $cloudId){
     return $cloudId
   }
@@ -37,22 +37,6 @@ function Get-Username($powershellVersion) {
   $username = Get-PublicSettings-From-Config-Json "username"  $powershellVersion
   if ( $username){
     return $username
-  }
-  return ""
-}
-
-function Get-Password($powershellVersion) {
-  $password = Get-PublicSettings-From-Config-Json "password"  $powershellVersion
-  if ( $password){
-    return $password
-  }
-  return ""
-}
-
-function Get-ApiKey($powershellVersion) {
-  $apiKey = Get-PublicSettings-From-Config-Json "api_key"  $powershellVersion
-  if ( $apiKey){
-    return $apiKey
   }
   return ""
 }
@@ -87,14 +71,12 @@ function Get-Stack-Version {
   $elasticsearchUrl = Get-Elasticsearch-URL $powershellVersion
   $username = Get-Username $powershellVersion
   $password = Get-Password $powershellVersion
-  #$api_key = Get-ApiKey $powershellVersion
   if ( $elasticsearchUrl -ne "" -and $username -ne "" -and $password -ne ""){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-        $headers.Add("Accept","Application/Json")
+        $headers.Add("Accept","application/json")
         $pair = "$($username):$($password)"
         $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
         $headers.Add('Authorization', "Basic $encodedCredentials")
-        #$headers.Add('Authorization', "ApiKey $api_key")
         $jsonResult = Invoke-WebRequest -Uri "$($elasticsearchUrl)"  -Method 'GET' -Headers $headers -UseBasicParsing
         if ($jsonResult.statuscode -eq '200') {
             $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand ""
@@ -137,6 +119,34 @@ function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
     echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
     throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
   }
+}
+
+function Get-ProtectedSettings-From-Config-Json($key, $powershellVersion) {
+    Try
+    {
+        if(!$normalizedJson)
+        {
+            $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
+            $jsonContents = Get-Content $azureConfigFile
+            $global:normalizedJson = normalize-json($jsonContents)
+        }
+        if ( $powershellVersion -ge 3 ) {
+            $value = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings).$key
+
+        }
+        else {
+            $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+            $value = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.$key
+        }
+        $value
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
+    }
 }
 
 function Get-Azure-Logs-Path() {
@@ -184,7 +194,7 @@ function Get-Azure-Config-Path($powershellVersion) {
 
     # In case of update, the n.settings file doesn't exists initially in the
     # folder of the new extension. Hence using the n.settings file copied into
-    # the C:\Chef folder during enable
+    # the C:\Elastic folder during enable
     if ( $configFileIsFolder ) {
       Write-Log "n.settings file doesn't exist in the extension folder. Reading from C:\Elastic." "ERROR"
       $configFolder = "C:\Elastic"
@@ -226,7 +236,6 @@ function Get-Azure-Status-Path($powershellVersion) {
   }
 }
 
-
 function Get-Lastest-Settings-File($configFolder) {
   $configFiles = get-childitem $configFolder -recurse | where {$_.extension -eq ".settings"}
 
@@ -262,47 +271,6 @@ function DownloadFile {
     }
     while ($trials -lt $Retries)
 }
-
-function Decrypt
-{
-    [CmdletBinding()]
-    [OutputType([System.String])]
-    param(
-        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
-        $EncryptedBase64String,
-        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
-        $CertThumbprint
-    )
-    # Decrypts cipher text using the private key
-    # Assumes the certificate is in the LocalMachine\My (Personal) Store
-    $Cert = Get-ChildItem cert:\LocalMachine\My | where { $_.Thumbprint -eq $CertThumbprint }
-    if($Cert) {
-        $EncryptedByteArray = [Convert]::FromBase64String($EncryptedBase64String)
-        $ClearText = [System.Text.Encoding]::UTF8.GetString($Cert.PrivateKey.Decrypt($EncryptedByteArray,$true))
-    }
-    Else {Write-Error "Certificate with thumbprint: $CertThumbprint not found!"}
-
-    Return $ClearText
-}
-
-Function Encrypt {
-    [CmdletBinding()]
-    [OutputType([System.String])]
-    param(
-        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
-        $ClearText,
-        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][ValidateScript({Test-Path $_ -PathType Leaf})][System.String]
-        $PublicCertFilePath
-    )
-    # Encrypts a string with a public key
-    $PublicCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($PublicCertFilePath)
-    $ByteArray = [System.Text.Encoding]::UTF8.GetBytes($ClearText)
-    $EncryptedByteArray = $PublicCert.PublicKey.Key.Encrypt($ByteArray,$true)
-    $Base64String = [Convert]::ToBase64String($EncryptedByteArray)
-
-    Return $Base64String
-}
-
 
 function Get-Lastest-Status-File($statusFolder) {
   $statusFiles = get-childitem $statusFolder -recurse | where {$_.extension -eq ".status"}
@@ -410,3 +378,122 @@ function Get-AnyActive-Policy($content){
           }
     }
 }
+
+#region encryption
+
+Function Encrypt {
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param(
+        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $ClearText,
+        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $CertThumbprint
+    )
+    $store = new-object System.Security.Cryptography.X509Certificates.X509Store([System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
+    $store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
+    $cert = $store.Certificates | Where-Object {$_.thumbprint -eq $CertThumbprint}
+
+    $utf8EncrypedByteArray = [System.Text.Encoding]::UTF8.GetBytes($ClearText)
+    $content = New-Object Security.Cryptography.Pkcs.ContentInfo -argumentList (,$utf8EncrypedByteArray)
+    $env = New-Object Security.Cryptography.Pkcs.EnvelopedCms $content
+    $recpient = (New-Object System.Security.Cryptography.Pkcs.CmsRecipient($cert))
+    $env.Encrypt($recpient)
+    $base64string = [Convert]::ToBase64String($env.Encode())
+    Return $base64string
+}
+
+function Decrypt
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param(
+        [Parameter(Position=0, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $EncryptedBase64String,
+        [Parameter(Position=1, Mandatory=$true)][ValidateNotNullOrEmpty()][System.String]
+        $CertThumbprint
+    )
+    [System.Reflection.Assembly]::LoadWithPartialName("System.Security") | out-null
+    $encryptedByteArray = [Convert]::FromBase64String($EncryptedBase64String)
+    $envelope =  New-Object System.Security.Cryptography.Pkcs.EnvelopedCms
+
+    # get certificate from local machine store
+    $store = new-object System.Security.Cryptography.X509Certificates.X509Store([System.Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
+    $store.open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
+    $cert = $store.Certificates | Where-Object {$_.thumbprint -eq $CertThumbprint}
+    if($cert) {
+        $envelope.Decode($encryptedByteArray)
+        $envelope.Decrypt($cert)
+        $decryptedBytes = $envelope.ContentInfo.Content
+        $decryptedResult = [System.Text.Encoding]::UTF8.GetString($decryptedBytes)
+        Return $decryptedResult
+    }
+    Return ""
+}
+
+function Get-Password($powershellVersion) {
+    Try
+    {
+        $thumbprint = Get-ProtectedSettings-From-Config-Json "protectedSettingsCertThumbprint"  $powershellVersion
+        $protectedSettings = Get-ProtectedSettings-From-Config-Json "protectedSettings"  $powershellVersion
+        if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
+            $jsonKeys = Decrypt $protectedSettings $thumbprint
+            if ($jsonKeys) {
+                if(!$normalizedJsonKeys)
+                {
+                    $global:normalizedJsonKeys = normalize-json($jsonKeys)
+                }
+                if ( $powershellVersion -ge 3 ) {
+                    $value = ($normalizedJsonKeys | ConvertFrom-Json).password
+
+                }
+                else {
+                    $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+                    $value = $ser.DeserializeObject($normalizedJsonKeys).password
+                }
+                Return $value
+            }
+        }
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse configuration file"
+    }
+}
+
+function Get-Base64Auth($powershellVersion) {
+    Try
+    {
+        $thumbprint = Get-ProtectedSettings-From-Config-Json "protectedSettingsCertThumbprint"  $powershellVersion
+        $protectedSettings = Get-ProtectedSettings-From-Config-Json "protectedSettings"  $powershellVersion
+        if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
+            $jsonKeys = Decrypt $protectedSettings $thumbprint
+            if ($jsonKeys) {
+                if(!$normalizedJsonKeys)
+                {
+                    $global:normalizedJsonKeys = normalize-json($jsonKeys)
+                }
+                if ( $powershellVersion -ge 3 ) {
+                    $value = ($normalizedJsonKeys | ConvertFrom-Json).base64Auth
+
+                }
+                else {
+                    $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+                    $value = $ser.DeserializeObject($normalizedJsonKeys).base64Auth
+                }
+                Return $value
+            }
+        }
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
+    }
+}
+
