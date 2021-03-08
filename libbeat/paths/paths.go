@@ -44,14 +44,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 var (
 	// TODO: remove this flag in 8.0 since it should be replaced by system.hostfs configuration option (config.HostFS)
 	// HostFS is an alternate mountpoint for the filesytem root, for when metricbeat is running inside a container.
-	hostFS = flag.String("system.hostfs", "", "mountpoint of the host's filesystem for use in monitoring a host from within a container")
+	hostFS = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
 )
 
 // Path tracks user-configurable path locations and directories
@@ -136,7 +134,6 @@ func (paths *Path) initPaths(cfg *Path) error {
 	}
 
 	if *hostFS != "" {
-		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
 		paths.Hostfs = *hostFS
 	}
 
@@ -145,6 +142,13 @@ func (paths *Path) initPaths(cfg *Path) error {
 	}
 
 	return nil
+}
+
+func IsCLISet() bool {
+	if *hostFS != "" {
+		return true
+	}
+	return false
 }
 
 // Resolve resolves a path to a location in one of the default

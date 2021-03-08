@@ -285,9 +285,8 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 		return
 	}
 
-
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
-		RootfsMountpoint: paths.Paths.Hostfs,
+		RootfsMountpoint:         paths.Paths.Hostfs,
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
 	})

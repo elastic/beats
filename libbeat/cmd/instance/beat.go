@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -1086,6 +1087,10 @@ func initPaths(cfg *common.Config) error {
 		Path   paths.Path `config:"path"`
 		Hostfs string     `config:"system.hostfs"`
 	}{}
+
+	if paths.IsCLISet() {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
+	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
