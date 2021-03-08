@@ -18269,6 +18269,72 @@ Elasticsearch module
 
 
 
+*`index_recovery.shards.start_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.start_time.ms
+
+--
+
+*`index_recovery.shards.stop_time_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.recovery.stop_time.ms
+
+--
+
+
+*`stack_stats.apm.found`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.apm.found
+
+--
+
+*`stack_stats.xpack.ccr.enabled`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
+
+--
+
+*`stack_stats.xpack.ccr.available`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
+
+--
+
+
+*`license.status`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.status
+
+--
+
+*`license.type`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.license.type
+
+--
+
+
 *`shard.primary`*::
 +
 --
@@ -18302,6 +18368,73 @@ alias to: elasticsearch.index.name
 type: alias
 
 alias to: elasticsearch.node.name
+
+--
+
+*`shard.shard`*::
++
+--
+type: alias
+
+alias to: elasticsearch.shard.number
+
+--
+
+
+
+*`cluster_stats.indices.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.total
+
+--
+
+*`cluster_stats.indices.shards.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.indices.shards.count
+
+--
+
+
+*`cluster_stats.nodes.count.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.count
+
+--
+
+
+*`cluster_stats.nodes.jvm.max_uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_used_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
+
+--
+
+*`cluster_stats.nodes.jvm.mem.heap_max_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
 
 --
 
@@ -18347,7 +18480,7 @@ alias to: elasticsearch.cluster.stats.state.state_uuid
 --
 type: alias
 
-alias to: elasticsearch.cluster.stats.state.status
+alias to: elasticsearch.cluster.stats.status
 
 --
 
@@ -18394,6 +18527,15 @@ alias to: elasticsearch.node.name
 type: alias
 
 alias to: elasticsearch.ml.job.id
+
+--
+
+*`job_stats.forecasts_stats.total`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ml.job.forecasts_stats.total
 
 --
 
@@ -18711,13 +18853,22 @@ alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 
 --
 
+*`ccr_auto_follow_stats.follower.failed_read_requests`*::
++
+--
+type: alias
+
+alias to: elasticsearch.ccr.requests.failed.read.count
+
+--
+
 
 *`ccr_stats.shard_id`*::
 +
 --
 type: alias
 
-alias to: elasticsearch.ccr.shard_id
+alias to: elasticsearch.ccr.follower.shard.number
 
 --
 
@@ -18958,6 +19109,34 @@ alias to: elasticsearch.node.stats.fs.summary.available.bytes
 
 --
 
+*`node_stats.fs.total.total_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
+
+*`node_stats.fs.summary.available.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.available.bytes
+
+--
+
+*`node_stats.fs.summary.total.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+--
+
 
 
 *`node_stats.fs.io_stats.total.operations`*::
@@ -18987,6 +19166,34 @@ alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
 
 --
 
+
+
+*`node_stats.indices.store.size_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.store.size.bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.store.size.bytes
+
+--
+
+*`node_stats.indices.docs.count`*::
++
+--
+type: alias
+
+alias to: elasticsearch.node.stats.indices.docs.count
+
+--
 
 
 *`node_stats.indices.indexing.index_time_in_millis`*::
@@ -19620,6 +19827,13 @@ type: long
 
 --
 
+*`elasticsearch.ccr.read_exceptions`*::
++
+--
+type: nested
+
+--
+
 
 
 *`elasticsearch.ccr.requests.successful.read.count`*::
@@ -19829,6 +20043,13 @@ Cluster stats
 
 
 
+*`elasticsearch.cluster.stats.version`*::
++
+--
+type: keyword
+
+--
+
 
 *`elasticsearch.cluster.stats.state.nodes_hash`*::
 +
@@ -19858,18 +20079,10 @@ type: keyword
 
 --
 
-*`elasticsearch.cluster.stats.state.status`*::
-+
---
-type: keyword
-
---
-
 *`elasticsearch.cluster.stats.status`*::
 +
 --
 Cluster status (green, yellow, red).
-
 
 type: keyword
 
@@ -19881,21 +20094,24 @@ type: keyword
 Nodes statistics.
 
 
+*`elasticsearch.cluster.stats.nodes.fs.total.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.fs.available.bytes`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.nodes.count`*::
 +
 --
-type: alias
-
-alias to: elasticsearch.cluster.stats.nodes.stats.count
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.count`*::
-+
---
 Total number of nodes in cluster.
-
 
 type: long
 
@@ -19904,17 +20120,7 @@ type: long
 *`elasticsearch.cluster.stats.nodes.master`*::
 +
 --
-type: alias
-
-alias to: elasticsearch.cluster.stats.nodes.stats.master
-
---
-
-*`elasticsearch.cluster.stats.nodes.stats.master`*::
-+
---
 Number of master-eligible nodes in cluster.
-
 
 type: long
 
@@ -19925,8 +20131,6 @@ type: long
 --
 type: long
 
-alias to: elasticsearch.cluster.stats.nodes.stats.data
-
 --
 
 *`elasticsearch.cluster.stats.nodes.stats.data`*::
@@ -19934,7 +20138,28 @@ alias to: elasticsearch.cluster.stats.nodes.stats.data
 --
 Number of data nodes in cluster.
 
+type: long
 
+--
+
+
+*`elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes`*::
++
+--
 type: long
 
 --
@@ -19946,7 +20171,14 @@ Indices statistics.
 
 
 
-*`elasticsearch.cluster.stats.indices.count`*::
+*`elasticsearch.cluster.stats.indices.store.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.indices.total`*::
 +
 --
 Total number of indices in cluster.
@@ -19962,6 +20194,13 @@ type: long
 Shard statistics.
 
 
+
+*`elasticsearch.cluster.stats.indices.shards.docs.total`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.cluster.stats.indices.shards.count`*::
 +
@@ -19990,6 +20229,50 @@ Memory used for fielddata.
 
 
 type: long
+
+--
+
+
+*`elasticsearch.cluster.stats.license.expiry_date_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.cluster.stats.license.status`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.cluster.stats.license.type`*::
++
+--
+type: keyword
+
+--
+
+
+*`elasticsearch.cluster.stats.stack.apm.found`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.available`*::
++
+--
+type: boolean
+
+--
+
+*`elasticsearch.cluster.stats.stack.xpack.ccr.enabled`*::
++
+--
+type: boolean
 
 --
 
@@ -20110,7 +20393,7 @@ index
 *`elasticsearch.index.created`*::
 +
 --
-type: date
+type: long
 
 --
 
@@ -20122,77 +20405,7 @@ type: boolean
 --
 
 
-*`elasticsearch.index.shards.initializing`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_replicas`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_replicas`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.unassigned_total`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.index.shards.total`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.relocating`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.active_total`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.primaries`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.shards.replicas`*::
 +
 --
 type: long
@@ -20239,20 +20452,6 @@ type: long
 
 --
 
-*`elasticsearch.index.primaries.fielddata.memory_size_in_bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.primaries.fielddata.evictions`*::
-+
---
-type: long
-
---
-
 
 *`elasticsearch.index.primaries.request_cache.memory_size_in_bytes`*::
 +
@@ -20284,13 +20483,6 @@ type: long
 
 
 *`elasticsearch.index.primaries.query_cache.memory_size_in_bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.primaries.query_cache.evictions`*::
 +
 --
 type: long
@@ -20709,7 +20901,80 @@ index
 
 
 
+
+
+*`elasticsearch.index.recovery.index.files.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.index.files.recovered`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.reused`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.files.total`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.recovery.index.size.recovered_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.reused_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.index.size.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.name`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.stop_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.start_time.ms`*::
 +
 --
 type: long
@@ -20756,6 +21021,35 @@ type: keyword
 
 --
 
+
+*`elasticsearch.index.recovery.translog.percent`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.translog.total`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.translog.total_on_start`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.recovery.target.transport_address`*::
++
+--
+type: keyword
+
+--
+
 *`elasticsearch.index.recovery.target.id`*::
 +
 --
@@ -20782,6 +21076,13 @@ type: keyword
 Target node name.
 
 
+type: keyword
+
+--
+
+*`elasticsearch.index.recovery.source.transport_address`*::
++
+--
 type: keyword
 
 --
@@ -20813,115 +21114,6 @@ Source node name.
 
 
 type: keyword
-
---
-
-*`elasticsearch.index.recovery.stop_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.start_time.ms`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.index.recovery.index.total_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.throttle_time.source.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.throttle_time.target.ms`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.index.recovery.index.files.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.files.reused`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.files.recovered`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.index.recovery.index.size.recovered.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.size.total.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.index.size.reused.bytes`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.index.recovery.translog.total_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.translog.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.translog.total_on_start`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.index.recovery.translog.recovered`*::
-+
---
-type: long
 
 --
 
@@ -21006,8 +21198,6 @@ format: bytes
 *`elasticsearch.index.summary.primaries.indexing.index.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21015,26 +21205,6 @@ type: long
 *`elasticsearch.index.summary.primaries.indexing.index.time.ms`*::
 +
 --
-TODO
-
-type: long
-
---
-
-*`elasticsearch.index.summary.primaries.indexing.is_throttled`*::
-+
---
-TODO
-
-type: boolean
-
---
-
-*`elasticsearch.index.summary.primaries.indexing.throttle_time.ms`*::
-+
---
-TODO
-
 type: long
 
 --
@@ -21044,8 +21214,6 @@ type: long
 *`elasticsearch.index.summary.primaries.search.query.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21053,8 +21221,6 @@ type: long
 *`elasticsearch.index.summary.primaries.search.query.time.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21063,8 +21229,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.operations.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21072,8 +21236,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.size.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21082,8 +21244,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.count.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21091,8 +21251,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.avg.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21100,8 +21258,6 @@ type: long
 *`elasticsearch.index.summary.primaries.bulk.time.avg.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21165,17 +21321,6 @@ format: bytes
 *`elasticsearch.index.summary.total.indexing.index.count`*::
 +
 --
-TODO
-
-type: long
-
---
-
-*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
-+
---
-TODO
-
 type: long
 
 --
@@ -21183,8 +21328,6 @@ type: long
 *`elasticsearch.index.summary.total.indexing.is_throttled`*::
 +
 --
-TODO
-
 type: boolean
 
 --
@@ -21192,8 +21335,13 @@ type: boolean
 *`elasticsearch.index.summary.total.indexing.throttle_time.ms`*::
 +
 --
-TODO
+type: long
 
+--
+
+*`elasticsearch.index.summary.total.indexing.index.time.ms`*::
++
+--
 type: long
 
 --
@@ -21203,8 +21351,6 @@ type: long
 *`elasticsearch.index.summary.total.search.query.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21212,8 +21358,6 @@ type: long
 *`elasticsearch.index.summary.total.search.query.time.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21222,8 +21366,6 @@ type: long
 *`elasticsearch.index.summary.total.bulk.operations.count`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21231,27 +21373,14 @@ type: long
 *`elasticsearch.index.summary.total.bulk.size.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
 
-
-*`elasticsearch.index.summary.total.bulk.time.count.ms`*::
-+
---
-TODO
-
-type: long
-
---
 
 *`elasticsearch.index.summary.total.bulk.time.avg.ms`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21259,8 +21388,6 @@ type: long
 *`elasticsearch.index.summary.total.bulk.time.avg.bytes`*::
 +
 --
-TODO
-
 type: long
 
 --
@@ -21292,137 +21419,23 @@ type: keyword
 
 --
 
+*`elasticsearch.ml.job.forecasts_stats.total`*::
++
+--
+type: long
 
-*`elasticsearch.ml.job.model_size.result_type`*::
+--
+
+
+*`elasticsearch.ml.job.model_size.memory_status`*::
 +
 --
 type: keyword
 
 --
 
-*`elasticsearch.ml.job.model_size.model.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.bucket_allocation_failures.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.memory_status`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.log_time.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.timestamp.ms`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.model_size.total.field.by.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.total.field.over.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.model_size.total.field.partition.count`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.field.processed.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.input.bytes`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.input.field.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.missing_field.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.out_of_order.timestamp.count`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.ml.job.data_counts.invalid_date_count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.last_data_time`*::
-+
---
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.bucket.empty.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.bucket.sparse.count`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.bucket.count`*::
 +
 --
 type: long
@@ -21434,28 +21447,6 @@ type: long
 --
 Processed data events.
 
-type: long
-
---
-
-
-*`elasticsearch.ml.job.data_counts.record.earliest.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.record.latest.ms`*::
-+
---
-type: long
-
---
-
-*`elasticsearch.ml.job.data_counts.record.input.count`*::
-+
---
 type: long
 
 --
@@ -21794,7 +21785,7 @@ format: bytes
 *`elasticsearch.node.stats.jvm.mem.heap.used.pct`*::
 +
 --
-type: long
+type: double
 
 format: percent
 
@@ -21980,6 +21971,21 @@ type: long
 --
 
 
+
+*`elasticsearch.node.stats.fs.total.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.fs.total.available_in_bytes`*::
++
+--
+type: long
+
+--
+
 [float]
 === summary
 
@@ -21990,8 +21996,6 @@ File system summary
 *`elasticsearch.node.stats.fs.summary.total.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -22001,8 +22005,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.free.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -22012,8 +22014,6 @@ format: bytes
 *`elasticsearch.node.stats.fs.summary.available.bytes`*::
 +
 --
-
-
 type: long
 
 format: bytes
@@ -22048,7 +22048,7 @@ type: long
 *`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
 +
 --
-type: long
+type: double
 
 --
 
@@ -22119,7 +22119,7 @@ format: bytes
 *`elasticsearch.node.stats.process.cpu.pct`*::
 +
 --
-type: long
+type: double
 
 format: percent
 
@@ -34492,10 +34492,124 @@ alias to: logstash.node.stats.logstash.version
 
 --
 
-*`logstash_stats.pipelines`*::
+
+*`logstash_stats.pipelines.id`*::
 +
 --
-type: nested
+type: alias
+
+alias to: logstash.node.stats.pipelines.id
+
+--
+
+*`logstash_stats.pipelines.hash`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.hash
+
+--
+
+
+*`logstash_stats.pipelines.queue.type`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.type
+
+--
+
+*`logstash_stats.pipelines.queue.queue_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.queue_size_in_bytes
+
+--
+
+*`logstash_stats.pipelines.queue.max_queue_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.queue.max_queue_size_in_bytes
+
+--
+
+
+*`logstash_stats.pipelines.events.out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.events.out
+
+--
+
+*`logstash_stats.pipelines.events.duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.events.duration_in_millis
+
+--
+
+
+*`logstash_stats.pipelines.vertices.duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.duration_in_millis
+
+--
+
+*`logstash_stats.pipelines.vertices.events_in`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.events_in
+
+--
+
+*`logstash_stats.pipelines.vertices.pipeline_ephemeral_id`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.pipeline_ephemeral_id
+
+--
+
+*`logstash_stats.pipelines.vertices.events_out`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.events_out
+
+--
+
+*`logstash_stats.pipelines.vertices.id`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.id
+
+--
+
+*`logstash_stats.pipelines.vertices.queue_push_duration_in_millis`*::
++
+--
+type: alias
+
+alias to: logstash.node.stats.pipelines.vertices.queue_push_duration_in_millis
 
 --
 
@@ -34827,9 +34941,6 @@ type: long
 *`logstash.node.stats.process.cpu.percent`*::
 +
 --
-TODO
-
-
 type: double
 
 --

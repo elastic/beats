@@ -6,12 +6,8 @@
             "id": "8l_zoGznQRmtoX9iSC-goA",
             "name": "docker-cluster",
             "stats": {
-                "cluster_name": "docker-cluster",
                 "indices": {
                     "docs": {
-                        "deleted": {
-                            "total": 862
-                        },
                         "total": 223
                     },
                     "fielddata": {
@@ -19,87 +15,11 @@
                             "bytes": 0
                         }
                     },
-                    "query_cache": {
-                        "cache": {
-                            "total": 0
-                        },
-                        "cache_size": {
-                            "bytes": 0
-                        },
-                        "evictions": 0,
-                        "hit": {
-                            "total": 0
-                        },
-                        "memory_size": {
-                            "bytes": 0
-                        },
-                        "miss": {
-                            "total": 0
-                        },
-                        "total": 0
-                    },
-                    "segments": {
-                        "max_unsafe_auto_id": {
-                            "ms": -1
-                        },
-                        "memory": {
-                            "bytes": 110372,
-                            "doc_values": {
-                                "bytes": 17228
-                            },
-                            "fixed_bit_set": {
-                                "bytes": 776
-                            },
-                            "index_writer": {
-                                "bytes": 0
-                            },
-                            "norms": {
-                                "bytes": 2880
-                            },
-                            "points": {
-                                "bytes": 0
-                            },
-                            "stored_fields": {
-                                "bytes": 9304
-                            },
-                            "terms": {
-                                "bytes": 80960,
-                                "vectors": {
-                                    "bytes": 0
-                                }
-                            },
-                            "version_map": {
-                                "bytes": 0
-                            }
-                        },
-                        "total": 19
-                    },
                     "shards": {
                         "count": 8,
-                        "index": {
-                            "primaries": {
-                                "avg": 1,
-                                "max": 1,
-                                "min": 1
-                            },
-                            "replication": {
-                                "avg": 0,
-                                "max": 0,
-                                "min": 0
-                            },
-                            "shards": {
-                                "avg": 1,
-                                "max": 1,
-                                "min": 1
-                            }
-                        },
-                        "primaries": 8,
-                        "replication": 0
+                        "primaries": 8
                     },
                     "store": {
-                        "reserved": {
-                            "bytes": 0
-                        },
                         "size": {
                             "bytes": 11701629
                         }
@@ -107,34 +27,18 @@
                     "total": 8
                 },
                 "license": {
-                    "cluster_needs_tls": false,
-                    "expiry_date": null,
-                    "issue_date": null,
-                    "issue_date_in_millis": 0,
-                    "issued_to": "",
-                    "issuer": "",
-                    "start_date_in_millis": 0,
                     "status": "",
                     "type": "platinum",
-                    "uid": ""
+                    "expiry_date_in_millis": 0
                 },
                 "nodes": {
                     "count": 1,
-                    "data": 1,
                     "fs": {
                         "available": {
                             "bytes": 182713794560
                         },
-                        "free": {
-                            "bytes": 231480127488
-                        },
                         "total": {
                             "bytes": 958613114880
-                        }
-                    },
-                    "ingest": {
-                        "pipelines": {
-                            "count": 1
                         }
                     },
                     "jvm": {
@@ -150,222 +54,17 @@
                                     "bytes": 615251232
                                 }
                             }
-                        },
-                        "threads": {
-                            "total": 85
                         }
                     },
                     "master": 1,
-                    "stats": {
-                        "coordinating_only": 0,
-                        "data": 1,
-                        "data_cold": 0,
-                        "data_content": 0,
-                        "data_hot": 0,
-                        "data_warm": 0,
-                        "ingest": 1,
-                        "master": 1,
-                        "ml": 1,
-                        "remote_cluster_client": 1,
-                        "total": 1,
-                        "transform": 1,
-                        "voting_only": 0
-                    }
+                    "versions": [
+                        "8.0.0"
+                    ]
                 },
                 "stack": {
-                    "apm": {
-                        "found": false
-                    },
                     "xpack": {
                         "ccr": {
-                            "auto_follow_patterns_count": 0,
                             "available": false,
-                            "enabled": true,
-                            "follower_indices_count": 0
-                        },
-                        "data_streams": {
-                            "available": true,
-                            "data_streams": 0,
-                            "enabled": true,
-                            "indices_count": 0
-                        },
-                        "frozen_indices": {
-                            "available": true,
-                            "enabled": true,
-                            "indices_count": 0
-                        },
-                        "graph": {
-                            "available": false,
-                            "enabled": true
-                        },
-                        "ilm": {
-                            "policy": {
-                                "stats": [
-                                    {
-                                        "indices_managed": 1,
-                                        "phases": {
-                                            "delete": {
-                                                "actions": [
-                                                    "delete"
-                                                ],
-                                                "min_age": 7776000000
-                                            },
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "delete": {
-                                                "actions": [
-                                                    "delete"
-                                                ],
-                                                "min_age": 604800000
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 1,
-                                        "phases": {
-                                            "delete": {
-                                                "actions": [
-                                                    "delete"
-                                                ],
-                                                "min_age": 7776000000
-                                            },
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "indices_managed": 0,
-                                        "phases": {
-                                            "delete": {
-                                                "actions": [
-                                                    "delete"
-                                                ],
-                                                "min_age": 7776000000
-                                            },
-                                            "hot": {
-                                                "actions": [
-                                                    "rollover"
-                                                ],
-                                                "min_age": 0
-                                            }
-                                        }
-                                    }
-                                ],
-                                "total": 8
-                            }
-                        },
-                        "logstash": {
-                            "available": false,
-                            "enabled": true
-                        },
-                        "ml": {
-                            "available": false,
-                            "enabled": true,
-                            "jobs": {
-                                "total": 0
-                            },
-                            "node": {
-                                "total": 1
-                            }
-                        },
-                        "monitoring": {
-                            "available": true,
-                            "collection_enabled": false,
-                            "enabled": true,
-                            "enabled_exporters": {
-                                "local": 1
-                            }
-                        },
-                        "rollup": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "searchable_snapshots": {
-                            "available": false,
-                            "enabled": true,
-                            "indices_count": 0
-                        },
-                        "security": {
-                            "available": true,
-                            "enabled": false
-                        },
-                        "slm": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "spatial": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "transform": {
-                            "available": true,
-                            "enabled": true
-                        },
-                        "vectors": {
-                            "available": true,
-                            "dense_vector_dims_avg_count": 0,
-                            "dense_vector_fields_count": 0,
-                            "enabled": true
-                        },
-                        "voting_only": {
-                            "available": true,
                             "enabled": true
                         }
                     }
@@ -386,13 +85,12 @@
                         }
                     },
                     "nodes_hash": -575310727,
-                    "state_uuid": "N0SOO0GZQICpIp19KZ27dg",
-                    "status": "yellow"
+                    "state_uuid": "N0SOO0GZQICpIp19KZ27dg"
                 },
-                "status": "yellow",
-                "version": "7.10.0"
+                "status": "yellow"
             }
-        }
+        },
+        "version": 65
     },
     "event": {
         "dataset": "elasticsearch.cluster.stats",
@@ -404,7 +102,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:53266",
+        "address": "127.0.0.1:39279",
         "type": "elasticsearch"
     }
 }

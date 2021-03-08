@@ -39,19 +39,18 @@ var (
 	schema = s.Schema{
 		"status": c.Str("status"),
 		"nodes": c.Dict("nodes", s.Schema{
-			"stats":  c.Ifc("count"),
-			"count":  c.Int("count.total"),
-			"master": c.Int("count.master"),
-			"data":   c.Int("count.data"),
-			"ingest": s.Object{
-				"pipelines": s.Object{
-					"count": c.Int("ingest.number_of_pipelines"),
+			"versions": c.Ifc("versions"),
+			"count":    c.Int("count.total"),
+			"master":   c.Int("count.master"),
+			"fs": c.Dict("fs", s.Schema{
+				"total": s.Object{
+					"bytes": c.Int("total_in_bytes"),
 				},
-			},
+				"available": s.Object{
+					"bytes": c.Int("available_in_bytes"),
+				},
+			}),
 			"jvm": c.Dict("jvm", s.Schema{
-				"threads": s.Object{
-					"total": c.Int("threads"),
-				},
 				"max_uptime": s.Object{
 					"ms": c.Int("max_uptime_in_millis"),
 				},
@@ -66,94 +65,19 @@ var (
 					},
 				}),
 			}),
-			"fs": c.Dict("fs", s.Schema{
-				"available": s.Object{
-					"bytes": c.Int("available_in_bytes"),
-				},
-				"total": s.Object{
-					"bytes": c.Int("total_in_bytes"),
-				},
-				"free": s.Object{
-					"bytes": c.Int("free_in_bytes"),
-				},
-			}),
 		}),
+
 		"indices": c.Dict("indices", s.Schema{
-			"total": c.Int("count"),
 			"docs": c.Dict("docs", s.Schema{
 				"total": c.Int("count"),
-				"deleted": s.Object{
-					"total": c.Int("deleted"),
-				},
 			}),
+			"total": c.Int("count"),
 			"shards": c.Dict("shards", s.Schema{
-				"count":       c.Int("total"),
-				"primaries":   c.Int("primaries"),
-				"replication": c.Int("replication"),
-				"index":       c.Ifc("index"),
+				"count":     c.Int("total"),
+				"primaries": c.Int("primaries"),
 			}),
 			"store": c.Dict("store", s.Schema{
-				"size": s.Object{
-					"bytes": c.Int("size_in_bytes"),
-				},
-				"reserved": s.Object{
-					"bytes": c.Int("reserved_in_bytes"),
-				},
-			}),
-			"query_cache": c.Dict("query_cache", s.Schema{
-				"total": c.Int("total_count"),
-				"hit": s.Object{
-					"total": c.Ifc("hit_count"),
-				},
-				"miss": s.Object{
-					"total": c.Ifc("miss_count"),
-				},
-				"cache": s.Object{
-					"total": c.Ifc("cache_count"),
-				},
-				"evictions": c.Int("evictions"),
-				"cache_size": s.Object{
-					"bytes": c.Int("cache_size"),
-				},
-				"memory_size": s.Object{
-					"bytes": c.Int("memory_size_in_bytes"),
-				},
-			}),
-			"segments": c.Dict("segments", s.Schema{
-				"total": c.Int("count"),
-				"memory": s.Object{
-					"stored_fields": s.Object{
-						"bytes": c.Int("stored_fields_memory_in_bytes"),
-					},
-					"points": s.Object{
-						"bytes": c.Int("points_memory_in_bytes"),
-					},
-					"doc_values": s.Object{
-						"bytes": c.Int("doc_values_memory_in_bytes"),
-					},
-					"index_writer": s.Object{
-						"bytes": c.Int("index_writer_memory_in_bytes"),
-					},
-					"fixed_bit_set": s.Object{
-						"bytes": c.Int("fixed_bit_set_memory_in_bytes"),
-					},
-					"norms": s.Object{
-						"bytes": c.Int("norms_memory_in_bytes"),
-					},
-					"version_map": s.Object{
-						"bytes": c.Int("version_map_memory_in_bytes"),
-					},
-					"bytes": c.Int("memory_in_bytes"),
-					"terms": s.Object{
-						"bytes": c.Int("terms_memory_in_bytes"),
-						"vectors": s.Object{
-							"bytes": c.Int("term_vectors_memory_in_bytes"),
-						},
-					},
-				},
-				"max_unsafe_auto_id": s.Object{
-					"ms": c.Int("max_unsafe_auto_id_timestamp"),
-				},
+				"size": s.Object{"bytes": c.Int("size_in_bytes")},
 			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
 				"memory": s.Object{
@@ -164,37 +88,10 @@ var (
 	}
 
 	stackSchema = s.Schema{
-		"apm": c.Ifc("apm"),
 		"xpack": c.Dict("xpack", s.Schema{
-			"rollup":               c.Ifc("rollup"),
-			"logstash":             c.Ifc("logstash"),
-			"transform":            c.Ifc("transform"),
-			"security":             c.Ifc("security"),
-			"data_streams":         c.Ifc("data_streams"),
-			"monitoring":           c.Ifc("monitoring"),
-			"graph":                c.Ifc("graph"),
-			"voting_only":          c.Ifc("voting_only"),
-			"slm":                  c.Ifc("slm"),
-			"frozen_indices":       c.Ifc("frozen_indices"),
-			"spatial":              c.Ifc("spatial"),
-			"searchable_snapshots": c.Ifc("searchable_snapshots"),
-			"ccr":                  c.Ifc("ccr"),
-			"vectors":              c.Ifc("vectors"),
-			"ilm": c.Dict("ilm", s.Schema{
-				"policy": s.Object{
-					"total": c.Int("policy_count"),
-					"stats": c.Ifc("policy_stats"),
-				},
-			}),
-			"ml": c.Dict("ml", s.Schema{
-				"node": s.Object{
-					"total": c.Int("node_count"),
-				},
-				"available": c.Bool("available"),
+			"ccr": c.Dict("ccr", s.Schema{
 				"enabled":   c.Bool("enabled"),
-				"jobs": c.Dict("jobs", s.Schema{
-					"total": c.Int("_all.count"),
-				}),
+				"available": c.Bool("available"),
 			}),
 		}),
 	}
@@ -325,16 +222,6 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	clusterStats := common.MapStr(data)
 	clusterStats.Delete("_nodes")
 
-	value, err := clusterStats.GetValue("cluster_name")
-	if err != nil {
-		return elastic.MakeErrorForMissingField("cluster_name", elastic.Elasticsearch)
-	}
-	clusterName, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("cluster name is not a string")
-	}
-	clusterStats.Delete("cluster_name")
-
 	license, err := elasticsearch.GetLicense(httpClient, httpClient.GetURI())
 	if err != nil {
 		return errors.Wrap(err, "failed to get license from Elasticsearch")
@@ -351,6 +238,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterStateReduced); err != nil {
 		return errors.Wrap(err, "failed to pass through status field")
 	}
+	clusterStateReduced.Delete("status")
 
 	if err = elasticsearch.PassThruField("master_node", clusterState, clusterStateReduced); err != nil {
 		return errors.Wrap(err, "failed to pass through master_node field")
@@ -395,6 +283,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 			"found": isAPMFound,
 		},
 	}
+	stackData, _ := stackSchema.Apply(stackStats)
 
 	event := mb.Event{
 		ModuleFields: common.MapStr{},
@@ -413,13 +302,22 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 
 	metricSetFields, _ := schema.Apply(data)
 
-	stackData, _ := stackSchema.Apply(stackStats)
-
 	metricSetFields.Put("stack", stackData)
-	metricSetFields.Put("license", l)
-	metricSetFields.Put("version", info.Version.Number.String())
-	metricSetFields.Put("cluster_name", clusterName)
+	metricSetFields.Put("license", struct {
+		Status       string `json:"status"`
+		Type         string `json:"type"`
+		ExpiryDateMs int    `json:"expiry_date_in_millis"`
+	}{
+		Status:       license.Status,
+		Type:         license.Type,
+		ExpiryDateMs: license.ExpiryDateInMillis,
+	})
+
 	metricSetFields.Put("state", clusterStateReduced)
+
+	if err = elasticsearch.PassThruField("version", clusterState, event.ModuleFields); err != nil {
+		return errors.Wrap(err, "failed to pass through version field")
+	}
 
 	event.MetricSetFields = metricSetFields
 

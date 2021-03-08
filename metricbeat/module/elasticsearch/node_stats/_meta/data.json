@@ -26,25 +26,6 @@
                     }
                 },
                 "indices": {
-                    "bulk": {
-                        "avg_size": {
-                            "bytes": 111
-                        },
-                        "avg_time": {
-                            "ms": 0
-                        },
-                        "operations": {
-                            "total": {
-                                "count": 10
-                            }
-                        },
-                        "total_size": {
-                            "bytes": 2939
-                        },
-                        "total_time": {
-                            "ms": 75
-                        }
-                    },
                     "docs": {
                         "count": 9207,
                         "deleted": 43
@@ -165,50 +146,6 @@
                             "used": {
                                 "bytes": 177654272,
                                 "pct": 16
-                            }
-                        },
-                        "pools": {
-                            "old": {
-                                "max": {
-                                    "bytes": 1073741824
-                                },
-                                "peak": {
-                                    "bytes": 40290816
-                                },
-                                "peak_max": {
-                                    "bytes": 1073741824
-                                },
-                                "used": {
-                                    "bytes": 40290816
-                                }
-                            },
-                            "survivor": {
-                                "max": {
-                                    "bytes": 0
-                                },
-                                "peak": {
-                                    "bytes": 53477376
-                                },
-                                "peak_max": {
-                                    "bytes": 0
-                                },
-                                "used": {
-                                    "bytes": 50331648
-                                }
-                            },
-                            "young": {
-                                "max": {
-                                    "bytes": 0
-                                },
-                                "peak": {
-                                    "bytes": 637534208
-                                },
-                                "peak_max": {
-                                    "bytes": 0
-                                },
-                                "used": {
-                                    "bytes": 87031808
-                                }
                             }
                         }
                     }

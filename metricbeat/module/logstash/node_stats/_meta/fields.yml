@@ -76,8 +76,6 @@
                       type: long
     - name: process.cpu.percent
       type: double
-      description: >
-        TODO
     - name: pipelines
       type: group
       fields:

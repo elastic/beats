@@ -4,6 +4,8 @@
     Cluster stats
   release: ga
   fields:
+    - name: version
+      type: keyword
     - name: state
       type: group
       fields:
@@ -15,44 +17,45 @@
           type: keyword
         - name: state_uuid
           type: keyword
-        - name: status
-          type: keyword
     - name: status
       type: keyword
-      description: >
-        Cluster status (green, yellow, red).
+      description: Cluster status (green, yellow, red).
     - name: nodes
       type: group
-      description: >
-        Nodes statistics.
+      description: Nodes statistics.
       fields:
+      - name: fs.total.bytes
+        type: long
+      - name: fs.available.bytes
+        type: long
       - name: count
-        type: alias
-        path: elasticsearch.cluster.stats.nodes.stats.count
-      - name: stats.count
         type: long
-        description: >
-          Total number of nodes in cluster.
+        description: Total number of nodes in cluster.
       - name: master
-        type: alias
-        path: elasticsearch.cluster.stats.nodes.stats.master
-      - name: stats.master
         type: long
-        description: >
-          Number of master-eligible nodes in cluster.
+        description: Number of master-eligible nodes in cluster.
       - name: data
         type: long
-        path: elasticsearch.cluster.stats.nodes.stats.data
       - name: stats.data
         type: long
-        description: >
-          Number of data nodes in cluster.
+        description: Number of data nodes in cluster.
+      - name: jvm
+        type: group
+        fields:
+          - name: max_uptime.ms
+            type: long
+          - name: memory.heap.max.bytes
+            type: long
+          - name: memory.heap.used.bytes
+            type: long
     - name: indices
       type: group
       description: >
         Indices statistics.
       fields:
-      - name: count
+      - name: store.size.bytes
+        type: long
+      - name: total
         type: long
         description: >
           Total number of indices in cluster.
@@ -61,6 +64,8 @@
         description: >
           Shard statistics.
         fields:
+        - name: docs.total
+          type: long
         - name: count
           type: long
           description: >
@@ -73,3 +78,21 @@
         type: long
         description: >
           Memory used for fielddata.
+    - name: license
+      type: group
+      fields:
+      - name: expiry_date_in_millis
+        type: long
+      - name: status
+        type: keyword
+      - name: type
+        type: keyword
+    - name: stack
+      type: group
+      fields:
+        - name: apm.found
+          type: boolean
+        - name: xpack.ccr.available
+          type: boolean
+        - name: xpack.ccr.enabled
+          type: boolean

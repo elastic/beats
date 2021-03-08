@@ -38,76 +38,13 @@ var (
 		"state": c.Str("state"),
 		"data_counts": c.Dict("data_counts", s.Schema{
 			"processed_record_count": c.Int("processed_record_count"),
-			"record": s.Object{
-				"earliest": s.Object{
-					"ms": c.Int("earliest_record_timestamp"),
-				},
-				"latest": s.Object{
-					"ms": c.Int("latest_record_timestamp"),
-				},
-				"input": s.Object{
-					"count": c.Int("input_record_count"),
-				},
-			},
-			"field": s.Object{
-				"processed": s.Object{
-					"count": c.Int("processed_field_count"),
-				},
-			},
-			"input": s.Object{
-				"bytes": c.Int("input_bytes"),
-				"field": s.Object{
-					"count": c.Int("input_field_count"),
-				},
-			},
-			"missing_field": s.Object{
-				"count": c.Int("missing_field_count"),
-			},
-			"out_of_order": s.Object{
-				"timestamp": s.Object{
-					"count": c.Int("out_of_order_timestamp_count"),
-				},
-			},
-			"bucket": s.Object{
-				"empty": s.Object{
-					"count": c.Int("empty_bucket_count"),
-				},
-				"sparse": s.Object{
-					"count": c.Int("sparse_bucket_count"),
-				},
-				"count": c.Int("bucket_count"),
-			},
-			"invalid_date_count": c.Int("invalid_date_count"),
-			"last_data_time":     c.Int("last_data_time"),
+			"invalid_date_count":     c.Int("invalid_date_count"),
 		}),
 		"model_size": c.Dict("model_size_stats", s.Schema{
-			"result_type": c.Str("result_type"),
-			"model": s.Object{
-				"bytes": c.Int("model_bytes"),
-			},
-			"total": s.Object{
-				"field": s.Object{
-					"by": s.Object{
-						"count": c.Int("total_by_field_count"),
-					},
-					"over": s.Object{
-						"count": c.Int("total_over_field_count"),
-					},
-					"partition": s.Object{
-						"count": c.Int("total_partition_field_count"),
-					},
-				},
-			},
-			"bucket_allocation_failures": s.Object{
-				"count": c.Int("bucket_allocation_failures_count"),
-			},
-			"memory_status": c.Int("memory_status"),
-			"log_time": s.Object{
-				"ms": c.Int("log_time"),
-			},
-			"timestamp": s.Object{
-				"ms": c.Int("timestamp"),
-			},
+			"memory_status": c.Str("memory_status"),
+		}),
+		"forecasts_stats": c.Dict("forecasts_stats", s.Schema{
+			"total": c.Int("total"),
 		}),
 	}
 )
@@ -144,6 +81,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
+		event.ModuleFields.Put("node.id", info.Name)
 
 		event.MetricSetFields, _ = schema.Apply(job)
 

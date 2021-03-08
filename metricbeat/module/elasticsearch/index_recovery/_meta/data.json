@@ -11,31 +11,15 @@
                 "id": 0,
                 "index": {
                     "files": {
-                        "count": 0,
+                        "percent": "0.0%",
                         "recovered": 0,
-                        "reused": 0
+                        "reused": 0,
+                        "total": 0
                     },
                     "size": {
-                        "recovered": {
-                            "bytes": 0
-                        },
-                        "reused": {
-                            "bytes": 0
-                        },
-                        "total": {
-                            "bytes": 0
-                        }
-                    },
-                    "throttle_time": {
-                        "source": {
-                            "ms": 0
-                        },
-                        "target": {
-                            "ms": 0
-                        }
-                    },
-                    "total_time": {
-                        "ms": 1600
+                        "recovered_in_bytes": 0,
+                        "reused_in_bytes": 0,
+                        "total_in_bytes": 0
                     }
                 },
                 "primary": true,
@@ -50,28 +34,15 @@
                 "target": {
                     "host": "127.0.0.1",
                     "id": "Fkj12lAFQOex0DwK0HMwHw",
-                    "name": "082618b4bb36"
-                },
-                "total_time": {
-                    "ms": 2573
+                    "name": "082618b4bb36",
+                    "transport_address": "127.0.0.1:9300"
                 },
                 "translog": {
-                    "count": 0,
-                    "recovered": 0,
-                    "total_on_start": 0,
-                    "total_time": {
-                        "ms": 951
-                    }
+                    "percent": "100.0%",
+                    "total": 0,
+                    "total_on_start": 0
                 },
-                "type": "EMPTY_STORE",
-                "verify_index": {
-                    "check_index_time": {
-                        "ms": 0
-                    },
-                    "total_time": {
-                        "ms": 0
-                    }
-                }
+                "type": "EMPTY_STORE"
             }
         }
     },
@@ -85,7 +56,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:50581",
+        "address": "127.0.0.1:43035",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

@@ -8,80 +8,21 @@
         "ml": {
             "job": {
                 "data_counts": {
-                    "bucket": {
-                        "count": 2,
-                        "empty": {
-                            "count": 0
-                        },
-                        "sparse": {
-                            "count": 0
-                        }
-                    },
-                    "field": {
-                        "processed": {
-                            "count": 28
-                        }
-                    },
-                    "input": {
-                        "bytes": 1254,
-                        "field": {
-                            "count": 28
-                        }
-                    },
                     "invalid_date_count": 0,
-                    "last_data_time": 1525848008257,
-                    "missing_field": {
-                        "count": 0
-                    },
-                    "out_of_order": {
-                        "timestamp": {
-                            "count": 0
-                        }
-                    },
-                    "processed_record_count": 14,
-                    "record": {
-                        "earliest": {
-                            "ms": 1525847665298
-                        },
-                        "input": {
-                            "count": 14
-                        },
-                        "latest": {
-                            "ms": 1525847795423
-                        }
-                    }
+                    "processed_record_count": 1216
                 },
-                "id": "55",
+                "forecasts_stats": {
+                    "total": 1
+                },
+                "id": "low_request_rate",
                 "model_size": {
-                    "bucket_allocation_failures": {
-                        "count": 0
-                    },
-                    "log_time": {
-                        "ms": 1525848008000
-                    },
-                    "model": {
-                        "bytes": 49176
-                    },
-                    "result_type": "model_size_stats",
-                    "timestamp": {
-                        "ms": 1525847700000
-                    },
-                    "total": {
-                        "field": {
-                            "by": {
-                                "count": 3
-                            },
-                            "over": {
-                                "count": 0
-                            },
-                            "partition": {
-                                "count": 2
-                            }
-                        }
-                    }
+                    "memory_status": "ok"
                 },
-                "state": "closed"
+                "state": "opened"
             }
+        },
+        "node": {
+            "id": "a14cf47ef7f2"
         }
     },
     "event": {
@@ -94,7 +35,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:45215",
+        "address": "127.0.0.1:38585",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

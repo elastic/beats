@@ -23,6 +23,8 @@
         - name: write.ms
           type: long
 
+    - name: read_exceptions
+      type: nested
     - name: requests
       type: group
       fields:

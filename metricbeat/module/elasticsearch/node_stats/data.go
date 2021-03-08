@@ -38,11 +38,6 @@ var (
 		"name": c.Str("name"),
 		"jvm": c.Dict("jvm", s.Schema{
 			"mem": c.Dict("mem", s.Schema{
-				"pools": c.Dict("pools", s.Schema{
-					"young":    c.Dict("young", poolSchema),
-					"survivor": c.Dict("survivor", poolSchema),
-					"old":      c.Dict("old", poolSchema),
-				}),
 				"heap": s.Object{
 					"max": s.Object{
 						"bytes": c.Int("heap_max_in_bytes"),
@@ -187,6 +182,10 @@ var (
 					"bytes": c.Int("available_in_bytes"),
 				},
 			}),
+			"total": c.Dict("total", s.Schema{
+				"available_in_bytes": c.Int("available_in_bytes"),
+				"total_in_bytes":     c.Int("total_in_bytes"),
+			}),
 			"io_stats": c.Dict("io_stats", s.Schema{
 				"total": c.Dict("total", s.Schema{
 					"operations": s.Object{
@@ -258,21 +257,6 @@ var (
 			"get":    c.Dict("get", threadPoolStatsSchema),
 			"search": c.Dict("search", threadPoolStatsSchema),
 		}),
-	}
-
-	poolSchema = s.Schema{
-		"used": s.Object{
-			"bytes": c.Int("used_in_bytes"),
-		},
-		"max": s.Object{
-			"bytes": c.Int("max_in_bytes"),
-		},
-		"peak": s.Object{
-			"bytes": c.Int("peak_used_in_bytes"),
-		},
-		"peak_max": s.Object{
-			"bytes": c.Int("peak_max_in_bytes"),
-		},
 	}
 
 	collectorSchema = s.Schema{

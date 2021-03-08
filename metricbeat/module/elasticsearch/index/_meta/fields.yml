@@ -5,33 +5,13 @@
   release: ga
   fields:
     - name: created
-      type: date
+      type: long
     - name: hidden
       type: boolean
     - name: shards
       type: group
       fields:
-        - name: initializing
-          type: long
-        - name: unassigned_primaries
-          type: long
-        - name: unassigned_replicas
-          type: long
-        - name: active_replicas
-          type: long
-        - name: unassigned_total
-          type: long
         - name: total
-          type: long
-        - name: active_primaries
-          type: long
-        - name: relocating
-          type: long
-        - name: active_total
-          type: long
-        - name: primaries
-          type: long
-        - name: replicas
           type: long
     - name: uuid
       type: keyword
@@ -51,10 +31,6 @@
               type: long
             - name: query_time_in_millis
               type: long
-        - name: fielddata.memory_size_in_bytes
-          type: long
-        - name: fielddata.evictions
-          type: long
         - name: request_cache
           type: group
           fields:
@@ -70,8 +46,6 @@
           type: group
           fields:
             - name: memory_size_in_bytes
-              type: long
-            - name: evictions
               type: long
             - name: hit_count
               type: long

@@ -35,71 +35,51 @@ var (
 	schema = s.Schema{
 		// This is all shard information and should be linked to elasticsearch.shard.*
 		// as soon as field aliases are available.
-		"id":      c.Int("id"),
-		"type":    c.Str("type"),
-		"primary": c.Bool("primary"),
-		"stage":   c.Str("stage"),
+		"id":      c.Int("id", s.Optional),
+		"type":    c.Str("type", s.Optional),
+		"primary": c.Bool("primary", s.Optional),
+		"stage":   c.Str("stage", s.Optional),
 
 		// As soon as we have field alias feature available, source and target should
 		// link to elasticsearch.node.* as it's not specific information.
 		"source": c.Dict("source", s.Schema{
-			"id":   c.Str("id", s.Optional),
-			"host": c.Str("host", s.Optional),
-			"name": c.Str("name", s.Optional),
+			"id":                c.Str("id", s.Optional),
+			"host":              c.Str("host", s.Optional),
+			"name":              c.Str("name", s.Optional),
+			"transport_address": c.Str("transport_address", s.Optional),
 		}),
 		"target": c.Dict("target", s.Schema{
-			"id":   c.Str("id", s.Optional),
-			"host": c.Str("host", s.Optional),
-			"name": c.Str("name", s.Optional),
+			"id":                c.Str("id", s.Optional),
+			"host":              c.Str("host", s.Optional),
+			"name":              c.Str("name", s.Optional),
+			"transport_address": c.Str("transport_address", s.Optional),
 		}),
+		"index": s.Object{
+			"files": c.Dict("index.files", s.Schema{
+				"percent":   c.Str("percent", s.Optional),
+				"reused":    c.Int("reused", s.Optional),
+				"recovered": c.Int("recovered", s.Optional),
+				"total":     c.Int("total", s.Optional),
+			}),
+			"size": c.Dict("index.size", s.Schema{
+				"recovered_in_bytes": c.Int("recovered_in_bytes", s.Optional),
+				"reused_in_bytes":    c.Int("reused_in_bytes", s.Optional),
+				"total_in_bytes":     c.Int("total_in_bytes", s.Optional),
+			}),
+		},
+		"translog": c.Dict("translog", s.Schema{
+			"total":          c.Int("total", s.Optional),
+			"percent":        c.Str("percent", s.Optional),
+			"total_on_start": c.Int("total_on_start", s.Optional),
+		}),
+
+		"stop_time": s.Object{
+			"ms": c.Int("stop_time_in_millis", s.Optional),
+		},
 
 		"start_time": s.Object{
-			"ms": c.Int("start_time_in_millis"),
+			"ms": c.Int("start_time_in_millis", s.Optional),
 		},
-		"stop_time": s.Object{
-			"ms": c.Int("stop_time_in_millis"),
-		},
-		"total_time": s.Object{
-			"ms": c.Int("total_time_in_millis"),
-		},
-
-		"index": c.Dict("index", s.Schema{
-			"size": c.Dict("size", s.Schema{
-				"total":     s.Object{"bytes": c.Int("total_in_bytes")},
-				"reused":    s.Object{"bytes": c.Int("reused_in_bytes")},
-				"recovered": s.Object{"bytes": c.Int("recovered_in_bytes")},
-			}),
-			"files": c.Dict("files", s.Schema{
-				"count":     c.Int("total"),
-				"reused":    c.Int("reused"),
-				"recovered": c.Int("recovered"),
-			}),
-			"total_time": s.Object{
-				"ms": c.Int("total_time_in_millis"),
-			},
-			"throttle_time": s.Object{
-				"source": s.Object{
-					"ms": c.Int("source_throttle_time_in_millis"),
-				},
-				"target": s.Object{
-					"ms": c.Int("target_throttle_time_in_millis"),
-				},
-			},
-		}),
-
-		"translog": c.Dict("translog", s.Schema{
-			"recovered":      c.Int("recovered"),
-			"count":          c.Int("total"),
-			"total_on_start": c.Int("total_on_start"),
-			"total_time": s.Object{
-				"ms": c.Int("total_time_in_millis"),
-			},
-		}),
-
-		"verify_index": c.Dict("verify_index", s.Schema{
-			"check_index_time": s.Object{"ms": c.Int("check_index_time_in_millis")},
-			"total_time":       s.Object{"ms": c.Int("total_time_in_millis")},
-		}),
 	}
 )
 
@@ -129,6 +109,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 			event.ModuleFields.Put("index.name", indexName)
+			event.MetricSetFields.Put("name", indexName)
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {

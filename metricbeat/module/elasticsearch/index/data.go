@@ -39,8 +39,8 @@ type stats struct {
 
 type Index struct {
 	UUID      string     `json:"uuid"`
-	Primaries indexStats `json:"primaries"`
-	Total     indexStats `json:"total"`
+	Primaries primaries `json:"primaries"`
+	Total     total `json:"total"`
 
 	Index   string     `json:"index"`
 	Created int64      `json:"created"`
@@ -49,14 +49,35 @@ type Index struct {
 	Shards  shardStats `json:"shards"`
 }
 
-type indexStats struct {
+type primaries struct {
 	Docs struct {
 		Count   int `json:"count"`
-		Deleted int `json:"deleted"`
+	} `json:"docs"`
+	Indexing struct {
+		IndexTotal           int `json:"index_total"`
+		IndexTimeInMillis    int `json:"index_time_in_millis"`
+		ThrottleTimeInMillis int `json:"throttle_time_in_millis"`
+	} `json:"indexing"`
+	Merges struct {
+		TotalSizeInBytes int `json:"total_size_in_bytes"`
+	} `json:"merges"`
+	Segments struct {
+		Count                     int `json:"count"`
+	} `json:"segments"`
+	Store struct {
+		SizeInBytes int `json:"size_in_bytes"`
+	} `json:"store"`
+	Refresh struct {
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+	} `json:"refresh"`
+}
+
+type total struct {
+	Docs struct {
+		Count   int `json:"count"`
 	} `json:"docs"`
 	FieldData struct {
 		MemorySizeInBytes int `json:"memory_size_in_bytes"`
-		Evictions         int `json:"evictions"`
 	} `json:"fielddata"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -67,8 +88,6 @@ type indexStats struct {
 	Merges struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
-	QueryCache   cacheStats `json:"query_cache"`
-	RequestCache cacheStats `json:"request_cache"`
 	Search       struct {
 		QueryTotal        int `json:"query_total"`
 		QueryTimeInMillis int `json:"query_time_in_millis"`
@@ -90,33 +109,26 @@ type indexStats struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
 	} `json:"refresh"`
 }
 
-type cacheStats struct {
-	MemorySizeInBytes int `json:"memory_size_in_bytes"`
-	Evictions         int `json:"evictions"`
-	HitCount          int `json:"hit_count"`
-	MissCount         int `json:"miss_count"`
-}
 
 type shardStats struct {
 	Total     int `json:"total"`
-	Primaries int `json:"primaries"`
-	Replicas  int `json:"replicas"`
+	Primaries int `json:"-"`
+	Replicas  int `json:"-"`
 
-	ActiveTotal     int `json:"active_total"`
-	ActivePrimaries int `json:"active_primaries"`
-	ActiveReplicas  int `json:"active_replicas"`
+	ActiveTotal     int `json:"-"`
+	ActivePrimaries int `json:"-"`
+	ActiveReplicas  int `json:"-"`
 
-	UnassignedTotal     int `json:"unassigned_total"`
-	UnassignedPrimaries int `json:"unassigned_primaries"`
-	UnassignedReplicas  int `json:"unassigned_replicas"`
+	UnassignedTotal     int `json:"-"`
+	UnassignedPrimaries int `json:"-"`
+	UnassignedReplicas  int `json:"-"`
 
-	Initializing int `json:"initializing"`
-	Relocating   int `json:"relocating"`
+	Initializing int `json:"-"`
+	Relocating   int `json:"-"`
 }
 
 type bulkStats struct {
