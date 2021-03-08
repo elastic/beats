@@ -6,9 +6,24 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
+    - name: kibana_stats
+      type: group
+      fields:
+        - name: timestamp
+          type: alias
+          path: "@timestamp"
+        - name: kibana.response_time.max
+          type: alias
+          path: kibana.stats.response_time.max.ms
+        - name: kibana.status
+          type: alias
+          path: kibana.stats.kibana.status
+        - name: os.memory.free_in_bytes
+          type: alias
+          path: kibana.stats.os.memory.free_in_bytes
+        - name: process.uptime_in_millis
+          type: alias
+          path: kibana.stats.process.uptime.ms
     - name: kibana
       type: group
       fields:
-        - name: stats.usage.name
-          type: alias
-          path: kibana.stats.usage.index

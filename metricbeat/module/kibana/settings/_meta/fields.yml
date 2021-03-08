@@ -6,12 +6,10 @@
   fields:
     - name: uuid
       type: keyword
-      description: >
-        Kibana instance UUID
+      description: Kibana instance UUID
     - name: name
       type: keyword
-      description: >
-        Kibana instance name
+      description: Kibana instance name
     - name: index
       type: keyword
       description: Name of Kibana's internal index
