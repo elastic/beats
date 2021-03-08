@@ -3,6 +3,13 @@ set -euo pipefail
 script_path=$(dirname $(realpath -s $0))
 source $script_path/helper.sh
 
+# for status
+name="Uninstall elastic agent"
+first_operation="unenrolling elastic agent"
+second_operation="uninstalling elastic agent and removing any elastic agent related folders"
+message="Uninstall elastic agent"
+sub_name="Elastic Agent"
+
 checkOS
 
 Unenroll_ElasticAgent_DEB_RPM()
@@ -36,6 +43,7 @@ Unenroll_ElasticAgent_DEB_RPM()
     return $EXITCODE
   fi
   log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Agent has been unenrolled"
+  write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has been unenrolled" 4
 }
 
 Uninstall_ElasticAgent_DEB_RPM() {
@@ -69,6 +77,7 @@ Uninstall_ElasticAgent()
     retry_backoff Uninstall_ElasticAgent_DEB_RPM
   fi
   log "INFO" "Elastic Agent is uninstalled"
+  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "error" "Elastic Agent service has been uninstalled" 4
 }
 
 Uninstall_ElasticAgent

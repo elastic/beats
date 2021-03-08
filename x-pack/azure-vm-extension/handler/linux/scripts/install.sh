@@ -6,6 +6,13 @@ source $script_path/helper.sh
 checkOS
 install_dependencies
 
+# for status
+name="Install elastic agent"
+first_operation="installing elastic agent"
+second_operation="enrolling elastic agent"
+message="Install elastic agent"
+sub_name="Elastic Agent"
+
 
 # Install Elastic Agent
 
@@ -37,7 +44,7 @@ Install_ElasticAgent_DEB()
         return $EXIT_CODE
     fi
     log "INFO" "[Install_ElasticAgent_DEB] downloaded Elastic Agent $STACK_VERSION"
-
+    write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded" 1
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
@@ -48,7 +55,7 @@ Install_ElasticAgent_DEB()
     sudo dpkg -i $PACKAGE
     sudo apt-get install -f
     log "INFO" "[Install_ElasticAgent_DEB] installed Elastic Agent $STACK_VERSION"
-
+    write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed" 1
  fi
 }
 
@@ -80,7 +87,7 @@ Install_ElasticAgent_RPM()
         return $EXIT_CODE
       fi
       log "INFO" "[Install_ElasticAgent_RPM] downloaded Elastic Agent $STACK_VERSION"
-
+      write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded" 1
       #checkShasum $PACKAGE $SHASUM
       EXIT_CODE=$?
       if [[ $EXIT_CODE -ne 0 ]]; then
@@ -89,6 +96,7 @@ Install_ElasticAgent_RPM()
       fi
       sudo rpm -vi $PACKAGE
       log "INFO" "[Install_ElasticAgent_RPM] installed Elastic Agent $STACK_VERSION"
+      write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed" 1
     fi
 }
 
@@ -178,6 +186,7 @@ Enroll_ElasticAgent() {
   log "INFO" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN"
   log "INFO" "[Enroll_ElasticAgent] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}"
   sudo elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
+  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been enrolled" 1
 }
 
 

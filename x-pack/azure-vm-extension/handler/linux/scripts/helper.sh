@@ -300,3 +300,31 @@ get_any_active_policy() {
   fi
 done
 }
+
+write_status() {
+  local name="${1}"
+  local operation="${2}"
+  local mainStatus="${3}"
+  local message="${4}"
+  local subName="${5}"
+  local subStatus="${6}"
+  local subMessage="${7}"
+  local sequenceNumber="${8}"
+  local code=0
+  get_status_location
+  #2013-11-17T16:05:14Z
+  timestampUTC=$(date +"%Y-%m-%dT%H:%M:%S%z")
+  if [[ $subStatus = "error" ]]; then
+        code=1
+  fi
+  if [[ "$STATUS_FOLDER" != "" ]]; then
+    if [ -n "$(ls -A "$STATUS_FOLDER" 2>/dev/null)" ]; then
+      status_files_path="$STATUS_FOLDER/*.status"
+      latest_status_file=$(ls $status_files_path -A1 | sort -V | tail -1)
+      echo $latest_status_file
+    else
+      json="{  \"version\":\"1.0\",\"timestampUTC\":\"$timestampUTC\",\"status\":\"$mainStatus\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$message\"},\"substatus\": [{ \"name\":\"$subName\", \"status\":\"$subStatus\",\"code\":\"$code\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"subMessage\"}}] }"
+      echo $json > "$STATUS_FOLDER"/"$sequenceNumber".status
+    fi
+  fi
+}
