@@ -118,7 +118,6 @@ processors:
         - append:
             field: error.message
             value: "failed to parse timestamp field: {{ cyberarkpas.audit.Timestamp }}: {{ _ingest.on_failure_message }}"
-
   - remove:
       field:
        - _tmp
@@ -127,3 +126,6 @@ on_failure:
   - append:
         field: error.message
         value: "{{ _ingest.on_failure_message }}"
+  - remove:
+      field:
+        - _tmp
