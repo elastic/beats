@@ -280,6 +280,11 @@ func (m *Managed) Start() error {
 		return nil
 	}
 
+	// reload ID because of win7 sync issue
+	if err := m.agentInfo.ReloadID(); err != nil {
+		return err
+	}
+
 	err := m.upgrader.Ack(m.bgContext)
 	if err != nil {
 		m.log.Warnf("failed to ack update %v", err)
