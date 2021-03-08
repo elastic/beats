@@ -5,7 +5,10 @@
 package paths
 
 import (
+	"fmt"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 )
 
 // defaultAgentConfigFile is a name of file used to store agent information
@@ -19,6 +22,15 @@ const defaultAgentStateStoreFile = "state.yml"
 // AgentConfigFile is a name of file used to store agent information
 func AgentConfigFile() string {
 	return filepath.Join(Config(), defaultAgentConfigFile)
+}
+
+// AgentConfigFileLock is a locker for agent config file updates.
+func AgentConfigFileLock() *filelock.AppLocker {
+	fmt.Println(">>>", filepath.Join(Config(), fmt.Sprintf("%s.lock", defaultAgentConfigFile)))
+	return filelock.NewAppLocker(
+		Config(),
+		fmt.Sprintf("%s.lock", defaultAgentConfigFile),
+	)
 }
 
 // AgentCapabilitiesPath is a name of file used to store agent capabilities
