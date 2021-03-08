@@ -91,8 +91,7 @@ endif::[]
 [[ssl-common-config]]
 === Common configuration options
 
-In the +{beatname_lc}.yml+ config file, you can specify the following common options in the
-`ssl` section of each output that supports SSL.
+You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
 
 [float]
 [[enabled]]
@@ -105,12 +104,6 @@ To disable the ssl configuration, set the value to `false`. The default value is
 SSL settings are disabled if either `enabled` is set to `false` or the
 `ssl` section is missing.
 =====
-
-[float]
-[[key-passphrase]]
-==== `key_passphrase`
-
-The passphrase used to decrypt an encrypted key stored in the configured `key` file.
 
 [float]
 [[supported-protocols]]
@@ -222,14 +215,13 @@ it will not receive any verified chains.
 [[ssl-client-config]]
 === Client configuration options
 
-In the +{beatname_lc}.yml+ config file, you can specify the following client options in the
-`ssl` section of each output that supports SSL.
+You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
 
 [float]
 [[client-certificate-authorities]]
 ==== `certificate_authorities`
 
-The list of root certificates for server verifications is optional. If `certificate_authorities` is empty or not set, the
+The list of root certificates for verifications is required. If `certificate_authorities` is empty or not set, the
 system keystore is used. If `certificate_authorities` is self-signed, the host system
 needs to trust that CA cert as well.
 
@@ -303,8 +295,8 @@ certificate: |
 [[client-key]]
 ==== `key: "/etc/pki/client/cert.key"`
 
-The client certificate key used for client authentication. This option is only required if `client_authentication` is enabled.
-The key option support embedding of the private key:
+The client certificate key used for client authentication and is only required
+if `client_authentication` is configured. The key option support embedding of the private key:
 
 [source,yaml]
 ----
@@ -340,6 +332,13 @@ key: |
 ----
 
 [float]
+[[client-key-passphrase]]
+==== `key_passphrase`
+
+The passphrase used to decrypt an encrypted key stored in the configured `key` file.
+
+
+[float]
 [[client-verification-mode]]
 ==== `verification_mode`
 
@@ -363,7 +362,7 @@ trusted authority (CA), but does not perform any hostname verification.
 `none`::
 Performs _no verification_ of the server's certificate. This
 mode disables many of the security benefits of SSL/TLS and should only be used
-after very careful consideration. It is primarily intended as a temporary
+after cautious consideration. It is primarily intended as a temporary
 diagnostic mechanism when attempting to resolve TLS errors; its use in
 production environments is strongly discouraged.
 +
@@ -373,16 +372,15 @@ The default value is `full`.
 [[ssl-server-config]]
 === Server configuration options
 
-In the +{beatname_lc}.yml+ config file, you can specify the following server options in the
-`ssl` section of each output that supports SSL.
+You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
 
 [float]
 [[server-certificate-authorities]]
 ==== `certificate_authorities`
 
-The list of root certificates for server verifications is optional and is only active if 
-`client_authentication` is enabled. If `certificate_authorities` is empty or not set, and `client_authentication` is not enabled,
-the system keystore is used.
+The list of root certificates for server verifications is only required if 
+`client_authentication` is configured. If `certificate_authorities` is empty or not set, and
+`client_authentication` is not configured, the system keystore is used.
 
 If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 By default you can specify a list of files that +{beatname_lc}+ will read, but you can also embed a certificate
@@ -418,10 +416,7 @@ certificate_authorities:
 ==== `certificate: "/etc/pki/server/cert.pem"`
 
 The path to the certificate for SSL authentication is required. If the certificate
-is not specified, client authentication is not available. The connection
-might fail if the server requests client authentication. If the SSL server does not
-require client authentication, the certificate will be loaded, but not requested or used
-by the server.
+is not specified, server authentication is not available. 
 
 When this option is configured, the <<server-key,`key`>> option is also required.
 The certificate option support embedding of the certificate:
@@ -491,6 +486,12 @@ key: |
 ----
 
 [float]
+[[server-key-passphrase]]
+==== `key_passphrase`
+
+The passphrase is used to decrypt an encrypted key stored in the configured `key` file.
+
+[float]
 [[server-verification-mode]]
 ==== `verification_mode`
 
@@ -514,7 +515,7 @@ trusted authority (CA), but does not perform any hostname verification.
 `none`::
 Performs _no verification_ of the server's certificate. This
 mode disables many of the security benefits of SSL/TLS and should only be used
-after very careful consideration. It is primarily intended as a temporary
+after cautious consideration. It is primarily intended as a temporary
 diagnostic mechanism when attempting to resolve TLS errors; its use in
 production environments is strongly discouraged.
 +
@@ -534,7 +535,7 @@ Disables renegotiation.
 Allows a remote server to request renegotiation once per connection.
 
 `freely`::
-Allows a remote server to repeatedly request renegotiation.
+Allows a remote server to request renegotiation repeatedly.
 +
 The default value is `never`.
 
@@ -544,11 +545,11 @@ ifeval::["{beatname_lc}" == "filebeat"]
 ==== `client_authentication`
 
 The type of client authentication mode. When `certificate_authorities` is set, it
-defaults to `required`, otherwise it defaults to `none`.
+defaults to `required`. Otherwise, it defaults to `none`.
 
 [NOTE]
 =====
-This option is only valid with the TCP or the Syslog input.
+This option is only valid with the HTTP Endpoint, HTTP JSON, MQTT, Syslog, and the TCP input.
 =====
 
 The valid options are:
@@ -557,7 +558,7 @@ The valid options are:
 Disables client authentication.
 
 `optional`::
-When a client certificate is given, the server will verify it.
+When a client certificate is supplied, the server will verify it.
 
 `required`::
 Will require clients to provide a valid certificate.
