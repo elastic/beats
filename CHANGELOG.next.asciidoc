@@ -71,7 +71,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use ingress/egress instead of inbound/outbound for system/socket metricset. {pull}22992[22992]
 - Change types of numeric metrics from Kubelet summary api to double so as to cover big numbers. {pull}23335[23335]
 - Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
-- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}[23905]
+- Add support for Consul 1.9. {pull}24123[24123]
+- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 - Store `cloudfoundry.container.cpu.pct` in decimal form and as `scaled_float`. {pull}24219[24219]
 
 *Packetbeat*
@@ -145,6 +146,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
+- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 
 
 *Auditbeat*
@@ -247,6 +249,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 - Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 
 *Heartbeat*
 
@@ -582,6 +585,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add mime type detection for http responses. {pull}22976[22976]
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
+- Handle datastreams for fleet. {pull}24223[24223]
+- Add --sandbox option for browser monitor. {pull}24172[24172]
 
 *Heartbeat*
 
@@ -664,6 +669,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
 - Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
+- Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
 
 *Packetbeat*
 

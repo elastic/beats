@@ -25,7 +25,7 @@ stages:
     macos:
         mage: "mage build test"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/heartbeat for macos"
