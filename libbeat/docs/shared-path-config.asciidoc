@@ -112,8 +112,8 @@ path.logs: /var/log/beats
 
 Specifies the mount point of the host's filesystem for use in monitoring a host.
 This can either be set in the config, or with the `--system.hostfs` CLI flag.
-In metricbeat, this is used by the system module to read files from `/proc` and `/sys`.
-In other beats as well as metricbeat, this is used for cgroup self-monitoring.
+In Metricbeat, this is used by the system module to read files from `/proc` and `/sys`.
+In other beats as well as Metricbeat, this is used for cgroup self-monitoring.
 
 Example:
 
