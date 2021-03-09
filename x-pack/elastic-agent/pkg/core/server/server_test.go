@@ -741,7 +741,7 @@ func (*EchoAction) Name() string {
 	return "echo"
 }
 
-func (*EchoAction) Execute(request map[string]interface{}) (map[string]interface{}, error) {
+func (*EchoAction) Execute(ctx context.Context, request map[string]interface{}) (map[string]interface{}, error) {
 	echoRaw, ok := request["echo"]
 	if !ok {
 		return nil, fmt.Errorf("missing required param of echo")
@@ -757,7 +757,7 @@ func (*SleepAction) Name() string {
 	return "sleep"
 }
 
-func (*SleepAction) Execute(request map[string]interface{}) (map[string]interface{}, error) {
+func (*SleepAction) Execute(ctx context.Context, request map[string]interface{}) (map[string]interface{}, error) {
 	sleepRaw, ok := request["sleep"]
 	if !ok {
 		return nil, fmt.Errorf("missing required param of slow")
