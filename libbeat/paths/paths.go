@@ -76,6 +76,8 @@ const (
 	Logs FileType = "logs"
 	// Hostfs is an alternate path to the filesystem root,
 	// used for system metrics that interact with procfs and sysfs.
+	// Unlike the other values here, this corrisponds to `system.hostfs`
+	// and not `path.hostfs`.
 	Hostfs FileType = "hostfs"
 )
 
@@ -144,6 +146,7 @@ func (paths *Path) initPaths(cfg *Path) error {
 	return nil
 }
 
+// IsCLISet returns true if the CLI system.hostfs value has been set
 func IsCLISet() bool {
 	if *hostFS != "" {
 		return true

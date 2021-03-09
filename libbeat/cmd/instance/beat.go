@@ -1096,6 +1096,8 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
 
+	// Read the value for hostfs as `system.hostfs`
+	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
 	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
