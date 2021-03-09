@@ -507,15 +507,26 @@ def target(Map args = [:]) {
 }
 
 /**
+* If a static worker given the labels.
+* TODO: as soon as ARM and MacOS are ephemerals then we need to change this method
+*/
+def isStaticWorker(label) {
+  return (label?.contains('arm') || label?.contains('macosx') || label?.contains('metal'))
+}
+
+/**
 * This method wraps the node call for two reasons:
 *  1. with some latency to avoid the known issue with the scalabitity in gobld.
-*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir.
+*  3. enforce one shoot ephemeral workers with the extra/uuid label that gobld provides.
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
   // this should workaround the existing issue with reusing workers with the Gobld
   def uuid = UUID.randomUUID().toString()
-  node(label) {
+  def labels = isStaticWorker(label) ? label : (label?.trim() ? "${label} && extra/${uuid}" : "extra/${uuid}")
+  log(level: 'INFO', text: "Allocating a worker with the labels '${labels}'.")
+  node("${labels}") {
     ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
       body()
     }
