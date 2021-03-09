@@ -63,12 +63,12 @@ var (
 
 		Labels: map[string]p.LabelMap{
 			"pod":       p.KeyLabel(mb.ModuleDataKey + ".pod.name"),
-			"container": p.KeyLabel("name"), // this will be moved to ECS container.name through alias type
+			"container": p.KeyLabel("name"),
 			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 
 			"node":         p.Label(mb.ModuleDataKey + ".node.name"),
 			"container_id": p.Label("id"),
-			"image":        p.Label("image"), // this will be moved to ECS container.image.name through alias type
+			"image":        p.Label("image"),
 		},
 	}
 )
@@ -147,6 +147,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				containerFields.Put("id", cID[split+3:])
 			}
 		}
+		if containerImage, ok := event["image"]; ok {
+			cImage := (containerImage).(string)
+			containerFields.Put("image.name", cImage)
+		}
+		if containerName, ok := event["name"]; ok {
+			cName := (containerName).(string)
+			containerFields.Put("name", cName)
+		}
+		// remove ECS container fields from kubernetes.container.* since they will be set through alias
+		event.Delete("image")
+		event.Delete("name")
 		if len(containerFields) > 0 {
 			rootFields = common.MapStr{
 				"container": containerFields,
