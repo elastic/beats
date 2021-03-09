@@ -22,12 +22,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule/cron"
 )
 
-type Schedule struct {
-	scheduler.Schedule
+// Schedule defines an interface for getting the next scheduled runtime for a job
+type Schedule interface {
+	// Next returns the next runAt a scheduled event occurs after the given runAt
+	Next(now time.Time) (next time.Time)
+	Interval() time.Duration
+	// Returns true if this schedule type should run once immediately before checking Next.
+	// Cron tasks run at exact times so should set this to false.
+	RunOnInit() bool
 }
 
 // intervalScheduler defines a schedule that runs at fixed intervals.
@@ -40,7 +45,7 @@ func (s intervalScheduler) RunOnInit() bool {
 	return true
 }
 
-func Parse(in string) (*Schedule, error) {
+func Parse(in string, monitorId string) (Schedule, error) {
 	every := "@every"
 
 	// add '@every' keyword
@@ -51,7 +56,7 @@ func Parse(in string) (*Schedule, error) {
 			return nil, err
 		}
 
-		return &Schedule{intervalScheduler{d}}, nil
+		return intervalScheduler{d}, nil
 	}
 
 	// fallback on cron scheduler parsers
@@ -59,13 +64,13 @@ func Parse(in string) (*Schedule, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Schedule{s}, nil
+	return s, nil
 }
 
-func MustParse(in string) *Schedule {
-	sched, err := Parse(in)
+func MustParse(in string, monitorId string) Schedule {
+	sched, err := Parse(in, monitorId)
 	if err != nil {
-		panic(fmt.Sprintf("could not parse schedule parsed with MustParse: %s", err))
+		panic(fmt.Sprintf("could not parse schedule '%s': %s", in, err))
 	}
 	return sched
 }
@@ -78,21 +83,13 @@ func (s intervalScheduler) Interval() time.Duration {
 	return s.interval
 }
 
-type Timespan struct {
+type TimespanBounds struct {
 	Gte time.Time
 	Lt  time.Time
 }
 
-func (s *Schedule) Timespan(t time.Time) (ts Timespan) {
+func Timespan(t time.Time, s Schedule) (ts TimespanBounds) {
 	ts.Gte = t.Add(-time.Duration(t.UnixNano() % s.Interval().Nanoseconds()))
 	ts.Lt = ts.Gte.Add(s.Interval())
 	return ts
-}
-
-func (s *Schedule) Unpack(str string) error {
-	tmp, err := Parse(str)
-	if err == nil {
-		*s = *tmp
-	}
-	return err
 }

@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -67,16 +68,6 @@ type schedulerStats struct {
 // TaskFunc represents a single task in a job. Optionally returns continuation of tasks to
 // be executed within current job.
 type TaskFunc func(ctx context.Context) []TaskFunc
-
-// Schedule defines an interface for getting the next scheduled runtime for a job
-type Schedule interface {
-	// Next returns the next runAt a scheduled event occurs after the given runAt
-	Next(now time.Time) (next time.Time)
-	Interval() time.Duration
-	// Returns true if this schedule type should run once immediately before checking Next.
-	// Cron tasks run at exact times so should set this to false.
-	RunOnInit() bool
-}
 
 // New creates a new Scheduler
 func New(limit int64, registry *monitoring.Registry) *Scheduler {
@@ -175,7 +166,7 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched schedule.Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
 	if s.state.Load() == stateStopped {
 		return nil, ErrAlreadyStopped
 	}

@@ -21,10 +21,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
-	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -34,25 +35,18 @@ import (
 // subsequent processors.
 type configuredJob struct {
 	job      jobs.Job
-	config   jobConfig
+	config   stdfields.StdMonitorFields
 	monitor  *Monitor
 	cancelFn context.CancelFunc
 	client   beat.Client
 }
 
-func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+func newConfiguredJob(job jobs.Job, config stdfields.StdMonitorFields, monitor *Monitor) (*configuredJob, error) {
 	return &configuredJob{
 		job:     job,
 		config:  config,
 		monitor: monitor,
 	}, nil
-}
-
-// jobConfig represents fields needed to execute a single job.
-type jobConfig struct {
-	Name     string             `config:"pluginName"`
-	Type     string             `config:"type"`
-	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
 }
 
 // ProcessorsError is used to indicate situations when processors could not be loaded.
@@ -84,7 +78,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.stdFields.ID, tf)
+	t.cancelFn, err = t.monitor.scheduler.Add(t.config.ParsedSchedule, t.monitor.stdFields.ID, tf)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}

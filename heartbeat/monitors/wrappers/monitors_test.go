@@ -49,19 +49,19 @@ type testDef struct {
 }
 
 var testMonFields = stdfields.StdMonitorFields{
-	ID:       "myid",
-	Name:     "myname",
-	Type:     "mytype",
-	Schedule: schedule.MustParse("@every 1s"),
-	Timeout:  1,
+	ID:             "myid",
+	Name:           "myname",
+	Type:           "mytype",
+	ParsedSchedule: schedule.MustParse("@every 1s", "myId"),
+	Timeout:        1,
 }
 
 var testBrowserMonFields = stdfields.StdMonitorFields{
-	ID:       "myid",
-	Name:     "myname",
-	Type:     "browser",
-	Schedule: schedule.MustParse("@every 1s"),
-	Timeout:  1,
+	ID:             "myid",
+	Name:           "myname",
+	Type:           "browser",
+	ParsedSchedule: schedule.MustParse("@every 1s", "myId"),
+	Timeout:        1,
 }
 
 func testCommonWrap(t *testing.T, tt testDef) {
@@ -357,12 +357,12 @@ func summaryValidator(up int, down int) validator.Validator {
 
 func TestTimespan(t *testing.T) {
 	now := time.Now()
-	sched10s, err := schedule.Parse("@every 10s")
+	sched10s, err := schedule.Parse("@every 10s", "myId")
 	require.NoError(t, err)
 
 	type args struct {
 		started time.Time
-		sched   *schedule.Schedule
+		sched   schedule.Schedule
 		timeout time.Duration
 	}
 	tests := []struct {

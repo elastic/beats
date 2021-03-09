@@ -203,14 +203,14 @@ func (m *Monitor) configHash() (uint64, error) {
 }
 
 func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
-	mtConf := jobConfig{}
-	if err := config.Unpack(&mtConf); err != nil {
+	stf, err := stdfields.ConfigToStdMonitorFields(config)
+	if err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
 	}
 
 	var mTasks []*configuredJob
 	for _, job := range jobs {
-		t, err := newConfiguredJob(job, mtConf, m)
+		t, err := newConfiguredJob(job, stf, m)
 		if err != nil {
 			// Failure to compile monitor processors should not crash hb or prevent progress
 			if _, ok := err.(ProcessorsError); ok {

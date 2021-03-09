@@ -25,6 +25,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -91,7 +93,7 @@ func TestScheduler_Start(t *testing.T) {
 	executed := make(chan string)
 
 	preAddEvents := uint32(10)
-	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
+	s.Add(schedule.MustParse("@every 0s", "preAdd"), "preAdd", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
 		executed <- "preAdd"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "preAddCont"
@@ -113,7 +115,7 @@ func TestScheduler_Start(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
+	remove, err := s.Add(schedule.MustParse("@every 0s", "removed"), "removed", testTaskTimes(removedEvents+1, testFn))
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
@@ -121,7 +123,7 @@ func TestScheduler_Start(t *testing.T) {
 	s.Start()
 
 	postAddEvents := uint32(10)
-	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
+	s.Add(schedule.MustParse("@every 0s", "postAdd"), "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postAdd"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "postAddCont"
@@ -167,7 +169,7 @@ func TestScheduler_Stop(t *testing.T) {
 	require.NoError(t, s.Start())
 	require.NoError(t, s.Stop())
 
-	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(schedule.MustParse("@every 0s", "testPostStop"), "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
 	}))
@@ -243,7 +245,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 func BenchmarkScheduler(b *testing.B) {
 	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime())
 
-	sched := testSchedule{0}
+	sched := schedule.MustParse("@every 0s", "testPostStop")
 
 	executed := make(chan struct{})
 	for i := 0; i < 1024; i++ {

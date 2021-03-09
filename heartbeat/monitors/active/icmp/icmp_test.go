@@ -69,8 +69,8 @@ func execTestICMPCheck(t *testing.T, cfg Config) (mockLoop, *beat.Event) {
 	require.Len(t, p.Jobs, 1)
 	require.Equal(t, 1, p.Endpoints)
 	e := &beat.Event{}
-	sched, _ := schedule.Parse("@every 1s")
-	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", Schedule: sched, Timeout: 1})
+	sched := schedule.MustParse("@every 1s", "test")
+	wrapped := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "icmp", ParsedSchedule: sched, Timeout: 1})
 	wrapped[0](e)
 	return tl, e
 }

@@ -111,7 +111,7 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 			"id":       id,
 			"name":     name,
 			"type":     sf.Type,
-			"timespan": timespan(started, sf.Schedule, sf.Timeout),
+			"timespan": timespan(started, sf.ParsedSchedule, sf.Timeout),
 		},
 	}
 
@@ -125,7 +125,7 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 	eventext.MergeEventFields(event, fieldsToMerge)
 }
 
-func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
+func timespan(started time.Time, sched schedule.Schedule, timeout time.Duration) common.MapStr {
 	maxEnd := sched.Next(started)
 
 	if maxEnd.Sub(started) < timeout {
