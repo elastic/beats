@@ -61,8 +61,7 @@ precedence over those specified in the `username` and `password` config options.
 [float]
 === Compatibility
 
-This module was tested with PostgreSQL 9, 10, 11 and 12. It is expected to work with all
-versions >= 9.
+This module was tested with PostgreSQL 9, 10, 11, 12 and 13.
 
 
 [float]
