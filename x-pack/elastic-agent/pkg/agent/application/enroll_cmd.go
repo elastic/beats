@@ -15,13 +15,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
@@ -29,15 +27,17 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 const (
-	waitingForAgent        = "waiting for Elastic Agent to start"
-	waitingForFleetServer  = "waiting for Elastic Agent to start Fleet Server"
-	defaultFleetServerPort = 8220
+	maxRetriesstoreAgentInfo = 5
+	waitingForAgent          = "waiting for Elastic Agent to start"
+	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerPort   = 8220
 )
 
 var (
@@ -233,8 +233,9 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save fleet server bootstrap information", errors.TypeFilesystem)
+
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
+		return err
 	}
 
 	if agentRunning {
@@ -404,11 +405,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		return err
 	}
 
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
-	}
-
-	if _, err := info.NewAgentInfo(); err != nil {
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
 		return err
 	}
 
@@ -554,5 +551,36 @@ func getAppFromStatus(status *client.AgentStatus, name string) *client.Applicati
 			return app
 		}
 	}
+	return nil
+}
+
+func safelyStoreAgentInfo(s saver, reader io.Reader) error {
+	var err error
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 100*time.Millisecond, 3*time.Second)
+
+	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
+		backExp.Wait()
+		err = storeAgentInfo(s, reader)
+		if err != filelock.ErrAppAlreadyRunning {
+			break
+		}
+	}
+
+	close(signal)
+	return err
+}
+
+func storeAgentInfo(s saver, reader io.Reader) error {
+	fileLock := paths.AgentConfigFileLock()
+	if err := fileLock.TryLock(); err != nil {
+		return err
+	}
+	defer fileLock.Unlock()
+
+	if err := s.Save(reader); err != nil {
+		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
+	}
+
 	return nil
 }
