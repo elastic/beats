@@ -55,7 +55,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields.Type)
+			return makeAddSummary(stdMonFields)
 		})
 }
 
@@ -111,7 +111,7 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 			"id":       id,
 			"name":     name,
 			"type":     sf.Type,
-			"timespan": timespan(started, sf.ParsedSchedule, sf.Timeout),
+			"timespan": schedule.Timespan(started, sf.ParsedSchedule),
 		},
 	}
 
@@ -123,19 +123,6 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 	}
 
 	eventext.MergeEventFields(event, fieldsToMerge)
-}
-
-func timespan(started time.Time, sched schedule.Schedule, timeout time.Duration) common.MapStr {
-	maxEnd := sched.Next(started)
-
-	if maxEnd.Sub(started) < timeout {
-		maxEnd = started.Add(timeout)
-	}
-
-	return common.MapStr{
-		"gte": started,
-		"lt":  maxEnd,
-	}
 }
 
 // addMonitorStatus wraps the given Job's execution such that any error returned
@@ -183,12 +170,11 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(monitorType string) jobs.JobWrapper {
+func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
 		mtx        sync.Mutex
-		monitorId  string
 		remaining  uint16
 		up         uint16
 		down       uint16
@@ -230,7 +216,13 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				}
 			}
 
-			event.PutValue("monitor.check_group", state.checkGroup)
+			//event.PutValue("monitor.check_group", state.checkGroup)
+			ts, err := event.GetValue("monitor.timespan")
+			if err != nil {
+				return nil, fmt.Errorf("could not get timespan for monitor summary: %w", err)
+			}
+			// TODO: Create a more optimial string representation
+			event.PutValue("monitor.check_group", fmt.Sprintf("%s-%s", smf.ID, ts.(schedule.TimespanBounds).ShortString()))
 
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))

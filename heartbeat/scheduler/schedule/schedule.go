@@ -84,8 +84,16 @@ func (s intervalScheduler) Interval() time.Duration {
 }
 
 type TimespanBounds struct {
-	Gte time.Time
-	Lt  time.Time
+	Gte time.Time `json:"gte"`
+	Lt  time.Time `json:"lt"`
+}
+
+func (tsb TimespanBounds) String() string {
+	return fmt.Sprintf("TimespanBounds<%s->%s>", tsb.Gte, tsb.Lt)
+}
+
+func (tsb TimespanBounds) ShortString() string {
+	return fmt.Sprintf("%x-%d", tsb.Gte.Unix(), int32(tsb.Lt.Sub(tsb.Gte).Seconds()))
 }
 
 func Timespan(t time.Time, s Schedule) (ts TimespanBounds) {

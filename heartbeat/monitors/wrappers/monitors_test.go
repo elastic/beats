@@ -20,9 +20,7 @@ package wrappers
 import (
 	"fmt"
 	"net/url"
-	"reflect"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -353,47 +351,6 @@ func summaryValidator(up int, down int) validator.Validator {
 			"down": uint16(down),
 		},
 	})
-}
-
-func TestTimespan(t *testing.T) {
-	now := time.Now()
-	sched10s, err := schedule.Parse("@every 10s", "myId")
-	require.NoError(t, err)
-
-	type args struct {
-		started time.Time
-		sched   schedule.Schedule
-		timeout time.Duration
-	}
-	tests := []struct {
-		name string
-		args args
-		want common.MapStr
-	}{
-		{
-			"interval longer than timeout",
-			args{now, sched10s, time.Second},
-			common.MapStr{
-				"gte": now,
-				"lt":  now.Add(time.Second * 10),
-			},
-		},
-		{
-			"timeout longer than interval",
-			args{now, sched10s, time.Second * 20},
-			common.MapStr{
-				"gte": now,
-				"lt":  now.Add(time.Second * 20),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := timespan(tt.args.started, tt.args.sched, tt.args.timeout); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("timespan() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }
 
 func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {

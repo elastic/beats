@@ -65,6 +65,7 @@ func FailError(typ string, err error) common.MapStr {
 func Fail(r Reason) common.MapStr {
 	return common.MapStr{
 		"type":    r.Type(),
+		"code":    r.Error(),
 		"message": r.Error(),
 	}
 }
