@@ -126,7 +126,7 @@ is renamed. This happens, for example, when rotating files. By default, the
 harvester stays open and keeps reading the file because the file handler does
 not depend on the file name. If the `close_renamed` option is enabled and the
 file is renamed or moved in such a way that it's no longer matched by the file
-patterns specified for the , the file will not be picked up again.
+patterns specified for the path, the file will not be picked up again.
 {beatname_uc} will not finish reading the file.
 
 Do not use this option when `path` based `file_identity` is configured. It does
