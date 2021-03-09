@@ -72,7 +72,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		switch se.Type {
 		case "journey/start":
 			je.firstError = nil
-			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
 		case "journey/end":
