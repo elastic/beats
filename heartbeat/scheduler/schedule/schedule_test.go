@@ -161,3 +161,42 @@ func TestSchedule_Unpack(t *testing.T) {
 		})
 	}
 }
+
+func TestSchedule_Timespan(t *testing.T) {
+	tests := []struct {
+		name     string
+		Schedule scheduler.Schedule
+		t        time.Time
+		wantTs   Timespan
+	}{
+		{
+			"One second interval",
+			intervalScheduler{time.Second},
+			time.Unix(1000, 0),
+			Timespan{Gte: time.Unix(1000, 0), Lt: time.Unix(1001, 0)},
+		},
+		{
+			"One minute interval",
+			intervalScheduler{time.Minute},
+			time.Unix(60, 0),
+			Timespan{Gte: time.Unix(60, 0), Lt: time.Unix(120, 0)},
+		},
+		{
+			"One minute interval, odd time",
+			intervalScheduler{time.Minute},
+			time.Unix(83, 0),
+			Timespan{Gte: time.Unix(60, 0), Lt: time.Unix(120, 0)},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Schedule{
+				Schedule: tt.Schedule,
+			}
+			if gotTs := s.Timespan(tt.t); !reflect.DeepEqual(gotTs, tt.wantTs) {
+				t.Errorf("Timespan.Gte() = %v, want %v", gotTs.Gte, tt.wantTs.Gte)
+				t.Errorf("Timespan.Lt() = %v, want %v", gotTs.Lt, tt.wantTs.Lt)
+			}
+		})
+	}
+}

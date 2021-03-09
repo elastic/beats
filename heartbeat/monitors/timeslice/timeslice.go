@@ -15,49 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cron
+package timeslice
 
 import (
 	"time"
 
-	"github.com/gorhill/cronexpr"
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 )
 
-type Schedule cronexpr.Expression
-
-func MustParse(in string) *Schedule {
-	s, err := Parse(in)
-	if err != nil {
-		panic(err)
-	}
-	return s
+type Timeslice struct {
+	key      string
+	schedule schedule.Schedule
 }
 
-func Parse(in string) (*Schedule, error) {
-	expr, err := cronexpr.Parse(in)
-	return (*Schedule)(expr), err
-}
-
-func (s *Schedule) Next(t time.Time) time.Time {
-	expr := (*cronexpr.Expression)(s)
-	return expr.Next(t)
-}
-
-func (s *Schedule) Interval() time.Duration {
-	next := s.Next(time.Now())
-	nnext := s.Next(next)
-	return nnext.Sub(next)
-}
-
-func (s *Schedule) Unpack(str string) error {
-	tmp, err := Parse(str)
-	if err == nil {
-		*s = *tmp
-	}
-	return err
-}
-
-// RunOnInit returns false for interval schedulers.
-func (s *Schedule) RunOnInit() bool {
-	return false
+func (t Timeslice) calculate() {
+	t.schedule.Next(time.Now())
 }

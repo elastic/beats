@@ -72,6 +72,7 @@ type TaskFunc func(ctx context.Context) []TaskFunc
 type Schedule interface {
 	// Next returns the next runAt a scheduled event occurs after the given runAt
 	Next(now time.Time) (next time.Time)
+	Interval() time.Duration
 	// Returns true if this schedule type should run once immediately before checking Next.
 	// Cron tasks run at exact times so should set this to false.
 	RunOnInit() bool

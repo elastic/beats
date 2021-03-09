@@ -74,6 +74,21 @@ func (s intervalScheduler) Next(t time.Time) time.Time {
 	return t.Add(s.interval)
 }
 
+func (s intervalScheduler) Interval() time.Duration {
+	return s.interval
+}
+
+type Timespan struct {
+	Gte time.Time
+	Lt  time.Time
+}
+
+func (s *Schedule) Timespan(t time.Time) (ts Timespan) {
+	ts.Gte = t.Add(-time.Duration(t.UnixNano() % s.Interval().Nanoseconds()))
+	ts.Lt = ts.Gte.Add(s.Interval())
+	return ts
+}
+
 func (s *Schedule) Unpack(str string) error {
 	tmp, err := Parse(str)
 	if err == nil {
