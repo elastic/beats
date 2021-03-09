@@ -63,9 +63,10 @@ var schema = s.Schema{
 	},
 }
 
-// PostgreSQL 13 renames fields with exec times, keep this for compatibility with older versions.
+// PostgreSQL 13 renames fields with stats about execution time from *_time to *_exec_time,
+// keep this for compatibility with older versions.
 // Based on: https://www.postgresql.org/docs/9.6/pgstatstatements.html
-var schemaTime = s.Schema{
+var schemaOldTime = s.Schema{
 	"query": s.Object{
 		"time": s.Object{
 			"total":  s.Object{"ms": c.Float("total_time")},
