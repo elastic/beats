@@ -11,12 +11,16 @@ check_install:
     path: "endpoint-security"
     args:
     - "verify"
+    - "--log"
+    - "stderr"
     timeout: 30
 post_install:
 - exec_file:
     path: "endpoint-security"
     args:
     - "install"
+    - "--log"
+    - "stderr"
     - "--upgrade"
     - "--resources"
     - "endpoint-security-resources.zip"
@@ -26,6 +30,8 @@ pre_uninstall:
     path: "endpoint-security"
     args:
       - "uninstall"
+      - "--log"
+      - "stderr"
     timeout: 600
 rules:
 - fix_stream: {}

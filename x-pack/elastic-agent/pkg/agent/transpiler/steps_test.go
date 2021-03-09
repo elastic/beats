@@ -5,7 +5,9 @@
 package transpiler
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"runtime"
 	"testing"
 
@@ -67,5 +69,69 @@ func TestIsSubpath(t *testing.T) {
 			assert.Equal(t, test.resultPath, newPath)
 			assert.Equal(t, test.isSubpath, result)
 		})
+	}
+}
+
+func TestExecFile_Success(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	binaryPath := "tests/exec-1.0-darwin-x86_64/exec"
+	step := ExecFile(10, binaryPath, "-output=stdout", "-exitcode=0")
+	err = step.Execute(context.Background(), pwd)
+	if err != nil {
+		t.Fatal("command should not have errored")
+	}
+}
+
+func TestExecFile_StdErr(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	binaryPath := "tests/exec-1.0-darwin-x86_64/exec"
+	step := ExecFile(10, binaryPath, "-output=stderr", "-exitcode=15")
+	err = step.Execute(context.Background(), pwd)
+	if err == nil {
+		t.Fatal("command should have errored")
+	}
+	errMsg := "operation 'Exec' failed (return code: 15): message written to stderr"
+	if err.Error() != errMsg {
+		t.Fatalf("got unexpected error: %s", err)
+	}
+}
+
+func TestExecFile_StdOut(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	binaryPath := "tests/exec-1.0-darwin-x86_64/exec"
+	step := ExecFile(10, binaryPath, "-output=stdout", "-exitcode=16")
+	err = step.Execute(context.Background(), pwd)
+	if err == nil {
+		t.Fatal("command should have errored")
+	}
+	errMsg := "operation 'Exec' failed (return code: 16): message written to stdout"
+	if err.Error() != errMsg {
+		t.Fatalf("got unexpected error: %s", err)
+	}
+}
+
+func TestExecFile_NoOutput(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	binaryPath := "tests/exec-1.0-darwin-x86_64/exec"
+	step := ExecFile(10, binaryPath, "-no-output", "-exitcode=17")
+	err = step.Execute(context.Background(), pwd)
+	if err == nil {
+		t.Fatal("command should have errored")
+	}
+	errMsg := "operation 'Exec' failed (return code: 17): (command had no output)"
+	if err.Error() != errMsg {
+		t.Fatalf("got unexpected error: %s", err)
 	}
 }
