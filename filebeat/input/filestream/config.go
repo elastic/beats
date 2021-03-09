@@ -69,8 +69,10 @@ type readerConfig struct {
 	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                    `config:"seek_to_tail"`
 
-	Parsers []*common.ConfigNamespace `config:"parsers"` // TODO multiline, json, syslog?
+	Parsers ParserConfig `config:"parsers"`
 }
+
+type ParserConfig []common.ConfigNamespace
 
 type backoffConfig struct {
 	Init time.Duration `config:"init" validate:"nonzero"`
@@ -114,7 +116,7 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
-		Parsers:        nil,
+		Parsers:        make([]common.ConfigNamespace, 0),
 	}
 }
 
