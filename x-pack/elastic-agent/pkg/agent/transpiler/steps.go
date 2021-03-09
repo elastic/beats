@@ -253,10 +253,21 @@ func (r *ExecFileStep) Execute(ctx context.Context, rootDir string) error {
 	}
 	if err != nil {
 		exitErr, ok := err.(*exec.ExitError)
-		if ok && exitErr.Stderr != nil && len(exitErr.Stderr) > 0 {
-			return fmt.Errorf("operation 'Exec' failed: %s", string(exitErr.Stderr))
+		if ok && exitErr.Stderr != nil {
+			errStr := strings.TrimSpace(string(exitErr.Stderr))
+			if len(errStr) > 0 {
+				return fmt.Errorf("operation 'Exec' failed (return code: %d): %s", exitErr.ExitCode(), errStr)
+			}
 		}
-		return fmt.Errorf("operation 'Exec' failed: %s", string(output))
+		exitCode := 1
+		if ok {
+			exitCode = exitErr.ExitCode()
+		}
+		outStr := strings.TrimSpace(string(output))
+		if len(outStr) == 0 {
+			outStr = "(command had no output)"
+		}
+		return fmt.Errorf("operation 'Exec' failed (return code: %d): %s", exitCode, outStr)
 	}
 	return nil
 }
