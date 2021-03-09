@@ -75,7 +75,6 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
 func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool, now time.Time) jobs.JobWrapper {
-	fmt.Printf("MMM %s\n", stdMonFields.ID)
 	now = time.Now()
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
