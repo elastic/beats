@@ -458,7 +458,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -583,7 +582,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"runtime": "docker",
 							"id":      "foobar",
 						},
@@ -628,7 +626,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -799,7 +796,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"runtime": "",
 							"id":      "",
 						},
@@ -907,7 +903,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "",
 							"runtime": "",
 						},
@@ -1015,7 +1010,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"runtime": "",
 							"id":      "",
 						},
@@ -1127,7 +1121,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1241,7 +1234,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1387,7 +1379,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar",
 							"runtime": "docker",
 						},
@@ -1433,7 +1424,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar-init",
 							"runtime": "docker",
 						},
@@ -1479,7 +1469,6 @@ func TestEmitEvent(t *testing.T) {
 							},
 						},
 						"container": common.MapStr{
-							"image":   common.MapStr{"name": "elastic/filebeat:6.3.0"},
 							"id":      "foobar-ephemeral",
 							"runtime": "docker",
 						},
