@@ -111,11 +111,11 @@ path.logs: /var/log/beats
 ==== `system.hostfs`
 
 Specifies the mount point of the host's filesystem for use in monitoring a host.
-This can either be set in the config, or with the `--system.hostfs` CLI flag.
+This can either be set in the config, or with the `--system.hostfs` CLI flag. This is used for cgroup self-monitoring.
 ifeval::["{beatname_lc}"=="metricbeat"]
-In Metricbeat, this is used by the system module to read files from `/proc` and `/sys`.
+This is also used by the system module to read files from `/proc` and `/sys`.
 endif::[]
-In all beats, this is used for cgroup self-monitoring.
+
 
 Example:
 
