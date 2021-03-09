@@ -113,7 +113,6 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.St
 		name = fmt.Sprintf("%s - %s", smf.Name, v.(string))
 	}
 
-	logp.Info("MT %s: %s", id, started)
 	tsb := schedule.Timespan(started, smf.ParsedSchedule)
 	tg := tsb.ShortString()
 	fieldsToMerge := common.MapStr{
