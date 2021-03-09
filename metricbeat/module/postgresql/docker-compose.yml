@@ -2,10 +2,12 @@ version: '2.3'
 
 services:
   postgresql:
-    image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-9.5.3}-1
+    image: docker.elastic.co/integrations-ci/beats-postgresql:${POSTGRESQL_VERSION:-13.2}-2
     build:
       context: ./_meta
       args:
-        POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-9.5.3}
+        POSTGRESQL_VERSION: ${POSTGRESQL_VERSION:-13.2}
+    environment:
+      POSTGRES_PASSWORD: postgres
     ports:
       - 5432
