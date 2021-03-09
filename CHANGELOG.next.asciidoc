@@ -41,7 +41,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
-- Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
 
 *Heartbeat*
 
@@ -112,7 +111,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
-- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 
 *Auditbeat*
 
@@ -167,8 +165,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
-- Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
-- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
 
 *Heartbeat*
 
@@ -230,7 +226,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 - Add support for azure light metricset app_stats. {pull}20639[20639]
 - Fix remote_write flaky test. {pull}21173[21173]
-- Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
 
 *Packetbeat*
 
@@ -466,6 +461,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
 
 
 
