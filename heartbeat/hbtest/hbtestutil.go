@@ -154,6 +154,7 @@ func BaseChecks(ip string, status string, typ string) validator.Validator {
 				"id":          isdef.IsNonEmptyString,
 				"name":        isdef.IsString,
 				"type":        typ,
+				"time_group":  isdef.IsString,
 				"check_group": isdef.IsString,
 			},
 		}),

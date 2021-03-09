@@ -99,6 +99,7 @@ func TestSimpleJob(t *testing.T) {
 						"name":        testMonFields.Name,
 						"type":        testMonFields.Type,
 						"status":      "up",
+						"time_group":  isdef.IsString,
 						"check_group": isdef.IsString,
 					},
 				}),
@@ -126,6 +127,7 @@ func TestJobWithServiceName(t *testing.T) {
 						"name":        testMonFields.Name,
 						"type":        testMonFields.Type,
 						"status":      "up",
+						"time_group":  isdef.IsString,
 						"check_group": isdef.IsString,
 					},
 					"service": map[string]interface{}{
@@ -153,6 +155,7 @@ func TestErrorJob(t *testing.T) {
 				"name":        testMonFields.Name,
 				"type":        testMonFields.Type,
 				"status":      "down",
+				"time_group":  isdef.IsString,
 				"check_group": isdef.IsString,
 			},
 		}),
@@ -185,10 +188,11 @@ func TestMultiJobNoConts(t *testing.T) {
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
 					"status":      "up",
+					"time_group":  isdef.IsString,
+					"timespan":    hbtestllext.IsTimespanBounds,
 					"check_group": uniqScope.IsUniqueTo("check_group"),
 				},
 			}),
-			hbtestllext.MonitorTimespanValidator,
 			summaryValidator(1, 0),
 		)
 	}
@@ -232,6 +236,7 @@ func TestMultiJobConts(t *testing.T) {
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
 					"status":      "up",
+					"time_group":  isdef.IsString,
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
@@ -290,6 +295,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 					"name":        testMonFields.Name,
 					"type":        testMonFields.Type,
 					"status":      "up",
+					"time_group":  isdef.IsString,
 					"check_group": uniqScope.IsUniqueTo(u),
 				},
 			}),
@@ -360,7 +366,9 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
-				"check_group": "inline-check-group",
+				"id":          "inline-browser-job",
+				"time_group":  isdef.IsString,
+				"check_group": isdef.IsStringContaining("inline-browser-job"),
 			},
 		})
 		return nil, nil
@@ -382,11 +390,12 @@ func TestInlineBrowserJob(t *testing.T) {
 					urlValidator(t, "http://foo.com"),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{
-							"id":          testMonFields.ID,
+							"id":          isdef.IsStringContaining(testMonFields.ID),
 							"name":        testMonFields.Name,
 							"type":        fields.Type,
 							"status":      "up",
-							"check_group": "inline-check-group",
+							"time_group":  isdef.IsString,
+							"check_group": isdef.IsStringContaining(testMonFields.ID),
 						},
 					}),
 					hbtestllext.MonitorTimespanValidator,
@@ -416,6 +425,7 @@ func makeSuiteBrowserJob(t *testing.T, u string) jobs.Job {
 			"monitor": common.MapStr{
 				"id":          suiteBrowserJobValues.id,
 				"name":        suiteBrowserJobValues.name,
+				"time_group":  isdef.IsString,
 				"check_group": suiteBrowserJobValues.checkGroup,
 			},
 		})
@@ -440,12 +450,10 @@ func TestSuiteBrowserJob(t *testing.T) {
 							"id":          fmt.Sprintf("%s-%s", testMonFields.ID, suiteBrowserJobValues.id),
 							"name":        fmt.Sprintf("%s - %s", testMonFields.Name, suiteBrowserJobValues.name),
 							"type":        fields.Type,
-							"check_group": suiteBrowserJobValues.checkGroup,
+							"time_group":  isdef.IsString,
+							"timespan":    hbtestllext.IsTimespanBounds,
+							"check_group": isdef.IsStringContaining(suiteBrowserJobValues.id),
 							"status":      "up",
-							"timespan": common.MapStr{
-								"gte": hbtestllext.IsTime,
-								"lt":  hbtestllext.IsTime,
-							},
 						},
 						"url": URLFields(urlU),
 					}),

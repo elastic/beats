@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -47,13 +48,15 @@ func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.J
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
 func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
-	return jobs.WrapAllSeparately(
+	return jobs.WrapEachRun(
 		jobs.WrapAll(
 			js,
-			addMonitorMeta(stdMonFields, len(js) > 1),
 			addMonitorStatus(stdMonFields.Type),
 			addMonitorDuration,
 		),
+		func() jobs.JobWrapper {
+			return addMonitorMeta(stdMonFields, len(js) > 1, time.Now())
+		},
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields)
 		})
@@ -65,25 +68,30 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAll(
 		js,
-		addMonitorMeta(stdMonFields, len(js) > 1),
+		addMonitorMeta(stdMonFields, len(js) > 1, time.Now()),
 		addMonitorStatus(stdMonFields.Type),
 	)
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
+func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool, now time.Time) jobs.JobWrapper {
+	fmt.Printf("MMM %s\n", stdMonFields.ID)
+	now = time.Now()
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, e := job(event)
-			addMonitorMetaFields(event, time.Now(), stdMonFields, isMulti)
+			addMonitorMetaFields(event, now, stdMonFields, isMulti)
 			return cont, e
 		}
 	}
 }
 
-func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.StdMonitorFields, isMulti bool) {
-	id := sf.ID
-	name := sf.Name
+// runId is a unique ID used to add enough entropy to check groups.
+var runId = rand.Uint32()
+
+func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.StdMonitorFields, isMulti bool) {
+	id := smf.ID
+	name := smf.Name
 
 	// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
 	// unique URLs to create unique suffixes for the monitor.
@@ -94,31 +102,36 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 			url = "n/a"
 		}
 		urlHash, _ := hashstructure.Hash(url, nil)
-		id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
+		id = fmt.Sprintf("%s-%x", smf.ID, urlHash)
 	}
 
 	// Allow jobs to override the ID, useful for browser suites
 	// which do this logic on their own
 	if v, _ := event.GetValue("monitor.id"); v != nil {
-		id = fmt.Sprintf("%s-%s", sf.ID, v.(string))
+		id = fmt.Sprintf("%s-%s", smf.ID, v.(string))
 	}
 	if v, _ := event.GetValue("monitor.name"); v != nil {
-		name = fmt.Sprintf("%s - %s", sf.Name, v.(string))
+		name = fmt.Sprintf("%s - %s", smf.Name, v.(string))
 	}
 
+	logp.Info("MT %s: %s", id, started)
+	tsb := schedule.Timespan(started, smf.ParsedSchedule)
+	tg := tsb.ShortString()
 	fieldsToMerge := common.MapStr{
 		"monitor": common.MapStr{
-			"id":       id,
-			"name":     name,
-			"type":     sf.Type,
-			"timespan": schedule.Timespan(started, sf.ParsedSchedule),
+			"id":          id,
+			"name":        name,
+			"type":        smf.Type,
+			"timespan":    tsb,
+			"time_group":  tg,
+			"check_group": fmt.Sprintf("%s-%s-%x", id, tg, runId),
 		},
 	}
 
 	// Add service.name for APM interop
-	if sf.Service.Name != "" {
+	if smf.Service.Name != "" {
 		fieldsToMerge["service"] = common.MapStr{
-			"name": sf.Service.Name,
+			"name": smf.Service.Name,
 		}
 	}
 
@@ -195,6 +208,7 @@ func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
 		}
 		state.checkGroup = u.String()
 	}
+
 	resetState()
 
 	return func(job jobs.Job) jobs.Job {
@@ -216,14 +230,6 @@ func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
 				}
 			}
 
-			//event.PutValue("monitor.check_group", state.checkGroup)
-			ts, err := event.GetValue("monitor.timespan")
-			if err != nil {
-				return nil, fmt.Errorf("could not get timespan for monitor summary: %w", err)
-			}
-			// TODO: Create a more optimial string representation
-			event.PutValue("monitor.check_group", fmt.Sprintf("%s-%s", smf.ID, ts.(schedule.TimespanBounds).ShortString()))
-
 			// Adjust the total remaining to account for new continuations
 			state.remaining += uint16(len(cont))
 			// Reduce total remaining to account for the just executed job
@@ -240,7 +246,6 @@ func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
 						"down": down,
 					},
 				})
-				resetState()
 			}
 
 			return cont, jobErr

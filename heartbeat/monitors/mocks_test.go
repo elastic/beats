@@ -114,6 +114,7 @@ func mockEventMonitorValidator(id string) validator.Validator {
 				"type":        "test",
 				"duration.us": isdef.IsDuration,
 				"status":      "up",
+				"time_group":  isdef.IsString,
 				"check_group": isdef.IsString,
 			},
 		}),

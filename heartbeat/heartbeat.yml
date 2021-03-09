@@ -23,7 +23,7 @@ heartbeat.monitors:
   name: Elastic 404
   urls:
   - https://www.elastic.co/i/am/not/a/realpagebutactually/a/404
-  schedule: "@every 60s"
+  schedule: "@every 10s"
   mode: all
   ipv6: false
   tags:
@@ -190,7 +190,7 @@ processors:
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
-setup.kibana: 
+setup.kibana:
 output.elasticsearch:
   hosts: localhost:9200
   username: elastic

@@ -18,15 +18,22 @@
 package hbtestllext
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
+	"github.com/elastic/go-lookslike/llpath"
+	"github.com/elastic/go-lookslike/llresult"
 )
 
 // MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
 var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
 	"monitor": map[string]interface{}{
-		"timespan": map[string]interface{}{
-			"gte": IsTime,
-			"lt":  IsTime,
-		},
+		"timespan": IsTimespanBounds,
 	},
+})
+
+// IsTimespanBounds checks whether the given value is a schedule.TimespanBounds object
+var IsTimespanBounds = isdef.Is("a timespan", func(path llpath.Path, v interface{}) *llresult.Results {
+	_, ok := v.(schedule.TimespanBounds)
+	return llresult.SimpleResult(path, ok, "expected a TimespanBounds struct, got %#v", v)
 })
