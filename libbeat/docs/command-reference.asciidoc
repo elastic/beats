@@ -706,7 +706,7 @@ endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
 
-Specifies the mount point of the host's filesystem for use in monitoring a host
+Specifies the mount point of the host's filesystem for use in monitoring a host.
 
 
 ifeval::["{beatname_lc}"=="packetbeat"]
