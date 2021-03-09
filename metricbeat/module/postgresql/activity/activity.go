@@ -65,6 +65,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, result := range results {
 		var data common.MapStr
+		// If the activity is not connected to any database, it is from a backend service. This
+		// can be distingished by checking if the record has a database identifier (`datid`).
+		// Activity records on these cases have different sets of fields.
 		if datid, ok := result["datid"].(string); ok && datid != "" {
 			data, _ = schema.Apply(result)
 		} else {
