@@ -87,17 +87,24 @@ Example module with SSL enabled:
 ----
 endif::[]
 
+There are a number of SSL configuration options available to you:
+
+* <<ssl-common-config,Common configuration options>>
+* <<ssl-client-config,Client configuration options>>
+* <<ssl-server-config,Server configuration options>>
+
 [discrete]
 [[ssl-common-config]]
 === Common configuration options
 
+Common SSL configuration options can be used in both client and server configurations.
 You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
 
 [float]
 [[enabled]]
 ==== `enabled`
 
-To disable the ssl configuration, set the value to `false`. The default value is `true`.
+To disable SSL configuration, set the value to `false`. The default value is `true`.
 
 [NOTE]
 =====
