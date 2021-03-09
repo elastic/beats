@@ -147,10 +147,36 @@ get_cloud_id()
   get_configuration_location
   if [ "$CONFIG_FILE" != "" ]; then
     log "INFO" "[get_cloud_id] Found configuration file $CONFIG_FILE"
-    CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloud_id' $CONFIG_FILE)
+    CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloudId' $CONFIG_FILE)
     log "INFO" "[get_cloud_id] Found cloud id $CLOUD_ID"
   else
     log "[get_cloud_id] Configuration file not found" "ERROR"
+    exit 1
+  fi
+}
+
+get_protected_settings()
+{
+  get_configuration_location
+  if [ "$CONFIG_FILE" != "" ]; then
+    log "INFO" "[get_protected_settings] Found configuration file $CONFIG_FILE"
+    PROTECTED_SETTINGS=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $CONFIG_FILE)
+    log "INFO" "[get_protected_settings] Found protected settings $PROTECTED_SETTINGS"
+  else
+    log "[get_protected_settings] Configuration file not found" "ERROR"
+    exit 1
+  fi
+}
+
+get_thumbprint()
+{
+  get_configuration_location
+  if [ "$CONFIG_FILE" != "" ]; then
+    log "INFO" "[get_thumbprint] Found configuration file $CONFIG_FILE"
+    THUMBPRINT=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $CONFIG_FILE)
+    log "INFO" "[get_thumbprint] Found thumbprint $THUMBPRINT"
+  else
+    log "[get_thumbprint] Configuration file not found" "ERROR"
     exit 1
   fi
 }
