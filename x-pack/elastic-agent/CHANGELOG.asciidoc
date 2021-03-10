@@ -41,6 +41,7 @@
 - Fix failing installation on windows 7 {pull}[24387]24387
 - Fix capabilities resolution in inspect command {pull}[24346]24346
 - Fix windows installer during enroll {pull}[24343]24343
+- Logging to file disabled on enroll {issue}[24173]24173
 
 ==== New features
 
