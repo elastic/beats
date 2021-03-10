@@ -130,10 +130,8 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	go func() {
-		ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
-		ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
-	}()
+	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0600)
+	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0600)
 
 	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
