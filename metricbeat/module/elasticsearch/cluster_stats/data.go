@@ -313,6 +313,12 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 		ExpiryDateMs: license.ExpiryDateInMillis,
 	})
 
+	if license.ExpiryDateInMillis != 0 {
+		// We don't want to record a 0 expiry date as this means the license has expired
+		// in the Stack Monitoring UI
+		metricSetFields.Put("expiry_date_in_millis", license.ExpiryDateInMillis)
+	}
+
 	metricSetFields.Put("state", clusterStateReduced)
 
 	if err = elasticsearch.PassThruField("version", clusterState, event.ModuleFields); err != nil {
