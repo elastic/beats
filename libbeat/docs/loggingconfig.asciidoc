@@ -156,7 +156,7 @@ To see which selectors are available, run {beatname_uc} in debug mode
 after the log level and is enclosed in brackets.
 =====
 
-To configure multiple selectors, use the following syntax:
+To configure multiple selectors, use the following {beats-ref}/config-file-format.html[YAML list syntax]:
 ["source","yaml",subs="attributes"]
 ----
 logging.selectors: [ harvester, input ]
