@@ -49,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 - Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
+- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
