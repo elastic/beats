@@ -698,6 +698,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 - Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
 - Add new ECS 1.8 improvements. {pull}23563[23563]
+- Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
 
 *Elastic Log Driver*
 
