@@ -2,49 +2,48 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package operations
 
 import (
 	"fmt"
 
-	yaml "gopkg.in/yaml.v2"
-
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-// InspectConfigCmd is an inspect subcommand that shows configurations of the agent.
-type InspectConfigCmd struct {
-	cfgPath string
-}
-
-// NewInspectConfigCmd creates a new inspect command.
-func NewInspectConfigCmd(configPath string,
-) (*InspectConfigCmd, error) {
-	return &InspectConfigCmd{
-		cfgPath: configPath,
-	}, nil
-}
-
-// Execute inspects agent configuration.
-func (c *InspectConfigCmd) Execute() error {
-	return c.inspectConfig()
-}
-
-func (c *InspectConfigCmd) inspectConfig() error {
-	fullCfg, err := operations.LoadFullAgentConfig(c.cfgPath)
+// LoadFullAgentConfig load agent config based on provided paths and defined capabilities.
+// In case fleet is used, config from policy action is returned.
+func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
+	rawConfig, err := loadConfig(cfgPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return printConfig(fullCfg)
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	if configuration.IsStandalone(cfg.Fleet) {
+		return rawConfig, nil
+	}
+
+	fleetConfig, err := loadFleetConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	} else if fleetConfig == nil {
+		// resolving fleet config but not fleet config retrieved yet, returning last applied config
+		return rawConfig, nil
+	}
+
+	return config.NewConfigFrom(fleetConfig)
 }
 
 func loadConfig(configPath string) (*config.Config, error) {
@@ -98,45 +97,11 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 			continue
 		}
 
-		fmt.Println("Action ID:", cfgChange.ID())
 		return cfgChange.Policy, nil
 	}
 	return nil, nil
 }
 
-func printMapStringConfig(mapStr map[string]interface{}) error {
-	l, err := newErrorLogger()
-	if err != nil {
-		return err
-	}
-	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), l, status.NewController(l))
-	if err != nil {
-		return err
-	}
-
-	newCfg, err := caps.Apply(mapStr)
-	if err != nil {
-		return errors.New(err, "failed to apply capabilities")
-	}
-	newMap, ok := newCfg.(map[string]interface{})
-	if !ok {
-		return errors.New("config returned from capabilities has invalid type")
-	}
-
-	data, err := yaml.Marshal(newMap)
-	if err != nil {
-		return errors.New(err, "could not marshal to YAML")
-	}
-
-	fmt.Println(string(data))
-	return nil
-}
-
-func printConfig(cfg *config.Config) error {
-	mapStr, err := cfg.ToMapStr()
-	if err != nil {
-		return err
-	}
-
-	return printMapStringConfig(mapStr)
+func newErrorLogger() (*logger.Logger, error) {
+	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }

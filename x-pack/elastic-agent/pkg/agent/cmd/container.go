@@ -20,7 +20,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/kibana"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
@@ -122,7 +122,7 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		return err
 	}
 
-	_, err = os.Stat(info.AgentConfigFile())
+	_, err = os.Stat(paths.AgentConfigFile())
 	if !os.IsNotExist(err) && !envBool("FLEET_FORCE") {
 		// already enrolled, just run the standard run
 		return run(flags, streams)
