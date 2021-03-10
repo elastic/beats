@@ -103,42 +103,75 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 }
 
 func (m *stdManager) EnsureAlias() error {
-	if !m.checkExists {
-		return nil
+	log := m.log
+	overwrite := m.Overwrite()
+
+	var exists bool
+	if m.checkExists && !overwrite {
+		var err error
+		exists, err = m.client.HasAlias(m.alias.Name)
+		if err != nil {
+			return err
+		}
 	}
 
-	b, err := m.client.HasAlias(m.alias.Name)
-	if err != nil {
-		return err
-	}
-	if b {
+	switch {
+	case exists && !overwrite:
+		log.Infof("Index Alias %v exists already", m.alias.Name)
+		return nil
+
+	case !exists || overwrite:
+		err := m.client.CreateAlias(m.alias)
+		if err != nil {
+			if ErrReason(err) != ErrAliasAlreadyExists {
+				log.Errorf("Index Alias %v setup failed: %v", m.alias.Name, err)
+				return err
+			}
+			log.Infof("Index Alias %v exists already", m.alias.Name)
+			return nil
+		}
+
+		log.Info("Index Alias %v successfully created", m.alias.Name)
+		return nil
+
+	default:
+		m.log.Infof("ILM index alias not created: exists=%v, overwrite=%v", exists, overwrite)
 		return nil
 	}
-
-	// This always assume it's a date pattern by sourrounding it by <...>
-	return m.client.CreateAlias(m.alias)
 }
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
 	overwrite = overwrite || m.Overwrite()
 
-	exists := true
+	var exists bool
 	if m.checkExists && !overwrite {
-		b, err := m.client.HasILMPolicy(m.policy.Name)
+		var err error
+		exists, err = m.client.HasILMPolicy(m.policy.Name)
 		if err != nil {
 			return false, err
 		}
-		exists = b
 	}
 
-	if !exists || overwrite {
-		return !exists, m.client.CreateILMPolicy(m.policy)
-	}
+	switch {
+	case exists && !overwrite:
+		log.Infof("ILM policy %v exists already", m.policy)
+		return false, nil
 
-	log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",
-		exists, overwrite)
-	return false, nil
+	case !exists || overwrite:
+		err := m.client.CreateILMPolicy(m.policy)
+		if err != nil {
+			log.Errorf("ILM policy %v creation failed: %v", m.policy, err)
+			return false, err
+		}
+
+		log.Infof("ILM policy %v successfully created", m.policy)
+		return true, err
+
+	default:
+		log.Infof("ILM policy not created: exists=%v, overwrite=%v", exists, overwrite)
+		return false, nil
+	}
 }
 
 func (c *infoCache) Valid() bool {

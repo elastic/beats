@@ -287,8 +287,9 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 				onHasILMPolicy(testPolicy.Name).Return(true, nil),
 			},
 		},
-		"overwrite existing": {
+		"overwrite": {
 			overwrite: true,
+			create:    true,
 			calls: []onCall{
 				onCreateILMPolicy(testPolicy).Return(nil),
 			},
