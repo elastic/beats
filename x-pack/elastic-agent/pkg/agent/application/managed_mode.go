@@ -15,11 +15,13 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -55,21 +57,21 @@ type Managed struct {
 	gateway     FleetGateway
 	router      *router
 	srv         *server.Server
-	stateStore  *stateStore
+	stateStore  stateStore
 	upgrader    *upgrade.Upgrader
 }
 
 func newManaged(
 	ctx context.Context,
 	log *logger.Logger,
-	store storage.Store,
+	storeSaver storage.Store,
 	cfg *configuration.Configuration,
 	rawConfig *config.Config,
 	reexec reexecManager,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
 ) (*Managed, error) {
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, statusCtrl)
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
 	if err != nil {
 		return nil, err
 	}
@@ -153,12 +155,12 @@ func newManaged(
 	batchedAcker := newLazyAcker(acker, log)
 
 	// Create the state store that will persist the last good policy change on disk.
-	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())
+	stateStore, err := store.NewStateStoreWithMigration(log, paths.AgentActionStoreFile(), paths.AgentStateStoreFile())
 	if err != nil {
-		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", info.AgentActionStoreFile()))
+		return nil, errors.New(err, fmt.Sprintf("fail to read action store '%s'", paths.AgentActionStoreFile()))
 	}
 	managedApplication.stateStore = stateStore
-	actionAcker := newStateStoreActionAcker(batchedAcker, stateStore)
+	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
 	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
 	if err != nil {
@@ -180,8 +182,11 @@ func newManaged(
 		emitter:   emit,
 		agentInfo: agentInfo,
 		config:    cfg,
-		store:     store,
-		setters:   []clientSetter{acker},
+		store:     storeSaver,
+	}
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.setters = []clientSetter{acker}
 	}
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
@@ -234,7 +239,7 @@ func newManaged(
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
 		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
 		// But at the moment this is not possible because the policy change was acked.
-		if err := replayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
+		if err := store.ReplayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
 			log.Errorf("could not recover state, error %+v, skipping...", err)
 		}
 	}
@@ -271,6 +276,11 @@ func (m *Managed) Start() error {
 	if m.wasUnenrolled() {
 		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
 		return nil
+	}
+
+	// reload ID because of win7 sync issue
+	if err := m.agentInfo.ReloadID(); err != nil {
+		return err
 	}
 
 	err := m.upgrader.Ack(m.bgContext)

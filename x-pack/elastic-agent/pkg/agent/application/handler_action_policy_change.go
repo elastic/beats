@@ -62,6 +62,11 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetA
 }
 
 func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
+	// do not update kibana host from policy; no setters provided with local Fleet Server
+	if len(h.setters) == 0 {
+		return nil
+	}
+
 	cfg, err := configuration.NewFromConfig(c)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
