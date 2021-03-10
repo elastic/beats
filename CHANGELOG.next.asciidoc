@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
 - Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix `add_cloud_metadata` to better support modifying sub-fields with other processors. {pull}13808[13808]
 - TLS or Beats that accept connections over TLS and validate client certificates. {pull}14146[14146]
@@ -261,6 +262,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fixed start failure when run under config reloader. {issue}20851[20851] {pull}21693[21693]
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 - Note incompatibility of system/socket on ARM. {pull}23381[23381]
+- system/login: Fixed offset reset on inode reuse. {pull}24414[24414]
 
 *Filebeat*
 
@@ -395,6 +397,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 - Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 
 *Heartbeat*
 
@@ -875,6 +878,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
+- Support X-Forwarder-For in IIS logs. {pull}19142[192142]
 
 
 *Heartbeat*
@@ -1011,6 +1015,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
 - Add support for defining metrics_filters for prometheus module in hints. {pull}24264[24264]
+- Add support for PostgreSQL 10, 11, 12 and 13. {pull}24402[24402]
 
 *Packetbeat*
 
