@@ -62,7 +62,8 @@ const defaultLevel = InfoLevel
 // Beat is supposed to be run within.
 func DefaultConfig(environment Environment) Config {
 	return Config{
-		Level: defaultLevel,
+		Level:   defaultLevel,
+		ToFiles: true,
 		Files: FileConfig{
 			MaxSize:         10 * 1024 * 1024,
 			MaxBackups:      7,
