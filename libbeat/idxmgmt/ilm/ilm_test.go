@@ -238,6 +238,27 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 			},
 			fail: ErrRequestFailed,
 		},
+		"overwrite non-existent": {
+			calls: []onCall{
+				onCreateAlias(alias).Return(nil),
+			},
+			fail: nil,
+			cfg:  map[string]interface{}{"check_exists": false, "overwrite": true},
+		},
+		"try overwrite existing": {
+			calls: []onCall{
+				onCreateAlias(alias).Return(errOf(ErrAliasAlreadyExists)),
+			},
+			fail: nil, // we detect that that the alias exists, and call it a day.
+			cfg:  map[string]interface{}{"check_exists": false, "overwrite": true},
+		},
+		"fail to overwrite": {
+			calls: []onCall{
+				onCreateAlias(alias).Return(errOf(ErrAliasCreateFailed)),
+			},
+			fail: ErrAliasCreateFailed,
+			cfg:  map[string]interface{}{"check_exists": false, "overwrite": true},
+		},
 	}
 
 	for name, test := range cases {
@@ -283,6 +304,7 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 			},
 		},
 		"policy already exists": {
+			create: false,
 			calls: []onCall{
 				onHasILMPolicy(testPolicy.Name).Return(true, nil),
 			},
