@@ -54,13 +54,18 @@ func new(name string, cfg *Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	internal, err := makeInternalFileOutput(cfg)
-	if err != nil {
-		return nil, err
+
+	if cfg.ToFiles {
+		internal, err := makeInternalFileOutput(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
+			return nil, fmt.Errorf("error initializing logging: %v", err)
+		}
 	}
-	if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
-		return nil, fmt.Errorf("error initializing logging: %v", err)
-	}
+
 	return logp.NewLogger(name), nil
 }
 
