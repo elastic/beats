@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
@@ -33,6 +34,12 @@ const (
 
 	requestRetrySleep = 1 * time.Second // sleep 1 sec between retries for HTTP requests
 	maxRequestRetries = 30              // maximum number of retries for HTTP requests
+)
+
+var (
+	// Used to strip the appended ({uuid}) from the name of an enrollment token. This makes much easier for
+	// a container to reference a token by name, without having to know what the generated UUID is for that name.
+	tokenNameStrip = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$`)
 )
 
 func newContainerCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
@@ -209,7 +216,7 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 			args = append(args, "--fleet-server-cert-key", certKey)
 		}
 		if envBool("FLEET_SERVER_INSECURE_HTTP") {
-			args = append(args, "--fleet-server--insecure-http")
+			args = append(args, "--fleet-server-insecure-http")
 			args = append(args, "--insecure")
 		}
 	} else {
@@ -228,8 +235,8 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 
 func buildFleetServerConnStr() (string, error) {
 	host := envWithDefault(defaultESHost, "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST")
-	username := envWithDefault(defaultUsername, "FLEET_SERVER_ELASTICSEARCH_USERNAME", "$ELASTICSEARCH_USERNAME")
-	password := envWithDefault(defaultPassword, "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	username := envWithDefault(defaultUsername, "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD")
 	u, err := url.Parse(host)
 	if err != nil {
 		return "", err
@@ -272,13 +279,18 @@ func kibanaFetchToken(client *kibana.Client, policy *kibanaPolicy, streams *cli.
 	if err != nil {
 		return "", err
 	}
-	return key.APIKey, nil
+	var keyDetail kibanaAPIKeyDetail
+	err = performGET(client, fmt.Sprintf("/api/fleet/enrollment-api-keys/%s", key.ID), &keyDetail, streams.Err, "Kibana fetch token detail")
+	if err != nil {
+		return "", err
+	}
+	return keyDetail.Item.APIKey, nil
 }
 
 func kibanaClient() (*kibana.Client, error) {
 	host := envWithDefault(defaultKibanaHost, "KIBANA_FLEET_HOST", "KIBANA_HOST")
-	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "$ELASTICSEARCH_USERNAME")
-	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "$ELASTICSEARCH_PASSWORD")
+	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME")
+	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD")
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Host:          host,
 		Username:      username,
@@ -317,7 +329,7 @@ func findPolicy(policies []kibanaPolicy) (*kibanaPolicy, error) {
 func findKey(keys []kibanaAPIKey, policy *kibanaPolicy) (*kibanaAPIKey, error) {
 	tokenName := envWithDefault(defaultTokenName, "FLEET_TOKEN_NAME")
 	for _, key := range keys {
-		name := strings.TrimSpace(strings.Replace(key.Name, fmt.Sprintf(" (%s)", key.ID), "", 1))
+		name := strings.TrimSpace(tokenNameStrip.ReplaceAllString(key.Name, ""))
 		if name == tokenName && key.PolicyID == policy.ID {
 			return &key, nil
 		}
@@ -424,4 +436,8 @@ type kibanaAPIKey struct {
 
 type kibanaAPIKeys struct {
 	List []kibanaAPIKey `json:"list"`
+}
+
+type kibanaAPIKeyDetail struct {
+	Item kibanaAPIKey `json:"item"`
 }

@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -105,6 +107,10 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		return je.createSummary(event)
 	case "step/end":
 		je.stepCount++
+	case "step/screenshot":
+		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
+	case "journey/network_info":
+		add_data_stream_index.SetEventDataset(event, "browser_network")
 	}
 
 	eventext.MergeEventFields(event, se.ToMap())
