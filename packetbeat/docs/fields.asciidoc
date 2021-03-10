@@ -11358,12 +11358,10 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
-type: alias
-
-alias to: container.name
+type: keyword
 
 --
 

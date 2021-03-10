@@ -349,7 +349,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		// so it works also on `stop` if containers have been already deleted.
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
-		meta := p.metagen.Generate(pod)
+		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name))
 
 		cmeta := common.MapStr{
 			"id":      cid,
@@ -357,7 +357,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			"image": common.MapStr{
 				"name": c.Image,
 			},
-			"name": c.Name,
 		}
 
 		// Information that can be used in discovering a workload
@@ -386,7 +385,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 				"kubernetes": kubemeta,
 				//Actual metadata that will enrich the event
 				"meta": common.MapStr{
-					"kubernetes": meta, // these will be moved to ECS (container.name and container.image.name) through alias type
+					"kubernetes": meta,
 					"container":  cmeta,
 				},
 			}

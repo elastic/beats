@@ -13,6 +13,7 @@
       "app": "playground"
     },
     "container": {
+      "name": "ubuntu",
       "cpu": {
         "request": {
           "nanocores": 200000000
@@ -64,7 +65,6 @@
     "image": {
       "name": "ubuntu:latest"
     },
-    "name": "ubuntu"
   },
   "event": {
     "dataset": "kubernetes.container",

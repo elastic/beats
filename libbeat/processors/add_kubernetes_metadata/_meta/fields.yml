@@ -70,10 +70,9 @@
             Kubernetes statefulset name
 
         - name: container.name
-          type: alias
-          path: container.name
+          type: keyword
           description: >
-            Kubernetes container name
+            Kubernetes container name (different than the name from the runtime)
 
         - name: container.image
           type: alias

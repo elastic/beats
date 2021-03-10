@@ -257,7 +257,8 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	metaClone := metadata.Clone()
-	containerImage, err := metaClone.GetValue("container.image")
+	metaClone.Delete("container.name")
+	containerImage, err := metadata.GetValue("container.image")
 	if err == nil {
 		metaClone.Delete("container.image")
 		metaClone.Put("container.image.name", containerImage)
@@ -271,7 +272,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 
 	kubeMeta := metadata.Clone()
 	// remove container meta from kubernetes.container.*
-	kubeMeta.Delete("container")
+	kubeMeta.Delete("container.id")
+	kubeMeta.Delete("container.runtime")
+	kubeMeta.Delete("container.image")
 	event.Fields.DeepUpdate(common.MapStr{
 		"kubernetes": kubeMeta,
 	})
