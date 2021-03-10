@@ -46311,7 +46311,7 @@ type: keyword
 Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
 
 
-type: keyword
+type: long
 
 --
 
