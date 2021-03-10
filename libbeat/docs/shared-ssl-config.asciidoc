@@ -98,7 +98,8 @@ There are a number of SSL configuration options available to you:
 === Common configuration options
 
 Common SSL configuration options can be used in both client and server configurations.
-You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
+You can specify the following options in the `ssl` section of each subsystem that
+supports SSL.
 
 [float]
 [[enabled]]
@@ -222,7 +223,8 @@ it will not receive any verified chains.
 [[ssl-client-config]]
 === Client configuration options
 
-You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
+You can specify the following options in the `ssl` section of each subsystem that
+supports SSL.
 
 [float]
 [[client-certificate-authorities]]
@@ -379,15 +381,16 @@ The default value is `full`.
 [[ssl-server-config]]
 === Server configuration options
 
-You can specify the following options in the `ssl` section of the +{beatname_lc}.yml+ config file.
+You can specify the following options in the `ssl` section of each subsystem that
+supports SSL.
 
 [float]
 [[server-certificate-authorities]]
 ==== `certificate_authorities`
 
-The list of root certificates for server verifications is only required if 
+The list of root certificates for client verifications is only required if 
 `client_authentication` is configured. If `certificate_authorities` is empty or not set, and
-`client_authentication` is not configured, the system keystore is used.
+`client_authentication` is configured, the system keystore is used.
 
 If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 By default you can specify a list of files that +{beatname_lc}+ will read, but you can also embed a certificate
@@ -422,8 +425,8 @@ certificate_authorities:
 [[server-certificate]]
 ==== `certificate: "/etc/pki/server/cert.pem"`
 
-The path to the certificate for SSL authentication is required. If the certificate
-is not specified, server authentication is not available. 
+For server authentication, the path to the SSL authentication certificate must
+be specified for TLS. If the certificate is not specified, startup will fail.
 
 When this option is configured, the <<server-key,`key`>> option is also required.
 The certificate option support embedding of the certificate:
@@ -553,11 +556,6 @@ ifeval::["{beatname_lc}" == "filebeat"]
 
 The type of client authentication mode. When `certificate_authorities` is set, it
 defaults to `required`. Otherwise, it defaults to `none`.
-
-[NOTE]
-=====
-This option is only valid with the HTTP Endpoint, HTTP JSON, MQTT, Syslog, and the TCP input.
-=====
 
 The valid options are:
 
