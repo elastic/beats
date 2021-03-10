@@ -157,7 +157,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+                          analyzeFlakey: !isTag(), jobName: "${getFlakyJobName()}")
       }
     }
   }
@@ -166,12 +166,13 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 /**
 * There are only two supported branches, master and 7.x
 */
-def getIdSuffix() {
+def getFlakyJobName() {
+  def parent = env.JOB_NAME.replaceAll(env.JOB_BASE_NAME + '$', '')
   if(isPR()) {
-    return getBranchIndice(env.CHANGE_TARGET)
+    return parent + getBranchIndice(env.CHANGE_TARGET)
   }
   if(isBranch()) {
-    return getBranchIndice(env.BRANCH_NAME)
+    return parent + getBranchIndice(env.BRANCH_NAME)
   }
 }
 
