@@ -29580,14 +29580,51 @@ Kibana module
 
 
 
-*`kibana.stats.usage.name`*::
+*`kibana_stats.timestamp`*::
 +
 --
 type: alias
 
-alias to: kibana.stats.usage.index
+alias to: @timestamp
 
 --
+
+*`kibana_stats.kibana.response_time.max`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.max.ms
+
+--
+
+*`kibana_stats.kibana.status`*::
++
+--
+type: alias
+
+alias to: kibana.stats.kibana.status
+
+--
+
+*`kibana_stats.os.memory.free_in_bytes`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.memory.free_in_bytes
+
+--
+
+*`kibana_stats.process.uptime_in_millis`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.uptime.ms
+
+--
+
 
 [float]
 === settings
@@ -29601,7 +29638,6 @@ Kibana stats and run-time metrics.
 --
 Kibana instance UUID
 
-
 type: keyword
 
 --
@@ -29610,7 +29646,6 @@ type: keyword
 +
 --
 Kibana instance name
-
 
 type: keyword
 
@@ -29690,6 +29725,14 @@ type: integer
 Kibana stats and run-time metrics.
 
 
+
+
+*`kibana.stats.kibana.status`*::
++
+--
+type: keyword
+
+--
 
 
 *`kibana.stats.usage.index`*::
@@ -29785,6 +29828,12 @@ type: keyword
 
 --
 
+
+*`kibana.stats.os.memory.free_in_bytes`*::
++
+--
+--
+
 *`kibana.stats.concurrent_connections`*::
 +
 --
@@ -29801,6 +29850,13 @@ type: long
 Process metrics
 
 
+
+*`kibana.stats.process.uptime.ms`*::
++
+--
+type: long
+
+--
 
 *`kibana.stats.process.event_loop_delay.ms`*::
 +
@@ -29898,12 +29954,10 @@ type: long
 Response times metrics
 
 
-
 *`kibana.stats.response_time.avg.ms`*::
 +
 --
 Average response time in milliseconds
-
 
 type: long
 
@@ -29913,7 +29967,6 @@ type: long
 +
 --
 Maximum response time in milliseconds
-
 
 type: long
 
