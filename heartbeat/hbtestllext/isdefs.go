@@ -18,26 +18,14 @@
 package hbtestllext
 
 import (
-	"time"
-
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/llpath"
 	"github.com/elastic/go-lookslike/llresult"
 )
 
-// IsTime checks that the value is a time.Time instance.
-var IsTime = isdef.Is("time", func(path llpath.Path, v interface{}) *llresult.Results {
-	_, ok := v.(time.Time)
-	if !ok {
-		return llresult.SimpleResult(path, false, "expected a time.Time")
-	}
-	return llresult.ValidResult(path)
-})
-
-var IsInt64 = isdef.Is("positiveInt64", func(path llpath.Path, v interface{}) *llresult.Results {
-	_, ok := v.(int64)
-	if !ok {
-		return llresult.SimpleResult(path, false, "expected an int64")
-	}
-	return llresult.ValidResult(path)
+// IsTimespanBounds checks whether the given value is a schedule.TimespanBounds object
+var IsTimespanBounds = isdef.Is("a timespan", func(path llpath.Path, v interface{}) *llresult.Results {
+	_, ok := v.(schedule.TimespanBounds)
+	return llresult.SimpleResult(path, ok, "expected a TimespanBounds struct, got %#v", v)
 })

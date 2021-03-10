@@ -15,15 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package hbtestllext
+package timeslice
 
 import (
-	"github.com/elastic/go-lookslike"
+	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 )
 
-// MonitorTimespanValidator is tests for the `next_run` and `next_run_in.us` keys.
-var MonitorTimespanValidator = lookslike.MustCompile(map[string]interface{}{
-	"monitor": map[string]interface{}{
-		"timespan": IsTimespanBounds,
-	},
-})
+type Timeslice struct {
+	key      string
+	schedule schedule.Schedule
+}
+
+func (t Timeslice) calculate() {
+	t.schedule.Next(time.Now())
+}

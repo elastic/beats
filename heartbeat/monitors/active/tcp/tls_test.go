@@ -187,8 +187,8 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	p, err := createWithResolver(config, resolver)
 	require.NoError(t, err)
 
-	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	sched := schedule.MustParse("@every 1s", "myId")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", ParsedSchedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

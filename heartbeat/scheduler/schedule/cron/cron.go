@@ -43,6 +43,12 @@ func (s *Schedule) Next(t time.Time) time.Time {
 	return expr.Next(t)
 }
 
+func (s *Schedule) Interval() time.Duration {
+	next := s.Next(time.Now())
+	nnext := s.Next(next)
+	return nnext.Sub(next)
+}
+
 func (s *Schedule) Unpack(str string) error {
 	tmp, err := Parse(str)
 	if err == nil {

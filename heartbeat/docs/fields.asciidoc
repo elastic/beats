@@ -304,6 +304,16 @@ type: keyword
 
 --
 
+*`monitor.time_group`*::
++
+--
+A quantized bucket of time based on this monitor's schedule. Can be used to correlate across geolocations when combined with monitor ID
+
+
+type: keyword
+
+--
+
 *`monitor.timespan`*::
 +
 --

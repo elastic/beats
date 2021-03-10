@@ -81,8 +81,8 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	p, err := create("tls", config)
 	require.NoError(t, err)
 
-	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
+	sched := schedule.MustParse("@every 1s", "myId")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", ParsedSchedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -321,8 +321,8 @@ func TestLargeResponse(t *testing.T) {
 	p, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	sched := schedule.MustParse("@every 1s", "myId")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", ParsedSchedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -535,8 +535,8 @@ func TestRedirect(t *testing.T) {
 	p, err := create("redirect", config)
 	require.NoError(t, err)
 
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	sched := schedule.MustParse("@every 1s", "test")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", ParsedSchedule: sched, Timeout: 1})[0]
 
 	// Run this test multiple times since in the past we had an issue where the redirects
 	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
@@ -582,8 +582,8 @@ func TestNoHeaders(t *testing.T) {
 	p, err := create("http", config)
 	require.NoError(t, err)
 
-	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	sched := schedule.MustParse("@every 1s", "test")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", ParsedSchedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

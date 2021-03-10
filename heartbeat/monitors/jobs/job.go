@@ -51,17 +51,21 @@ func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
 // JobWrapperFactory can be used to created new instances of JobWrappers.
 type JobWrapperFactory func() JobWrapper
 
-// WrapAllSeparately wraps the given jobs using the given JobWrapperFactory instances.
-// This enables us to use a different JobWrapper for the jobs passed in, but recursively apply
-// the same wrapper to their children.
-func WrapAllSeparately(jobs []Job, factories ...JobWrapperFactory) []Job {
+// WrapEachRun invokes the given factory once per schedule run, then applies the
+// wrapper that factory produces recursively to any continuations. This is useful
+// for when you want something to run once per 'root' job that creates a new wrapper,
+// then re-use that wrapper for all subsequent jobs
+func WrapEachRun(js []Job, wf ...JobWrapperFactory) []Job {
 	var wrapped []Job
-	for _, j := range jobs {
-		for _, factory := range factories {
-			wrapper := factory()
-			j = Wrap(j, wrapper)
-		}
-		wrapped = append(wrapped, j)
+	for _, j := range js {
+		j := j // scope j locally since we get async next
+		wrapped = append(wrapped, func(event *beat.Event) ([]Job, error) {
+			for _, f := range wf {
+				w := f()
+				j = Wrap(j, w)
+			}
+			return j(event)
+		})
 	}
 	return wrapped
 }
