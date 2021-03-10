@@ -165,6 +165,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Fix event.kind for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
+- Add check for empty values in azure module. {pull}24156[24156]
 
 *Heartbeat*
 
