@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
+- Use alias to report container image in k8s metadata. {pull}24380[24380]
 
 *Auditbeat*
 
@@ -103,7 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
-- Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
+- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
@@ -239,7 +240,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
-- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 
 *Auditbeat*
 
@@ -390,13 +390,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
-- Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 - Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
-- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
+- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 
 *Heartbeat*
 
@@ -514,11 +513,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix metric grouping for windows/perfmon module {issue}23489[23489] {pull}23505[23505]
-- Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
 - Fix ec2 metricset fields.yml and the integration test {pull}23726[23726]
 - Unskip s3_request integration test. {pull}23887[23887]
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
+- Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
 
 *Packetbeat*
 
@@ -1056,6 +1055,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dns.question.top_level_domain fields for sysmon DNS events. {pull}23046[23046]
 - Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
 - Add new ECS 1.8 improvements. {pull}23563[23563]
+- Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
 
 *Elastic Log Driver*
 
