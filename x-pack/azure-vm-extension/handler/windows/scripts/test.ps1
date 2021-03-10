@@ -53,9 +53,10 @@ function Decrypt
     Return ""
 }
 
-function Get-Password($powershellVersion) {
+function Get-Password() {
     Try
     {
+        $powershellVersion = Get-PowershellVersion
     $thumbprint = Get-ProtectedSettings-From-Config-Json "protectedSettingsCertThumbprint"  $powershellVersion
     $protectedSettings = Get-ProtectedSettings-From-Config-Json "protectedSettings"  $powershellVersion
     if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
@@ -122,3 +123,4 @@ function Get-Base64Auth($powershellVersion) {
     }
 }
 
+Get-Password

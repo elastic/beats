@@ -459,7 +459,7 @@ function Get-Password($powershellVersion) {
     {
         $ErrorMessage = $_.Exception.Message
         $FailedItem = $_.Exception.ItemName
-        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
         throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse configuration file"
     }
 }
@@ -492,8 +492,7 @@ function Get-Base64Auth($powershellVersion) {
     {
         $ErrorMessage = $_.Exception.Message
         $FailedItem = $_.Exception.ItemName
-        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
         throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
     }
 }
-

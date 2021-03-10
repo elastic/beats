@@ -8,10 +8,13 @@ STATUS_FOLDER=""
 CLOUD_ID=""
 USERNAME=""
 PASSWORD=""
+BASE64_AUTH=""
 ELASTICSEARCH_URL=""
 STACK_VERSION=""
 KIBANA_URL=""
 POLICY_ID=""
+#LINUX_CERT_PATH="/var/lib/waagent"
+LINUX_CERT_PATH="/mnt/c/Users/maria/Downloads/test/waagent"
 
 checkOS()
 {
@@ -195,23 +198,6 @@ get_username()
   fi
 }
 
-
-get_password()
-{
-  get_configuration_location
-  log "INFO" "[get_password] Found configuration file $CONFIG_FILE"
-  if [ "$CONFIG_FILE" != "" ]; then
-    cert=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $CONFIG_FILE)
-    settings=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $CONFIG_FILE)
-    PASSWORD=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.password' $CONFIG_FILE)
-    log "INFO" "[get_password] Found password  $PASSWORD"
-  else
-    log "ERROR" "[get_password] Configuration file not found"
-    exit 1
-  fi
-}
-
-
 get_kibana_host () {
   get_cloud_id
   if [ "$CLOUD_ID" != "" ]; then
@@ -354,3 +340,45 @@ write_status() {
     fi
   fi
 }
+
+# encryption
+
+encrypt() {
+  cert_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.crt"
+  private_key_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.prv"
+  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
+    openssl cms -encrypt -in <(echo "$2") -inkey $private_key_path -recip $cert_path -inform dem
+  else
+    echo "ERROR" "[decrypt] Decryption failed. Could not find certificates"
+  exit 1
+  fi
+}
+
+get_password() {
+  get_protected_settings
+  get_thumbprint
+  cert_path="$LINUX_CERT_PATH/$THUMBPRINT.crt"
+  private_key_path="$LINUX_CERT_PATH/$THUMBPRINT.prv"
+  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
+    protected_settings=$(openssl cms -decrypt -in <(echo "$PROTECTED_SETTINGS" | base64 --decode) -inkey "$private_key_path" -recip "$cert_path" -inform dem)
+    PASSWORD=$(echo "$protected_settings" | jq -r '.password')
+  else
+    log "ERROR" "[get_password] Decryption failed. Could not find certificates"
+    exit 1
+  fi
+}
+
+get_base64Auth() {
+  get_protected_settings
+  get_thumbprint
+  cert_path="$LINUX_CERT_PATH/$THUMBPRINT.crt"
+  private_key_path="$LINUX_CERT_PATH/$THUMBPRINT.prv"
+  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
+    protected_settings=$(openssl cms -decrypt -in <(echo "$PROTECTED_SETTINGS" | base64 --decode) -inkey "$private_key_path" -recip "$cert_path" -inform dem)
+    BASE64_AUTH=$(echo "$protected_settings" | jq -r '.base64Auth')
+  else
+    log "ERROR" "[get_base64Auth] Decryption failed. Could not find certificates"
+    exit 1
+  fi
+}
+

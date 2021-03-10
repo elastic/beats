@@ -48,12 +48,13 @@ function Install-ElasticAgent {
         throw "Kibana url could not be found"
         }
       $username = Get-Username $powershellVersion
-      if (-Not $username) {
-        throw "Username could not be found"
-        }
       $password = Get-Password $powershellVersion
-        if (-Not $password) {
+      $base64Auth = Get-Base64Auth $powershellVersion
+      if (-Not $password) {
         throw "Password could not be found"
+      }
+      if (-Not $username) {
+          throw "Username could not be found"
       }
       Write-Log "Found Kibana url $kibana_url" "INFO"
       $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"

@@ -1,25 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
-script_path=$(dirname $(realpath -s $0))
-source $script_path/helper.sh
+
 
 LINUX_CERT_PATH="/var/lib/waagent"
 
 
-decrypt() {
-  get_protected_settings
-  get_thumbprint
-  #PROTECTED_SETTINGS
-  THUMBPRINT="75944CEE9BE769DD92EC5F39B66F73B9EBC45A2B"
-  cert_path="$LINUX_CERT_PATH/$THUMBPRINT.crt"
-  private_key_path="$LINUX_CERT_PATH}/$THUMBPRINT.prv"
-  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
-    echo "$FILE exists."
 
-    encrypted=$(echo "$PROTECTED_SETTINGS" | base64 --decode)
+decrypt1() {
+  cert_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.crt"
+  echo $cert_path
+  private_key_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.prv"
+  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
+    dec=$(openssl cms -decrypt -in <(echo "$2" | base64 --decode) -inkey $private_key_path -recip $cert_path -inform dem)
+    echo $dec
+     CLOUD_ID=$(echo $dec | jq -r '.password')
+     echo $CLOUD_ID
     else
-    log "ERROR" "[decrypt] Decryption failed. Could not find certificates"
+    echo "ERROR" "[decrypt] Decryption failed. Could not find certificates"
     exit 1
 fi
 }
+
+encrypt() {
+  cert_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.crt"
+  echo $cert_path
+  private_key_path="/mnt/c/Users/maria/Downloads/test/waagent/$1.prv"
+  if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
+    echo "files exists."
+    openssl cms -encrypt -in <(echo "$2") -inkey $private_key_path -recip $cert_path -inform dem
+    else
+    echo "ERROR" "[decrypt] Decryption failed. Could not find certificates"
+    exit 1
+fi
+}
+
 
