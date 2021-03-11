@@ -240,7 +240,7 @@
           type: group
           fields:
             - name: load_avg.1m
-              type: double
+              type: half_float
         - name: cgroup
           type: group
           fields:

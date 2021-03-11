@@ -22048,7 +22048,7 @@ type: long
 *`elasticsearch.node.stats.os.cpu.load_avg.1m`*::
 +
 --
-type: double
+type: half_float
 
 --
 
