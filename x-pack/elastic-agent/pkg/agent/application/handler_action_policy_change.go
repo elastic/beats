@@ -25,6 +25,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 )
 
+const (
+	apiStatusTimeout = 15 * time.Second
+)
+
 type clientSetter interface {
 	SetClient(clienter)
 }
@@ -100,7 +104,7 @@ func (h *handlerPolicyChange) handleKibanaHosts(ctx context.Context, c *config.C
 			err, "fail to create API client with updated hosts",
 			errors.TypeNetwork, errors.M("hosts", h.config.Fleet.Kibana.Hosts))
 	}
-	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, apiStatusTimeout)
 	defer cancel()
 	_, err = client.Send(ctx, "GET", "/api/status", nil, nil, nil)
 	if err != nil {
