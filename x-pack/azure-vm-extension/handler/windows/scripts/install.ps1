@@ -47,21 +47,27 @@ function Install-ElasticAgent {
       if (-Not $kibana_url) {
         throw "Kibana url could not be found"
         }
-      $username = Get-Username $powershellVersion
       $password = Get-Password $powershellVersion
       $base64Auth = Get-Base64Auth $powershellVersion
-      if (-Not $password) {
-        throw "Password could not be found"
-      }
-      if (-Not $username) {
-          throw "Username could not be found"
+      if (-Not $password -And -Not $base64Auth) {
+        throw "Password  or base64auto key could not be found"
       }
       Write-Log "Found Kibana url $kibana_url" "INFO"
       $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
       $headers.Add("Accept","Application/Json")
       $headers.Add("kbn-xsrf", "true")
-      $pair = "$($username):$($password)"
-      $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
+      #cred
+      $encodedCredentials = ""
+      if ($password) {
+          $username = Get-Username $powershellVersion
+          if (-Not $username) {
+              throw "Username could not be found"
+          }
+          $pair = "$($username):$($password)"
+          $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
+      } else {
+          $encodedCredentials = $base64Auth
+      }
       $headers.Add('Authorization', "Basic $encodedCredentials")
       $jsonResult = Invoke-WebRequest -Uri "$($kibana_url)/api/fleet/enrollment-api-keys"  -Method 'GET' -Headers $headers -UseBasicParsing
       if ($jsonResult.statuscode -eq '200') {

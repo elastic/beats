@@ -54,7 +54,7 @@ function Get-Elasticsearch-URL($powershellVersion) {
   return ""
 }
 
-function Get-Kibana-URL ($powershellVersion){
+function Get-Kibana-URL ($powershellVersion) {
   $cloudId = Get-CloudId $powershellVersion
   if ( $cloudId -ne ""){
      $cloudHash=$cloudId.split(":")[-1]
@@ -69,27 +69,39 @@ function Get-Kibana-URL ($powershellVersion){
 function Get-Stack-Version {
   $powershellVersion = Get-PowershellVersion
   $elasticsearchUrl = Get-Elasticsearch-URL $powershellVersion
-  $username = Get-Username $powershellVersion
-  $password = Get-Password $powershellVersion
-  if ( $elasticsearchUrl -ne "" -and $username -ne "" -and $password -ne ""){
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-        $headers.Add("Accept","application/json")
-        $pair = "$($username):$($password)"
-        $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
-        $headers.Add('Authorization', "Basic $encodedCredentials")
-        $jsonResult = Invoke-WebRequest -Uri "$($elasticsearchUrl)"  -Method 'GET' -Headers $headers -UseBasicParsing
-        if ($jsonResult.statuscode -eq '200') {
-            $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand ""
-            $stackVersion=$keyValue.version.number
-            Write-Log "Found stack version  $stackVersion" "INFO"
-            return $stackVersion
-             }else {
-             Write-Log "Error pinging elastic cluster $elasticsearchUrl" "ERROR"
-        return ""
-              }
-  } else {
-    Write-Log "User credentials not found" "ERROR"
+  if (-Not $elasticsearchUrl) {
+      throw "Elasticsearch URL could not be found"
   }
+  $password = Get-Password $powershellVersion
+  $base64Auth = Get-Base64Auth $powershellVersion
+  if (-Not $password -And -Not $base64Auth) {
+      throw "Password  or base64auto key could not be found"
+  }
+  $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+  $headers.Add("Accept","application/json")
+  #cred
+  $encodedCredentials = ""
+  if ($password) {
+      $username = Get-Username $powershellVersion
+      if (-Not $username) {
+          throw "Username could not be found"
+      }
+      $pair = "$($username):$($password)"
+      $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
+  } else {
+      $encodedCredentials = $base64Auth
+  }
+  $headers.Add('Authorization', "Basic $encodedCredentials")
+  $jsonResult = Invoke-WebRequest -Uri "$($elasticsearchUrl)"  -Method 'GET' -Headers $headers -UseBasicParsing
+  if ($jsonResult.statuscode -eq '200') {
+      $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand ""
+      $stackVersion=$keyValue.version.number
+      Write-Log "Found stack version  $stackVersion" "INFO"
+      return $stackVersion
+  }else {
+      Write-Log "Error pinging elastic cluster $elasticsearchUrl" "ERROR"
+      return ""
+   }
   return ""
 }
 
@@ -177,7 +189,6 @@ function Get-Azure-Config-Path($powershellVersion) {
   Try
   {
     $handlerFile = "$extensionRoot\HandlerEnvironment.json"
-
     if ( $powershellVersion -ge 3 ) {
       $configFolder = (((Get-Content $handlerFile) | ConvertFrom-Json)[0] | Select -expand handlerEnvironment).configFolder
     }

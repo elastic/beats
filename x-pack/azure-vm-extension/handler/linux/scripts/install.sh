@@ -142,18 +142,25 @@ Enroll_ElasticAgent() {
     log "ERROR" "[Enroll_ElasticAgent] Kibana URL could not be found/parsed"
     return 1
   fi
-  get_username
-  if [[ "$USERNAME" = "" ]]; then
-    log "ERROR" "[Enroll_ElasticAgent] Username could not be found/parsed"
+  get_password
+  get_base64Auth
+   if [ "$PASSWORD" = "" ] && [ "$BASE64_AUTH" = "" ]; then
+    log "ERROR" "[Enroll_ElasticAgent] Password could not be found/parsed"
     return 1
   fi
-  get_password
-   if [[ "$PASSWORD" = "" ]]; then
-     log "ERROR" "[Enroll_ElasticAgent] Password could not be found/parsed"
-     return 1
-   fi
+  local cred=""
+  if [[ "$PASSWORD" != "" ]] && [[ "$PASSWORD" != "null" ]]; then
+    get_username
+    if [[ "$USERNAME" = "" ]]; then
+      log "ERROR" "[Enroll_ElasticAgent] Username could not be found/parsed"
+      return 1
+    fi
+    cred=${USERNAME}:${PASSWORD}
+  else
+    cred=$(echo "$BASE64_AUTH" | base64 --decode)
+  fi
   local ENROLLMENT_TOKEN=""
-  jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u ${USERNAME}:${PASSWORD} )
+  jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" )
   local EXITCODE=$?
   if [ $EXITCODE -ne 0 ]; then
     log "ERROR" "[Enroll_ElasticAgent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"
@@ -172,7 +179,7 @@ Enroll_ElasticAgent() {
   jsonResult=$(curl ${KIBANA_URL}/api/fleet/enrollment-api-keys/$POLICY_ID \
         -H 'Content-Type: application/json' \
         -H 'kbn-xsrf: true' \
-        -u ${USERNAME}:${PASSWORD} )
+        -u "$cred" )
   EXITCODE=$?
   if [ $EXITCODE -ne 0 ]; then
     log "ERROR" "[Enroll_ElasticAgent] error calling $KIBANA_URL/api/fleet/enrollment-api-keys in order to retrieve the ENROLLMENT_TOKEN"

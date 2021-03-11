@@ -13,8 +13,8 @@ ELASTICSEARCH_URL=""
 STACK_VERSION=""
 KIBANA_URL=""
 POLICY_ID=""
-#LINUX_CERT_PATH="/var/lib/waagent"
-LINUX_CERT_PATH="/mnt/c/Users/maria/Downloads/test/waagent"
+LINUX_CERT_PATH="/var/lib/waagent"
+#LINUX_CERT_PATH="/mnt/c/Users/maria/Downloads/test/waagent"
 
 checkOS()
 {
@@ -230,21 +230,35 @@ get_elasticsearch_host () {
 get_cloud_stack_version () {
   log "INFO" "[get_cloud_stack_version] Get ES cluster URL"
   get_elasticsearch_host
-  get_username
-  get_password
-  if [ "$ELASTICSEARCH_URL" != "" ] && [ "$USERNAME" != "" ] && [ "$PASSWORD" != "" ]; then
-    json_result=$(curl "${ELASTICSEARCH_URL}"  -H 'Content-Type: application/json' -u ${USERNAME}:${PASSWORD})
-    local EXITCODE=$?
-    if [ $EXITCODE -ne 0 ]; then
-      log "ERROR" "[get_cloud_stack_version] error pinging $ELASTICSEARCH_URL"
-      exit $EXITCODE
-    fi
-   STACK_VERSION=$(echo $json_result | jq -r '.version.number')
-   log "INFO" "[get_cloud_stack_version] Stack version found is $STACK_VERSION"
-  else
+  if [ "$ELASTICSEARCH_URL" = "" ]; then
     log "ERROR" "[get_cloud_stack_version] Elasticsearch URL could not be found"
     exit 1
   fi
+  get_password
+  get_base64Auth
+   if [ "$PASSWORD" = "" ] && [ "$BASE64_AUTH" = "" ]; then
+    log "ERROR" "[get_cloud_stack_version] Both PASSWORD and BASE64AUTH key could not be found"
+    exit 1
+  fi
+  local cred=""
+  if [ "$PASSWORD" != "" ] && [ "$PASSWORD" != "null" ]; then
+    get_username
+    if [ "$USERNAME" = "" ]; then
+      log "ERROR" "[get_cloud_stack_version] USERNAME could not be found"
+      exit 1
+    fi
+    cred=${USERNAME}:${PASSWORD}
+  else
+    cred=$(echo "$BASE64_AUTH" | base64 --decode)
+  fi
+  json_result=$(curl "${ELASTICSEARCH_URL}"  -H 'Content-Type: application/json' -u $cred)
+  local EXITCODE=$?
+  if [ $EXITCODE -ne 0 ]; then
+      log "ERROR" "[get_cloud_stack_version] error pinging $ELASTICSEARCH_URL"
+      exit $EXITCODE
+  fi
+  STACK_VERSION=$(echo $json_result | jq -r '.version.number')
+  log "INFO" "[get_cloud_stack_version] Stack version found is $STACK_VERSION"
 }
 
 function parse_yaml {
@@ -375,7 +389,7 @@ get_base64Auth() {
   private_key_path="$LINUX_CERT_PATH/$THUMBPRINT.prv"
   if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
     protected_settings=$(openssl cms -decrypt -in <(echo "$PROTECTED_SETTINGS" | base64 --decode) -inkey "$private_key_path" -recip "$cert_path" -inform dem)
-    BASE64_AUTH=$(echo "$protected_settings" | jq -r '.base64Auth')
+    BASE64_AUTH=$(echo "${protected_settings}" | jq -r '.base64Auth')
   else
     log "ERROR" "[get_base64Auth] Decryption failed. Could not find certificates"
     exit 1

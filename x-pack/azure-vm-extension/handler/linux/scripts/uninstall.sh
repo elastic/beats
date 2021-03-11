@@ -20,15 +20,22 @@ Unenroll_ElasticAgent_DEB_RPM()
     log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] Kibana URL could not be found/parsed"
     return 1
   fi
-  get_username
-  if [[ "$USERNAME" = "" ]]; then
-    log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] Username could not be found/parsed"
+  get_password
+  get_base64Auth
+  if [ "$PASSWORD" = "" ] && [ "$BASE64_AUTH" = "" ]; then
+    log "ERROR" "[Enroll_ElasticAgent] Password could not be found/parsed"
     return 1
   fi
-  get_password
-  if [[ "$PASSWORD" = "" ]]; then
-    log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] Password could not be found/parsed"
-    return 1
+  local cred=""
+  if [[ "$PASSWORD" != "" ]] && [ "$PASSWORD" != "null" ]; then
+    get_username
+    if [[ "$USERNAME" = "" ]]; then
+      log "ERROR" "[Enroll_ElasticAgent] Username could not be found/parsed"
+      return 1
+    fi
+    cred=${USERNAME}:${PASSWORD}
+  else
+    cred=$(echo "$BASE64_AUTH" | base64 --decode)
   fi
   eval $(parse_yaml "/etc/elastic-agent/fleet.yml")
   if [[ "$agent_id" = "" ]]; then
@@ -36,7 +43,7 @@ Unenroll_ElasticAgent_DEB_RPM()
     return 1
   fi
   log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Agent ID is $agent_id"
-  jsonResult=$(curl -X POST "${KIBANA_URL}/api/fleet/agents/$agent_id/unenroll"  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u ${USERNAME}:${PASSWORD} --data '{"force":"true"}' )
+  jsonResult=$(curl -X POST "${KIBANA_URL}/api/fleet/agents/$agent_id/unenroll"  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" --data '{"force":"true"}' )
   local EXITCODE=$?
   if [ $EXITCODE -ne 0 ]; then
     log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] error calling $KIBANA_URL/api/fleet/agents/$agent_id/unenroll in order to unenroll the agent"
