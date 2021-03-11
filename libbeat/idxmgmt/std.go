@@ -298,7 +298,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	}
 
 	if ilmComponent.load {
-		_, err := m.ilm.EnsureAlias()
+		err := m.ilm.EnsureAlias()
 		if err != nil {
 			return err
 		}
