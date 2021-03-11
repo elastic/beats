@@ -21,8 +21,11 @@ package filestream
 
 import (
 	"context"
+	"os"
 	"runtime"
 	"testing"
+
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 )
 
 // test_close_renamed from test_harvester.py
@@ -57,7 +60,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	newerTestlines := []byte("new first log line\nnew second log line\n")
 	env.mustWriteLinesToFile(testlogName, newerTestlines)
 
-	// new two events arrived
 	env.waitUntilEventCount(3)
 
 	cancelInput()
@@ -65,6 +67,46 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 
 	env.requireOffsetInRegistry(testlogNameRotated, len(testlines))
 	env.requireOffsetInRegistry(testlogName, len(newerTestlines))
+}
+
+// test_close_removed from test_harvester.py
+func TestFilestreamCloseRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "1ms",
+		"close.on_state_change.removed":        "true",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	testlines := []byte("first log line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	// first event has made it successfully
+	env.waitUntilEventCount(1)
+
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	fi, err := os.Stat(env.abspath(testlogName))
+	if err != nil {
+		t.Fatalf("cannot stat file: %+v", err)
+	}
+
+	env.mustRemoveFile(testlogName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	identifier, _ := newINodeDeviceIdentifier(nil)
+	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: env.abspath(testlogName)})
+	env.requireOffsetInRegistryByID(src.Name(), len(testlines))
 }
 
 // test_close_eof from test_harvester.py
@@ -78,12 +120,12 @@ func TestFilestreamCloseEOF(t *testing.T) {
 		"close.reader.on_eof":               "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	expectedOffset := len(testlines)
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -99,4 +141,63 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.waitUntilInputStops()
 
 	env.requireOffsetInRegistry(testlogName, expectedOffset)
+}
+
+// test_empty_lines from test_harvester.py
+func TestFilestreamEmptyLine(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	testlines := []byte("first log line\nnext is an empty line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	env.waitUntilEventCount(2)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	moreTestlines := []byte("\nafter an empty line\n")
+	env.mustAppendLinesToFile(testlogName, moreTestlines)
+
+	env.waitUntilEventCount(3)
+	env.requireEventsReceived([]string{
+		"first log line",
+		"next is an empty line",
+		"after an empty line",
+	})
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreTestlines))
+}
+
+// test_empty_lines_only from test_harvester.py
+// This test differs from the original because in filestream
+// input offset is no longer persisted when the line is empty.
+func TestFilestreamEmptyLinesOnly(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "1ms",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	testlines := []byte("\n\n\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireNoEntryInRegistry(testlogName)
 }
