@@ -9,12 +9,13 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -38,28 +39,12 @@ func (c *InspectConfigCmd) Execute() error {
 }
 
 func (c *InspectConfigCmd) inspectConfig() error {
-	rawConfig, err := loadConfig(c.cfgPath)
+	fullCfg, err := operations.LoadFullAgentConfig(c.cfgPath)
 	if err != nil {
 		return err
 	}
 
-	cfg, err := configuration.NewFromConfig(rawConfig)
-	if err != nil {
-		return err
-	}
-
-	if IsStandalone(cfg.Fleet) {
-		return printConfig(rawConfig)
-	}
-
-	fleetConfig, err := loadFleetConfig(rawConfig)
-	if err != nil {
-		return err
-	} else if fleetConfig == nil {
-		return fmt.Errorf("no fleet config retrieved yet")
-	}
-
-	return printMapStringConfig(fleetConfig)
+	return printConfig(fullCfg)
 }
 
 func loadConfig(configPath string) (*config.Config, error) {
@@ -68,7 +53,7 @@ func loadConfig(configPath string) (*config.Config, error) {
 		return nil, err
 	}
 
-	path := info.AgentConfigFile()
+	path := paths.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
@@ -102,7 +87,7 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	stateStore, err := newStateStoreWithMigration(log, info.AgentActionStoreFile(), info.AgentStateStoreFile())
+	stateStore, err := store.NewStateStoreWithMigration(log, paths.AgentActionStoreFile(), paths.AgentStateStoreFile())
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +109,7 @@ func printMapStringConfig(mapStr map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), l, status.NewController(l))
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), l, status.NewController(l))
 	if err != nil {
 		return err
 	}

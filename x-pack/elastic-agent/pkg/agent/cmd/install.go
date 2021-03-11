@@ -53,7 +53,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	status, reason := install.Status()
 	force, _ := cmd.Flags().GetBool("force")
 	if status == install.Installed && !force {
-		return fmt.Errorf("already installed at: %s", install.InstallPath)
+		return fmt.Errorf("already installed at: %s", paths.InstallPath)
 	}
 
 	// check the lock to ensure that elastic-agent is not already running in this directory
@@ -71,7 +71,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
-			confirm, err := c.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", install.InstallPath), true)
+			confirm, err := c.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -81,7 +81,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 	} else {
 		if !force {
-			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", install.InstallPath), true)
+			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -141,15 +141,15 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 			}
 		}
 	}
-
-	err = install.Install()
+	cfgFile := flags.Config()
+	err = install.Install(cfgFile)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
 		if err != nil {
-			install.Uninstall()
+			install.Uninstall(cfgFile)
 		}
 	}()
 
@@ -178,7 +178,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 		}
 		err = enrollCmd.Wait()
 		if err != nil {
-			install.Uninstall()
+			install.Uninstall(cfgFile)
 			exitErr, ok := err.(*exec.ExitError)
 			if ok {
 				return fmt.Errorf("enroll command failed with exit code: %d", exitErr.ExitCode())

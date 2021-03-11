@@ -3,6 +3,26 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.11.2]]
+=== Beats version 7.11.2
+https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
+
+*Filebeat*
+
+- Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
+- Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- Add `nodes` to filebeat-kubernetes.yaml ClusterRole. {issue}24051[24051] {pull}24052[24052]
+
+*Metricbeat*
+
+- Add check for iis/application_pool metricset for nil worker process id values. {issue}23605[23605] {pull}23647[23647]
+
 [[release-notes-7.11.1]]
 === Beats version 7.11.1
 https://github.com/elastic/beats/compare/v7.11.0...v7.11.1[View commits]
