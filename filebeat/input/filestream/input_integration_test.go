@@ -279,3 +279,35 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 		})
 	}
 }
+
+// test_close_timeout from test_harvester.py
+func TestFilestreamCloseTimeout(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "100ms",
+		"close.reader.after_interval":          "500ms",
+	})
+
+	testlines := []byte("first line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	env.mustWriteLinesToFile(testlogName, []byte("first line\nsecond log line\n"))
+
+	env.waitUntilEventCount(1)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+}
