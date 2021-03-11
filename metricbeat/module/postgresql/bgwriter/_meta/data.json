@@ -1,44 +1,41 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "postgresql.bgwriter",
         "duration": 115000,
         "module": "postgresql"
     },
     "metricset": {
-        "name": "bgwriter"
+        "name": "bgwriter",
+        "period": 10000
     },
     "postgresql": {
         "bgwriter": {
             "buffers": {
-                "allocated": 143,
+                "allocated": 273,
                 "backend": 0,
                 "backend_fsync": 0,
-                "checkpoints": 0,
+                "checkpoints": 8,
                 "clean": 0,
                 "clean_full": 0
             },
             "checkpoints": {
                 "requested": 0,
-                "scheduled": 1,
+                "scheduled": 4,
                 "times": {
                     "sync": {
-                        "ms": 0
+                        "ms": 9
                     },
                     "write": {
-                        "ms": 0
+                        "ms": 804
                     }
                 }
             },
-            "stats_reset": "2019-03-05T08:32:30.028Z"
+            "stats_reset": "2021-03-05T18:39:17.954Z"
         }
     },
     "service": {
-        "address": "172.26.0.2:5432",
+        "address": "192.168.128.2:5432",
         "type": "postgresql"
     }
 }

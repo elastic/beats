@@ -22,12 +22,12 @@ package activity
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestFetch(t *testing.T) {
@@ -43,26 +43,38 @@ func TestFetch(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	// Check event fields
-	assert.Contains(t, event, "database")
-	db_oid := event["database"].(common.MapStr)["oid"].(int64)
-	assert.True(t, db_oid > 0)
-
 	assert.Contains(t, event, "pid")
 	assert.True(t, event["pid"].(int64) > 0)
 
-	assert.Contains(t, event, "user")
-	assert.Contains(t, event["user"].(common.MapStr), "name")
-	assert.Contains(t, event["user"].(common.MapStr), "id")
+	// Check event fields
+	if _, isQuery := event["database"]; isQuery {
+		db_oid := event["database"].(common.MapStr)["oid"].(int64)
+		assert.True(t, db_oid > 0)
+
+		assert.Contains(t, event, "user")
+		assert.Contains(t, event["user"].(common.MapStr), "name")
+		assert.Contains(t, event["user"].(common.MapStr), "id")
+	} else {
+		assert.Contains(t, event, "backend_type")
+		assert.Contains(t, event, "wait_event")
+		assert.Contains(t, event, "wait_event_type")
+	}
 }
 
 func TestData(t *testing.T) {
 	service := compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	f := mbtest.NewFetcher(t, getConfig(service.Host()))
+
+	dbNameKey := "postgresql.activity.database.name"
+	f.WriteEventsCond(t, "", func(event common.MapStr) bool {
+		_, err := event.GetValue(dbNameKey)
+		return err == nil
+	})
+	f.WriteEventsCond(t, "./_meta/data_backend.json", func(event common.MapStr) bool {
+		_, err := event.GetValue(dbNameKey)
+		return err != nil
+	})
 }
 
 func getConfig(host string) map[string]interface{} {
