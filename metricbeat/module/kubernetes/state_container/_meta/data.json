@@ -13,14 +13,13 @@
       "app": "playground"
     },
     "container": {
+      "name": "ubuntu",
       "cpu": {
         "request": {
           "nanocores": 200000000
         }
-      },      
-      "image": "ubuntu:latest",
+      },
       "id": "docker://5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
-      "name": "ubuntu",
       "status": {
         "ready": true,
         "restarts": 0,
@@ -62,7 +61,10 @@
   },
   "container": {
     "runtime": "docker",
-    "id": "5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f"
+    "id": "5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
+    "image": {
+      "name": "ubuntu:latest"
+    },
   },
   "event": {
     "dataset": "kubernetes.container",
