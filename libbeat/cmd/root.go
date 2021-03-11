@@ -52,7 +52,7 @@ type BeatsRootCmd struct {
 	KeystoreCmd   *cobra.Command
 }
 
-// GenRootCmdWithSettings returns the root command to use for your beat. It take the
+// GenRootCmdWithSettings returns the root command to use for your beat. It takes the
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
