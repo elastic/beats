@@ -181,14 +181,14 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 	size := utmpFile.Size
 	oldSize := savedUtmpFile.Size
-	if size < oldSize {
+	if size < oldSize || utmpFile.Offset > size {
 		// UTMP files are append-only and so this is weird. It might be a sign of
 		// a highly unlikely inode reuse - or of something more nefarious.
 		// Setting isKnownFile to false so we read the whole file from the beginning.
 		isKnownFile = false
 
-		r.log.Warnf("Unexpectedly, the file %v is smaller than before (new: %v, old: %v) - reading whole file.",
-			utmpFile.Path, size, oldSize)
+		r.log.Warnf("saved size or offset illogical (new=%+v, saved=%+v) - reading whole file.",
+			utmpFile, savedUtmpFile)
 	}
 
 	if !isKnownFile && size == 0 {
