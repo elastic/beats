@@ -187,6 +187,11 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
+	// enroll is invoked either manually or from install with redirected IO
+	// no need to log to file
+	cfg.Settings.LoggingConfig.ToFiles = false
+	cfg.Settings.LoggingConfig.ToStderr = true
+
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
