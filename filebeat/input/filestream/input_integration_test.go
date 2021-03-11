@@ -22,6 +22,7 @@ package filestream
 import (
 	"bytes"
 	"context"
+	"os"
 	"runtime"
 	"testing"
 
@@ -67,7 +68,6 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	newerTestlines := []byte("new first log line\nnew second log line\n")
 	env.mustWriteLinesToFile(testlogName, newerTestlines)
 
-	// new two events arrived
 	env.waitUntilEventCount(3)
 
 	cancelInput()
@@ -116,6 +116,45 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
+// test_close_removed from test_harvester.py
+func TestFilestreamCloseRemoved(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName) + "*"},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "1ms",
+		"close.on_state_change.removed":        "true",
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	testlines := []byte("first log line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	// first event has made it successfully
+	env.waitUntilEventCount(1)
+
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	fi, err := os.Stat(env.abspath(testlogName))
+	if err != nil {
+		t.Fatalf("cannot stat file: %+v", err)
+	}
+
+	env.mustRemoveFile(testlogName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	id := getIDFromPath(env.abspath(testlogName), fi)
+	env.requireOffsetInRegistryByID(id, len(testlines))
+}
+
 // test_close_eof from test_harvester.py
 func TestFilestreamCloseEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
@@ -127,12 +166,12 @@ func TestFilestreamCloseEOF(t *testing.T) {
 		"close.reader.on_eof":               "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	expectedOffset := len(testlines)
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
