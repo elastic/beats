@@ -232,11 +232,12 @@ func execPing(
 	responseConfig responseConfig,
 ) (start, end time.Time, err reason.Reason) {
 	var (
-		ctx       context.Context
-		cancel    context.CancelFunc
-		errReason reason.Reason
-		retries   int
+		ctx     context.Context
+		cancel  context.CancelFunc
+		retries int
 	)
+	// initial start
+	start = time.Now()
 	// default retries is 0, that means there's no retry by default
 	if maxRetries <= 0 {
 		retries = 0
@@ -279,6 +280,8 @@ func execPing(
 		}
 
 		bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
+		// overwrite the func scope err with errReason, that can return the real err
+		err = errReason
 
 		responseFields := common.MapStr{
 			"status_code": resp.StatusCode,
@@ -329,7 +332,9 @@ func execPing(
 	if cancel != nil {
 		cancel()
 	}
-	return start, end, errReason
+	// initial end
+	end = time.Now()
+	return start, end, err
 }
 
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
