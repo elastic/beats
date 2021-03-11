@@ -43,6 +43,10 @@ const (
 	WatchdogCheckLoop = 5 * time.Second
 )
 
+const (
+	inputTypesKey = "input_types"
+)
+
 var (
 	// ErrApplicationAlreadyRegistered returned when trying to register an application more than once.
 	ErrApplicationAlreadyRegistered = errors.New("application already registered", errors.TypeApplication)
@@ -85,6 +89,8 @@ type ApplicationState struct {
 	actionsConn    bool
 	actionsDone    chan bool
 	actionsLock    sync.RWMutex
+
+	inputTypes map[string]struct{}
 }
 
 // Handler is the used by the server to inform of status changes.
@@ -185,6 +191,24 @@ func (s *Server) Get(app interface{}) (*ApplicationState, bool) {
 	s.apps.Range(func(_ interface{}, val interface{}) bool {
 		as := val.(*ApplicationState)
 		if as.app == app {
+			foundState = as
+			return false
+		}
+		return true
+	})
+	return foundState, foundState != nil
+}
+
+// FindByInputType application by input type
+func (s *Server) FindByInputType(inputType string) (*ApplicationState, bool) {
+	var foundState *ApplicationState
+	s.apps.Range(func(_ interface{}, val interface{}) bool {
+		as := val.(*ApplicationState)
+		if as.inputTypes == nil {
+			return true
+		}
+
+		if _, ok := as.inputTypes[inputType]; ok {
 			foundState = as
 			return false
 		}
@@ -709,6 +733,17 @@ func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForRe
 	as.statusPayload = payload
 	as.statusConfigIdx = checkin.ConfigStateIdx
 	as.statusTime = time.Now().UTC()
+
+	if payload != nil {
+		var pconf struct {
+			InputTypes []string `json:"input_types"`
+		}
+		_ = json.Unmarshal([]byte(checkin.Payload), &pconf)
+		as.inputTypes = make(map[string]struct{})
+		for _, inputType := range pconf.InputTypes {
+			as.inputTypes[inputType] = struct{}{}
+		}
+	}
 	as.checkinLock.Unlock()
 
 	var expected *proto.StateExpected

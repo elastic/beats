@@ -235,7 +235,7 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// retrieve ack token from the store
 	ackToken := f.stateStore.AckToken()
 	if ackToken != "" {
-		f.log.Debug("using previously saved ack token: %v", ackToken)
+		f.log.Debugf("using previously saved ack token: %v", ackToken)
 	}
 
 	// checkin
