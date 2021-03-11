@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 
@@ -202,6 +203,8 @@ func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
 	assert.Equal(t, expectedUserAgent, request.Header.Get("User-Agent"))
 }
 
+// TestRequestBuildingWithMaxRetries tests the value of max_retries in case http check fails
+// set timeout of client shorter than the timeout of execPing, which can trigger the retry logic of http check
 func TestRequestBuildingWithMaxRetries(t *testing.T) {
 	var (
 		body      []byte
@@ -209,21 +212,18 @@ func TestRequestBuildingWithMaxRetries(t *testing.T) {
 	)
 	config := Config{
 		MaxRetries: 5,
-		Timeout:    10,
+		// default time.Duration is 1 nanosecond
+		Timeout: 10 * time.Second,
 	}
 	event := beat.Event{}
 
-	request, _ := buildRequest("http://localhost:80", &config, nilEncoder{})
+	request, _ := buildRequest("http://abc", &config, nilEncoder{})
 	client := &http.Client{
-		Timeout: config.Timeout,
+		// default time.Duration is 1 nanosecond
+		Timeout: 5 * time.Second,
 	}
-	_, _, err := execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
+	_, _, _ = execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
 	maxRetries, _ := event.GetValue("http.max_retries")
-	if err != nil {
-		// max_retries will be the same as config.MaxRetries if target is unreachable
-		assert.Equal(t, config.MaxRetries, maxRetries)
-	} else {
-		// max_retries will be as 0 if target is reachable
-		assert.Equal(t, 0, maxRetries)
-	}
+	// max_retries will be the same as config.MaxRetries if target is unreachable
+	assert.Equal(t, config.MaxRetries, maxRetries)
 }
