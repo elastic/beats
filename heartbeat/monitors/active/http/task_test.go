@@ -20,6 +20,7 @@ package http
 import (
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"testing"
@@ -226,4 +227,122 @@ func TestRequestBuildingWithMaxRetries(t *testing.T) {
 	maxRetries, _ := event.GetValue("http.max_retries")
 	// max_retries will be the same as config.MaxRetries if target is unreachable
 	assert.Equal(t, config.MaxRetries, maxRetries)
+}
+
+//  TestGetNormalResultPerStatusCode200AfterAddMaxRetries ensures get the same result before adding retry logic of http check
+func TestGetNormalResultPerStatusCode200AfterAddMaxRetries(t *testing.T) {
+	config := Config{
+		MaxRetries: 5,
+		// default time.Duration is 1 nanosecond
+		Timeout: 10 * time.Second,
+		Check: checkConfig{
+			Response: responseParameters{
+				Status: []uint16{200, 201},
+			},
+		},
+	}
+
+	v := checkStatus(config.Check.Response.Status)
+	validator := multiValidator{
+		respValidators: []respValidator{v},
+	}
+
+	var body []byte
+	event := beat.Event{}
+
+	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
+	backend := httptest.NewServer(handlerFunc)
+	defer backend.Close()
+	request, _ := buildRequest(backend.URL, &config, nilEncoder{})
+	client := &http.Client{
+		// default time.Duration is 1 nanosecond
+		Timeout: 20 * time.Second,
+	}
+	_, _, err := execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
+	assert.Equal(t, nil, err)
+	statusCode, _ := event.GetValue("http.response.status_code")
+	assert.Equal(t, 200, statusCode)
+}
+
+//  TestGetErrPerStatusCode403AfterAddMaxRetries ensures err can be passed out of retry logic of http check
+func TestGetErrPerStatusCode403AfterAddMaxRetries(t *testing.T) {
+	config := Config{
+		MaxRetries: 5,
+		// default time.Duration is 1 nanosecond
+		Timeout: 10 * time.Second,
+		Check: checkConfig{
+			Response: responseParameters{
+				Status: []uint16{200, 201},
+			},
+		},
+	}
+
+	v := checkStatus(config.Check.Response.Status)
+	validator := multiValidator{
+		respValidators: []respValidator{v},
+	}
+
+	var body []byte
+	event := beat.Event{}
+
+	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+	})
+
+	backend := httptest.NewServer(handlerFunc)
+	defer backend.Close()
+	request, _ := buildRequest(backend.URL, &config, nilEncoder{})
+	client := &http.Client{
+		// default time.Duration is 1 nanosecond
+		Timeout: 20 * time.Second,
+	}
+	_, _, err := execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
+	if err != nil {
+		assert.Equal(t, "received status code 403 expecting [200 201]", err.Error())
+		statusCode, _ := event.GetValue("http.response.status_code")
+		assert.Equal(t, 403, statusCode)
+	}
+}
+
+//  TestGetErrPerStatusCode503AfterAddMaxRetries ensures err can be passed out of retry logic of http check
+func TestGetErrPerStatusCode503AfterAddMaxRetries(t *testing.T) {
+	config := Config{
+		MaxRetries: 5,
+		// default time.Duration is 1 nanosecond
+		Timeout: 10 * time.Second,
+		Check: checkConfig{
+			Response: responseParameters{
+				Status: []uint16{200, 201},
+			},
+		},
+	}
+
+	v := checkStatus(config.Check.Response.Status)
+	validator := multiValidator{
+		respValidators: []respValidator{v},
+	}
+
+	var body []byte
+	event := beat.Event{}
+
+	handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	})
+
+	backend := httptest.NewServer(handlerFunc)
+	defer backend.Close()
+	request, _ := buildRequest(backend.URL, &config, nilEncoder{})
+	client := &http.Client{
+		// default time.Duration is 1 nanosecond
+		Timeout: 20 * time.Second,
+	}
+	_, _, err := execPing(&event, client, request, body, config.Timeout, config.MaxRetries, validator, config.Response)
+	if err != nil {
+		assert.Equal(t, "received status code 503 expecting [200 201]", err.Error())
+		statusCode, _ := event.GetValue("http.response.status_code")
+		assert.Equal(t, 503, statusCode)
+	}
 }
