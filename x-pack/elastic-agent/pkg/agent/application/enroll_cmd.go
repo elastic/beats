@@ -79,14 +79,15 @@ type EnrollCmd struct {
 
 // EnrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type EnrollCmdFleetServerOption struct {
-	ConnStr    string
-	PolicyID   string
-	Host       string
-	Port       uint16
-	Cert       string
-	CertKey    string
-	Insecure   bool
-	SpawnAgent bool
+	ConnStr         string
+	ElasticsearchCA string
+	PolicyID        string
+	Host            string
+	Port            uint16
+	Cert            string
+	CertKey         string
+	Insecure        bool
+	SpawnAgent      bool
 }
 
 // EnrollCmdOption define all the supported enrollment option.
@@ -225,7 +226,7 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
-		c.options.FleetServer.Cert, c.options.FleetServer.CertKey)
+		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
@@ -386,7 +387,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
-			c.options.FleetServer.Cert, c.options.FleetServer.CertKey)
+			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 		if err != nil {
 			return err
 		}

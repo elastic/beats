@@ -28,10 +28,15 @@ func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*conf
 	return cfg, nil
 }
 
-func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string) (*configuration.FleetAgentConfig, error) {
+func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
 	es, err := configuration.ElasticsearchFromConnStr(connStr)
 	if err != nil {
 		return nil, err
+	}
+	if esCA != "" {
+		es.TLS = &tlscommon.Config{
+			CAs: []string{esCA},
+		}
 	}
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
