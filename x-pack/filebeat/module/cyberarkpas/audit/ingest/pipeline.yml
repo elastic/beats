@@ -47,6 +47,11 @@ processors:
         - fail:
             message: "unexpected event structure: {{ _ingest.on_failure_message }}"
 
+  - rename:
+      field: _tmp.json.raw
+      target_field: cyberarkpas.audit.raw
+      ignore_missing: true
+
   # Parse the syslog timestamp when the logs are emitted in legacy format.
   # In this case, this is the only timestamp present in the event, and in the
   # default configuration it doesn't include a year.
@@ -121,11 +126,12 @@ processors:
   - remove:
       field:
        - _tmp
+      ignore_missing: true
 
   - set:
       field: event.code
       value: '{{ cyberarkpas.audit.MessageID }}'
-      if: 'ctx.cyberarkpas.audit?.MessageID'
+      if: 'ctx.cyberarkpas.audit?.MessageID != null && ctx.cyberarkpas.audit.MessageID != ""'
 
 on_failure:
   - append:
@@ -134,3 +140,4 @@ on_failure:
   - remove:
       field:
         - _tmp
+      ignore_missing: true
