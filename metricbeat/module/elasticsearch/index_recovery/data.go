@@ -109,13 +109,13 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 			event.ModuleFields.Put("index.name", indexName)
-			event.MetricSetFields.Put("name", indexName)
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
 				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
 				continue
 			}
+			event.MetricSetFields.Put("name", indexName)
 
 			r.Event(event)
 		}
