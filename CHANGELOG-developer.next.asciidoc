@@ -109,3 +109,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add support for customized monitoring API. {pull}22605[22605]
 - Update Go version to 1.15.7. {pull}22495[22495]
 - Update Go version to 1.15.8. {pull}23955[23955]
+- Update Go version to 1.15.9. {pull}24442[24442]
