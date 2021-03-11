@@ -58,13 +58,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "approval_canceled",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -118,13 +122,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "approval_comment_added",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -178,13 +186,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "approval_requested",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -238,13 +250,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "approval_reviewer_responded",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -298,7 +314,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "create",
@@ -357,7 +376,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "delete",
@@ -416,7 +438,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "download",
@@ -475,7 +500,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "edit",
@@ -534,7 +562,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "add_lock",
@@ -593,7 +624,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "move",
@@ -656,7 +690,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "preview",
@@ -715,7 +752,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "print",
@@ -774,7 +814,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "remove_from_folder",
@@ -835,7 +878,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "rename",
@@ -896,7 +942,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "untrash",
@@ -955,7 +1004,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "sheets_import_range",
@@ -1014,7 +1066,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "trash",
@@ -1073,7 +1128,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "remove_lock",
@@ -1132,7 +1190,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "upload",
@@ -1191,7 +1252,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "view",
@@ -1251,13 +1315,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_acl_editors",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1315,13 +1383,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_document_access_scope",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1380,13 +1452,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_document_visibility",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1445,13 +1521,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "shared_drive_membership_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1510,13 +1590,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "shared_drive_settings_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1575,13 +1659,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "sheets_import_range_access_change",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1635,13 +1723,17 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_user_access",
         "event.category": [
             "file",
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.drive",
         "event.id": "1",
@@ -1701,6 +1793,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

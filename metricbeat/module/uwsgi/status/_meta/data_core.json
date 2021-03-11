@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "uwsgi.status",
+        "duration": 115000,
+        "module": "uwsgi"
+    },
+    "metricset": {
+        "name": "status",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.28.0.3:9191",
+        "type": "uwsgi"
+    },
+    "uwsgi": {
+        "status": {
+            "core": {
+                "id": 1,
+                "read_errors": 0,
+                "requests": {
+                    "offloaded": 0,
+                    "routed": 0,
+                    "static": 0,
+                    "total": 1
+                },
+                "worker_pid": 8,
+                "write_errors": 0
+            }
+        }
+    }
+}

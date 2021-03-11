@@ -35,7 +35,7 @@ var dup1 = call({
 		constant(" "),
 		field("messageid"),
 		constant(" "),
-		field("payload"),
+		field("p0"),
 	],
 });
 
@@ -71,15 +71,15 @@ var dup13 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_0", "nwparser.p0", "\"[%{r
 
 var dup14 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_1", "nwparser.p0", "[%{result}] %{p0}");
 
-var dup15 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
+var dup15 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
 
-var dup16 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
+var dup16 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
 
 var dup17 = setc("eventcategory","1204000000");
 
-var dup18 = match("MESSAGE#118:TR_Logs:01/1_0", "nwparser.p0", "%{stransport->} %{content_type->} ");
+var dup18 = match("MESSAGE#118:TR_Logs:01/1_0", "nwparser.p0", "%{stransport->} %{content_type}");
 
-var dup19 = match("MESSAGE#118:TR_Logs:01/1_1", "nwparser.p0", "%{stransport}");
+var dup19 = match_copy("MESSAGE#118:TR_Logs:01/1_1", "nwparser.p0", "stransport");
 
 var dup20 = setf("msg_id","web_method");
 
@@ -126,7 +126,7 @@ var dup27 = all_match({
 	]),
 });
 
-var hdr1 = match("HEADER#0:0001", "message", "%{messageid}:%{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{messageid}:%{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -134,7 +134,7 @@ var hdr1 = match("HEADER#0:0001", "message", "%{messageid}:%{payload}", processo
 		args: [
 			field("messageid"),
 			constant(":"),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
@@ -143,17 +143,17 @@ var hdr2 = match("HEADER#1:0005", "message", "time=%{hfld1->} %{hfld2->} %{timez
 	setc("header_id","0005"),
 ]));
 
-var hdr3 = match("HEADER#2:0003", "message", "%{hfld9->} %{hfld10->} %{hfld11->} %{hfld12->} %{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} %{hfld4->} %{hfld5->} %{hfld6->} %{messageid->} %{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0003", "message", "%{hfld9->} %{hfld10->} %{hfld11->} %{hfld12->} %{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} %{hfld4->} %{hfld5->} %{hfld6->} %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0003"),
 	dup1,
 ]));
 
-var hdr4 = match("HEADER#3:0002", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} %{hfld4->} %{hfld5->} %{hfld6->} %{messageid->} %{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0002", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} %{hfld4->} %{hfld5->} %{hfld6->} %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0002"),
 	dup1,
 ]));
 
-var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} TR %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} TR %{hfld5->} %{hfld6->} %{hfld8->} %{p0}", processor_chain([
 	setc("header_id","0009"),
 	dup2,
 	call({
@@ -174,12 +174,12 @@ var hdr5 = match("HEADER#4:0009", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			constant(" "),
 			field("hfld8"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} AUDIT %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} AUDIT %{hfld5->} %{hfld6->} %{hfld8->} %{p0}", processor_chain([
 	setc("header_id","0007"),
 	dup2,
 	call({
@@ -200,12 +200,12 @@ var hdr6 = match("HEADER#5:0007", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			constant(" "),
 			field("hfld8"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} WF %{hfld5->} %{hfld6->} %{hfld8->} %{payload}", processor_chain([
+var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{hfld2->} %{hfld3->} WF %{hfld5->} %{hfld6->} %{hfld8->} %{p0}", processor_chain([
 	setc("header_id","0008"),
 	dup2,
 	call({
@@ -226,12 +226,12 @@ var hdr7 = match("HEADER#6:0008", "message", "%{hhost->} %{hfld7->} %{hfld8}.%{h
 			constant(" "),
 			field("hfld8"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr8 = match("HEADER#7:0006", "message", "%{hmonth->} %{hday->} %{htime->} BARRACUDAWAF %{hhost->} %{hdate->} %{htime->} %{htimezone->} %{messageid->} %{payload}", processor_chain([
+var hdr8 = match("HEADER#7:0006", "message", "%{hmonth->} %{hday->} %{htime->} BARRACUDAWAF %{hhost->} %{hdate->} %{htime->} %{htimezone->} %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0006"),
 	call({
 		dest: "nwparser.payload",
@@ -247,12 +247,12 @@ var hdr8 = match("HEADER#7:0006", "message", "%{hmonth->} %{hday->} %{htime->} B
 			constant(" "),
 			field("messageid"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr9 = match("HEADER#8:0004", "message", "%{hfld9->} %{hfld10->} %{hfld11->} %{hhost->} %{messageid->} %{payload}", processor_chain([
+var hdr9 = match("HEADER#8:0004", "message", "%{hfld9->} %{hfld10->} %{hfld11->} %{hhost->} %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0004"),
 	call({
 		dest: "nwparser.payload",
@@ -266,7 +266,7 @@ var hdr9 = match("HEADER#8:0004", "message", "%{hfld9->} %{hfld10->} %{hfld11->}
 			constant(" "),
 			field("messageid"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
@@ -1296,13 +1296,13 @@ var part95 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_0", "nwparser.p0", "\"[%{
 
 var part96 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/1_1", "nwparser.p0", "[%{result}] %{p0}");
 
-var part97 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
+var part97 = match("MESSAGE#84:HEADER_COUNT_EXCEEDED/2", "nwparser.p0", "%{web_method->} %{url->} %{protocol->} - %{stransaddr->} %{stransport->} %{web_referer}");
 
-var part98 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{} %{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
+var part98 = match("MESSAGE#85:CROSS_SITE_SCRIPTING_IN_PARAM:01/2", "nwparser.p0", "%{web_method->} %{url->} %{protocol->} \"%{user_agent}\" %{stransaddr->} %{stransport->} %{web_referer}");
 
-var part99 = match("MESSAGE#118:TR_Logs:01/1_0", "nwparser.p0", "%{stransport->} %{content_type->} ");
+var part99 = match("MESSAGE#118:TR_Logs:01/1_0", "nwparser.p0", "%{stransport->} %{content_type}");
 
-var part100 = match("MESSAGE#118:TR_Logs:01/1_1", "nwparser.p0", "%{stransport}");
+var part100 = match_copy("MESSAGE#118:TR_Logs:01/1_1", "nwparser.p0", "stransport");
 
 var select23 = linear_select([
 	dup13,

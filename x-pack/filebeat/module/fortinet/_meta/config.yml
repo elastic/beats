@@ -12,6 +12,16 @@
     # The port to listen for syslog traffic. Defaults to 9004.
     #var.syslog_port: 9004
 
+    # Set internal interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.internal_interfaces: [ "LAN" ]
+
+    # Set external interfaces. used to override parsed network.direction
+    # based on a tagged interface. Both internal and external interfaces must be
+    # set to leverage this functionality.
+    #var.external_interfaces: [ "WAN" ]
+
   clientendpoint:
     enabled: true
 

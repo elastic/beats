@@ -14,7 +14,14 @@ The maximum size of the message received over the socket. The default is `20MiB`
 [id="{beatname_lc}-input-{type}-unix-path"]
 ==== `path`
 
-The path to the Unix socket that will receive event streams.
+The path to the Unix socket that will receive events.
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-socket-type"]
+==== `socket_type`
+
+The type to of the Unix socket that will receive events. Valid values
+are `stream` and `datagram`. The default is `stream`.
 
 [float]
 [id="{beatname_lc}-input-{type}-unix-group"]
@@ -31,6 +38,17 @@ This option is ignored on Windows.
 The file mode of the Unix socket that will be created by Filebeat. This is
 expected to be a file mode as an octal string. The default value is the system
 default (generally `0755`).
+
+[float]
+[id="{beatname_lc}-input-{type}-unix-framing"]
+==== `framing`
+
+Specify the framing used to split incoming events.  Can be one of
+`delimiter` or `rfc6587`.  `delimiter` uses the characters specified
+in `line_delimiter` to split the incoming events.  `rfc6587` supports
+octet counting and non-transparent framing as described in
+https://tools.ietf.org/html/rfc6587[RFC6587].  `line_delimiter` is
+used to split the events in non-transparent framing.  The default is `delimiter`.
 
 [float]
 [id="{beatname_lc}-input-{type}-unix-line-delimiter"]

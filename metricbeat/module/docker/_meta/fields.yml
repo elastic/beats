@@ -3,6 +3,7 @@
   description: >
     Docker stats collected from Docker.
   release: ga
+  settings: ["ssl"]
   short_config: false
   fields:
     - name: docker

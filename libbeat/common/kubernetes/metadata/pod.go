@@ -18,6 +18,10 @@
 package metadata
 
 import (
+	"context"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -26,18 +30,25 @@ import (
 
 type pod struct {
 	store     cache.Store
+	client    k8s.Interface
 	node      MetaGen
 	namespace MetaGen
 	resource  *Resource
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
-func NewPodMetadataGenerator(cfg *common.Config, pods cache.Store, node MetaGen, namespace MetaGen) MetaGen {
+func NewPodMetadataGenerator(
+	cfg *common.Config,
+	pods cache.Store,
+	client k8s.Interface,
+	node MetaGen,
+	namespace MetaGen) MetaGen {
 	return &pod{
 		resource:  NewResourceMetadataGenerator(cfg),
 		store:     pods,
 		node:      node,
 		namespace: namespace,
+		client:    client,
 	}
 }
 
@@ -49,6 +60,15 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) common.Map
 	}
 
 	out := p.resource.Generate("pod", obj, opts...)
+
+	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
+	rsName, _ := out.GetValue("replicaset.name")
+	if rsName, ok := rsName.(string); ok {
+		dep := p.getRSDeployment(rsName, po.GetNamespace())
+		if dep != "" {
+			out.Put("deployment.name", dep)
+		}
+	}
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
@@ -88,4 +108,25 @@ func (p *pod) GenerateFromName(name string, opts ...FieldOptions) common.MapStr 
 	}
 
 	return nil
+}
+
+// getRSDeployment return the name of the Deployment object that
+// owns the ReplicaSet with the given name under the given Namespace
+func (p *pod) getRSDeployment(rsName string, ns string) string {
+	if p.client == nil {
+		return ""
+	}
+	rs, err := p.client.AppsV1().ReplicaSets(ns).Get(context.TODO(), rsName, metav1.GetOptions{})
+	if err != nil {
+		return ""
+	}
+	for _, ref := range rs.GetOwnerReferences() {
+		if ref.Controller != nil && *ref.Controller {
+			switch ref.Kind {
+			case "Deployment":
+				return ref.Name
+			}
+		}
+	}
+	return ""
 }

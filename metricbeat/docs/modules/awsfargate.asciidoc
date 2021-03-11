@@ -33,6 +33,17 @@ be managed: ECS EC2 and ECS Fargate.
 ECS EC2 launches containers that run on EC2 instances. Users have to manage EC2
 instances. Pricing depends on the number of EC2 instances running.
 
+One can monitor these containers by deploying Metricbeat on the corresponding EC2 instances with the
+Metricbeat Docker module enabled.
+
+In order to achieve this one will need:
+--
+. to ensure access to these EC2 instances using ssh keys
+coupled with EC2 instances (attach ssh keys on cluster creation using `Key pair` option)
+. to enable shh access for the instances with the
+proper https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html[inbound rules].
+--
+
 * *ECS Fargate*
 
 ECS Fargate removes the responsibility of provisioning, configuring, and

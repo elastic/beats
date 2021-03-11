@@ -47,6 +47,13 @@
           description: >
             Kubernetes annotations map
 
+        - name: service.selectors.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Kubernetes Service selectors map
+
         - name: replicaset.name
           type: keyword
           description: >
@@ -65,9 +72,10 @@
         - name: container.name
           type: keyword
           description: >
-            Kubernetes container name
+            Kubernetes container name (different than the name from the runtime)
 
         - name: container.image
-          type: keyword
+          type: alias
+          path: container.image.name
           description: >
             Kubernetes container image

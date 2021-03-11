@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-function VPCFlow(keep_original_message) {
+function VPCFlow(keep_original_message, internalNetworks) {
     var processor = require("processor");
 
     // The pub/sub input writes the Stackdriver LogEntry object into the message
@@ -239,11 +239,19 @@ function VPCFlow(keep_original_message) {
         .Add(setNetworkTransport)
         .Add(setNetworkDirection)
         .Add(setNetworkType)
-        .Add(setRelatedIP)
-        .Build();
+        .Add(setRelatedIP);
+
+    if (internalNetworks) {
+        pipeline = pipeline.AddNetworkDirection({
+            source: "source.ip",
+            destination: "destination.ip",
+            target: "network.direction",
+            internal_networks: internalNetworks,
+        })
+    }
 
     return {
-        process: pipeline.Run,
+        process: pipeline.Build().Run,
     };
 }
 
@@ -251,7 +259,7 @@ var vpcflow;
 
 // Register params from configuration.
 function register(params) {
-    vpcflow = new VPCFlow(params.keep_original_message);
+    vpcflow = new VPCFlow(params.keep_original_message, params.internal_networks);
 }
 
 function process(evt) {

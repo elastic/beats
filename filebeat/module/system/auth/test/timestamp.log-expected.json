@@ -15,7 +15,14 @@
         "related.hosts": [
             "localhost"
         ],
-        "service.type": "system"
+        "related.user": [
+            "userauth3",
+            "root"
+        ],
+        "service.type": "system",
+        "user.effective.name": "root",
+        "user.id": "0",
+        "user.name": "userauth3"
     },
     {
         "@timestamp": "2019-06-14T09:31:15.412-02:00",

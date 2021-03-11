@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -50,7 +51,8 @@ type Application struct {
 	uid int
 	gid int
 
-	monitor monitoring.Monitor
+	monitor        monitoring.Monitor
+	statusReporter status.Reporter
 
 	processConfig *process.Config
 
@@ -72,7 +74,8 @@ func NewApplication(
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Application, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Application, error) {
 
 	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
@@ -92,10 +95,14 @@ func NewApplication(
 		processConfig: cfg.ProcessConfig,
 		logger:        logger,
 		limiter:       b,
-		reporter:      reporter,
-		monitor:       monitor,
-		uid:           uid,
-		gid:           gid,
+		state: state.State{
+			Status: state.Stopped,
+		},
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
+		statusReporter: statusController.RegisterApp(id, appName),
 	}, nil
 }
 
@@ -169,10 +176,10 @@ func (a *Application) Shutdown() {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
+func (a *Application) SetState(s state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg, payload)
+	a.setState(s, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -227,33 +234,15 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
-	var status state.Status
-	switch pstatus {
-	case proto.StateObserved_STARTING:
-		status = state.Starting
-	case proto.StateObserved_CONFIGURING:
-		status = state.Configuring
-	case proto.StateObserved_HEALTHY:
-		status = state.Running
-	case proto.StateObserved_DEGRADED:
-		status = state.Degraded
-	case proto.StateObserved_FAILED:
-		status = state.Failed
-	case proto.StateObserved_STOPPING:
-		status = state.Stopping
-	}
-	a.setState(status, msg, payload)
-}
-
-func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
-	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
-		a.state.Status = status
+func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
+		a.statusReporter.Update(s, msg)
 	}
 }
 

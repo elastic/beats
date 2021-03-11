@@ -2,6 +2,7 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "awsfargate": {
         "task_stats": {
+            "cluster_name": "default",
             "cpu": {
                 "core": null,
                 "kernel": {
@@ -61,6 +62,7 @@
                 },
                 "writes": 0
             },
+            "identifier": "query-metadata/1234",
             "memory": {
                 "fail": {
                     "count": 0
@@ -125,11 +127,15 @@
                         "packets": 25857
                     }
                 }
-            }
+            },
+            "task_name": "query-metadata"
         }
     },
+    "cloud": {
+        "region": "us-west-2"
+    },
     "container": {
-        "id": "query-metadata-1",
+        "id": "1234",
         "image": {
             "name": "mreferre/eksutils"
         },

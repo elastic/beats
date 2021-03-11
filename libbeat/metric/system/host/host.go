@@ -53,7 +53,9 @@ func MapHostInfo(info types.HostInfo) common.MapStr {
 	if info.OS.Build != "" {
 		data.Put("host.os.build", info.OS.Build)
 	}
-
+	if info.OS.Type != "" {
+		data.Put("host.os.type", info.OS.Type)
+	}
 	return data
 }
 

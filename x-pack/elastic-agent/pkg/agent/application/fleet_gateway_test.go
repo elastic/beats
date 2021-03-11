@@ -20,9 +20,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
+	fleetreporterConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
@@ -103,7 +107,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{}, 1)}
 }
 
-type withGatewayFunc func(*testing.T, *fleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
+type withGatewayFunc func(*testing.T, FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -117,6 +121,9 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -127,6 +134,8 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			scheduler,
 			rep,
 			newNoopAcker(),
+			&noopController{},
+			stateStore,
 		)
 
 		require.NoError(t, err)
@@ -165,7 +174,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send no event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -190,7 +199,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -241,6 +250,9 @@ func TestFleetGateway(t *testing.T) {
 		defer cancel()
 
 		log, _ := logger.New("tst")
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -251,6 +263,8 @@ func TestFleetGateway(t *testing.T) {
 			scheduler,
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
+			&noopController{},
+			stateStore,
 		)
 
 		require.NoError(t, err)
@@ -280,7 +294,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway *fleetGateway,
+		gateway FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -326,6 +340,10 @@ func TestFleetGateway(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		log, _ := logger.New("tst")
+
+		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		require.NoError(t, err)
+
 		gateway, err := newFleetGatewayWithScheduler(
 			ctx,
 			log,
@@ -339,6 +357,8 @@ func TestFleetGateway(t *testing.T) {
 			scheduler,
 			getReporter(agentInfo, log, t),
 			newNoopAcker(),
+			&noopController{},
+			stateStore,
 		)
 
 		require.NoError(t, err)
@@ -386,7 +406,7 @@ func TestRetriesOnFailures(t *testing.T) {
 	t.Run("When the gateway fails to communicate with the checkin API we will retry",
 		withGateway(agentInfo, settings, func(
 			t *testing.T,
-			gateway *fleetGateway,
+			gateway FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
@@ -442,7 +462,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			Backoff:  backoffSettings{Init: 10 * time.Minute, Max: 20 * time.Minute},
 		}, func(
 			t *testing.T,
-			gateway *fleetGateway,
+			gateway FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
@@ -469,7 +489,7 @@ func TestRetriesOnFailures(t *testing.T) {
 }
 
 func getReporter(info agentInfo, log *logger.Logger, t *testing.T) *fleetreporter.Reporter {
-	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporter.DefaultConfig())
+	fleetR, err := fleetreporter.NewReporter(info, log, fleetreporterConfig.DefaultConfig())
 	if err != nil {
 		t.Fatal(errors.Wrap(err, "fail to create reporters"))
 	}

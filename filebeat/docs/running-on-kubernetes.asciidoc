@@ -112,6 +112,28 @@ oc patch namespace kube-system -p \
 This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
 
+[float]
+==== Load {kib} dashboards
+
+{beatname_uc} comes packaged with various pre-built {kib} dashboards
+that you can use to visualize logs from your Kubernetes environment.
+
+If these dashboards are not already loaded into {kib}, you must <<{beatname_lc}-installation-configuration,install {beatname_uc}>>
+on any system that can connect to the {stack}, and then run the `setup` command to load the dashboards.
+To learn how, see <<load-kibana-dashboards,Load {kib} dashboards>>.
+
+The `setup` command does not load the ingest pipelines used to parse log lines. By default, ingest pipelines
+are set up automatically the first time you run {beatname_uc} and connect to {es}.
+
+[IMPORTANT]
+=======================================
+If you are using a different output other than {es}, such as {ls}, you
+need to:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>>
+=======================================
 
 [float]
 ==== Deploy
@@ -211,3 +233,12 @@ annotations:
     co.elastic.logs.json-logging/json.add_error_key: "true"
     co.elastic.logs.json-logging/json.message_key: "message"
 ------------------------------------------------
+
+[float]
+==== Logrotation
+
+According to https://kubernetes.io/docs/concepts/cluster-administration/logging/#logging-at-the-node-level[kubernetes documentation]
+_Kubernetes is not responsible for rotating logs, but rather a deployment tool should set up a solution to address that_.
+Different logrotation strategies can cause issues that might make Filebeat losing events or even duplicating events.
+Users can find more information about Filebeat's logrotation best practises at Filebeat's
+<<file-log-rotation,log rotation specific documentation>>

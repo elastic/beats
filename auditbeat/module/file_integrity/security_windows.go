@@ -67,7 +67,7 @@ const (
 // Use "GOOS=windows go generate -v -x ." to generate the source.
 
 // Add -trace to enable debug prints around syscalls.
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zsecurity_windows.go security_windows.go
+//go:generate go run golang.org/x/sys/windows/mkwinsyscall -output zsecurity_windows.go security_windows.go
 
 // Windows API calls
-//sys GetSecurityInfo(handle syscall.Handle, objectType ObjectType, securityInformation SecurityInformation, ppsidOwner **syscall.SID, ppsidGroup **syscall.SID, ppDacl **ACL, ppSacl **ACL, ppSecurityDescriptor **SecurityDescriptor) (err error) [failretval!=0] = advapi32.GetSecurityInfo
+//sys GetNamedSecurityInfo(name *uint16, objectType ObjectType, securityInformation SecurityInformation, ppsidOwner **syscall.SID, ppsidGroup **syscall.SID, ppDacl **ACL, ppSacl **ACL, ppSecurityDescriptor **SecurityDescriptor) (err error) [failretval!=0] = advapi32.GetNamedSecurityInfoW

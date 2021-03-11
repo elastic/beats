@@ -16,11 +16,11 @@ import (
 // After running Unenroll agent is in idle state, non managed non standalone.
 // For it to be operational again it needs to be either enrolled or reconfigured.
 type handlerUnenroll struct {
-	log         *logger.Logger
-	emitter     emitterFunc
-	dispatcher  programsDispatcher
-	closers     []context.CancelFunc
-	actionStore *actionStore
+	log        *logger.Logger
+	emitter    emitterFunc
+	dispatcher programsDispatcher
+	closers    []context.CancelFunc
+	stateStore stateStore
 }
 
 func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker) error {
@@ -44,10 +44,10 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 		if err := acker.Commit(ctx); err != nil {
 			return err
 		}
-	} else if h.actionStore != nil {
+	} else if h.stateStore != nil {
 		// backup action for future start to avoid starting fleet gateway loop
-		h.actionStore.Add(a)
-		h.actionStore.Save()
+		h.stateStore.Add(a)
+		h.stateStore.Save()
 	}
 
 	// close fleet gateway loop

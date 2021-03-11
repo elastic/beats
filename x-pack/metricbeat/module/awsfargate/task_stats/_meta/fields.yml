@@ -4,6 +4,10 @@
     `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
   release: beta
   fields:
+    - name: identifier
+      type: keyword
+      description: >
+        Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
     - name: cpu
       type: group
       description: Runtime CPU metrics.

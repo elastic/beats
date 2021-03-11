@@ -3,15 +3,17 @@
     "@timestamp": "2019-09-06T13:28:46.1631928Z",
     "event": {
       "action": "enabled-user-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4722,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "user"
+        "user",
+        "change"
       ]
     },
     "host": {
@@ -69,15 +71,17 @@
     "@timestamp": "2019-09-06T13:29:08.5737904Z",
     "event": {
       "action": "enabled-user-account",
-      "category": "iam",
+      "category": [
+        "iam"
+      ],
       "code": 4722,
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "user"
+        "user",
+        "change"
       ]
     },
     "host": {

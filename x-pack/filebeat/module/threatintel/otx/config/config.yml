@@ -1,0 +1,69 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+
+request.method: GET
+{{ if .ssl }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
+{{ end }}
+request.url: {{ .url }}
+request.transforms:
+- set:
+    target: header.Content-Type
+    value: application/json
+{{ if .api_token }}
+- set:
+    target: header.X-OTX-API-KEY
+    value: {{ .api_token }}
+{{ end }}
+{{ if .types }}
+- set:
+    target: url.params.types
+    value: {{ .types }}
+{{ end }}
+- set:
+    target: url.params.modified_since
+    value: '[[.cursor.timestamp]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "RFC3339" ]]'
+
+response.split:
+  target: body.results
+
+response.pagination:
+- set:
+    target: url.value
+    value: '[[ .last_response.body.next ]]'
+cursor:
+  timestamp:
+    value: '[[ formatDate (now (parseDuration "-{{ .lookback_range }}")) "RFC3339" ]]'
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: json
+  - fingerprint:
+      fields: ["json.id"]
+      target_field: "@metadata._id"
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.6.0

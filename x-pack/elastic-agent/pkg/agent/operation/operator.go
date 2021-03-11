@@ -28,12 +28,17 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 const (
 	isMonitoringMetricsFlag = 1 << 0
 	isMonitoringLogsFlag    = 1 << 1
 )
+
+type waiter interface {
+	Wait()
+}
 
 // Operator runs Start/Stop/Update operations
 // it is responsible for detecting reconnect to existing processes
@@ -56,10 +61,12 @@ type Operator struct {
 	apps     map[string]Application
 	appsLock sync.Mutex
 
-	downloader  download.Downloader
-	verifier    download.Verifier
-	installer   install.InstallerChecker
-	uninstaller uninstall.Uninstaller
+	downloader       download.Downloader
+	verifier         download.Verifier
+	installer        install.InstallerChecker
+	uninstaller      uninstall.Uninstaller
+	statusController status.Controller
+	statusReporter   status.Reporter
 }
 
 // NewOperator creates a new operator, this operator holds
@@ -78,26 +85,29 @@ func NewOperator(
 	stateResolver *stateresolver.StateResolver,
 	srv *server.Server,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Operator, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Operator, error) {
 	if config.DownloadConfig == nil {
 		return nil, fmt.Errorf("artifacts configuration not provided")
 	}
 
 	operator := &Operator{
-		bgContext:     ctx,
-		config:        config,
-		pipelineID:    pipelineID,
-		logger:        logger,
-		agentInfo:     agentInfo,
-		downloader:    fetcher,
-		verifier:      verifier,
-		installer:     installer,
-		uninstaller:   uninstaller,
-		stateResolver: stateResolver,
-		srv:           srv,
-		apps:          make(map[string]Application),
-		reporter:      reporter,
-		monitor:       monitor,
+		bgContext:        ctx,
+		config:           config,
+		pipelineID:       pipelineID,
+		logger:           logger,
+		agentInfo:        agentInfo,
+		downloader:       fetcher,
+		verifier:         verifier,
+		installer:        installer,
+		uninstaller:      uninstaller,
+		stateResolver:    stateResolver,
+		srv:              srv,
+		apps:             make(map[string]Application),
+		reporter:         reporter,
+		monitor:          monitor,
+		statusController: statusController,
+		statusReporter:   statusController.RegisterComponent("operator-" + pipelineID),
 	}
 
 	operator.initHandlerMap()
@@ -127,20 +137,27 @@ func (o *Operator) State() map[string]state.State {
 // Close stops all programs handled by operator and clears state
 func (o *Operator) Close() error {
 	o.monitor.Close()
+	o.statusReporter.Unregister()
+
 	return o.HandleConfig(configrequest.New("", time.Now(), nil))
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
-	_, steps, ack, err := o.stateResolver.Resolve(cfg)
+	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
+		o.statusReporter.Update(state.Failed, err.Error())
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
+	o.statusController.UpdateStateID(stateID)
 
 	for _, step := range steps {
 		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
 			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
+				// mark failed, new config cannot be run
+				msg := fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd)
+				o.statusReporter.Update(state.Failed, msg)
+				return errors.New(msg,
 					errors.TypeApplication,
 					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
@@ -148,15 +165,20 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 		handler, found := o.handlers[step.ID]
 		if !found {
-			return errors.New(fmt.Sprintf("operator: received unexpected event '%s'", step.ID), errors.TypeConfig)
+			msg := fmt.Sprintf("operator: received unexpected event '%s'", step.ID)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(msg, errors.TypeConfig)
 		}
 
 		if err := handler(step); err != nil {
-			return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err))
+			msg := fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(err, errors.TypeConfig, msg)
 		}
 	}
 
 	// Ack the resolver should state for next call.
+	o.statusReporter.Update(state.Healthy, "")
 	ack()
 
 	return nil
@@ -164,6 +186,13 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 // Shutdown handles shutting down the running apps for Agent shutdown.
 func (o *Operator) Shutdown() {
+	//  wait for installer and downloader
+	if awaitable, ok := o.installer.(waiter); ok {
+		o.logger.Infof("waiting for installer of pipeline '%s' to finish", o.pipelineID)
+		awaitable.Wait()
+		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
+	}
+
 	for _, app := range o.apps {
 		app.Shutdown()
 	}
@@ -277,7 +306,8 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.config,
 			o.logger,
 			o.reporter,
-			o.monitor)
+			o.monitor,
+			o.statusController)
 	} else {
 		// Service port is defined application is ran with service application type, with it fetching
 		// the connection credentials through the defined service port.
@@ -293,7 +323,8 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.config,
 			o.logger,
 			o.reporter,
-			o.monitor)
+			o.monitor,
+			o.statusController)
 	}
 
 	if err != nil {

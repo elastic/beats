@@ -400,6 +400,54 @@ func TestAddErrKeyOption(t *testing.T) {
 	}
 }
 
+func TestExpandKeys(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":      fields,
+		"expand_keys": true,
+		"target":      "",
+	})
+	input := common.MapStr{"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`}
+	expected := common.MapStr{
+		"msg": `{"a.b": {"c": "c"}, "a.b.d": "d"}`,
+		"a": common.MapStr{
+			"b": map[string]interface{}{
+				"c": "c",
+				"d": "d",
+			},
+		},
+	}
+	actual := getActualValue(t, testConfig, input)
+	assert.Equal(t, expected, actual)
+}
+
+func TestExpandKeysError(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"expand_keys":   true,
+		"add_error_key": true,
+		"target":        "",
+	})
+	input := common.MapStr{"msg": `{"a.b": "c", "a.b.c": "d"}`}
+	expected := common.MapStr{
+		"msg": `{"a.b": "c", "a.b.c": "d"}`,
+		"error": common.MapStr{
+			"message": "cannot expand ...",
+			"type":    "json",
+		},
+	}
+
+	actual := getActualValue(t, testConfig, input)
+	assert.Contains(t, actual, "error")
+	errorField := actual["error"].(common.MapStr)
+	assert.Contains(t, errorField, "message")
+
+	// The order in which keys are processed is not defined, so the error
+	// message is not defined. Apart from that, the outcome is the same.
+	assert.Regexp(t, `cannot expand ".*": .*`, errorField["message"])
+	errorField["message"] = "cannot expand ..."
+	assert.Equal(t, expected, actual)
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	log := logp.NewLogger("decode_json_fields_test")
 

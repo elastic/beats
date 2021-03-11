@@ -39,10 +39,11 @@ processors:
     field: azure.auditlogs.level
     target_field: log.level
     ignore_missing: true
+- rename:
+    field: message
+    target_field: event.original
 - remove:
-    field:
-    - message
-    - azure.auditlogs.time
+    field: azure.auditlogs.time
     ignore_missing: true
 - convert:
     field: azure.auditlogs.operationName
