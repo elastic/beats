@@ -7,16 +7,40 @@
 <xsl:variable name="format" select="'elastic'"/>
 <xsl:variable name="version" select="'1.0'"/>
 
+<!-- configuration -->
+<xsl:variable name="include_raw" select="1"/> <!-- save a "raw" key with the original XML -->
+
 <!-- main object with header info -->
 <xsl:template match="/">
   <xsl:apply-imports/>
   <xsl:text>{"format":"</xsl:text><xsl:value-of select="$format"/>
   <xsl:text>","version":"</xsl:text><xsl:value-of select="$version"/>
-  <xsl:text>",</xsl:text>
+  <xsl:text>"</xsl:text>
+  <xsl:choose>
+    <xsl:when test="$include_raw=1">
+      <xsl:text>,"raw":</xsl:text>
+      <xsl:call-template name="json-string">
+        <xsl:with-param name="text">
+          <xsl:apply-templates select="*" mode="raw"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:when>
+  </xsl:choose>
+  <xsl:text>,</xsl:text>
   <xsl:apply-templates select="*" mode="object"/>
   <!-- this text below includes the terminating newline -->
   <xsl:text>}&#xa;</xsl:text>
 </xsl:template>
+
+<xsl:template match="*" mode="raw">
+    <xsl:value-of select="concat('&lt;', name())" />
+    <xsl:for-each select="@*">
+      <xsl:value-of select="concat(' ', name(), '=&quot;', ., '&quot;')"/>
+    </xsl:for-each>
+    <xsl:text>&gt;</xsl:text>
+    <xsl:apply-templates mode="raw"/>
+    <xsl:value-of select="concat('&lt;/', name(), '&gt;')" />
+  </xsl:template>
 
 <!-- serialize objects -->
 <xsl:template match="*" mode="object">
