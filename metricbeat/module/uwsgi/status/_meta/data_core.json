@@ -15,11 +15,16 @@
     },
     "uwsgi": {
         "status": {
-            "total": {
-                "exceptions": 0,
-                "pid": 1,
+            "core": {
+                "id": 1,
                 "read_errors": 0,
-                "requests": 2,
+                "requests": {
+                    "offloaded": 0,
+                    "routed": 0,
+                    "static": 0,
+                    "total": 1
+                },
+                "worker_pid": 8,
                 "write_errors": 0
             }
         }
