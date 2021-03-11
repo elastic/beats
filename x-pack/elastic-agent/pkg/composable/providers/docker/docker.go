@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 // ContainerPriority is the priority that container mappings are added to the provider.
@@ -36,7 +37,7 @@ type dynamicProvider struct {
 }
 
 // Run runs the environment context provider.
-func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
+func (c *dynamicProvider) Run(comm corecomp.DynamicProviderComm) error {
 	watcher, err := docker.NewWatcher(c.logger, c.config.Host, c.config.TLS, false)
 	if err != nil {
 		// info only; return nil (do nothing)
@@ -101,7 +102,7 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable.DynamicProvider, error) {
+func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.DynamicProvider, error) {
 	var cfg Config
 	if c == nil {
 		c = config.New()

@@ -5,36 +5,16 @@
 package composable
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
-// DynamicProviderComm is the interface that an dynamic provider uses to communicate back to Elastic Agent.
-type DynamicProviderComm interface {
-	context.Context
-
-	// AddOrUpdate updates a mapping with given ID with latest mapping and processors.
-	//
-	// `priority` ensures that order is maintained when adding the mapping to the current state
-	// for the processor. Lower priority mappings will always be sorted before higher priority mappings
-	// to ensure that matching of variables occurs on the lower priority mappings first.
-	AddOrUpdate(id string, priority int, mapping map[string]interface{}, processors []map[string]interface{}) error
-	// Remove removes a mapping by given ID.
-	Remove(id string)
-}
-
-// DynamicProvider is the interface that a dynamic provider must implement.
-type DynamicProvider interface {
-	// Run runs the inventory provider.
-	Run(DynamicProviderComm) error
-}
-
 // DynamicProviderBuilder creates a new dynamic provider based on the given config and returns it.
-type DynamicProviderBuilder func(log *logger.Logger, config *config.Config) (DynamicProvider, error)
+type DynamicProviderBuilder func(log *logger.Logger, config *config.Config) (corecomp.DynamicProvider, error)
 
 // AddDynamicProvider adds a new DynamicProviderBuilder
 func (r *providerRegistry) AddDynamicProvider(name string, builder DynamicProviderBuilder) error {

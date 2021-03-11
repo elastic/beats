@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 // VarsCallback is callback called when the current vars state changes.
@@ -120,6 +121,11 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		}
 	}
 
+	// manually register providers that want to pass to the Vars
+	var dynamicProviders map[string]corecomp.DynamicProvider
+	k8sProvider := c.dynamicProviders["kubernetes"]
+	dynamicProviders["kubernetes"] = k8sProvider.provider
+
 	go func() {
 		for {
 			// performs debounce of notifies; accumulates them into 100 millisecond chunks
@@ -159,7 +165,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
-					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors)
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, dynamicProviders)
 					vars = append(vars, v)
 				}
 			}
@@ -222,7 +228,7 @@ type dynamicProviderMapping struct {
 type dynamicProviderState struct {
 	context.Context
 
-	provider DynamicProvider
+	provider corecomp.DynamicProvider
 	lock     sync.RWMutex
 	mappings map[string]dynamicProviderMapping
 	signal   chan bool

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package kubernetes
+package kubernetes_secrets
 
 import (
 	"fmt"
@@ -24,10 +24,11 @@ const (
 )
 
 func init() {
-	composable.Providers.AddDynamicProvider("kubernetes", DynamicProviderBuilder)
+	composable.Providers.AddDynamicProvider("kubernetes_secrets ", DynamicProviderBuilder)
 }
 
-type dynamicProvider struct {
+
+type dynamicProviderSecrets struct {
 	logger *logger.Logger
 	config *Config
 }
@@ -48,11 +49,15 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.D
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
-	return &dynamicProvider{logger, &cfg}, nil
+	return &dynamicProviderSecrets{logger, &cfg}, nil
+}
+
+func (p *dynamicProviderSecrets) Fetch(comm corecomp.DynamicProviderComm) {
+
 }
 
 // Run runs the environment context provider.
-func (p *dynamicProvider) Run(comm corecomp.DynamicProviderComm) error {
+func (p *dynamicProviderSecrets) Run(comm corecomp.DynamicProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)

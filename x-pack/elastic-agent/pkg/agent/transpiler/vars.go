@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 var varsRegex = regexp.MustCompile(`\${([\p{L}\d\s\\\-_|.'"]*)}`)
@@ -21,20 +23,21 @@ type Vars struct {
 	tree          *AST
 	processorsKey string
 	processors    Processors
+	dynamicProviders map[string]composable.DynamicProvider
 }
 
 // NewVars returns a new instance of vars.
 func NewVars(mapping map[string]interface{}) (*Vars, error) {
-	return NewVarsWithProcessors(mapping, "", nil)
+	return NewVarsWithProcessors(mapping, "", nil, nil)
 }
 
 // NewVarsWithProcessors returns a new instance of vars with attachment of processors.
-func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors) (*Vars, error) {
+func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, dynamicProviders map[string]composable.DynamicProvider) (*Vars, error) {
 	tree, err := NewAST(mapping)
 	if err != nil {
 		return nil, err
 	}
-	return &Vars{tree, processorKey, processors}, nil
+	return &Vars{tree, processorKey, processors, dynamicProviders}, nil
 }
 
 // Replace returns a new value based on variable replacement.
@@ -55,6 +58,14 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
+				fmt.Println(val.Value)
+				if (v.processorsKey == "kubernetes_secret"){
+					fmt.Println("I'm in kubernetes Secrettt!!!!")
+					fmt.Println(val.Value)
+					k8sProvider := v.dynamicProviders[v.processorsKey]
+					k8sProviderSecrets := k8sProvider.(composable.DynamicProviderSecrets)
+					k8sProviderSecrets.Fetch()
+				}
 				switch val.(type) {
 				case *constString:
 					result += value[lastIndex:r[0]] + val.Value()
