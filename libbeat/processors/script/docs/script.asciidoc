@@ -70,6 +70,7 @@ function process(event) {
     if (event.Get("event.code") === 1102) {
         event.Put("event.action", "cleared");
     }
+    return event;
 }
 
 function test() {
