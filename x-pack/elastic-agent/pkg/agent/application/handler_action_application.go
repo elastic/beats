@@ -46,17 +46,17 @@ func (h *handlerAppAction) Handle(ctx context.Context, a action, acker fleetAcke
 		action.CompletedAt = end
 		action.Error = err.Error()
 	} else {
-		action.StartedAt = readMapString(res, "started_at")
-		action.CompletedAt = readMapString(res, "completed_at")
-		action.Error = readMapString(res, "error")
+		action.StartedAt = readMapString(res, "started_at", start)
+		action.CompletedAt = readMapString(res, "completed_at", end)
+		action.Error = readMapString(res, "error", "")
 	}
 
 	return acker.Ack(ctx, action)
 }
 
-func readMapString(m map[string]interface{}, key string) string {
+func readMapString(m map[string]interface{}, key string, def string) string {
 	if m == nil {
-		return ""
+		return def
 	}
 
 	if v, ok := m[key]; ok {
@@ -64,5 +64,5 @@ func readMapString(m map[string]interface{}, key string) string {
 			return s
 		}
 	}
-	return ""
+	return def
 }
