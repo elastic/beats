@@ -45,13 +45,8 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return errors.Wrap(err, "failed to get cluster ID from Elasticsearch")
 	}
 
-	// Ids we visited in the previous fetch
-	var previousKnownIds = m.knownIds
-	// We forget the previous round, if we don't complete the loop let's play safe and start "fresh"
-	m.knownIds = make(map[string]bool)
-	// Ids visited in the current fetch
-	var currentKnownIds = make(map[string]bool)
-
+	var known = m.known.startRound()
+	var targetIndex = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 	var errs multierror.Errors
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
@@ -105,17 +100,16 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 					errs = append(errs, errors.Wrap(err, "failure getting event ID"))
 					continue
 				}
-				// We store the visited ID and only send the event
-				currentKnownIds[event.ID] = true
-				if !previousKnownIds[event.ID] {
-					event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				// We only send the event if the id was not known
+				if known.addID(event.ID) {
+					event.Index = targetIndex
 					r.Event(event)
 				}
 
 			}
 		}
 	}
-	m.knownIds = currentKnownIds
+	known.done()
 	return errs.Err()
 }
 
