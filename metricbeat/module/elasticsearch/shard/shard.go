@@ -37,6 +37,7 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
+	knownIds map[string]bool
 }
 
 // New create a new instance of the MetricSet
@@ -46,7 +47,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{MetricSet: ms}, nil
+	return &MetricSet{MetricSet: ms, knownIds: make(map[string]bool)}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
