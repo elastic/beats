@@ -17,9 +17,12 @@
 
 package shard
 
+import "sync"
+
 // Information about previously known shards
 type knownShards struct {
-	ids map[string]bool
+	ids  map[string]bool
+	lock *sync.Mutex
 }
 
 // Information about the shards tracked in the current iteration of the metricset
@@ -32,16 +35,19 @@ type currentShards struct {
 // Creates a new instance of the MetricSet
 func newKnownShards() *knownShards {
 	return &knownShards{
-		ids: make(map[string]bool),
+		ids:  make(map[string]bool),
+		lock: &sync.Mutex{},
 	}
 }
 
 // Starts a new round of collecting shards
 func (k *knownShards) startRound() *currentShards {
 	// Ids we visited in the previous fetch
+	k.lock.Lock()
 	var previous = k.ids
 	// We forget the previous round so that if the caller does not call completeRound we play safe and start "fresh"
 	k.ids = make(map[string]bool)
+	k.lock.Unlock()
 	// Struct to keep the current iteration
 	return &currentShards{
 		parent:   k,
@@ -58,5 +64,7 @@ func (c *currentShards) addID(id string) bool {
 
 // Completes a round
 func (c *currentShards) done() {
+	c.parent.lock.Lock()
 	c.parent.ids = c.current
+	c.parent.lock.Unlock()
 }
