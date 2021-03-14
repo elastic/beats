@@ -23,7 +23,13 @@ Will retrieve azure activity logs. Control-plane events on Azure Resource Manage
 Will retrieve azure platform logs. Platform logs provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on.
 
 `signinlogs` ::
-Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities.
+Will retrieve azure Active Directory sign-in logs. The https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins#interactive-user-sign-ins[sign-ins] report provides information about the usage of managed applications and user sign-in activities.
+
+`noninteractiveusersigninlogs` ::
+Will retrieve Azure Active Directory non-interactive user sign-in logs. The https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins#non-interactive-user-sign-ins[non-interactive user sign-ins] report provides authentication information from operating systems or applications authenticating on behalf of the user where providing an authentication factor wasn't required.
+
+`serviceprincipalsigninlogs` ::
+Will retrieve Azure Active Directory service principal sign-in logs. The https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins#service-principal-sign-ins[service principal sign-ins] report provides authentication information from non-user accounts or applications.
 
 `auditlogs` ::
 Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies.
