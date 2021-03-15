@@ -115,14 +115,24 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.St
 
 	tsb := schedule.Timespan(started, smf.ParsedSchedule)
 	tg := tsb.ShortString()
+
+	tcUnix := tsb.Gte.Unix()
+	minuteChunk := tcUnix - (tcUnix % 60)           // minute res
+	fiveMinuteChunk := tcUnix - (tcUnix % (60 * 5)) // 5m res
+	hourChunk := tcUnix - (tcUnix % (60 * 60))      // hour res
+
 	fieldsToMerge := common.MapStr{
 		"monitor": common.MapStr{
-			"id":          id,
-			"name":        name,
-			"type":        smf.Type,
-			"timespan":    tsb,
-			"time_group":  tg,
-			"check_group": fmt.Sprintf("%s-%s-%x", id, tg, runId),
+			"id":           id,
+			"name":         name,
+			"type":         smf.Type,
+			"timespan":     tsb,
+			"1m_chunk":     minuteChunk,
+			"5m_chunk":     fiveMinuteChunk,
+			"minute_chunk": minuteChunk,
+			"hour_chunk":   hourChunk,
+			"time_group":   tg,
+			"check_group":  fmt.Sprintf("%s-%s-%x", id, tg, runId),
 		},
 	}
 

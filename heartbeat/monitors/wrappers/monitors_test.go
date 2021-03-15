@@ -390,7 +390,7 @@ func TestInlineBrowserJob(t *testing.T) {
 					urlValidator(t, "http://foo.com"),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{
-							"id":          isdef.IsStringContaining(testMonFields.ID),
+							"id":          "myid-inline-browser-job",
 							"name":        testMonFields.Name,
 							"type":        fields.Type,
 							"status":      "up",

@@ -35,13 +35,13 @@ func TestParse(t *testing.T) {
 		{
 			"every second",
 			"@every 1s",
-			intervalScheduler{time.Duration(1 * time.Second)},
+			intervalScheduler{time.Duration(1 * time.Second), 1097981},
 			false,
 		},
 		{
 			"every year",
 			"@every 1m",
-			intervalScheduler{time.Duration(1 * time.Minute)},
+			intervalScheduler{time.Duration(1 * time.Minute), 3318479164},
 			false,
 		},
 		{
@@ -71,7 +71,8 @@ func TestParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Parse(tt.schedStr, "myId")
+			got, err := Parse(tt.schedStr, t.Name())
+
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Parse() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -92,12 +93,12 @@ func Test_intervalScheduler_Next(t *testing.T) {
 	}{
 		{
 			"one second",
-			intervalScheduler{time.Duration(time.Second)},
+			intervalScheduler{time.Duration(time.Second), 0},
 			now.Add(time.Second),
 		},
 		{
 			"one minute",
-			intervalScheduler{time.Duration(time.Minute)},
+			intervalScheduler{time.Duration(time.Minute), 0},
 			now.Add(time.Minute),
 		},
 	}
@@ -119,19 +120,19 @@ func TestSchedule_Timespan(t *testing.T) {
 	}{
 		{
 			"One second interval",
-			intervalScheduler{time.Second},
+			intervalScheduler{time.Second, 0},
 			time.Unix(1000, 0),
 			TimespanBounds{Gte: time.Unix(1000, 0), Lt: time.Unix(1001, 0)},
 		},
 		{
 			"One minute interval",
-			intervalScheduler{time.Minute},
+			intervalScheduler{time.Minute, 0},
 			time.Unix(60, 0),
 			TimespanBounds{Gte: time.Unix(60, 0), Lt: time.Unix(120, 0)},
 		},
 		{
 			"One minute interval, odd time",
-			intervalScheduler{time.Minute},
+			intervalScheduler{time.Minute, 0},
 			time.Unix(83, 0),
 			TimespanBounds{Gte: time.Unix(60, 0), Lt: time.Unix(120, 0)},
 		},

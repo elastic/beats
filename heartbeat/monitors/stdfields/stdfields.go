@@ -49,28 +49,28 @@ type StdMonitorFields struct {
 }
 
 func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
-	stf := StdMonitorFields{Enabled: true}
-	err := config.Unpack(&stf)
+	smf := StdMonitorFields{Enabled: true}
+	err := config.Unpack(&smf)
 	if err != nil {
-		return stf, errors.Wrap(err, "error unpacking monitor plugin config")
+		return smf, errors.Wrap(err, "error unpacking monitor plugin config")
 	}
 
-	stf.ParsedSchedule, err = schedule.Parse(stf.SchedString, stf.ID)
+	smf.ParsedSchedule, err = schedule.Parse(smf.SchedString, smf.ID)
 	if err != nil {
-		return stf, fmt.Errorf("could not parse schedule string '%s': %w", stf.SchedString, err)
+		return smf, fmt.Errorf("could not parse schedule string '%s': %w", smf.SchedString, err)
 	}
 
 	// Use `service_name` if `service.name` is unspecified
 	// `service_name` was only document in the 7.10.0 release.
-	if stf.LegacyServiceName != "" {
-		if stf.Service.Name == "" {
-			stf.Service.Name = stf.LegacyServiceName
+	if smf.LegacyServiceName != "" {
+		if smf.Service.Name == "" {
+			smf.Service.Name = smf.LegacyServiceName
 		}
 	}
 
-	if !stf.Enabled {
-		return stf, ErrPluginDisabled
+	if !smf.Enabled {
+		return smf, ErrPluginDisabled
 	}
 
-	return stf, nil
+	return smf, nil
 }

@@ -49,6 +49,10 @@ func (s *Schedule) Interval() time.Duration {
 	return nnext.Sub(next)
 }
 
+func (s *Schedule) Offset() time.Duration {
+	return 0
+}
+
 func (s *Schedule) Unpack(str string) error {
 	tmp, err := Parse(str)
 	if err == nil {

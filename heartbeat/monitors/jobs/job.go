@@ -36,18 +36,6 @@ func MakeSimpleJob(f func(*beat.Event) error) Job {
 // JobWrapper is used for functions that wrap other jobs transforming their behavior.
 type JobWrapper func(Job) Job
 
-// WrapAll wraps all jobs and their continuations with the given wrappers
-func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
-	var wrapped []Job
-	for _, j := range jobs {
-		for _, wrapper := range wrappers {
-			j = Wrap(j, wrapper)
-		}
-		wrapped = append(wrapped, j)
-	}
-	return wrapped
-}
-
 // JobWrapperFactory can be used to created new instances of JobWrappers.
 type JobWrapperFactory func() JobWrapper
 
@@ -58,13 +46,14 @@ type JobWrapperFactory func() JobWrapper
 func WrapEachRun(js []Job, wf ...JobWrapperFactory) []Job {
 	var wrapped []Job
 	for _, j := range js {
-		j := j // scope j locally since we get async next
+		j := j // store j for closure below
 		wrapped = append(wrapped, func(event *beat.Event) ([]Job, error) {
+			wj := j
 			for _, f := range wf {
 				w := f()
-				j = Wrap(j, w)
+				wj = Wrap(wj, w)
 			}
-			return j(event)
+			return wj(event)
 		})
 	}
 	return wrapped
@@ -76,4 +65,16 @@ func Wrap(job Job, wrapper JobWrapper) Job {
 		cont, err := wrapper(job)(event)
 		return WrapAll(cont, wrapper), err
 	}
+}
+
+// WrapAll wraps all jobs and their continuations with the given wrappers
+func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
+	var wrapped []Job
+	for _, j := range jobs {
+		for _, wrapper := range wrappers {
+			j = Wrap(j, wrapper)
+		}
+		wrapped = append(wrapped, j)
+	}
+	return wrapped
 }

@@ -19,6 +19,7 @@ package schedule
 
 import (
 	"fmt"
+	"hash/fnv"
 	"strings"
 	"time"
 
@@ -30,6 +31,7 @@ type Schedule interface {
 	// Next returns the next runAt a scheduled event occurs after the given runAt
 	Next(now time.Time) (next time.Time)
 	Interval() time.Duration
+	Offset() time.Duration
 	// Returns true if this schedule type should run once immediately before checking Next.
 	// Cron tasks run at exact times so should set this to false.
 	RunOnInit() bool
@@ -38,6 +40,21 @@ type Schedule interface {
 // intervalScheduler defines a schedule that runs at fixed intervals.
 type intervalScheduler struct {
 	interval time.Duration
+	offset   time.Duration
+}
+
+func NewIntervalScheduler(interval time.Duration, monitorId string) (intervalScheduler, error) {
+	s := intervalScheduler{interval: interval}
+
+	hash := fnv.New32a()
+	_, err := hash.Write([]byte(monitorId))
+	if err != nil {
+		return intervalScheduler{}, fmt.Errorf("could not hash monitor id '%s': %w", monitorId, err)
+	}
+	hashSum := hash.Sum32()
+	s.offset = time.Duration(int64(hashSum) % interval.Nanoseconds())
+
+	return s, nil
 }
 
 // RunOnInit returns true for interval schedulers.
@@ -56,7 +73,7 @@ func Parse(in string, monitorId string) (Schedule, error) {
 			return nil, err
 		}
 
-		return intervalScheduler{d}, nil
+		return NewIntervalScheduler(d, monitorId)
 	}
 
 	// fallback on cron scheduler parsers
@@ -76,11 +93,15 @@ func MustParse(in string, monitorId string) Schedule {
 }
 
 func (s intervalScheduler) Next(t time.Time) time.Time {
-	return t.Add(s.interval)
+	return t.Add(s.interval + s.offset)
 }
 
 func (s intervalScheduler) Interval() time.Duration {
 	return s.interval
+}
+
+func (s intervalScheduler) Offset() time.Duration {
+	return s.offset
 }
 
 type TimespanBounds struct {
@@ -93,11 +114,12 @@ func (tsb TimespanBounds) String() string {
 }
 
 func (tsb TimespanBounds) ShortString() string {
-	return fmt.Sprintf("%x-%d", tsb.Gte.Unix(), int32(tsb.Lt.Sub(tsb.Gte).Seconds()))
+	intervalSecs := int32(tsb.Lt.Sub(tsb.Gte).Seconds())
+	return fmt.Sprintf("%x-%d", tsb.Gte.Unix(), intervalSecs)
 }
 
 func Timespan(t time.Time, s Schedule) (ts TimespanBounds) {
-	ts.Gte = t.Add(-time.Duration(t.UnixNano() % s.Interval().Nanoseconds()))
+	ts.Gte = t.Add(s.Offset() - time.Duration(t.UnixNano()%s.Interval().Nanoseconds()))
 	ts.Lt = ts.Gte.Add(s.Interval())
 	return ts
 }
