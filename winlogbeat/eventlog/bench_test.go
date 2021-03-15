@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
-	"strings"
 	"testing"
 
 	"golang.org/x/sys/windows/svc/eventlog"
@@ -70,21 +69,14 @@ func TestBenchmarkRead(t *testing.T) {
 			}
 		})
 	}
-
-	t.Run("api="+eventLoggingAPIName, func(t *testing.T) {
-		result := testing.Benchmark(benchmarkEventLog(eventLoggingAPIName, -1))
-		outputBenchmarkResults(t, result)
-	})
 }
 
 func benchmarkEventLog(api string, batchSize int) func(b *testing.B) {
 	return func(b *testing.B) {
 		conf := common.MapStr{
-			"name": providerName,
-		}
-		if strings.HasPrefix(api, "wineventlog") {
-			conf.Put("batch_read_size", batchSize)
-			conf.Put("no_more_events", "stop")
+			"name":            providerName,
+			"batch_read_size": batchSize,
+			"no_more_events":  "stop",
 		}
 
 		log := openLog(b, api, nil, conf)
