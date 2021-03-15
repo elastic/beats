@@ -30,7 +30,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, false, m.Fleet.Enabled)
-		assert.Equal(t, true, IsStandalone(m.Fleet))
+		assert.Equal(t, true, configuration.IsStandalone(m.Fleet))
 
 	})
 
@@ -40,7 +40,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, true, m.Fleet.Enabled)
-		assert.Equal(t, false, IsStandalone(m.Fleet))
+		assert.Equal(t, false, configuration.IsStandalone(m.Fleet))
 	})
 }
 

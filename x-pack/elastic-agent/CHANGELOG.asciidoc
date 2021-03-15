@@ -36,6 +36,12 @@
 - Windows agent doesn't uninstall with a lowercase `c:` drive in the path {pull}23998[23998]
 - Fix reloading of log level for services {pull}[24055]24055
 - Fix: Successfully installed and enrolled agent running standalone{pull}[24128]24128
+- Make installer atomic on windows {pull}[24253]24253
+- Remove installed services on agent uninstall {pull}[24151]24151
+- Fix failing installation on windows 7 {pull}[24387]24387
+- Fix capabilities resolution in inspect command {pull}[24346]24346
+- Fix windows installer during enroll {pull}[24343]24343
+- Logging to file disabled on enroll {issue}[24173]24173
 
 ==== New features
 
