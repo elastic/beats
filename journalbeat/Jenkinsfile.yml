@@ -21,7 +21,7 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-1804-aarch64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test journalbeat for arm"
@@ -42,4 +42,4 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-1804-aarch64"
