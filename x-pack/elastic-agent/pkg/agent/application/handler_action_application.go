@@ -38,16 +38,19 @@ func (h *handlerAppAction) Handle(ctx context.Context, a action, acker fleetAcke
 		return err
 	}
 
-	start := time.Now().UTC().Format(time.RFC3339Nano)
+	start := time.Now().UTC()
 	res, err := appState.PerformAction(action.InputType, params, defaultActionTimeout)
-	end := time.Now().UTC().Format(time.RFC3339Nano)
+	end := time.Now().UTC()
+
+	startFormatted := start.Format(time.RFC3339Nano)
+	endFormatted := end.Format(time.RFC3339Nano)
 	if err != nil {
-		action.StartedAt = start
-		action.CompletedAt = end
+		action.StartedAt = startFormatted
+		action.CompletedAt = endFormatted
 		action.Error = err.Error()
 	} else {
-		action.StartedAt = readMapString(res, "started_at", start)
-		action.CompletedAt = readMapString(res, "completed_at", end)
+		action.StartedAt = readMapString(res, "started_at", startFormatted)
+		action.CompletedAt = readMapString(res, "completed_at", endFormatted)
 		action.Error = readMapString(res, "error", "")
 	}
 
