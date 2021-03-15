@@ -133,5 +133,5 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 		return ts, nil
 	}
 
-	return time.Now(), nil
+	return time.Now(), err
 }
