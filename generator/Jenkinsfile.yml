@@ -17,8 +17,14 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     metricbeat-test:
         make: "make -C generator/_templates/metricbeat test test-package"
+        when:
+            comments:
+                - "/test build"
     beat-test:
         make: "make -C generator/_templates/beat test test-package"
+        when:
+            comments:
+                - "/test build"
     macos-metricbeat:
         make: "make -C generator/_templates/metricbeat test"
         platforms:             ## override default label in this specific stage.

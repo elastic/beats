@@ -20,16 +20,31 @@ stages:
           make -C x-pack/metricbeat check;
           make -C x-pack/metricbeat update;
           make check-no-changes;
+        when:
+            comments:
+                - "/test windows"
     unitTest:
         mage: "mage build unitTest"
+        when:
+            comments:
+                - "/test build"
     goIntegTest:
         mage: "mage goIntegTest"
         withModule: true
+        when:
+            comments:
+                - "/test build"
     pythonIntegTest:
         mage: "mage pythonIntegTest"
         withModule: true
+        when:
+            comments:
+                - "/test build"
     crosscompile:
         make: "make -C metricbeat crosscompile"
+        when:
+            comments:
+                - "/test build"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -42,43 +57,70 @@ stages:
             parameters:
                 - "macosTest"
             branches: true     ## for all the branches
-            tags: true         ## for all the tags
+            tags: true         ## for all the tags 
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
+            - "windows-2019" 
+        when:
+            comments:
+                - "/test windows"
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2016"
+            - "windows-2016" 
+        when:
+            comments:
+                - "/test windows"
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2012-r2"
+            - "windows-2012-r2" 
+        when:
+            comments:
+                - "/test windows"
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-10"
+            - "windows-10" 
+        when:
+            comments:
+                - "/test windows"
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-8"
+            - "windows-8" 
+        when:
+            comments:
+                - "/test windows"
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
+            - "windows-2008-r2" 
+        when:
+            comments:
+                - "/test windows"
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
-            - "windows-7"
+            - "windows-7" 
+        when:
+            comments:
+                - "/test windows"
     windows-7-32:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7-32-bit"
+        when:
+            comments:
+                - "/test windows"
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
             enabled: false     ## e2e is enabled only for x-pack beats
+        when:
+            comments:
+                - "/test windows"
     packaging-arm:
         packaging-arm: "mage package"
         e2e:

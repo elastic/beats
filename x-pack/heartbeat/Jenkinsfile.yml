@@ -19,22 +19,19 @@ stages:
           make -C x-pack/heartbeat update;
           make -C heartbeat check;
           make -C heartbeat update;
+        when:
+            comments:
+                - "/test build"
           make check-no-changes;
     build:
         mage: "mage build test"
+        when:
+            comments:
+                - "/test build"
     macos:
         mage: "mage build test"
         platforms:             ## override default label in this specific stage.
           - "macosx&&x86_64"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/heartbeat for macos"
-            labels:
-                - "macOS"
-            parameters:
-                - "macosTest"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
 # TODO: there are windows test failures already reported
 # https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
 # waiting for being fixed.
@@ -74,6 +71,9 @@ stages:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+        when:
+            comments:
+                - "/test build"
     packaging-arm:
         packaging-arm: "mage package"
         e2e:

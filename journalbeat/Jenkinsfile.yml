@@ -18,25 +18,25 @@ stages:
           make -C journalbeat check;
           make -C journalbeat update;
           make check-no-changes;
+        when:
+            comments:
+                - "/test build"
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "ubuntu-1804-aarch64"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test journalbeat for arm"
-            labels:
-                - "arm"
-            parameters:
-                - "armTest"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     unitTest:
         mage: "mage build unitTest"
+        when:
+            comments:
+                - "/test build"
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+        when:
+            comments:
+                - "/test build"
     packaging-arm:
         packaging-arm: "mage package"
         e2e:
