@@ -92,6 +92,7 @@ func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
 	cfg.Level = logp.InfoLevel
+	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
 	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
 
