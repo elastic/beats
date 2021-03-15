@@ -24,15 +24,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "ubuntu-1804-aarch64"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test x-pack/auditbeat for arm"
-            labels:
-                - "arm"
-            parameters:
-                - "armTest"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     build:
         mage: "mage update build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
