@@ -32,9 +32,9 @@ const (
 )
 
 var (
-	// ErrParseTimestamp is returned when parsing of a @timestamp field fails.
+	// ErrInvalidTimestamp is returned when parsing of a @timestamp field fails.
 	// Supported formats: ISO8601, RFC3339
-	ErrParseTimestamp = errors.New("failed to parse @timestamp, unknown format")
+	ErrInvalidTimestamp = errors.New("failed to parse @timestamp, unknown format")
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
@@ -137,5 +137,5 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 		return ts, nil
 	}
 
-	return time.Time{}, ErrParseTimestamp
+	return time.Time{}, ErrInvalidTimestamp
 }
