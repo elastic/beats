@@ -180,14 +180,20 @@ func (f *fleetGateway) worker() {
 				actions[idx] = a
 			}
 
+			var errMsg string
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
-				msg := fmt.Sprintf("failed to dispatch actions, error: %s", err)
-				f.log.Error(msg)
-				f.statusReporter.Update(state.Degraded, msg)
+				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
+				f.log.Error(errMsg)
+				f.statusReporter.Update(state.Failed, errMsg)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-			f.statusReporter.Update(state.Healthy, "")
+			if errMsg != "" {
+				f.statusReporter.Update(state.Failed, errMsg)
+			} else {
+				f.statusReporter.Update(state.Healthy, "")
+			}
+
 		case <-f.bgContext.Done():
 			f.stop()
 			return
