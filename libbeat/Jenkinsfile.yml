@@ -19,9 +19,6 @@ stages:
           make -C x-pack/libbeat check;
           make -C x-pack/libbeat update;
           make check-no-changes;
-        when:
-            comments:
-                - "/test build"
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -35,16 +32,7 @@ stages:
                 - "armTest"
     build:
         mage: "mage build test"
-        when:
-            comments:
-                - "/test build"
     crosscompile:
         make: "make -C libbeat crosscompile"
-        when:
-            comments:
-                - "/test build"
     stress-tests:
         make: "make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C libbeat stress-tests"
-        when:
-            comments:
-                - "/test build"

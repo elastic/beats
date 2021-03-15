@@ -18,9 +18,6 @@ stages:
           make -C x-pack/libbeat check;
           make -C x-pack/libbeat update;
           make check-no-changes;
-        when:
-            comments:
-                - "/test build"
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
@@ -36,6 +33,3 @@ stages:
             tags: true         ## for all the tags
     build:
         mage: "mage build test"
-        when:
-            comments:
-                - "/test build"
