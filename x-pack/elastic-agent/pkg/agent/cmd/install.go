@@ -9,12 +9,11 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
-
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
@@ -58,9 +57,9 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, 
 	}
 
 	// check the lock to ensure that elastic-agent is not already running in this directory
-	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), agentLockFileName)
 	if err := locker.TryLock(); err != nil {
-		if err == application.ErrAppAlreadyRunning {
+		if err == filelock.ErrAppAlreadyRunning {
 			return fmt.Errorf("cannot perform installation as Elastic Agent is already running from this directory")
 		}
 		return err

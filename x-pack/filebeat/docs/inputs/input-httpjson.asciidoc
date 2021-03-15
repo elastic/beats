@@ -349,7 +349,7 @@ HTTP method to use when making requests. `GET` or `POST` are the options. Defaul
 [float]
 ==== `request.encode_as`
 
-ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application\x-www-form-urlencoded`. `application/x-www-form-encoded` will url encode the `url.params` and set them as the body. It is not set by default.
+ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application/x-www-form-urlencoded`. `application/x-www-form-urlencoded` will url encode the `url.params` and set them as the body. It is not set by default.
 
 [float]
 ==== `request.body`

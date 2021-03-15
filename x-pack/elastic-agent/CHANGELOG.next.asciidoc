@@ -42,6 +42,8 @@
 - Select default agent policy if no enrollment token provided. {pull}23973[23973]
 - Fix bad substitution of API key. {pull}24036[24036]
 - Fix docker enrollment issue related to Fleet Server change. {pull}24155[24155]
+- Improve log on failure of Endpoint Security installation. {pull}24429[24429]
+- Verify communication to Kibana before updating Fleet client. {pull}24489[24489]
 
 ==== New features
 
