@@ -55,17 +55,19 @@ func new(name string, cfg *Config) (*Logger, error) {
 		return nil, err
 	}
 
+	var outputs []zapcore.Core
 	if cfg.ToFiles {
 		internal, err := makeInternalFileOutput(cfg)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
-			return nil, fmt.Errorf("error initializing logging: %v", err)
-		}
+		outputs = append(outputs, internal)
 	}
 
+	if err := configure.LoggingWithOutputs("", commonCfg, outputs...); err != nil {
+		return nil, fmt.Errorf("error initializing logging: %v", err)
+	}
 	return logp.NewLogger(name), nil
 }
 
