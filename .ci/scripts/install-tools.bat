@@ -36,11 +36,6 @@ IF EXIST "%PROGRAMFILES(X86)%" (
 SET GVM_BIN=gvm.exe
 WHERE /q %GVM_BIN%
 %GVM_BIN% version
-IF ERRORLEVEL 1 (
-    REM gvm is not configured correctly.
-    rmdir %WORKSPACE%\.gvm /s /q
-    exit /b 1
-)
 
 REM Install the given go version
 %GVM_BIN% --debug install %GO_VERSION%
