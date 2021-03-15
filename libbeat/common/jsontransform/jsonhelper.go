@@ -24,6 +24,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/hashicorp/go-multierror"
+)
+
+const (
+	iso8601 = "2006-01-02T15:04:05.000Z0700"
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
@@ -56,8 +61,8 @@ func WriteJSONKeys(event *beat.Event, keys map[string]interface{}, expandKeys, o
 				continue
 			}
 
-			// @timestamp must be of format RFC3339
-			ts, err := time.Parse(time.RFC3339, vstr)
+			// @timestamp must be of format RFC3339 or ISO8601
+			ts, err := parseTimestamp(vstr)
 			if err != nil {
 				logger.Errorf("JSON: Won't overwrite @timestamp because of parsing error: %v", err)
 				event.SetErrorWithOption(createJSONError(fmt.Sprintf("@timestamp not overwritten (parse error on %s)", vstr)), addErrKey)
@@ -109,4 +114,24 @@ func removeKeys(keys map[string]interface{}, names ...string) {
 	for _, name := range names {
 		delete(keys, name)
 	}
+}
+
+func parseTimestamp(timestamp string) (time.Time, error) {
+	validFormats := []string{
+		time.RFC3339,
+		iso8601,
+	}
+
+	var err error
+	for _, f := range validFormats {
+		ts, parseErr := time.Parse(f, timestamp)
+		if parseErr != nil {
+			err = multierror.Append(err, parseErr)
+			continue
+		}
+
+		return ts, nil
+	}
+
+	return time.Now(), nil
 }

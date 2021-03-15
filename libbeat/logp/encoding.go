@@ -32,7 +32,7 @@ var baseEncodingConfig = zapcore.EncoderConfig{
 	StacktraceKey:  "stacktrace",
 	LineEnding:     zapcore.DefaultLineEnding,
 	EncodeLevel:    zapcore.LowercaseLevelEncoder,
-	EncodeTime:     zapcore.RFC3339TimeEncoder,
+	EncodeTime:     zapcore.ISO8601TimeEncoder,
 	EncodeDuration: zapcore.NanosDurationEncoder,
 	EncodeCaller:   zapcore.ShortCallerEncoder,
 	EncodeName:     zapcore.FullNameEncoder,
