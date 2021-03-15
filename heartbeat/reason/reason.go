@@ -17,12 +17,45 @@
 
 package reason
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import (
+	"github.com/elastic/beats/v7/libbeat/common"
+)
 
 type Reason interface {
 	error
 	Type() string
+	Code() string
 	Unwrap() error
+}
+
+func NewResolve(err error) Reason {
+	return NewCustReason(err, "io", "could_not_resolve_host")
+}
+
+func NewCustReason(err error, typ string, code string) CustReason {
+	return CustReason{err: err, typ: typ, code: code}
+}
+
+type CustReason struct {
+	err error
+	code string
+	typ string
+}
+
+func (c CustReason) Error() string {
+	return c.err.Error()
+}
+
+func (c CustReason) Type() string {
+	return c.typ
+}
+
+func (c CustReason) Code() string {
+	return c.code
+}
+
+func (c CustReason) Unwrap() error {
+	return c.err
 }
 
 type ValidateError struct {
@@ -50,10 +83,12 @@ func IOFailed(err error) Reason {
 func (e ValidateError) Error() string { return e.err.Error() }
 func (e ValidateError) Unwrap() error { return e.err }
 func (ValidateError) Type() string    { return "validate" }
+func (ValidateError) Code() string    { return "" }
 
 func (e IOError) Error() string { return e.err.Error() }
 func (e IOError) Unwrap() error { return e.err }
 func (IOError) Type() string    { return "io" }
+func (IOError) Code() string    { return "" }
 
 func FailError(typ string, err error) common.MapStr {
 	return common.MapStr{

@@ -92,10 +92,10 @@ func TestJourneyEnricher(t *testing.T) {
 				require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
 
 				if se.Error != nil {
-					require.Equal(t, stepError(se.Error), enrichErr)
+					require.Equal(t, stepReason(se.Error), enrichErr)
 				}
 			} else { // journey end gets a summary
-				require.Equal(t, stepError(syntherr), enrichErr)
+				require.Equal(t, stepReason(syntherr), enrichErr)
 
 				u, _ := url.Parse(url1)
 				t.Run("summary", func(t *testing.T) {

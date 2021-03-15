@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"context"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"testing"
 
 	"github.com/elastic/go-lookslike/validator"
@@ -35,8 +36,8 @@ import (
 )
 
 func Test_runPublishJob(t *testing.T) {
-	defineJob := func(fields common.MapStr) func(event *beat.Event) (j []jobs.Job, e error) {
-		return func(event *beat.Event) (j []jobs.Job, e error) {
+	defineJob := func(fields common.MapStr) func(event *beat.Event) (j []jobs.Job, r reason.Reason) {
+		return func(event *beat.Event) (j []jobs.Job, r reason.Reason) {
 			eventext.MergeEventFields(event, fields)
 			return nil, nil
 		}
@@ -57,7 +58,7 @@ func Test_runPublishJob(t *testing.T) {
 		},
 		{
 			"one cont",
-			func(event *beat.Event) (j []jobs.Job, e error) {
+			func(event *beat.Event) (j []jobs.Job, r reason.Reason) {
 				simpleJob(event)
 				return []jobs.Job{simpleJob}, nil
 			},
@@ -68,7 +69,7 @@ func Test_runPublishJob(t *testing.T) {
 		},
 		{
 			"multiple conts",
-			func(event *beat.Event) (j []jobs.Job, e error) {
+			func(event *beat.Event) (j []jobs.Job, r reason.Reason) {
 				simpleJob(event)
 				return []jobs.Job{
 					defineJob(common.MapStr{"baz": "bot"}),
@@ -83,7 +84,7 @@ func Test_runPublishJob(t *testing.T) {
 		},
 		{
 			"cancelled cont",
-			func(event *beat.Event) (j []jobs.Job, e error) {
+			func(event *beat.Event) (j []jobs.Job, r reason.Reason) {
 				eventext.CancelEvent(event)
 				return []jobs.Job{simpleJob}, nil
 			},

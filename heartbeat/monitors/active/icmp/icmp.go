@@ -19,6 +19,7 @@ package icmp
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"net"
 	"net/url"
 
@@ -117,10 +118,10 @@ func (jf *jobFactory) makePlugin() (plugin2 plugin.Plugin, err error) {
 }
 
 func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {
-	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
+	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) reason.Reason {
 		rtt, n, err := jf.loop.ping(ip, config.Timeout, config.Wait)
 		if err != nil {
-			return err
+			return reason.NewCustReason(err, "io", "icmp_ping_failure")
 		}
 
 		icmpFields := common.MapStr{"requests": n}

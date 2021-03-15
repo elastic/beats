@@ -18,17 +18,18 @@
 package jobs
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // A Job represents a unit of execution, and may return multiple continuation jobs.
-type Job func(event *beat.Event) ([]Job, error)
+type Job func(event *beat.Event) ([]Job, reason.Reason)
 
 // MakeSimpleJob creates a new Job from a callback function. The callback should
 // return an valid event and can not create any sub-tasks to be executed after
 // completion.
-func MakeSimpleJob(f func(*beat.Event) error) Job {
-	return func(event *beat.Event) ([]Job, error) {
+func MakeSimpleJob(f func(*beat.Event) reason.Reason) Job {
+	return func(event *beat.Event) ([]Job, reason.Reason) {
 		return nil, f(event)
 	}
 }
@@ -47,7 +48,7 @@ func WrapEachRun(js []Job, wf ...JobWrapperFactory) []Job {
 	var wrapped []Job
 	for _, j := range js {
 		j := j // store j for closure below
-		wrapped = append(wrapped, func(event *beat.Event) ([]Job, error) {
+		wrapped = append(wrapped, func(event *beat.Event) ([]Job, reason.Reason) {
 			wj := j
 			for _, f := range wf {
 				w := f()
@@ -61,7 +62,7 @@ func WrapEachRun(js []Job, wf ...JobWrapperFactory) []Job {
 
 // Wrap wraps the given Job and also any continuations with the given JobWrapper.
 func Wrap(job Job, wrapper JobWrapper) Job {
-	return func(event *beat.Event) ([]Job, error) {
+	return func(event *beat.Event) ([]Job, reason.Reason) {
 		cont, err := wrapper(job)(event)
 		return WrapAll(cont, wrapper), err
 	}

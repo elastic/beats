@@ -63,7 +63,7 @@ func newHTTPMonitorHostJob(
 
 	timeout := config.Timeout
 
-	return jobs.MakeSimpleJob(func(event *beat.Event) error {
+	return jobs.MakeSimpleJob(func(event *beat.Event) reason.Reason {
 		var redirects []string
 		client := &http.Client{
 			// Trace visited URLs when redirects occur
@@ -71,11 +71,11 @@ func newHTTPMonitorHostJob(
 			Transport:     transport,
 			Timeout:       config.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, rea := execPing(event, client, request, body, timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
-		return err
+		return rea
 	}), nil
 }
 
@@ -115,7 +115,7 @@ func createPingFactory(
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 
-	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
+	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) reason.Reason {
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
 			Net: dialchain.MakeConstAddrDialer(addr, dialchain.TCPDialer(timeout)),
@@ -129,7 +129,7 @@ func createPingFactory(
 
 		dialer, err := d.Build(event)
 		if err != nil {
-			return err
+			return reason.NewCustReason(err, "io", "could_not_build_dialchain")
 		}
 
 		var (
@@ -166,7 +166,7 @@ func createPingFactory(
 			},
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, end, rea := execPing(event, client, request, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -185,7 +185,7 @@ func createPingFactory(
 			event.PutValue("http.rtt.content", look.RTT(end.Sub(readStart)))
 		}
 
-		return err
+		return rea
 	})
 }
 
@@ -227,7 +227,7 @@ func execPing(
 	timeout time.Duration,
 	validator multiValidator,
 	responseConfig responseConfig,
-) (start, end time.Time, err reason.Reason) {
+) (start, end time.Time, rea reason.Reason) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 

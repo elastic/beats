@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"io"
 	"os"
 	"os/exec"
@@ -27,12 +28,12 @@ import (
 const debugSelector = "synthexec"
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, reason.Reason) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
 	if err != nil {
-		return nil, err
+		return nil, reason.NewCustReason(err, "execution", "browser_suite_execution_error")
 	}
 
 	return startCmdJob(ctx, newCmd, nil, params), nil
@@ -67,10 +68,10 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
 func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params)
 		if err != nil {
-			return nil, err
+			return nil, reason.NewCustReason(err, "execution", "browser_could_not_run_command")
 		}
 		senr := streamEnricher{}
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
@@ -80,14 +81,14 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
 func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
-	return func(event *beat.Event) (conts []jobs.Job, err error) {
+	return func(event *beat.Event) (conts []jobs.Job, rea reason.Reason) {
 		select {
 		case se := <-synthEvents:
-			err = enrich(event, se)
+			rea = enrich(event, se)
 			if se != nil {
-				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
+				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, rea
 			} else {
-				return nil, err
+				return nil, rea
 			}
 		}
 	}

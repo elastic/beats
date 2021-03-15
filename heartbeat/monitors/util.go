@@ -20,6 +20,7 @@ package monitors
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"net"
 	"time"
 
@@ -57,7 +58,7 @@ var DefaultIPSettings = IPSettings{
 }
 
 // emptyTask is a helper value for a Noop.
-var emptyTask = MakeSimpleCont(func(*beat.Event) error { return nil })
+var emptyTask = MakeSimpleCont(func(*beat.Event) reason.Reason { return nil })
 
 // Network determines the Network type used for IP pluginName resolution, based on the
 // provided settings.
@@ -75,19 +76,19 @@ func (s IPSettings) Network() string {
 
 // MakeSimpleCont wraps a function that produces an event and error
 // into an executable Job.
-func MakeSimpleCont(f func(*beat.Event) error) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
-		err := f(event)
-		return nil, err
+func MakeSimpleCont(f func(*beat.Event) reason.Reason) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
+		rea := f(event)
+		return nil, rea
 	}
 }
 
 // MakePingIPFactory creates a jobFactory for building a Task from a new IP address.
 func MakePingIPFactory(
-	f func(*beat.Event, *net.IPAddr) error,
+	f func(*beat.Event, *net.IPAddr) reason.Reason,
 ) func(*net.IPAddr) jobs.Job {
 	return func(ip *net.IPAddr) jobs.Job {
-		return MakeSimpleCont(func(event *beat.Event) error {
+		return MakeSimpleCont(func(event *beat.Event) reason.Reason {
 			return f(event, ip)
 		})
 	}
@@ -153,11 +154,11 @@ func makeByHostAnyIPJob(
 ) jobs.Job {
 	network := ipSettings.Network()
 
-	return func(event *beat.Event) ([]jobs.Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 		resolveStart := time.Now()
 		ip, err := resolver.ResolveIPAddr(network, host)
 		if err != nil {
-			return nil, err
+			return nil, reason.NewCustReason(err, "io", "could_not_resolve_ip_addr")
 		}
 
 		resolveEnd := time.Now()
@@ -177,14 +178,14 @@ func makeByHostAllIPJob(
 	network := ipSettings.Network()
 	filter := makeIPFilter(network)
 
-	return func(event *beat.Event) ([]jobs.Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
 		resolveStart := time.Now()
 		ips, err := net.LookupIP(host)
 		if err != nil {
-			return nil, err
+			return nil, reason.NewCustReason(err, "io", "could_not_lookup_ip")
 		}
 
 		resolveEnd := time.Now()
@@ -196,7 +197,7 @@ func makeByHostAllIPJob(
 
 		if len(ips) == 0 {
 			err := fmt.Errorf("no %v address resolvable for host %v", network, host)
-			return nil, err
+			return nil, reason.NewResolve(err)
 		}
 
 		// create ip ping tasks
@@ -210,7 +211,7 @@ func makeByHostAllIPJob(
 		// In a future refactor we could perhaps test that this in correctly invoked.
 		eventext.CancelEvent(event)
 
-		return cont, err
+		return cont, nil
 	}
 }
 

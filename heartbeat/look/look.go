@@ -50,7 +50,7 @@ func Reason(err error) common.MapStr {
 	if r, ok := err.(reason.Reason); ok {
 		return reason.Fail(r)
 	}
-	return reason.FailIO(err)
+	return reason.Fail(reason.IOFailed(err))
 }
 
 // Timestamp converts an event timestamp into an compatible event timestamp for

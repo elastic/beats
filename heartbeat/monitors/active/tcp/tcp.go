@@ -158,7 +158,7 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 		jf.config.Mode,
 		jf.resolver,
 		monitors.MakePingIPFactory(
-			func(event *beat.Event, ip *net.IPAddr) error {
+			func(event *beat.Event, ip *net.IPAddr) reason.Reason {
 				// use address from resolved IP
 				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
 
@@ -173,7 +173,7 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 // makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
 func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job, error) {
 	return wrappers.WithURLField(endpointURL,
-		jobs.MakeSimpleJob(func(event *beat.Event) error {
+		jobs.MakeSimpleJob(func(event *beat.Event) reason.Reason {
 			hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
 			return jf.dial(event, hostPort, endpointURL)
 		})), nil
@@ -183,7 +183,7 @@ func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) (jobs.Job
 // dialAddr is the host:port that the dialer will connect to, and where an explicit IP should go to.
 // canonicalURL is the URL used to determine if TLS is used via the scheme of the URL, and
 // also which hostname should be passed to the TLS implementation for validation of the server cert.
-func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) error {
+func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url.URL) reason.Reason {
 	// First, create a plain dialer that can connect directly to either hostnames or IPs
 	dc := &dialchain.DialerChain{
 		Net: dialchain.CreateNetDialer(jf.config.Timeout),
@@ -210,7 +210,7 @@ func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url
 
 	dialer, err := dc.Build(event)
 	if err != nil {
-		return err
+		return reason.NewCustReason(err, "dialer_build", "tcp_dialer_could_not_be_built")
 	}
 
 	return jf.execDialer(event, dialer, dialAddr)
@@ -221,7 +221,7 @@ func (jf *jobFactory) execDialer(
 	event *beat.Event,
 	dialer transport.Dialer,
 	addr string,
-) error {
+) reason.Reason {
 	start := time.Now()
 	deadline := start.Add(jf.config.Timeout)
 
@@ -231,7 +231,7 @@ func (jf *jobFactory) execDialer(
 		if certErr, ok := err.(x509.CertificateInvalidError); ok {
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 		}
-		return reason.IOFailed(err)
+		return reason.NewCustReason(err, "io", "tcp_dialer_failure")
 	}
 	defer conn.Close()
 	if jf.dataCheck == nil {

@@ -7,6 +7,7 @@ package browser
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"os"
 	"os/user"
 	"sync"
@@ -61,14 +62,14 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 	if src, ok := ss.InlineSource(); ok {
 		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
 	} else {
-		j = func(event *beat.Event) ([]jobs.Job, error) {
+		j = func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			err := ss.Fetch()
 			if err != nil {
-				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
+				return nil, reason.NewCustReason(fmt.Errorf("could not fetch for suite job: %w"), "setup", "browser_could_not_fetch_suite")
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs...)
+			sj, rea := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs...)
 			if err != nil {
-				return nil, err
+				return nil, rea
 			}
 			return sj(event)
 		}

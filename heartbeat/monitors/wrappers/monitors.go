@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"math/rand"
 	"sync"
 	"time"
@@ -65,7 +66,7 @@ func (p *persistentStateDb) updateAndGet(monitorId string, status string, start 
 		item = persistentStateItem{status: status, start: start}
 	}
 
-	if len(item.window) >= criteria.WindowSize {
+	if len(item.window) >= criteria.WindowSize && criteria.WindowSize > 0 {
 		var popped string
 		popped, item.window = item.window[0], item.window[1:]
 		if popped == "down" {
@@ -134,7 +135,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateDb
 func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool, now time.Time) jobs.JobWrapper {
 	now = time.Now()
 	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			cont, e := job(event)
 			addMonitorMetaFields(event, now, stdMonFields, isMulti)
 			return cont, e
@@ -202,7 +203,7 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.St
 
 func addMonitorStatus(monitorType string) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			cont, err := origJob(event)
 
 			fields := common.MapStr{
@@ -221,7 +222,7 @@ func addMonitorStatus(monitorType string) jobs.JobWrapper {
 
 // addMonitorDuration adds duration correctly for all non-browser jobs
 func addMonitorDuration(job jobs.Job) jobs.Job {
-	return func(event *beat.Event) ([]jobs.Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 		start := time.Now()
 
 		cont, err := job(event)
@@ -269,7 +270,7 @@ func makeAddSummary(smf stdfields.StdMonitorFields, stateDb *persistentStateDb) 
 	resetState()
 
 	return func(job jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			cont, jobErr := job(event)
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
@@ -305,7 +306,7 @@ func makeAddSummary(smf stdfields.StdMonitorFields, stateDb *persistentStateDb) 
 				tsbI, err := event.GetValue("monitor.timespan")
 				tsb := tsbI.(schedule.TimespanBounds)
 				if err != nil {
-					return nil, fmt.Errorf("could not get monitor timespan in summary: %w", err)
+					return nil, reason.NewCustReason(err, "wrapper", "could not get monitor timespan in summary")
 				}
 				stateItem := stateDb.updateAndGet(smf.ID, summaryStatus, tsb.Gte, smf.DownWhen)
 

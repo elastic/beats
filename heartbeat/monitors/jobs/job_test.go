@@ -18,6 +18,7 @@
 package jobs
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -35,18 +36,18 @@ func TestWrapAll(t *testing.T) {
 		fns  []JobWrapper
 	}
 
-	var basicJob Job = func(event *beat.Event) (jobs []Job, err error) {
+	var basicJob Job = func(event *beat.Event) (jobs []Job, r reason.Reason) {
 		eventext.MergeEventFields(event, common.MapStr{"basic": "job"})
 		return nil, nil
 	}
 
-	var contJob Job = func(event *beat.Event) (js []Job, e error) {
+	var contJob Job = func(event *beat.Event) (js []Job, r reason.Reason) {
 		eventext.MergeEventFields(event, common.MapStr{"cont": "job"})
 		return []Job{basicJob}, nil
 	}
 
 	addFoo := func(job Job) Job {
-		return func(event *beat.Event) ([]Job, error) {
+		return func(event *beat.Event) ([]Job, reason.Reason) {
 			cont, err := job(event)
 			eventext.MergeEventFields(event, common.MapStr{"foo": "bar"})
 			return cont, err
@@ -54,7 +55,7 @@ func TestWrapAll(t *testing.T) {
 	}
 
 	addBaz := func(job Job) Job {
-		return func(event *beat.Event) ([]Job, error) {
+		return func(event *beat.Event) ([]Job, reason.Reason) {
 			cont, err := job(event)
 			eventext.MergeEventFields(event, common.MapStr{"baz": "bot"})
 			return cont, err

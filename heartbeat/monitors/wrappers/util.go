@@ -18,6 +18,7 @@
 package wrappers
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"net/url"
 	"strconv"
 
@@ -36,7 +37,7 @@ func WithFields(fields common.MapStr, origJob jobs.Job) jobs.Job {
 // Fields is a JobWrapper that adds fields to a given event
 func Fields(fields common.MapStr) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			cont, err := origJob(event)
 			eventext.MergeEventFields(event, fields)
 			return cont, err

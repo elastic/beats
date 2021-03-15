@@ -6,6 +6,7 @@ package synthexec
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
@@ -17,13 +18,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func(event *beat.Event, se *SynthEvent) error
+type enricher func(event *beat.Event, se *SynthEvent) reason.Reason
 
 type streamEnricher struct {
 	je *journeyEnricher
 }
 
-func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) reason.Reason {
 	if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
 	}
@@ -38,7 +39,7 @@ type journeyEnricher struct {
 	journey         *Journey
 	checkGroup      string
 	errorCount      int
-	firstError      error
+	firstReason     reason.Reason
 	stepCount       int
 	// The first URL we visit is the URL for this journey, which is set on the summary event.
 	// We store the URL fields here for use on the summary event.
@@ -61,7 +62,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) reason.Reason {
 	if se == nil {
 		return nil
 	}
@@ -71,7 +72,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 		// Record start and end so we can calculate journey duration accurately later
 		switch se.Type {
 		case "journey/start":
-			je.firstError = nil
+			je.firstReason = nil
 			je.journey = se.Journey
 			je.start = event.Timestamp
 		case "journey/end":
@@ -99,7 +100,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	return je.enrichSynthEvent(event, se)
 }
 
-func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) reason.Reason {
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
@@ -122,19 +123,19 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		}
 	}
 
-	var jobErr error
+	var jobReason reason.Reason
 	if se.Error != nil {
-		jobErr = stepError(se.Error)
+		jobReason = stepReason(se.Error)
 		je.errorCount++
-		if je.firstError == nil {
-			je.firstError = jobErr
+		if je.firstReason == nil {
+			je.firstReason = jobReason
 		}
 	}
 
-	return jobErr
+	return jobReason
 }
 
-func (je *journeyEnricher) createSummary(event *beat.Event) error {
+func (je *journeyEnricher) createSummary(event *beat.Event) reason.Reason {
 	var up, down int
 	if je.errorCount > 0 {
 		up = 0
@@ -161,12 +162,14 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 				"down": down,
 			},
 		})
-		return je.firstError
+		return je.firstReason
 	}
 
-	return fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
+	err := fmt.Errorf("journey did not finish executing, %d steps ran", je.stepCount)
+	return reason.NewCustReason(err, "io", "journey_did_not_finish_executing")
 }
 
-func stepError(e *SynthError) error {
-	return fmt.Errorf("error executing step: %s", e.String())
+func stepReason(e *SynthError) reason.Reason {
+	err :=  fmt.Errorf("error executing step: %s", e.String())
+	return reason.NewCustReason(err, "io", "suite_step_error")
 }

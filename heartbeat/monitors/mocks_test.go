@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"regexp"
 	"sync"
 	"testing"
@@ -129,7 +130,7 @@ func mockEventCustomFields() map[string]interface{} {
 }
 
 func createMockJob() ([]jobs.Job, error) {
-	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
+	j := jobs.MakeSimpleJob(func(event *beat.Event) reason.Reason {
 		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})

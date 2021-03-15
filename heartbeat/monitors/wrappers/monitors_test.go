@@ -19,6 +19,7 @@ package wrappers
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/reason"
 	"net/url"
 	"testing"
 
@@ -142,8 +143,8 @@ func TestJobWithServiceName(t *testing.T) {
 }
 
 func TestErrorJob(t *testing.T) {
-	errorJob := func(event *beat.Event) ([]jobs.Job, error) {
-		return nil, fmt.Errorf("myerror")
+	errorJob := func(event *beat.Event) ([]jobs.Job, reason.Reason) {
+		return nil, reason.NewCustReason(fmt.Errorf("myerror"), "test", "test")
 	}
 
 	errorJobValidator := lookslike.Compose(
@@ -210,13 +211,13 @@ func TestMultiJobConts(t *testing.T) {
 	uniqScope := isdef.ScopedIsUnique()
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
 			u, err := url.Parse(u)
 			require.NoError(t, err)
 			eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
 			return []jobs.Job{
-				func(event *beat.Event) ([]jobs.Job, error) {
+				func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 					eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
 					eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
 					return nil, nil
@@ -268,14 +269,14 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 	uniqScope := isdef.ScopedIsUnique()
 
 	makeContJob := func(t *testing.T, u string) jobs.Job {
-		return func(event *beat.Event) ([]jobs.Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 			eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
 			eventext.CancelEvent(event)
 			u, err := url.Parse(u)
 			require.NoError(t, err)
 			eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
 			return []jobs.Job{
-				func(event *beat.Event) ([]jobs.Job, error) {
+				func(event *beat.Event) ([]jobs.Job, reason.Reason) {
 					eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
 					eventext.MergeEventFields(event, common.MapStr{"url": URLFields(u)})
 					return nil, nil
@@ -336,7 +337,7 @@ func TestMultiJobContsCancelledEvents(t *testing.T) {
 func makeURLJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
-	return func(event *beat.Event) (i []jobs.Job, e error) {
+	return func(event *beat.Event) (i []jobs.Job, e reason.Reason) {
 		eventext.MergeEventFields(event, common.MapStr{"url": URLFields(parsed)})
 		return nil, nil
 	}
@@ -362,7 +363,7 @@ func summaryValidator(up int, down int) validator.Validator {
 func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
-	return func(event *beat.Event) (i []jobs.Job, e error) {
+	return func(event *beat.Event) (i []jobs.Job, r reason.Reason) {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
@@ -419,7 +420,7 @@ var suiteBrowserJobValues = struct {
 func makeSuiteBrowserJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
-	return func(event *beat.Event) (i []jobs.Job, e error) {
+	return func(event *beat.Event) (i []jobs.Job, r reason.Reason) {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
