@@ -80,6 +80,10 @@
           type: date_range
           description: >
             Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+        - name: timespan_length
+          type: integer
+          description: >
+            Total duration, in seconds, timespan applies to
 
 - key: summary
   title: "Monitor summary"
@@ -97,6 +101,39 @@
           type: integer
           description: >
             The number of endpoints that failed
+        - name: status
+          type: keyword
+          description: Up or down across all checks in group
+
+- key: segment
+  title: "Monitor segment"
+  description:
+  fields:
+    - name: segment
+      type: group
+      fields:
+        - name: status
+          type: keyword
+          description: up or down
+        - name: start
+          type: date
+          description: >
+            Timestamp matching the lower bound of the timespan
+            of the first event where the event status changed.
+            Useful for grouping errors.
+        - name: duration
+          type: integer
+          description: >
+            Total duration, in seconds, this status segment has been active
+        - window:
+          type: group
+          fields:
+            - name: up
+              type: integer
+            - name: down
+              type: integer
+            - name: ratio
+              type: float
 
 - key: resolve
   title: "Host lookup"

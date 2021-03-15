@@ -1,194 +1,197 @@
-################### Heartbeat Configuration Example #########################
-
-# This file is an example configuration file highlighting only some common options.
-# The heartbeat.reference.yml file in the same directory contains all the supported options
-# with detailed comments. You can use it for reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/heartbeat/index.html
-
-############################# Heartbeat ######################################
-
-# Define a directory to load monitor definitions from. Definitions take the form
-# of individual yaml files.
+---
 heartbeat.config.monitors:
-  # Directory + glob pattern to search for configuration files
-  path: ${path.config}/monitors.d/*.yml
-  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  path: "${path.config}/monitors.d/*.yml"
   reload.enabled: false
-  # How often to check for changes
   reload.period: 5s
-
-# Configure monitors inline
+heartbeat.synthetic_suites:
+- name: Todos suite
+  path: "/home/andrewvc/projects/synthetics/examples/todos"
+  schedule: "@every 1m"
 heartbeat.monitors:
 - type: http
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
-  id: my-monitor
-  # Human readable display name for this service in Uptime UI and elsewhere
-  name: My Monitor
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-  # Configure task schedule
-  schedule: '@every 10s'
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service.name: my-apm-service-name
-
-# ======================= Elasticsearch template setting =======================
-
+  id: elastic-co
+  name: Elastic Homepage
+  urls:
+  - https://www.elastic.co
+  schedule: "@every 60s"
+  mode: all
+  ipv6: false
+  tags:
+  - org:elastic
+- type: http
+  id: elastic-co-404
+  name: Elastic 404
+  urls:
+  - https://www.elastic.co/i/am/not/a/realpagebutactually/a/404
+  schedule: "@every 60s"
+  mode: all
+  ipv6: false
+  tags:
+  - org:elastic
+  response.include_body_max_bytes: 101024
+- type: http
+  id: elastic-observability
+  name: Elastic Forums
+  urls:
+  - https://www.elastic.co/observability
+  schedule: "@every 60s"
+  tags:
+  - org:elastic
+- type: http
+  id: ir-elastic-co
+  name: Elastic Investor Relations
+  urls:
+  - https://ir.elastic.co
+  schedule: "@every 60s"
+  tags:
+  - org:elastic
+- type: http
+  id: elastic-community
+  name: Elastic Community
+  urls:
+  - https://community.elastic.co
+  schedule: "@every 5m"
+  tags:
+  - org:elastic
+- type: http
+  id: elastic-training
+  name: Elastic Training
+  urls:
+  - https://training.elastic.co
+  schedule: "@every 5m"
+  tags:
+  - org:elastic
+- type: http
+  id: hacker-news
+  name: Hacker News
+  urls:
+  - http://news.ycombinator.com
+  schedule: "@every 30s"
+- type: http
+  id: nytimes
+  name: New York Times
+  urls:
+  - https://nytimes.com
+  schedule: "@every 30s"
+- type: http
+  id: google-homepage
+  name: Google Homepage
+  urls: https://www.google.com
+  tags:
+  - org:google
+  schedule: "@every 30s"
+- type: http
+  id: youtube-homepage
+  name: Youtube Homepage
+  urls: https://www.youtube.com
+  tags:
+  - org:google
+  schedule: "@every 30s"
+- type: http
+  id: android-homepage
+  name: Android Homepage
+  urls: https://www.android.com
+  tags:
+  - org:google
+  schedule: "@every 30s"
+- type: icmp
+  id: google-dns
+  name: Google DNS
+  hosts:
+  - 8.8.8.8
+  schedule: "@every 30s"
+  tags:
+  - service:dns
+  - org:google
+- type: icmp
+  name: Cloudflare DNS
+  hosts:
+  - 1.1.1.1
+  schedule: "@every 30s"
+  tags:
+  - service:dns
+  - org:cloudflare
+- type: tcp
+  id: gmail-smtp
+  name: GMail SMTP
+  hosts:
+  - smtp.gmail.com:587
+  schedule: "@every 30s"
+  tags:
+  - service:smtp
+  - org:google
+- type: tcp
+  id: o365-smtp
+  name: Office 365 SMTP
+  hosts:
+  - smtp.office365.com:587
+  schedule: "@every 30s"
+  tags:
+  - service:smtp
+  - org:microsoft
+- type: http
+  id: example.net
+  urls:
+  - https://example.net
+  schedule: "@every 30s"
+  mode: all
+  ipv6: false
+- type: tcp
+  hosts:
+  - localhost:18278
+  id: always-down
+  name: Always Down Local Port
+  schedule: "@every 30s"
+- type: http
+  urls:
+  - https://www.cloudflare.com
+  id: cloudflare-home
+  name: Cloudflare Homepage
+  schedule: "@every 30s"
+  tags:
+  - org:cloudflare
+- type: http
+  urls:
+  - https://developers.cloudflare.com
+  id: cloudflare-developers
+  name: Cloudflare Developers
+  schedule: "@every 30s"
+  tags:
+  - org:cloudflare
+- type: http
+  urls:
+  - https://blog.cloudflare.com
+  id: cloudflare-blog
+  name: Cloudflare Blog
+  schedule: "@every 30s"
+  tags:
+  - org:cloudflare
+- type: http
+  urls:
+  - https://expired.badssl.com/
+  id: expired-badssl
+  name: BadSSL Expired
+  schedule: "@every 30s"
+  tags:
+  - org:badssl
+- type: http
+  urls:
+  - https://wrong.host.badssl.com/
+  id: badhost-badssl
+  name: BadSSL Wrong Host
+  schedule: "@every 30s"
+  tags:
+  - org:badssl
+processors:
+- add_observer_metadata:
+    geo:
+      name: nyc
+      location: 44.986656, -93.258133
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
-  #_source.enabled: false
-
-# ================================== General ===================================
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published.
-#tags: ["service-X", "web-tier"]
-
-# Optional fields that you can specify to add additional information to the
-# output.
-#fields:
-#  env: staging
-
-
-# =================================== Kibana ===================================
-
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
-# This requires a Kibana endpoint configuration.
-setup.kibana:
-
-  # Kibana Host
-  # Scheme and port can be left out and will be set to the default (http and 5601)
-  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
-
-  # Kibana Space ID
-  # ID of the Kibana Space into which the dashboards should be loaded. By default,
-  # the Default Space will be used.
-  #space.id:
-
-# =============================== Elastic Cloud ================================
-
-# These settings simplify using Heartbeat with the Elastic Cloud (https://cloud.elastic.co/).
-
-# The cloud.id setting overwrites the `output.elasticsearch.hosts` and
-# `setup.kibana.host` options.
-# You can find the `cloud.id` in the Elastic Cloud web UI.
-#cloud.id:
-
-# The cloud.auth setting overwrites the `output.elasticsearch.username` and
-# `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
-#cloud.auth:
-
-# ================================== Outputs ===================================
-
-# Configure what output to use when sending the data collected by the beat.
-
-# ---------------------------- Elasticsearch Output ----------------------------
+setup.kibana: 
 output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
-
-  # Protocol - either `http` (default) or `https`.
-  #protocol: "https"
-
-  # Authentication credentials - either API key or username/password.
-  #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
-
-# ------------------------------ Logstash Output -------------------------------
-#output.logstash:
-  # The Logstash hosts
-  #hosts: ["localhost:5044"]
-
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
-# ================================= Processors =================================
-
-processors:
-  - add_observer_metadata:
-      # Optional, but recommended geo settings for the location Heartbeat is running in
-      #geo:
-        # Token describing this location
-        #name: us-east-1a
-        # Lat, Lon "
-        #location: "37.926868, -78.024902"
-
-
-# ================================== Logging ===================================
-
-# Sets log level. The default log level is info.
-# Available log levels are: error, warning, info, debug
-#logging.level: debug
-
-# At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publisher", "service".
-#logging.selectors: ["*"]
-
-# ============================= X-Pack Monitoring ==============================
-# Heartbeat can export internal metrics to a central Elasticsearch monitoring
-# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
-# reporting is disabled by default.
-
-# Set to true to enable the monitoring reporter.
-#monitoring.enabled: false
-
-# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Heartbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
-# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
-#monitoring.cluster_uuid:
-
-# Uncomment to send the metrics to Elasticsearch. Most settings from the
-# Elasticsearch output are accepted here as well.
-# Note that the settings should point to your Elasticsearch *monitoring* cluster.
-# Any setting that is not set is automatically inherited from the Elasticsearch
-# output configuration, so if you have the Elasticsearch output configured such
-# that it is pointing to your Elasticsearch monitoring cluster, you can simply
-# uncomment the following line.
-#monitoring.elasticsearch:
-
-# ============================== Instrumentation ===============================
-
-# Instrumentation support for the heartbeat.
-#instrumentation:
-    # Set to true to enable instrumentation of heartbeat.
-    #enabled: false
-
-    # Environment in which heartbeat is running on (eg: staging, production, etc.)
-    #environment: ""
-
-    # APM Server hosts to report instrumentation results to.
-    #hosts:
-    #  - http://localhost:8200
-
-    # API Key for the APM Server(s).
-    # If api_key is set then secret_token will be ignored.
-    #api_key:
-
-    # Secret token for the APM Server(s).
-    #secret_token:
-
-
-# ================================= Migration ==================================
-
-# This allows to enable 6.7 migration aliases
-#migration.6_to_7.enabled: true
-
+  hosts: localhost:9200
+  username: elastic
+  password: changeme

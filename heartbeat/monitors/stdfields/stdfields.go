@@ -35,6 +35,11 @@ type ServiceFields struct {
 	Name string `config:"name"`
 }
 
+type DownCriteria struct {
+	NumDown int `config:"down"`
+	WindowSize int `config:"window_size"`
+}
+
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
 	ID                string `config:"id"`
@@ -45,6 +50,7 @@ type StdMonitorFields struct {
 	Timeout           time.Duration `config:"timeout"`
 	Service           ServiceFields `config:"service"`
 	LegacyServiceName string        `config:"service_name"`
+	DownWhen		  DownCriteria  `config:"down_when"`
 	Enabled           bool          `config:"enabled"`
 }
 
@@ -66,6 +72,13 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 		if smf.Service.Name == "" {
 			smf.Service.Name = smf.LegacyServiceName
 		}
+	}
+
+	if smf.DownWhen.NumDown < 1 {
+		smf.DownWhen.NumDown = 2
+	}
+	if smf.DownWhen.WindowSize == 0 {
+		smf.DownWhen.WindowSize = 10
 	}
 
 	if !smf.Enabled {

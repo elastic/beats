@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
+* <<exported-fields-segment>>
 * <<exported-fields-socks5>>
 * <<exported-fields-summary>>
 * <<exported-fields-synthetics>>
@@ -321,6 +322,16 @@ Time range this ping reported starting at the instant the check was started, end
 
 
 type: date_range
+
+--
+
+*`monitor.timespan_length`*::
++
+--
+Total duration, in seconds, timespan applies to
+
+
+type: integer
 
 --
 
@@ -9646,6 +9657,42 @@ type: long
 
 --
 
+[[exported-fields-segment]]
+== Monitor segment fields
+
+None
+
+
+
+*`segment.status`*::
++
+--
+up or down
+
+type: keyword
+
+--
+
+*`segment.start`*::
++
+--
+Timestamp matching the lower bound of the timespan of the first event where the event status changed. Useful for grouping errors.
+
+
+type: date
+
+--
+
+*`segment.duration`*::
++
+--
+Total duration, in seconds, this status segment has been active
+
+
+type: integer
+
+--
+
 [[exported-fields-socks5]]
 == SOCKS5 proxy fields
 
@@ -9711,6 +9758,15 @@ The number of endpoints that failed
 
 
 type: integer
+
+--
+
+*`summary.status`*::
++
+--
+Up or down across all checks in group
+
+type: keyword
 
 --
 

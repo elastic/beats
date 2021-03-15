@@ -37,17 +37,74 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+type Status int
+type persistentStateItem struct {
+	status string
+	start time.Time
+	window []string
+	numDown int
+}
+
+type persistentStateDb struct {
+	store map[string]persistentStateItem
+	mtx sync.Mutex
+}
+
+func newPersistentStateDb() *persistentStateDb {
+	return &persistentStateDb{
+		store: map[string]persistentStateItem{},
+		mtx: sync.Mutex{},
+	}
+}
+
+func (p *persistentStateDb) updateAndGet(monitorId string, status string, start time.Time, criteria stdfields.DownCriteria) persistentStateItem {
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+	item, ok := p.store[monitorId]
+	if !ok {
+		item = persistentStateItem{status: status, start: start}
+	}
+
+	if len(item.window) >= criteria.WindowSize {
+		var popped string
+		popped, item.window = item.window[0], item.window[1:]
+		if popped == "down" {
+			item.numDown--
+		}
+	}
+
+	item.window = append(item.window, status)
+
+	numDown := 0
+	segmentStatus := "up"
+	if status == "down" {
+		item.numDown++
+	}
+	if numDown >= criteria.NumDown {
+		segmentStatus = "down"
+	}
+
+	if item.status != segmentStatus {
+		item.start = start
+		item.status = segmentStatus
+	}
+
+	p.store[monitorId] = item
+	return item
+}
+
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	stateDb := newPersistentStateDb()
 	if stdMonFields.Type == "browser" {
-		return WrapBrowser(js, stdMonFields)
+		return WrapBrowser(js, stdMonFields, stateDb)
 	} else {
-		return WrapLightweight(js, stdMonFields)
+		return WrapLightweight(js, stdMonFields, stateDb)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateDb *persistentStateDb) []jobs.Job {
 	return jobs.WrapEachRun(
 		jobs.WrapAll(
 			js,
@@ -58,14 +115,14 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			return addMonitorMeta(stdMonFields, len(js) > 1, time.Now())
 		},
 		func() jobs.JobWrapper {
-			return makeAddSummary(stdMonFields)
+			return makeAddSummary(stdMonFields, stateDb)
 		})
 }
 
 // WrapBrowser is pretty minimal in terms of fields added. The browser monitor
 // type handles most of the fields directly, since it runs multiple jobs in a single
 // run it needs to take this task on in a unique way.
-func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateDb *persistentStateDb) []jobs.Job {
 	return jobs.WrapAll(
 		js,
 		addMonitorMeta(stdMonFields, len(js) > 1, time.Now()),
@@ -116,21 +173,13 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.St
 	tsb := schedule.Timespan(started, smf.ParsedSchedule)
 	tg := tsb.ShortString()
 
-	tcUnix := tsb.Gte.Unix()
-	minuteChunk := tcUnix - (tcUnix % 60)           // minute res
-	fiveMinuteChunk := tcUnix - (tcUnix % (60 * 5)) // 5m res
-	hourChunk := tcUnix - (tcUnix % (60 * 60))      // hour res
-
 	fieldsToMerge := common.MapStr{
 		"monitor": common.MapStr{
 			"id":           id,
 			"name":         name,
 			"type":         smf.Type,
 			"timespan":     tsb,
-			"1m_chunk":     minuteChunk,
-			"5m_chunk":     fiveMinuteChunk,
-			"minute_chunk": minuteChunk,
-			"hour_chunk":   hourChunk,
+			"timespan_length": tsb.Lt.Sub(tsb.Gte).Seconds(),
 			"time_group":   tg,
 			"check_group":  fmt.Sprintf("%s-%s-%x", id, tg, runId),
 		},
@@ -191,7 +240,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
+func makeAddSummary(smf stdfields.StdMonitorFields, stateDb *persistentStateDb) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -248,10 +297,34 @@ func makeAddSummary(smf stdfields.StdMonitorFields) jobs.JobWrapper {
 				up := state.up
 				down := state.down
 
+				summaryStatus := "up"
+				if down > 0 {
+					summaryStatus = "down"
+				}
+
+				tsbI, err := event.GetValue("monitor.timespan")
+				tsb := tsbI.(schedule.TimespanBounds)
+				if err != nil {
+					return nil, fmt.Errorf("could not get monitor timespan in summary: %w", err)
+				}
+				stateItem := stateDb.updateAndGet(smf.ID, summaryStatus, tsb.Gte, smf.DownWhen)
+
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
 						"up":   up,
 						"down": down,
+						"status": summaryStatus,
+					},
+					"segment": common.MapStr{
+						"status": stateItem.status,
+						"start": stateItem.start,
+						// Coerce to int to align source with the indexed value
+						"duration": int(tsb.Lt.Sub(stateItem.start).Seconds()),
+						"window": common.MapStr{
+							"up": len(stateItem.window) - stateItem.numDown,
+							"down": stateItem.numDown,
+							"ratio": float32(len(stateItem.window) - stateItem.numDown)/float32(len(stateItem.window)),
+						},
 					},
 				})
 			}
