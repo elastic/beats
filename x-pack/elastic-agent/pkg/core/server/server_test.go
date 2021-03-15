@@ -766,7 +766,15 @@ func (*SleepAction) Execute(ctx context.Context, request map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("sleep param must be a number")
 	}
-	<-time.After(time.Duration(sleep))
+	timer := time.NewTimer(time.Duration(sleep))
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-timer.C:
+	}
+
 	return map[string]interface{}{}, nil
 }
 

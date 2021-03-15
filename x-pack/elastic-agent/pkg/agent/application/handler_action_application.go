@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-const defaultActionTimeout = 1 * time.Minute
+const defaultActionTimeout = time.Minute
 
 type handlerAppAction struct {
 	log *logger.Logger
@@ -60,7 +60,7 @@ func readMapString(m map[string]interface{}, key string, def string) string {
 	}
 
 	if v, ok := m[key]; ok {
-		if s, ok := v.(string); ok {
+		if s, ok := v.(string); ok && s != "" {
 			return s
 		}
 	}

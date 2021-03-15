@@ -43,10 +43,6 @@ const (
 	WatchdogCheckLoop = 5 * time.Second
 )
 
-const (
-	inputTypesKey = "input_types"
-)
-
 var (
 	// ErrApplicationAlreadyRegistered returned when trying to register an application more than once.
 	ErrApplicationAlreadyRegistered = errors.New("application already registered", errors.TypeApplication)
