@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
@@ -179,13 +180,13 @@ func (a *ActionSettings) String() string {
 
 // ActionApp is the application action request.
 type ActionApp struct {
-	ActionID    string          `json:"id"`
-	ActionType  string          `json:"type"`
-	InputType   string          `json:"input_type"`
-	Data        json.RawMessage `json:"data"`
-	StartedAt   string          `json:"started_at,omitempty"`
-	CompletedAt string          `json:"completed_at,omitempty"`
-	Error       string          `json:"error,omitempty"`
+	ActionID    string          `json:"id" struct:"id"`
+	ActionType  string          `json:"type" struct:"type"`
+	InputType   string          `json:"input_type" struct:"input_type"`
+	Data        json.RawMessage `json:"data" struct:"data"`
+	StartedAt   string          `json:"started_at,omitempty" struct:"started_at,omitempty"`
+	CompletedAt string          `json:"completed_at,omitempty" struct:"completed_at,omitempty"`
+	Error       string          `json:"error,omitempty" struct:"error,omitempty"`
 }
 
 func (a *ActionApp) String() string {
@@ -212,11 +213,7 @@ func (a *ActionApp) Type() string {
 // MarshalMap marshals ActionApp into a corresponding map
 func (a *ActionApp) MarshalMap() (map[string]interface{}, error) {
 	var res map[string]interface{}
-	b, err := json.Marshal(a)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &res)
+	err := typeconv.Convert(&res, a)
 	return res, err
 }
 
