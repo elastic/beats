@@ -18,10 +18,9 @@
 package jsontransform
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/hashicorp/go-multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,6 +29,12 @@ import (
 
 const (
 	iso8601 = "2006-01-02T15:04:05.000Z0700"
+)
+
+var (
+	// ErrParseTimestamp is returned when parsing of a @timestamp field fails.
+	// Supported formats: ISO8601, RFC3339
+	ErrParseTimestamp = errors.New("failed to parse @timestamp, unknown format")
 )
 
 // WriteJSONKeys writes the json keys to the given event based on the overwriteKeys option and the addErrKey
@@ -123,16 +128,14 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 		iso8601,
 	}
 
-	var err error
 	for _, f := range validFormats {
 		ts, parseErr := time.Parse(f, timestamp)
 		if parseErr != nil {
-			err = multierror.Append(err, parseErr)
 			continue
 		}
 
 		return ts, nil
 	}
 
-	return time.Now(), err
+	return time.Time{}, ErrParseTimestamp
 }
