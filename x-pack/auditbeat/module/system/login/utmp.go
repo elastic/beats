@@ -221,7 +221,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 		// This will be the usual case, but we do not want to seek with the stored offset
 		// if the saved size is smaller than the current one.
-		if size >= oldSize {
+		if size >= oldSize && utmpFile.Offset <= size {
 			_, err = f.Seek(utmpFile.Offset, 0)
 			if err != nil {
 				errorC <- errors.Wrapf(err, "error setting offset %d for file %v", utmpFile.Offset, utmpFile.Path)
@@ -230,7 +230,7 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 		// If the saved size is smaller than the current one, or the previous Seek failed,
 		// we retry one more time, this time resetting to the beginning of the file.
-		if size < oldSize || err != nil {
+		if size < oldSize || utmpFile.Offset > size || err != nil {
 			_, err = f.Seek(0, 0)
 			if err != nil {
 				errorC <- errors.Wrapf(err, "error setting offset 0 for file %v", utmpFile.Path)
