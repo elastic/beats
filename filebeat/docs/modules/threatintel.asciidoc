@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 [role="xpack"]
 
 :modulename: threatintel
-:has-dashboards: false
+:has-dashboards: true
 
 == Threat Intel module
 beta[]
@@ -24,6 +24,7 @@ The available filesets are:
 
 * `abuseurl`: Supports URL entities from Abuse.ch.
 * `abusemalware`: Supports Malware/Payload entities from Abuse.ch.
+* `malwarebazaar`: Supports gathering threat intel attributes from Malware Bazaar.
 * `misp`: Supports gathering threat intel attributes from MISP (replaces MISP module).
 * `otx`: Supports gathering threat intel attributes from AlientVault OTX.
 * `anomali`: Supports gathering threat intel attributes from Anomali.
@@ -107,6 +108,66 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 | sha256_hash                | threatintel.indicator.file.hash.sha256
 | file_size                  | threatintel.indicator.file.size
 |================================================================
+
+[float]
+==== `malwarebazaar` fileset settings
+
+This fileset contacts the Malware Bazaar API and fetches all new malicious indicators found
+the last 60 minutes.
+
+To configure the module, please utilize the default URL unless specified as the
+example below:
+
+[source,yaml]
+----
+- module: threatintel
+  malwarebazaar:
+    enabled: true
+    var.input: httpjson
+    var.url: https://mb-api.abuse.ch/api/v1/
+    var.interval: 10m
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.url`*::
+
+The URL of the API endpoint to connect with.
+
+*`var.interval`*::
+
+How often the API is polled for updated information.
+
+Malware Bazaar Threat Intel is mapped to the following ECS fields.
+
+[options="header"]
+|==============================================================
+| Threat Intel Fields        | ECS Fields
+| first_seen                 | threatintel.indicator.first_seen
+| last_seen                  | threatintel.indicator.last_seen
+| file_name                  | threatintel.indicator.file.name
+| file_type_mime             | threatintel.indicator.file.mime_type
+| reporter                   | threatintel.indicator.provider
+| origin_country             | threatintel.indicator.geo.country_iso_code
+| signature                  | threatintel.indicator.signature
+| code_sign.subject_cn       | threatintel.indicator.file.x509.subject.common_name
+| code_sign.issuer_cn        | threatintel.indicator.file.x509.issuer.common_name
+| code_sign.valid_from       | threatintel.indicator.file.x509.not_before
+| code_sign.valid_to         | threatintel.indicator.file.x509.not_after
+| code_sign.algorithm        | threatintel.indicator.file.x509.public_key_algorithm
+| code_sign.serial_number    | threatintel.indicator.file.x509.serial_number
+| file_size                  | threatintel.indicator.file.size
+| file_type                  | threatintel.indicator.file.extension
+| md5_hash                   | threatintel.indicator.file.hash.md5
+| sha256_hash                | threatintel.indicator.file.hash.sha256
+| sha1_hash                  | threatintel.indicator.file.hash.sha1
+| imphash                    | threatintel.indicator.file.pe.imphash
+| ssdeep                     | threatintel.indicator.file.hash.ssdeep
+| tlsh                       | threatintel.indicator.file.hash.tlsh
+|==============================================================
+
+[role="screenshot"]
+image::./images/filebeat-aws-cloudtrail.png[]
 
 [float]
 ==== `misp` fileset settings
@@ -349,4 +410,3 @@ Anomali Threat Intel is mapped to the following ECS fields.
 
 For a description of each field in the module, see the
 <<exported-fields-threatintel,exported fields>> section.
-
