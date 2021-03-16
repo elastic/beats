@@ -2,16 +2,24 @@
 description: Pipeline for CyberArk PAS
 
 processors:
-  # ECS event.ingested
+  #
+  # Set ECS event.ingested
+  #
   - set:
         field: event.ingested
         value: '{{_ingest.timestamp}}'
 
+  #
+  # Save event.original
+  # TODO: Config flag.
+  #
   - rename:
       field: message
       target_field: event.original
 
+  #
   # Parse syslog headers (if any) and extract JSON payload.
+  #
   - grok:
       field: event.original
       patterns:
@@ -46,6 +54,17 @@ processors:
       on_failure:
         - fail:
             message: "unexpected event structure: {{ _ingest.on_failure_message }}"
+
+
+  #
+  # Remove all empty fields
+  #
+  - script:
+      lang: painless
+      params:
+        values: [""]
+      source: >-
+        ctx.cyberarkpas.audit.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
 
   - rename:
       field: _tmp.json.raw
