@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -388,5 +389,39 @@ func TestMaxBytesLimit(t *testing.T) {
 		if line != s {
 			t.Fatalf("lines do not match, expected: %s got: %s", line, s)
 		}
+	}
+}
+
+// test_exceed_buffer from test_harvester.py
+func TestBufferSize(t *testing.T) {
+	lines := []string{
+		"first line is too long\n",
+		"second line is too long\n",
+		"third line too long\n",
+		"OK\n",
+	}
+
+	codecFactory, _ := encoding.FindEncoding("")
+	codec, _ := codecFactory(bytes.NewBuffer(nil))
+	bufferSize := 10
+
+	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
+	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024})
+	if err != nil {
+		t.Fatal("failed to initialize reader:", err)
+	}
+
+	for i := 0; i < len(lines); i++ {
+		b, n, err := reader.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				t.Fatal("unexpected error:", err)
+			}
+		}
+
+		require.Equal(t, n, len(lines[i]))
+		require.Equal(t, string(b[:n]), lines[i])
 	}
 }

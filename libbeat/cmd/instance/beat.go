@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -1083,12 +1084,21 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path paths.Path `config:"path"`
+		Path   paths.Path `config:"path"`
+		Hostfs string     `config:"system.hostfs"`
 	}{}
+
+	if paths.IsCLISet() {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
+	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
+
+	// Read the value for hostfs as `system.hostfs`
+	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
+	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

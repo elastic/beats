@@ -9897,7 +9897,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -9910,7 +9910,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
