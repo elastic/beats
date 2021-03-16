@@ -201,6 +201,7 @@ function Get-Azure-Config-Path($powershellVersion) {
     # Get the last .settings file
     $configFileName = Get-Lastest-Settings-File($configFolder)
     $azureConfigFile = "$configFolder\$configFileName"
+    Write-Log "The latest configuration file is $azureConfigFile" "INFO"
     $configFileIsFolder = (Get-Item $azureConfigFile) -is [System.IO.DirectoryInfo]
 
     # In case of update, the n.settings file doesn't exists initially in the
