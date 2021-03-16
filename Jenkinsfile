@@ -700,7 +700,7 @@ def archiveTestOutput(Map args = [:]) {
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
     }
-    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py', returnStdout: true)
     dir('build') {
       if (isUnix()) {
         cmd(label: 'Delete folders that are causing exceptions (See JENKINS-58421)',
