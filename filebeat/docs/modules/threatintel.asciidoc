@@ -167,7 +167,7 @@ Malware Bazaar Threat Intel is mapped to the following ECS fields.
 |==============================================================
 
 [role="screenshot"]
-image::./images/filebeat-aws-cloudtrail.png[]
+image::./images/filebeat-threatintel-malware-bazaar.png[]
 
 [float]
 ==== `misp` fileset settings
