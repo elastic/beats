@@ -18,29 +18,31 @@
 package sys
 
 import (
-	"strings"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"sync"
 )
 
-// UTF16BytesToString converts the given UTF-16 bytes to a string.
-func UTF16BytesToString(b []byte) (string, error) {
-	// Use space from the ByteBuffer pool as working memory for the conversion.
-	bb := NewPooledByteBuffer()
-	defer bb.Free()
-
-	if err := common.UTF16ToUTF8Bytes(b, bb); err != nil {
-		return "", err
-	}
-
-	// This copies the UTF-8 bytes to create a string.
-	return string(bb.Bytes()), nil
+// bufferPool contains a pool of byteBuffer objects.
+var bufferPool = sync.Pool{
+	New: func() interface{} { return &PooledByteBuffer{ByteBuffer: NewByteBuffer(1024)} },
 }
 
-// RemoveWindowsLineEndings replaces carriage return line feed (CRLF) with
-// line feed (LF) and trims any newline character that may exist at the end
-// of the string.
-func RemoveWindowsLineEndings(s string) string {
-	s = strings.Replace(s, "\r\n", "\n", -1)
-	return strings.TrimRight(s, "\n")
+// byteBuffer is an expandable buffer backed by a byte slice.
+type PooledByteBuffer struct {
+	*ByteBuffer
+}
+
+// NewPooledByteBuffer return a ByteBuffer from the pool. The returned value must
+// be released with free().
+func NewPooledByteBuffer() *PooledByteBuffer {
+	b := bufferPool.Get().(*PooledByteBuffer)
+	b.Reset()
+	return b
+}
+
+// Free returns the byteBuffer to the pool.
+func (b *PooledByteBuffer) Free() {
+	if b == nil {
+		return
+	}
+	bufferPool.Put(b)
 }
