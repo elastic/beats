@@ -70,6 +70,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,
 		Namespace:    config.Namespace,
+		Selector:     config.Selector,
 		HonorReSyncs: true,
 		Instance:     config.Sharding.Instance,
 		ShardCount:   config.Sharding.Count,

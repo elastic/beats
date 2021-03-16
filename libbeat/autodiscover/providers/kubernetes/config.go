@@ -35,13 +35,14 @@ import (
 // Config for kubernetes autodiscover provider
 type Config struct {
 	KubeConfig     string        `config:"kube_config"`
-	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	// Needed when resource is a pod
-	HostDeprecated string `config:"host"`
-	Node           string `config:"node"`
+	HostDeprecated string            `config:"host"`
+	Node           string            `config:"node"`
+	Namespace      string            `config:"namespace"`
+	Selector       common.MapStr     `config:"selector"`
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`

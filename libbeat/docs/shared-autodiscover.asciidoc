@@ -217,6 +217,8 @@ The `kubernetes` autodiscover provider has the following configuration settings:
   metadata. If it is not set, the processor collects metadata from all
   namespaces. It is unset by default. The namespace configuration only applies to
   kubernetes resources that are namespace scoped.
+`selector`:: (Optional) Selector allows configuring a map of label key/value pairs based
+on which the Kubernetes objects are queried by the Kubernetes client
 `cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container, 60s by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes

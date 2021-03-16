@@ -67,6 +67,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,
+		Selector:     config.Selector,
 		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
 		Instance:     config.Sharding.Instance,

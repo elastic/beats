@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -66,6 +67,8 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
+	// Selector allows you to choose what are the labels based off of which resources need to be watched on
+	Selector common.MapStr
 	// IsUpdated allows registering a func that allows the invoker of the Watch to decide what amounts to an update
 	// vs what does not.
 	IsUpdated func(old, new interface{}) bool

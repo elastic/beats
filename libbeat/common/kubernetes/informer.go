@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
@@ -40,6 +41,18 @@ func nameSelector(options *metav1.ListOptions, name string) {
 	}
 }
 
+func labelSelector(options *metav1.ListOptions, opt WatchOptions) {
+	if len(opt.Selector) != 0 {
+		// In order to account for labels that are namespaced like kubernetes.io/fault-domain we first flatten the MapStr
+		// and then convert it to a map[string]string
+		lbls := make(map[string]string)
+		for k, v := range opt.Selector.Flatten() {
+			lbls[k] = fmt.Sprint(v)
+		}
+		options.LabelSelector = labels.Set(lbls).String()
+	}
+}
+
 // NewInformer creates an informer for a given resource
 func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (cache.SharedInformer, string, error) {
 	var objType string
@@ -52,10 +65,12 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nodeSelector(&options, opts)
+				labelSelector(&options, opts)
 				return p.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nodeSelector(&options, opts)
+				labelSelector(&options, opts)
 				return p.Watch(ctx, options)
 			},
 		}
@@ -65,9 +80,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		e := client.CoreV1().Events(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				labelSelector(&options, opts)
 				return e.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				labelSelector(&options, opts)
 				return e.Watch(ctx, options)
 			},
 		}
@@ -78,10 +95,12 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nameSelector(&options, opts.Node)
+				labelSelector(&options, opts)
 				return n.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nameSelector(&options, opts.Node)
+				labelSelector(&options, opts)
 				return n.Watch(ctx, options)
 			},
 		}
@@ -92,10 +111,12 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				nameSelector(&options, opts.Namespace)
+				labelSelector(&options, opts)
 				return ns.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				nameSelector(&options, opts.Namespace)
+				labelSelector(&options, opts)
 				return ns.Watch(ctx, options)
 			},
 		}
@@ -105,9 +126,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		d := client.AppsV1().Deployments(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				labelSelector(&options, opts)
 				return d.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				labelSelector(&options, opts)
 				return d.Watch(ctx, options)
 			},
 		}
@@ -117,9 +140,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		rs := client.AppsV1().ReplicaSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				labelSelector(&options, opts)
 				return rs.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				labelSelector(&options, opts)
 				return rs.Watch(ctx, options)
 			},
 		}
@@ -129,9 +154,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		ss := client.AppsV1().StatefulSets(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				labelSelector(&options, opts)
 				return ss.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				labelSelector(&options, opts)
 				return ss.Watch(ctx, options)
 			},
 		}
@@ -141,9 +168,11 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		svc := client.CoreV1().Services(opts.Namespace)
 		listwatch = &cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				labelSelector(&options, opts)
 				return svc.List(ctx, options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				labelSelector(&options, opts)
 				return svc.Watch(ctx, options)
 			},
 		}

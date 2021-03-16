@@ -56,6 +56,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,
+		Selector:     config.Selector,
 		HonorReSyncs: true,
 		Instance:     config.Sharding.Instance,
 		ShardCount:   config.Sharding.Count,
