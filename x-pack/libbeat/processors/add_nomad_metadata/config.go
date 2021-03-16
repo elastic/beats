@@ -40,7 +40,7 @@ func (c *nomadAnnotatorConfig) Validate() error {
 	case ScopeNode:
 	case ScopeCluster:
 	default:
-		return fmt.Errorf("invalid value for `scope`, select `%s` or `%s`: %s", ScopeNode, ScopeCluster, c.Scope)
+		return fmt.Errorf("invalid value for `scope`: %s, select `%s` or `%s`", c.Scope, ScopeNode, ScopeCluster)
 	}
 	return nil
 }
