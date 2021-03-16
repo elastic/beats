@@ -707,7 +707,7 @@ def archiveTestOutput(Map args = [:]) {
            returnStatus: true,
            script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
       } else {
-        bat(label: 'Delete ve folder', returnStatus: true, script: 'rmdir ve /s /q')
+        bat(label: 'Delete ve folder', returnStatus: true, script: 'FOR /d /r . %%d IN (ve) DO @IF EXIST "%%d" rmdir /s /q "%%d"')
       }
     }
     cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py', returnStdout: true)
