@@ -167,7 +167,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 * There are only two supported branches, master and 7.x
 */
 def getFlakyJobName() {
-  def parent = env.JOB_NAME.replaceAll(env.JOB_BASE_NAME + '$', '')
+  def parent = env.JOB_NAME - env.JOB_BASE_NAME
   if(isPR()) {
     return parent + getBranchIndice(env.CHANGE_TARGET)
   }
