@@ -2,27 +2,20 @@
     {
         "@timestamp": "2021-03-11T17:43:44.000Z",
         "cyberarkpas.audit.Action": "Retrieve SSH Key",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Retrieve SSH Key",
@@ -69,27 +62,20 @@
     {
         "@timestamp": "2021-03-11T21:08:48.000Z",
         "cyberarkpas.audit.Action": "Retrieve SSH Key",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Retrieve SSH Key",
@@ -137,27 +123,20 @@
     {
         "@timestamp": "2021-03-15T13:18:52.000Z",
         "cyberarkpas.audit.Action": "Retrieve SSH Key",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Retrieve SSH Key",

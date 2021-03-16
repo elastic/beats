@@ -1,56 +1,42 @@
 [
     {
-        "@timestamp": "2021-03-16T15:14:12.661Z",
+        "@timestamp": "2021-03-16T15:30:12.759Z",
         "cyberarkpas.audit.Action": "Window Title",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WIN-SERVER-LOCAL"
-            },
-            {
-                "Name": "UserName",
-                "Value": "Administrator2"
-            },
-            {
-                "Name": "Address",
-                "Value": "dbserver.cyberark.local"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "LogonDomain",
-                "Value": "DBServer"
-            },
-            {
-                "Name": "SequenceID",
-                "Value": "1"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "LastSuccessReconciliation",
-                "Value": "1604944215"
-            },
-            {
-                "Name": "Customer",
-                "Value": "EvilCorp"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "dbserver.cyberark.local"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.Customer": [
+            "EvilCorp"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessReconciliation": [
+            "1604944215"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.LogonDomain": [
+            "DBServer"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WIN-SERVER-LOCAL"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.SequenceID": [
+            "1"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "Administrator2"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Window Title",

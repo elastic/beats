@@ -2,35 +2,26 @@
     {
         "@timestamp": "2021-03-16T15:01:00.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "LINUX-SSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "admin2"
-            },
-            {
-                "Name": "Address",
-                "Value": "radiussrv.cyberark.local"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "CPMDisabled",
-                "Value": "No Reason"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "Customer",
-                "Value": "Tesla"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "radiussrv.cyberark.local"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMDisabled": [
+            "No Reason"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.Customer": [
+            "Tesla"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "LINUX-SSH"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "admin2"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -71,27 +62,20 @@
     {
         "@timestamp": "2021-03-11T17:38:26.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -136,27 +120,20 @@
     {
         "@timestamp": "2021-03-11T17:47:01.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -201,27 +178,20 @@
     {
         "@timestamp": "2021-03-11T17:48:40.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -266,27 +236,20 @@
     {
         "@timestamp": "2021-03-11T17:55:02.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -331,27 +294,20 @@
     {
         "@timestamp": "2021-03-11T17:56:42.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -396,27 +352,20 @@
     {
         "@timestamp": "2021-03-11T20:23:30.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -461,51 +410,38 @@
     {
         "@timestamp": "2021-03-14T13:49:54.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "ResetImmediately",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "failure"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "0"
-            },
-            {
-                "Name": "LastFailDate",
-                "Value": "1615729572"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMErrorDetails",
-                "Value": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMErrorDetails": [
+            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "failure"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastFailDate": [
+            "1615729572"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.ResetImmediately": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "0"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -550,51 +486,38 @@
     {
         "@timestamp": "2021-03-14T13:51:35.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "ResetImmediately",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "failure"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "0"
-            },
-            {
-                "Name": "LastFailDate",
-                "Value": "1615729572"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMErrorDetails",
-                "Value": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMErrorDetails": [
+            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "failure"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastFailDate": [
+            "1615729572"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.ResetImmediately": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "0"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -639,43 +562,32 @@
     {
         "@timestamp": "2021-03-15T10:33:30.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "VerifyTask"
-            },
-            {
-                "Name": "LastSuccessVerification",
-                "Value": "1615803764"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessVerification": [
+            "1615803764"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "VerifyTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -720,43 +632,32 @@
     {
         "@timestamp": "2021-03-15T10:34:50.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "VerifyTask"
-            },
-            {
-                "Name": "LastSuccessVerification",
-                "Value": "1615803764"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessVerification": [
+            "1615803764"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "VerifyTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -801,43 +702,32 @@
     {
         "@timestamp": "2021-03-15T11:12:09.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "VerifyTask"
-            },
-            {
-                "Name": "LastSuccessVerification",
-                "Value": "1615803764"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessVerification": [
+            "1615803764"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "VerifyTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -882,27 +772,20 @@
     {
         "@timestamp": "2021-03-15T13:18:36.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -947,27 +830,20 @@
     {
         "@timestamp": "2021-03-15T14:08:11.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSHKeys"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSHKeys"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -1012,59 +888,44 @@
     {
         "@timestamp": "2021-03-15T14:08:36.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "ResetImmediately",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "failure"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "0"
-            },
-            {
-                "Name": "LastFailDate",
-                "Value": "1615814025"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "LastSuccessVerification",
-                "Value": "1615803764"
-            },
-            {
-                "Name": "CPMErrorDetails",
-                "Value": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "UseSudoOnReconcile",
-                "Value": "Yes"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMErrorDetails": [
+            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "failure"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastFailDate": [
+            "1615814025"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessVerification": [
+            "1615803764"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.ResetImmediately": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "0"
+        ],
+        "cyberarkpas.audit.CAProperties.UseSudoOnReconcile": [
+            "Yes"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",
@@ -1109,59 +970,44 @@
     {
         "@timestamp": "2021-03-15T15:00:21.000Z",
         "cyberarkpas.audit.Action": "PSM Disconnect",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "UnixSSH"
-            },
-            {
-                "Name": "UserName",
-                "Value": "testark"
-            },
-            {
-                "Name": "Address",
-                "Value": "34.123.103.115"
-            },
-            {
-                "Name": "ResetImmediately",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "failure"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "1"
-            },
-            {
-                "Name": "LastFailDate",
-                "Value": "1615819476"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ReconcileTask"
-            },
-            {
-                "Name": "LastSuccessVerification",
-                "Value": "1615803764"
-            },
-            {
-                "Name": "CPMErrorDetails",
-                "Value": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "UseSudoOnReconcile",
-                "Value": "Yes"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "34.123.103.115"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMErrorDetails": [
+            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "failure"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LastFailDate": [
+            "1615819476"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessVerification": [
+            "1615803764"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "UnixSSH"
+        ],
+        "cyberarkpas.audit.CAProperties.ResetImmediately": [
+            "ReconcileTask"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "1"
+        ],
+        "cyberarkpas.audit.CAProperties.UseSudoOnReconcile": [
+            "Yes"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "testark"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "PSM Disconnect",

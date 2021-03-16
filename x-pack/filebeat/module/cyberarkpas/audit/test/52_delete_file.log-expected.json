@@ -2,27 +2,20 @@
     {
         "@timestamp": "2021-03-08T18:32:43.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinDesktopLocal"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adriansr"
-            },
-            {
-                "Name": "Address",
-                "Value": "components"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "components"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinDesktopLocal"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adriansr"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -66,31 +59,23 @@
     {
         "@timestamp": "2021-03-08T18:38:21.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinServerLocal"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adriansr"
-            },
-            {
-                "Name": "Address",
-                "Value": "components"
-            },
-            {
-                "Name": "LogonDomain",
-                "Value": "COMPONENTS"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "components"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.LogonDomain": [
+            "COMPONENTS"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinServerLocal"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adriansr"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -388,27 +373,20 @@
     {
         "@timestamp": "2021-03-11T19:32:12.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "_PSMLiveSessions_1",
-                "Value": ""
-            },
-            {
-                "Name": "_PSMLiveSessions_2",
-                "Value": ""
-            },
-            {
-                "Name": "_PSMLiveSessions_3",
-                "Value": ""
-            },
-            {
-                "Name": "_PSMLiveSessions_4",
-                "Value": ""
-            },
-            {
-                "Name": "_PSMLiveSessions_5",
-                "Value": ""
-            }
+        "cyberarkpas.audit.CAProperties._PSMLiveSessions_1": [
+            ""
+        ],
+        "cyberarkpas.audit.CAProperties._PSMLiveSessions_2": [
+            ""
+        ],
+        "cyberarkpas.audit.CAProperties._PSMLiveSessions_3": [
+            ""
+        ],
+        "cyberarkpas.audit.CAProperties._PSMLiveSessions_4": [
+            ""
+        ],
+        "cyberarkpas.audit.CAProperties._PSMLiveSessions_5": [
+            ""
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -453,27 +431,20 @@
     {
         "@timestamp": "2021-03-11T21:06:40.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinDomain"
-            },
-            {
-                "Name": "UserName",
-                "Value": "PSMConnect"
-            },
-            {
-                "Name": "Address",
-                "Value": "35.192.121.42"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "35.192.121.42"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinDomain"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "PSMConnect"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -518,19 +489,14 @@
     {
         "@timestamp": "2021-03-11T21:06:50.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "UserName",
-                "Value": "PSMConnect"
-            },
-            {
-                "Name": "Address",
-                "Value": "10.128.0.65"
-            },
-            {
-                "Name": "LogonDomain",
-                "Value": "ASR-CYBERARK-WI"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "10.128.0.65"
+        ],
+        "cyberarkpas.audit.CAProperties.LogonDomain": [
+            "ASR-CYBERARK-WI"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "PSMConnect"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -575,19 +541,14 @@
     {
         "@timestamp": "2021-03-14T12:10:17.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "UserName",
-                "Value": "PSMAdminConnect"
-            },
-            {
-                "Name": "Address",
-                "Value": "169.254.180.25"
-            },
-            {
-                "Name": "LogonDomain",
-                "Value": "VAGRANT-2012-R2"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "169.254.180.25"
+        ],
+        "cyberarkpas.audit.CAProperties.LogonDomain": [
+            "VAGRANT-2012-R2"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "PSMAdminConnect"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -632,19 +593,14 @@
     {
         "@timestamp": "2021-03-14T12:10:28.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "UserName",
-                "Value": "PSMConnect"
-            },
-            {
-                "Name": "Address",
-                "Value": "169.254.180.25"
-            },
-            {
-                "Name": "LogonDomain",
-                "Value": "VAGRANT-2012-R2"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "169.254.180.25"
+        ],
+        "cyberarkpas.audit.CAProperties.LogonDomain": [
+            "VAGRANT-2012-R2"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "PSMConnect"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -775,35 +731,26 @@
     {
         "@timestamp": "2021-03-15T15:09:00.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "Oracle"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "10.128.0.7"
-            },
-            {
-                "Name": "Port",
-                "Value": "3306"
-            },
-            {
-                "Name": "Database",
-                "Value": "test"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Database"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "10.128.0.7"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.Database": [
+            "test"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Database"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "Oracle"
+        ],
+        "cyberarkpas.audit.CAProperties.Port": [
+            "3306"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",
@@ -848,35 +795,26 @@
     {
         "@timestamp": "2021-03-15T15:13:59.000Z",
         "cyberarkpas.audit.Action": "Delete File",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "MySQL"
-            },
-            {
-                "Name": "UserName",
-                "Value": "adrian"
-            },
-            {
-                "Name": "Address",
-                "Value": "10.128.0.7"
-            },
-            {
-                "Name": "Port",
-                "Value": "3306"
-            },
-            {
-                "Name": "Database",
-                "Value": "test"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Database"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "10.128.0.7"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.Database": [
+            "test"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Database"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "MySQL"
+        ],
+        "cyberarkpas.audit.CAProperties.Port": [
+            "3306"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "adrian"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "Delete File",

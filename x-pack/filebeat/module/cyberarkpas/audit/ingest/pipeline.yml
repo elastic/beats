@@ -123,9 +123,42 @@ processors:
         - append:
             field: error.message
             value: "failed to parse timestamp field: {{ cyberarkpas.audit.Timestamp }}: {{ _ingest.on_failure_message }}"
+
+  # This script converts the nested object under cyberarkpas.audit.CAProperties.CAProperty
+  # into an object under cyberarkpas.audit.CAProperties:
+  #
+  # input:
+  # "cyberarkpas.audit.CAProperties.CAProperty": [
+  #            {
+  #                "Name": "PolicyID",
+  #                "Value": "LINUX-SSH"
+  #            },
+  #            {
+  #                "Name": "UserName",
+  #                "Value": "test12"
+  #            }
+  # output:
+  # "cyberarkpas.audit.CAProperties":
+  #            {
+  #                "PolicyID": "LINUX-SSH",
+  #                "UserName": "test12"
+  #            }
+  - foreach:
+      field: cyberarkpas.audit.CAProperties.CAProperty
+      ignore_missing: true
+      processor:
+        append:
+          field: 'cyberarkpas.audit.CAProperties.{{_ingest._value.Name}}'
+          value: '{{_ingest._value.Value}}'
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to process CAProperties array: {{ _ingest.on_failure_message }}"
+
   - remove:
       field:
        - _tmp
+       - cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
 
   - set:

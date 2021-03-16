@@ -2,63 +2,47 @@
     {
         "@timestamp": "2021-03-08T10:19:42.000Z",
         "cyberarkpas.audit.Action": "General Audit",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinDesktopLocal"
-            },
-            {
-                "Name": "UserName",
-                "Value": "x_accountB"
-            },
-            {
-                "Name": "Address",
-                "Value": "components"
-            },
-            {
-                "Name": "SequenceID",
-                "Value": "24"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ChangeTask"
-            },
-            {
-                "Name": "GroupName",
-                "Value": "WindowsGroup"
-            },
-            {
-                "Name": "LastSuccessChange",
-                "Value": "1614868762"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "Index",
-                "Value": "2"
-            },
-            {
-                "Name": "DualAccountStatus",
-                "Value": "Active"
-            },
-            {
-                "Name": "VirtualUsername",
-                "Value": "virtual"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "components"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.DualAccountStatus": [
+            "Active"
+        ],
+        "cyberarkpas.audit.CAProperties.GroupName": [
+            "WindowsGroup"
+        ],
+        "cyberarkpas.audit.CAProperties.Index": [
+            "2"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessChange": [
+            "1614868762"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ChangeTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinDesktopLocal"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.SequenceID": [
+            "24"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "x_accountB"
+        ],
+        "cyberarkpas.audit.CAProperties.VirtualUsername": [
+            "virtual"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "General Audit",
@@ -102,63 +86,47 @@
     {
         "@timestamp": "2021-03-10T14:38:57.000Z",
         "cyberarkpas.audit.Action": "General Audit",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinDesktopLocal"
-            },
-            {
-                "Name": "UserName",
-                "Value": "x_accountA"
-            },
-            {
-                "Name": "Address",
-                "Value": "components"
-            },
-            {
-                "Name": "SequenceID",
-                "Value": "27"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ChangeTask"
-            },
-            {
-                "Name": "GroupName",
-                "Value": "WindowsGroup"
-            },
-            {
-                "Name": "LastSuccessChange",
-                "Value": "1615231204"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "Index",
-                "Value": "1"
-            },
-            {
-                "Name": "DualAccountStatus",
-                "Value": "Active"
-            },
-            {
-                "Name": "VirtualUsername",
-                "Value": "virtual"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "components"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.DualAccountStatus": [
+            "Active"
+        ],
+        "cyberarkpas.audit.CAProperties.GroupName": [
+            "WindowsGroup"
+        ],
+        "cyberarkpas.audit.CAProperties.Index": [
+            "1"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessChange": [
+            "1615231204"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ChangeTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinDesktopLocal"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.SequenceID": [
+            "27"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "x_accountA"
+        ],
+        "cyberarkpas.audit.CAProperties.VirtualUsername": [
+            "virtual"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "General Audit",
@@ -202,63 +170,47 @@
     {
         "@timestamp": "2021-03-14T11:48:26.000Z",
         "cyberarkpas.audit.Action": "General Audit",
-        "cyberarkpas.audit.CAProperties.CAProperty": [
-            {
-                "Name": "PolicyID",
-                "Value": "WinDesktopLocal"
-            },
-            {
-                "Name": "UserName",
-                "Value": "x_accountB"
-            },
-            {
-                "Name": "Address",
-                "Value": "components"
-            },
-            {
-                "Name": "SequenceID",
-                "Value": "25"
-            },
-            {
-                "Name": "CPMStatus",
-                "Value": "success"
-            },
-            {
-                "Name": "RetriesCount",
-                "Value": "-1"
-            },
-            {
-                "Name": "LastTask",
-                "Value": "ChangeTask"
-            },
-            {
-                "Name": "GroupName",
-                "Value": "WindowsGroup"
-            },
-            {
-                "Name": "LastSuccessChange",
-                "Value": "1615419568"
-            },
-            {
-                "Name": "CreationMethod",
-                "Value": "PVWA"
-            },
-            {
-                "Name": "DeviceType",
-                "Value": "Operating System"
-            },
-            {
-                "Name": "Index",
-                "Value": "2"
-            },
-            {
-                "Name": "DualAccountStatus",
-                "Value": "Active"
-            },
-            {
-                "Name": "VirtualUsername",
-                "Value": "virtual"
-            }
+        "cyberarkpas.audit.CAProperties.Address": [
+            "components"
+        ],
+        "cyberarkpas.audit.CAProperties.CPMStatus": [
+            "success"
+        ],
+        "cyberarkpas.audit.CAProperties.CreationMethod": [
+            "PVWA"
+        ],
+        "cyberarkpas.audit.CAProperties.DeviceType": [
+            "Operating System"
+        ],
+        "cyberarkpas.audit.CAProperties.DualAccountStatus": [
+            "Active"
+        ],
+        "cyberarkpas.audit.CAProperties.GroupName": [
+            "WindowsGroup"
+        ],
+        "cyberarkpas.audit.CAProperties.Index": [
+            "2"
+        ],
+        "cyberarkpas.audit.CAProperties.LastSuccessChange": [
+            "1615419568"
+        ],
+        "cyberarkpas.audit.CAProperties.LastTask": [
+            "ChangeTask"
+        ],
+        "cyberarkpas.audit.CAProperties.PolicyID": [
+            "WinDesktopLocal"
+        ],
+        "cyberarkpas.audit.CAProperties.RetriesCount": [
+            "-1"
+        ],
+        "cyberarkpas.audit.CAProperties.SequenceID": [
+            "25"
+        ],
+        "cyberarkpas.audit.CAProperties.UserName": [
+            "x_accountB"
+        ],
+        "cyberarkpas.audit.CAProperties.VirtualUsername": [
+            "virtual"
         ],
         "cyberarkpas.audit.Category": "",
         "cyberarkpas.audit.Desc": "General Audit",
