@@ -45,7 +45,8 @@
             "virtual"
         ],
         "cyberarkpas.audit.Desc": "General Audit",
-        "cyberarkpas.audit.ExtraDetails": "DualAccountStatus=Active;Index=2;",
+        "cyberarkpas.audit.ExtraDetails.DualAccountStatus": "Active",
+        "cyberarkpas.audit.ExtraDetails.Index": "2",
         "cyberarkpas.audit.File": "Root\\Operating System-WindowsDesktopLocalAccountsRotationalPolicy-10.0.1.20-x_accountB",
         "cyberarkpas.audit.Hostname": "VAULT",
         "cyberarkpas.audit.IsoTimestamp": "2021-03-08T10:19:42Z",
@@ -123,7 +124,8 @@
             "virtual"
         ],
         "cyberarkpas.audit.Desc": "General Audit",
-        "cyberarkpas.audit.ExtraDetails": "DualAccountStatus=Active;Index=1;",
+        "cyberarkpas.audit.ExtraDetails.DualAccountStatus": "Active",
+        "cyberarkpas.audit.ExtraDetails.Index": "1",
         "cyberarkpas.audit.File": "Root\\Operating System-WindowsDesktopLocalAccountsRotationalPolicy-10.0.1.20-x_accountA",
         "cyberarkpas.audit.Hostname": "VAULT",
         "cyberarkpas.audit.IsoTimestamp": "2021-03-10T14:38:57Z",
@@ -201,7 +203,8 @@
             "virtual"
         ],
         "cyberarkpas.audit.Desc": "General Audit",
-        "cyberarkpas.audit.ExtraDetails": "DualAccountStatus=Active;Index=2;",
+        "cyberarkpas.audit.ExtraDetails.DualAccountStatus": "Active",
+        "cyberarkpas.audit.ExtraDetails.Index": "2",
         "cyberarkpas.audit.File": "Root\\Operating System-WindowsDesktopLocalAccountsRotationalPolicy-10.0.1.20-x_accountB",
         "cyberarkpas.audit.Hostname": "VAULT",
         "cyberarkpas.audit.IsoTimestamp": "2021-03-14T11:48:26Z",

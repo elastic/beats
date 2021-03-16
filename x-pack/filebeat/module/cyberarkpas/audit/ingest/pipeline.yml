@@ -174,12 +174,42 @@ processors:
             field: error.message
             value: "failed to process CAProperties array: {{ _ingest.on_failure_message }}"
 
+  # Parse key-value pairs at ExtraDetails:
+  # input:
+  #   "cyberarkpas.audit.ExtraDetails": "Command=ls \"/var/tmp\";ConnectionComponentId=PSMP-SSH;DstHost=[...]",
+  #
+  # output:
+  #   "cyberarkpas.audit.ExtraDetails":
+  #     {
+  #       "Command": "ls \"/var/tmp\"",
+  #       "ConnectionComponentId": "PSMP-SSH",
+  #       "DstHost": [...]
+  #
+  # The original string can contain escaped separators, \= and \;
+  - kv:
+      field: cyberarkpas.audit.ExtraDetails
+      field_split: '(?<!\\);' # unescaped ;
+      value_split: '(?<!\\)=' # uneescaped =
+      target_field: _tmp.kv
+      ignore_missing: true
+  - set:
+      field: cyberarkpas.audit.ExtraDetails
+      copy_from: _tmp.kv
+      override: true
+      if: 'ctx._tmp?.kv != null' # Ignore missing doesn't apply to copy_from.
+
+  #
+  # Cleanup
+  #
   - remove:
       field:
        - _tmp
        - cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
 
+  #
+  # ECS enrichment
+  #
   - set:
       field: event.code
       value: '{{ cyberarkpas.audit.MessageID }}'
