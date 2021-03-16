@@ -55,7 +55,32 @@
     - name: os
       type: group
       fields:
-        - name: memory.free_in_bytes
+        - name: distro
+          type: keyword
+        - name: distroRelease
+          type: keyword
+        - name: platform
+          type: keyword
+        - name: platformRelease
+          type: keyword
+        - name: memory
+          type: group
+          fields:
+            - name: free_in_bytes
+              type: long
+            - name: total_in_bytes
+              type: long
+            - name: used_in_bytes
+              type: long
+        - name: load
+          type: group
+          fields:
+            - name: 1m
+              type: double
+            - name: 5m
+              type: double
+            - name: 15m
+              type: double
     - name: concurrent_connections
       type: long
       description: >

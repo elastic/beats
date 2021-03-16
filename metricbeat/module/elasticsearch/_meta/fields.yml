@@ -50,7 +50,7 @@
           path: elasticsearch.index.name
         - name: node
           type: alias
-          path: elasticsearch.node.name
+          path: elasticsearch.node.id
         - name: shard
           type: alias
           path: elasticsearch.shard.number
@@ -204,9 +204,6 @@
             - name: segments
               type: group
               fields:
-                - name: query_total
-                  type: alias
-                  path: elasticsearch.index.total.segments.memory_in_bytes
                 - name: terms_memory_in_bytes
                   type: alias
                   path: elasticsearch.index.total.segments.terms_memory_in_bytes
@@ -237,6 +234,9 @@
                 - name: index_writer_memory_in_bytes
                   type: alias
                   path: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+                - name: memory_in_bytes
+                  type: alias
+                  path: elasticsearch.index.total.segments.memory_in_bytes
 
     - name: ccr_auto_follow_stats
       type: group

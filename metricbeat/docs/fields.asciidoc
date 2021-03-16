@@ -18367,7 +18367,7 @@ alias to: elasticsearch.index.name
 --
 type: alias
 
-alias to: elasticsearch.node.name
+alias to: elasticsearch.node.id
 
 --
 
@@ -18726,15 +18726,6 @@ alias to: elasticsearch.index.total.search.query_time_in_millis
 --
 
 
-*`index_stats.total.segments.query_total`*::
-+
---
-type: alias
-
-alias to: elasticsearch.index.total.segments.memory_in_bytes
-
---
-
 *`index_stats.total.segments.terms_memory_in_bytes`*::
 +
 --
@@ -18822,6 +18813,15 @@ alias to: elasticsearch.index.total.segments.version_map_memory_in_bytes
 type: alias
 
 alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
+
+--
+
+*`index_stats.total.segments.memory_in_bytes`*::
++
+--
+type: alias
+
+alias to: elasticsearch.index.total.segments.memory_in_bytes
 
 --
 
@@ -22289,6 +22289,16 @@ type: keyword
 +
 --
 The node the shard was relocated from.
+
+
+type: keyword
+
+--
+
+*`elasticsearch.shard.relocating_node.id`*::
++
+--
+The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
 
 
 type: keyword
@@ -29829,9 +29839,76 @@ type: keyword
 --
 
 
+*`kibana.stats.os.distro`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.distroRelease`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platform`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platformRelease`*::
++
+--
+type: keyword
+
+--
+
+
 *`kibana.stats.os.memory.free_in_bytes`*::
 +
 --
+type: long
+
+--
+
+*`kibana.stats.os.memory.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.memory.used_in_bytes`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.stats.os.load.1m`*::
++
+--
+type: double
+
+--
+
+*`kibana.stats.os.load.5m`*::
++
+--
+type: double
+
+--
+
+*`kibana.stats.os.load.15m`*::
++
+--
+type: double
+
 --
 
 *`kibana.stats.concurrent_connections`*::

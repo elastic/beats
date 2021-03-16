@@ -20,6 +20,10 @@
       type: keyword
       description: >
         The node the shard was relocated from.
+    - name: relocating_node.id
+      type: keyword
+      description: >
+        The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
     - name: source_node
       type: group
       fields:

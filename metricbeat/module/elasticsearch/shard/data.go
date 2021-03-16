@@ -127,6 +127,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 				delete(event.MetricSetFields, "relocating_node")
 				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
+				event.MetricSetFields.Put("relocating_node.id", fields["relocating_node"])
 
 				r.Event(event)
 			}
