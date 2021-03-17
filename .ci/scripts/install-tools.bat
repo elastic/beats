@@ -17,14 +17,14 @@ mkdir %WORKSPACE%\bin
 IF EXIST "%PROGRAMFILES(X86)%" (
     REM Force the gvm installation.
     SET GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-amd64.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
         exit /b 1
     )
 ) ELSE (
     REM Windows 7 workers got a broken gvm installation.
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-386.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-386.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
         exit /b 1
