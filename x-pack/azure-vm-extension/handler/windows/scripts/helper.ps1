@@ -181,7 +181,7 @@ function Get-Azure-Logs-Path() {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
     Write-Host "Failed to read file: $FailedItem. The error message was $ErrorMessage"
-    throw "Error in Get-Azure-Config-Path. Couldn't parse the HandlerEnvironment.json file"
+    throw "Error in Get-Azure-Logs-Path. Couldn't parse the HandlerEnvironment.json file"
   }
 }
 
@@ -244,7 +244,7 @@ function Get-Azure-Status-Path($powershellVersion) {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
     Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
-    throw "Error in Get-Azure-Config-Path. Couldn't parse the HandlerEnvironment.json file"
+    throw "Error in Get-Azure-Status-Path. Couldn't parse the HandlerEnvironment.json file"
   }
 }
 
@@ -258,6 +258,18 @@ function Get-Lastest-Settings-File($configFolder) {
     $configFileName = $configFiles.Name
   }
   return $configFileName
+}
+
+function Get-Sequence() {
+    $settingsSequence = "0"
+    $powershellVersion = Get-PowershellVersion
+    $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
+    if ($azureConfigFile) {
+        $outputFile = Split-Path $azureConfigFile -leaf
+        $items = $outputFile.split(".")
+        $settingsSequence = $items[0]
+    }
+    return $settingsSequence
 }
 
 function DownloadFile {
@@ -307,32 +319,26 @@ function Write-Status
          [Parameter(Mandatory=$true, Position=2)]
          [string] $mainStatus,
          [Parameter(Mandatory=$true, Position=3)]
-         [string] $message,
+         [string] $mainMessage,
          [Parameter(Mandatory=$true, Position=4)]
          [string] $subname,
          [Parameter(Mandatory=$true, Position=5)]
          [string] $subStatus,
          [Parameter(Mandatory=$true, Position=6)]
-         [string] $subMessage,
-         [Parameter(Mandatory=$true, Position=7)]
-         [string] $sequenceNumber
+         [string] $subMessage
     )
-  #$sequenceNumber = 1
+  $sequenceNumber = Get-Sequence
   $code = 0
   $statusPath = Get-Azure-Status-Path
   if ( $statusPath) {
-#    $lastStatusFile = Get-Lastest-Status-File($statusPath)
-#    if ($lastStatusFile) {
-#        $lastSequence =  $lastStatusFile.Split(".")[0]
-#        $sequenceNumber = [int]$lastSequence  + 1
-#    }
     $statusFile = $statusPath + "\\" + $sequenceNumber + ".status"
     #transitioning, error, success and warning
     if ($subStatus -eq "error") {
         $code = 1
     }
     $timestampUTC = (Get-Date -Format u).Replace(" ", "T")
-    $jsonRequest = [ordered]@{
+    $jsonRequest = @(
+      @{
         version="1.0"
         timestampUTC = "$timestampUTC"
         status= @{
@@ -340,24 +346,25 @@ function Write-Status
             operation = "$operation"
             status = "$mainStatus"
             formattedMessage =@{
+                lang = "en-US"
+                message = "$mainMessage"
+            }
+            substatus =  @(
+            @{
+                name = "$subName"
+                status = "$subStatus"
+                code = $code
+                formattedMessage =@{
                     lang = "en-US"
-                    message = "$message"
-                       }
-            substatus = @(
-                @{
-                   name = "$subName"
-                   status = "$subStatus"
-                   code = $code
-                   formattedMessage =@{
-                        lang = "en-US"
-                        message = "$subMessage"
-                    }
+                    message = "$subMessage"
                 }
+            }
             )
         }
     }
+    )
     if ( $(Get-PowershellVersion) -ge 3) {
-      ConvertTo-Json -Compress $jsonRequest -Depth 4 | Out-File -filePath $statusFile
+      ConvertTo-Json -Compress $jsonRequest -Depth 6 | Out-File -filePath $statusFile
     }
   }
 }

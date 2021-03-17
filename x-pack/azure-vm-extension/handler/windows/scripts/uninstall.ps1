@@ -55,7 +55,7 @@ function Install-ElasticAgent {
             } else {
                 throw "Unenrolling the agent failed, api request returned status $jsonResult.statuscode"
                 }
-            Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent service has been unenrolled" 4
+            Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent service has been unenrolled"
             Write-Log "Uninstalling Elastic Agent" "INFO"
             & "$INSTALL_LOCATION\Elastic\Agent\elastic-agent.exe" uninstall --force
             Write-Log "Elastic Agent has been uninstalled" "INFO"
@@ -63,7 +63,7 @@ function Install-ElasticAgent {
             Remove-Item "$INSTALL_LOCATION\Elastic\Agent" -Recurse -Force
             Remove-Item "$INSTALL_LOCATION\Elastic-Agent" -Recurse -Force
             Write-Log "elastic agent directories removed" "INFO"
-            Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent service has been uninstalled" 4
+            Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent service has been uninstalled"
             $completed = $true
         }
         Catch {
@@ -71,7 +71,7 @@ function Install-ElasticAgent {
             Write-Log "Elastic Agent installation failed after 3 retries" "ERROR"
             Write-Log $_ "ERROR"
             Write-Log $_.ScriptStackTrace "ERROR"
-            Write-Status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent service has been uninstalled" 4
+            Write-Status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent service has been uninstalled"
             exit 1
           } else {
             Write-Log "Elastic Agent installation failed. retrying in 20s" "ERROR"

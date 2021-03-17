@@ -6,13 +6,13 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 # for status enable
 $nameE = "Enable elastic agent"
 $operationE = "starting elastic agent"
-$messageE= "Enable elastic agent"
+$messageE = "Enable elastic agent"
 
 # for status install
 $name = "Install elastic agent"
 $firstOperation = "installing elastic agent"
 $secondOperation = "enrolling elastic agent"
-$message= "Install elastic agent"
+$message = "Install elastic agent"
 $subName = "Elastic Agent"
 
 
@@ -26,7 +26,7 @@ function Install-ElasticAgent {
     $retries = 3
     $retryCount = 0
     $completed = $false
-    $enrollment_token=""
+    $enrollment_token= ""
     while (-not $completed) {
         Try {
             $powershellVersion = Get-PowershellVersion
@@ -43,7 +43,7 @@ function Install-ElasticAgent {
             Write-Log "Starting download of elastic agent package with version $STACK_VERSION" "INFO"
             DownloadFile -Params @{'Uri'="$DOWNLOAD_URL";'OutFile'="$SAVEDFILE"}
             # write status
-            Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded" 1
+            Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded"
             Write-Log "Unzip elastic agent archive" "INFO"
             Expand-Archive -LiteralPath $SAVEDFILE -DestinationPath $INSTALL_LOCATION -Force
             Write-Log "Elastic agent unzipped location $INSTALL_LOCATION" "INFO"
@@ -105,8 +105,8 @@ function Install-ElasticAgent {
             }
             $completed = $true
             # write status for both install and enroll
-            Write-Status "$name" "$firstOperation" "success" "$message" "$subName" "success" "Elastic Agent has been installed" 1
-            Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent has been enrolled" 1
+            Write-Status "$name" "$firstOperation" "success" "$message" "$subName" "success" "Elastic Agent has been installed"
+            Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent has been enrolled"
         }
         Catch {
             if ($retryCount -ge $retries) {
@@ -114,7 +114,7 @@ function Install-ElasticAgent {
                 Write-Log $_ "ERROR"
                 Write-Log $_.ScriptStackTrace "ERROR"
                 # write status for fail
-                Write-Status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent has not been installed" 1
+                Write-Status "$name" "$firstOperation" "error" "$message" "$subName" "error" "Elastic Agent has not been installed"
                 exit 1
             } else {
                 Write-Log "Elastic Agent installation failed. retrying in 20s" "ERROR"
@@ -137,14 +137,14 @@ function Enable-ElasticAgent {
             Start-Service "$serviceName"
             Write-Log "The elastic agent is started" "INFO"
             $completed = $true
-            Write-Status "$nameE" "$operationE" "success" "$messageE" "$subName" "success" "Elastic Agent service has started" 2
+            Write-Status "$nameE" "$operationE" "success" "$messageE" "$subName" "success" "Elastic Agent service has started"
            }
         Catch {
             if ($retryCount -ge $retries) {
                 Write-Log "Starting the Elastic Agent failed after 3 retries" "ERROR"
                 Write-Log $_ "ERROR"
                 Write-Log $_.ScriptStackTrace "ERROR"
-                Write-Status "$nameE" "$operationE" "error" "$messageE" "$subName" "error" "Elastic Agent service has not started" 2
+                Write-Status "$nameE" "$operationE" "error" "$messageE" "$subName" "error" "Elastic Agent service has not started"
                 exit 1
             } else {
                 Write-Log "Starting the Elastic Agent has failed. retrying in 20s" "ERROR"
@@ -166,6 +166,5 @@ If (Get-Service $serviceName -ErrorAction SilentlyContinue) {
 } Else {
     Install-ElasticAgent
     Enable-ElasticAgent
-    Write-Status "$subName" "Enabling Handler" "success" "$message" "$subName" "success" "Enabling Handler" 0
 }
 
