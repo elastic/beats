@@ -43,10 +43,6 @@ const (
 	WatchdogCheckLoop = 5 * time.Second
 )
 
-const (
-	inputTypesKey = "input_types"
-)
-
 var (
 	// ErrApplicationAlreadyRegistered returned when trying to register an application more than once.
 	ErrApplicationAlreadyRegistered = errors.New("application already registered", errors.TypeApplication)
@@ -709,6 +705,16 @@ func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg str
 	return nil
 }
 
+// SetInputTypes sets the allowed action input types for this application
+func (as *ApplicationState) SetInputTypes(inputTypes []string) {
+	as.checkinLock.Lock()
+	as.inputTypes = make(map[string]struct{})
+	for _, inputType := range inputTypes {
+		as.inputTypes[inputType] = struct{}{}
+	}
+	as.checkinLock.Unlock()
+}
+
 // updateStatus updates the current observed status from the application, sends the expected state back to the
 // application if the server expects it to be different then its observed state, and alerts the handler on the
 // server when the application status has changed.
@@ -733,17 +739,6 @@ func (as *ApplicationState) updateStatus(checkin *proto.StateObserved, waitForRe
 	as.statusPayload = payload
 	as.statusConfigIdx = checkin.ConfigStateIdx
 	as.statusTime = time.Now().UTC()
-
-	if payload != nil {
-		var pconf struct {
-			InputTypes []string `json:"input_types"`
-		}
-		_ = json.Unmarshal([]byte(checkin.Payload), &pconf)
-		as.inputTypes = make(map[string]struct{})
-		for _, inputType := range pconf.InputTypes {
-			as.inputTypes[inputType] = struct{}{}
-		}
-	}
 	as.checkinLock.Unlock()
 
 	var expected *proto.StateExpected
