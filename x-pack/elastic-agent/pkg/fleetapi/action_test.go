@@ -5,6 +5,7 @@
 package fleetapi
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -43,7 +44,7 @@ func TestActionSerialization(t *testing.T) {
 		t.Error(diff)
 	}
 
-	diff = cmp.Diff([]byte(a.Data), mapBytesVal(m, "data"))
+	diff = cmp.Diff(a.Data, mapRawMessageVal(m, "data"))
 	if diff != "" {
 		t.Error(diff)
 	}
@@ -71,15 +72,9 @@ func mapStringVal(m map[string]interface{}, key string) string {
 	return ""
 }
 
-func mapBytesVal(m map[string]interface{}, key string) []byte {
+func mapRawMessageVal(m map[string]interface{}, key string) json.RawMessage {
 	if v, ok := m[key]; ok {
-		if b, ok := v.([]interface{}); ok {
-			res := make([]byte, 0, len(b))
-			for _, v := range b {
-				if val, ok := v.(byte); ok {
-					res = append(res, val)
-				}
-			}
+		if res, ok := v.(json.RawMessage); ok {
 			return res
 		}
 	}
