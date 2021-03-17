@@ -18,6 +18,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -60,6 +61,7 @@ The following actions are possible and grouped based on the actions.
   KIBANA_FLEET_HOST - kibana host to enable Fleet on [$KIBANA_HOST]
   KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
   KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
+  KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
 
 * Bootstrapping Fleet Server
   This bootstraps the Fleet Server to be run by this Elastic Agent. At least one Fleet Server is required in a Fleet
@@ -69,6 +71,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_HOST - elasticsearch host for Fleet Server to communicate with [$ELASTICSEARCH_HOST]
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
+  FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_POLICY_NAME - name of policy for the Fleet Server to use for itself [$FLEET_TOKEN_POLICY_NAME]
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
@@ -86,6 +89,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_ENROLLMENT_TOKEN - token to use for enrollment
   FLEET_TOKEN_NAME - token name to use for fetching token from Kibana
   FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana
+  FLEET_CA - path to certificate authority to use with communicate with Fleet Server [$KIBANA_CA]
   FLEET_INSECURE - communicate with Fleet with either insecure HTTP or un-verified HTTPS
   KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
   KIBANA_FLEET_USERNAME - kibana username to create enrollment token [$KIBANA_USERNAME]
@@ -97,9 +101,11 @@ be used when the same credentials will be used across all the possible actions a
   ELASTICSEARCH_HOST - elasticsearch host [http://elasticsearch:9200]
   ELASTICSEARCH_USERNAME - elasticsearch username [elastic]
   ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
+  ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch
   KIBANA_HOST - kibana host [http://kibana:5601]
   KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
   KIBANA_PASSWORD - kibana password [$ELASTICSEARCH_PASSWORD]
+  KIBANA_CA - path to certificate authority to use with communicate with Kibana [$ELASTICSEARCH_CA]
 
 By default when this command starts it will check for an existing fleet.yml. If that file already exists then
 all the above actions will be skipped, because the Elastic Agent has already been enrolled. To ensure that enrollment
@@ -199,6 +205,10 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 		if policyID != "" {
 			args = append(args, "--fleet-server-policy", policyID)
 		}
+		ca := envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA")
+		if ca != "" {
+			args = append(args, "--fleet-server-elasticsearch-ca", ca)
+		}
 		host := envWithDefault("", "FLEET_SERVER_HOST")
 		if host != "" {
 			args = append(args, "--fleet-server-host", host)
@@ -227,6 +237,10 @@ func buildEnrollArgs(token string, policyID string) ([]string, error) {
 		args = append(args, "--url", url)
 		if envBool("FLEET_INSECURE") {
 			args = append(args, "--insecure")
+		}
+		ca := envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA")
+		if ca != "" {
+			args = append(args, "--certificate-authorities", ca)
 		}
 	}
 	args = append(args, "--enrollment-token", token)
@@ -291,11 +305,20 @@ func kibanaClient() (*kibana.Client, error) {
 	host := envWithDefault(defaultKibanaHost, "KIBANA_FLEET_HOST", "KIBANA_HOST")
 	username := envWithDefault(defaultUsername, "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME")
 	password := envWithDefault(defaultPassword, "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD")
+
+	var tls *tlscommon.Config
+	ca := envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA")
+	if ca != "" {
+		tls = &tlscommon.Config{
+			CAs: []string{ca},
+		}
+	}
 	return kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Host:          host,
 		Username:      username,
 		Password:      password,
 		IgnoreVersion: true,
+		TLS:           tls,
 	})
 }
 

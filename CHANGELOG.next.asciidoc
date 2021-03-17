@@ -240,6 +240,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
 - Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
+- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
+- Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
 *Auditbeat*
 
@@ -262,6 +264,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Having some CPUs unavailable to Auditbeat could cause startup errors or event loss. {pull}22827[22827]
 - Note incompatibility of system/socket on ARM. {pull}23381[23381]
 - system/login: Fixed offset reset on inode reuse. {pull}24414[24414]
+- system/login: Add additional offset check for utmp files. {pull}24515[24515]
 
 *Filebeat*
 
@@ -396,6 +399,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Netflow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
+- Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
 
 *Heartbeat*
 
