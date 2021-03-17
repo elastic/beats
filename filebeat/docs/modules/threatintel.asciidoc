@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 [role="xpack"]
 
 :modulename: threatintel
-:has-dashboards: false
+:has-dashboards: true
 
 == Threat Intel module
 beta[]
@@ -340,6 +340,49 @@ Anomali Threat Intel is mapped to the following ECS fields.
 |=============================================================
 
 `anomali.pattern` is mapped to the appropriate field dependent on attribute type.
+
+:has-dashboards!:
+
+[float]
+=== Dashboards
+
+This module comes with dashboards for the threat information feeds.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-overview.png[]
+
+[float]
+Overview of the information provided, and the health of, the Threat Intel module.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-abuse-malware.png[]
+
+[float]
+Overview of the information provided by the Abuse.ch Malware feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-abuse-url.png[]
+
+[float]
+Overview of the information provided by the Abuse.ch URL feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-alienvault-otx.png[]
+
+[float]
+Overview of the information provided by the AlienVault OTX feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-anomali-limo.png[]
+
+[float]
+Overview of the information provided by the Anomali Limo feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-misp.png[]
+
+[float]
+Overview of the information provided by the MSIP feed.
 
 :modulename!:
 
