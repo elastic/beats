@@ -39,7 +39,7 @@ Log lines should be preffixed with the timestamp in milliseconds, the process
 id, the user id and the database name. This uses to be the default in most
 distributions, and is translated to this setting in the configuration file:
 
-["source"]
+["source","sh"]
 ----------------------------
 log_line_prefix = '%m [%p] %q%u@%d '
 ----------------------------
@@ -49,7 +49,7 @@ this module is able to collect this information. To be able to correlate each
 duration with their statements, they must be logged in the same line. This
 happens when the following options are used:
 
-["source"]
+["source","sh"]
 ----------------------------
 log_duration = 'on'
 log_statement = 'none'
@@ -73,7 +73,7 @@ obtained from logs.
 
 Other logging options that you may consider to enable are the following ones:
 
-["source"]
+["source","sh"]
 ----------------------------
 log_checkpoints = 'on';
 log_connections = 'on';
@@ -84,7 +84,6 @@ log_lock_waits = 'on';
 Both `log_connections` and `log_disconnections` can cause a lot of events if you
 don't have persistent connections, so enable with care.
 
-
 [float]
 === Using CSV logs
 
@@ -94,7 +93,7 @@ there is almost no configuration to be done in {beatname_uc}, just the filepath
 On the other hand, it's necessary to configure postgresql to emit `.csv` logs.
 The recommended parameters are:
 
-["source"]
+["source","sh"]
 ----------------------------
 logging_collector = 'on';
 log_destination = 'csvlog';
