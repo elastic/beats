@@ -50,7 +50,7 @@ Unenroll_ElasticAgent_DEB_RPM()
     return $EXITCODE
   fi
   log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Agent has been unenrolled"
-  write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has been unenrolled" 4
+  write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has been unenrolled"
 }
 
 Uninstall_ElasticAgent_DEB_RPM() {
@@ -58,6 +58,8 @@ Uninstall_ElasticAgent_DEB_RPM() {
       sudo rpm -e elastic-agent
    fi
    log "INFO" "[Uninstall_ElasticAgent] removing Elastic Agent directories"
+   sudo systemctl stop elastic-agent
+   sudo systemctl disable elastic-agent
    sudo rm -rf /usr/share/elastic-agent
    sudo rm -rf /etc/elastic-agent
    sudo rm -rf /var/lib/elastic-agent
@@ -84,7 +86,7 @@ Uninstall_ElasticAgent()
     retry_backoff Uninstall_ElasticAgent_DEB_RPM
   fi
   log "INFO" "Elastic Agent is uninstalled"
-  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "error" "Elastic Agent service has been uninstalled" 4
+  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "error" "Elastic Agent service has been uninstalled"
 }
 
 Uninstall_ElasticAgent

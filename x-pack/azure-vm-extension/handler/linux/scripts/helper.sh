@@ -85,10 +85,9 @@ log()
 {
   if [ "$LOGS_FOLDER" = "" ]; then
     get_logs_location
-    fi
-
-    echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2"
-    echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2" >> $LOGS_FOLDER/es-agent.log
+  fi
+  echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2"
+  echo \[$(date +%H:%M:%ST%d-%m-%Y)\]  "$1" "$2" >> $LOGS_FOLDER/es-agent.log
 }
 
 checkShasum ()
@@ -335,7 +334,7 @@ write_status() {
   local subName="${5}"
   local subStatus="${6}"
   local subMessage="${7}"
-  local sequenceNumber="${8}"
+  local sequenceNumber="0"
   local code=0
   get_status_location
   #2013-11-17T16:05:14Z
@@ -344,14 +343,16 @@ write_status() {
         code=1
   fi
   if [[ "$STATUS_FOLDER" != "" ]]; then
-    if [ -n "$(ls -A "$STATUS_FOLDER" 2>/dev/null)" ]; then
-      status_files_path="$STATUS_FOLDER/*.status"
-      latest_status_file=$(ls $status_files_path -A1 | sort -V | tail -1)
-      echo $latest_status_file
+    get_configuration_location
+    if [ "$CONFIG_FILE" != "" ]; then
+      filename="$(basename -- $CONFIG_FILE)"
+      sequenceNumber=$(echo $filename | cut -f1 -d.)
     else
-      json="{  \"version\":\"1.0\",\"timestampUTC\":\"$timestampUTC\",\"status\":\"$mainStatus\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$message\"},\"substatus\": [{ \"name\":\"$subName\", \"status\":\"$subStatus\",\"code\":\"$code\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"subMessage\"}}] }"
-      echo $json > "$STATUS_FOLDER"/"$sequenceNumber".status
+    log "[write_status] Configuration file not found" "ERROR"
+    exit 1
     fi
+  json="[{  \"version\":\"1.0\",\"timestampUTC\":\"$timestampUTC\",\"status\":\"$mainStatus\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$message\"},\"substatus\": [{ \"name\":\"$subName\", \"status\":\"$subStatus\",\"code\":\"$code\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"subMessage\"}}] }]"
+  echo $json > "$STATUS_FOLDER"/"$sequenceNumber".status
   fi
 }
 

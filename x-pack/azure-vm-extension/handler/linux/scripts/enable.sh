@@ -50,7 +50,7 @@ Install_ElasticAgent_DEB()
         return $EXIT_CODE
     fi
     log "INFO" "[Install_ElasticAgent_DEB] downloaded Elastic Agent $STACK_VERSION"
-    write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded" 1
+    write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded"
     #checkShasum $PACKAGE $SHASUM
     EXIT_CODE=$?
     if [[ $EXIT_CODE -ne 0 ]]; then
@@ -61,7 +61,7 @@ Install_ElasticAgent_DEB()
     sudo dpkg -i $PACKAGE
     sudo apt-get install -f
     log "INFO" "[Install_ElasticAgent_DEB] installed Elastic Agent $STACK_VERSION"
-    write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed" 1
+    write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed"
  fi
 }
 
@@ -93,7 +93,7 @@ Install_ElasticAgent_RPM()
         return $EXIT_CODE
       fi
       log "INFO" "[Install_ElasticAgent_RPM] downloaded Elastic Agent $STACK_VERSION"
-      write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded" 1
+      write_status "$name" "$first_operation" "transitioning" "$message" "$sub_name" "success" "Elastic Agent package has been downloaded"
       #checkShasum $PACKAGE $SHASUM
       EXIT_CODE=$?
       if [[ $EXIT_CODE -ne 0 ]]; then
@@ -102,7 +102,7 @@ Install_ElasticAgent_RPM()
       fi
       sudo rpm -vi $PACKAGE
       log "INFO" "[Install_ElasticAgent_RPM] installed Elastic Agent $STACK_VERSION"
-      write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed" 1
+      write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been installed"
     fi
 }
 
@@ -199,7 +199,7 @@ Enroll_ElasticAgent() {
   log "INFO" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN"
   log "INFO" "[Enroll_ElasticAgent] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}"
   sudo elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
-  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been enrolled" 1
+  write_status "$name" "$second_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been enrolled"
 }
 
 
@@ -223,13 +223,13 @@ Start_ElasticAgent()
     log "INFO" "[Start_ElasticAgent] starting Elastic Agent"
     sudo service elastic-agent start
     log "INFO" "[Start_ElasticAgent] Elastic Agent started"
-    write_status "$name_en" "$operation_en" "success" "$message_en" "$sub_name" "success" "Elastic Agent service has started" 2
+    write_status "$name_en" "$operation_en" "success" "$message_en" "$sub_name" "success" "Elastic Agent service has started"
   else
     log "INFO" "[Start_ElasticAgent] enabling and starting Elastic Agent"
     sudo systemctl enable elastic-agent
     sudo systemctl start elastic-agent
     log "INFO" "[Start_ElasticAgent] Elastic Agent started"
-    write_status "$name_en" "$operation_en" "success" "$message_en" "$sub_name" "success" "Elastic Agent service has started" 2
+    write_status "$name_en" "$operation_en" "success" "$message_en" "$sub_name" "success" "Elastic Agent service has started"
   fi
 }
 service_exists() {
@@ -243,24 +243,30 @@ service_exists() {
 
 Run_Agent()
 {
-   if [ "$(pidof systemd && echo "systemd" || echo "other")" = "other" ]; then
-
+  if [ "$(pidof systemd && echo "systemd" || echo "other")" = "other" ]; then
+    if sudo service --status-all | grep -Fq "$service_name"; then
+      retry_backoff Start_ElasticAgent
+    else
+      Install_ElasticAgent
+    fi
   else
-    if service_exists $service_name; then
-      service_status="$(systemctl is-active $service_name)"
-      if [ "${service_status}" = "active" ]; then
+    if [[ $(systemctl list-units --all -t service --full --no-legend "$service_name.service" | cut -f1 -d' ') == $service_name.service ]] && [[ $(systemctl list-units --all -t service --full --no-legend "$service_name.service" | cut -f2 -d' ') != "not-found" ]]; then
+      service_status="$(sudo systemctl is-active --quiet elastic-agent && echo Running || echo Stopped)"
+      if [[ "$service_status" = "Running" ]]; then
         log "INFO" "[Run_Agent] Elastic Agent is running"
       else
-       retry_backoff Start_ElasticAgent
+        log "INFO" "[Run_Agent] Elastic Agent is not running"
+        retry_backoff Start_ElasticAgent
       fi
     else
+      log "INFO" "[Run_Agent] Elastic Agent is not installed"
       Install_ElasticAgent
       retry_backoff Start_ElasticAgent
     fi
   fi
 }
 
-
+Run_Agent
 
 
 

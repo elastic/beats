@@ -16,12 +16,12 @@ Stop_ElasticAgent()
     log "INFO" "[Stop_ElasticAgent] stopping Elastic Agent"
     sudo service elastic-agent stop
     log "INFO" "[Stop_ElasticAgent] Elastic Agent stopped"
-    write_status "$name" "$operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has stopped" 3
+    write_status "$name" "$operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has stopped"
   else
     log "INFO" "[Stop_ElasticAgent] stopping  Elastic Agent"
     sudo systemctl stop elastic-agent
     log "INFO" "[Stop_ElasticAgent] Elastic Agent stopped"
-    write_status "$name" "$operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has stopped" 3
+    write_status "$name" "$operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has stopped"
   fi
 }
 
