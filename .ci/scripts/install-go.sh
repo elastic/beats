@@ -24,9 +24,13 @@ fi
 echo "UNMET DEP: Installing Go"
 mkdir -p "${HOME}/bin"
 
+<<<<<<< HEAD
 curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-${ARCH}-amd64"
+=======
+curl -sSLo "${GVM_CMD}" "https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-${OS}-${GVM_ARCH_SUFFIX}"
+>>>>>>> 34e5c09bd ([CI] bump gvm version and use the binary (#24571))
 chmod +x "${GVM_CMD}"
 
-gvm ${GO_VERSION}|cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
+${GVM_CMD} "${GO_VERSION}" |cut -d ' ' -f 2|tr -d '\"' > ${PROPERTIES_FILE}
 
-eval $(gvm ${GO_VERSION})
+eval "$("${GVM_CMD}" "${GO_VERSION}")"
