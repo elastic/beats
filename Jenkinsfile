@@ -157,7 +157,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: !isTag(), jobName: "${getFlakyJobName()}")
+                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
   }
@@ -166,13 +166,11 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 /**
 * There are only two supported branches, master and 7.x
 */
-def getFlakyJobName() {
-  def parent = env.JOB_NAME - env.JOB_BASE_NAME
+def getFlakyBranch() {
   if(isPR()) {
-    return parent + getBranchIndice(env.CHANGE_TARGET)
-  }
-  if(isBranch()) {
-    return parent + getBranchIndice(env.BRANCH_NAME)
+    return getBranchIndice(env.CHANGE_TARGET)
+  } else {
+    return getBranchIndice(env.BRANCH_NAME)
   }
 }
 
