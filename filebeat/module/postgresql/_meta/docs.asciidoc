@@ -79,7 +79,9 @@ log_lock_waits = 'on';
 Both `log_connections` and `log_disconnections` can cause a lot of events if you
 don't have persistent connections, so enable with care.
 
-==== Using CSV logs
+
+[float]
+=== Using CSV logs
 
 Since the PostgreSQL CSV log file is a well-defined format,
 there is almost no configuration to be done in {beatname_uc}, just the filepath
