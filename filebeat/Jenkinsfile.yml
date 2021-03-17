@@ -23,7 +23,7 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"
     build:
         mage: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
@@ -81,4 +81,4 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"

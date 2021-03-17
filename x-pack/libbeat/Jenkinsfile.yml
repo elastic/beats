@@ -21,6 +21,6 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"
     build:
         mage: "mage build test"

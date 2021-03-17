@@ -21,7 +21,7 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"
     unitTest:
         mage: "mage build unitTest"
     packaging-linux:
@@ -33,4 +33,4 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"

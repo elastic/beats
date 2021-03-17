@@ -21,7 +21,7 @@ stages:
     arm:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "ubuntu-1804-aarch64"
+          - "arm"
     build:
         mage: "mage build test && GO_VERSION=1.13.1 mage testGCPFunctions"
     macos:
