@@ -148,7 +148,7 @@ func getClusterMetadataSettings(m *MetricSet) (common.MapStr, error) {
 	return clusterSettings, nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
+func eventMappingXPack(period time.Duration, r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -174,10 +174,16 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	clusterStateBytes, err := elasticsearch.GetClusterStateResponseCache(period).GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
+	//clusterState, err := elasticsearch.GetClusterState(m.HTTP, m.HTTP.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return errors.Wrap(err, "failed to get cluster state from Elasticsearch")
 	}
+	clusterState := common.MapStr{}
+	if err = json.Unmarshal(clusterStateBytes, &clusterState);err != nil {
+		return errors.Wrap(err, "failed to parse cluster state from Elasticsearch")
+	}
+
 	clusterState.Delete("cluster_name")
 
 	if err = elasticsearch.PassThruField("status", clusterStats, clusterState); err != nil {

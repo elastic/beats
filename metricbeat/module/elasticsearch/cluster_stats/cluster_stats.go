@@ -68,7 +68,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if m.MetricSet.XPack {
-		err = eventMappingXPack(r, m, *info, content)
+		err = eventMappingXPack(m.Module().Config().Period, r, m, *info, content)
 		if err != nil {
 			// Since this is an x-pack code path, we log the error but don't
 			// return it. Otherwise it would get reported into `metricbeat-*`

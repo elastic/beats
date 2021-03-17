@@ -59,10 +59,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
+	content, err := elasticsearch.GetClusterStateResponseCache(m.Module().Config().Period).GetClusterState(m.HTTP, m.HTTP.GetURI(), nil)
 	if err != nil {
 		return err
 	}
+
+	//content, err := m.HTTP.FetchContent()
+	//if err != nil {
+	//	return err
+	//}
 
 	if m.XPack {
 		err = eventsMappingXPack(r, m, content)
