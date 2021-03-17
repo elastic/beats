@@ -21,25 +21,25 @@ import (
 	"sync"
 )
 
-// bufferPool contains a pool of byteBuffer objects.
+// bufferPool contains a pool of PooledByteBuffer objects.
 var bufferPool = sync.Pool{
 	New: func() interface{} { return &PooledByteBuffer{ByteBuffer: NewByteBuffer(1024)} },
 }
 
-// byteBuffer is an expandable buffer backed by a byte slice.
+// PooledByteBuffer is an expandable buffer backed by a byte slice.
 type PooledByteBuffer struct {
 	*ByteBuffer
 }
 
-// NewPooledByteBuffer return a ByteBuffer from the pool. The returned value must
-// be released with free().
+// NewPooledByteBuffer return a PooledByteBuffer from the pool. The returned value must
+// be released with Free().
 func NewPooledByteBuffer() *PooledByteBuffer {
 	b := bufferPool.Get().(*PooledByteBuffer)
 	b.Reset()
 	return b
 }
 
-// Free returns the byteBuffer to the pool.
+// Free returns the PooledByteBuffer to the pool.
 func (b *PooledByteBuffer) Free() {
 	if b == nil {
 		return
