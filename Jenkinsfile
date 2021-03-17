@@ -157,7 +157,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
   }
@@ -166,11 +166,10 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 /**
 * There are only two supported branches, master and 7.x
 */
-def getIdSuffix() {
+def getFlakyBranch() {
   if(isPR()) {
     return getBranchIndice(env.CHANGE_TARGET)
-  }
-  if(isBranch()) {
+  } else {
     return getBranchIndice(env.BRANCH_NAME)
   }
 }
@@ -665,7 +664,7 @@ def installTools(args) {
         git config --global user.name "beatsmachine"
       fi''')
   } else {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
