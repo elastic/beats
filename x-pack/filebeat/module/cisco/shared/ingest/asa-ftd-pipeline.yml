@@ -555,7 +555,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"
-      pattern: "Group %{} User %{source.user.name} IP %{source.address} IPv4 Address %{_temp_.cisco.assigned_ip} %{}"
+      pattern: "Group %{} User <%{source.user.name}> IP <%{source.address}> IPv4 Address <%{_temp_.cisco.assigned_ip}> %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '733100'"
       field: "message"
