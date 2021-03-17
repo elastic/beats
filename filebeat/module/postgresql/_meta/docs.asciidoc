@@ -137,7 +137,8 @@ The first dashboard is for regular logs.
 [role="screenshot"]
 image::./images/filebeat-postgresql-overview.png[]
 
-The second one shows the slowlogs of PostgreSQL.
+The second one shows the slowlogs of PostgreSQL. If `log_min_duration_statement`
+is not used, this dashboard will show incomplete or no data.
 
 [role="screenshot"]
 image::./images/filebeat-postgresql-slowlog-overview.png[]
