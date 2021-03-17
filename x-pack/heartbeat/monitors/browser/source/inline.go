@@ -14,9 +14,11 @@ type InlineSource struct {
 	BaseSource
 }
 
+var ErrNoInlineScript = fmt.Errorf("no 'script' value specified for inline source")
+
 func (s *InlineSource) Validate() error {
 	if !regexp.MustCompile("\\S").MatchString(s.Script) {
-		return fmt.Errorf("no 'script' value specified for inline source")
+		return ErrNoInlineScript
 	}
 
 	return nil
