@@ -1,0 +1,25 @@
+pull_request_rules:
+  - name: backport patches to 7.x branch
+    conditions:
+      - base=master
+      - label=backport-to-7.x
+    actions:
+      backport:
+        branches:
+          - 7.x
+  - name: backport patches to 7.12 branch
+    conditions:
+      - base=master
+      - label=backport-to-7.12
+    actions:
+      backport:
+        branches:
+          - 7.12
+  - name: backport patches to 7.11 branch
+    conditions:
+      - base=master
+      - label=backport-to-7.11
+    actions:
+      backport:
+        branches:
+          - 7.11
