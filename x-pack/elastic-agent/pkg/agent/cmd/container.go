@@ -16,13 +16,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
-	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -118,8 +119,7 @@ occurs on every start of the container set FLEET_FORCE to 1.
 		Run: func(c *cobra.Command, args []string) {
 			iscloud, err := c.Flags().GetBool("cloud")
 			if err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
-				os.Exit(1)
+				logError(streams, err)
 			}
 			if iscloud {
 				err = containerCloudCmd(streams, c, flags, args)
@@ -127,7 +127,7 @@ occurs on every start of the container set FLEET_FORCE to 1.
 				err = containerCmd(streams, c, flags, defaultAccessConfig())
 			}
 			if err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				logError(streams, err)
 				os.Exit(1)
 			}
 		},
@@ -136,27 +136,79 @@ occurs on every start of the container set FLEET_FORCE to 1.
 	return &cmd
 }
 
+func logError(streams *cli.IOStreams, err error) {
+	fmt.Fprintf(streams.Err, "Error: %v\n", err)
+}
+
+func logInfo(streams *cli.IOStreams, msg string) {
+	fmt.Fprintf(streams.Out, msg)
+}
+
 func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	log, err := logger.New("bootstrap")
+	logInfo(streams, "Elastic Agent container in cloud mode")
+	// sync main process and apm-server legacy process
+	var wg sync.WaitGroup
+	wg.Add(1) // main process (always running)
+	mainProc, err := os.FindProcess(os.Getpid())
 	if err != nil {
-		return err
+		return errors.New(err, "finding current process")
 	}
-	log.Info("Starting Elastic Agent container in cloud mode")
-	// run legacy APM Server if APM_SERVER_PATH is given
-	if apmPath := os.Getenv("APM_SERVER_PATH"); apmPath != "" {
-		if err := runLegacyAPMServer(log, apmPath, args); err != nil {
-			return err
+	var apmProc *process.Info
+	// run legacy APM Server as a daemon; send termination signal
+	// to the main process if the daemon is stopped
+	apmPath := os.Getenv("APM_SERVER_PATH")
+	if apmPath != "" {
+		wg.Add(1) // apm-server legacy process
+		go func() {
+			if err := func() error {
+				apmProc, err = runLegacyAPMServer(streams, apmPath, args)
+				if err != nil {
+					return errors.New(err, "starting legacy apm-server")
+				}
+				logInfo(streams, "Legacy apm-server daemon started...")
+				apmProcState, err := apmProc.Process.Wait()
+				if err != nil {
+					return err
+				}
+				if apmProcState.ExitCode() != 0 {
+					return errors.New("apm-server process exited with %d", apmProcState.ExitCode())
+				}
+				return nil
+			}(); err != nil {
+				logError(streams, err)
+			}
+
+			wg.Done()
+			// sending kill signal to current process (elastic-agent)
+			logInfo(streams, "Initiate shutdown elastic-agent..")
+			mainProc.Signal(syscall.SIGTERM)
+		}()
+	}
+	// run Elastic Agent; send termination signal to the
+	// legacy apm-server process if stopped
+	go func() {
+		if err := func() error {
+			// create configuration for Elastic Agent
+			cfg := defaultAccessConfig()
+			if err := readYaml(filepath.Join(paths.Config(), "fleet-setup.yml"), &cfg); err != nil {
+				return errors.New(err, "parsing fleet-setup.yml")
+			}
+			if err := readYaml(filepath.Join(paths.Config(), "credentials.yml"), &cfg); err != nil {
+				return errors.New(err, "parsing credentials.yml")
+			}
+			return containerCmd(streams, cmd, flags, cfg)
+		}(); err != nil {
+			logError(streams, err)
 		}
-	}
-	// setup and start Fleet Server respecting configuration files
-	cfg := defaultAccessConfig()
-	if err := readYaml(filepath.Join(paths.Config(), "fleet-setup.yml"), &cfg); err != nil {
-		return errors.New(err, "parsing fleet-setup.yml")
-	}
-	if err := readYaml(filepath.Join(paths.Config(), "credentials.yml"), &cfg); err != nil {
-		return errors.New(err, "parsing credentials.yml")
-	}
-	return containerCmd(streams, cmd, flags, cfg)
+		wg.Done()
+		// sending kill signal to APM Server
+		if apmProc != nil {
+			apmProc.Stop()
+			logInfo(streams, "Initiate shutdown legacy apm-server..")
+		}
+	}()
+	wg.Wait()
+	return nil
 }
 
 func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, cfg setupConfig) error {
@@ -272,8 +324,7 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 			args = append(args, "--certificate-authorities", cfg.Fleet.CA)
 		}
 	}
-	args = append(args, "--enrollment-token", token)
-	return args, nil
+	return append(args, "--enrollment-token", token), nil
 }
 
 func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
@@ -456,17 +507,16 @@ func truncateString(b []byte) string {
 	return strings.Replace(string(runes), "\n", " ", -1)
 }
 
-//runLegacyAPMServer by extracting bundled apm-server from elastic-agent
-//and passing on args
-func runLegacyAPMServer(log *logp.Logger, path string, args []string) error {
+// runLegacyAPMServer extracts the bundled apm-server from elastic-agent
+// to path and runs it with args.
+func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*process.Info, error) {
 	name := "apm-server"
-	log.Info("Preparing apm-server for legacy mode.")
-	log.Infof("Extracting apm-server into install directory %s.", path)
+	logInfo(streams, "Preparing apm-server for legacy mode.")
 	cfg := artifact.DefaultConfig()
-
+	logInfo(streams, fmt.Sprintf("Extracting apm-server into install directory %s.", path))
 	installer, err := tar.NewInstaller(cfg)
 	if err != nil {
-		return errors.New(err, "creating installer")
+		return nil, errors.New(err, "creating installer")
 	}
 	spec := program.Spec{Name: name, Cmd: name, Artifact: name}
 	version := release.Version()
@@ -475,46 +525,29 @@ func runLegacyAPMServer(log *logp.Logger, path string, args []string) error {
 	}
 	// Extract the bundled apm-server binary into the APM_SERVER_PATH
 	if err := installer.Install(context.Background(), spec, version, path); err != nil {
-		return errors.New(err,
+		return nil, errors.New(err,
 			fmt.Sprintf("installing %s (%s) from %s to %s", spec.Name, version, cfg.TargetDirectory, path))
 	}
 
 	// Start apm-server process respecting args
-	log.Info("Starting legacy apm-server daemon as a subprocess..")
+	logInfo(streams, "Starting legacy apm-server daemon as a subprocess..")
 	pattern := filepath.Join(path, fmt.Sprintf("%s-%s-%s*", spec.Cmd, version, cfg.OS()), spec.Cmd)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("searching apm-server in %s", pattern))
+		return nil, errors.New(err, fmt.Sprintf("searching apm-server in %s", pattern))
 	}
 	if len(files) != 1 {
-		return errors.New("multiple apm-server versions installed")
+		return nil, errors.New("multiple apm-server versions installed")
 	}
 	f, err := filepath.Abs(files[0])
 	if err != nil {
-		return errors.New(err, fmt.Sprintf("absPath for %s", files[0]))
+		return nil, errors.New(err, fmt.Sprintf("absPath for %s", files[0]))
 	}
-	proc, err := process.Start(log, f, nil, os.Geteuid(), os.Getegid(), args...)
+	log, err := logger.New("apm-server")
 	if err != nil {
-		return err
+		return nil, err
 	}
-	log.Info("Legacy apm-server daemon started...")
-
-	go func() {
-		st, err := proc.Process.Wait()
-		if err != nil {
-			log.Error(errors.New(err, "waiting for apm-server process"))
-		} else {
-			log.Warnf("Process apm-server exited with %d", st.ExitCode())
-		}
-		// sending kill signal to current process (elastic-agent)
-		p, err := os.FindProcess(os.Getpid())
-		if err != nil {
-			log.Error(errors.New(err, "finding elastic-agent process"))
-		}
-		p.Signal(os.Interrupt)
-		log.Info("Shutdown elastic-agent initiated..")
-	}()
-	return nil
+	return process.Start(log, f, nil, os.Geteuid(), os.Getegid(), args...)
 }
 
 func readYaml(f string, cfg *setupConfig) error {
