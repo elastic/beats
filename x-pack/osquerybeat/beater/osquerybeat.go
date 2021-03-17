@@ -208,7 +208,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	setManagerPayload := func(itypes []string) {
 		if b.Manager != nil {
 			b.Manager.SetPayload(map[string]interface{}{
-				"input_types":     itypes,
 				"osquery_version": distro.OsquerydVersion(),
 			})
 		}
@@ -283,7 +282,7 @@ func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
 }
 
 func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
-	log.Debug("Execute query")
+	log.Debugf("Execute query: %s", query)
 
 	start := time.Now()
 
