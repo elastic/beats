@@ -1064,8 +1064,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
 - Add new ECS 1.8 improvements. {pull}23563[23563]
 - Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
-- Move SafeReader to libbeat/common/encoding/xml. {pull}24560[24560]
-- Merge redundant code into winlogbeat/sys. {pull}24560[24560]
 
 *Elastic Log Driver*
 
