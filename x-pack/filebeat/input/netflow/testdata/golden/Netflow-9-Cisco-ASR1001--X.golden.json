@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.100.13",
-          "locality": "private",
+          "locality": "internal",
           "port": 53218
         },
         "event": {
@@ -16,7 +16,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -24,7 +23,7 @@
         },
         "flow": {
           "id": "_qSyv-Xe8IM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAFHg==",
@@ -71,7 +70,7 @@
         "source": {
           "bytes": 965,
           "ip": "10.111.111.242",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 52444
         }
@@ -85,7 +84,7 @@
       "Fields": {
         "destination": {
           "ip": "10.100.105.85",
-          "locality": "private",
+          "locality": "internal",
           "port": 41746
         },
         "event": {
@@ -94,7 +93,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -102,7 +100,7 @@
         },
         "flow": {
           "id": "7s_4xBb69Y0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -149,7 +147,7 @@
         "source": {
           "bytes": 284,
           "ip": "10.10.4.29",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 161
         }
@@ -163,7 +161,7 @@
       "Fields": {
         "destination": {
           "ip": "10.111.111.242",
-          "locality": "private",
+          "locality": "internal",
           "port": 52444
         },
         "event": {
@@ -172,7 +170,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -180,7 +177,7 @@
         },
         "flow": {
           "id": "_qSyv-Xe8IM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAFHg==",
@@ -227,7 +224,7 @@
         "source": {
           "bytes": 670,
           "ip": "10.12.100.13",
-          "locality": "private",
+          "locality": "internal",
           "packets": 6,
           "port": 53218
         }
@@ -241,7 +238,7 @@
       "Fields": {
         "destination": {
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "port": 61440
         },
         "event": {
@@ -250,7 +247,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -258,7 +254,7 @@
         },
         "flow": {
           "id": "jk1T8-P2OHM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -305,7 +301,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.12.104.239",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 1720
         }
@@ -319,7 +315,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.104.239",
-          "locality": "private",
+          "locality": "internal",
           "port": 1720
         },
         "event": {
@@ -328,7 +324,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -336,7 +331,7 @@
         },
         "flow": {
           "id": "jk1T8-P2OHM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -383,7 +378,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 61440
         }
@@ -397,7 +392,7 @@
       "Fields": {
         "destination": {
           "ip": "10.15.131.98",
-          "locality": "private",
+          "locality": "internal",
           "port": 64400
         },
         "event": {
@@ -406,7 +401,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -414,7 +408,7 @@
         },
         "flow": {
           "id": "6AEj_wlzQm4",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAANQ==",
@@ -461,7 +455,7 @@
         "source": {
           "bytes": 101,
           "ip": "10.100.101.45",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 53
         }
@@ -475,7 +469,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.105.23",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -484,7 +478,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -492,7 +485,7 @@
         },
         "flow": {
           "id": "MtCuD-nvBTY",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAHFA==",
@@ -539,7 +532,7 @@
         "source": {
           "bytes": 1134,
           "ip": "10.100.101.43",
-          "locality": "private",
+          "locality": "internal",
           "packets": 14,
           "port": 0
         }
@@ -553,7 +546,7 @@
       "Fields": {
         "destination": {
           "ip": "10.11.31.108",
-          "locality": "private",
+          "locality": "internal",
           "port": 51708
         },
         "event": {
@@ -562,7 +555,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -570,7 +562,7 @@
         },
         "flow": {
           "id": "8zAXung0YbA",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "application_id": "DQACBg==",
@@ -617,7 +609,7 @@
         "source": {
           "bytes": 237,
           "ip": "31.13.71.7",
-          "locality": "public",
+          "locality": "external",
           "packets": 4,
           "port": 443
         }
@@ -631,7 +623,7 @@
       "Fields": {
         "destination": {
           "ip": "10.100.105.86",
-          "locality": "private",
+          "locality": "internal",
           "port": 58842
         },
         "event": {
@@ -640,7 +632,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -648,7 +639,7 @@
         },
         "flow": {
           "id": "5LxKkXX5FfM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -695,7 +686,7 @@
         "source": {
           "bytes": 91,
           "ip": "10.11.21.60",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 161
         }
@@ -709,7 +700,7 @@
       "Fields": {
         "destination": {
           "ip": "172.217.11.5",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
@@ -718,7 +709,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -726,7 +716,7 @@
         },
         "flow": {
           "id": "MnDMft-qZjs",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "application_id": "DQABzg==",
@@ -773,7 +763,7 @@
         "source": {
           "bytes": 41,
           "ip": "10.12.92.102",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 50766
         }
@@ -787,7 +777,7 @@
       "Fields": {
         "destination": {
           "ip": "10.11.21.60",
-          "locality": "private",
+          "locality": "internal",
           "port": 161
         },
         "event": {
@@ -796,7 +786,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -804,7 +793,7 @@
         },
         "flow": {
           "id": "Ddy-Ii-ZDDI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -851,7 +840,7 @@
         "source": {
           "bytes": 111,
           "ip": "10.100.105.86",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 58843
         }
@@ -865,7 +854,7 @@
       "Fields": {
         "destination": {
           "ip": "10.100.105.85",
-          "locality": "private",
+          "locality": "internal",
           "port": 41351
         },
         "event": {
@@ -874,7 +863,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -882,7 +870,7 @@
         },
         "flow": {
           "id": "Hiy-Ti0eVlY",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -929,7 +917,7 @@
         "source": {
           "bytes": 1164,
           "ip": "10.10.4.234",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 161
         }
@@ -943,7 +931,7 @@
       "Fields": {
         "destination": {
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "port": 61440
         },
         "event": {
@@ -952,7 +940,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -960,7 +947,7 @@
         },
         "flow": {
           "id": "7iMintjCsaw",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -1007,7 +994,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.12.106.83",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 1720
         }
@@ -1021,7 +1008,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.92.102",
-          "locality": "private",
+          "locality": "internal",
           "port": 50766
         },
         "event": {
@@ -1030,7 +1017,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1038,7 +1024,7 @@
         },
         "flow": {
           "id": "MnDMft-qZjs",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "application_id": "DQABzg==",
@@ -1085,7 +1071,7 @@
         "source": {
           "bytes": 52,
           "ip": "172.217.11.5",
-          "locality": "public",
+          "locality": "external",
           "packets": 1,
           "port": 443
         }
@@ -1099,7 +1085,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.106.83",
-          "locality": "private",
+          "locality": "internal",
           "port": 1720
         },
         "event": {
@@ -1108,7 +1094,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1116,7 +1101,7 @@
         },
         "flow": {
           "id": "7iMintjCsaw",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -1163,7 +1148,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 61440
         }
@@ -1177,7 +1162,7 @@
       "Fields": {
         "destination": {
           "ip": "74.201.129.29",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
@@ -1186,7 +1171,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1194,7 +1178,7 @@
         },
         "flow": {
           "id": "hphBugBrKPY",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1241,7 +1225,7 @@
         "source": {
           "bytes": 3088,
           "ip": "10.12.81.86",
-          "locality": "private",
+          "locality": "internal",
           "packets": 10,
           "port": 58657
         }
@@ -1255,7 +1239,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.100.13",
-          "locality": "private",
+          "locality": "internal",
           "port": 389
         },
         "event": {
@@ -1264,7 +1248,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1272,7 +1255,7 @@
         },
         "flow": {
           "id": "gJ7Z20zGGk8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAB2Q==",
@@ -1319,7 +1302,7 @@
         "source": {
           "bytes": 5306,
           "ip": "10.14.121.98",
-          "locality": "private",
+          "locality": "internal",
           "packets": 24,
           "port": 50174
         }
@@ -1333,7 +1316,7 @@
       "Fields": {
         "destination": {
           "ip": "10.100.105.86",
-          "locality": "private",
+          "locality": "internal",
           "port": 58843
         },
         "event": {
@@ -1342,7 +1325,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1350,7 +1332,7 @@
         },
         "flow": {
           "id": "Ddy-Ii-ZDDI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -1397,7 +1379,7 @@
         "source": {
           "bytes": 116,
           "ip": "10.11.21.60",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 161
         }
@@ -1411,7 +1393,7 @@
       "Fields": {
         "destination": {
           "ip": "10.14.121.98",
-          "locality": "private",
+          "locality": "internal",
           "port": 50174
         },
         "event": {
@@ -1420,7 +1402,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1428,7 +1409,7 @@
         },
         "flow": {
           "id": "gJ7Z20zGGk8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAB2Q==",
@@ -1475,7 +1456,7 @@
         "source": {
           "bytes": 22764,
           "ip": "10.12.100.13",
-          "locality": "private",
+          "locality": "internal",
           "packets": 30,
           "port": 389
         }
@@ -1489,7 +1470,7 @@
       "Fields": {
         "destination": {
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "port": 61443
         },
         "event": {
@@ -1498,7 +1479,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1506,7 +1486,7 @@
         },
         "flow": {
           "id": "LZaFrMI9jg0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -1553,7 +1533,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.12.102.125",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 1720
         }
@@ -1567,7 +1547,7 @@
       "Fields": {
         "destination": {
           "ip": "10.11.21.60",
-          "locality": "private",
+          "locality": "internal",
           "port": 161
         },
         "event": {
@@ -1576,7 +1556,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1584,7 +1563,7 @@
         },
         "flow": {
           "id": "f6pXcQQIzpU",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -1631,7 +1610,7 @@
         "source": {
           "bytes": 75,
           "ip": "10.100.105.86",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 58844
         }
@@ -1645,7 +1624,7 @@
       "Fields": {
         "destination": {
           "ip": "10.12.102.125",
-          "locality": "private",
+          "locality": "internal",
           "port": 1720
         },
         "event": {
@@ -1654,7 +1633,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1662,7 +1640,7 @@
         },
         "flow": {
           "id": "LZaFrMI9jg0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAQA==",
@@ -1709,7 +1687,7 @@
         "source": {
           "bytes": 80,
           "ip": "10.10.11.21",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 61443
         }
@@ -1723,7 +1701,7 @@
       "Fields": {
         "destination": {
           "ip": "10.10.4.151",
-          "locality": "private",
+          "locality": "internal",
           "port": 161
         },
         "event": {
@@ -1732,7 +1710,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1740,7 +1717,7 @@
         },
         "flow": {
           "id": "gQGJtHjUcB8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAoQ==",
@@ -1787,7 +1764,7 @@
         "source": {
           "bytes": 160,
           "ip": "10.100.105.85",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 37265
         }
@@ -1801,7 +1778,7 @@
       "Fields": {
         "destination": {
           "ip": "17.253.24.253",
-          "locality": "public",
+          "locality": "external",
           "port": 123
         },
         "event": {
@@ -1810,7 +1787,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1818,7 +1794,7 @@
         },
         "flow": {
           "id": "UHiF_w4I6zM",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "application_id": "AwAAew==",
@@ -1865,7 +1841,7 @@
         "source": {
           "bytes": 76,
           "ip": "10.14.25.80",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 62427
         }
@@ -1879,7 +1855,7 @@
       "Fields": {
         "destination": {
           "ip": "10.100.101.43",
-          "locality": "private",
+          "locality": "internal",
           "port": 49156
         },
         "event": {
@@ -1888,7 +1864,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-10-09T20:22:35Z",
           "kind": "event",
           "type": [
             "connection"
@@ -1896,7 +1871,7 @@
         },
         "flow": {
           "id": "czsFrOKrayM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAB2Q==",
@@ -1943,7 +1918,7 @@
         "source": {
           "bytes": 1340,
           "ip": "10.12.150.13",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 61792
         }

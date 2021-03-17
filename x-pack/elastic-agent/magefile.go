@@ -192,16 +192,19 @@ func (Build) Clean() {
 // TestBinaries build the required binaries for the test suite.
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
-
+	p2 := filepath.Join("pkg", "agent", "transpiler", "tests")
 	configurableName := "configurable"
 	serviceableName := "serviceable"
+	execName := "exec"
 	if runtime.GOOS == "windows" {
 		configurableName += ".exe"
 		serviceableName += ".exe"
+		execName += ".exe"
 	}
 	return combineErr(
 		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p2, "exec-1.0-darwin-x86_64", execName), filepath.Join(p2, "exec-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -577,7 +580,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		packedBeats := []string{"filebeat", "metricbeat"}
+		packedBeats := []string{"filebeat", "heartbeat", "metricbeat"}
 
 		for _, b := range packedBeats {
 			pwd, err := filepath.Abs(filepath.Join("..", b))
@@ -591,6 +594,9 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
 				cmd.Env = append(os.Environ(), fmt.Sprintf("PWD=%s", pwd), "AGENT_PACKAGING=on")
+				if envVar := selectedPackageTypes(); envVar != "" {
+					cmd.Env = append(cmd.Env, envVar)
+				}
 
 				if err := cmd.Run(); err != nil {
 					panic(err)
@@ -611,6 +617,14 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+func selectedPackageTypes() string {
+	if len(devtools.SelectedPackageTypes) == 0 {
+		return ""
+	}
+
+	return "PACKAGES=targz,zip"
 }
 
 func copyAll(from, to string) error {

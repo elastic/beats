@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -90,7 +89,7 @@ func (p *upstartPidProvider) PID(ctx context.Context) (int, error) {
 	// find line
 	pidLine := strings.TrimSpace(string(out))
 	if pidLine == "" {
-		return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", install.ServiceName))
+		return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", paths.ServiceName))
 	}
 
 	re := regexp.MustCompile(agentName + ` start/running, process ([0-9]+)`)
@@ -127,17 +126,17 @@ func (p *sysvPidProvider) PID(ctx context.Context) (int, error) {
 	// find line
 	statusLine := strings.TrimSpace(string(out))
 	if statusLine == "" {
-		return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", install.ServiceName))
+		return 0, errors.New(fmt.Sprintf("service process not found for service '%v'", paths.ServiceName))
 	}
 
 	// sysv does not report pid, let's do best effort
 	if !strings.HasPrefix(statusLine, "Running") {
-		return 0, errors.New(fmt.Sprintf("'%v' is not running", install.ServiceName))
+		return 0, errors.New(fmt.Sprintf("'%v' is not running", paths.ServiceName))
 	}
 
-	pidofLine, err := exec.Command("pidof", filepath.Join(install.InstallPath, install.BinaryName)).Output()
+	pidofLine, err := exec.Command("pidof", filepath.Join(paths.InstallPath, paths.BinaryName)).Output()
 	if err != nil {
-		return 0, errors.New(fmt.Sprintf("PID not found for'%v': %v", install.ServiceName, err))
+		return 0, errors.New(fmt.Sprintf("PID not found for'%v': %v", paths.ServiceName, err))
 	}
 
 	pid, err := strconv.Atoi(strings.TrimSpace(string(pidofLine)))
@@ -171,7 +170,12 @@ func (p *dbusPidProvider) Close() {
 }
 
 func (p *dbusPidProvider) PID(ctx context.Context) (int, error) {
-	prop, err := p.dbusConn.GetServiceProperty(install.ServiceName, "MainPID")
+	sn := paths.ServiceName
+	if !strings.HasSuffix(sn, ".service") {
+		sn += ".service"
+	}
+
+	prop, err := p.dbusConn.GetServiceProperty(sn, "MainPID")
 	if err != nil {
 		return 0, errors.New("failed to read service", err)
 	}

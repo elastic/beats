@@ -13,14 +13,17 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 // InspectOutputCmd is an inspect subcommand that shows configurations of the agent.
@@ -69,7 +72,7 @@ func (c *InspectOutputCmd) inspectOutputs(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return listOutputsFromConfig(l, agentInfo, rawConfig, true)
 	}
 
@@ -122,7 +125,7 @@ func (c *InspectOutputCmd) inspectOutput(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return printOutputFromConfig(l, agentInfo, c.output, c.program, rawConfig, true)
 	}
 
@@ -207,6 +210,11 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		modifiers.Filters = append(modifiers.Filters, injectFleet(cfg, sysInfo.Info(), agentInfo))
 	}
 
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, status.NewController(log))
+	if err != nil {
+		return nil, err
+	}
+
 	emit, err := emitter(
 		ctx,
 		log,
@@ -214,6 +222,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		composableWaiter,
 		router,
 		modifiers,
+		caps,
 		monitor,
 	)
 	if err != nil {

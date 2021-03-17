@@ -78,17 +78,17 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, endpoints, err := create("tls", config)
+	p, err := create("tls", config)
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
 	require.NoError(t, err)
 
-	require.Equal(t, 1, endpoints)
+	require.Equal(t, 1, p.Endpoints)
 
 	return event
 }
@@ -318,11 +318,11 @@ func TestLargeResponse(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, _, err := create("largeresp", config)
+	p, err := create("largeresp", config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -532,11 +532,11 @@ func TestRedirect(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, _, err := create("redirect", config)
+	p, err := create("redirect", config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	// Run this test multiple times since in the past we had an issue where the redirects
 	// list was added onto by each request. See https://github.com/elastic/beats/pull/15944
@@ -579,11 +579,11 @@ func TestNoHeaders(t *testing.T) {
 	config, err := common.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	jobs, _, err := create("http", config)
+	p, err := create("http", config)
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -626,7 +626,12 @@ func TestNewRoundTripper(t *testing.T) {
 			require.NotNil(t, transp.Dial)
 			require.NotNil(t, transport.TLSDialer)
 
-			require.Equal(t, (&tlscommon.TLSConfig{}).ToConfig(), transp.TLSClientConfig)
+			expected := (&tlscommon.TLSConfig{}).ToConfig()
+			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
+			// When we remove support for the legacy common name treatment
+			// this test has to be adjusted, as we will not depend on our
+			// VerifyConnection callback.
+			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
 			require.True(t, transp.DisableKeepAlives)
 		})
 	}

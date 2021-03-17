@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/kardianos/service"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
 // StatusType is the return status types.
@@ -25,7 +27,7 @@ const (
 
 // Status returns the installation status of Agent.
 func Status() (StatusType, string) {
-	expected := filepath.Join(InstallPath, BinaryName)
+	expected := filepath.Join(paths.InstallPath, paths.BinaryName)
 	status, reason := checkService()
 	_, err := os.Stat(expected)
 	if os.IsNotExist(err) {
@@ -40,25 +42,6 @@ func Status() (StatusType, string) {
 		return Broken, reason
 	}
 	return Installed, ""
-}
-
-// RunningInstalled returns true when executing Agent is the installed Agent.
-//
-// This verifies the running executable path based on hard-coded paths
-// for each platform type.
-func RunningInstalled() bool {
-	expected := filepath.Join(InstallPath, BinaryName)
-	execPath, _ := os.Executable()
-	execPath, _ = filepath.Abs(execPath)
-	execName := filepath.Base(execPath)
-	execDir := filepath.Dir(execPath)
-	if insideData(execDir) {
-		// executable path is being reported as being down inside of data path
-		// move up to directories to perform the comparison
-		execDir = filepath.Dir(filepath.Dir(execDir))
-		execPath = filepath.Join(execDir, execName)
-	}
-	return expected == execPath
 }
 
 // checkService only checks the status of the service.

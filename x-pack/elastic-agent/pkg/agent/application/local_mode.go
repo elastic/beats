@@ -9,16 +9,19 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -62,10 +65,15 @@ func newLocal(
 	pathConfigFile string,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	statusCtrl status.Controller,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (*Local, error) {
-	statusController := &noopController{}
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
@@ -98,7 +106,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusController))
+	router, err := newRouter(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -120,6 +128,7 @@ func newLocal(
 			Decorators: []decoratorFunc{injectMonitoring},
 			Filters:    []filterFunc{filters.StreamChecker},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -145,7 +154,8 @@ func newLocal(
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
 		newNoopAcker(),
-		reporter)
+		reporter,
+		caps)
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil

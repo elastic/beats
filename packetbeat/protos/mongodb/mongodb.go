@@ -382,7 +382,9 @@ func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {
 
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)
+	pbf.AddIP(t.src.IP)
 	pbf.SetDestination(&t.dst)
+	pbf.AddIP(t.dst.IP)
 	pbf.Source.Bytes = int64(t.bytesIn)
 	pbf.Destination.Bytes = int64(t.bytesOut)
 	pbf.Event.Dataset = "mongodb"

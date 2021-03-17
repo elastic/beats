@@ -18,7 +18,6 @@
 package beater
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -36,6 +35,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -81,10 +82,11 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
-	err := bt.RunStaticMonitors(b)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
 		return err
 	}
+	defer stopStaticMonitors()
 
 	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
@@ -95,13 +97,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors(b)
-		if err != nil {
-			return err
-		}
-	}
-
-	if len(bt.config.SyntheticSuites) > 0 {
-		err := bt.RunSyntheticSuiteMonitors(b)
 		if err != nil {
 			return err
 		}
@@ -129,9 +124,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
 
+	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
@@ -139,12 +135,19 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 				continue // don't stop loading monitors just because they're disabled
 			}
 
-			return errors.Wrap(err, "could not create monitor")
+			return nil, errors.Wrap(err, "could not create monitor")
 		}
 
 		created.Start()
+		runners = append(runners, created)
 	}
-	return nil
+
+	stop = func() {
+		for _, runner := range runners {
+			runner.Stop()
+		}
+	}
+	return stop, nil
 }
 
 // RunCentralMgmtMonitors loads any central management configured configs.
@@ -165,50 +168,6 @@ func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Execute the monitor
 	go bt.monitorReloader.Run(bt.dynamicFactory)
 
-	return nil
-}
-
-// Provide hook to define journey list discovery from x-pack
-type JourneyLister func(ctx context.Context, suiteFile string, params common.MapStr) ([]string, error)
-
-var mainJourneyLister JourneyLister
-
-func RegisterJourneyLister(jl JourneyLister) {
-	mainJourneyLister = jl
-}
-
-func (bt *Heartbeat) RunSyntheticSuiteMonitors(b *beat.Beat) error {
-	// If we are running without XPack this will be nil
-	if mainJourneyLister == nil {
-		return nil
-	}
-	for _, suite := range bt.config.SyntheticSuites {
-		logp.Info("Listing suite %s", suite.Path)
-		journeyNames, err := mainJourneyLister(context.TODO(), suite.Path, suite.Params)
-		if err != nil {
-			return err
-		}
-		factory := monitors.NewFactory(b.Info, bt.scheduler, false)
-		for _, name := range journeyNames {
-			cfg, err := common.NewConfigFrom(map[string]interface{}{
-				"type":         "browser",
-				"path":         suite.Path,
-				"schedule":     suite.Schedule,
-				"params":       suite.Params,
-				"journey_name": name,
-				"name":         name,
-				"id":           name,
-			})
-			if err != nil {
-				return err
-			}
-			created, err := factory.Create(b.Publisher, cfg)
-			if err != nil {
-				return errors.Wrap(err, "could not create monitor")
-			}
-			created.Start()
-		}
-	}
 	return nil
 }
 

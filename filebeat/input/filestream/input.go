@@ -53,14 +53,8 @@ type fileMeta struct {
 // are actively written by other applications.
 type filestream struct {
 	readerConfig    readerConfig
-	bufferSize      int
-	tailFile        bool // TODO
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
-	lineTerminator  readfile.LineTerminator
-	excludeLines    []match.Matcher
-	includeLines    []match.Matcher
-	maxBytes        int
 	closerConfig    closerConfig
 }
 
@@ -97,9 +91,9 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
 	prospector := &fileProspector{
@@ -111,13 +105,8 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 	}
 
 	filestream := &filestream{
-		readerConfig:    config.readerConfig,
-		bufferSize:      config.BufferSize,
+		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
-		lineTerminator:  config.LineTerminator,
-		excludeLines:    config.ExcludeLines,
-		includeLines:    config.IncludeLines,
-		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
 	}
 
@@ -159,7 +148,7 @@ func (inp *filestream) Run(
 		return err
 	}
 
-	_, streamCancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {
@@ -191,7 +180,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		return nil, err
 	}
 
-	log.Debug("newLogFileReader with config.MaxBytes:", inp.maxBytes)
+	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
@@ -211,13 +200,13 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
 	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
-	encReaderMaxBytes := inp.maxBytes * 4
+	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      inp.encoding,
-		BufferSize: inp.bufferSize,
-		Terminator: inp.lineTerminator,
+		BufferSize: inp.readerConfig.BufferSize,
+		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
@@ -225,8 +214,8 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 		return nil, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.lineTerminator)
-	r = readfile.NewLimitReader(r, inp.maxBytes)
+	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
 	return r, nil
 }
@@ -318,13 +307,13 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
+		s.Offset += int64(message.Bytes)
+
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
 		event := inp.eventFromMessage(message, path)
-		s.Offset += int64(message.Bytes)
-
 		if err := p.Publish(event, s); err != nil {
 			return err
 		}
@@ -335,14 +324,14 @@ func (inp *filestream) readFromSource(
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
 func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
-	if len(inp.includeLines) > 0 {
-		if !matchAny(inp.includeLines, line) {
+	if len(inp.readerConfig.IncludeLines) > 0 {
+		if !matchAny(inp.readerConfig.IncludeLines, line) {
 			log.Debug("Drop line as it does not match any of the include patterns %s", line)
 			return true
 		}
 	}
-	if len(inp.excludeLines) > 0 {
-		if matchAny(inp.excludeLines, line) {
+	if len(inp.readerConfig.ExcludeLines) > 0 {
+		if matchAny(inp.readerConfig.ExcludeLines, line) {
 			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
 			return true
 		}

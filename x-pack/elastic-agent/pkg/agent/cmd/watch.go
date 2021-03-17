@@ -15,12 +15,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
@@ -66,9 +67,9 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return nil
 	}
 
-	locker := application.NewAppLocker(paths.Top(), watcherLockFile)
+	locker := filelock.NewAppLocker(paths.Top(), watcherLockFile)
 	if err := locker.TryLock(); err != nil {
-		if err == application.ErrAppAlreadyRunning {
+		if err == filelock.ErrAppAlreadyRunning {
 			log.Debugf("exiting, lock already exists")
 			return nil
 		}
@@ -182,7 +183,7 @@ func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 
 func configuredLogger(flags *globalFlags) (*logger.Logger, error) {
 	pathConfigFile := flags.Config()
-	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
+	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),

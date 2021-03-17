@@ -37,7 +37,7 @@ const (
 	InitialCheckinTimeout = 5 * time.Second
 	// CheckinMinimumTimeoutGracePeriod is additional time added to the client.CheckinMinimumTimeout
 	// to ensure the application is checking in correctly.
-	CheckinMinimumTimeoutGracePeriod = 2 * time.Second
+	CheckinMinimumTimeoutGracePeriod = 30 * time.Second
 	// WatchdogCheckLoop is the amount of time that the watchdog will wait between checking for
 	// applications that have not checked in the correct amount of time.
 	WatchdogCheckLoop = 5 * time.Second
@@ -249,9 +249,13 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 	}()
 
 	var ok bool
+	var observedConfigStateIdx uint64
 	var firstCheckin *proto.StateObserved
 	select {
 	case firstCheckin, ok = <-firstCheckinChan:
+		if firstCheckin != nil {
+			observedConfigStateIdx = firstCheckin.ConfigStateIdx
+		}
 		break
 	case <-time.After(InitialCheckinTimeout):
 		// close connection
@@ -281,6 +285,13 @@ func (s *Server) Checkin(server proto.ElasticAgent_CheckinServer) error {
 		s.logger.Debug("check-in stream cannot connect, application is being destroyed; closing connection")
 		return status.Error(codes.Unavailable, "application cannot connect being destroyed")
 	}
+
+	// application is running as a service and counter is already counting
+	// force config reload
+	if observedConfigStateIdx > 0 {
+		appState.expectedConfigIdx = observedConfigStateIdx + 1
+	}
+
 	checkinDone := make(chan bool)
 	appState.checkinDone = checkinDone
 	appState.checkinLock.Unlock()

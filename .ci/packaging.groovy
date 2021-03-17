@@ -17,6 +17,7 @@ pipeline {
     JOB_GCS_BUCKET = 'beats-ci-artifacts'
     JOB_GCS_BUCKET_STASH = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
@@ -40,6 +41,7 @@ pipeline {
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
     booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
+    booleanParam(name: 'arm', defaultValue: true, description: 'Allow ARM stages.')
   }
   stages {
     stage('Filter build') {
@@ -83,12 +85,13 @@ pipeline {
               }
             }
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
+            // Stash without any build/dependencies context to support different architectures.
+            stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
             withMageEnv(){
               dir("${BASE_DIR}"){
                 setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
               }
             }
-            stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
           }
         }
         stage('Build Packages'){
@@ -149,7 +152,9 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    pushCIDockerImages()
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'amd64')
+                    }
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
@@ -172,10 +177,74 @@ pipeline {
                 }
                 steps {
                   withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-                    deleteDir()
+                    deleteWorkspace()
                     withMacOSEnv(){
                       release()
                     }
+                  }
+                }
+                post {
+                  always {
+                    // static workers require this
+                    deleteWorkspace()
+                  }
+                }
+              }
+            }
+          }
+        }
+        stage('Build Packages ARM'){
+          matrix {
+            axes {
+              axis {
+                name 'BEATS_FOLDER'
+                values (
+                  'auditbeat',
+                  'filebeat',
+                  'heartbeat',
+                  'journalbeat',
+                  'metricbeat',
+                  'packetbeat',
+                  'x-pack/auditbeat',
+                  'x-pack/dockerlogbeat',
+                  'x-pack/elastic-agent',
+                  'x-pack/filebeat',
+                  'x-pack/heartbeat',
+                  'x-pack/metricbeat',
+                  'x-pack/packetbeat'
+                )
+              }
+            }
+            stages {
+              stage('Package Docker images for linux/arm64'){
+                agent { label 'arm' }
+                options { skipDefaultCheckout() }
+                when {
+                  beforeAgent true
+                  expression {
+                    return params.arm
+                  }
+                }
+                environment {
+                  HOME = "${env.WORKSPACE}"
+                  PACKAGES = "docker"
+                  PLATFORMS = [
+                    'linux/arm64',
+                  ].join(' ')
+                }
+                steps {
+                  withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
+                    deleteWorkspace()
+                    release()
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'arm64')
+                    }
+                  }
+                }
+                post {
+                  always {
+                    // static workers require this
+                    deleteWorkspace()
                   }
                 }
               }
@@ -205,27 +274,37 @@ pipeline {
   }
 }
 
-def pushCIDockerImages(){
+/**
+* @param arch what architecture
+*/
+def pushCIDockerImages(Map args = [:]) {
+  def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      tagAndPush('auditbeat')
+      tagAndPush(beatName: 'auditbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      tagAndPush('filebeat')
+      tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      tagAndPush('heartbeat')
+      tagAndPush(beatName: 'heartbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush('journalbeat')
+      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      tagAndPush('metricbeat')
+      tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush('packetbeat')
+      tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush('elastic-agent')
+      tagAndPush(beatName: 'elastic-agent', arch: arch)
     }
   }
 }
 
-def tagAndPush(beatName){
+/**
+* @param beatName name of the Beat
+* @param arch what architecture
+*/
+def tagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def arch = args.get('arch', 'amd64')
   def libbetaVer = env.BEAT_VERSION
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
@@ -242,14 +321,22 @@ def tagAndPush(beatName){
 
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
 
+  // supported tags
+  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
+  if (!isPR() && aliasVersion != "") {
+    tags << aliasVersion
+  }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    doTagAndPush(beatName, variant, libbetaVer, tagName)
-    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
-
-    if (!isPR() && aliasVersion != "") {
-      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    tags.each { tag ->
+      // TODO:
+      // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
+      // they support the versioning with the architecture
+      if ("${arch}" == "amd64") {
+        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}")
+      }
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
     }
   }
 }
@@ -260,18 +347,19 @@ def tagAndPush(beatName){
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
-def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+def doTagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def variant = args.variant
+  def sourceTag = args.sourceTag
+  def targetTag = args.targetTag
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
-    def status = sh(label: "Change tag and push ${targetName}", script: """
-      docker tag ${sourceName} ${targetName}
-      docker push ${targetName}
-    """, returnStatus: true)
-
+    def status = sh(label: "Change tag and push ${targetName}",
+                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
+                    returnStatus: true)
     if ( status > 0 && iterations < 3) {
       error("tag and push failed for ${beatName}, retry")
     } else if ( status > 0 ) {
@@ -339,17 +427,13 @@ def triggerE2ETests(String suite) {
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
+    string(name: 'BEAT_VERSION', value: env.BEAT_VERSION),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
     string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
   ]
-  if (isPR()) {
-    def version = "pr-${env.CHANGE_ID}"
-    parameters.push(booleanParam(name: 'ELASTIC_AGENT_USE_CI_SNAPSHOTS', value: true))
-    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
-    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
-  }
 
   build(job: "${e2eTestsPipeline}",
     parameters: parameters,
@@ -385,14 +469,11 @@ def publishPackages(baseDir){
   uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
 }
 
-def uploadPackages(bucketUri, baseDir){
-  googleStorageUpload(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_CREDENTIALS}",
-    pathPrefix: "${baseDir}/build/distributions/",
-    pattern: "${baseDir}/build/distributions/**/*",
-    sharedPublicly: true,
-    showInline: true
-  )
+def uploadPackages(bucketUri, beatsFolder){
+  googleStorageUploadExt(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+    pattern: "${beatsFolder}/build/distributions/**/*",
+    sharedPublicly: true)
 }
 
 /**
@@ -408,13 +489,42 @@ def getBeatsName(baseDir) {
 }
 
 def withBeatsEnv(Closure body) {
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  fixPermissions()
   withMageEnv(){
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
-      unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
       dir("${env.BASE_DIR}"){
         body()
+      }
+    }
+  }
+}
+
+/**
+* This method fixes the filesystem permissions after the build has happenend. The reason is to
+* ensure any non-ephemeral workers don't have any leftovers that could cause some environmental
+* issues.
+*/
+def deleteWorkspace() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    fixPermissions()
+    deleteDir()
+  }
+}
+
+def fixPermissions() {
+  if(isUnix()) {
+    catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+      dir("${env.BASE_DIR}") {
+        if (fileExists('script/fix_permissions.sh')) {
+          sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+            set +x
+            source ./dev-tools/common.bash
+            docker_setup
+            script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
+        }
       }
     }
   }

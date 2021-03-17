@@ -4,7 +4,7 @@ Apr 15 2014 09:34:34 EDT: %ASA-session-5-106100: access-list acl_in permitted tc
 Apr 24 2013 16:00:28 INT-FW01 : %ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]
 Apr 24 2013 16:00:27 INT-FW01 : %ASA-6-106100: access-list inside permitted udp inside/172.29.2.3(1065) -> outside/192.0.2.57(53) hit-cnt 144 300-second interval [0xe982c7a4, 0x0]
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4952 to outside:192.0.2.130/12834
-Apr 29 2013 12:59:50: %ASA-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42.130/12834)
+Apr 29 2013 12:59:50: %ASA-6-302013: Built outbound TCP connection 89743274 for outside:192.0.2.43/443 (192.0.2.43/443) to outside:10.123.3.42/4952 (10.123.3.42/12834)
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic UDP translation from outside:10.123.1.35/52925 to outside:192.0.2.130/25882
 Apr 29 2013 12:59:50: %ASA-6-302015: Built outbound UDP connection 89743275 for outside:192.0.2.222/53 (192.0.2.43/53) to outside:10.123.1.35/52925 (10.123.1.35/25882)
 Apr 29 2013 12:59:50: %ASA-6-305011: Built dynamic TCP translation from outside:10.123.3.42/4953 to outside:192.0.2.130/45392
@@ -38,7 +38,6 @@ Apr 30 2013 09:23:43: %ASA-5-106100: access-list acl_in est-allowed tcp inside/1
 Apr 30 2013 09:23:43: %ASA-5-106100: access-list acl_in est-allowed tcp inside/10.0.0.16(2013) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Apr 15 2018 09:34:34 EDT: %ASA-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]
 Dec 11 2018 08:01:24 <IP>: %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80 (10.0.13.13/80)
-Dec 11 2018 08:01:24 <IP>: %ASA-6-302015: Built outbound UDP connection 447235 for outside:192.168.77.12/11180 (192.168.77.12/11180) to identity:10.0.13.13/80port> (10.0.13.13/80)
 Dec 11 2018 08:01:24 <IP>: %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
 Dec 11 2018 08:01:24 <IP>: %ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group "dmz" [0x123a465e, 0x4c7bf613]
 Dec 11 2018 08:01:31 <IP>: %ASA-6-302013: Built outbound TCP connection 447236 for outside:192.0.2.222/1234 (192.0.2.222/1234) to dmz:OCSP_Server/5678 (OCSP_Server/5678)
@@ -70,3 +69,4 @@ Jan 14 2015 13:16:14: %ASA-4-338008: Dynamic Filter dropped blacklisted TCP traf
 Nov 16 2009 14:12:35: %ASA-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app
 Nov 16 2009 14:12:36: %ASA-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com
 Nov 16 2009 14:12:37: %ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside
+Jan 13 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)

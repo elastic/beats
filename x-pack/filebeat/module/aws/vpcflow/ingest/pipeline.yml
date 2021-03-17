@@ -119,7 +119,7 @@ processors:
       ignore_empty_value: true
 
   - set:
-      if: "ctx.aws.vpcflow.instance_id != '-'"
+      if: "ctx.aws?.vpcflow?.instance_id != null && ctx.aws.vpcflow.instance_id != '-'"
       field: cloud.instance.id
       value: "{{aws.vpcflow.instance_id}}"
       ignore_empty_value: true
@@ -127,6 +127,37 @@ processors:
   - set:
       field: event.kind
       value: event
+
+  - script:
+      lang: painless
+      ignore_failure: true
+      if: "ctx.aws?.vpcflow?.tcp_flags != null"
+      source: |
+        if (ctx.aws.vpcflow.tcp_flags_array == null) {
+          ArrayList al = new ArrayList();
+          ctx.aws.vpcflow.put("tcp_flags_array", al);
+        }
+
+        def flags = Integer.parseUnsignedInt(ctx.aws.vpcflow.tcp_flags);
+
+        if ((flags & 0x01) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('fin');
+        }
+        if ((flags & 0x02) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('syn');
+        }
+        if ((flags & 0x04) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('rst');
+        }
+        if ((flags & 0x08) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('psh');
+        }
+        if ((flags & 0x10) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('ack');
+        }
+        if ((flags & 0x20) != 0) {
+          ctx.aws.vpcflow.tcp_flags_array.add('urg');
+        }
 
 on_failure:
   - set:

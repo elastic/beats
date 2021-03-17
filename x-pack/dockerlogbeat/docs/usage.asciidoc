@@ -16,7 +16,7 @@ The following examples show common configurations for the {log-driver}.
 ["source","sh",subs="attributes"]
 ----
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            -it debian:jessie /bin/bash
@@ -29,7 +29,7 @@ docker run --log-driver=elastic/{log-driver-alias}:{version} \
 {
   "log-driver" : "elastic/{log-driver-alias}:{version}",
   "log-opts" : {
-    "endpoint" : "myhost:9200",
+    "hosts" : "myhost:9200",
     "user" : "myusername",
     "password" : "mypassword",
   }
@@ -71,7 +71,7 @@ docker run --log-driver=elastic/{log-driver-alias}:{version} \
 ["source","sh",subs="attributes"]
 ----
 docker run --log-driver=elastic/{log-driver-alias}:{version} \
-           --log-opt endpoint="myhost:9200" \
+           --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
            --log-opt index="eld-%{[agent.version]}-%{+yyyy.MM.dd}" \
@@ -85,7 +85,7 @@ docker run --log-driver=elastic/{log-driver-alias}:{version} \
 {
   "log-driver" : "elastic/{log-driver-alias}:{version}",
   "log-opts" : {
-    "endpoint" : "myhost:9200",
+    "hosts" : "myhost:9200",
     "user" : "myusername",
     "index" : "eld-%{[agent.version]}-%{+yyyy.MM.dd}",
     "password" : "mypassword",

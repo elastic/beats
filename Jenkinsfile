@@ -9,17 +9,19 @@ pipeline {
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
+    JOB_GCS_EXT_CREDENTIALS = 'beats-ci-gcs-plugin-file-credentials'
     OSS_MODULE_PATTERN = '^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats-build"
-    TERRAFORM_VERSION = "0.12.24"
+    SNAPSHOT = 'true'
+    TERRAFORM_VERSION = "0.12.30"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
@@ -37,7 +39,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
-    booleanParam(name: 'awsCloudTests', defaultValue: true, description: 'Run AWS cloud integration tests.')
+    booleanParam(name: 'awsCloudTests', defaultValue: false, description: 'Run AWS cloud integration tests.')
     string(name: 'awsRegion', defaultValue: 'eu-central-1', description: 'Default AWS region to use for testing.')
     booleanParam(name: 'runAllStages', defaultValue: false, description: 'Allow to run all stages.')
     booleanParam(name: 'armTest', defaultValue: false, description: 'Allow ARM stages.')
@@ -56,6 +58,7 @@ pipeline {
           // Skip all the stages except docs for PR's with asciidoc and md changes only
           setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '.*\\.(asciidoc|md)' ], shouldMatchAll: true).toString())
           setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
+          setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '^dev-tools/packaging/.*' ], shouldMatchAll: false).toString())
           setEnvVar('GO_VERSION', readFile(".go-version").trim())
           withEnv(["HOME=${env.WORKSPACE}"]) {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
@@ -79,6 +82,7 @@ pipeline {
             whenTrue(env.ONLY_DOCS == 'false') {
               cmd(label: "make check-python", script: "make check-python")
               cmd(label: "make check-go", script: "make check-go")
+              cmd(label: "make notice", script: "make notice")
               cmd(label: "Check for changes", script: "make check-no-changes")
             }
           }
@@ -127,7 +131,10 @@ pipeline {
       options { skipDefaultCheckout() }
       when {
         allOf {
-          expression { return env.GO_MOD_CHANGES == "true" }
+          anyOf {
+            expression { return env.GO_MOD_CHANGES == "true" }
+            expression { return env.PACKAGING_CHANGES == "true" }
+          }
           changeRequest()
         }
       }
@@ -255,16 +262,223 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
+* This method runs the packaging for ARM
+*/
+def packagingArm(Map args = [:]) {
+  def PLATFORMS = [ 'linux/arm64' ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}",
+    "PACKAGES=docker"
+  ]) {
+    target(args)
+  }
+}
+
+/**
+* This method runs the packaging for Linux
+*/
+def packagingLinux(Map args = [:]) {
+  def PLATFORMS = [ '+all',
+                'linux/amd64',
+                'linux/386',
+                'linux/arm64',
+                'linux/armv7',
+                // The platforms above are disabled temporarly as crossbuild images are
+                // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+                //'linux/ppc64le',
+                //'linux/mips64',
+                //'linux/s390x',
+                'windows/amd64',
+                'windows/386',
+                (params.macos ? '' : 'darwin/amd64'),
+              ].join(' ')
+  withEnv([
+    "PLATFORMS=${PLATFORMS}"
+  ]) {
+    target(args)
+  }
+}
+
+/**
+* Upload the packages to their snapshot or pull request buckets
+* @param beatsFolder beats folder
+*/
+def publishPackages(beatsFolder){
+  def bucketUri = "gs://beats-ci-artifacts/snapshots"
+  if (isPR()) {
+    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
+  }
+  def beatsFolderName = getBeatsName(beatsFolder)
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
+
+  // Copy those files to another location with the sha commit to test them
+  // afterward.
+  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
+  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
+}
+
+/**
+* Upload the distribution files to google cloud.
+* TODO: There is a known issue with Google Storage plugin.
+* @param bucketUri the buckets URI.
+* @param beatsFolder the beats folder.
+*/
+def uploadPackages(bucketUri, beatsFolder){
+  googleStorageUploadExt(bucket: bucketUri,
+    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+    pattern: "${beatsFolder}/build/distributions/**/*",
+    sharedPublicly: true)
+}
+
+/**
+* Push the docker images for the given beat.
+* @param beatsFolder beats folder
+* @param arch what architecture
+*/
+def pushCIDockerImages(Map args = [:]) {
+  def arch = args.get('arch', 'amd64')
+  def beatsFolder = args.beatsFolder
+  catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    if (beatsFolder.endsWith('auditbeat')) {
+      tagAndPush(beatName: 'auditbeat', arch: arch)
+    } else if (beatsFolder.endsWith('filebeat')) {
+      tagAndPush(beatName: 'filebeat', arch: arch)
+    } else if (beatsFolder.endsWith('heartbeat')) {
+      tagAndPush(beatName: 'heartbeat', arch: arch)
+    } else if ("${beatsFolder}" == "journalbeat"){
+      tagAndPush(beatName: 'journalbeat', arch: arch)
+    } else if (beatsFolder.endsWith('metricbeat')) {
+      tagAndPush(beatName: 'metricbeat', arch: arch)
+    } else if ("${beatsFolder}" == "packetbeat"){
+      tagAndPush(beatName: 'packetbeat', arch: arch)
+    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
+      tagAndPush(beatName: 'elastic-agent', arch: arch)
+    }
+  }
+}
+
+/**
+* Tag and push all the docker images for the given beat.
+* @param beatName name of the Beat
+*/
+def tagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def arch = args.get('arch', 'amd64')
+  def libbetaVer = env.VERSION
+  if("${env?.SNAPSHOT.trim()}" == "true"){
+    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
+
+    libbetaVer += "-SNAPSHOT"
+    aliasVersion += "-SNAPSHOT"
+  }
+
+  def tagName = "${libbetaVer}"
+  if (isPR()) {
+    tagName = "pr-${env.CHANGE_ID}"
+  }
+
+  // supported tags
+  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
+  if (!isPR() && aliasVersion != "") {
+    tags << aliasVersion
+  }
+  // supported image flavours
+  def variants = ["", "-oss", "-ubi8"]
+  variants.each { variant ->
+    tags.each { tag ->
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+    }
+  }
+}
+
+/**
+* @param beatName name of the Beat
+* @param variant name of the variant used to build the docker image name
+* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
+* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
+*/
+def doTagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def variant = args.variant
+  def sourceTag = args.sourceTag
+  def targetTag = args.targetTag
+  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
+
+  def iterations = 0
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    iterations++
+    def status = sh(label: "Change tag and push ${targetName}",
+                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
+                    returnStatus: true)
+    if ( status > 0 && iterations < 3) {
+      error("tag and push failed for ${beatName}, retry")
+    } else if ( status > 0 ) {
+      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
+    }
+  }
+}
+
+/**
+* There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
+* therefore the storage bucket in GCP should follow the same folder structure.
+* This is required by https://github.com/elastic/beats-tester
+* e.g.
+* baseDir=name -> return name
+* baseDir=name1/name2/name3-> return name2
+*/
+def getBeatsName(baseDir) {
+  return baseDir.replace('x-pack/', '')
+}
+
+/**
+* This method runs the end 2 end testing in the same worker where the packages have been
+* generated, this should help to speed up the things
+*/
+def e2e(Map args = [:]) {
+  def enabled = args.e2e?.get('enabled', false)
+  def entrypoint = args.e2e?.get('entrypoint')
+  def dockerLogFile = "docker_logs_${entrypoint}.log"
+  if (!enabled) { return }
+  dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
+    // TBC with the target branch if running on a PR basis.
+    git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
+    if(isDockerInstalled()) {
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+    }
+    def goVersionForE2E = readFile('.go-version').trim()
+    withEnv(["GO_VERSION=${goVersionForE2E}",
+              "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "LOG_LEVEL=TRACE"]) {
+      def status = 0
+      filebeat(output: dockerLogFile){
+        status = sh(script: ".ci/scripts/${entrypoint}",
+                    label: "Run functional tests ${entrypoint}",
+                    returnStatus: true)
+      }
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+      if (status != 0) {
+        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+      }
+    }
+  }
+}
+
+/**
 * This method runs the given command supporting two kind of scenarios:
 *  - make -C <folder> then the dir(location) is not required, aka by disaling isMage: false
 *  - mage then the dir(location) is required, aka by enabling isMage: true.
 */
 def target(Map args = [:]) {
-  def context = args.context
   def command = args.command
+  def context = args.context
   def directory = args.get('directory', '')
   def withModule = args.get('withModule', false)
   def isMage = args.get('isMage', false)
+  def isE2E = args.e2e?.get('enabled', false)
+  def isPackaging = args.get('package', false)
+  def dockerArch = args.get('dockerArch', 'amd64')
   withNode(args.label) {
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
@@ -274,18 +488,37 @@ def target(Map args = [:]) {
         dir(isMage ? directory : '') {
           cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
         }
+        // TODO:
+        // Packaging should happen only after the e2e?
+        if (isPackaging) {
+          publishPackages("${directory}")
+        }
+        if(isE2E) {
+          e2e(args)
+        }
+        // TODO:
+        // push docker images should happen only after the e2e?
+        if (isPackaging) {
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
+        }
       }
     }
   }
 }
 
 /**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+* This method wraps the node call for two reasons:
+*  1. with some latency to avoid the known issue with the scalabitity in gobld.
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
+  // this should workaround the existing issue with reusing workers with the Gobld
+  def uuid = UUID.randomUUID().toString()
   node(label) {
-    body()
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
+      body()
+    }
   }
 }
 
@@ -328,7 +561,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
     gox_flags = '-arch 386'
   }
 
-  deleteDir()
+  // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+  //            Windows workers are ephemerals, so this should not really affect us.
+  if(isUnix()) {
+    deleteDir()
+  }
+
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
@@ -349,7 +587,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
     }
     dir("${env.BASE_DIR}") {
       installTools(args)
@@ -372,11 +610,24 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
-        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-          fixPermissions("${WORKSPACE}")
-          deleteDir()
-        }
+        tearDown()
+      }
+    }
+  }
+}
+
+/**
+* Tear down the setup for the permanent workers.
+*/
+def tearDown() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    cmd(label: 'Remove the entire module cache', script: 'go clean -modcache', returnStatus: true)
+    fixPermissions("${WORKSPACE}")
+    // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+    //            Windows workers are ephemerals, so this should not really affect us.
+    if (isUnix()) {
+      dir("${WORKSPACE}") {
+        deleteDir()
       }
     }
   }
@@ -391,6 +642,7 @@ def fixPermissions(location) {
   if(isUnix()) {
     sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
       set +x
+      echo "Cleaning up ${location}"
       source ./dev-tools/common.bash
       docker_setup
       script/fix_permissions.sh ${location}""", returnStatus: true)
@@ -481,11 +733,10 @@ def archiveTestOutput(Map args = [:]) {
 */
 def tarAndUploadArtifacts(Map args = [:]) {
   tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
-  googleStorageUpload(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-                      credentialsId: "${JOB_GCS_CREDENTIALS}",
-                      pattern: "${args.file}",
-                      sharedPublicly: true,
-                      showInline: true)
+  googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+                         credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                         pattern: "${args.file}",
+                         sharedPublicly: true)
 }
 
 /**
@@ -649,9 +900,6 @@ def dumpVariables(){
   PYTHON_EXE: ${env.PYTHON_EXE}
   PYTHON_TEST_FILES: ${env.PYTHON_TEST_FILES}
   PROCESSES: ${env.PROCESSES}
-  REVIEWDOG: ${env.REVIEWDOG}
-  REVIEWDOG_OPTIONS: ${env.REVIEWDOG_OPTIONS}
-  REVIEWDOG_REPO: ${env.REVIEWDOG_REPO}
   STRESS_TESTS: ${env.STRESS_TESTS}
   STRESS_TEST_OPTIONS: ${env.STRESS_TEST_OPTIONS}
   SYSTEM_TESTS: ${env.SYSTEM_TESTS}
@@ -668,12 +916,14 @@ def dumpVariables(){
 }
 
 def isDockerInstalled(){
-  if (isUnix()) {
-    // TODO: some issues with macosx if(isInstalled(tool: 'docker', flag: '--version')) {
-    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true)
-  } else {
+  if (env?.NODE_LABELS?.toLowerCase().contains('macosx')) {
+    log(level: 'WARN', text: "Macosx workers require some docker-machine context. They are not used for anything related to docker stuff yet.")
     return false
   }
+  if (isUnix()) {
+    return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
+  }
+  return false
 }
 
 /**
@@ -708,6 +958,28 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     }
     if(args?.content?.containsKey('mage')) {
       steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+    }
+    if(args?.content?.containsKey('packaging-arm')) {
+      steps.packagingArm(context: args.context,
+                         command: args.content.get('packaging-arm'),
+                         directory: args.project,
+                         label: args.label,
+                         isMage: true,
+                         id: args.id,
+                         e2e: args.content.get('e2e'),
+                         package: true,
+                         dockerArch: 'arm64')
+    }
+    if(args?.content?.containsKey('packaging-linux')) {
+      steps.packagingLinux(context: args.context,
+                           command: args.content.get('packaging-linux'),
+                           directory: args.project,
+                           label: args.label,
+                           isMage: true,
+                           id: args.id,
+                           e2e: args.content.get('e2e'),
+                           package: true,
+                           dockerArch: 'amd64')
     }
     if(args?.content?.containsKey('k8sTest')) {
       steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)

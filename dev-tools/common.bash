@@ -34,32 +34,29 @@ get_go_version() {
   fi
 }
 
-# install_gimme
-# Install gimme to HOME/bin.
-install_gimme() {
-  # Install gimme
-  if [ ! -f "${HOME}/bin/gimme" ]; then
-    mkdir -p ${HOME}/bin
-    curl -sL -o ${HOME}/bin/gimme https://raw.githubusercontent.com/travis-ci/gimme/v1.1.0/gimme
-    chmod +x ${HOME}/bin/gimme
-  fi
-
-  GIMME="${HOME}/bin/gimme"
-  debug "Gimme version $(${GIMME} version)"
-}
-
 # setup_go_root "version"
 # This configures the Go version being used. It sets GOROOT and adds
 # GOROOT/bin to the PATH. It uses gimme to download the Go version if
 # it does not already exist in the ~/.gimme dir.
 setup_go_root() {
   local version=${1}
+  export PROPERTIES_FILE=go_env.properties
 
-  install_gimme
+  # Support cases when the call to this script is done not from the
+  # root folder but from a nested folder.
+  BASEDIR=$(dirname "$(dirname "$0")")
+  GO_VERSION="${version}" "${BASEDIR}"/.ci/scripts/install-go.sh
 
   # Setup GOROOT and add go to the PATH.
-  ${GIMME} "${version}" > /dev/null
-  source "${HOME}/.gimme/envs/go${version}.env" 2> /dev/null
+  # shellcheck disable=SC1090
+  source "${PROPERTIES_FILE}" 2> /dev/null
+
+  # Setup GOPATH and add GOPATH/bin to the PATH.
+  if [ -d "${HOME}" ] ; then
+    setup_go_path "${HOME}"
+  else
+    setup_go_path "${GOROOT}"
+  fi
 
   debug "$(go version)"
 }

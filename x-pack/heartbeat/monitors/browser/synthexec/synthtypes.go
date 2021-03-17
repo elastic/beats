@@ -37,6 +37,7 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
 			"payload":         se.Payload,
+			"index":           se.index,
 		},
 	}
 	if se.Blob != "" {
@@ -94,14 +95,16 @@ func (se *SynthError) toMap() common.MapStr {
 }
 
 type Step struct {
-	Name  string `json:"name"`
-	Index int    `json:"index"`
+	Name   string `json:"name"`
+	Index  int    `json:"index"`
+	Status string `json:"status"`
 }
 
 func (s *Step) ToMap() common.MapStr {
 	return common.MapStr{
-		"name":  s.Name,
-		"index": s.Index,
+		"name":   s.Name,
+		"index":  s.Index,
+		"status": s.Status,
 	}
 }
 

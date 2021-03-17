@@ -1,0 +1,271 @@
+- name: cisco.amp
+  type: group
+  release: beta
+  default_field: false
+  description: >
+    Module for parsing Cisco AMP logs.
+  fields:
+    - name: timestamp_nanoseconds
+      type: date
+      description: >
+        The timestamp in Epoch nanoseconds.
+
+    - name: event_type_id
+      type: keyword
+      description: >
+        A sub ID of the event, depending on event type.
+
+    - name: detection
+      type: keyword
+      description: >
+        The name of the malware detected.
+
+    - name: detection_id
+      type: keyword
+      description: >
+        The ID of the detection.
+
+    - name: connector_guid
+      type: keyword
+      description: >
+        The GUID of the connector sending information to AMP.
+
+    - name: group_guids
+      type: keyword
+      description: >
+        An array of group GUIDS related to the connector sending information to AMP.
+
+    - name: vulnerabilities
+      type: flattened
+      description: >
+        An array of related vulnerabilities to the malicious event.
+
+    - name: scan.description
+      type: keyword
+      description: >
+        Description of an event related to a scan being initiated, for example the specific directory name.
+
+    - name: scan.clean
+      type: boolean
+      description: >
+        Boolean value if a scanned file was clean or not.
+
+    - name: scan.scanned_files
+      type: long
+      description: >
+        Count of files scanned in a directory.
+
+    - name: scan.scanned_processes
+      type: long
+      description: >
+        Count of processes scanned related to a single scan event.
+
+    - name: scan.scanned_paths
+      type: long
+      description: >
+        Count of different directories scanned related to a single scan event.
+
+    - name: scan.malicious_detections
+      type: long
+      description: >
+        Count of malicious files or documents detected related to a single scan event.
+
+    - name: computer.connector_guid
+      type: keyword
+      description: >
+        The GUID of the connector, similar to top level connector_guid, but unique if multiple connectors are involved.
+
+    - name: computer.external_ip
+      type: ip
+      description: >
+        The external IP of the related host.
+
+    - name: computer.active
+      type: boolean
+      description: >
+        If the current endpoint is active or not.
+
+    - name: computer.network_addresses
+      type: flattened
+      description: >
+        All network interface information on the related host.
+
+    - name: file.disposition
+      type: keyword
+      description: >
+        Categorization of file, for example "Malicious" or "Clean".
+
+    - name: network_info.disposition
+      type: keyword
+      description: >
+        Categorization of a network event related to a file, for example "Malicious" or "Clean".
+
+    - name: network_info.nfm.direction
+      type: keyword
+      description: >
+        The current direction based on source and destination IP.
+
+    - name: related.mac
+      type: keyword
+      description: >
+        An array of all related MAC addresses.
+
+    - name: related.cve
+      type: keyword
+      description: >
+        An array of all related MAC addresses.
+
+    - name: cloud_ioc.description
+      type: keyword
+      description: >
+        Description of the related IOC for specific IOC events from AMP.
+
+    - name: cloud_ioc.short_description
+      type: keyword
+      description: >
+        Short description of the related IOC for specific IOC events from AMP.
+
+    - name: network_info.parent.disposition
+      type: keyword
+      description: >
+        Categorization of a IOC for example "Malicious" or "Clean".
+
+    - name: network_info.parent.identity.md5
+      type: keyword
+      description: >
+        MD5 hash of the related IOC.
+
+    - name: network_info.parent.identity.sha1
+      type: keyword
+      description: >
+        SHA1 hash of the related IOC.
+
+    - name: network_info.parent.identify.sha256
+      type: keyword
+      description: >
+        SHA256 hash of the related IOC.
+
+    - name: file.archived_file.disposition
+      type: keyword
+      description: >
+        Categorization of a file archive related to a file, for example "Malicious" or "Clean".
+
+    - name: file.archived_file.identity.md5
+      type: keyword
+      description: >
+        MD5 hash of the archived file related to the malicious event.
+
+    - name: file.archived_file.identity.sha1
+      type: keyword
+      description: >
+        SHA1 hash of the archived file related to the malicious event.
+
+    - name: file.archived_file.identify.sha256
+      type: keyword
+      description: >
+        SHA256 hash of the archived file related to the malicious event.
+
+    - name: file.attack_details.application
+      type: keyword
+      description: >
+        The application name related to Exploit Prevention events.
+
+    - name: file.attack_details.attacked_module
+      type: keyword
+      description: >
+        Path to the executable or dll that was attacked and detected by Exploit Prevention.
+
+    - name: file.attack_details.base_address
+      type: keyword
+      description: >
+        The base memory address related to the exploit detected.
+
+    - name: file.attack_details.suspicious_files
+      type: keyword
+      description: >
+        An array of related files when an attack is detected by Exploit Prevention.
+
+    - name: file.parent.disposition
+      type: keyword
+      description: >
+        Categorization of parrent, for example "Malicious" or "Clean".
+
+    - name: error.description
+      type: keyword
+      description: >
+        Description of an endpoint error event.
+
+    - name: error.error_code
+      type: keyword
+      description: >
+        The error code describing the related error event.
+
+    - name: threat_hunting.severity
+      type: keyword
+      description: >
+        Severity result of the threat hunt registered to the malicious event. Can be Low-Critical.
+
+    - name: threat_hunting.incident_report_guid
+      type: keyword
+      description: >
+        The GUID of the related threat hunting report.
+
+    - name: threat_hunting.incident_hunt_guid
+      type: keyword
+      description: >
+        The GUID of the related investigation tracking issue.
+
+    - name: threat_hunting.incident_title
+      type: keyword
+      description: >
+        Title of the incident related to the threat hunting activity.
+
+    - name: threat_hunting.incident_summary
+      type: keyword
+      description: >
+        Summary of the outcome on the threat hunting activity.
+
+    - name: threat_hunting.incident_remediation
+      type: keyword
+      description: >
+        Recommendations to resolve the vulnerability or exploited host.
+
+    - name: threat_hunting.incident_id
+      type: keyword
+      description: >
+        The id of the related incident for the threat hunting activity.
+
+    - name: threat_hunting.incident_end_time
+      type: date
+      description: >
+        When the threat hunt finalized or closed.
+
+    - name: threat_hunting.incident_start_time
+      type: date
+      description: >
+        When the threat hunt was initiated.
+
+    - name: file.attack_details.indicators
+      type: flattened
+      description: >
+        Different indicator types that matches the exploit detected, for example different MITRE tactics.
+
+    - name: threat_hunting.tactics
+      type: flattened
+      description: >
+        List of all MITRE tactics related to the incident found.
+
+    - name: threat_hunting.techniques
+      type: flattened
+      description: >
+        List of all MITRE techniques related to the incident found.
+
+    - name: tactics
+      type: flattened
+      description: >
+        List of all MITRE tactics related to the incident found.
+
+    - name: techniques
+      type: flattened
+      description: >
+        List of all MITRE techniques related to the incident found.

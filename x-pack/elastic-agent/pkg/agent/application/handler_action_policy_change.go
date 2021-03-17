@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 
@@ -22,6 +23,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+)
+
+const (
+	apiStatusTimeout = 15 * time.Second
 )
 
 type clientSetter interface {
@@ -44,13 +49,13 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetA
 		return fmt.Errorf("invalid type, expected ActionPolicyChange and received %T", a)
 	}
 
-	c, err := LoadConfig(action.Policy)
+	c, err := config.NewConfigFrom(action.Policy)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
 	}
 
 	h.log.Debugf("handlerPolicyChange: emit configuration for action %+v", a)
-	err = h.handleKibanaHosts(c)
+	err = h.handleKibanaHosts(ctx, c)
 	if err != nil {
 		return err
 	}
@@ -61,7 +66,12 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetA
 	return acker.Ack(ctx, action)
 }
 
-func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
+func (h *handlerPolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
+	// do not update kibana host from policy; no setters provided with local Fleet Server
+	if len(h.setters) == 0 {
+		return nil
+	}
+
 	cfg, err := configuration.NewFromConfig(c)
 	if err != nil {
 		return errors.New(err, "could not parse the configuration from the policy", errors.TypeConfig)
@@ -92,6 +102,14 @@ func (h *handlerPolicyChange) handleKibanaHosts(c *config.Config) (err error) {
 	if err != nil {
 		return errors.New(
 			err, "fail to create API client with updated hosts",
+			errors.TypeNetwork, errors.M("hosts", h.config.Fleet.Kibana.Hosts))
+	}
+	ctx, cancel := context.WithTimeout(ctx, apiStatusTimeout)
+	defer cancel()
+	_, err = client.Send(ctx, "GET", "/api/status", nil, nil, nil)
+	if err != nil {
+		return errors.New(
+			err, "fail to communicate with updated API client hosts",
 			errors.TypeNetwork, errors.M("hosts", h.config.Fleet.Kibana.Hosts))
 	}
 	reader, err := fleetToReader(h.agentInfo, h.config)

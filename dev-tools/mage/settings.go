@@ -60,6 +60,8 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
+	PLATFORMS    = EnvOr("PLATFORMS", "")
+	PACKAGES     = EnvOr("PACKAGES", "")
 
 	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
@@ -160,6 +162,8 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"GOARCH":          GOARCH,
 		"GOARM":           GOARM,
 		"Platform":        Platform,
+		"PLATFORMS":       PLATFORMS,
+		"PACKAGES":        PACKAGES,
 		"BinaryExt":       BinaryExt,
 		"XPackDir":        XPackDir,
 		"BeatName":        BeatName,
@@ -203,6 +207,8 @@ BeatLicense      = {{.BeatLicense}}
 BeatURL          = {{.BeatURL}}
 BeatUser         = {{.BeatUser}}
 VersionQualifier = {{.Qualifier}}
+PLATFORMS        = {{.PLATFORMS}}
+PACKAGES         = {{.PACKAGES}}
 
 ## Functions
 

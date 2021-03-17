@@ -19,6 +19,7 @@ package autodiscover
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -44,11 +45,13 @@ func (m *mockRunner) Start() {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.started = true
+	m.stopped = false
 }
 func (m *mockRunner) Stop() {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.stopped = true
+	m.started = false
 }
 func (m *mockRunner) Clone() *mockRunner {
 	m.mutex.Lock()
@@ -62,7 +65,10 @@ func (m *mockRunner) Clone() *mockRunner {
 func (m *mockRunner) String() string {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	return "runner"
+
+	out := common.MapStr{}
+	m.config.Unpack(&out)
+	return fmt.Sprintf("config: %v, started=%v, stopped=%v", out.String(), m.started, m.stopped)
 }
 
 type mockAdapter struct {
@@ -249,7 +255,7 @@ func TestAutodiscover(t *testing.T) {
 	runners = adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
-	assert.True(t, runners[1].started)
+	assert.False(t, runners[1].started)
 	assert.True(t, runners[1].stopped)
 }
 
@@ -440,12 +446,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
-	assert.True(t, runners[1].started)
-	assert.False(t, runners[1].stopped)
-	assert.Equal(t, runners[1].config, common.MustNewConfigFrom(map[string]interface{}{"x": "y"}))
-
+	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
+	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 	// Test start event with changed configurations
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
@@ -466,18 +468,19 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 3 })
 	runners = adapter.Runners()
 	// Ensure the first config is the same as before
-	assert.Equal(t, runners[0].config, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}))
+	fmt.Println(runners)
 	assert.Equal(t, len(runners), 3)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
+	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+
 	// Ensure that the runner for the stale config is stopped
-	wait(t, func() bool { return adapter.Runners()[1].stopped == true })
+	wait(t, func() bool {
+		check(t, adapter.Runners(), common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+		return true
+	})
 
 	// Ensure that the new runner is started
-	assert.False(t, runners[2].stopped)
-	assert.True(t, runners[2].started)
-	assert.Equal(t, runners[2].config, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}))
+	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
 
 	// Stop all the configs
 	eventBus.Publish(bus.Event{
@@ -499,7 +502,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 
 	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
 	runners = adapter.Runners()
-	assert.True(t, runners[0].stopped)
+	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
 }
 
 func wait(t *testing.T, test func() bool) {
@@ -514,4 +517,22 @@ func wait(t *testing.T, test func() bool) {
 	if !ready {
 		t.Fatal("Waiting for condition")
 	}
+}
+
+func check(t *testing.T, runners []*mockRunner, expected *common.Config, started, stopped bool) {
+	for _, r := range runners {
+		if reflect.DeepEqual(expected, r.config) {
+			ok1 := assert.Equal(t, started, r.started)
+			ok2 := assert.Equal(t, stopped, r.stopped)
+
+			if ok1 && ok2 {
+				return
+			}
+		}
+	}
+
+	// Fail the test case if the check fails
+	out := common.MapStr{}
+	expected.Unpack(&out)
+	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }

@@ -15,11 +15,11 @@ request.transforms:
   - set:
       target: url.params.startTime
       value: "[[.cursor.last_execution_datetime]]"
-      default: '[[now (parseDuration "-{{.initial_interval}}")]]'
+      default: '[[parseDate now (parseDuration "-{{.initial_interval}}")]]'
 response.split:
   target: body.items
   split:
-    target: events
+    target: body.events
     keep_parent: true
 response.pagination:
   - set:
@@ -45,7 +45,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0
   - script:
       lang: javascript
       id: gworkspace-common

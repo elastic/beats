@@ -9,10 +9,10 @@ package include
 import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/s3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/azure"
@@ -55,9 +55,11 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sophos"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/squid"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/suricata"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/threatintel"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/tomcat"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zeek"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zoom"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zscaler"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/add_nomad_metadata"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef"
 )

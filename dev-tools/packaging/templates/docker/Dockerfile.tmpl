@@ -8,18 +8,18 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-RUN mkdir {{ $beatHome }}/data {{ $beatHome }}/logs && \
+RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
+    find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
+    chmod 0755 {{ $beatBinary }} && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+    chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+    chmod 0775 {{ $beatHome }}/data {{ $beatHome }}/logs
 
 FROM {{ .from }}
 
@@ -28,7 +28,27 @@ RUN microdnf -y --setopt=tsflags=nodocs update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN yum -y --setopt=tsflags=nodocs update && yum clean all
+RUN yum -y --setopt=tsflags=nodocs update \
+  {{- if (eq .BeatName "heartbeat") }}
+    && yum -y install epel-release \
+    && yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
+        libXext libXi libXtst cups-libs libXScrnSaver libXrandr GConf2 \
+        alsa-lib atk gtk3 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
+        xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
+  {{- end }}
+  && yum clean all && rm -rf /var/cache/yum
+  # See https://access.redhat.com/discussions/3195102 for why rm is needed
+{{- end }}
+
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+ENV NODE_PATH={{ $beatHome }}/.node
+RUN echo \
+    $NODE_PATH \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
 {{- end }}
 
 LABEL \
@@ -63,9 +83,22 @@ ENV GODEBUG="madvdontneed=1"
 
 # Add an init process, check the checksum to make sure it's a match
 RUN set -e ; \
-  TINI_VERSION='v0.19.0' ; \
-  TINI_BIN='tini-amd64' ; \
-  TINI_SHA256='93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c' ; \
+  TINI_BIN=""; \
+  TINI_SHA256=""; \
+  TINI_VERSION="v0.19.0"; \
+  case "$(arch)" in \
+    x86_64) \
+        TINI_BIN="tini-amd64"; \
+        TINI_SHA256="93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c"; \
+        ;; \
+    aarch64) \
+        TINI_BIN="tini-arm64"; \
+        TINI_SHA256="07952557df20bfd2a95f9bef198b445e006171969499a1d361bd9e6f8e5e0e81"; \
+        ;; \
+    *) \
+        echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+        ;; \
+  esac ; \
   curl --retry 8 -S -L -O "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BIN}" ; \
   echo "${TINI_SHA256} ${TINI_BIN}" | sha256sum -c - ; \
   mv "${TINI_BIN}" /usr/bin/tini ; \
@@ -83,8 +116,39 @@ COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
+RUN chown {{ .user }} $NODE_PATH
+{{- end }}
 {{- end }}
 USER {{ .user }}
+
+{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV SUITES_DIR={{ $beatHome }}/suites
+ENV NODE_VERSION=12.18.4
+ENV PATH="$NODE_PATH/node/bin:$PATH"
+# Install the latest version of @elastic/synthetics forcefully ignoring the previously
+# cached node_modules, heartbeat then calls the global executable to run test suites
+# Setup node
+RUN cd /usr/share/heartbeat/.node \
+  && NODE_DOWNLOAD_URL="" \
+  && case "$(arch)" in \
+       x86_64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+           ;; \
+       aarch64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
+           ;; \
+       *) \
+           echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+           ;; \
+     esac \
+  && mkdir -p node \
+  && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+  && chmod ug+rwX -R $NODE_PATH \
+  && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
+{{- end }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}

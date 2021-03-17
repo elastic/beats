@@ -16,6 +16,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -24,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -61,7 +64,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), agentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
@@ -79,7 +82,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	service.HandleSignals(stopBeat, cancel)
 
 	pathConfigFile := flags.Config()
-	rawConfig, err := application.LoadConfigFromFile(pathConfigFile)
+	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,
 			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
@@ -129,14 +132,16 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	rexLogger := logger.Named("reexec")
 	rex := reexec.NewManager(rexLogger, execPath)
 
+	statusCtrl := status.NewController(logger)
+
 	// start the control listener
-	control := server.New(logger.Named("control"), rex, nil)
+	control := server.New(logger.Named("control"), rex, statusCtrl, nil)
 	if err := control.Start(); err != nil {
 		return err
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, control, agentInfo)
+	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo)
 	if err != nil {
 		return err
 	}
@@ -202,7 +207,7 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
-	path := info.AgentConfigFile()
+	path := paths.AgentConfigFile()
 
 	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
@@ -235,7 +240,7 @@ func getOverwrites(rawConfig *config.Config) error {
 }
 
 func defaultLogLevel(cfg *configuration.Configuration) string {
-	if application.IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		// for standalone always take the one from config and don't override
 		return ""
 	}

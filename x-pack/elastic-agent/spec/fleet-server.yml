@@ -1,0 +1,72 @@
+name: Fleet Server
+cmd: fleet-server
+args: ["--agent-mode"]
+artifact: fleet-server
+rules:
+  - fix_stream: {}
+
+  - filter_values:
+      selector: inputs
+      key: type
+      values:
+        - fleet-server
+
+  - filter_values:
+      selector: inputs
+      key: enabled
+      values:
+        - true
+
+  - remove_key:
+      key: output
+
+  - select_into:
+      selectors: [ fleet.server.output.elasticsearch ]
+      path: output
+
+  - select_into:
+      selectors: [ fleet.server.policy.id ]
+      path: inputs.0.policy
+
+  - select_into:
+      selectors:
+        - fleet.server.host
+        - fleet.server.port
+        - fleet.server.ssl
+      path: inputs.0.server
+
+  - map:
+      path: fleet
+      rules:
+        - remove_key:
+            key: enabled
+        - remove_key:
+            key: access_api_key
+        - remove_key:
+            key: kibana
+        - remove_key:
+            key: reporting
+        - remove_key:
+            key: server
+
+  - map:
+      path: inputs
+      rules:
+        - remove_key:
+            key: use_output
+        - remove_key:
+            key: data_stream
+        - remove_key:
+            key: data_stream.namespace
+        - remove_key:
+            key: data_stream.dataset
+        - remove_key:
+            key: streams
+
+  - filter:
+      selectors:
+        - fleet
+        - inputs
+        - output
+
+when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')

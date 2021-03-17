@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/gosigar/cgroup"
 )
 
@@ -285,6 +286,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:         paths.Paths.Hostfs,
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
 	})
@@ -298,7 +300,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 	selfStats, err := cgroups.GetStatsForProcess(pid)
 	if err != nil {
-		logp.Err("error getting group status: %v", err)
+		logp.Err("error getting cgroup stats: %v", err)
 		return
 	}
 	// GetStatsForProcess returns a nil selfStats and no error when there's no stats

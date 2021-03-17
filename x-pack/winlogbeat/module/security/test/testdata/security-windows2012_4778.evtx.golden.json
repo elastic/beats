@@ -4,7 +4,8 @@
     "event": {
       "action": "session-reconnected",
       "category": [
-        "authentication"
+        "authentication",
+        "session"
       ],
       "code": 4778,
       "kind": "event",
@@ -22,6 +23,7 @@
       "level": "information"
     },
     "related": {
+      "ip": "10.100.150.9",
       "user": "at_adm"
     },
     "source": {

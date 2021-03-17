@@ -157,7 +157,7 @@ function makeDictFromModifiedPropertyArray(options) {
             if (src[i] == null
                 || (name=src[i].Name) == null
                 || (newValue=src[i].NewValue) == null
-                || (oldValue=src[i].OldValue)) continue;
+                || (oldValue=src[i].OldValue) == null) continue;
             name = validFieldName(name);
             if (name in dict) {
                 if (dict[name].NewValue instanceof Array) {
@@ -191,8 +191,113 @@ function exchangeAdminSchema(debug) {
     return builder.Build();
 }
 
-function azureADLogonSchema(debug) {
+function typeMapEnrich(conversions) {
+    return function (evt) {
+        var action = evt.Get("event.action");
+        if (action != null && conversions.hasOwnProperty(action)) {
+            var conv = conversions[action];
+            if (conv.action !== undefined) evt.Put("event.action", conv.action);
+            if (conv.category !== undefined) evt.Put("event.category", conv.category);
+            if (conv.type !== undefined) evt.Put("event.type", conv.type);
+            var n = conv.copy !== undefined? conv.copy.length : 0;
+            for (var i=0; i<n; i++) {
+                var value = evt.Get(conv.copy[i].from);
+                if (value != null)
+                    evt.Put(conv.copy[i].to, value);
+            }
+        }
+    }
+}
+
+function azureADSchema(debug) {
+    var azureADConversion = {
+        'Add user.': {
+            action: "added-user-account",
+            category: 'iam',
+            type: ['user', 'creation'],
+            copy: [
+                {
+                    from: 'o365audit.ObjectId',
+                    to: 'user.target.id',
+                }
+            ],
+        },
+        'Update user.': {
+            action: "modified-user-account",
+            category: 'iam',
+            type: ['user', 'change'],
+            copy: [
+                {
+                    from: 'o365audit.ObjectId',
+                    to: 'user.target.id',
+                }
+            ],
+        },
+        'Delete user.': {
+            action: "deleted-user-account",
+            category: 'iam',
+            type: ['user', 'deletion'],
+            copy: [
+                {
+                    from: 'o365audit.ObjectId',
+                    to: 'user.target.id',
+                }
+            ],
+        },
+    };
+
     var builder = new PipelineBuilder("o365.audit.AzureActiveDirectory", debug);
+    builder.Add("setIAMFields", typeMapEnrich(azureADConversion));
+    return builder.Build();
+}
+
+function teamsSchema(debug) {
+    var teamsConversion = {
+        'TeamCreated': {
+            action: "added-group-account-to",
+            category: 'iam',
+            type: ['group', 'creation'],
+            copy: [
+                {
+                    from: 'o365audit.TeamName',
+                    to: 'group.name',
+                }
+            ],
+        },
+        'MemberAdded': {
+            action: "added-users-to-group",
+            category: 'iam',
+            type: ['group', 'change'],
+        },
+
+        'Delete user.': {
+            action: "deleted-user-account",
+            category: 'iam',
+            type: ['user', 'deletion'],
+            copy: [
+                {
+                    from: 'o365audit.ObjectId',
+                    to: 'user.target.id',
+                }
+            ],
+        },
+    };
+
+    var builder = new PipelineBuilder("o365.audit.MicrosoftTeams", debug);
+    builder.Add("setIAMFields", typeMapEnrich(teamsConversion));
+    builder.Add("groupMembersToRelatedUser", function (evt) {
+        var m = evt.Get("o365audit.Members");
+        if (m == null || m.forEach == null) return;
+        m.forEach(function (obj) {
+            if (obj != null && obj.hasOwnProperty('UPN'))
+                evt.AppendTo('related.user', obj.UPN);
+        })
+    })
+    return builder.Build();
+}
+
+function azureADLogonSchema(debug) {
+    var builder = new PipelineBuilder("o365.audit.AzureActiveDirectoryLogon", debug);
     builder.Add("setEventAuthFields", function(evt){
        evt.Put("event.category", "authentication");
        var outcome = evt.Get("event.outcome");
@@ -443,59 +548,94 @@ function yammerSchema(debug) {
         fail_on_error: false
     }));
 
-    var actionToCategoryType = {
-        // Network or verified admin changes the information that appears on
-        // member profiles for network users network.
-        ProcessProfileFields: [ "iam", "user"],
+    var yammerConversion = {
         // Network or verified admin changes the Yammer network's configuration.
         // This includes setting the interval for exporting data and enabling chat.
-        NetworkConfigurationUpdated:  [ "configuration", "change" ],
+        NetworkConfigurationUpdated: {
+            category: "configuration",
+            type: "change",
+        },
         // Verified admin updates the Yammer network's security configuration.
         // This includes setting password expiration policies and restrictions
         // on IP addresses.
-        NetworkSecurityConfigurationUpdated: [ ["iam", "configuration"], ["admin", "change"]],
+        NetworkSecurityConfigurationUpdated: {
+            category: ["iam", "configuration"],
+            type: ["admin", "change"],
+        },
         // Verified admin updates the setting for the network data retention
         // policy to either Hard Delete or Soft Delete. Only verified admins
         // can perform this operation.
-        SoftDeleteSettingsUpdated: [ "configuration", "change" ],
+        SoftDeleteSettingsUpdated: {
+            category: "configuration",
+            type: "change",
+        },
         // Network or verified admin changes the information that appears on
         // member profiles for network users network.
-        ProcessProfileFields: [ "configuration", "change" ],
+        ProcessProfileFields: {
+            category: "configuration",
+            type: "change"
+        },
         // Verified admin turns Private Content Mode on or off. This mode
         // lets an admin view the posts in private groups and view private
         // messages between individual users (or groups of users). Only verified
         // admins only can perform this operation.
-        SupervisorAdminToggled: [ "configuration", "change" ],
+        SupervisorAdminToggled: {
+            category: "configuration",
+            type: "change"
+        },
         // User uploads a file.
-        FileCreated: [ "file", "creation"],
+        FileCreated: {
+            category: "file",
+            type: "creation"
+        },
         // User creates a group.
-        GroupCreation: [ "iam", ["group", "creation"] ],
+        GroupCreation: {
+            category: "iam",
+            type: ["group", "creation"],
+        },
         // A group is deleted from Yammer.
-        GroupDeletion: [ "iam", ["group", "deletion"] ],
+        GroupDeletion: {
+            category: "iam",
+            type: ["group", "deletion"]
+        },
         // User downloads a file.
-        FileDownloaded: [ "file", "access"],
+        FileDownloaded: {
+            category: "file",
+            type: "access"
+        },
         // User shares a file with another user.
-        FileShared: [ "file", "access"],
+        FileShared: {
+            category: "file",
+            type: "access"
+        },
         // Network or verified admin suspends (deactivates) a user from Yammer.
-        NetworkUserSuspended: [ "iam", "user"],
+        NetworkUserSuspended: {
+            category: "iam",
+            type: "user"
+        },
         // User account is suspended (deactivated).
-        UserSuspension: [ "iam", "user"],
+        UserSuspension: {
+            category: "iam",
+            type: "user"
+        },
         // User changes the description of a file.
-        FileUpdateDescription: [ "file", "access"],
+        FileUpdateDescription: {
+            category: "file",
+            type: "access"
+        },
         // User changes the name of a file.
-        FileUpdateName: [ "file", "creation"],
+        FileUpdateName: {
+            category: "file",
+            type: "creation",
+        },
         // User views a file.
-        FileVisited: [ "file", "access"],
+        FileVisited: {
+            category: "file",
+            type: "access",
+        },
     };
 
-    builder.Add("setEventFields", function(evt) {
-        var action = evt.Get("event.action");
-        if (action == null) return;
-        var fields = actionToCategoryType[action];
-        if (fields == null) return;
-        evt.Put("event.category", fields[0]);
-        evt.Put("event.type", fields[1]);
-    });
+    builder.Add("setEventFields", typeMapEnrich(yammerConversion));
     return builder.Build();
 }
 
@@ -578,6 +718,22 @@ function securityComplianceAlertsSchema(debug) {
         }),
     }));
     return builder.Build();
+}
+
+function splitEmailUserID(prefix) {
+    var idField = prefix + ".id",
+        nameField = prefix + ".name",
+        domainField = prefix + ".domain",
+        emailField = prefix + ".email";
+    return function(evt) {
+        var email = evt.Get(idField);
+        if (email == null) return;
+        var pos = email.indexOf('@');
+        if (pos === -1) return;
+        evt.Put(emailField, email);
+        evt.Put(nameField, email.substr(0, pos));
+        evt.Put(domainField, email.substr(pos+1));
+    }
 }
 
 function AuditProcessor(tenant_names, debug) {
@@ -733,12 +889,14 @@ function AuditProcessor(tenant_names, debug) {
         },
         'ExchangeAdmin': exchangeAdminSchema(debug).Run,
         'ExchangeItem': exchangeMailboxSchema(debug).Run,
+        'AzureActiveDirectory': azureADSchema(debug).Run,
         'AzureActiveDirectoryStsLogon': azureADLogonSchema(debug).Run,
         'SharePointFileOperation': sharePointFileOperationSchema(debug).Run,
         'SecurityComplianceAlerts': securityComplianceAlertsSchema(debug).Run,
         'ComplianceDLPSharePoint': dlp.Run,
         'ComplianceDLPExchange': dlp.Run,
         'Yammer': yammerSchema(debug).Run,
+        'MicrosoftTeams': teamsSchema(debug).Run,
     }));
 
     builder.Add("extractClientIPPortBrackets", new processor.Dissect({
@@ -789,12 +947,14 @@ function AuditProcessor(tenant_names, debug) {
         fail_on_error: false
     }));
 
-    builder.Add("setUserFieldsFromId", new processor.Dissect({
-        tokenizer: "%{name}@%{domain}",
-        field: "user.id",
-        target_prefix: "user",
-        'when.contains.user.id': '@',
-    }));
+    [
+      'user',
+      'user.target',
+      'source.user',
+      'destination.user',
+    ].forEach(function (prefix) {
+        builder.Add('setFromID' + prefix, splitEmailUserID(prefix));
+    })
 
     builder.Add("setNetworkType", function(event) {
         var ip = event.Get("client.ip");
@@ -813,6 +973,7 @@ function AuditProcessor(tenant_names, debug) {
     builder.Add("setRelatedUser", appendFields({
         fields: [
             "user.name",
+            "user.target.name",
             "file.owner",
         ],
         to: 'related.user'

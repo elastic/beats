@@ -18,13 +18,15 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
@@ -50,9 +52,10 @@ type publishSettings struct {
 	KeepNull bool `config:"keep_null"`
 
 	// Output meta data settings
-	Pipeline string                   `config:"pipeline"` // ES Ingest pipeline name
-	Index    fmtstr.EventFormatString `config:"index"`    // ES output index pattern
-	DataSet  string                   `config:"dataset"`
+	Pipeline   string                            `config:"pipeline"` // ES Ingest pipeline name
+	Index      fmtstr.EventFormatString          `config:"index"`    // ES output index pattern
+	DataStream *add_data_stream_index.DataStream `config:"data_stream"`
+	DataSet    string                            `config:"dataset"`
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -62,19 +65,24 @@ func NewFactory(info beat.Info, sched *scheduler.Scheduler, allowWatches bool) *
 
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runner, error) {
+	c, err := stdfields.UnnestStream(c)
+	if err != nil {
+		return nil, err
+	}
+
 	configEditor, err := newCommonPublishConfigs(f.info, c)
 	if err != nil {
 		return nil, err
 	}
 
 	p = pipetool.WithClientConfigEdit(p, configEditor)
-	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches)
+	monitor, err := newMonitor(c, plugin.GlobalPluginsReg, p, f.sched, f.allowWatches)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg, f.allowWatches)
 }
 
 func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.ConfigEditor, error) {
@@ -83,15 +91,14 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	var indexProcessor processors.Processor
-	if !settings.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
-		if err != nil {
-			return nil, err
-		}
-		indexProcessor = add_formatted_index.New(timestampFormat)
+	stdFields, err := stdfields.ConfigToStdMonitorFields(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	indexProcessor, err := setupIndexProcessor(info, settings, stdFields.Type)
+	if err != nil {
+		return nil, err
 	}
 
 	userProcessors, err := processors.New(settings.Processors)
@@ -99,14 +106,17 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
+	// TODO: Remove this logic in the 8.0/master branch, preserve only in 7.x
 	dataset := settings.DataSet
 	if dataset == "" {
-		dataset = "uptime"
+		if settings.DataStream != nil && settings.DataStream.Dataset != "" {
+			dataset = settings.DataStream.Dataset
+		} else {
+			dataset = "uptime"
+		}
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
-		logp.Info("Client connection with: %#v", clientCfg)
-
 		fields := clientCfg.Processing.Fields.Clone()
 		fields.Put("event.dataset", dataset)
 
@@ -139,4 +149,30 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 
 		return clientCfg, nil
 	}, nil
+}
+
+func setupIndexProcessor(info beat.Info, settings publishSettings, dataset string) (processors.Processor, error) {
+	var indexProcessor processors.Processor
+	if settings.DataStream != nil {
+		ds := settings.DataStream
+		if ds.Type == "" {
+			ds.Type = "synthetics"
+		}
+		if ds.Dataset == "" {
+			ds.Dataset = dataset
+		}
+		return add_data_stream_index.New(*ds), nil
+	}
+
+	if !settings.Index.IsEmpty() {
+		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
+
+		timestampFormat, err :=
+			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
+		if err != nil {
+			return nil, err
+		}
+		indexProcessor = add_formatted_index.New(timestampFormat)
+	}
+	return indexProcessor, nil
 }

@@ -140,19 +140,30 @@ processors:
 - append:
     field: related.user
     value: "{{zoom.phone.callee.user_id}}"
+    allow_duplicates: false
     if: ctx?.zoom?.phone?.callee?.user_id != null
 - append:
     field: related.user
     value: "{{zoom.phone.callee_user_id}}"
+    allow_duplicates: false
     if: ctx?.zoom?.phone?.callee_user_id != null
 - append:
     field: related.user
     value: "{{zoom.phone.caller.user_id}}"
+    allow_duplicates: false
     if: ctx?.zoom?.phone?.caller?.user_id != null
 - remove:
     field: zoom.phone.date_time
     ignore_missing: true
     if: ctx?.event?.action == 'phone.voicemail_received'
+- set:
+    field: source.user.id
+    value: '{{zoom.phone.caller.user_id}}'
+    ignore_empty_value: true
+- set:
+    field: destination.user.id
+    value: '{{zoom.phone.callee.user_id}}'
+    ignore_empty_value: true
 on_failure:
 - set:
     field: error.message

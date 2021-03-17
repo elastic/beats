@@ -16,6 +16,8 @@ stages:
         make: |
           make -C libbeat check;
           make -C libbeat update;
+          make -C x-pack/libbeat check;
+          make -C x-pack/libbeat update;
           make check-no-changes;
     arm:
         mage: "mage build unitTest"

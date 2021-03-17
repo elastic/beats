@@ -79,6 +79,9 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
+  # Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
+  #system.hostfs: "/hostfs"
+
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
@@ -608,7 +611,13 @@ metricbeat.modules:
 - module: haproxy
   metricsets: ["info", "stat"]
   period: 10s
+  # TCP socket, UNIX socket, or HTTP address where HAProxy stats are reported
+  # TCP socket
   hosts: ["tcp://127.0.0.1:14567"]
+  # UNIX socket
+  #hosts: ["unix:///path/to/haproxy.sock"]
+  # Stats page
+  #hosts: ["http://127.0.0.1:14567"]
   username : "admin"
   password : "admin"
   enabled: true
@@ -770,6 +779,9 @@ metricbeat.modules:
 
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
+
+  # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
+  #ssl.key_passphrase: "yourKeyPassphrase"
 
   # SASL authentication
   #username: ""
@@ -1805,6 +1817,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1932,6 +1948,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2122,6 +2142,10 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
+  # Enables Kerberos FAST authentication in the Kafka output. This may
+  # conflict with certain Active Directory configurations.
+  #enable_krb5_fast: false
+
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -2129,6 +2153,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2285,6 +2313,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2361,7 +2393,9 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
+  # Configure automatic file rotation on every startup. The default is true.
+  #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -2581,6 +2615,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2778,6 +2816,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

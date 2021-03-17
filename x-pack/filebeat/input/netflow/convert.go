@@ -65,7 +65,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	// ECS Fields -- event
 	ecsEvent := common.MapStr{
-		"created":  flow.Timestamp,
+		"created":  time.Now().UTC(),
 		"kind":     "event",
 		"category": []string{"network_traffic", "network"},
 		"action":   flow.Fields["type"],
@@ -375,16 +375,20 @@ func fixMacAddresses(dict map[string]interface{}) {
 	}
 }
 
+// Locality is an enum representing the locality of a network address.
 type Locality uint8
 
 const (
-	LocalityPrivate Locality = iota + 1
-	LocalityPublic
+	// LocalityInternal identifies addresses that are internal to the organization.
+	LocalityInternal Locality = iota + 1
+
+	// LocalityExternal identifies addresses that are outside of the organization.
+	LocalityExternal
 )
 
 var localityNames = map[Locality]string{
-	LocalityPrivate: "private",
-	LocalityPublic:  "public",
+	LocalityInternal: "internal",
+	LocalityExternal: "external",
 }
 
 func (l Locality) String() string {
@@ -408,14 +412,14 @@ func getIPLocality(internalNetworks []string, ips ...net.IP) Locality {
 	for _, ip := range ips {
 		contains, err := conditions.NetworkContains(ip, internalNetworks...)
 		if err != nil {
-			return LocalityPublic
+			return LocalityExternal
 		}
 		// always consider loopback/link-local private
 		if !contains && !isLocal(ip) {
-			return LocalityPublic
+			return LocalityExternal
 		}
 	}
-	return LocalityPrivate
+	return LocalityInternal
 }
 
 // TODO: create table from https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
