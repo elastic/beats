@@ -159,8 +159,8 @@ processors:
   # output:
   # "cyberarkpas.audit.CAProperties":
   #            {
-  #                "PolicyID": "LINUX-SSH",
-  #                "UserName": "test12"
+  #                "PolicyID": ["LINUX-SSH"],
+  #                "UserName": ["test12"]
   #            }
   - foreach:
       field: cyberarkpas.audit.CAProperties.CAProperty
@@ -192,6 +192,10 @@ processors:
       value_split: '(?<!\\)=' # uneescaped =
       target_field: _tmp.kv
       ignore_missing: true
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to process ExtraDetails expression '{{ cyberarkpas.audit.ExtraDetails }}': {{ _ingest.on_failure_message }}"
   - set:
       field: cyberarkpas.audit.ExtraDetails
       copy_from: _tmp.kv
@@ -214,6 +218,46 @@ processors:
       field: event.code
       value: '{{ cyberarkpas.audit.MessageID }}'
       if: 'ctx.cyberarkpas.audit?.MessageID != null && ctx.cyberarkpas.audit.MessageID != ""'
+
+  #
+  # Convert field names from CamelCase to snake_case.
+  #
+  - script:
+      lang: painless
+      source: >
+        String to_snake(String key) {
+          int run = 0;
+          boolean first = true;
+          StringBuilder result = new StringBuilder();
+          for (char c : key.toCharArray()) {
+            char o = Character.toLowerCase(c);
+            if (c != o) {
+              if (run == 0 && !first) {
+                result.append('_');
+              }
+              run ++;
+            } else {
+              if (run > 1) {
+                char prev = result.charAt(result.length()-1);
+                result.setCharAt(result.length()-1, (char)'_');
+                result.append(prev);
+              }
+              run = 0;
+              first = false;
+            }
+            result.append(o);
+          }
+          return result.toString();
+        }
+        def convert(Map object) {
+          return object.entrySet().stream().collect(
+            Collectors.toMap(
+              e -> to_snake(e.getKey()),
+              e -> (e.getValue() instanceof Map? convert(e.getValue()) : e.getValue())
+            )
+          );
+        }
+        ctx.cyberarkpas.audit = convert(ctx.cyberarkpas.audit);
 
 on_failure:
   - append:
