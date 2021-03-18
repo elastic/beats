@@ -133,7 +133,7 @@
   short: The list of targets.
   description: >
     The list of targets.
-  type: array
+  type: nested
   fields:
 
   - name: id
