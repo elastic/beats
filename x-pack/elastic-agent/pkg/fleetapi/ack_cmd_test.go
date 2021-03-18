@@ -47,7 +47,7 @@ func TestAck(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			action := &ActionPolicyChange{
 				ActionID:   "my-id",
 				ActionType: "POLICY_CHANGE",

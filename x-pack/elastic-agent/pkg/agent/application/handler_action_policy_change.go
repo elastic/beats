@@ -31,7 +31,7 @@ const (
 )
 
 type clientSetter interface {
-	SetClient(client.HttpSender)
+	SetClient(client.Sender)
 }
 
 type handlerPolicyChange struct {

@@ -10,14 +10,19 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-type noopAcker struct{}
+// Acker is a noop acker.
+// Methods of these acker do nothing.
+type Acker struct{}
 
-func NewAcker() *noopAcker {
-	return &noopAcker{}
+// NewAcker creates a new noop acker.
+func NewAcker() *Acker {
+	return &Acker{}
 }
 
-func (f *noopAcker) Ack(ctx context.Context, action fleetapi.Action) error {
+// Ack acknowledges action.
+func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
 	return nil
 }
 
-func (*noopAcker) Commit(ctx context.Context) error { return nil }
+// Commit commits ack actions.
+func (*Acker) Commit(ctx context.Context) error { return nil }

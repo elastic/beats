@@ -21,7 +21,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-type HttpSender interface {
+// Sender is an sender interface describing client behavior.
+type Sender interface {
 	Send(
 		ctx context.Context,
 		method string,

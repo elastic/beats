@@ -79,7 +79,7 @@ func (w *fleetServerWrapper) Start() error {
 }
 
 // SetClient sets the client for the wrapped gateway.
-func (w *fleetServerWrapper) SetClient(c client.HttpSender) {
+func (w *fleetServerWrapper) SetClient(c client.Sender) {
 	w.wrapped.SetClient(c)
 }
 

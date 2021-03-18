@@ -19,21 +19,24 @@ type ackForcer interface {
 	ForceAck()
 }
 
-type lazyAcker struct {
+// Acker is a lazy acker which performs HTTP communication on commit.
+type Acker struct {
 	log   *logger.Logger
 	acker batchAcker
 	queue []fleetapi.Action
 }
 
-func NewAcker(baseAcker batchAcker, log *logger.Logger) *lazyAcker {
-	return &lazyAcker{
+// NewAcker creates a new lazy acker.
+func NewAcker(baseAcker batchAcker, log *logger.Logger) *Acker {
+	return &Acker{
 		acker: baseAcker,
 		queue: make([]fleetapi.Action, 0),
 		log:   log,
 	}
 }
 
-func (f *lazyAcker) Ack(ctx context.Context, action fleetapi.Action) error {
+// Ack acknowledges action.
+func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
 	f.queue = append(f.queue, action)
 	f.log.Debugf("appending action with id '%s' to the queue", action.ID())
 
@@ -44,7 +47,8 @@ func (f *lazyAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	return nil
 }
 
-func (f *lazyAcker) Commit(ctx context.Context) error {
+// Commit commits ack actions.
+func (f *Acker) Commit(ctx context.Context) error {
 	err := f.acker.AckBatch(ctx, f.queue)
 	if err != nil {
 		// do not cleanup on error

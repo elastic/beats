@@ -59,12 +59,12 @@ func (e *AckResponse) Validate() error {
 
 // AckCmd is a fleet API command.
 type AckCmd struct {
-	client client.HttpSender
+	client client.Sender
 	info   agentInfo
 }
 
 // NewAckCmd creates a new api command.
-func NewAckCmd(info agentInfo, client client.HttpSender) *AckCmd {
+func NewAckCmd(info agentInfo, client client.Sender) *AckCmd {
 	return &AckCmd{
 		client: client,
 		info:   info,

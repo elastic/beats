@@ -42,7 +42,7 @@ func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, hos
 func withServerWithAuthClient(
 	m func(t *testing.T) *http.ServeMux,
 	apiKey string,
-	test func(t *testing.T, client client.HttpSender),
+	test func(t *testing.T, client client.Sender),
 ) func(t *testing.T) {
 
 	return withServer(m, func(t *testing.T, host string) {

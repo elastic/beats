@@ -59,7 +59,7 @@ type storeLoad interface {
 type EnrollCmd struct {
 	log          *logger.Logger
 	options      *EnrollCmdOption
-	client       fleetclient.HttpSender
+	client       fleetclient.Sender
 	configStore  saver
 	kibanaConfig *kibana.Config
 	agentProc    *process.Info

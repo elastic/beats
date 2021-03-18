@@ -169,7 +169,7 @@ func (e *EnrollResponse) Validate() error {
 
 // EnrollCmd is the command to be executed to enroll an elastic-agent into Fleet.
 type EnrollCmd struct {
-	client client.HttpSender
+	client client.Sender
 }
 
 // Execute enroll the Agent in the Fleet.
@@ -228,6 +228,6 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 }
 
 // NewEnrollCmd creates a new EnrollCmd.
-func NewEnrollCmd(client client.HttpSender) *EnrollCmd {
+func NewEnrollCmd(client client.Sender) *EnrollCmd {
 	return &EnrollCmd{client: client}
 }

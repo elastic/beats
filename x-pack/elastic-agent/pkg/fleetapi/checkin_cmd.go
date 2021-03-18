@@ -62,7 +62,7 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client client.HttpSender
+	client client.Sender
 	info   agentInfo
 }
 
@@ -71,7 +71,7 @@ type agentInfo interface {
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client client.HttpSender) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client client.Sender) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,

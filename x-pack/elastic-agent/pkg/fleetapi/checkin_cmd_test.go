@@ -42,7 +42,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -91,7 +91,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -152,7 +152,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -184,7 +184,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -218,7 +218,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{Metadata: testMetadata()}
@@ -252,7 +252,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client client.HttpSender) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}

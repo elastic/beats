@@ -32,33 +32,37 @@ type dispatcher interface {
 	Dispatch(acker acker.Acker, actions ...fleetapi.Action) error
 }
 
-type actionAcker struct {
+// Acker is acker capable of acking action in fleet.
+type Acker struct {
 	log        *logger.Logger
 	dispatcher dispatcher
-	client     client.HttpSender
+	client     client.Sender
 	scheduler  scheduler.Scheduler
 	agentInfo  agentInfo
 	reporter   fleetReporter
 	done       chan struct{}
 }
 
+// NewAcker creates a new fleet acker.
 func NewAcker(
 	log *logger.Logger,
 	agentInfo agentInfo,
-	client client.HttpSender,
-) (*actionAcker, error) {
-	return &actionAcker{
+	client client.Sender,
+) (*Acker, error) {
+	return &Acker{
 		log:       log,
 		client:    client,
 		agentInfo: agentInfo,
 	}, nil
 }
 
-func (f *actionAcker) SetClient(c client.HttpSender) {
+// SetClient sets client to be used for http communication.
+func (f *Acker) SetClient(c client.Sender) {
 	f.client = c
 }
 
-func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
+// Ack acknowledges action.
+func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
 	// checkin
 	agentID := f.agentInfo.AgentID()
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
@@ -78,7 +82,8 @@ func (f *actionAcker) Ack(ctx context.Context, action fleetapi.Action) error {
 	return nil
 }
 
-func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
+// AckBatch acknowledges multiple actions at once.
+func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
 	// checkin
 	agentID := f.agentInfo.AgentID()
 	events := make([]fleetapi.AckEvent, 0, len(actions))
@@ -102,7 +107,8 @@ func (f *actionAcker) AckBatch(ctx context.Context, actions []fleetapi.Action) e
 	return nil
 }
 
-func (f *actionAcker) Commit(ctx context.Context) error {
+// Commit commits ack actions.
+func (f *Acker) Commit(ctx context.Context) error {
 	return nil
 }
 
