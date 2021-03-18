@@ -24,6 +24,8 @@
         "log.offset": 0,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -54,6 +56,8 @@
         "log.offset": 529,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -84,6 +88,8 @@
         "log.offset": 1056,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -114,6 +120,8 @@
         "log.offset": 1585,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

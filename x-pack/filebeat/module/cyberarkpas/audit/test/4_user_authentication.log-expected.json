@@ -26,6 +26,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "81.32.170.205",
+        "source.ip": "81.32.170.205",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -58,6 +60,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "81.32.170.205",
+        "source.ip": "81.32.170.205",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -92,6 +96,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -126,6 +132,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -160,6 +168,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -194,6 +204,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -228,6 +240,8 @@
         "log.syslog.severity.code": "7",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

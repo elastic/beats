@@ -26,6 +26,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -58,6 +60,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -90,6 +94,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -122,6 +128,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -154,6 +162,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -186,6 +196,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -218,6 +230,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -246,6 +260,8 @@
         "log.offset": 4186,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -274,6 +290,8 @@
         "log.offset": 4686,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -302,6 +320,8 @@
         "log.offset": 5186,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -330,6 +350,8 @@
         "log.offset": 5686,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -358,6 +380,8 @@
         "log.offset": 6186,
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -390,6 +414,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -422,6 +448,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -454,6 +482,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -486,6 +516,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -518,6 +550,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -550,6 +584,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -582,6 +618,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -614,6 +652,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -646,6 +686,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -678,6 +720,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -710,6 +754,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -742,6 +788,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -774,6 +822,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -806,6 +856,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -838,6 +890,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -870,6 +924,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -902,6 +958,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -934,6 +992,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -966,6 +1026,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -998,6 +1060,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1030,6 +1094,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1062,6 +1128,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1094,6 +1162,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1126,6 +1196,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1158,6 +1230,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1190,6 +1264,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1222,6 +1298,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1255,6 +1333,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1288,6 +1368,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1321,6 +1403,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1354,6 +1438,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1387,6 +1473,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1420,6 +1508,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1453,6 +1543,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1486,6 +1578,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1519,6 +1613,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1552,6 +1648,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1585,6 +1683,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1618,6 +1718,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1651,6 +1753,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1684,6 +1788,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1717,6 +1823,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1750,6 +1858,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1783,6 +1893,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1816,6 +1928,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1849,6 +1963,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1882,6 +1998,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1915,6 +2033,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1948,6 +2068,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -1981,6 +2103,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2014,6 +2138,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2047,6 +2173,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2080,6 +2208,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2113,6 +2243,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2146,6 +2278,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2179,6 +2313,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2212,6 +2348,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2245,6 +2383,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2278,6 +2418,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2311,6 +2453,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2344,6 +2488,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -2377,6 +2523,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

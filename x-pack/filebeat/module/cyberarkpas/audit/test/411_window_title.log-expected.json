@@ -49,6 +49,8 @@
         "input.type": "log",
         "log.offset": 0,
         "service.type": "cyberarkpas",
+        "source.address": "10.2.0.5",
+        "source.ip": "10.2.0.5",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

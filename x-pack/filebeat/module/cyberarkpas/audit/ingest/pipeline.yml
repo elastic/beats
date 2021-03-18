@@ -223,14 +223,6 @@ processors:
       ignore_missing: true
 
   #
-  # ECS enrichment
-  #
-  - set:
-      field: event.code
-      value: '{{ cyberarkpas.audit.MessageID }}'
-      if: 'ctx.cyberarkpas.audit?.MessageID != null && ctx.cyberarkpas.audit.MessageID != ""'
-
-  #
   # Convert field names from CamelCase to snake_case.
   #
   - script:
@@ -273,6 +265,32 @@ processors:
           );
         }
         ctx.cyberarkpas.audit = keys_to_snake_case_recursive(ctx.cyberarkpas.audit);
+
+  ########################################################
+  # ECS enrichment
+  #
+  # All processors from this point use the snake_case form
+  # to access Cyberark fields.
+  ########################################################
+
+  - set:
+      field: event.code
+      value: '{{ cyberarkpas.audit.message_id }}'
+      ignore_empty_value: true
+
+  - set:
+      field: source.address
+      value: '{{ cyberarkpas.audit.station }}'
+      ignore_empty_value: true
+
+  #
+  # Populate ip/host fields from address.
+  #
+  - grok:
+      field: source.address
+      patterns:
+        - "(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})"
+      ignore_failure: true
 
 on_failure:
   - append:

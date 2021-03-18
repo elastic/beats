@@ -26,6 +26,8 @@
         "log.syslog.severity.code": "5",
         "observer.hostname": "VAULT",
         "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
