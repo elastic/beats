@@ -220,6 +220,12 @@ func createEvent(
 		"category": []string{"network_traffic", "network"},
 		"action":   "network_flow",
 	}
+	eventType := []string{"connection"}
+	if isOver {
+		eventType = append(eventType, "end")
+	}
+	event["type"] = eventType
+
 	flow := common.MapStr{
 		"id":    common.NetString(f.id.Serialize()),
 		"final": isOver,
