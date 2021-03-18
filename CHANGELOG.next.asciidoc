@@ -400,6 +400,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 - Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
+- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
 
 *Heartbeat*
 
@@ -881,7 +882,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 - Support X-Forwarder-For in IIS logs. {pull}19142[192142]
-
+- Added NTP fileset to Zeek module {pull}24224[24224]
 
 *Heartbeat*
 
