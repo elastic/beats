@@ -26,7 +26,7 @@ processors:
         # RFC5424 from Cyberark.
         # UseLegacySyslogFormat=No
         # <5>1 2021-03-04T17:28:23Z VAULT {"format":"elastic","version":"1.0",...}
-        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:@timestamp} %{SYSLOGHOST:observer.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+        - "^<%{NONNEGINT:log.syslog.severity.code}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:observer.hostname} %{JSON_PAYLOAD:_tmp.payload}"
 
         # Default Legacy format.
         # UseLegacySyslogFormat=Yes
@@ -71,12 +71,56 @@ processors:
       target_field: cyberarkpas.audit.raw
       ignore_missing: true
 
-  # Parse the syslog timestamp when the logs are emitted in legacy format.
-  # In this case, this is the only timestamp present in the event, and in the
-  # default configuration it doesn't include a year.
+  # The following processors populate @timestamp from the different sources that can exist in an event.
+  # In the following order of precedence:
+  # - IsoTimestamp field (expected ISO8601). Present when new syslog format is used (rfc5424: yes).
+  # - Timestamp (expected MMM dd HH:mm:ss). Also present only when new syslog format is used.
+  # - Syslog header timestamp. Either ISO8601 or legacy MMM dd HH:mm:ss, depending on the syslog format in use.
+  # - Original @timestamp from Filebeat.
   - date:
-      if: 'ctx._tmp?.syslog_ts != null'
+      if: 'ctx.cyberarkpas.audit.IsoTimestamp != null'
+      field: cyberarkpas.audit.IsoTimestamp
+      target_field: _tmp.timestamp
+      formats:
+        - ISO8601
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse ISO timestamp field: {{ cyberarkpas.audit.IsoTimestamp }}: {{ _ingest.on_failure_message }}"
+
+  - date:
+      if: 'ctx._tmp.timestamp == null && ctx.cyberarkpas.audit.Timestamp != null'
+      field: cyberarkpas.audit.Timestamp
+      target_field: _tmp.timestamp
+      formats:
+        # This is the default format.
+        - 'MMM dd HH:mm:ss'
+        # Drop a few other formats in case the above fails.
+        - ISO8601
+        - 'MMM  d HH:mm:ss'
+        - "EEE MMM dd HH:mm:ss"
+        - "EEE MMM  d HH:mm:ss"
+        - "MMM  d HH:mm:ss z"
+        - "MMM dd HH:mm:ss z"
+        - "EEE MMM  d HH:mm:ss z"
+        - "EEE MMM dd HH:mm:ss z"
+        - "MMM  d yyyy HH:mm:ss"
+        - "MMM dd yyyy HH:mm:ss"
+        - "EEE MMM  d yyyy HH:mm:ss"
+        - "EEE MMM dd yyyy HH:mm:ss"
+        - "MMM  d yyyy HH:mm:ss z"
+        - "MMM dd yyyy HH:mm:ss z"
+        - "EEE MMM  d yyyy HH:mm:ss z"
+        - "EEE MMM dd yyyy HH:mm:ss z"
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse timestamp field: {{ cyberarkpas.audit.Timestamp }}: {{ _ingest.on_failure_message }}"
+
+  - date:
+      if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null'
       field: _tmp.syslog_ts
+      target_field: _tmp.timestamp
       # TODO: Timezone?
       formats:
         # This is the default format.
@@ -103,45 +147,11 @@ processors:
             field: error.message
             value: "failed to parse legacy syslog timestamp: {{ _tmp.syslog_ts }}: {{ _ingest.on_failure_message }}"
 
-  # Parse IsoTimestamp field.
-  - date:
-      if: 'ctx.cyberarkpas.audit.IsoTimestamp != null'
-      field: cyberarkpas.audit.IsoTimestamp
-      formats:
-        - ISO8601
-      on_failure:
-        - append:
-            field: error.message
-            value: "failed to parse ISO timestamp field: {{ cyberarkpas.audit.IsoTimestamp }}: {{ _ingest.on_failure_message }}"
-
-  # Parse Timestamp field only if @timestamp not already set.
-  - date:
-      if: 'ctx.cyberarkpas.audit.Timestamp != null && ctx["@timestamp"] == null'
-      field: cyberarkpas.audit.Timestamp
-      formats:
-        # This is the default format.
-        - 'MMM dd HH:mm:ss'
-        # Drop a few other formats in case the above fails.
-        - ISO8601
-        - 'MMM  d HH:mm:ss'
-        - "EEE MMM dd HH:mm:ss"
-        - "EEE MMM  d HH:mm:ss"
-        - "MMM  d HH:mm:ss z"
-        - "MMM dd HH:mm:ss z"
-        - "EEE MMM  d HH:mm:ss z"
-        - "EEE MMM dd HH:mm:ss z"
-        - "MMM  d yyyy HH:mm:ss"
-        - "MMM dd yyyy HH:mm:ss"
-        - "EEE MMM  d yyyy HH:mm:ss"
-        - "EEE MMM dd yyyy HH:mm:ss"
-        - "MMM  d yyyy HH:mm:ss z"
-        - "MMM dd yyyy HH:mm:ss z"
-        - "EEE MMM  d yyyy HH:mm:ss z"
-        - "EEE MMM dd yyyy HH:mm:ss z"
-      on_failure:
-        - append:
-            field: error.message
-            value: "failed to parse timestamp field: {{ cyberarkpas.audit.Timestamp }}: {{ _ingest.on_failure_message }}"
+  - set:
+      field: '@timestamp'
+      value: '{{ _tmp.timestamp }}'
+      ignore_empty_value: true
+      override: true
 
   # This script converts the nested object under cyberarkpas.audit.CAProperties.CAProperty
   # into an object under cyberarkpas.audit.CAProperties:
