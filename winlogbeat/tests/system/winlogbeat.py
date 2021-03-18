@@ -77,14 +77,14 @@ class WriteReadTest(BaseTest):
             level = win32evtlog.EVENTLOG_INFORMATION_TYPE
 
         # Retry on exception for up to 10 sec.
-        t = time.process_time()
+        t = time.monotonic()
         while True:
             try:
                 win32evtlogutil.ReportEvent(source, eventID,
                                             eventType=level, strings=[message], sid=sid)
                 break
             except:
-                if time.process_time() - t < 10:
+                if time.monotonic() - t < 10:
                     continue
                 raise
 
