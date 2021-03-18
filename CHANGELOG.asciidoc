@@ -11,6 +11,8 @@ https://github.com/elastic/beats/compare/v7.11.1...v7.11.2[View commits]
 
 *Affecting all Beats*
 
+- FOO, fix tests and remove afterwards
+
 - Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 
 *Filebeat*
