@@ -24,6 +24,7 @@ type Config struct {
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")
 var ErrIdRequired = fmt.Errorf("config 'id' must be specified for this monitor")
+var ErrSourceRequired = fmt.Errorf("config 'source' must be specified for this monitor, if upgrading from a previous experimental version please see our new config docs")
 
 func (c *Config) Validate() error {
 	if c.Name == "" {
@@ -31,6 +32,10 @@ func (c *Config) Validate() error {
 	}
 	if c.Id == "" {
 		return ErrIdRequired
+	}
+
+	if c.Source == nil {
+		return ErrSourceRequired
 	}
 
 	return nil
