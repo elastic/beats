@@ -20,7 +20,6 @@
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "input.type": "log",
         "log.offset": 0,
-        "message": "Here's the phony data",
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
         "o365.audit.ExchangeMetaData.BCC": [],
         "o365.audit.ExchangeMetaData.CC": [
@@ -169,7 +168,6 @@
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "input.type": "log",
         "log.offset": 2230,
-        "message": "Here's the phony data",
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
         "o365.audit.ExchangeMetaData.BCC": [],
         "o365.audit.ExchangeMetaData.CC": [
@@ -318,7 +316,6 @@
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "input.type": "log",
         "log.offset": 4459,
-        "message": "Here's the phony data",
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
         "o365.audit.ExceptionInfo.Reason": "{ \"Justification\": \"I really need to share those files\" }",
         "o365.audit.ExchangeMetaData.BCC": [],
@@ -468,7 +465,6 @@
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "input.type": "log",
         "log.offset": 6769,
-        "message": "Here's the phony data",
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
         "o365.audit.ExceptionInfo.FalsePositive": true,
         "o365.audit.ExchangeMetaData.BCC": [],
@@ -618,7 +614,6 @@
         "host.id": "0e1dddce-163e-4b0b-9e33-87ba56ac4655",
         "input.type": "log",
         "log.offset": 9041,
-        "message": "Here's the phony data",
         "o365.audit.CreationTime": "2020-02-24T20:11:15",
         "o365.audit.ExchangeMetaData.BCC": [],
         "o365.audit.ExchangeMetaData.CC": [

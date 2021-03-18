@@ -397,7 +397,6 @@ function dataLossPreventionSchema(debug) {
 
             // Exchange metadata
             {from: 'o365audit.ExchangeMetaData.From', to: 'source.user.email'},
-            {from: 'o365audit.ExchangeMetaData.Subject', to: 'message'},
 
             // Policy details
             {from: 'o365audit.PolicyId', to: 'rule.id'},
