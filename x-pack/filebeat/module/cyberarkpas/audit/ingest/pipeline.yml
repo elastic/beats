@@ -196,11 +196,14 @@ processors:
         - append:
             field: error.message
             value: "failed to process ExtraDetails expression '{{ cyberarkpas.audit.ExtraDetails }}': {{ _ingest.on_failure_message }}"
-  - set:
+  - remove:
       field: cyberarkpas.audit.ExtraDetails
-      copy_from: _tmp.kv
-      override: true
-      if: 'ctx._tmp?.kv != null' # Ignore missing doesn't apply to copy_from.
+      ignore_missing: true
+
+  - rename:
+      field: _tmp.kv
+      target_field: cyberarkpas.audit.ExtraDetails
+      ignore_missing: true
 
   #
   # Cleanup
