@@ -333,6 +333,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
+- Ignore unsupported derive types for filesystem metricset. {issue}22501[22501] {pull}24502[24502]
 
 *Packetbeat*
 
