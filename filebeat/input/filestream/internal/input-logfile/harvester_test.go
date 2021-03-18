@@ -47,19 +47,19 @@ func TestReaderGroup(t *testing.T) {
 	}
 
 	t.Run("assert new group is empty", func(t *testing.T) {
-		rg := newReaderGroup(0)
+		rg := newReaderGroup()
 		require.Equal(t, 0, len(rg.table))
 	})
 
 	t.Run("assert non existent key can be removed", func(t *testing.T) {
-		rg := newReaderGroup(0)
+		rg := newReaderGroup()
 		require.Equal(t, 0, len(rg.table))
 		rg.remove("no such id")
 		require.Equal(t, 0, len(rg.table))
 	})
 
 	t.Run("assert inserting existing key returns error", func(t *testing.T) {
-		rg := newReaderGroup(0)
+		rg := newReaderGroup()
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
 		require.Equal(t, 1, len(rg.table))
@@ -69,7 +69,7 @@ func TestReaderGroup(t *testing.T) {
 	})
 
 	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
-		rg := newReaderGroup(0)
+		rg := newReaderGroup()
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
 		require.Equal(t, 1, len(rg.table))
@@ -87,7 +87,7 @@ func TestReaderGroup(t *testing.T) {
 	})
 
 	t.Run("assert new harvester cannot be added if limit is reached", func(t *testing.T) {
-		rg := newReaderGroup(1)
+		rg := newReaderGroupWithLimit(1)
 		require.Equal(t, 0, len(rg.table))
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
@@ -275,7 +275,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
-		readers:   newReaderGroup(0),
+		readers:   newReaderGroup(),
 		pipeline:  &pipelinemock.MockPipelineConnector{},
 		harvester: mockHarvester,
 		store:     testOpenStore(t, "test", nil),

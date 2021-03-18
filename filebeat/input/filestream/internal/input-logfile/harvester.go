@@ -56,7 +56,11 @@ type readerGroup struct {
 	table map[string]context.CancelFunc
 }
 
-func newReaderGroup(limit uint64) *readerGroup {
+func newReaderGroup() *readerGroup {
+	return newReaderGroupWithLimit(0)
+}
+
+func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	return &readerGroup{
 		limit: limit,
 		table: make(map[string]context.CancelFunc),

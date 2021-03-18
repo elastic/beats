@@ -63,7 +63,7 @@ func (inp *managedInput) Run(
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroup(inp.harvesterLimit),
+		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
