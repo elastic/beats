@@ -27465,7 +27465,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -27478,7 +27478,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -38969,6 +38971,14 @@ type: long
 
 --
 
+*`postgresql.activity.backend_type`*::
++
+--
+Type of the current backend. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. Extensions may register workers with additional backend types.
+
+
+--
+
 *`postgresql.activity.backend_start`*::
 +
 --
@@ -39041,6 +39051,22 @@ Current overall state of this backend. Possible values are:
 +
 --
 Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+--
+
+*`postgresql.activity.wait_event`*::
++
+--
+Wait event name if the backend is currently waiting.
+
+
+--
+
+*`postgresql.activity.wait_event_type`*::
++
+--
+The type of event for which the backend is waiting.
 
 
 --
@@ -39172,7 +39198,7 @@ One row per database, showing database-wide statistics. Collected by querying pg
 *`postgresql.database.oid`*::
 +
 --
-OID of the database this backend is connected to.
+OID of the database this backend is connected to, or 0 for shared resources.
 
 
 type: long
@@ -39182,7 +39208,7 @@ type: long
 *`postgresql.database.name`*::
 +
 --
-Name of the database this backend is connected to.
+Name of the database this backend is connected to, empty for shared resources.
 
 
 type: keyword
@@ -46285,7 +46311,7 @@ type: keyword
 Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
 
 
-type: keyword
+type: long
 
 --
 

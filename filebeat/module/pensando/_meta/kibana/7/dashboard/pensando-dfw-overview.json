@@ -1093,13 +1093,13 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchRefName": "search_0",
         "title": "Top Destination IPs [Filebeat Pensando]",
         "uiStateJSON": {},
         "version": 1,
@@ -1123,7 +1123,7 @@
                 "orderBy": "1",
                 "otherBucket": true,
                 "otherBucketLabel": "Other",
-                "size": 10
+                "size": 25
               },
               "schema": "segment",
               "type": "terms"
@@ -1152,9 +1152,9 @@
       },
       "references": [
         {
-          "id": "0d0216f0-2fe0-11e7-9d02-3f49bde5c1d5",
-          "name": "search_0",
-          "type": "search"
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
