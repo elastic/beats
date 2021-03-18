@@ -61,10 +61,8 @@ processors:
   #
   - script:
       lang: painless
-      params:
-        values: [""]
       source: >-
-        ctx.cyberarkpas.audit.entrySet().removeIf(entry -> params.values.contains(entry.getValue()));
+        ctx.cyberarkpas.audit.entrySet().removeIf(entry -> entry.getValue() == "");
 
   - rename:
       field: _tmp.json.raw
