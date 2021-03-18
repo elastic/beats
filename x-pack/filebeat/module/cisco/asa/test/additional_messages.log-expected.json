@@ -3061,7 +3061,7 @@
         ]
     },
     {
-        "cisco.asa.assigned_ip": "8.8.4.4",
+        "cisco.asa.assigned_ip": "192.168.50.5",
         "cisco.asa.message_id": "722051",
         "event.action": "firewall-rule",
         "event.category": [
@@ -3071,7 +3071,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-4-722051: Group some-policy User testuser IP 8.8.8.8 IPv4 Address 8.8.4.4 IPv6 address 2001:4860:4860::8888 assigned to session",
+        "event.original": "%ASA-4-722051: Group <VPN5Policy> User <john> IP <192.168.50.3> IPv4 Address <192.168.50.5> IPv6 address <::> assigned to session",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3090,22 +3090,15 @@
             "dev01"
         ],
         "related.ip": [
-            "8.8.8.8"
+            "192.168.50.3"
         ],
         "related.user": [
-            "testuser"
+            "john"
         ],
         "service.type": "cisco",
-        "source.address": "8.8.8.8",
-        "source.as.number": 15169,
-        "source.as.organization.name": "Google LLC",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "8.8.8.8",
-        "source.user.name": "testuser",
+        "source.address": "192.168.50.3",
+        "source.ip": "192.168.50.3",
+        "source.user.name": "john",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -3132,7 +3125,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 9683,
+        "log.offset": 9680,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -3183,7 +3176,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 9810,
+        "log.offset": 9807,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -3240,7 +3233,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
-        "log.offset": 9937,
+        "log.offset": 9934,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.hostname": "dev01",
