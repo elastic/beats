@@ -236,11 +236,15 @@ processors:
   - script:
       lang: painless
       source: >
-        String to_snake(String key) {
+        String to_snake_case(String s) {
+          /* faster code path for strings that won't need an underscore */
+          if (s.chars().skip(1).noneMatch(Character::isUpperCase)) {
+            return s.toLowerCase();
+          }
           int run = 0;
           boolean first = true;
           StringBuilder result = new StringBuilder();
-          for (char c : key.toCharArray()) {
+          for (char c : s.toCharArray()) {
             char o = Character.toLowerCase(c);
             if (c != o) {
               if (run == 0 && !first) {
@@ -260,15 +264,15 @@ processors:
           }
           return result.toString();
         }
-        def convert(Map object) {
+        def keys_to_snake_case_recursive(Map object) {
           return object.entrySet().stream().collect(
             Collectors.toMap(
-              e -> to_snake(e.getKey()),
-              e -> (e.getValue() instanceof Map? convert(e.getValue()) : e.getValue())
+              e -> to_snake_case(e.getKey()),
+              e -> e.getValue() instanceof Map? keys_to_snake_case_recursive(e.getValue()) : e.getValue()
             )
           );
         }
-        ctx.cyberarkpas.audit = convert(ctx.cyberarkpas.audit);
+        ctx.cyberarkpas.audit = keys_to_snake_case_recursive(ctx.cyberarkpas.audit);
 
 on_failure:
   - append:
