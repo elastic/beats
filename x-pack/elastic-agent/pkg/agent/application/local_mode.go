@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
+	acker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
@@ -153,7 +154,7 @@ func newLocal(
 		log,
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
-		newNoopAcker(),
+		acker.NewAcker(),
 		reporter,
 		caps)
 	uc.SetUpgrader(upgrader)

@@ -12,6 +12,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 func TestAck(t *testing.T) {
@@ -45,7 +47,7 @@ func TestAck(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			action := &ActionPolicyChange{
 				ActionID:   "my-id",
 				ActionType: "POLICY_CHANGE",

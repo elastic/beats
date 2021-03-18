@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 const gatewayWait = 2 * time.Second
@@ -78,8 +79,8 @@ func (w *fleetServerWrapper) Start() error {
 }
 
 // SetClient sets the client for the wrapped gateway.
-func (w *fleetServerWrapper) SetClient(client clienter) {
-	w.wrapped.SetClient(client)
+func (w *fleetServerWrapper) SetClient(c client.HttpSender) {
+	w.wrapped.SetClient(c)
 }
 
 func injectFleetServer(rawConfig *config.Config) (*config.Config, error) {

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -60,7 +61,7 @@ func TestManagedModeRouting(t *testing.T) {
 	actions, err := testActions()
 	require.NoError(t, err)
 
-	err = actionDispatcher.Dispatch(newNoopAcker(), actions...)
+	err = actionDispatcher.Dispatch(noopacker.NewAcker(), actions...)
 	require.NoError(t, err)
 
 	// has 1 config request for fb, mb and monitoring?

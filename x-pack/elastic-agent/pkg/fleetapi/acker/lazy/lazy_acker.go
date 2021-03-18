@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package lazy
 
 import (
 	"context"
@@ -25,7 +25,7 @@ type lazyAcker struct {
 	queue []fleetapi.Action
 }
 
-func newLazyAcker(baseAcker batchAcker, log *logger.Logger) *lazyAcker {
+func NewAcker(baseAcker batchAcker, log *logger.Logger) *lazyAcker {
 	return &lazyAcker{
 		acker: baseAcker,
 		queue: make([]fleetapi.Action, 0),
@@ -54,5 +54,3 @@ func (f *lazyAcker) Commit(ctx context.Context) error {
 	f.queue = make([]fleetapi.Action, 0)
 	return nil
 }
-
-var _ fleetAcker = &lazyAcker{}

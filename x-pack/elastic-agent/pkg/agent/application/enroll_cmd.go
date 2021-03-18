@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"net/http"
-	"net/url"
 	"os"
 	"time"
 
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	fleetclient "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
@@ -56,24 +55,11 @@ type storeLoad interface {
 	Load() (io.ReadCloser, error)
 }
 
-type clienter interface {
-	Send(
-		ctx context.Context,
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
-
-	URI() string
-}
-
 // EnrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
 type EnrollCmd struct {
 	log          *logger.Logger
 	options      *EnrollCmdOption
-	client       clienter
+	client       fleetclient.HttpSender
 	configStore  saver
 	kibanaConfig *kibana.Config
 	agentProc    *process.Info
@@ -185,7 +171,7 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
-	c.client, err = fleetapi.NewWithConfig(c.log, c.kibanaConfig)
+	c.client, err = fleetclient.NewWithConfig(c.log, c.kibanaConfig)
 	if err != nil {
 		return errors.New(
 			err, "Error",

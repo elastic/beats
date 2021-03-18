@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 const checkingPath = "/api/fleet/agents/%s/checkin"
@@ -61,7 +62,7 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client clienter
+	client client.HttpSender
 	info   agentInfo
 }
 
@@ -70,7 +71,7 @@ type agentInfo interface {
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client client.HttpSender) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,
@@ -101,7 +102,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
 	rs, _ := ioutil.ReadAll(resp.Body)

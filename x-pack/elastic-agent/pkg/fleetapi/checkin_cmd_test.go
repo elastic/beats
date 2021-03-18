@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 type agentinfo struct{}
@@ -41,7 +42,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -90,7 +91,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -151,7 +152,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -183,7 +184,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -217,7 +218,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{Metadata: testMetadata()}
@@ -251,7 +252,7 @@ func TestCheckin(t *testing.T) {
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.HttpSender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
