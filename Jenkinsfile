@@ -508,10 +508,11 @@ def archiveTestOutput(Map args = [:]) {
 * disk space of the jenkins instance
 */
 def tarAndUploadArtifacts(Map args = [:]) {
-  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  def fileName = args.file.replaceAll('[^A-Za-z-0-9]','-')
+  tar(file: fileName, dir: args.location, archive: false, allowMissing: true)
   googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
                          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-                         pattern: "${args.file}",
+                         pattern: "${fileName}",
                          sharedPublicly: true)
 }
 
