@@ -2,21 +2,11 @@
     {
         "@timestamp": "2021-03-11T17:43:44.000Z",
         "cyberarkpas.audit.action": "Retrieve SSH Key",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "Retrieve SSH Key",
         "cyberarkpas.audit.file": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -56,21 +46,11 @@
     {
         "@timestamp": "2021-03-11T21:08:48.000Z",
         "cyberarkpas.audit.action": "Retrieve SSH Key",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "Retrieve SSH Key",
         "cyberarkpas.audit.file": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -111,21 +91,11 @@
     {
         "@timestamp": "2021-03-15T13:18:52.000Z",
         "cyberarkpas.audit.action": "Retrieve SSH Key",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "Retrieve SSH Key",
         "cyberarkpas.audit.file": "Root\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",

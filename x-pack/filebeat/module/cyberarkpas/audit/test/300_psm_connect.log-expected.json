@@ -2,27 +2,13 @@
     {
         "@timestamp": "2021-03-16T15:01:00.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "radiussrv.cyberark.local"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_disabled": [
-            "No Reason"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.customer": [
-            "Tesla"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "LINUX-SSH"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "admin2"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "radiussrv.cyberark.local",
+        "cyberarkpas.audit.ca_properties.cpm_disabled": "No Reason",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.customer": "Tesla",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "LINUX-SSH",
+        "cyberarkpas.audit.ca_properties.user_name": "admin2",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "radiussrv.cyberark.local",
@@ -62,21 +48,11 @@
     {
         "@timestamp": "2021-03-11T17:38:20.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -120,21 +96,11 @@
     {
         "@timestamp": "2021-03-11T17:46:56.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -178,21 +144,11 @@
     {
         "@timestamp": "2021-03-11T17:48:34.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -236,21 +192,11 @@
     {
         "@timestamp": "2021-03-11T17:54:56.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -294,21 +240,11 @@
     {
         "@timestamp": "2021-03-11T17:56:37.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -352,21 +288,11 @@
     {
         "@timestamp": "2021-03-11T20:23:25.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -410,39 +336,17 @@
     {
         "@timestamp": "2021-03-14T13:49:37.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_error_details": [
-            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "failure"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_fail_date": [
-            "1615729572"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.reset_immediately": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "0"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_error_details": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031",
+        "cyberarkpas.audit.ca_properties.cpm_status": "failure",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_fail_date": "1615729572",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.reset_immediately": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.retries_count": "0",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -486,39 +390,17 @@
     {
         "@timestamp": "2021-03-14T13:50:43.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_error_details": [
-            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "failure"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_fail_date": [
-            "1615729572"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.reset_immediately": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "0"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_error_details": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031",
+        "cyberarkpas.audit.ca_properties.cpm_status": "failure",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_fail_date": "1615729572",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.reset_immediately": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.retries_count": "0",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -562,33 +444,15 @@
     {
         "@timestamp": "2021-03-15T10:31:56.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "VerifyTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "VerifyTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -632,33 +496,15 @@
     {
         "@timestamp": "2021-03-15T10:33:39.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "VerifyTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "VerifyTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -702,33 +548,15 @@
     {
         "@timestamp": "2021-03-15T10:35:00.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "VerifyTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "VerifyTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -772,21 +600,11 @@
     {
         "@timestamp": "2021-03-15T13:18:31.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -830,21 +648,11 @@
     {
         "@timestamp": "2021-03-15T14:08:06.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSHKeys"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -888,45 +696,19 @@
     {
         "@timestamp": "2021-03-15T14:08:28.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_error_details": [
-            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "failure"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_fail_date": [
-            "1615814025"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.reset_immediately": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "0"
-        ],
-        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": [
-            "Yes"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_error_details": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031",
+        "cyberarkpas.audit.ca_properties.cpm_status": "failure",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_fail_date": "1615814025",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.reset_immediately": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.retries_count": "0",
+        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": "Yes",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -970,45 +752,19 @@
     {
         "@timestamp": "2021-03-15T14:11:09.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_error_details": [
-            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "failure"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_fail_date": [
-            "1615814025"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.reset_immediately": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "0"
-        ],
-        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": [
-            "Yes"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_error_details": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031",
+        "cyberarkpas.audit.ca_properties.cpm_status": "failure",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_fail_date": "1615814025",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.reset_immediately": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.retries_count": "0",
+        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": "Yes",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",
@@ -1052,45 +808,19 @@
     {
         "@timestamp": "2021-03-16T10:04:51.000Z",
         "cyberarkpas.audit.action": "PSM Connect",
-        "cyberarkpas.audit.ca_properties.address": [
-            "34.123.103.115"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_error_details": [
-            "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "failure"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_fail_date": [
-            "1615888216"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_verification": [
-            "1615803764"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "UnixSSH"
-        ],
-        "cyberarkpas.audit.ca_properties.reset_immediately": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "4"
-        ],
-        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": [
-            "Yes"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "testark"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "34.123.103.115",
+        "cyberarkpas.audit.ca_properties.cpm_error_details": "First login - Reconcile account is not set or password is empty. Please link reconcile account to the target account or set the password. code: 8031",
+        "cyberarkpas.audit.ca_properties.cpm_status": "failure",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_fail_date": "1615888216",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1615803764",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSH",
+        "cyberarkpas.audit.ca_properties.reset_immediately": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.retries_count": "4",
+        "cyberarkpas.audit.ca_properties.use_sudo_on_reconcile": "Yes",
+        "cyberarkpas.audit.ca_properties.user_name": "testark",
         "cyberarkpas.audit.desc": "PSM Connect",
         "cyberarkpas.audit.extra_details.application_type": "PSMP-SSH",
         "cyberarkpas.audit.extra_details.dst_host": "34.123.103.115",

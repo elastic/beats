@@ -2,48 +2,20 @@
     {
         "@timestamp": "2021-03-08T10:19:42.000Z",
         "cyberarkpas.audit.action": "General Audit",
-        "cyberarkpas.audit.ca_properties.address": [
-            "components"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.dual_account_status": [
-            "Active"
-        ],
-        "cyberarkpas.audit.ca_properties.group_name": [
-            "WindowsGroup"
-        ],
-        "cyberarkpas.audit.ca_properties.index": [
-            "2"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_change": [
-            "1614868762"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ChangeTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinDesktopLocal"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.sequence_id": [
-            "24"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "x_accountB"
-        ],
-        "cyberarkpas.audit.ca_properties.virtual_username": [
-            "virtual"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "components",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.dual_account_status": "Active",
+        "cyberarkpas.audit.ca_properties.group_name": "WindowsGroup",
+        "cyberarkpas.audit.ca_properties.index": "2",
+        "cyberarkpas.audit.ca_properties.last_success_change": "1614868762",
+        "cyberarkpas.audit.ca_properties.last_task": "ChangeTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinDesktopLocal",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.sequence_id": "24",
+        "cyberarkpas.audit.ca_properties.user_name": "x_accountB",
+        "cyberarkpas.audit.ca_properties.virtual_username": "virtual",
         "cyberarkpas.audit.desc": "General Audit",
         "cyberarkpas.audit.extra_details.dual_account_status": "Active",
         "cyberarkpas.audit.extra_details.index": "2",
@@ -81,48 +53,20 @@
     {
         "@timestamp": "2021-03-10T14:38:57.000Z",
         "cyberarkpas.audit.action": "General Audit",
-        "cyberarkpas.audit.ca_properties.address": [
-            "components"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.dual_account_status": [
-            "Active"
-        ],
-        "cyberarkpas.audit.ca_properties.group_name": [
-            "WindowsGroup"
-        ],
-        "cyberarkpas.audit.ca_properties.index": [
-            "1"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_change": [
-            "1615231204"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ChangeTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinDesktopLocal"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.sequence_id": [
-            "27"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "x_accountA"
-        ],
-        "cyberarkpas.audit.ca_properties.virtual_username": [
-            "virtual"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "components",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.dual_account_status": "Active",
+        "cyberarkpas.audit.ca_properties.group_name": "WindowsGroup",
+        "cyberarkpas.audit.ca_properties.index": "1",
+        "cyberarkpas.audit.ca_properties.last_success_change": "1615231204",
+        "cyberarkpas.audit.ca_properties.last_task": "ChangeTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinDesktopLocal",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.sequence_id": "27",
+        "cyberarkpas.audit.ca_properties.user_name": "x_accountA",
+        "cyberarkpas.audit.ca_properties.virtual_username": "virtual",
         "cyberarkpas.audit.desc": "General Audit",
         "cyberarkpas.audit.extra_details.dual_account_status": "Active",
         "cyberarkpas.audit.extra_details.index": "1",
@@ -160,48 +104,20 @@
     {
         "@timestamp": "2021-03-14T11:48:26.000Z",
         "cyberarkpas.audit.action": "General Audit",
-        "cyberarkpas.audit.ca_properties.address": [
-            "components"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.dual_account_status": [
-            "Active"
-        ],
-        "cyberarkpas.audit.ca_properties.group_name": [
-            "WindowsGroup"
-        ],
-        "cyberarkpas.audit.ca_properties.index": [
-            "2"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_change": [
-            "1615419568"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ChangeTask"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinDesktopLocal"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.sequence_id": [
-            "25"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "x_accountB"
-        ],
-        "cyberarkpas.audit.ca_properties.virtual_username": [
-            "virtual"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "components",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.dual_account_status": "Active",
+        "cyberarkpas.audit.ca_properties.group_name": "WindowsGroup",
+        "cyberarkpas.audit.ca_properties.index": "2",
+        "cyberarkpas.audit.ca_properties.last_success_change": "1615419568",
+        "cyberarkpas.audit.ca_properties.last_task": "ChangeTask",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinDesktopLocal",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.sequence_id": "25",
+        "cyberarkpas.audit.ca_properties.user_name": "x_accountB",
+        "cyberarkpas.audit.ca_properties.virtual_username": "virtual",
         "cyberarkpas.audit.desc": "General Audit",
         "cyberarkpas.audit.extra_details.dual_account_status": "Active",
         "cyberarkpas.audit.extra_details.index": "2",

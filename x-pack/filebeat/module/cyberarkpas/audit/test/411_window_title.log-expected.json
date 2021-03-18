@@ -2,42 +2,18 @@
     {
         "@timestamp": "2021-03-16T17:11:42.000Z",
         "cyberarkpas.audit.action": "Window Title",
-        "cyberarkpas.audit.ca_properties.address": [
-            "dbserver.cyberark.local"
-        ],
-        "cyberarkpas.audit.ca_properties.cpm_status": [
-            "success"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.customer": [
-            "EvilCorp"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.last_success_reconciliation": [
-            "1604944215"
-        ],
-        "cyberarkpas.audit.ca_properties.last_task": [
-            "ReconcileTask"
-        ],
-        "cyberarkpas.audit.ca_properties.logon_domain": [
-            "DBServer"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WIN-SERVER-LOCAL"
-        ],
-        "cyberarkpas.audit.ca_properties.retries_count": [
-            "-1"
-        ],
-        "cyberarkpas.audit.ca_properties.sequence_id": [
-            "1"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "Administrator2"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "dbserver.cyberark.local",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.customer": "EvilCorp",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_success_reconciliation": "1604944215",
+        "cyberarkpas.audit.ca_properties.last_task": "ReconcileTask",
+        "cyberarkpas.audit.ca_properties.logon_domain": "DBServer",
+        "cyberarkpas.audit.ca_properties.policy_id": "WIN-SERVER-LOCAL",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.sequence_id": "1",
+        "cyberarkpas.audit.ca_properties.user_name": "Administrator2",
         "cyberarkpas.audit.desc": "Window Title",
         "cyberarkpas.audit.extra_details.command": "shutdown.exe, Shutdown Event Tracker",
         "cyberarkpas.audit.extra_details.connection_component_id": "PSM-RDP",

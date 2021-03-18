@@ -2,21 +2,11 @@
     {
         "@timestamp": "2021-03-08T18:32:43.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "components"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinDesktopLocal"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adriansr"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "components",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinDesktopLocal",
+        "cyberarkpas.audit.ca_properties.user_name": "adriansr",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\Operating System-WinDesktopLocal-Address-adriansr",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -52,24 +42,12 @@
     {
         "@timestamp": "2021-03-08T18:38:21.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "components"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.logon_domain": [
-            "COMPONENTS"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinServerLocal"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adriansr"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "components",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.logon_domain": "COMPONENTS",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinServerLocal",
+        "cyberarkpas.audit.ca_properties.user_name": "adriansr",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\Operating System-WinServerLocal-components-adriansr",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -311,21 +289,11 @@
     {
         "@timestamp": "2021-03-11T19:32:12.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_1": [
-            ""
-        ],
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_2": [
-            ""
-        ],
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_3": [
-            ""
-        ],
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_4": [
-            ""
-        ],
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_5": [
-            ""
-        ],
+        "cyberarkpas.audit.ca_properties.__psm_live_sessions_1": "",
+        "cyberarkpas.audit.ca_properties.__psm_live_sessions_2": "",
+        "cyberarkpas.audit.ca_properties.__psm_live_sessions_3": "",
+        "cyberarkpas.audit.ca_properties.__psm_live_sessions_4": "",
+        "cyberarkpas.audit.ca_properties.__psm_live_sessions_5": "",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\PSMPApp_VAGRANT.LiveSessions",
         "cyberarkpas.audit.hostname": "VAULT",
@@ -361,21 +329,11 @@
     {
         "@timestamp": "2021-03-11T21:06:40.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "35.192.121.42"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Operating System"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "WinDomain"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "PSMConnect"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "35.192.121.42",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.policy_id": "WinDomain",
+        "cyberarkpas.audit.ca_properties.user_name": "PSMConnect",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\Operating System-WinDomain-35.192.121.42-PSMConnect",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -412,15 +370,9 @@
     {
         "@timestamp": "2021-03-11T21:06:50.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "10.128.0.65"
-        ],
-        "cyberarkpas.audit.ca_properties.logon_domain": [
-            "ASR-CYBERARK-WI"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "PSMConnect"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "10.128.0.65",
+        "cyberarkpas.audit.ca_properties.logon_domain": "ASR-CYBERARK-WI",
+        "cyberarkpas.audit.ca_properties.user_name": "PSMConnect",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\PSM-ASR-CYBERARK-WI",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -457,15 +409,9 @@
     {
         "@timestamp": "2021-03-14T12:10:17.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "169.254.180.25"
-        ],
-        "cyberarkpas.audit.ca_properties.logon_domain": [
-            "VAGRANT-2012-R2"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "PSMAdminConnect"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "169.254.180.25",
+        "cyberarkpas.audit.ca_properties.logon_domain": "VAGRANT-2012-R2",
+        "cyberarkpas.audit.ca_properties.user_name": "PSMAdminConnect",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\PSMAdmin",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -502,15 +448,9 @@
     {
         "@timestamp": "2021-03-14T12:10:28.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "169.254.180.25"
-        ],
-        "cyberarkpas.audit.ca_properties.logon_domain": [
-            "VAGRANT-2012-R2"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "PSMConnect"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "169.254.180.25",
+        "cyberarkpas.audit.ca_properties.logon_domain": "VAGRANT-2012-R2",
+        "cyberarkpas.audit.ca_properties.user_name": "PSMConnect",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\PSMServer",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -617,27 +557,13 @@
     {
         "@timestamp": "2021-03-15T15:09:00.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "10.128.0.7"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.database": [
-            "test"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Database"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "Oracle"
-        ],
-        "cyberarkpas.audit.ca_properties.port": [
-            "3306"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "10.128.0.7",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.database": "test",
+        "cyberarkpas.audit.ca_properties.device_type": "Database",
+        "cyberarkpas.audit.ca_properties.policy_id": "Oracle",
+        "cyberarkpas.audit.ca_properties.port": "3306",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\Database-Oracle-10.128.0.7-adrian",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",
@@ -674,27 +600,13 @@
     {
         "@timestamp": "2021-03-15T15:13:59.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.address": [
-            "10.128.0.7"
-        ],
-        "cyberarkpas.audit.ca_properties.creation_method": [
-            "PVWA"
-        ],
-        "cyberarkpas.audit.ca_properties.database": [
-            "test"
-        ],
-        "cyberarkpas.audit.ca_properties.device_type": [
-            "Database"
-        ],
-        "cyberarkpas.audit.ca_properties.policy_id": [
-            "MySQL"
-        ],
-        "cyberarkpas.audit.ca_properties.port": [
-            "3306"
-        ],
-        "cyberarkpas.audit.ca_properties.user_name": [
-            "adrian"
-        ],
+        "cyberarkpas.audit.ca_properties.address": "10.128.0.7",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.database": "test",
+        "cyberarkpas.audit.ca_properties.device_type": "Database",
+        "cyberarkpas.audit.ca_properties.policy_id": "MySQL",
+        "cyberarkpas.audit.ca_properties.port": "3306",
+        "cyberarkpas.audit.ca_properties.user_name": "adrian",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\Database-MySQL-10.128.0.7-adrian",
         "cyberarkpas.audit.gateway_station": "10.0.1.20",

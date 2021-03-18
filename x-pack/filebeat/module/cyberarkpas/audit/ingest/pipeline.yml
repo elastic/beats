@@ -166,7 +166,7 @@ processors:
       field: cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
       processor:
-        append:
+        set:
           field: 'cyberarkpas.audit.CAProperties.{{_ingest._value.Name}}'
           value: '{{_ingest._value.Value}}'
       on_failure:
