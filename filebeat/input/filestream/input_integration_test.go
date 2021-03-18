@@ -45,16 +45,16 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                                []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval":    "1ms",
+		"prospector.scanner.check_interval":    "10ms",
 		"close.on_state_change.check_interval": "1ms",
 		"close.on_state_change.renamed":        "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
