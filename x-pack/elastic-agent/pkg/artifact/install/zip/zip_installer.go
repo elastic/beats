@@ -61,9 +61,13 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	// if root directory is not the same as desired directory rename
 	// e.g contains `-windows-` or  `-SNAPSHOT-`
 	if rootDir != installDir {
+		defer syncDir(rootDir)
+		defer syncDir(installDir)
+
 		if err := os.Rename(rootDir, installDir); err != nil {
 			return errors.New(err, errors.TypeFilesystem, errors.M(errors.MetaKeyPath, installDir))
 		}
+
 	}
 
 	return nil
@@ -154,4 +158,11 @@ func (i *Installer) getRootDir(zipPath string) (dir string, err error) {
 	}
 
 	return rootDir, nil
+}
+
+func syncDir(dir string) {
+	if f, err := os.OpenFile(dir, os.O_RDWR, 0777); err == nil {
+		f.Sync()
+		f.Close()
+	}
 }

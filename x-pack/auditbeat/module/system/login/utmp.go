@@ -181,14 +181,14 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 	size := utmpFile.Size
 	oldSize := savedUtmpFile.Size
-	if size < oldSize {
+	if size < oldSize || utmpFile.Offset > size {
 		// UTMP files are append-only and so this is weird. It might be a sign of
 		// a highly unlikely inode reuse - or of something more nefarious.
 		// Setting isKnownFile to false so we read the whole file from the beginning.
 		isKnownFile = false
 
-		r.log.Warnf("Unexpectedly, the file %v is smaller than before (new: %v, old: %v) - reading whole file.",
-			utmpFile.Path, size, oldSize)
+		r.log.Warnf("saved size or offset illogical (new=%+v, saved=%+v) - reading whole file.",
+			utmpFile, savedUtmpFile)
 	}
 
 	if !isKnownFile && size == 0 {
@@ -219,11 +219,18 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 			f.Close()
 		}()
 
-		_, err = f.Seek(utmpFile.Offset, 0)
-		if err != nil {
-			errorC <- errors.Wrapf(err, "error setting offset for file %v", utmpFile.Path)
+		// This will be the usual case, but we do not want to seek with the stored offset
+		// if the saved size is smaller than the current one.
+		if size >= oldSize && utmpFile.Offset <= size {
+			_, err = f.Seek(utmpFile.Offset, 0)
+			if err != nil {
+				errorC <- errors.Wrapf(err, "error setting offset %d for file %v", utmpFile.Offset, utmpFile.Path)
+			}
+		}
 
-			// Try one more time, this time resetting to the beginning of the file.
+		// If the saved size is smaller than the current one, or the previous Seek failed,
+		// we retry one more time, this time resetting to the beginning of the file.
+		if size < oldSize || utmpFile.Offset > size || err != nil {
 			_, err = f.Seek(0, 0)
 			if err != nil {
 				errorC <- errors.Wrapf(err, "error setting offset 0 for file %v", utmpFile.Path)
