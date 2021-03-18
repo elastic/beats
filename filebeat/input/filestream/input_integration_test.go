@@ -43,6 +43,10 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	// prospector.scanner.check_interval must be set to a bigger interval
+	// than close.on_state_change.check_interval to make sure
+	// the Harvester detects the rename first thus allowing
+	// the output to receive the event and then close the source file.
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                                []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":    "10ms",
