@@ -20,6 +20,7 @@ IF EXIST "%PROGRAMFILES(X86)%" (
     curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-amd64.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
+        del bin\gvm.exe /s /f /q
         exit /b 1
     )
 ) ELSE (
@@ -27,6 +28,7 @@ IF EXIST "%PROGRAMFILES(X86)%" (
     curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.4/gvm-windows-386.exe
     IF ERRORLEVEL 1 (
         REM gvm installation has failed.
+        del bin\gvm.exe /s /f /q
         exit /b 1
     )
 )
@@ -44,6 +46,7 @@ FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 go env
 IF ERRORLEVEL 1 (
     REM go is not configured correctly.
+    rmdir %WORKSPACE%\.gvm /s /q
     exit /b 1
 )
 
