@@ -68,3 +68,39 @@ func TestInvalidConfiguration(t *testing.T) {
 		})
 	}
 }
+
+func TestValidConfiguration(t *testing.T) {
+	testcases := map[string]struct {
+		config map[string]interface{}
+	}{
+		"correct pattern based multiline": {
+			config: map[string]interface{}{
+				"type":    "pattern",
+				"match":   "before",
+				"pattern": "^\n",
+			},
+		},
+		"correct while_pattern based multiline": {
+			config: map[string]interface{}{
+				"type":    "while_pattern",
+				"pattern": "^\n",
+			},
+		},
+		"correct count based multiline": {
+			config: map[string]interface{}{
+				"type":        "count",
+				"count_lines": 5,
+			},
+		},
+	}
+
+	for name, test := range testcases {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			var config Config
+			c := common.MustNewConfigFrom(test.config)
+			err := c.Unpack(&config)
+			require.Nil(t, err)
+		})
+	}
+}
