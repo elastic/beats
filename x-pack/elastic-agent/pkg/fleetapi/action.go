@@ -21,6 +21,8 @@ const (
 	ActionTypeUnenroll = "UNENROLL"
 	// ActionTypePolicyChange specifies policy change action.
 	ActionTypePolicyChange = "POLICY_CHANGE"
+	// ActionTypePolicyReassign specifies policy reassign action.
+	ActionTypePolicyReassign = "POLICY_REASSIGN"
 	// ActionTypeSettings specifies change of agent settings.
 	ActionTypeSettings = "SETTINGS"
 	// ActionTypeInputAction specifies agent action.
@@ -70,6 +72,31 @@ func (a *ActionUnknown) String() string {
 // OriginalType returns the original type of the action as returned by the API.
 func (a *ActionUnknown) OriginalType() string {
 	return a.originalType
+}
+
+// ActionPolicyReassign is a request to apply a new
+type ActionPolicyReassign struct {
+	ActionID   string
+	ActionType string
+}
+
+func (a *ActionPolicyReassign) String() string {
+	var s strings.Builder
+	s.WriteString("action_id: ")
+	s.WriteString(a.ActionID)
+	s.WriteString(", type: ")
+	s.WriteString(a.ActionType)
+	return s.String()
+}
+
+// Type returns the type of the Action.
+func (a *ActionPolicyReassign) Type() string {
+	return a.ActionType
+}
+
+// ID returns the ID of the Action.
+func (a *ActionPolicyReassign) ID() string {
+	return a.ActionID
 }
 
 // ActionPolicyChange is a request to apply a new
@@ -246,6 +273,11 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				return errors.New(err,
 					"fail to decode POLICY_CHANGE action",
 					errors.TypeConfig)
+			}
+		case ActionTypePolicyReassign:
+			action = &ActionPolicyReassign{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
 			}
 		case ActionTypeInputAction:
 			action = &ActionApp{
