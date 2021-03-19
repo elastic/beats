@@ -156,6 +156,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
 - system/login: Fixed offset reset on inode reuse. {pull}24414[24414]
+- system/login: Add additional offset check for utmp files. {pull}24515[24515]
 
 *Filebeat*
 
@@ -249,7 +250,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
 - Fix aws/vpcflow generating errors for empty logs or unidentified formats. {pull}24167[24167]
+- Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
+- Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
 
 *Heartbeat*
 
@@ -671,6 +674,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 - Upgrade to ECS 1.8.0. {pull}23783[23783]
+- Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
 
 *Functionbeat*
 
