@@ -134,7 +134,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Adding Threat Intel module {pull}21795[21795]
 - Added username parsing from Cisco ASA message 302013. {pull}21196[21196]
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
-- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
+- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by removing unsupported processors. {pull}23763[23763]
 - Added support for Cisco AMP API as a new fileset. {pull}22768[22768]
 - Added RFC6587 framing option for tcp and unix inputs {issue}23663[23663] {pull}23724[23724]
 - Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
