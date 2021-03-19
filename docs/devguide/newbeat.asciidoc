@@ -123,11 +123,12 @@ mkdir ${GOPATH}/src/github.com/{user}
 cd ${GOPATH}/src/github.com/{user}
 --------------------
 
-Run the mage script to generate the custom beat:
+If you haven't installed Mage on your system already, be sure to follow the [installation instructions here](https://magefile.org/). Next up we'll run a mage script to generate the custom beat:
 
 
 [source,shell]
 --------------------
+cd ${GOPATH}/src/github.com/elastic/beats
 mage GenerateCustomBeat
 --------------------
 
