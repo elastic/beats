@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 *Filebeat*
 
-- Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
@@ -164,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
+- Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 
 *Heartbeat*
 
