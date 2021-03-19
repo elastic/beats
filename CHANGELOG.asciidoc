@@ -29,7 +29,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 *Metricbeat*
 
 - Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
-- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}[23905]
+- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 
 *Packetbeat*
 
