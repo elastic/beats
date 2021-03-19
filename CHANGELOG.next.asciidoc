@@ -476,6 +476,3 @@ to be consistent with ECS. {pull}23094[23094]
 ==== Known Issue
 
 *Journalbeat*
-
-
-
