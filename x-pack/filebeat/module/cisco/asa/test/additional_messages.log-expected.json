@@ -1605,6 +1605,156 @@
     },
     {
         "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw1111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built director stub TCP connection for fw1111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4472,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "fw1111",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built forwarder  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4631,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "fw111",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.1682.2.2",
+        "destination.domain": "192.1682.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built backup  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.1682.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4791,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "fw111",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01",
+            "192.1682.2.2"
+        ],
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
         "cisco.asa.message_id": "302023",
         "cisco.asa.source_interface": "fw111",
         "destination.address": "192.168.2.2",
