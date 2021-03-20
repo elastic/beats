@@ -282,6 +282,16 @@ processors:
       field: source.address
       value: '{{ cyberarkpas.audit.station }}'
       ignore_empty_value: true
+  #
+  # Observer fields
+  #
+  - set:
+      field: observer
+      value:
+        hostname: "{{ cyberarkpas.audit.hostname }}"
+        vendor: "{{ cyberarkpas.audit.vendor }}"
+        product: "{{ cyberarkpas.audit.product }}"
+        version: "{{ cyberarkpas.audit.version }}"
 
   #
   # Populate ip/host fields from address.
