@@ -181,6 +181,9 @@ processors:
         - append:
             field: error.message
             value: "failed to process CAProperties array: {{ _ingest.on_failure_message }}"
+  - remove:
+      field: cyberarkpas.audit.CAProperties.CAProperty
+      ignore_missing: true
 
   # Parse key-value pairs at ExtraDetails:
   # input:
@@ -211,15 +214,6 @@ processors:
   - rename:
       field: _tmp.kv
       target_field: cyberarkpas.audit.ExtraDetails
-      ignore_missing: true
-
-  #
-  # Cleanup
-  #
-  - remove:
-      field:
-       - _tmp
-       - cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
 
   #
@@ -274,6 +268,16 @@ processors:
   ########################################################
 
   - set:
+      field: event.kind
+      value: event
+
+  # TODO: Severity to number
+  #- set:
+  #    field: event.severity
+  #    value: 0
+  # TODO: event.type: info by default?
+
+  - set:
       field: event.code
       value: '{{ cyberarkpas.audit.message_id }}'
       ignore_empty_value: true
@@ -314,6 +318,67 @@ processors:
       ignore_failure: true
 
   #
+  # Enrichment based on message_id
+  #
+  # This script is overly complicated (read_field) because at this time
+  # there is no processor that allows to set one field from a source
+  # field using indirection (it is possible with rename, but that
+  # removes the original field).
+  #
+  # Once something like this is possible:
+  # set:
+  #   target_field: '{{ _ingest.value.to }}'
+  #   copy_from: '{{ _ingest.value.from }}'
+  #
+  # ... this script can be updated to just create two output lists, one
+  # for value-to pairs, another for value-from pairs.
+  #
+  - script:
+      lang: painless
+      params:
+        "7": # Logon
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - value: [ "authentication"]
+            to: event.category
+          - value: [ "start", "authentication_success" ]
+            to: event.action
+          - value: "success"
+            to: event.outcome
+      source: >
+        def clone(def val) {
+            return val instanceof List? new ArrayList(val) : val;
+        }
+        def read_field(def map, String name) {
+          if (map == null || !(map instanceof Map)) return null;
+          int pos = name.indexOf(".");
+          return pos == -1? clone(map[name])
+                          : read_field(map[name.substring(0, pos)], name.substring(pos+1));
+        }
+        String msgID = ctx.cyberarkpas.audit?.message_id;
+        def actions = params.get(msgID);
+        if (actions == null) return;
+        List values = new ArrayList();
+        for (def item : actions) {
+          def val = item.value;
+          if (val == null && (val = read_field(ctx, item.from)) == null) continue;
+          values.add([
+            "to": item.to,
+            "value": val
+          ]);
+        }
+        if (!values.isEmpty()) ctx._tmp["values"] = values;
+
+  - foreach:
+      field: _tmp.values
+      ignore_missing: true
+      processor:
+        set:
+          field: '{{_ingest._value.to}}'
+          copy_from: '_ingest._value.value'
+          ignore_empty_value: true
+
+  #
   # Populate related fields
   #
   - append:
@@ -326,6 +391,14 @@ processors:
       value: '{{destination.ip}}'
       if: 'ctx.destination?.ip != null'
       allow_duplicates: false
+
+  #
+  # Cleanup
+  #
+  - remove:
+      field:
+        - _tmp
+      ignore_missing: true
 
 on_failure:
   - append:

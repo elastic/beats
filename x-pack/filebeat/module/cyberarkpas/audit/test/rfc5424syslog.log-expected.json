@@ -15,10 +15,19 @@
         "cyberarkpas.audit.timestamp": "Mar 04 09:27:14",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "event.action": [
+            "start",
+            "authentication_success"
+        ],
+        "event.category": [
+            "authentication"
+        ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:14Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:14\",\"IsoTimestamp\":\"2021-03-04T17:27:14Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
@@ -37,7 +46,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-04T17:27:21.000Z",
@@ -55,10 +65,19 @@
         "cyberarkpas.audit.timestamp": "Mar 04 09:27:21",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "event.action": [
+            "start",
+            "authentication_success"
+        ],
+        "event.category": [
+            "authentication"
+        ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:21Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:21\",\"IsoTimestamp\":\"2021-03-04T17:27:21Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
@@ -77,7 +96,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PasswordManager"
     },
     {
         "@timestamp": "2021-03-04T17:27:21.000Z",
@@ -99,6 +119,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:21Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:21\",\"IsoTimestamp\":\"2021-03-04T17:27:21Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-GenericWebApp.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -141,6 +162,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:21Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:21\",\"IsoTimestamp\":\"2021-03-04T17:27:21Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-Azure.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -183,6 +205,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:21Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:21\",\"IsoTimestamp\":\"2021-03-04T17:27:21Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-BusinessWebsite.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -221,10 +244,19 @@
         "cyberarkpas.audit.timestamp": "Mar 04 09:27:33",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "event.action": [
+            "start",
+            "authentication_success"
+        ],
+        "event.category": [
+            "authentication"
+        ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:27:33Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:27:33\",\"IsoTimestamp\":\"2021-03-04T17:27:33Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
+        "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
@@ -243,7 +275,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAAppUser"
     },
     {
         "@timestamp": "2021-03-04T17:28:23.000Z",
@@ -265,6 +298,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:28:23Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:28:23\",\"IsoTimestamp\":\"2021-03-04T17:28:23Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-Azure.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -307,6 +341,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:28:23Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:28:23\",\"IsoTimestamp\":\"2021-03-04T17:28:23Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-BusinessWebsite.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -349,6 +384,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:28:23Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:28:23\",\"IsoTimestamp\":\"2021-03-04T17:28:23Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-GenericWebApp.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -391,6 +427,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:29:25Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:29:25\",\"IsoTimestamp\":\"2021-03-04T17:29:25Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-Azure.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -433,6 +470,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:29:25Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:29:25\",\"IsoTimestamp\":\"2021-03-04T17:29:25Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-BusinessWebsite.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
@@ -475,6 +513,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "event.code": "51",
         "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T17:29:25Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 09:29:25\",\"IsoTimestamp\":\"2021-03-04T17:29:25Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"51\",\"Desc\":\"Retrieve File\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Retrieve File\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"PasswordManagerShared\",\"File\":\"Root\\\\Policies\\\\Policy-GenericWebApp.ini\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Retrieve File\",\"GatewayStation\":\"\"}}}",
         "event.timezone": "-02:00",
