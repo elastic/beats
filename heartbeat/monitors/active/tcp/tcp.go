@@ -210,7 +210,7 @@ func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url
 
 	dialer, err := dc.Build(event)
 	if err != nil {
-		return reason.NewCustReason(err, "dialer_build", "tcp_dialer_could_not_be_built")
+		return reason.NewCustReason(err, "dialer_build", "dialchain_build_failure")
 	}
 
 	return jf.execDialer(event, dialer, dialAddr)
@@ -231,7 +231,7 @@ func (jf *jobFactory) execDialer(
 		if certErr, ok := err.(x509.CertificateInvalidError); ok {
 			tlsmeta.AddCertMetadata(event.Fields, []*x509.Certificate{certErr.Cert})
 		}
-		return reason.NewCustReason(err, "io", "tcp_dialer_failure")
+		return reason.NewCustReason(err, "io", "dial_failure")
 	}
 	defer conn.Close()
 	if jf.dataCheck == nil {
@@ -241,14 +241,14 @@ func (jf *jobFactory) execDialer(
 
 	if err := conn.SetDeadline(deadline); err != nil {
 		debugf("setting connection deadline failed with: %v", err)
-		return reason.IOFailed(err)
+		return reason.NewCustReason(err, "io", "could_not_set_conn_deadline")
 	}
 
 	validateStart := time.Now()
 	err = jf.dataCheck.Check(conn)
 	if err != nil && err != errRecvMismatch {
 		debugf("check failed with: %v", err)
-		return reason.IOFailed(err)
+		return reason.NewCustReason(err, "validate", "invalid_tcp_response")
 	}
 
 	end := time.Now()
@@ -260,7 +260,7 @@ func (jf *jobFactory) execDialer(
 		},
 	})
 	if err != nil {
-		return reason.MakeValidateError(err)
+		return reason.NewCustReason(err, "validate", "could_not_validate")
 	}
 
 	return nil

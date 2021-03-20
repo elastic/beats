@@ -47,13 +47,13 @@ func (rv multiValidator) wantsBody() bool {
 func (rv multiValidator) validate(resp *http.Response, body string) reason.Reason {
 	for _, respValidator := range rv.respValidators {
 		if err := respValidator(resp); err != nil {
-			return reason.ValidateFailed(err)
+			return reason.NewCustReason(err, "validate", "invalid_http_response")
 		}
 	}
 
 	for _, bodyValidator := range rv.bodyValidators {
 		if err := bodyValidator(resp, body); err != nil {
-			return reason.ValidateFailed(err)
+			return reason.NewCustReason(err, "validate", "invalid_http_body")
 		}
 	}
 

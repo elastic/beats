@@ -121,7 +121,7 @@ func (jf *jobFactory) pingIPFactory(config *Config) func(*net.IPAddr) jobs.Job {
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) reason.Reason {
 		rtt, n, err := jf.loop.ping(ip, config.Timeout, config.Wait)
 		if err != nil {
-			return reason.NewCustReason(err, "io", "icmp_ping_failure")
+			return reason.NewCustReason(err, "io", "icmp_unreachable")
 		}
 
 		icmpFields := common.MapStr{"requests": n}

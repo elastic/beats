@@ -76,12 +76,12 @@ func (p *persistentStateDb) updateAndGet(monitorId string, status string, start 
 
 	item.window = append(item.window, status)
 
-	numDown := 0
 	segmentStatus := "up"
 	if status == "down" {
 		item.numDown++
 	}
-	if numDown >= criteria.NumDown {
+
+	if item.numDown >= criteria.NumDown || item.numDown == len(item.window) {
 		segmentStatus = "down"
 	}
 
@@ -204,15 +204,19 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, smf stdfields.St
 func addMonitorStatus(monitorType string) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, reason.Reason) {
-			cont, err := origJob(event)
+			cont, rea := origJob(event)
 
 			fields := common.MapStr{
 				"monitor": common.MapStr{
-					"status": look.Status(err),
+					"status": look.Status(rea),
 				},
 			}
-			if err != nil {
-				fields["error"] = look.Reason(err)
+			if rea != nil {
+				fields["error"] = common.MapStr{
+					"message": rea.Error(),
+					"code": rea.Code(),
+					"type": rea.Type(),
+				}
 			}
 			eventext.MergeEventFields(event, fields)
 			return cont, nil
@@ -306,7 +310,7 @@ func makeAddSummary(smf stdfields.StdMonitorFields, stateDb *persistentStateDb) 
 				tsbI, err := event.GetValue("monitor.timespan")
 				tsb := tsbI.(schedule.TimespanBounds)
 				if err != nil {
-					return nil, reason.NewCustReason(err, "wrapper", "could not get monitor timespan in summary")
+					return nil, reason.NewCustReason(err, "internal", "could_not_set_summary_wrapper")
 				}
 				stateItem := stateDb.updateAndGet(smf.ID, summaryStatus, tsb.Gte, smf.DownWhen)
 

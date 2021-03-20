@@ -129,7 +129,7 @@ func createPingFactory(
 
 		dialer, err := d.Build(event)
 		if err != nil {
-			return reason.NewCustReason(err, "io", "could_not_build_dialchain")
+			return reason.NewCustReason(err, "io", "dialchain_build_failure")
 		}
 
 		var (
@@ -313,7 +313,17 @@ func execRequest(client *http.Client, req *http.Request) (start time.Time, resp 
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return start, nil, reason.IOFailed(err)
+		if ue, ok := err.(*url.Error); ok {
+			if ue.Timeout() {
+				return start, nil, reason.NewCustReason(err, "io", "timeout")
+			} else if ue.Temporary() {
+				return start, nil, reason.NewCustReason(err, "io", "temporary_http_error")
+			} else {
+				return start, nil, reason.NewCustReason(err, "io", "other_http_error")
+			}
+		} else {
+			return start, nil, reason.NewCustReason(err, "io", "unknown_http_error")
+		}
 	}
 
 	return start, resp, nil

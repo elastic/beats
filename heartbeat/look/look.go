@@ -23,8 +23,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/elastic/beats/v7/heartbeat/reason"
 )
 
 // RTT formats a round-trip-time given as time.Duration into an
@@ -43,14 +41,6 @@ func RTT(rtt time.Duration) common.MapStr {
 		// we get back has the wrong unit
 		"us": rtt / (time.Microsecond / time.Nanosecond),
 	}
-}
-
-// Reason formats an error into an error event field.
-func Reason(err error) common.MapStr {
-	if r, ok := err.(reason.Reason); ok {
-		return reason.Fail(r)
-	}
-	return reason.Fail(reason.IOFailed(err))
 }
 
 // Timestamp converts an event timestamp into an compatible event timestamp for

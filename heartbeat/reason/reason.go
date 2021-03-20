@@ -17,10 +17,6 @@
 
 package reason
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common"
-)
-
 type Reason interface {
 	error
 	Type() string
@@ -33,80 +29,28 @@ func NewResolve(err error) Reason {
 }
 
 func NewCustReason(err error, typ string, code string) CustReason {
-	return CustReason{err: err, typ: typ, code: code}
+	return CustReason{Err: err, Message: err.Error(), Typ: typ, CodeV: code}
 }
 
 type CustReason struct {
-	err error
-	code string
-	typ string
+	Err error
+	Message string `json:"message"`
+	CodeV string `json:"code"`
+	Typ string `json:"type"`
 }
 
 func (c CustReason) Error() string {
-	return c.err.Error()
+	return c.Err.Error()
 }
 
 func (c CustReason) Type() string {
-	return c.typ
+	return c.Typ
 }
 
 func (c CustReason) Code() string {
-	return c.code
+	return c.CodeV
 }
 
 func (c CustReason) Unwrap() error {
-	return c.err
-}
-
-type ValidateError struct {
-	err error
-}
-
-type IOError struct {
-	err error
-}
-
-func ValidateFailed(err error) Reason {
-	if err == nil {
-		return nil
-	}
-	return ValidateError{err}
-}
-
-func IOFailed(err error) Reason {
-	if err == nil {
-		return nil
-	}
-	return IOError{err}
-}
-
-func (e ValidateError) Error() string { return e.err.Error() }
-func (e ValidateError) Unwrap() error { return e.err }
-func (ValidateError) Type() string    { return "validate" }
-func (ValidateError) Code() string    { return "" }
-
-func (e IOError) Error() string { return e.err.Error() }
-func (e IOError) Unwrap() error { return e.err }
-func (IOError) Type() string    { return "io" }
-func (IOError) Code() string    { return "" }
-
-func FailError(typ string, err error) common.MapStr {
-	return common.MapStr{
-		"type":    typ,
-		"message": err.Error(),
-	}
-}
-
-func Fail(r Reason) common.MapStr {
-	return common.MapStr{
-		"type":    r.Type(),
-		"message": r.Error(),
-	}
-}
-
-func FailIO(err error) common.MapStr { return Fail(IOError{err}) }
-
-// MakeValidateError creates an instance of ValidateError from the given error.
-func MakeValidateError(err error) ValidateError {
-	return ValidateError{err}
+	return c.Err
 }

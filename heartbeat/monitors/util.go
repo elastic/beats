@@ -158,7 +158,7 @@ func makeByHostAnyIPJob(
 		resolveStart := time.Now()
 		ip, err := resolver.ResolveIPAddr(network, host)
 		if err != nil {
-			return nil, reason.NewCustReason(err, "io", "could_not_resolve_ip_addr")
+			return nil, reason.NewCustReason(err, "io", "ip_resolve")
 		}
 
 		resolveEnd := time.Now()
@@ -185,7 +185,7 @@ func makeByHostAllIPJob(
 		resolveStart := time.Now()
 		ips, err := net.LookupIP(host)
 		if err != nil {
-			return nil, reason.NewCustReason(err, "io", "could_not_lookup_ip")
+			return nil, reason.NewCustReason(err, "io", "ip_lookup")
 		}
 
 		resolveEnd := time.Now()

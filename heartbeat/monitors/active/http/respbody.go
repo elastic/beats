@@ -58,7 +58,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	respBody, bodyLenBytes, bodyHash, respErr := readBody(resp, bufferBodyBytes)
 	// If we encounter an error while reading the body just fail early
 	if respErr != nil {
-		return nil, "", reason.IOFailed(respErr)
+		return nil, "", reason.NewCustReason(respErr, "io", "http_body_read_failure")
 	}
 
 	// Run any validations
