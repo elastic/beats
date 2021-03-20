@@ -15,6 +15,8 @@
         "cyberarkpas.audit.station": "10.2.0.6",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.6.0000",
+        "destination.address": "10.2.0.3",
+        "destination.ip": "10.2.0.3",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -27,6 +29,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.6.0000",
+        "related.ip": [
+            "10.2.0.6",
+            "10.2.0.3"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.2.0.6",
         "source.ip": "10.2.0.6",
@@ -64,6 +70,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -101,6 +110,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -138,6 +150,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -175,6 +190,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -212,6 +230,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -249,6 +270,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -286,6 +310,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -323,6 +350,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -360,6 +390,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -397,6 +430,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -434,6 +470,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -467,6 +506,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -500,6 +542,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -533,6 +578,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -566,6 +614,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -599,6 +650,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -632,6 +686,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -665,6 +722,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -698,6 +758,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -735,6 +798,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -772,6 +838,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -809,6 +878,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -846,6 +918,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -883,6 +958,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -920,6 +998,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -957,6 +1038,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -994,6 +1078,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1031,6 +1118,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1064,6 +1154,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1097,6 +1190,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1130,6 +1226,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1163,6 +1262,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1196,6 +1298,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1229,6 +1334,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1262,6 +1370,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1295,6 +1406,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1328,6 +1442,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1361,6 +1478,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1394,6 +1514,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1431,6 +1554,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1468,6 +1594,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1505,6 +1634,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1542,6 +1674,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1579,6 +1714,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1616,6 +1754,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1653,6 +1794,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1690,6 +1834,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1727,6 +1874,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1764,6 +1914,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1801,6 +1954,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1838,6 +1994,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1863,6 +2022,8 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:07:51",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -1876,6 +2037,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -1901,6 +2066,8 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:09:37",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -1914,6 +2081,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -1951,6 +2122,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1976,6 +2150,8 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:19:26",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -1989,6 +2165,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2014,6 +2194,8 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:32:22",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2027,6 +2209,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2064,6 +2250,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2101,6 +2290,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2138,6 +2330,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2175,6 +2370,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2212,6 +2410,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2249,6 +2450,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2286,6 +2490,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2311,6 +2518,8 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:32:51",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2324,6 +2533,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -2349,6 +2562,8 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:14:58",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2362,6 +2577,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "37.223.7.45",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "37.223.7.45",
         "source.ip": "37.223.7.45",
@@ -2399,6 +2618,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2436,6 +2658,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2473,6 +2698,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2498,6 +2726,8 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:46:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2511,6 +2741,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "37.223.7.45",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "37.223.7.45",
         "source.ip": "37.223.7.45",
@@ -2536,6 +2770,8 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:48:24",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2549,6 +2785,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "37.223.7.45",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "37.223.7.45",
         "source.ip": "37.223.7.45",
@@ -2586,6 +2826,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2623,6 +2866,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2660,6 +2906,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2697,6 +2946,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2734,6 +2986,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2759,6 +3014,8 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:23:33",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -2772,6 +3029,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -2809,6 +3070,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2846,6 +3110,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2883,6 +3150,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2920,6 +3190,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2957,6 +3230,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2994,6 +3270,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3031,6 +3310,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3068,6 +3350,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3105,6 +3390,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3142,6 +3430,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3179,6 +3470,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3204,6 +3498,8 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:31:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -3217,6 +3513,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3254,6 +3553,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3291,6 +3593,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3328,6 +3633,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3365,6 +3673,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3402,6 +3713,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3439,6 +3753,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3476,6 +3793,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3513,6 +3833,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3550,6 +3873,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3575,6 +3901,8 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:31:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -3588,6 +3916,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3625,6 +3956,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",

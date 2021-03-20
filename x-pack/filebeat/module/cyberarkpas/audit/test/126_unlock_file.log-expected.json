@@ -30,6 +30,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

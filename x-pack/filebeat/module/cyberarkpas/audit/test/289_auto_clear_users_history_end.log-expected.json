@@ -28,6 +28,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
@@ -61,6 +64,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
@@ -98,6 +104,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",
@@ -136,6 +145,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "0.0.0.0",
         "source.ip": "0.0.0.0",

@@ -28,6 +28,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -65,6 +68,9 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -91,6 +97,8 @@
         "cyberarkpas.audit.timestamp": "Mar 11 10:03:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "4",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -104,6 +112,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -130,6 +142,8 @@
         "cyberarkpas.audit.timestamp": "Mar 11 10:51:11",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "4",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -143,6 +157,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -169,6 +187,8 @@
         "cyberarkpas.audit.timestamp": "Mar 11 12:12:00",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "4",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -182,6 +202,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -208,6 +232,8 @@
         "cyberarkpas.audit.timestamp": "Mar 14 06:00:33",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "4",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -221,6 +247,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -247,6 +277,8 @@
         "cyberarkpas.audit.timestamp": "Mar 14 06:17:18",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
         "event.code": "4",
         "event.dataset": "cyberarkpas.audit",
         "event.module": "cyberarkpas",
@@ -260,6 +292,10 @@
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "10.0.1.20"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",

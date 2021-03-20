@@ -282,16 +282,22 @@ processors:
       field: source.address
       value: '{{ cyberarkpas.audit.station }}'
       ignore_empty_value: true
+
+  - set:
+      field: destination.address
+      value: '{{ cyberarkpas.audit.gateway_station }}'
+      ignore_empty_value: true
+
   #
   # Observer fields
   #
   - set:
       field: observer
       value:
-        hostname: "{{ cyberarkpas.audit.hostname }}"
-        vendor: "{{ cyberarkpas.audit.vendor }}"
-        product: "{{ cyberarkpas.audit.product }}"
-        version: "{{ cyberarkpas.audit.version }}"
+        hostname: '{{ cyberarkpas.audit.hostname }}'
+        vendor: '{{ cyberarkpas.audit.vendor }}'
+        product: '{{ cyberarkpas.audit.product }}'
+        version: '{{ cyberarkpas.audit.version }}'
 
   #
   # Populate ip/host fields from address.
@@ -299,13 +305,32 @@ processors:
   - grok:
       field: source.address
       patterns:
-        - "(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})"
+        - '(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})'
       ignore_failure: true
+  - grok:
+      field: destination.address
+      patterns:
+        - '(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})'
+      ignore_failure: true
+
+  #
+  # Populate related fields
+  #
+  - append:
+      field: related.ip
+      value: '{{source.ip}}'
+      if: 'ctx.source?.ip != null'
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{destination.ip}}'
+      if: 'ctx.destination?.ip != null'
+      allow_duplicates: false
 
 on_failure:
   - append:
         field: error.message
-        value: "{{ _ingest.on_failure_message }}"
+        value: '{{ _ingest.on_failure_message }}'
   - remove:
       field:
         - _tmp
