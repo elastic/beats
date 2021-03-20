@@ -49,56 +49,7 @@
               type: alias
               path: logstash.node.stats.logstash.version
         - name: pipelines
-          type: group
-          fields:
-            - name: id
-              type: alias
-              path: logstash.node.stats.pipelines.id
-            - name: hash
-              type: alias
-              path: logstash.node.stats.pipelines.hash
-            - name: queue
-              type: group
-              fields:
-                - name: type
-                  type: alias
-                  path: logstash.node.stats.pipelines.queue.type
-                - name: queue_size_in_bytes
-                  type: alias
-                  path: logstash.node.stats.pipelines.queue.queue_size_in_bytes
-                - name: max_queue_size_in_bytes
-                  type: alias
-                  path: logstash.node.stats.pipelines.queue.max_queue_size_in_bytes
-            - name: events
-              type: group
-              fields:
-                - name: out
-                  type: alias
-                  path: logstash.node.stats.pipelines.events.out
-                - name: duration_in_millis
-                  type: alias
-                  path: logstash.node.stats.pipelines.events.duration_in_millis
-            - name: vertices
-              type: group
-              fields:
-                - name: duration_in_millis
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.duration_in_millis
-                - name: events_in
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.events_in
-                - name: pipeline_ephemeral_id
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.pipeline_ephemeral_id
-                - name: events_out
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.events_out
-                - name: id
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.id
-                - name: queue_push_duration_in_millis
-                  type: alias
-                  path: logstash.node.stats.pipelines.vertices.queue_push_duration_in_millis
+          type: nested
         - name: os
           type: group
           fields:

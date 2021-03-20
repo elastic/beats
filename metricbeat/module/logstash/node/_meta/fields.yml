@@ -4,37 +4,3 @@
     node
   release: ga
   fields:
-    - name: state.pipeline
-      type: group
-      fields:
-        - name: id
-          type: keyword
-        - name: hash
-          type: keyword
-    - name: host
-      type: alias
-      path: host.hostname
-      migration: true
-      description: >
-        Host name
-    - name: version
-      type: alias
-      path: service.version
-      migration: true
-      description: >
-        Logstash Version
-    - name: jvm
-      type: group
-      description: >
-        JVM Info
-      fields:
-        - name: version
-          type: keyword
-          description: >
-            Version
-        - name: pid
-          type: alias
-          path: process.pid
-          migration: true
-          description: >
-            Process ID

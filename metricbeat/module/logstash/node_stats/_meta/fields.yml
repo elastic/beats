@@ -1,124 +1,161 @@
-- name: node.stats
+- name: node
   type: group
   description: >
     node_stats metrics.
   release: ga
   fields:
-    - name: jvm
-      type: group
-      fields:
-        - name: uptime_in_millis
-          type: long
-        - name: mem
-          type: group
-          fields:
-            - name: heap_used_in_bytes
-              type: long
-            - name: heap_max_in_bytes
-              type: long
-    - name: events
-      type: group
-      description: >
-        Events stats
-      fields:
-        - name: in
-          type: long
-          description: >
-            Incoming events counter.
-        - name: out
-          type: long
-          description: >
-            Outgoing events counter.
-        - name: filtered
-          type: long
-          description: >
-            Filtered events counter.
-        - name: duration_in_millis
-          type: long
-    - name: logstash
-      type: group
-      fields:
-        - name: uuid
-          type: keyword
-        - name: version
-          type: keyword
-    - name: os
-      type: group
-      fields:
-        - name: cpu
-          type: group
-          fields:
-            - name: load_average
-              type: group
-              fields:
-                - name: 15m
-                  type: long
-                - name: 1m
-                  type: long
-                - name: 5m
-                  type: long
-        - name: cgroup
-          type: group
-          fields:
-            - name: cpuacct.usage_nanos
-              type: long
-            - name: cpu
-              type: group
-              fields:
-                - name: stat
-                  type: group
-                  fields:
-                    - name: number_of_elapsed_periods
-                      type: long
-                    - name: time_throttled_nanos
-                      type: long
-                    - name: number_of_times_throttled
-                      type: long
-    - name: process.cpu.percent
-      type: double
-    - name: pipelines
+    - name: state.pipeline
       type: group
       fields:
         - name: id
           type: keyword
         - name: hash
           type: keyword
-        - name: queue
+    - name: host
+      type: alias
+      path: host.hostname
+      migration: true
+      description: >
+        Host name
+    - name: version
+      type: alias
+      path: service.version
+      migration: true
+      description: >
+        Logstash Version
+    - name: jvm
+      type: group
+      description: >
+        JVM Info
+      fields:
+        - name: version
+          type: keyword
+          description: >
+            Version
+        - name: pid
+          type: alias
+          path: process.pid
+          migration: true
+          description: >
+            Process ID
+    - name: stats
+      type: group
+      fields:
+        - name: jvm
           type: group
           fields:
-            - name: events_count
+            - name: uptime_in_millis
               type: long
-            - name: type
-              type: keyword
-            - name: queue_size_in_bytes
-              type: long
-            - name: max_queue_size_in_bytes
-              type: long
+            - name: mem
+              type: group
+              fields:
+                - name: heap_used_in_bytes
+                  type: long
+                - name: heap_max_in_bytes
+                  type: long
         - name: events
           type: group
+          description: >
+            Events stats
           fields:
+            - name: in
+              type: long
+              description: >
+                Incoming events counter.
             - name: out
               type: long
+              description: >
+                Outgoing events counter.
+            - name: filtered
+              type: long
+              description: >
+                Filtered events counter.
             - name: duration_in_millis
               type: long
-        - name: vertices
+        - name: logstash
           type: group
           fields:
-            - name: duration_in_millis
-              type: long
-            - name: events_in
-              type: long
-            - name: pipeline_ephemeral_id
+            - name: uuid
               type: keyword
-              description: pipeline_ephemeral_id
-            - name: events_out
-              type: long
-              description: events_out
+            - name: version
+              type: keyword
+        - name: os
+          type: group
+          fields:
+            - name: cpu
+              type: group
+              fields:
+                - name: load_average
+                  type: group
+                  fields:
+                    - name: 15m
+                      type: long
+                    - name: 1m
+                      type: long
+                    - name: 5m
+                      type: long
+            - name: cgroup
+              type: group
+              fields:
+                - name: cpuacct.usage_nanos
+                  type: long
+                - name: cpu
+                  type: group
+                  fields:
+                    - name: stat
+                      type: group
+                      fields:
+                        - name: number_of_elapsed_periods
+                          type: long
+                        - name: time_throttled_nanos
+                          type: long
+                        - name: number_of_times_throttled
+                          type: long
+        - name: process.cpu.percent
+          type: double
+        - name: pipelines
+          type: nested
+          fields:
             - name: id
               type: keyword
-              description: id
-            - name: queue_push_duration_in_millis
-              type: float
-              description: queue_push_duration_in_millis
-    - name: queue.events_count
-      type: long
+            - name: hash
+              type: keyword
+            - name: queue
+              type: group
+              fields:
+                - name: events_count
+                  type: long
+                - name: type
+                  type: keyword
+                - name: queue_size_in_bytes
+                  type: long
+                - name: max_queue_size_in_bytes
+                  type: long
+            - name: events
+              type: group
+              fields:
+                - name: out
+                  type: long
+                - name: duration_in_millis
+                  type: long
+            - name: vertices
+              type: group
+              fields:
+                - name: duration_in_millis
+                  type: long
+                - name: events_in
+                  type: long
+                - name: pipeline_ephemeral_id
+                  type: keyword
+                  description: pipeline_ephemeral_id
+                - name: events_out
+                  type: long
+                  description: events_out
+                - name: id
+                  type: keyword
+                  description: id
+                - name: queue_push_duration_in_millis
+                  type: float
+                  description: queue_push_duration_in_millis
+        - name: queue.events_count
+          type: long
