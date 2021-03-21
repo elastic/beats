@@ -336,15 +336,49 @@ processors:
   - script:
       lang: painless
       params:
-        "7": # Logon
+
+        # 7 - Logon
+        #
+        # User logged on to the PVWA.
+        "7":
           - from: cyberarkpas.audit.issuer
             to: user.name
-          - value: [ "authentication"]
+          - value: [ "authentication", "session"]
             to: event.category
           - value: [ "start", "authentication_success" ]
             to: event.action
           - value: "success"
             to: event.outcome
+
+        # 8 - Logoff
+        #
+        # User logged of from the PVWA.
+        "8": # Logoff
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - value: [ "authentication", "session"]
+            to: event.category
+          - value: [ "end"]
+            to: event.action
+          - value: "success"
+            to: event.outcome
+
+        # 19 - Full gateway connection.
+        # TODO: Not sure what this is, but not an "elevation".
+        #       The source user is internal to the system?.
+        #       Does this represents that a PSM has been added to the vault?
+        "19":
+          - from: cyberarkpas.audit.source_user
+            to: source.user.name
+          - from: cyberarkpas.audit.issuer
+            to: destination.user.name
+          - value: [ "network"]
+            to: event.category
+          - value: [ "start"]
+            to: event.action
+          - value: "success"
+            to: event.outcome
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;

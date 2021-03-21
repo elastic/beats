@@ -20,7 +20,8 @@
             "authentication_success"
         ],
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
@@ -70,7 +71,8 @@
             "authentication_success"
         ],
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
@@ -249,7 +251,8 @@
             "authentication_success"
         ],
         "event.category": [
-            "authentication"
+            "authentication",
+            "session"
         ],
         "event.code": "7",
         "event.dataset": "cyberarkpas.audit",
