@@ -1,0 +1,280 @@
+{
+    "cluster_name": "docker-cluster",
+    "cluster_uuid": "lf3q3A5DT4-0goYym5T1Kg",
+    "version": 172,
+    "state_uuid": "hxQNeQvhTCqScxjvD3HDjA",
+    "master_node": "wm6aTWRfRCuK3gb4YTYwGA",
+    "nodes": {
+        "wm6aTWRfRCuK3gb4YTYwGA": {
+            "name": "ba563a6c99a9",
+            "ephemeral_id": "c1FYo-l4QFmFeyJ7Ro_80Q",
+            "transport_address": "127.0.0.1:9300",
+            "attributes": {
+                "ml.machine_memory": "33291980800",
+                "xpack.installed": "true",
+                "transform.node": "true",
+                "ml.max_open_jobs": "20",
+                "ml.max_jvm_size": "1073741824"
+            }
+        }
+    },
+    "routing_table": {
+        "indices": {
+            ".monitoring-es-7-2021.03.08": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-7-2021.03.08",
+                            "allocation_id": {
+                                "id": "4vK9XIbpSH2tt77dZ5JfIw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-7-2021.03.08": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-7-2021.03.08",
+                            "allocation_id": {
+                                "id": "fZg1zbdjTJakTuKDJCmBnQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana_8.0.0_001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana_8.0.0_001",
+                            "allocation_id": {
+                                "id": "ofR0yGNjS7GcKYcgcfrDGg"
+                            }
+                        }
+                    ]
+                }
+            },
+            "metricbeat-8.0.0-2021.02.17-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-8.0.0-2021.02.17-000001",
+                            "allocation_id": {
+                                "id": "vQbTFP6VQ1uTm07aWcAx6g"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-8.0.0-2021.02.17-000001",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "CLUSTER_RECOVERED",
+                                "at": "2021-03-09T11:42:21.686Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-7-mb-2021.03.08": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-7-mb-2021.03.08",
+                            "allocation_id": {
+                                "id": "5-i55I9XQ_ynI3mkDefz9Q"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana-event-log-8.0.0-snapshot-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana-event-log-8.0.0-snapshot-000001",
+                            "allocation_id": {
+                                "id": "EF-gTM7gQK6HT8PAtq4VgA"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".async-search": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".async-search",
+                            "allocation_id": {
+                                "id": "cd-MOV0URF6GPaqE2ryRoQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".apm-agent-configuration": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".apm-agent-configuration",
+                            "allocation_id": {
+                                "id": "y0unMReeQJGbPZykdd0epQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-7-2021.03.09": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-7-2021.03.09",
+                            "allocation_id": {
+                                "id": "eQ8cZu2UQL2dYEMDO_Agaw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".apm-custom-link": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".apm-custom-link",
+                            "allocation_id": {
+                                "id": "fYCZqAPtTfaBdsAsUpJ0Vg"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-7-2021.03.09": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-7-2021.03.09",
+                            "allocation_id": {
+                                "id": "5fIOZs6ZSsurIqO_JnDDAw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".ds-ilm-history-5-2021.02.17-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".ds-ilm-history-5-2021.02.17-000001",
+                            "allocation_id": {
+                                "id": "8O-gDEQ7RmKUZLJPxqAm_g"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana_task_manager_8.0.0_001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana_task_manager_8.0.0_001",
+                            "allocation_id": {
+                                "id": "dEeg1sz3TmePKKkLLKUP_Q"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".tasks": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "wm6aTWRfRCuK3gb4YTYwGA",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".tasks",
+                            "allocation_id": {
+                                "id": "-OoBSqwmQM2Vnx-Ysoe2jA"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
