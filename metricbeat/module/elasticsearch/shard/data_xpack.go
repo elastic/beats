@@ -153,5 +153,5 @@ func getEventID(stateID string, shard common.MapStr) (string, error) {
 		shardType = "r"
 	}
 
-	return nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
+	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
 }
