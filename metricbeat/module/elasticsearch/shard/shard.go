@@ -37,6 +37,7 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
+	lastState map[string]string
 }
 
 // New create a new instance of the MetricSet
@@ -46,7 +47,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{MetricSet: ms}, nil
+
+	cache := make(map[string]string)
+
+	return &MetricSet{MetricSet: ms, lastState: cache}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -70,7 +74,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	//}
 
 	if m.XPack {
-		err = eventsMappingXPack(r, m, content)
+		newCache, err := eventsMappingXPack(r, m, m.lastState, content)
+		m.lastState = newCache
 		if err != nil {
 			// Since this is an x-pack code path, we log the error but don't
 			// return it. Otherwise it would get reported into `metricbeat-*`
