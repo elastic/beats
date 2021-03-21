@@ -157,7 +157,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
   }
@@ -166,11 +166,10 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 /**
 * There are only two supported branches, master and 7.x
 */
-def getIdSuffix() {
+def getFlakyBranch() {
   if(isPR()) {
     return getBranchIndice(env.CHANGE_TARGET)
-  }
-  if(isBranch()) {
+  } else {
     return getBranchIndice(env.BRANCH_NAME)
   }
 }
@@ -737,10 +736,11 @@ def archiveTestOutput(Map args = [:]) {
 * disk space of the jenkins instance
 */
 def tarAndUploadArtifacts(Map args = [:]) {
-  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  def fileName = args.file.replaceAll('[^A-Za-z-0-9]','-')
+  tar(file: fileName, dir: args.location, archive: false, allowMissing: true)
   googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
                          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-                         pattern: "${args.file}",
+                         pattern: "${fileName}",
                          sharedPublicly: true)
 }
 
