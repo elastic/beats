@@ -265,7 +265,17 @@
       description: >
         List of all MITRE tactics related to the incident found.
 
+    - name: mitre_tactics
+      type: keyword
+      description: >
+        Array of all related mitre tactic ID's
+
     - name: techniques
       type: flattened
       description: >
         List of all MITRE techniques related to the incident found.
+
+    - name: mitre_techniques
+      type: keyword
+      description: >
+        Array of all related mitre technique ID's
