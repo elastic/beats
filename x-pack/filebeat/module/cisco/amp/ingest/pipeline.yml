@@ -79,11 +79,11 @@ processors:
 - rename:
     field: cisco.amp.techniques
     target_field: cisco.amp.mitre_techniques
-    if: "ctx?.cisco?.amp?.techniques != null && ctx?.cisco?.amp?.techniques[0] instanceof String"
+    if: "ctx?.cisco?.amp?.techniques != null && ctx?.cisco?.amp?.techniques.length > 0 && ctx?.cisco?.amp?.techniques[0] instanceof String"
 - rename:
     field: cisco.amp.tactics
     target_field: cisco.amp.mitre_tactics
-    if: "ctx?.cisco?.amp?.tactics != null && ctx?.cisco?.amp?.tactics[0] instanceof String"
+    if: "ctx?.cisco?.amp?.tactics != null && ctx?.cisco?.amp?.tactics.length > 0 && ctx?.cisco?.amp?.tactics[0] instanceof String"
 
 ######################
 ## ECS Host Mapping ##
@@ -318,11 +318,11 @@ processors:
         if (ctx?.related == null) {
             ctx.related = new HashMap();
         }
-        if (ctx?.related != null && ctx?.related?.ip == null) {
+        if (ctx?.related?.ip == null) {
             ctx.related.ip = new ArrayList();
         }
         for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
-            if (addr.ip != null && addr.ip != "") {
+            if (addr.ip != null && !addr.ip.isEmpty()) {
                 if (!ctx?.related?.ip.contains(addr.ip)) {
                     ctx?.related?.ip.add(addr.ip);  
                 }
@@ -335,11 +335,11 @@ processors:
         if (ctx?.cisco?.amp?.related == null) {
             ctx.cisco.amp.related = new HashMap();
         }
-        if (ctx?.cisco?.amp?.related != null && ctx?.cisco?.amp?.related?.mac == null) {
+        if (ctx?.cisco?.amp?.related?.mac == null) {
             ctx.cisco.amp.related.mac = new ArrayList();
         }
         for (addr in ctx?.cisco?.amp?.computer?.network_addresses) {
-            if (addr.mac != null && addr.mac != "") {
+            if (addr.mac != null && !addr.mac.isEmpty()) {
                 if (!ctx?.cisco?.amp?.related?.mac.contains(addr.mac)) {
                     ctx?.cisco?.amp?.related?.mac.add(addr.mac);  
                 }

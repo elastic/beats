@@ -726,61 +726,6 @@
             }
         ],
         "cisco.amp.connector_guid": "test_connector_guid",
-        "cisco.amp.detection_id": "6880587021790740669",
-        "cisco.amp.error.description": "Object path not found",
-        "cisco.amp.error.error_code": 3221225530,
-        "cisco.amp.event_type_id": 2164260880,
-        "cisco.amp.file.disposition": "Malicious",
-        "cisco.amp.group_guids": [
-            "test_group_guid"
-        ],
-        "cisco.amp.related.mac": [
-            "be:b0:d5:89:e2:96"
-        ],
-        "cisco.amp.timestamp_nanoseconds": 706000000,
-        "event.action": "Quarantine Failure",
-        "event.category": [
-            "malware"
-        ],
-        "event.dataset": "cisco.amp",
-        "event.id": 6880587030380676000,
-        "event.kind": "alert",
-        "event.module": "cisco",
-        "event.severity": 2,
-        "file.hash.sha256": "1ceeffdd10ece58a1b0f298bf4bd2ca65e1ef5cd50248f89f89870e21c7e5e3b",
-        "fileset.name": "amp",
-        "host.hostname": "Demo_BP_WMIPRVSE",
-        "host.name": "Demo_BP_WMIPRVSE",
-        "input.type": "log",
-        "log.offset": 34692,
-        "related.hash": [
-            "1ceeffdd10ece58a1b0f298bf4bd2ca65e1ef5cd50248f89f89870e21c7e5e3b"
-        ],
-        "related.hosts": [
-            "Demo_BP_WMIPRVSE"
-        ],
-        "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
-        ],
-        "service.type": "cisco",
-        "tags": [
-            "cisco-amp",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2021-01-14T10:01:50.000Z",
-        "cisco.amp.computer.active": true,
-        "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
-        "cisco.amp.computer.network_addresses": [
-            {
-                "ip": "10.10.10.10",
-                "mac": "be:b0:d5:89:e2:96"
-            }
-        ],
-        "cisco.amp.connector_guid": "test_connector_guid",
         "cisco.amp.detection": "Generic.Malware.WX.9E93D282",
         "cisco.amp.detection_id": "6880587021790740668",
         "cisco.amp.event_type_id": 1090519054,
@@ -812,7 +757,7 @@
         "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 40617,
+        "log.offset": 27082,
         "process.hash.md5": "23ee3d381cfe3b9f6229483e2ce2f9e1",
         "process.hash.sha1": "93cf877f5627e55ec076a656e935042fac39950e",
         "process.hash.sha256": "4240a12e0b246c9d69af1f697488fe7da1b497df20f4a6f95135b4d5fe180a57",
@@ -878,7 +823,7 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 48227,
+        "log.offset": 28604,
         "process.hash.sha256": "db06c3534964e3fc79d2763144ba53742d7fa250ca336f4a0fe724b75aaff386",
         "related.hash": [
             "3337e3875b05e0bfba69ab926532e3f179e8cfbf162ebb60ce58a0281437a7ef"
@@ -938,7 +883,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 49673,
+        "log.offset": 30050,
         "related.hash": [
             "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
             "41476df3138717868118d8542cf3d1d6",
@@ -998,7 +943,7 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 50899,
+        "log.offset": 31276,
         "process.hash.sha256": "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8",
         "related.hash": [
             "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8"
@@ -1053,7 +998,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 52646,
+        "log.offset": 33023,
         "related.hash": [
             "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86"
         ],
@@ -1112,7 +1057,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 53755,
+        "log.offset": 34132,
         "related.hash": [
             "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
             "41476df3138717868118d8542cf3d1d6",
@@ -1161,7 +1106,7 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 54981,
+        "log.offset": 35358,
         "related.hosts": [
             "Demo_AMP_MAP_FriedEx"
         ],
@@ -1213,7 +1158,7 @@
         "host.hostname": "Demo_Qakbot_1",
         "host.name": "Demo_Qakbot_1",
         "input.type": "log",
-        "log.offset": 55911,
+        "log.offset": 36288,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
         ],
@@ -1266,7 +1211,7 @@
         "host.hostname": "Demo_Qakbot_1",
         "host.name": "Demo_Qakbot_1",
         "input.type": "log",
-        "log.offset": 57112,
+        "log.offset": 37489,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
         ],
@@ -1417,7 +1362,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 60837,
+        "log.offset": 41214,
         "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
         "related.hash": [
             "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2"
@@ -1465,7 +1410,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 63816,
+        "log.offset": 44193,
         "related.hosts": [
             "Demo_AMP"
         ],
@@ -1520,7 +1465,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 64734,
+        "log.offset": 45111,
         "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1579,7 +1524,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 66485,
+        "log.offset": 46862,
         "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1633,7 +1578,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 68132,
+        "log.offset": 48509,
         "related.hash": [
             "4a45dbc60436fc72fbd8a8bf81995c378575142e0022015f29a4b25546e19cef"
         ],
@@ -1691,7 +1636,7 @@
         "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
         "host.name": "Demo_AMP_Exploit_Prevention_Audit",
         "input.type": "log",
-        "log.offset": 69236,
+        "log.offset": 49613,
         "process.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1739,7 +1684,7 @@
         "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
         "host.name": "Demo_AMP_Exploit_Prevention_Audit",
         "input.type": "log",
-        "log.offset": 71012,
+        "log.offset": 51389,
         "related.hosts": [
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
@@ -1799,7 +1744,7 @@
         "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 71955,
+        "log.offset": 52332,
         "process.hash.md5": "38ae1b3c38faef56fe4907922f0385ba",
         "process.hash.sha1": "84123a3decdaa217e3588a1de59fe6cee1998004",
         "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
@@ -1872,7 +1817,7 @@
         "host.os.platform": "windows",
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 74680,
+        "log.offset": 55057,
         "process.hash.md5": "92f44e405db16ac55d97e3bfe3b132fa",
         "process.hash.sha1": "04c5d2b4da9a0f3fa8a45702d4256cee42d8c48d",
         "process.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
@@ -1940,7 +1885,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 77407,
+        "log.offset": 57784,
         "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1999,7 +1944,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 79164,
+        "log.offset": 59541,
         "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -2073,7 +2018,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 80817,
+        "log.offset": 61194,
         "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
         "related.hash": [
             "d1bea74ac9d85b3dcd4abc1af42af6c37b9349defc8e6577993611b773f56ca0"
@@ -2147,7 +2092,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 82391,
+        "log.offset": 62768,
         "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
         "related.hash": [
             "1dc5d15a26a79bb46519952a60b15aa4acb36f6ce3247ebf50df9c157bc4fcf4"
@@ -2251,7 +2196,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 83965,
+        "log.offset": 64342,
         "process.hash.sha256": "71854d2c40664493e05c0a7e4f0c7cc74ada1a63eec1d4fe32350f6af8728243",
         "related.hash": [
             "465f398ae8e3c32395eb7c04bc8cd24595068e6a127e243bed3e9b4931556bfc"
@@ -2299,7 +2244,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 86078,
+        "log.offset": 66455,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
@@ -2349,7 +2294,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 87002,
+        "log.offset": 67379,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
@@ -2394,7 +2339,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 88078,
+        "log.offset": 68455,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
