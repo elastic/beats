@@ -585,6 +585,25 @@ processors:
           - set: event.reason
             from: cyberarkpas.audit.reason
 
+        # 300 - PSM Connect
+        "300":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.protocol
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["network"]
+          - set: event.type
+            value: ["access"]
+          - set: event.outcome
+            value: "success"
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -683,6 +702,12 @@ processors:
   #    value: '{{cyberarkpas.audit.message}}'
   #    ignore_empty_value: true
 
+  #
+  # sometimes network protocol is capitalized.
+  #
+  - lowercase:
+      field: network.protocol
+      ignore_missing: true
   #
   # Cleanup
   #
