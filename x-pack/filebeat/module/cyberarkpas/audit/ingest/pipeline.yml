@@ -399,6 +399,7 @@ processors:
         "19":
           - from: cyberarkpas.audit.source_user
             to: source.user.name
+          # TODO: source.user to user
           - from: cyberarkpas.audit.issuer
             to: destination.user.name
           - value: ["network"]
@@ -466,6 +467,24 @@ processors:
             to: event.category
           - value: ["user", "change"]
             to: event.type
+
+        # 32 - Add Owner
+        #
+        # Change owner of a Safe.
+        # TODO: Not sure how to model this.
+        # TODO: Are fields reversed here? Who performs the action, source_user or issuer?
+        #       Seems that source_user performs the action, docs suggest otherwise.
+        "32":
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - from: cyberarkpas.audit.source_user
+            to: user.target.name
+          - value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+            to: event.category
+          - value: ["admin", "change"]
+            to: event.type
+          - value: "success"
+            to: event.outcome
 
       source: >
         def clone(def val) {
