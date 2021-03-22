@@ -19,7 +19,7 @@ import (
 type handlerUnenroll struct {
 	log        *logger.Logger
 	emitter    pipeline.EmitterFunc
-	dispatcher programsDispatcher
+	dispatcher pipeline.Dispatcher
 	closers    []context.CancelFunc
 	stateStore stateStore
 }

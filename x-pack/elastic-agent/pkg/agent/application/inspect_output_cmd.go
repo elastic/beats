@@ -246,6 +246,8 @@ func (r *inmemRouter) Dispatch(id string, grpProg map[pipeline.RoutingKey][]prog
 	return nil
 }
 
+func (r *inmemRouter) Shutdown() {}
+
 func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)
 }

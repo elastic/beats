@@ -24,15 +24,11 @@ type reloadable interface {
 	Reload(cfg *config.Config) error
 }
 
-type programsDispatcher interface {
-	Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error
-}
-
 type emitterController struct {
 	logger      *logger.Logger
 	agentInfo   *info.AgentInfo
 	controller  composable.Controller
-	router      programsDispatcher
+	router      pipeline.Dispatcher
 	modifiers   *pipeline.ConfigModifiers
 	reloadables []reloadable
 	caps        capabilities.Capability
@@ -150,7 +146,7 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *pipeline.ConfigModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router pipeline.Dispatcher, modifiers *pipeline.ConfigModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
 	init, _ := transpiler.NewVars(map[string]interface{}{})
