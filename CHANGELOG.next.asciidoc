@@ -175,7 +175,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Add json body check for sqs message. {pull}21727[21727]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
-to be consistent with ECS. {pull}23094[23094]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
 - Fix aws s3 overview dashboard. {pull}23045[23045]
