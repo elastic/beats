@@ -117,11 +117,8 @@ all the above actions will be skipped, because the Elastic Agent has already bee
 occurs on every start of the container set FLEET_FORCE to 1.
 `,
 		Run: func(c *cobra.Command, args []string) {
-			iscloud, err := c.Flags().GetBool("cloud")
-			if err != nil {
-				logError(streams, err)
-			}
-			if iscloud {
+			var err error
+			if _, cloud := os.LookupEnv("ELASTIC_AGENT_CLOUD"); cloud {
 				err = containerCloudCmd(streams, c, flags, args)
 			} else {
 				err = containerCmd(streams, c, flags, defaultAccessConfig())
@@ -132,7 +129,6 @@ occurs on every start of the container set FLEET_FORCE to 1.
 			}
 		},
 	}
-	cmd.Flags().Bool("cloud", false, "Start container in cloud mode")
 	return &cmd
 }
 
@@ -141,7 +137,7 @@ func logError(streams *cli.IOStreams, err error) {
 }
 
 func logInfo(streams *cli.IOStreams, msg string) {
-	fmt.Fprintf(streams.Out, msg)
+	fmt.Fprintln(streams.Out, msg)
 }
 
 func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
@@ -158,20 +154,20 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *global
 	// to the main process if the daemon is stopped
 	apmPath := os.Getenv("APM_SERVER_PATH")
 	if apmPath != "" {
+		apmProc, err = runLegacyAPMServer(streams, apmPath, args)
+		if err != nil {
+			return errors.New(err, "starting legacy apm-server")
+		}
+		logInfo(streams, "Legacy apm-server daemon started.")
 		wg.Add(1) // apm-server legacy process
 		go func() {
 			if err := func() error {
-				apmProc, err = runLegacyAPMServer(streams, apmPath, args)
-				if err != nil {
-					return errors.New(err, "starting legacy apm-server")
-				}
-				logInfo(streams, "Legacy apm-server daemon started...")
 				apmProcState, err := apmProc.Process.Wait()
 				if err != nil {
 					return err
 				}
 				if apmProcState.ExitCode() != 0 {
-					return errors.New("apm-server process exited with %d", apmProcState.ExitCode())
+					return fmt.Errorf("apm-server process exited with %d", apmProcState.ExitCode())
 				}
 				return nil
 			}(); err != nil {
@@ -180,7 +176,7 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *global
 
 			wg.Done()
 			// sending kill signal to current process (elastic-agent)
-			logInfo(streams, "Initiate shutdown elastic-agent..")
+			logInfo(streams, "Initiate shutdown elastic-agent.")
 			mainProc.Signal(syscall.SIGTERM)
 		}()
 	}
@@ -204,7 +200,7 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *global
 		// sending kill signal to APM Server
 		if apmProc != nil {
 			apmProc.Stop()
-			logInfo(streams, "Initiate shutdown legacy apm-server..")
+			logInfo(streams, "Initiate shutdown legacy apm-server.")
 		}
 	}()
 	wg.Wait()
@@ -513,6 +509,7 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*pr
 	name := "apm-server"
 	logInfo(streams, "Preparing apm-server for legacy mode.")
 	cfg := artifact.DefaultConfig()
+
 	logInfo(streams, fmt.Sprintf("Extracting apm-server into install directory %s.", path))
 	installer, err := tar.NewInstaller(cfg)
 	if err != nil {
@@ -530,7 +527,7 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*pr
 	}
 
 	// Start apm-server process respecting args
-	logInfo(streams, "Starting legacy apm-server daemon as a subprocess..")
+	logInfo(streams, "Starting legacy apm-server daemon as a subprocess.")
 	pattern := filepath.Join(path, fmt.Sprintf("%s-%s-%s*", spec.Cmd, version, cfg.OS()), spec.Cmd)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
@@ -547,6 +544,16 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*pr
 	if err != nil {
 		return nil, err
 	}
+	// add APM Server specific configuration
+	addEnv := func(arg, env string) {
+		if v := os.Getenv(env); v != "" {
+			args = append(args, arg, v)
+		}
+	}
+	addEnv("--path.config", "APM_SERVER_CONFIG_PATH")
+	addEnv("--path.data", "APM_SERVER_DATA_PATH")
+	addEnv("--path.logs", "APM_SERVER_LOGS_PATH")
+	addEnv("--httpprof", "APM_SERVER_HTTPPROF")
 	return process.Start(log, f, nil, os.Geteuid(), os.Getegid(), args...)
 }
 
