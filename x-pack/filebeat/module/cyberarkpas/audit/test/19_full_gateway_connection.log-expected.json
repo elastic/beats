@@ -20,9 +20,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -32,7 +30,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:07:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:07:51\",\"IsoTimestamp\":\"2021-03-08T18:07:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -76,9 +78,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -88,7 +88,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:09:37Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:09:37\",\"IsoTimestamp\":\"2021-03-08T18:09:37Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 611,
@@ -132,9 +136,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -144,7 +146,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:19:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:19:26\",\"IsoTimestamp\":\"2021-03-08T18:19:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1222,
@@ -188,9 +194,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -200,7 +204,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:32:22Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:32:22\",\"IsoTimestamp\":\"2021-03-08T18:32:22Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1833,
@@ -244,9 +252,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -256,7 +262,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:32:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:32:51\",\"IsoTimestamp\":\"2021-03-09T08:32:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 2444,
@@ -300,9 +310,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -312,7 +320,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:14:58Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:14:58\",\"IsoTimestamp\":\"2021-03-09T10:14:58Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 3059,
@@ -356,9 +368,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -368,7 +378,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:46:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:46:43\",\"IsoTimestamp\":\"2021-03-09T10:46:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 3672,
@@ -412,9 +426,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -424,7 +436,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:48:24Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:48:24\",\"IsoTimestamp\":\"2021-03-09T10:48:24Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 4285,
@@ -468,9 +484,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -480,7 +494,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:23:33Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:23:33\",\"IsoTimestamp\":\"2021-03-09T15:23:33Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 4898,
@@ -524,9 +542,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "PasswordManager",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -536,7 +552,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:31:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:31:50\",\"IsoTimestamp\":\"2021-03-10T08:31:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 5513,
@@ -579,9 +599,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "PasswordManager",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -591,7 +609,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:31:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:31:50\",\"IsoTimestamp\":\"2021-03-10T09:31:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 6126,
@@ -634,9 +656,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "PasswordManager",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -646,7 +666,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T14:58:07Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 06:58:07\",\"IsoTimestamp\":\"2021-03-10T14:58:07Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 6739,
@@ -689,9 +713,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "PasswordManager",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -701,7 +723,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T18:14:34Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 10:14:34\",\"IsoTimestamp\":\"2021-03-10T18:14:34Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 7352,
@@ -744,9 +770,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -756,7 +780,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T18:27:06Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 10:27:06\",\"IsoTimestamp\":\"2021-03-10T18:27:06Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 7965,
@@ -800,9 +828,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -812,7 +838,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:32:39Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:32:39\",\"IsoTimestamp\":\"2021-03-10T22:32:39Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 8580,
@@ -856,9 +886,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -868,7 +896,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:37:00Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:37:00\",\"IsoTimestamp\":\"2021-03-10T22:37:00Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.10\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 9195,
@@ -912,9 +944,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -924,7 +954,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:44:48Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:44:48\",\"IsoTimestamp\":\"2021-03-10T22:44:48Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 9806,
@@ -968,9 +1002,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -980,7 +1012,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:47:58Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:47:58\",\"IsoTimestamp\":\"2021-03-10T22:47:58Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 10421,
@@ -1024,9 +1060,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1036,7 +1070,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:52:29Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:52:29\",\"IsoTimestamp\":\"2021-03-10T22:52:29Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 11036,
@@ -1080,9 +1118,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1092,7 +1128,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T22:56:02Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 14:56:02\",\"IsoTimestamp\":\"2021-03-10T22:56:02Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 11647,
@@ -1137,9 +1177,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1149,7 +1187,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T16:03:52Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 08:03:52</Timestamp>\\n    <IsoTimestamp>2021-03-11T16:03:52Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 08:03:52\",\"IsoTimestamp\":\"2021-03-11T16:03:52Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 12258,
@@ -1194,9 +1236,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1206,7 +1246,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T16:34:00Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 08:34:00</Timestamp>\\n    <IsoTimestamp>2021-03-11T16:34:00Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 08:34:00\",\"IsoTimestamp\":\"2021-03-11T16:34:00Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 13760,
@@ -1251,9 +1295,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1263,7 +1305,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T16:35:27Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 08:35:27</Timestamp>\\n    <IsoTimestamp>2021-03-11T16:35:27Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 08:35:27\",\"IsoTimestamp\":\"2021-03-11T16:35:27Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 15270,
@@ -1308,9 +1354,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1320,7 +1364,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T16:43:00Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 08:43:00</Timestamp>\\n    <IsoTimestamp>2021-03-11T16:43:00Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 08:43:00\",\"IsoTimestamp\":\"2021-03-11T16:43:00Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 16780,
@@ -1365,9 +1413,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1377,7 +1423,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:02:07Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:02:07</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:02:07Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:02:07\",\"IsoTimestamp\":\"2021-03-11T17:02:07Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 18282,
@@ -1422,9 +1472,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1434,7 +1482,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:08:42Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:08:42</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:08:42Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:08:42\",\"IsoTimestamp\":\"2021-03-11T17:08:42Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 19784,
@@ -1479,9 +1531,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1491,7 +1541,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:38:05Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:38:05</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:38:05Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:38:05\",\"IsoTimestamp\":\"2021-03-11T17:38:05Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 21286,
@@ -1536,9 +1590,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1548,7 +1600,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:39:44Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:39:44</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:39:44Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:39:44\",\"IsoTimestamp\":\"2021-03-11T17:39:44Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 22804,
@@ -1593,9 +1649,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1605,7 +1659,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:46:40Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:46:40</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:46:40Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:46:40\",\"IsoTimestamp\":\"2021-03-11T17:46:40Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 24306,
@@ -1650,9 +1708,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1662,7 +1718,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:48:22Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:48:22</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:48:22Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.2.2</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:48:22\",\"IsoTimestamp\":\"2021-03-11T17:48:22Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.2.2\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 25824,
@@ -1707,9 +1767,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1719,7 +1777,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:54:41Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:54:41</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:54:41Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.2.2</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:54:41\",\"IsoTimestamp\":\"2021-03-11T17:54:41Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.2.2\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 27340,
@@ -1764,9 +1826,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1776,7 +1836,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T17:56:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 09:56:26</Timestamp>\\n    <IsoTimestamp>2021-03-11T17:56:26Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.2.2</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 09:56:26\",\"IsoTimestamp\":\"2021-03-11T17:56:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.2.2\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 28856,
@@ -1821,9 +1885,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1833,7 +1895,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T18:02:57Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 10:02:57</Timestamp>\\n    <IsoTimestamp>2021-03-11T18:02:57Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>35.192.121.42</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 10:02:57\",\"IsoTimestamp\":\"2021-03-11T18:02:57Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"35.192.121.42\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 30372,
@@ -1878,9 +1944,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1890,7 +1954,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T18:03:52Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 10:03:52</Timestamp>\\n    <IsoTimestamp>2021-03-11T18:03:52Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 10:03:52\",\"IsoTimestamp\":\"2021-03-11T18:03:52Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 31882,
@@ -1935,9 +2003,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -1947,7 +2013,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T18:51:17Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 10:51:17</Timestamp>\\n    <IsoTimestamp>2021-03-11T18:51:17Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 10:51:17\",\"IsoTimestamp\":\"2021-03-11T18:51:17Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 33384,
@@ -1992,9 +2062,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2004,7 +2072,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:25:09Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:25:09</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:25:09Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:25:09\",\"IsoTimestamp\":\"2021-03-11T19:25:09Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 34886,
@@ -2049,9 +2121,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2061,7 +2131,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:30:17Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:30:17</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:30:17Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:30:17\",\"IsoTimestamp\":\"2021-03-11T19:30:17Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 36388,
@@ -2106,9 +2180,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2118,7 +2190,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:34:34Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:34:34</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:34:34Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:34:34\",\"IsoTimestamp\":\"2021-03-11T19:34:34Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 37890,
@@ -2163,9 +2239,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2175,7 +2249,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:36:10Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:36:10</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:36:10Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:36:10\",\"IsoTimestamp\":\"2021-03-11T19:36:10Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 39392,
@@ -2220,9 +2298,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2232,7 +2308,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:42:12Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:42:12</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:42:12Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:42:12\",\"IsoTimestamp\":\"2021-03-11T19:42:12Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 40894,
@@ -2277,9 +2357,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2289,7 +2367,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T19:56:48Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 11:56:48</Timestamp>\\n    <IsoTimestamp>2021-03-11T19:56:48Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 11:56:48\",\"IsoTimestamp\":\"2021-03-11T19:56:48Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 42396,
@@ -2334,9 +2416,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2346,7 +2426,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T20:12:08Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 12:12:08</Timestamp>\\n    <IsoTimestamp>2021-03-11T20:12:08Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 12:12:08\",\"IsoTimestamp\":\"2021-03-11T20:12:08Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 43898,
@@ -2391,9 +2475,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2403,7 +2485,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T20:21:54Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 12:21:54</Timestamp>\\n    <IsoTimestamp>2021-03-11T20:21:54Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 12:21:54\",\"IsoTimestamp\":\"2021-03-11T20:21:54Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 45400,
@@ -2448,9 +2534,7 @@
         "destination.address": "81.32.170.205",
         "destination.ip": "81.32.170.205",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2460,7 +2544,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T20:23:13Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 12:23:13</Timestamp>\\n    <IsoTimestamp>2021-03-11T20:23:13Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.2.2</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>81.32.170.205</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 12:23:13\",\"IsoTimestamp\":\"2021-03-11T20:23:13Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_VAGRANT\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.2.2\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"81.32.170.205\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 46902,
@@ -2505,9 +2593,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2517,7 +2603,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-11T21:06:29Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 11 13:06:29</Timestamp>\\n    <IsoTimestamp>2021-03-11T21:06:29Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 11 13:06:29\",\"IsoTimestamp\":\"2021-03-11T21:06:29Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 48418,
@@ -2562,9 +2652,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2574,7 +2662,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T11:59:09Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 04:59:09</Timestamp>\\n    <IsoTimestamp>2021-03-14T11:59:09Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 04:59:09\",\"IsoTimestamp\":\"2021-03-14T11:59:09Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 49920,
@@ -2619,9 +2711,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "PasswordManager",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2631,7 +2721,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T12:07:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 05:07:26</Timestamp>\\n    <IsoTimestamp>2021-03-14T12:07:26Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>PasswordManager</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.0.1.20</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 05:07:26\",\"IsoTimestamp\":\"2021-03-14T12:07:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 51422,
@@ -2675,9 +2769,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2687,7 +2779,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T12:22:42Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 05:22:42</Timestamp>\\n    <IsoTimestamp>2021-03-14T12:22:42Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 05:22:42\",\"IsoTimestamp\":\"2021-03-14T12:22:42Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 52928,
@@ -2732,9 +2828,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2744,7 +2838,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T12:28:29Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 05:28:29</Timestamp>\\n    <IsoTimestamp>2021-03-14T12:28:29Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 05:28:29\",\"IsoTimestamp\":\"2021-03-14T12:28:29Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 54430,
@@ -2789,9 +2887,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2801,7 +2897,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:01:06Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:01:06</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:01:06Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:01:06\",\"IsoTimestamp\":\"2021-03-14T13:01:06Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 55932,
@@ -2846,9 +2946,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2858,7 +2956,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:17:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:17:26</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:17:26Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:17:26\",\"IsoTimestamp\":\"2021-03-14T13:17:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 57434,
@@ -2903,9 +3005,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2915,7 +3015,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:18:57Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:18:57</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:18:57Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:18:57\",\"IsoTimestamp\":\"2021-03-14T13:18:57Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 58936,
@@ -2960,9 +3064,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -2972,7 +3074,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:24:24Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:24:24</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:24:24Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:24:24\",\"IsoTimestamp\":\"2021-03-14T13:24:24Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 60438,
@@ -3017,9 +3123,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3029,7 +3133,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:34:07Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:34:07</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:34:07Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:34:07\",\"IsoTimestamp\":\"2021-03-14T13:34:07Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 61940,
@@ -3074,9 +3182,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3086,7 +3192,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:49:35Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:49:35</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:49:35Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:49:35\",\"IsoTimestamp\":\"2021-03-14T13:49:35Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 63442,
@@ -3131,9 +3241,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3143,7 +3251,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-14T13:50:40Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 14 06:50:40</Timestamp>\\n    <IsoTimestamp>2021-03-14T13:50:40Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 14 06:50:40\",\"IsoTimestamp\":\"2021-03-14T13:50:40Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 64960,
@@ -3188,9 +3300,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3200,7 +3310,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T10:20:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 03:20:36</Timestamp>\\n    <IsoTimestamp>2021-03-15T10:20:36Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 03:20:36\",\"IsoTimestamp\":\"2021-03-15T10:20:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 66478,
@@ -3245,9 +3359,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3257,7 +3369,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T10:31:54Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 03:31:54</Timestamp>\\n    <IsoTimestamp>2021-03-15T10:31:54Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 03:31:54\",\"IsoTimestamp\":\"2021-03-15T10:31:54Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 67980,
@@ -3302,9 +3418,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3314,7 +3428,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T10:33:37Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 03:33:37</Timestamp>\\n    <IsoTimestamp>2021-03-15T10:33:37Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 03:33:37\",\"IsoTimestamp\":\"2021-03-15T10:33:37Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 69498,
@@ -3359,9 +3477,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3371,7 +3487,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T10:34:58Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 03:34:58</Timestamp>\\n    <IsoTimestamp>2021-03-15T10:34:58Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 03:34:58\",\"IsoTimestamp\":\"2021-03-15T10:34:58Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 71016,
@@ -3416,9 +3536,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3428,7 +3546,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T13:02:55Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 06:02:55</Timestamp>\\n    <IsoTimestamp>2021-03-15T13:02:55Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 06:02:55\",\"IsoTimestamp\":\"2021-03-15T13:02:55Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 72534,
@@ -3473,9 +3595,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3485,7 +3605,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T13:18:29Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 06:18:29</Timestamp>\\n    <IsoTimestamp>2021-03-15T13:18:29Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 06:18:29\",\"IsoTimestamp\":\"2021-03-15T13:18:29Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 74036,
@@ -3530,9 +3654,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3542,7 +3664,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T14:08:04Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 07:08:04</Timestamp>\\n    <IsoTimestamp>2021-03-15T14:08:04Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 07:08:04\",\"IsoTimestamp\":\"2021-03-15T14:08:04Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 75554,
@@ -3587,9 +3713,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3599,7 +3723,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T14:08:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 07:08:26</Timestamp>\\n    <IsoTimestamp>2021-03-15T14:08:26Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 07:08:26\",\"IsoTimestamp\":\"2021-03-15T14:08:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 77072,
@@ -3644,9 +3772,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3656,7 +3782,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T14:09:56Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 07:09:56</Timestamp>\\n    <IsoTimestamp>2021-03-15T14:09:56Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 07:09:56\",\"IsoTimestamp\":\"2021-03-15T14:09:56Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 78590,
@@ -3701,9 +3831,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3713,7 +3841,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T14:11:07Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 07:11:07</Timestamp>\\n    <IsoTimestamp>2021-03-15T14:11:07Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 07:11:07\",\"IsoTimestamp\":\"2021-03-15T14:11:07Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 80092,
@@ -3758,9 +3890,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3770,7 +3900,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T15:04:09Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 08:04:09</Timestamp>\\n    <IsoTimestamp>2021-03-15T15:04:09Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 08:04:09\",\"IsoTimestamp\":\"2021-03-15T15:04:09Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 81610,
@@ -3815,9 +3949,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3827,7 +3959,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T16:08:45Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 09:08:45</Timestamp>\\n    <IsoTimestamp>2021-03-15T16:08:45Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 09:08:45\",\"IsoTimestamp\":\"2021-03-15T16:08:45Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 83112,
@@ -3872,9 +4008,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3884,7 +4018,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T16:17:41Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 09:17:41</Timestamp>\\n    <IsoTimestamp>2021-03-15T16:17:41Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 09:17:41\",\"IsoTimestamp\":\"2021-03-15T16:17:41Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 84614,
@@ -3929,9 +4067,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3941,7 +4077,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T16:38:11Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 09:38:11</Timestamp>\\n    <IsoTimestamp>2021-03-15T16:38:11Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 09:38:11\",\"IsoTimestamp\":\"2021-03-15T16:38:11Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 86116,
@@ -3986,9 +4126,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -3998,7 +4136,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T16:53:49Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 09:53:49</Timestamp>\\n    <IsoTimestamp>2021-03-15T16:53:49Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 09:53:49\",\"IsoTimestamp\":\"2021-03-15T16:53:49Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 87618,
@@ -4043,9 +4185,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -4055,7 +4195,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T16:54:55Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 09:54:55</Timestamp>\\n    <IsoTimestamp>2021-03-15T16:54:55Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 09:54:55\",\"IsoTimestamp\":\"2021-03-15T16:54:55Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 89120,
@@ -4100,9 +4244,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -4112,7 +4254,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-15T17:03:35Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 15 10:03:35</Timestamp>\\n    <IsoTimestamp>2021-03-15T17:03:35Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 15 10:03:35\",\"IsoTimestamp\":\"2021-03-15T17:03:35Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 90622,
@@ -4157,9 +4303,7 @@
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -4169,7 +4313,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-16T09:52:52Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 16 02:52:52</Timestamp>\\n    <IsoTimestamp>2021-03-16T09:52:52Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PVWAGWUser</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>127.0.0.1</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>10.0.1.20</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 16 02:52:52\",\"IsoTimestamp\":\"2021-03-16T09:52:52Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PVWAGWUser\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 92124,
@@ -4214,9 +4362,7 @@
         "destination.address": "34.71.250.247",
         "destination.ip": "34.71.250.247",
         "destination.user.name": "Administrator",
-        "event.action": [
-            "start"
-        ],
+        "event.action": "full gateway connection",
         "event.category": [
             "network"
         ],
@@ -4226,7 +4372,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-16T10:04:49Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n\\n  <audit_record>\\n    <Rfc5424>yes</Rfc5424>\\n    <Timestamp>Mar 16 03:04:49</Timestamp>\\n    <IsoTimestamp>2021-03-16T10:04:49Z</IsoTimestamp>\\n    <Hostname>VAULT</Hostname>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.7.0000</Version>\\n    <MessageID>19</MessageID>\\n    <Desc>Full Gateway Connection</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>Administrator</Issuer>\\n    <Action>Full Gateway Connection</Action>\\n    <SourceUser>PSMPGW_SSH</SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>81.32.170.205</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Full Gateway Connection</Message>\\n    <GatewayStation>34.71.250.247</GatewayStation>\\n  </audit_record>\\n\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 16 03:04:49\",\"IsoTimestamp\":\"2021-03-16T10:04:49Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"19\",\"Desc\":\"Full Gateway Connection\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Full Gateway Connection\",\"SourceUser\":\"PSMPGW_SSH\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Full Gateway Connection\",\"GatewayStation\":\"34.71.250.247\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 93626,

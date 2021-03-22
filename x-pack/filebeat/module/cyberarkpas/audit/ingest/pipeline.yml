@@ -271,11 +271,29 @@ processors:
       field: event.kind
       value: event
 
-  # TODO: Severity to number
-  #- set:
-  #    field: event.severity
-  #    value: 0
-  # TODO: event.type: info by default?
+  - lowercase:
+      field: cyberarkpas.audit.action
+      target_field: event.action
+      ignore_missing: true
+
+  # Severity to number
+  #
+  # Possible values:
+  # Info -> 0
+  # Error -> 5
+  # Critical -> 10
+  - set:
+      field: event.severity
+      value: 2
+      if: 'ctx.cyberarkpas.audit.severity == "Info"'
+  - set:
+      field: event.severity
+      value: 7
+      if: 'ctx.cyberarkpas.audit.severity == "Error"'
+  - set:
+      field: event.severity
+      value: 10
+      if: 'ctx.cyberarkpas.audit.severity == "Critical"'
 
   - set:
       field: event.code
@@ -336,7 +354,9 @@ processors:
             to: user.name
           - value: [ "authentication", "session"]
             to: event.category
-          - value: [ "start", "authentication_success" ]
+          - value: [ "start"]
+            to: event.type
+          - value:  "authentication_success"
             to: event.action
           - value: "success"
             to: event.outcome
@@ -349,8 +369,8 @@ processors:
             to: user.name
           - value: [ "authentication", "session"]
             to: event.category
-          - value: [ "end"]
-            to: event.action
+          - value: ["end"]
+            to: event.type
           - value: "success"
             to: event.outcome
 
@@ -363,10 +383,10 @@ processors:
             to: source.user.name
           - from: cyberarkpas.audit.issuer
             to: destination.user.name
-          - value: [ "network"]
+          - value: ["network"]
             to: event.category
-          - value: [ "start"]
-            to: event.action
+          - value: ["start"]
+            to: event.type
           - value: "success"
             to: event.outcome
 
@@ -383,6 +403,8 @@ processors:
             to: destination.user.name
           - from: cyberarkpas.audit.issuer
             to: source.user.name
+          - value: "info"
+            to: event.type
 
       source: >
         def clone(def val) {
@@ -416,6 +438,7 @@ processors:
           field: '{{_ingest._value.to}}'
           copy_from: '_ingest._value.value'
           ignore_empty_value: true
+          override: true
 
   #
   # Populate ip/domain fields from address.

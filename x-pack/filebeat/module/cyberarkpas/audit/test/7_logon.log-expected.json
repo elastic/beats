@@ -17,10 +17,7 @@
         "cyberarkpas.audit.version": "11.6.0000",
         "destination.address": "10.2.0.3",
         "destination.ip": "10.2.0.3",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -31,7 +28,11 @@
         "event.module": "cyberarkpas",
         "event.original": "{\"format\":\"elastic\",\"version\":\"1.0\",\"raw\":\"<syslog>\\n  <audit_record>\\n    <Rfc5424>no</Rfc5424>\\n    <Vendor>Cyber-Ark</Vendor>\\n    <Product>Vault</Product>\\n    <Version>11.6.0000</Version>\\n    <MessageID>7</MessageID>\\n    <Desc>Logon</Desc>\\n    <Severity>Info</Severity>\\n    <Issuer>adm2</Issuer>\\n    <Action>Logon</Action>\\n    <SourceUser></SourceUser>\\n    <TargetUser></TargetUser>\\n    <Safe></Safe>\\n    <File></File>\\n    <Station>10.2.0.6</Station>\\n    <Location></Location>\\n    <Category></Category>\\n    <RequestId></RequestId>\\n    <Reason></Reason>\\n    <ExtraDetails></ExtraDetails>\\n    <Message>Logon</Message>\\n    <GatewayStation>10.2.0.3</GatewayStation>\\n  </audit_record>\\n</syslog>\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.6.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"adm2\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.2.0.6\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.2.0.3\",\"IsoTimestamp\":\"2021-03-16T15:01:00Z\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
@@ -69,10 +70,7 @@
         "cyberarkpas.audit.timestamp": "Mar 04 11:10:05",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -83,7 +81,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T19:10:05Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 11:10:05\",\"IsoTimestamp\":\"2021-03-04T19:10:05Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1132,
@@ -121,10 +123,7 @@
         "cyberarkpas.audit.timestamp": "Mar 04 11:10:20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -135,7 +134,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T19:10:20Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 11:10:20\",\"IsoTimestamp\":\"2021-03-04T19:10:20Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 1671,
@@ -173,10 +176,7 @@
         "cyberarkpas.audit.timestamp": "Mar 04 11:11:20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -187,7 +187,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T19:11:20Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 11:11:20\",\"IsoTimestamp\":\"2021-03-04T19:11:20Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 2204,
@@ -225,10 +229,7 @@
         "cyberarkpas.audit.timestamp": "Mar 04 11:11:23",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -239,7 +240,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T19:11:23Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 11:11:23\",\"IsoTimestamp\":\"2021-03-04T19:11:23Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 2738,
@@ -277,10 +282,7 @@
         "cyberarkpas.audit.timestamp": "Mar 04 11:12:47",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -291,7 +293,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-04T19:12:47Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 04 11:12:47\",\"IsoTimestamp\":\"2021-03-04T19:12:47Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 3277,
@@ -329,10 +335,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:18:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -343,7 +346,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:18:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:18:50\",\"IsoTimestamp\":\"2021-03-05T10:18:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 3816,
@@ -381,10 +388,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:19:19",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -395,7 +399,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:19:19Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:19:19\",\"IsoTimestamp\":\"2021-03-05T10:19:19Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 4351,
@@ -433,10 +441,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:19:23",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -447,7 +452,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:19:23Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:19:23\",\"IsoTimestamp\":\"2021-03-05T10:19:23Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 4884,
@@ -485,10 +494,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:19:36",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -499,7 +505,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:19:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:19:36\",\"IsoTimestamp\":\"2021-03-05T10:19:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 5423,
@@ -537,10 +547,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:19:56",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -551,7 +558,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:19:56Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:19:56\",\"IsoTimestamp\":\"2021-03-05T10:19:56Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 5962,
@@ -589,10 +600,7 @@
         "cyberarkpas.audit.timestamp": "Mar 05 02:33:22",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -603,7 +611,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-05T10:33:22Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 05 02:33:22\",\"IsoTimestamp\":\"2021-03-05T10:33:22Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 6496,
@@ -638,10 +650,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -652,7 +661,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:45:56 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 7035,
@@ -686,10 +699,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -700,7 +710,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:46:06 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 7476,
@@ -734,10 +748,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -748,7 +759,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:46:54 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 7911,
@@ -782,10 +797,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -796,7 +808,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:46:58 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 8347,
@@ -830,10 +846,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -844,7 +857,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:47:13 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 8788,
@@ -878,10 +895,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -892,7 +906,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:47:27 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 9225,
@@ -926,10 +944,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -940,7 +955,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:56:09 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 9666,
@@ -974,10 +993,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -988,7 +1004,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 07:56:55 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 10107,
@@ -1025,10 +1045,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:18:30",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1039,7 +1056,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:18:30Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:18:30\",\"IsoTimestamp\":\"2021-03-08T10:18:30Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 10542,
@@ -1077,10 +1098,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:19:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1091,7 +1109,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:19:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:19:50\",\"IsoTimestamp\":\"2021-03-08T10:19:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 11081,
@@ -1129,10 +1151,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:20:02",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1143,7 +1162,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:20:02Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:20:02\",\"IsoTimestamp\":\"2021-03-08T10:20:02Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 11615,
@@ -1181,10 +1204,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:25:16",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1195,7 +1215,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:25:16Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:25:16\",\"IsoTimestamp\":\"2021-03-08T10:25:16Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 12154,
@@ -1233,10 +1257,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:25:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1247,7 +1268,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:25:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:25:43\",\"IsoTimestamp\":\"2021-03-08T10:25:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 12689,
@@ -1285,10 +1310,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:25:51",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1299,7 +1321,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:25:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:25:51\",\"IsoTimestamp\":\"2021-03-08T10:25:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 13228,
@@ -1337,10 +1363,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:26:04",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1351,7 +1374,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:26:04Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:26:04\",\"IsoTimestamp\":\"2021-03-08T10:26:04Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 13762,
@@ -1389,10 +1416,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:27:15",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1403,7 +1427,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:27:15Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:27:15\",\"IsoTimestamp\":\"2021-03-08T10:27:15Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 14301,
@@ -1441,10 +1469,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 02:29:01",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1455,7 +1480,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T10:29:01Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 02:29:01\",\"IsoTimestamp\":\"2021-03-08T10:29:01Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 14840,
@@ -1490,10 +1519,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1504,7 +1530,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:31:54 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 15373,
@@ -1538,10 +1568,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1552,7 +1579,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:31:54 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 15809,
@@ -1586,10 +1617,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1600,7 +1628,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:31:59 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 16250,
@@ -1634,10 +1666,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1648,7 +1677,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:32:15 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 16687,
@@ -1682,10 +1715,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1696,7 +1726,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:40:01 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 17128,
@@ -1730,10 +1764,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1744,7 +1775,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:42:57 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 17563,
@@ -1778,10 +1813,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1792,7 +1824,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:43:15 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 18000,
@@ -1826,10 +1862,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1840,7 +1873,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:43:54 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 18441,
@@ -1874,10 +1911,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1888,7 +1922,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:44:36 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 18877,
@@ -1922,10 +1960,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1936,7 +1971,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:45:15 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 19318,
@@ -1970,10 +2009,7 @@
         "cyberarkpas.audit.station": "10.0.1.20",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -1984,7 +2020,11 @@
         "event.module": "cyberarkpas",
         "event.original": "Mar 08 02:51:01 VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"no\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 19759,
@@ -2021,10 +2061,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 07:59:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2035,7 +2072,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T15:59:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 07:59:43\",\"IsoTimestamp\":\"2021-03-08T15:59:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 20194,
@@ -2073,10 +2114,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 07:59:46",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2087,7 +2125,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T15:59:46Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 07:59:46\",\"IsoTimestamp\":\"2021-03-08T15:59:46Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 20729,
@@ -2125,10 +2167,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 08:00:22",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2139,7 +2178,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T16:00:22Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 08:00:22\",\"IsoTimestamp\":\"2021-03-08T16:00:22Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 21268,
@@ -2177,10 +2220,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 08:00:53",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2191,7 +2231,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T16:00:53Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 08:00:53\",\"IsoTimestamp\":\"2021-03-08T16:00:53Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 21807,
@@ -2229,10 +2273,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 08:07:55",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2243,7 +2284,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T16:07:55Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 08:07:55\",\"IsoTimestamp\":\"2021-03-08T16:07:55Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 22341,
@@ -2281,10 +2326,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 08:14:09",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2295,7 +2337,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T16:14:09Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 08:14:09\",\"IsoTimestamp\":\"2021-03-08T16:14:09Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 22874,
@@ -2333,10 +2379,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 09:56:11",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2347,7 +2390,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T17:56:11Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 09:56:11\",\"IsoTimestamp\":\"2021-03-08T17:56:11Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 23413,
@@ -2385,10 +2432,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 09:56:19",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2399,7 +2443,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T17:56:19Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 09:56:19\",\"IsoTimestamp\":\"2021-03-08T17:56:19Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 23952,
@@ -2437,10 +2485,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 09:56:57",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2451,7 +2496,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T17:56:57Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 09:56:57\",\"IsoTimestamp\":\"2021-03-08T17:56:57Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 24485,
@@ -2489,10 +2538,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 09:56:57",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2503,7 +2549,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T17:56:57Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 09:56:57\",\"IsoTimestamp\":\"2021-03-08T17:56:57Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 25019,
@@ -2541,10 +2591,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 09:57:13",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2555,7 +2602,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T17:57:13Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 09:57:13\",\"IsoTimestamp\":\"2021-03-08T17:57:13Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 25554,
@@ -2593,10 +2644,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:02:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2607,7 +2655,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:02:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:02:43\",\"IsoTimestamp\":\"2021-03-08T18:02:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 26093,
@@ -2648,10 +2700,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2662,7 +2711,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:07:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:07:51\",\"IsoTimestamp\":\"2021-03-08T18:07:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 26632,
@@ -2704,10 +2757,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2718,7 +2768,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:09:37Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:09:37\",\"IsoTimestamp\":\"2021-03-08T18:09:37Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 27178,
@@ -2757,10 +2811,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:16:02",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2771,7 +2822,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:16:02Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:16:02\",\"IsoTimestamp\":\"2021-03-08T18:16:02Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 27724,
@@ -2812,10 +2867,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2826,7 +2878,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:19:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:19:26\",\"IsoTimestamp\":\"2021-03-08T18:19:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 28261,
@@ -2868,10 +2924,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2882,7 +2935,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:32:22Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:32:22\",\"IsoTimestamp\":\"2021-03-08T18:32:22Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 28807,
@@ -2921,10 +2978,7 @@
         "cyberarkpas.audit.timestamp": "Mar 08 10:57:18",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2935,7 +2989,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-08T18:57:18Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 08 10:57:18\",\"IsoTimestamp\":\"2021-03-08T18:57:18Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 29353,
@@ -2973,10 +3031,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:00:31",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -2987,7 +3042,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:00:31Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:00:31\",\"IsoTimestamp\":\"2021-03-09T08:00:31Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 29890,
@@ -3025,10 +3084,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:00:36",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3039,7 +3095,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:00:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:00:36\",\"IsoTimestamp\":\"2021-03-09T08:00:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 30429,
@@ -3077,10 +3137,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:00:49",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3091,7 +3148,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:00:49Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:00:49\",\"IsoTimestamp\":\"2021-03-09T08:00:49Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 30962,
@@ -3129,10 +3190,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:01:33",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3143,7 +3201,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:01:33Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:01:33\",\"IsoTimestamp\":\"2021-03-09T08:01:33Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 31501,
@@ -3181,10 +3243,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:08:16",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3195,7 +3254,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:08:16Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:08:16\",\"IsoTimestamp\":\"2021-03-09T08:08:16Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 32035,
@@ -3233,10 +3296,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 00:22:21",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3247,7 +3307,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:22:21Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:22:21\",\"IsoTimestamp\":\"2021-03-09T08:22:21Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 32574,
@@ -3288,10 +3352,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3302,7 +3363,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T08:32:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 00:32:51\",\"IsoTimestamp\":\"2021-03-09T08:32:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 33111,
@@ -3344,10 +3409,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3358,7 +3420,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:14:58Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:14:58\",\"IsoTimestamp\":\"2021-03-09T10:14:58Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 33661,
@@ -3397,10 +3463,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:32:59",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3411,7 +3474,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:32:59Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:32:59\",\"IsoTimestamp\":\"2021-03-09T10:32:59Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 34209,
@@ -3449,10 +3516,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:33:09",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3463,7 +3527,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:33:09Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:33:09\",\"IsoTimestamp\":\"2021-03-09T10:33:09Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 34748,
@@ -3501,10 +3569,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 02:33:17",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3515,7 +3580,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:33:17Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:33:17\",\"IsoTimestamp\":\"2021-03-09T10:33:17Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 35281,
@@ -3556,10 +3625,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3570,7 +3636,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:46:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:46:43\",\"IsoTimestamp\":\"2021-03-09T10:46:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 35820,
@@ -3612,10 +3682,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3626,7 +3693,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T10:48:24Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 02:48:24\",\"IsoTimestamp\":\"2021-03-09T10:48:24Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"37.223.7.45\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 36368,
@@ -3665,10 +3736,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:16:36",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3679,7 +3747,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:16:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:16:36\",\"IsoTimestamp\":\"2021-03-09T15:16:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 36916,
@@ -3717,10 +3789,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:17:03",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3731,7 +3800,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:17:03Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:17:03\",\"IsoTimestamp\":\"2021-03-09T15:17:03Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 37449,
@@ -3769,10 +3842,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:17:10",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3783,7 +3853,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:17:10Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:17:10\",\"IsoTimestamp\":\"2021-03-09T15:17:10Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 37988,
@@ -3821,10 +3895,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:18:19",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3835,7 +3906,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:18:19Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:18:19\",\"IsoTimestamp\":\"2021-03-09T15:18:19Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 38522,
@@ -3873,10 +3948,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:22:55",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3887,7 +3959,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:22:55Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:22:55\",\"IsoTimestamp\":\"2021-03-09T15:22:55Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"127.0.0.1\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 39061,
@@ -3928,10 +4004,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3942,7 +4015,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:23:33Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:23:33\",\"IsoTimestamp\":\"2021-03-09T15:23:33Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 39598,
@@ -3981,10 +4058,7 @@
         "cyberarkpas.audit.timestamp": "Mar 09 07:31:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -3995,7 +4069,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-09T15:31:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 09 07:31:50\",\"IsoTimestamp\":\"2021-03-09T15:31:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 40148,
@@ -4033,10 +4111,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:11:56",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4047,7 +4122,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:11:56Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:11:56\",\"IsoTimestamp\":\"2021-03-10T08:11:56Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 40687,
@@ -4085,10 +4164,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:12:12",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4099,7 +4175,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:12:12Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:12:12\",\"IsoTimestamp\":\"2021-03-10T08:12:12Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 41221,
@@ -4137,10 +4217,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:12:36",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4151,7 +4228,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:12:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:12:36\",\"IsoTimestamp\":\"2021-03-10T08:12:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 41760,
@@ -4189,10 +4270,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:12:51",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4203,7 +4281,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:12:51Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:12:51\",\"IsoTimestamp\":\"2021-03-10T08:12:51Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 42299,
@@ -4241,10 +4323,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:29:18",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4255,7 +4334,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:29:18Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:29:18\",\"IsoTimestamp\":\"2021-03-10T08:29:18Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Prov_COMPONENTS\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 42838,
@@ -4293,10 +4376,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:29:26",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4307,7 +4387,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:29:26Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:29:26\",\"IsoTimestamp\":\"2021-03-10T08:29:26Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 43377,
@@ -4345,10 +4429,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:29:28",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4359,7 +4440,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:29:28Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:29:28\",\"IsoTimestamp\":\"2021-03-10T08:29:28Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 43916,
@@ -4397,10 +4482,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:29:43",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4411,7 +4493,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:29:43Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:29:43\",\"IsoTimestamp\":\"2021-03-10T08:29:43Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"SCIM-user\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 44455,
@@ -4449,10 +4535,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:31:39",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4463,7 +4546,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:31:39Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:31:39\",\"IsoTimestamp\":\"2021-03-10T08:31:39Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAAppUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 44988,
@@ -4501,10 +4588,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 00:31:48",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4515,7 +4599,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:31:48Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:31:48\",\"IsoTimestamp\":\"2021-03-10T08:31:48Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PVWAGWUser\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 45523,
@@ -4556,10 +4644,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4570,7 +4655,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T08:31:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 00:31:50\",\"IsoTimestamp\":\"2021-03-10T08:31:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 46057,
@@ -4608,10 +4697,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:19",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4622,7 +4708,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:11:19Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:11:19\",\"IsoTimestamp\":\"2021-03-10T09:11:19Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 46605,
@@ -4660,10 +4750,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:34",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4674,7 +4761,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:11:34Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:11:34\",\"IsoTimestamp\":\"2021-03-10T09:11:34Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 47146,
@@ -4712,10 +4803,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:48",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4726,7 +4814,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:11:48Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:11:48\",\"IsoTimestamp\":\"2021-03-10T09:11:48Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PSMP_ADB_localhost.localdomain\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 47687,
@@ -4764,10 +4856,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:48",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4778,7 +4867,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:11:48Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:11:48\",\"IsoTimestamp\":\"2021-03-10T09:11:48Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PSMPApp_localhost.localdomain\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 48245,
@@ -4816,10 +4909,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:49",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4830,7 +4920,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:11:49Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:11:49\",\"IsoTimestamp\":\"2021-03-10T09:11:49Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PSMPGW_localhost.localdomain\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 48802,
@@ -4868,10 +4962,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:18:36",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4882,7 +4973,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:18:36Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:18:36\",\"IsoTimestamp\":\"2021-03-10T09:18:36Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 49358,
@@ -4920,10 +5015,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:18:52",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4934,7 +5026,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:18:52Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:18:52\",\"IsoTimestamp\":\"2021-03-10T09:18:52Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 49899,
@@ -4972,10 +5068,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:28:35",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -4986,7 +5079,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:28:35Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:28:35\",\"IsoTimestamp\":\"2021-03-10T09:28:35Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 50440,
@@ -5024,10 +5121,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:28:50",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -5038,7 +5132,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:28:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:28:50\",\"IsoTimestamp\":\"2021-03-10T09:28:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 50981,
@@ -5079,10 +5177,7 @@
         "cyberarkpas.audit.version": "11.7.0000",
         "destination.address": "10.0.1.20",
         "destination.ip": "10.0.1.20",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -5093,7 +5188,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:31:50Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:31:50\",\"IsoTimestamp\":\"2021-03-10T09:31:50Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"PasswordManager\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"10.0.1.20\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"10.0.1.20\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 51522,
@@ -5131,10 +5230,7 @@
         "cyberarkpas.audit.timestamp": "Mar 10 01:41:32",
         "cyberarkpas.audit.vendor": "Cyber-Ark",
         "cyberarkpas.audit.version": "11.7.0000",
-        "event.action": [
-            "start",
-            "authentication_success"
-        ],
+        "event.action": "authentication_success",
         "event.category": [
             "authentication",
             "session"
@@ -5145,7 +5241,11 @@
         "event.module": "cyberarkpas",
         "event.original": "<5>1 2021-03-10T09:41:32Z VAULT {\"format\":\"elastic\",\"version\":\"1.0\",\"syslog\":{\"audit_record\":{\"Rfc5424\":\"yes\",\"Timestamp\":\"Mar 10 01:41:32\",\"IsoTimestamp\":\"2021-03-10T09:41:32Z\",\"Hostname\":\"VAULT\",\"Vendor\":\"Cyber-Ark\",\"Product\":\"Vault\",\"Version\":\"11.7.0000\",\"MessageID\":\"7\",\"Desc\":\"Logon\",\"Severity\":\"Info\",\"Issuer\":\"Administrator\",\"Action\":\"Logon\",\"SourceUser\":\"\",\"TargetUser\":\"\",\"Safe\":\"\",\"File\":\"\",\"Station\":\"81.32.170.205\",\"Location\":\"\",\"Category\":\"\",\"RequestId\":\"\",\"Reason\":\"\",\"ExtraDetails\":\"\",\"Message\":\"Logon\",\"GatewayStation\":\"\"}}}",
         "event.outcome": "success",
+        "event.severity": 2,
         "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 52070,
