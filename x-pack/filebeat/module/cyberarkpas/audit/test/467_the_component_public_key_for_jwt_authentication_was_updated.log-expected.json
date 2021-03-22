@@ -27,7 +27,6 @@
         "input.type": "log",
         "log.offset": 0,
         "log.syslog.severity.code": "5",
-        "message": "The component public key for JWT authentication was updated",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",

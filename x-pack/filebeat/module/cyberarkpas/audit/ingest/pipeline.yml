@@ -510,7 +510,7 @@ processors:
             from: cyberarkpas.audit.ca_properties.address
           - set: event.outcome
             value: "failed"
-          - set: error.message
+          - set: event.reason
             from: cyberarkpas.audit.ca_properties.cpm_error_details
           - set: destination.user.name
             from: cyberarkpas.audit.ca_properties.user_name
@@ -556,13 +556,6 @@ processors:
           copy_from: '_ingest._value.value'
           ignore_empty_value: true
           override: true
-
-  # TODO:
-  # Mark the event somehow when it contains a legitimate (non-pipeline) error.
-  - append:
-      field: tags
-      value: upstream-error
-      if: 'ctx.error?.message != null'
 
   #
   # Populate ip/domain fields from address.
@@ -613,13 +606,13 @@ processors:
       allow_duplicates: false
 
   #
-  # Save message
-  # TODO: Correct?
+  # Save message into event.reason
   #
-  - set:
-      field: message
-      value: '{{cyberarkpas.audit.message}}'
-      ignore_empty_value: true
+  # TODO: This doesn't make much sense. Too simple messages.
+  #- set:
+  #    field: event.reason
+  #    value: '{{cyberarkpas.audit.message}}'
+  #    ignore_empty_value: true
 
   #
   # Cleanup
