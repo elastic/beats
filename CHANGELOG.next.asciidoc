@@ -49,7 +49,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - Improve ECS field mappings in panw module.  event.outcome now only contains success/failure per ECS specification. {issue}16025[16025] {pull}17910[17910]
 - Improve ECS categorization field mappings for nginx module. http.request.referrer only populated when nginx sets a value {issue}16174[16174] {pull}17844[17844]
@@ -108,8 +107,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 
 *Heartbeat*
-- Adds negative body match. {pull}20728[20728]
-- Refactor synthetics configuration to new syntax. {pull}23467[23467]
 
 *Journalbeat*
 
@@ -230,6 +227,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix duplicated pod events in kubernetes autodiscover for pods with init or ephemeral containers. {pull}22438[22438]
 - Fix FileVersion contained in Windows exe files. {pull}22581[22581]
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
+- The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
 - Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
@@ -292,6 +290,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   to be consistent with ECS. {pull}23094[23094]
 - Update `filestream` reader offset when a line is skipped. {pull}23417[23417]
 - Add check for empty values in azure module. {pull}24156[24156]
+
+*Filebeat*
+
 
 *Filebeat*
 
@@ -379,6 +380,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handing missing eventtime and assignip field being set to N/A for fortinet module. {pull}22361[22361]
 - Fix Zeek dashboard reference to `zeek.ssl.server.name` field. {pull}21696[21696]
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
+- Add json body check for sqs message. {pull}21727[21727]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
 - Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
@@ -648,11 +650,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add file integrity module ECS categorization fields. {pull}18012[18012]
 - Add `file.mime_type`, `file.extension`, and `file.drive_letter` for file integrity module. {pull}18012[18012]
 - Add ECS categorization info for auditd module {pull}18596[18596]
-- Add several improvements for auditd module for improved ECS field mapping {pull}22647[22647]
-- Add ECS 1.7 `configuration` categorization in certain events in auditd module. {pull}23000[23000]
-- Improve file_integrity monitoring when a file is created/deleted in quick succession. {issue}17347[17347] {pull}22170[22170]
-- system/host: Add new ECS 1.8 field `os.type` in `host.os.type`. {pull}23513[23513]
-- Update Auditbeat auditd module to ECS 1.8 {pull}23594[23594] {issue}23118[23118]
 
 *Filebeat*
 
@@ -896,7 +893,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Update Journalbeat to ECS 1.8. {pull}23737[23737]
 
 *Metricbeat*
 
@@ -1045,9 +1041,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 - Add support for multiple regions {pull}21065[21065]
 
+
+*Functionbeat*
+
+
 *Heartbeat*
 
-- Add support for script processor. {pull}23229[23229]
 
 *Winlogbeat*
 
@@ -1075,10 +1074,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as
-  a hostname when Subject Alternative Name is not present from v8.0.
-  Please update your certificates so it contains at least one DNSName instead of relying on CommonName in the new
-  major version of Beats.
 
 *Filebeat*
 
