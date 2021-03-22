@@ -85,6 +85,16 @@ func TestReaderGroup(t *testing.T) {
 		require.Equal(t, 1, len(rg.table))
 		require.Nil(t, newCtx.Err())
 	})
+
+	t.Run("assert new harvester cannot be added if limit is reached", func(t *testing.T) {
+		rg := newReaderGroupWithLimit(1)
+		require.Equal(t, 0, len(rg.table))
+		ctx, cf, err := rg.newContext("test-id", context.Background())
+		requireGroupSuccess(t, ctx, cf, err)
+		ctx, cf, err = rg.newContext("test-id", context.Background())
+		requireGroupError(t, ctx, cf, err)
+	})
+
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
