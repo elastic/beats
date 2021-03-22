@@ -93,7 +93,7 @@ func (f *actionAcker) Commit(ctx context.Context) error {
 }
 
 func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
-	return fleetapi.AckEvent{
+	ackev := fleetapi.AckEvent{
 		EventType: "ACTION_RESULT",
 		SubType:   "ACKNOWLEDGED",
 		Timestamp: time.Now().Format(fleetTimeFormat),
@@ -101,6 +101,14 @@ func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
 		AgentID:   agentID,
 		Message:   fmt.Sprintf("Action '%s' of type '%s' acknowledged.", action.ID(), action.Type()),
 	}
+
+	if a, ok := action.(*fleetapi.ActionApp); ok {
+		ackev.ActionData = a.Data
+		ackev.StartedAt = a.StartedAt
+		ackev.CompletedAt = a.CompletedAt
+		ackev.Error = a.Error
+	}
+	return ackev
 }
 
 type noopAcker struct{}
