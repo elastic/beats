@@ -486,6 +486,21 @@ processors:
           - value: "success"
             to: event.outcome
 
+        # 33 - Update Owner
+        #
+        # Same as above
+        "33":
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - from: cyberarkpas.audit.source_user
+            to: user.target.name
+          - value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+            to: event.category
+          - value: ["admin", "change"]
+            to: event.type
+          - value: "success"
+            to: event.outcome
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
