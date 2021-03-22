@@ -26,6 +26,11 @@ type AckEvent struct {
 	AgentID   string `json:"agent_id"`          // : 'agent1',
 	Message   string `json:"message,omitempty"` // : 'hello2',
 	Payload   string `json:"payload,omitempty"` // : 'payload2',
+
+	ActionData  json.RawMessage `json:"action_data,omitempty"`  // copy of original action data
+	StartedAt   string          `json:"started_at,omitempty"`   // time action started
+	CompletedAt string          `json:"completed_at,omitempty"` // time action completed
+	Error       string          `json:"error,omitempty"`        // optional action error
 }
 
 // AckRequest consists of multiple actions acked to fleet ui.
