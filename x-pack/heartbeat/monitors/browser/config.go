@@ -11,6 +11,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 )
 
+func DefaultConfig() *Config {
+	return &Config{
+		Sandbox: false,
+	}
+}
+
 type Config struct {
 	Schedule  string                 `config:"schedule"`
 	Params    map[string]interface{} `config:"params"`
@@ -19,7 +25,8 @@ type Config struct {
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
-	Id string `config:"id"`
+	Id      string `config:"id"`
+	Sandbox bool   `config:"sandbox"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")
