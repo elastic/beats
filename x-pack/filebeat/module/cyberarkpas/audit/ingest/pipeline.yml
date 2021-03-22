@@ -355,9 +355,9 @@ processors:
         "4":
           - from: cyberarkpas.audit.issuer
             to: user.name
-          - value: [ "authentication"]
+          - value: ["authentication"]
             to: event.category
-          - value: [ "error"]
+          - value: ["error"]
             to: event.type
           - value:  "authentication_failure"
             to: event.action
