@@ -79,7 +79,7 @@ func TestManagedModeRouting(t *testing.T) {
 	assert.Equal(t, monitoringName, confReq.ProgramNames()[2])
 }
 
-func testActions() ([]action, error) {
+func testActions() ([]fleetapi.Action, error) {
 	checkinResponse := &fleetapi.CheckinResponse{}
 	if err := json.Unmarshal([]byte(fleetResponse), &checkinResponse); err != nil {
 		return nil, err

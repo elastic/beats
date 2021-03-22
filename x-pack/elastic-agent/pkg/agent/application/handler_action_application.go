@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -21,7 +22,7 @@ type handlerAppAction struct {
 	srv *server.Server
 }
 
-func (h *handlerAppAction) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *handlerAppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerAppAction: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionApp)
 	if !ok {

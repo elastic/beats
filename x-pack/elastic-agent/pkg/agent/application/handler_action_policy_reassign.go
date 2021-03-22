@@ -7,7 +7,9 @@ package application
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
 // handlerPolicyReassign handles policy reassign change coming from fleet.
@@ -16,7 +18,7 @@ type handlerPolicyReassign struct {
 }
 
 // Handle handles POLICY_REASSIGN action.
-func (h *handlerPolicyReassign) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *handlerPolicyReassign) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerPolicyReassign: action '%+v' received", a)
 
 	if err := acker.Ack(ctx, a); err != nil {

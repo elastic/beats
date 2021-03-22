@@ -45,10 +45,8 @@ type backoffSettings struct {
 	Max  time.Duration `config:"max"`
 }
 
-type fleetAcker = store.FleetAcker
-
 type dispatcher interface {
-	Dispatch(acker fleetAcker, actions ...action) error
+	Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error
 }
 
 type agentInfo interface {
@@ -91,7 +89,7 @@ type fleetGateway struct {
 	reporter         fleetReporter
 	done             chan struct{}
 	wg               sync.WaitGroup
-	acker            fleetAcker
+	acker            store.FleetAcker
 	unauthCounter    int
 	statusController status.Controller
 	statusReporter   status.Reporter
@@ -105,7 +103,7 @@ func newFleetGateway(
 	client client.Sender,
 	d dispatcher,
 	r fleetReporter,
-	acker fleetAcker,
+	acker store.FleetAcker,
 	statusController status.Controller,
 	stateStore stateStore,
 ) (FleetGateway, error) {
@@ -135,7 +133,7 @@ func newFleetGatewayWithScheduler(
 	d dispatcher,
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
-	acker fleetAcker,
+	acker store.FleetAcker,
 	statusController status.Controller,
 	stateStore stateStore,
 ) (FleetGateway, error) {
@@ -182,7 +180,7 @@ func (f *fleetGateway) worker() {
 				continue
 			}
 
-			actions := make([]action, len(resp.Actions))
+			actions := make([]fleetapi.Action, len(resp.Actions))
 			for idx, a := range resp.Actions {
 				actions[idx] = a
 			}

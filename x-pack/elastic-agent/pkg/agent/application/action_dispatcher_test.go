@@ -10,16 +10,18 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 )
 
 type mockHandler struct {
-	received action
+	received fleetapi.Action
 	called   bool
 	err      error
 }
 
-func (h *mockHandler) Handle(_ context.Context, a action, acker fleetAcker) error {
+func (h *mockHandler) Handle(_ context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.called = true
 	h.received = a
 	return h.err

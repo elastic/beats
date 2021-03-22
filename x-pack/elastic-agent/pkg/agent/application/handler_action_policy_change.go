@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
 	"gopkg.in/yaml.v2"
@@ -44,7 +45,7 @@ type handlerPolicyChange struct {
 	setters   []clientSetter
 }
 
-func (h *handlerPolicyChange) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *handlerPolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerPolicyChange: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionPolicyChange)
 	if !ok {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -22,7 +23,7 @@ type handlerSettings struct {
 }
 
 // Handle handles SETTINGS action.
-func (h *handlerSettings) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *handlerSettings) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerUpgrade: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionSettings)
 	if !ok {

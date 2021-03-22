@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -20,7 +21,7 @@ type handlerUpgrade struct {
 	upgrader *upgrade.Upgrader
 }
 
-func (h *handlerUpgrade) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *handlerUpgrade) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerUpgrade: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionUpgrade)
 	if !ok {
