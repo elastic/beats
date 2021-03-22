@@ -551,6 +551,23 @@ processors:
           - set: event.reason
             from: cyberarkpas.audit.ca_properties.cpm_error_details
 
+        # 130 - CPM Disable Password
+        "130":
+          - set: event.outcome
+            value: "failed"
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -585,6 +602,13 @@ processors:
           ignore_empty_value: true
           override: true
 
+  #
+  # Force event.outcome: unknown in case it gets a value other than the allowed.
+  #
+  - set:
+      field: event.outcome
+      value: 'unknown'
+      if: 'ctx.event?.outcome != null && !["success", "failure"].contains(ctx.event.outcome)'
   #
   # Populate ip/domain fields from address.
   #
