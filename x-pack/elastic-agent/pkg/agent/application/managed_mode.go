@@ -198,6 +198,11 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionPolicyReassign{},
+		&handlerPolicyReassign{log: log},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
 			log:        log,
