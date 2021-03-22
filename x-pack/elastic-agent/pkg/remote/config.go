@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package kibana
+package remote
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-// Config is the configuration for the Kibana client.
+// Config is the configuration for the client.
 type Config struct {
 	Protocol Protocol          `config:"protocol" yaml:"protocol"`
 	SpaceID  string            `config:"space.id" yaml:"space.id,omitempty"`
@@ -28,9 +28,9 @@ type Config struct {
 type Protocol string
 
 const (
-	// ProtocolHTTP is HTTP protocol connection to Kibana.
+	// ProtocolHTTP is HTTP protocol connection.
 	ProtocolHTTP Protocol = "http"
-	// ProtocolHTTPS is HTTPS protocol connection to Kibana.
+	// ProtocolHTTPS is HTTPS protocol connection.
 	ProtocolHTTPS Protocol = "https"
 )
 
@@ -44,9 +44,9 @@ func (p *Protocol) Unpack(from string) error {
 	return nil
 }
 
-// DefaultClientConfig creates default configuration for kibana client.
-func DefaultClientConfig() *Config {
-	return &Config{
+// DefaultClientConfig creates default configuration for client.
+func DefaultClientConfig() Config {
+	return Config{
 		Protocol: ProtocolHTTP,
 		Host:     "localhost:5601",
 		Path:     "",
@@ -64,7 +64,7 @@ func (c *Config) IsBasicAuth() bool {
 	return len(c.Username) > 0 && len(c.Password) > 0
 }
 
-// GetHosts returns the hosts to connect to kibana.
+// GetHosts returns the hosts to connect.
 //
 // This looks first at `Hosts` and then at `Host` when `Hosts` is not defined.
 func (c *Config) GetHosts() []string {

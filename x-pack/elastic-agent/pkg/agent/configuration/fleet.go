@@ -6,7 +6,7 @@ package configuration
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 	fleetreporterConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
 )
 
@@ -15,7 +15,7 @@ import (
 type FleetAgentConfig struct {
 	Enabled      bool                        `config:"enabled" yaml:"enabled"`
 	AccessAPIKey string                      `config:"access_api_key" yaml:"access_api_key"`
-	Kibana       *kibana.Config              `config:"kibana" yaml:"kibana"`
+	Client       remote.Config               `config:",inline" yaml:",inline"`
 	Reporting    *fleetreporterConfig.Config `config:"reporting" yaml:"reporting"`
 	Info         *AgentInfo                  `config:"agent" yaml:"agent"`
 	Server       *FleetServerConfig          `config:"server" yaml:"server,omitempty"`
@@ -33,8 +33,8 @@ func (e *FleetAgentConfig) Valid() error {
 			return errors.New("empty access token", errors.TypeConfig)
 		}
 
-		if e.Kibana == nil || len(e.Kibana.Host) == 0 {
-			return errors.New("missing Kibana host configuration", errors.TypeConfig)
+		if len(e.Client.Host) == 0 {
+			return errors.New("missing fleet host configuration", errors.TypeConfig)
 		}
 	}
 
@@ -45,7 +45,7 @@ func (e *FleetAgentConfig) Valid() error {
 func DefaultFleetAgentConfig() *FleetAgentConfig {
 	return &FleetAgentConfig{
 		Enabled:   false,
-		Kibana:    kibana.DefaultClientConfig(),
+		Client:    remote.DefaultClientConfig(),
 		Reporting: fleetreporterConfig.DefaultConfig(),
 		Info:      &AgentInfo{},
 	}

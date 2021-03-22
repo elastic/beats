@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package kibana
+package remote
 
 import (
 	"bytes"
@@ -44,11 +44,11 @@ func TestPortDefaults(t *testing.T) {
 		ExpectedPort   int
 		ExpectedScheme string
 	}{
-		{"no scheme uri", "test.url", kibanaPort, "http"},
-		{"default kibana port", "http://test.url", kibanaPort, "http"},
-		{"specified kibana port", "http://test.url:123", 123, "http"},
-		{"default kibana https port", "https://test.url", kibanaHTTPSPort, "https"},
-		{"specified kibana https port", "https://test.url:123", 123, "https"},
+		{"no scheme uri", "test.url", defaultPort, "http"},
+		{"default port", "http://test.url", defaultPort, "http"},
+		{"specified port", "http://test.url:123", 123, "http"},
+		{"default https port", "https://test.url", defaultPort, "https"},
+		{"specified https port", "https://test.url:123", 123, "https"},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -236,35 +236,6 @@ func TestHTTPClient(t *testing.T) {
 		},
 	))
 
-	t.Run("Enforce Kibana version", withServer(
-		func(t *testing.T) *http.ServeMux {
-			msg := `{ message: "hello" }`
-			mux := http.NewServeMux()
-			mux.HandleFunc("/echo-hello", enforceKibanaHandler(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
-			}, "8.0.0"))
-			return mux
-		}, func(t *testing.T, host string) {
-			cfg := config.MustNewConfigFrom(map[string]interface{}{
-				"host": host,
-			})
-
-			client, err := NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
-				return NewEnforceKibanaVersionRoundTripper(wrapped, "8.0.0"), nil
-			})
-
-			require.NoError(t, err)
-			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
-			require.NoError(t, err)
-
-			body, err := ioutil.ReadAll(resp.Body)
-			require.NoError(t, err)
-			defer resp.Body.Close()
-			assert.Equal(t, `{ message: "hello" }`, string(body))
-		},
-	))
-
 	t.Run("Allows to debug HTTP request between a client and a server", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ "message": "hello" }`
@@ -308,7 +279,7 @@ func TestNextRequester(t *testing.T) {
 	t.Run("Picks first requester on initial call", func(t *testing.T) {
 		one := &requestClient{}
 		two := &requestClient{}
-		client, err := new(nil, nil, one, two)
+		client, err := new(nil, Config{}, one, two)
 		require.NoError(t, err)
 		assert.Equal(t, one, client.nextRequester())
 	})
@@ -319,7 +290,7 @@ func TestNextRequester(t *testing.T) {
 			lastErrOcc: time.Now().UTC(),
 		}
 		two := &requestClient{}
-		client, err := new(nil, nil, one, two)
+		client, err := new(nil, Config{}, one, two)
 		require.NoError(t, err)
 		assert.Equal(t, two, client.nextRequester())
 	})
@@ -329,7 +300,7 @@ func TestNextRequester(t *testing.T) {
 			lastUsed: time.Now().UTC(),
 		}
 		two := &requestClient{}
-		client, err := new(nil, nil, one, two)
+		client, err := new(nil, Config{}, one, two)
 		require.NoError(t, err)
 		assert.Equal(t, two, client.nextRequester())
 	})
@@ -344,7 +315,7 @@ func TestNextRequester(t *testing.T) {
 		three := &requestClient{
 			lastUsed: time.Now().UTC().Add(-2 * time.Minute),
 		}
-		client, err := new(nil, nil, one, two, three)
+		client, err := new(nil, Config{}, one, two, three)
 		require.NoError(t, err)
 		assert.Equal(t, two, client.nextRequester())
 	})
@@ -361,7 +332,7 @@ func TestNextRequester(t *testing.T) {
 		three := &requestClient{
 			lastUsed: time.Now().UTC().Add(-2 * time.Minute),
 		}
-		client, err := new(nil, nil, one, two, three)
+		client, err := new(nil, Config{}, one, two, three)
 		require.NoError(t, err)
 		assert.Equal(t, three, client.nextRequester())
 	})
@@ -382,7 +353,7 @@ func TestNextRequester(t *testing.T) {
 			lastErr:    fmt.Errorf("fake error"),
 			lastErrOcc: time.Now().Add(-2 * time.Minute),
 		}
-		client, err := new(nil, nil, one, two, three)
+		client, err := new(nil, Config{}, one, two, three)
 		require.NoError(t, err)
 		assert.Equal(t, two, client.nextRequester())
 	})
@@ -403,16 +374,6 @@ func basicAuthHandler(handler http.HandlerFunc, username, password, realm string
 		if !ok || u != username || p != password {
 			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		handler(w, r)
-	}
-}
-
-func enforceKibanaHandler(handler http.HandlerFunc, version string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("kbn-version") != version {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 		handler(w, r)

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func authHandler(handler http.HandlerFunc, apiKey string) http.HandlerFunc {
@@ -46,7 +46,7 @@ func withServerWithAuthClient(
 
 	return withServer(m, func(t *testing.T, host string) {
 		log, _ := logger.New("")
-		cfg := &kibana.Config{
+		cfg := remote.Config{
 			Host: host,
 		}
 

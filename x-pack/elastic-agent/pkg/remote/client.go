@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package kibana
+package remote
 
 import (
 	"context"
@@ -23,10 +23,9 @@ import (
 )
 
 const (
-	kibanaPort      = 5601
-	kibanaHTTPSPort = 443
+	defaultPort = 8220
 
-	kibanaRetryOnBadConnTimeout = 5 * time.Minute
+	retryOnBadConnTimeout = 5 * time.Minute
 )
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
@@ -40,7 +39,7 @@ type requestClient struct {
 	lastErrOcc time.Time
 }
 
-// Client wraps an http.Client and takes care of making the raw calls to kibana, the client should
+// Client wraps an http.Client and takes care of making the raw calls, the client should
 // stay simple and specificals should be implemented in external action instead of adding new methods
 // to the client. For authenticated calls or sending fields on every request, create customer RoundTripper
 // implementations that will take care of the boiler plates.
@@ -48,14 +47,14 @@ type Client struct {
 	log     *logger.Logger
 	lock    sync.Mutex
 	clients []*requestClient
-	config  *Config
+	config  Config
 }
 
-// NewConfigFromURL returns a Kibana Config based on a received host.
-func NewConfigFromURL(kURL string) (*Config, error) {
+// NewConfigFromURL returns a Config based on a received host.
+func NewConfigFromURL(kURL string) (Config, error) {
 	u, err := url.Parse(kURL)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not parse Kibana url")
+		return Config{}, errors.Wrap(err, "could not parse url")
 	}
 
 	var username, password string
@@ -75,27 +74,27 @@ func NewConfigFromURL(kURL string) (*Config, error) {
 	return c, nil
 }
 
-// NewWithRawConfig returns a new Kibana client with a specified configuration.
+// NewWithRawConfig returns a new client with a specified configuration.
 func NewWithRawConfig(log *logger.Logger, config *config.Config, wrapper wrapperFunc) (*Client, error) {
 	l := log
 	if l == nil {
-		log, err := logger.New("kibana_client")
+		log, err := logger.New("client")
 		if err != nil {
 			return nil, err
 		}
 		l = log
 	}
 
-	cfg := &Config{}
-	if err := config.Unpack(cfg); err != nil {
+	cfg := Config{}
+	if err := config.Unpack(&cfg); err != nil {
 		return nil, errors.Wrap(err, "invalidate configuration")
 	}
 
 	return NewWithConfig(l, cfg, wrapper)
 }
 
-// NewWithConfig takes a Kibana Config and return a client.
-func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Client, error) {
+// NewWithConfig takes a Config and return a client.
+func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client, error) {
 	// Normalize the URL with the path any spaces configured.
 	var p string
 	if len(cfg.SpaceID) > 0 {
@@ -108,10 +107,7 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 		p = p + "/"
 	}
 
-	usedDefaultPort := kibanaPort
-	if cfg.Protocol == "https" {
-		usedDefaultPort = kibanaHTTPSPort
-	}
+	usedDefaultPort := defaultPort
 
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
@@ -139,12 +135,12 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 			Timeout:   cfg.Timeout,
 		}
 
-		kibanaURL, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)
+		url, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)
 		if err != nil {
 			return nil, errors.Wrap(err, "invalid Kibana endpoint")
 		}
 		clients[i] = &requestClient{
-			request: prefixRequestFactory(kibanaURL),
+			request: prefixRequestFactory(url),
 			client:  httpClient,
 		}
 	}
@@ -152,14 +148,14 @@ func NewWithConfig(log *logger.Logger, cfg *Config, wrapper wrapperFunc) (*Clien
 	return new(log, cfg, clients...)
 }
 
-// Send executes a direct calls against the Kibana API, the method will takes cares of cloning
-// also add necessary headers for Kibana likes: "Content-Type", "Accept", and "kbn-xsrf".
+// Send executes a direct calls against the API, the method will takes cares of cloning
+// also add necessary headers for likes: "Content-Type", "Accept", and "kbn-xsrf".
 // No assumptions is done on the response concerning the received format, this will be the responsibility
 // of the implementation to correctly unpack any received data.
 //
 // NOTE:
 // - The caller of this method is free to override any value found in the headers.
-// - The magic of unpack kibana errors is not done in the Send method, a helper method is provided.
+// - The magic of unpacking of errors is not done in the Send method, a helper method is provided.
 func (c *Client) Send(
 	ctx context.Context,
 	method, path string,
@@ -208,10 +204,10 @@ func (c *Client) URI() string {
 	return string(c.config.Protocol) + "://" + host + "/" + c.config.Path
 }
 
-// new creates new Kibana API client.
+// new creates new API client.
 func new(
 	log *logger.Logger,
-	cfg *Config,
+	cfg Config,
 	httpClients ...*requestClient,
 ) (*Client, error) {
 	c := &Client{
@@ -230,7 +226,7 @@ func (c *Client) nextRequester() *requestClient {
 
 	now := time.Now().UTC()
 	for _, requester := range c.clients {
-		if requester.lastErr != nil && now.Sub(requester.lastErrOcc) > kibanaRetryOnBadConnTimeout {
+		if requester.lastErr != nil && now.Sub(requester.lastErrOcc) > retryOnBadConnTimeout {
 			requester.lastErr = nil
 			requester.lastErrOcc = time.Time{}
 		}

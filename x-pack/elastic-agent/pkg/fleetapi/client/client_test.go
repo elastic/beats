@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func TestHTTPClient(t *testing.T) {
@@ -37,7 +37,7 @@ func TestHTTPClient(t *testing.T) {
 				"host": host,
 			})
 
-			client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+			client, err := remote.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 				return NewFleetAuthRoundTripper(wrapped, "abc123")
 			})
 
@@ -66,7 +66,7 @@ func TestHTTPClient(t *testing.T) {
 				"host": host,
 			})
 
-			client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+			client, err := remote.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 				return NewFleetAuthRoundTripper(wrapped, "abc123")
 			})
 
@@ -91,7 +91,7 @@ func TestHTTPClient(t *testing.T) {
 				"host": host,
 			})
 
-			client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+			client, err := remote.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 				return NewFleetUserAgentRoundTripper(wrapped, "8.0.0"), nil
 			})
 
@@ -113,7 +113,7 @@ func TestHTTPClient(t *testing.T) {
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 		defer cancel()
-		client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
+		client, err := remote.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 			return NewFleetAuthRoundTripper(wrapped, "abc123")
 		})
 

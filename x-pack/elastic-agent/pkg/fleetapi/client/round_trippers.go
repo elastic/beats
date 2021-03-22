@@ -8,7 +8,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 // ErrInvalidAPIKey is returned when authentication fail to fleet.
@@ -30,7 +30,7 @@ func (r *FleetUserAgentRoundTripper) RoundTrip(req *http.Request) (*http.Respons
 func NewFleetUserAgentRoundTripper(wrapped http.RoundTripper, version string) http.RoundTripper {
 	const name = "Elastic Agent"
 	return &FleetUserAgentRoundTripper{
-		rt: kibana.NewUserAgentRoundTripper(wrapped, name+" v"+version),
+		rt: remote.NewUserAgentRoundTripper(wrapped, name+" v"+version),
 	}
 }
 
