@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package handlers
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
@@ -32,20 +33,46 @@ const (
 	apiStatusTimeout = 15 * time.Second
 )
 
-type clientSetter interface {
-	SetClient(client.Sender)
-}
-
-type handlerPolicyChange struct {
+// PolicyChange is a handler for POLICY_CHANGE action.
+type PolicyChange struct {
 	log       *logger.Logger
 	emitter   pipeline.EmitterFunc
 	agentInfo *info.AgentInfo
 	config    *configuration.Configuration
 	store     storage.Store
-	setters   []clientSetter
+	setters   []actions.ClientSetter
 }
 
-func (h *handlerPolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
+// NewPolicyChange creates a new PolicyChange handler.
+func NewPolicyChange(
+	log *logger.Logger,
+	emitter pipeline.EmitterFunc,
+	agentInfo *info.AgentInfo,
+	config *configuration.Configuration,
+	store storage.Store,
+	setters ...actions.ClientSetter,
+) *PolicyChange {
+	return &PolicyChange{
+		log:       log,
+		emitter:   emitter,
+		agentInfo: agentInfo,
+		config:    config,
+		store:     store,
+		setters:   setters,
+	}
+}
+
+// AddSetter adds a setter into a collection of client setters.
+func (h *PolicyChange) AddSetter(cs actions.ClientSetter) {
+	if h.setters == nil {
+		h.setters = make([]actions.ClientSetter, 0)
+	}
+
+	h.setters = append(h.setters, cs)
+}
+
+// Handle handles policy change action.
+func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerPolicyChange: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionPolicyChange)
 	if !ok {
@@ -69,7 +96,7 @@ func (h *handlerPolicyChange) Handle(ctx context.Context, a fleetapi.Action, ack
 	return acker.Ack(ctx, action)
 }
 
-func (h *handlerPolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
+func (h *PolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
 	// do not update kibana host from policy; no setters provided with local Fleet Server
 	if len(h.setters) == 0 {
 		return nil

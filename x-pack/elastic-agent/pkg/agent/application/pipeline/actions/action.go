@@ -2,21 +2,22 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package actions
 
 import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
-type handlerDefault struct {
-	log *logger.Logger
+// Handler handles action coming from fleet.
+type Handler interface {
+	Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error
 }
 
-func (h *handlerDefault) Handle(_ context.Context, a fleetapi.Action, acker store.FleetAcker) error {
-	h.log.Errorf("HandlerDefault: action '%+v' received", a)
-	return nil
+// ClientSetter sets the client for communication.
+type ClientSetter interface {
+	SetClient(client.Sender)
 }

@@ -42,7 +42,7 @@ type Local struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
-	router      pipeline.Dispatcher
+	router      pipeline.Router
 	source      source
 	agentInfo   *info.AgentInfo
 	srv         *server.Server

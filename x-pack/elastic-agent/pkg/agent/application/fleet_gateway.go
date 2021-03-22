@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -43,10 +44,6 @@ type fleetGatewaySettings struct {
 type backoffSettings struct {
 	Init time.Duration `config:"init"`
 	Max  time.Duration `config:"max"`
-}
-
-type dispatcher interface {
-	Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error
 }
 
 type agentInfo interface {
@@ -80,7 +77,7 @@ type stateStore interface {
 type fleetGateway struct {
 	bgContext        context.Context
 	log              *logger.Logger
-	dispatcher       dispatcher
+	dispatcher       pipeline.Dispatcher
 	client           client.Sender
 	scheduler        scheduler.Scheduler
 	backoff          backoff.Backoff
@@ -101,7 +98,7 @@ func newFleetGateway(
 	log *logger.Logger,
 	agentInfo agentInfo,
 	client client.Sender,
-	d dispatcher,
+	d pipeline.Dispatcher,
 	r fleetReporter,
 	acker store.FleetAcker,
 	statusController status.Controller,
@@ -130,7 +127,7 @@ func newFleetGatewayWithScheduler(
 	settings *fleetGatewaySettings,
 	agentInfo agentInfo,
 	client client.Sender,
-	d dispatcher,
+	d pipeline.Dispatcher,
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
 	acker store.FleetAcker,

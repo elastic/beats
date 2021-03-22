@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package handlers
 
 import (
 	"context"
@@ -17,12 +17,22 @@ import (
 
 const defaultActionTimeout = time.Minute
 
-type handlerAppAction struct {
+// AppAction is a handler for application actions.
+type AppAction struct {
 	log *logger.Logger
 	srv *server.Server
 }
 
-func (h *handlerAppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
+// NewAppAction creates a new AppAction handler.
+func NewAppAction(log *logger.Logger, srv *server.Server) *AppAction {
+	return &AppAction{
+		log: log,
+		srv: srv,
+	}
+}
+
+// Handle handles application action.
+func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerAppAction: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionApp)
 	if !ok {

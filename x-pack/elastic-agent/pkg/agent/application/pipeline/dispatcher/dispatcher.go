@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package dispatcher
 
 import (
 	"context"
@@ -19,14 +19,16 @@ import (
 
 type actionHandlers map[string]actions.Handler
 
-type actionDispatcher struct {
+// ActionDispatcher processes actions coming from fleet using registered set of handlers.
+type ActionDispatcher struct {
 	ctx      context.Context
 	log      *logger.Logger
 	handlers actionHandlers
 	def      actions.Handler
 }
 
-func newActionDispatcher(ctx context.Context, log *logger.Logger, def actions.Handler) (*actionDispatcher, error) {
+// New creates a new action dispatcher.
+func New(ctx context.Context, log *logger.Logger, def actions.Handler) (*ActionDispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New("action_dispatcher")
@@ -39,7 +41,7 @@ func newActionDispatcher(ctx context.Context, log *logger.Logger, def actions.Ha
 		return nil, errors.New("missing default handler")
 	}
 
-	return &actionDispatcher{
+	return &ActionDispatcher{
 		ctx:      ctx,
 		log:      log,
 		handlers: make(actionHandlers),
@@ -47,7 +49,8 @@ func newActionDispatcher(ctx context.Context, log *logger.Logger, def actions.Ha
 	}, nil
 }
 
-func (ad *actionDispatcher) Register(a fleetapi.Action, handler actions.Handler) error {
+// Register registers a new handler for action.
+func (ad *ActionDispatcher) Register(a fleetapi.Action, handler actions.Handler) error {
 	k := ad.key(a)
 	_, ok := ad.handlers[k]
 	if ok {
@@ -57,18 +60,21 @@ func (ad *actionDispatcher) Register(a fleetapi.Action, handler actions.Handler)
 	return nil
 }
 
-func (ad *actionDispatcher) MustRegister(a fleetapi.Action, handler actions.Handler) {
+// MustRegister registers a new handler for action.
+// Panics if not successful.
+func (ad *ActionDispatcher) MustRegister(a fleetapi.Action, handler actions.Handler) {
 	err := ad.Register(a, handler)
 	if err != nil {
 		panic("could not register action, error: " + err.Error())
 	}
 }
 
-func (ad *actionDispatcher) key(a fleetapi.Action) string {
+func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 	return reflect.TypeOf(a).String()
 }
 
-func (ad *actionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
+// Dispatch dispatches an action using pre-registered set of handlers.
+func (ad *ActionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
 	if len(actions) == 0 {
 		ad.log.Debug("No action to dispatch")
 		return nil
@@ -95,7 +101,7 @@ func (ad *actionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi
 	return acker.Commit(ad.ctx)
 }
 
-func (ad *actionDispatcher) dispatchAction(a fleetapi.Action, acker store.FleetAcker) error {
+func (ad *ActionDispatcher) dispatchAction(a fleetapi.Action, acker store.FleetAcker) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
 		return ad.def.Handle(ad.ctx, a, acker)

@@ -17,6 +17,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
@@ -62,7 +64,7 @@ type Managed struct {
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     FleetGateway
-	router      pipeline.Dispatcher
+	router      pipeline.Router
 	srv         *server.Server
 	stateStore  stateStore
 	upgrader    *upgrade.Upgrader
@@ -169,7 +171,7 @@ func newManaged(
 	managedApplication.stateStore = stateStore
 	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
-	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
+	actionDispatcher, err := dispatcher.New(managedApplication.bgContext, log, handlers.NewDefault(log))
 	if err != nil {
 		return nil, err
 	}
@@ -184,17 +186,19 @@ func newManaged(
 		combinedReporter,
 		caps)
 
-	policyChanger := &handlerPolicyChange{
-		log:       log,
-		emitter:   emit,
-		agentInfo: agentInfo,
-		config:    cfg,
-		store:     storeSaver,
-	}
+	policyChanger := handlers.NewPolicyChange(
+		log,
+		emit,
+		agentInfo,
+		cfg,
+		storeSaver,
+	)
+
 	if cfg.Fleet.Server == nil {
 		// setters only set when not running a local Fleet Server
-		policyChanger.setters = []clientSetter{acker}
+		policyChanger.AddSetter(acker)
 	}
+
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -202,48 +206,42 @@ func newManaged(
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyReassign{},
-		&handlerPolicyReassign{log: log},
+		handlers.NewPolicyReassign(log),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
-		&handlerUnenroll{
-			log:        log,
-			emitter:    emit,
-			dispatcher: router,
-			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
-			stateStore: stateStore,
-		},
+		handlers.NewUnenroll(
+			log,
+			emit,
+			router,
+			[]context.CancelFunc{managedApplication.cancelCtxFn},
+			stateStore,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
-		&handlerUpgrade{
-			upgrader: managedApplication.upgrader,
-			log:      log,
-		},
+		handlers.NewUpgrade(log, managedApplication.upgrader),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionSettings{},
-		&handlerSettings{
-			log:       log,
-			reexec:    reexec,
-			agentInfo: agentInfo,
-		},
+		handlers.NewSettings(
+			log,
+			reexec,
+			agentInfo,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionApp{},
-		&handlerAppAction{
-			srv: managedApplication.srv,
-			log: log,
-		},
+		handlers.NewAppAction(log, managedApplication.srv),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
-		&handlerUnknown{log: log},
+		handlers.NewUnknown(log),
 	)
 
 	actions := stateStore.Actions()
@@ -277,7 +275,7 @@ func newManaged(
 	}
 	// add the gateway to setters, so the gateway can be updated
 	// when the hosts for Kibana are updated by the policy.
-	policyChanger.setters = append(policyChanger.setters, gateway)
+	policyChanger.AddSetter(gateway)
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil

@@ -242,7 +242,7 @@ type inmemRouter struct {
 	programs map[string][]program.Program
 }
 
-func (r *inmemRouter) Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
+func (r *inmemRouter) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	r.programs = grpProg
 	return nil
 }

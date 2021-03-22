@@ -17,6 +17,8 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
@@ -46,19 +48,19 @@ func TestManagedModeRouting(t *testing.T) {
 	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{injectMonitoring}}, nil)
 	require.NoError(t, err)
 
-	actionDispatcher, err := newActionDispatcher(ctx, log, &handlerDefault{log: log})
+	actionDispatcher, err := dispatcher.New(ctx, log, handlers.NewDefault(log))
 	require.NoError(t, err)
 
 	cfg := configuration.DefaultConfiguration()
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{
-			log:       log,
-			emitter:   emit,
-			agentInfo: agentInfo,
-			config:    cfg,
-			store:     nullStore,
-		},
+		handlers.NewPolicyChange(
+			log,
+			emit,
+			agentInfo,
+			cfg,
+			nullStore,
+		),
 	)
 
 	actions, err := testActions()
