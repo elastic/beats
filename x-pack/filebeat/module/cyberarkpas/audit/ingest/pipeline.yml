@@ -39,21 +39,21 @@ processors:
         JSON_PAYLOAD: '{"format":"elastic","version":"1.0",.*}'
       on_failure:
         - fail:
-            message: "unexpected event format: {{ _ingest.on_failure_message }}"
+            message: "unexpected event format: {{_ingest.on_failure_message}}"
 
   - json:
       field: _tmp.payload
       target_field: _tmp.json
       on_failure:
         - fail:
-            message: "malformed JSON event: {{ _ingest.on_failure_message }}"
+            message: "malformed JSON event: {{_ingest.on_failure_message}}"
 
   - rename:
       field: _tmp.json.syslog.audit_record
       target_field: cyberarkpas.audit
       on_failure:
         - fail:
-            message: "unexpected event structure: {{ _ingest.on_failure_message }}"
+            message: "unexpected event structure: {{_ingest.on_failure_message}}"
 
 
   #
@@ -84,7 +84,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse ISO timestamp field: {{ cyberarkpas.audit.IsoTimestamp }}: {{ _ingest.on_failure_message }}"
+            value: "failed to parse ISO timestamp field: {{cyberarkpas.audit.IsoTimestamp}}: {{_ingest.on_failure_message}}"
 
   - date:
       if: 'ctx._tmp.timestamp == null && ctx.cyberarkpas.audit.Timestamp != null'
@@ -113,7 +113,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse timestamp field: {{ cyberarkpas.audit.Timestamp }}: {{ _ingest.on_failure_message }}"
+            value: "failed to parse timestamp field: {{cyberarkpas.audit.Timestamp}}: {{_ingest.on_failure_message}}"
 
   - date:
       if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null'
@@ -143,11 +143,11 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to parse legacy syslog timestamp: {{ _tmp.syslog_ts }}: {{ _ingest.on_failure_message }}"
+            value: "failed to parse legacy syslog timestamp: {{_tmp.syslog_ts}}: {{_ingest.on_failure_message}}"
 
   - set:
       field: '@timestamp'
-      value: '{{ _tmp.timestamp }}'
+      value: '{{_tmp.timestamp}}'
       ignore_empty_value: true
       override: true
 
@@ -180,7 +180,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to process CAProperties array: {{ _ingest.on_failure_message }}"
+            value: "failed to process CAProperties array: {{_ingest.on_failure_message}}"
   - remove:
       field: cyberarkpas.audit.CAProperties.CAProperty
       ignore_missing: true
@@ -206,7 +206,7 @@ processors:
       on_failure:
         - append:
             field: error.message
-            value: "failed to process ExtraDetails expression '{{ cyberarkpas.audit.ExtraDetails }}': {{ _ingest.on_failure_message }}"
+            value: "failed to process ExtraDetails expression '{{cyberarkpas.audit.ExtraDetails}}': {{_ingest.on_failure_message}}"
   - remove:
       field: cyberarkpas.audit.ExtraDetails
       ignore_missing: true
@@ -279,17 +279,22 @@ processors:
 
   - set:
       field: event.code
-      value: '{{ cyberarkpas.audit.message_id }}'
+      value: '{{cyberarkpas.audit.message_id}}'
       ignore_empty_value: true
 
   - set:
       field: source.address
-      value: '{{ cyberarkpas.audit.station }}'
+      value: '{{cyberarkpas.audit.station}}'
       ignore_empty_value: true
 
   - set:
       field: destination.address
-      value: '{{ cyberarkpas.audit.gateway_station }}'
+      value: '{{cyberarkpas.audit.gateway_station}}'
+      ignore_empty_value: true
+
+  - set:
+      field: file.path
+      value: '{{cyberarkpas.audit.file}}'
       ignore_empty_value: true
 
   #
@@ -298,24 +303,10 @@ processors:
   - set:
       field: observer
       value:
-        hostname: '{{ cyberarkpas.audit.hostname }}'
-        vendor: '{{ cyberarkpas.audit.vendor }}'
-        product: '{{ cyberarkpas.audit.product }}'
-        version: '{{ cyberarkpas.audit.version }}'
-
-  #
-  # Populate ip/host fields from address.
-  #
-  - grok:
-      field: source.address
-      patterns:
-        - '(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})'
-      ignore_failure: true
-  - grok:
-      field: destination.address
-      patterns:
-        - '(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})'
-      ignore_failure: true
+        hostname: '{{cyberarkpas.audit.hostname}}'
+        vendor: '{{cyberarkpas.audit.vendor}}'
+        product: '{{cyberarkpas.audit.product}}'
+        version: '{{cyberarkpas.audit.version}}'
 
   #
   # Enrichment based on message_id
@@ -327,8 +318,8 @@ processors:
   #
   # Once something like this is possible:
   # set:
-  #   target_field: '{{ _ingest.value.to }}'
-  #   copy_from: '{{ _ingest.value.from }}'
+  #   target_field: '{{_ingest.value.to}}'
+  #   copy_from: '{{_ingest.value.from}}'
   #
   # ... this script can be updated to just create two output lists, one
   # for value-to pairs, another for value-from pairs.
@@ -379,6 +370,20 @@ processors:
           - value: "success"
             to: event.outcome
 
+        # 22 - CPM Verify Password
+        #
+        # Password on a target host is verified.
+        "22":
+          # Address of device that hosts the account.
+          - from: cyberarkpas.audit.ca_properties.address
+            to: destination.address
+          - from: cyberarkpas.audit.ca_properties.cpm_status
+            to: event.outcome # TODO: Always success?
+          - from: cyberarkpas.audit.ca_properties.user_name
+            to: destination.user.name
+          - from: cyberarkpas.audit.issuer
+            to: source.user.name
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -413,6 +418,20 @@ processors:
           ignore_empty_value: true
 
   #
+  # Populate ip/domain fields from address.
+  #
+  - grok:
+      field: source.address
+      patterns:
+        - '(?:%{IP:source.ip}|%{GREEDYDATA:source.domain})'
+      ignore_failure: true
+  - grok:
+      field: destination.address
+      patterns:
+        - '(?:%{IP:destination.ip}|%{GREEDYDATA:destination.domain})'
+      ignore_failure: true
+
+  #
   # Populate related fields
   #
   - append:
@@ -437,7 +456,7 @@ processors:
 on_failure:
   - append:
         field: error.message
-        value: '{{ _ingest.on_failure_message }}'
+        value: '{{_ingest.on_failure_message}}'
   - remove:
       field:
         - _tmp
