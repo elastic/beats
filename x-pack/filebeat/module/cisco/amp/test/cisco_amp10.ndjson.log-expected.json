@@ -1425,6 +1425,61 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:32:14.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6411425813945647106",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 573000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411456342573187000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "input.type": "log",
+        "log.offset": 37048,
+        "related.hash": [
+            "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
         "@timestamp": "2021-01-14T12:27:42.000Z",
         "cisco.amp.cloud_ioc.description": "Qakbot is a worm that spreads through network shares and removable drives. It downloads additional files, steals information, and opens a back door on the compromised computer. The worm also contains rootkit functionality to allow it to hide its presence. A command or file path similar to one used by Qakbot for spreading across the network or persistence was seen.",
         "cisco.amp.cloud_ioc.short_description": "W32.Qakbot.ioc",
@@ -3552,61 +3607,6 @@
         ],
         "related.hosts": [
             "Demo_Command_Line_Arguments_Kovter"
-        ],
-        "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
-        ],
-        "service.type": "cisco",
-        "tags": [
-            "cisco-amp",
-            "forwarded"
-        ]
-    },
-    {
-        "@timestamp": "2021-01-14T10:33:46.000Z",
-        "cisco.amp.computer.active": true,
-        "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
-        "cisco.amp.computer.network_addresses": [
-            {
-                "ip": "10.10.10.10",
-                "mac": "f9:65:da:22:2a:41"
-            }
-        ],
-        "cisco.amp.connector_guid": "test_connector_guid",
-        "cisco.amp.detection_id": "6411425813945647106",
-        "cisco.amp.error.description": "Object name not found",
-        "cisco.amp.error.error_code": 3221225524,
-        "cisco.amp.event_type_id": 2164260893,
-        "cisco.amp.file.disposition": "Malicious",
-        "cisco.amp.group_guids": [
-            "test_group_guid"
-        ],
-        "cisco.amp.related.mac": [
-            "f9:65:da:22:2a:41"
-        ],
-        "cisco.amp.timestamp_nanoseconds": 758000000,
-        "event.action": "Retrospective Quarantine Attempt Failed",
-        "event.category": [
-            "malware"
-        ],
-        "event.dataset": "cisco.amp",
-        "event.id": 6411425813945647000,
-        "event.kind": "alert",
-        "event.module": "cisco",
-        "event.severity": 3,
-        "file.hash.sha256": "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837",
-        "fileset.name": "amp",
-        "host.hostname": "Demo_Qakbot_1",
-        "host.name": "Demo_Qakbot_1",
-        "input.type": "log",
-        "log.offset": 126973,
-        "related.hash": [
-            "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837"
-        ],
-        "related.hosts": [
-            "Demo_Qakbot_1"
         ],
         "related.ip": [
             "8.8.8.8",

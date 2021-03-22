@@ -317,7 +317,6 @@ processors:
     source: |
         if (ctx?.related == null) {
             ctx.related = new HashMap();
-            ctx.related.ip = new ArrayList();
         }
         if (ctx?.related != null && ctx?.related?.ip == null) {
             ctx.related.ip = new ArrayList();
@@ -335,7 +334,6 @@ processors:
     source: |
         if (ctx?.cisco?.amp?.related == null) {
             ctx.cisco.amp.related = new HashMap();
-            ctx.cisco.amp.related.mac = new ArrayList();
         }
         if (ctx?.cisco?.amp?.related != null && ctx?.cisco?.amp?.related?.mac == null) {
             ctx.cisco.amp.related.mac = new ArrayList();
