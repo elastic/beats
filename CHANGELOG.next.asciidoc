@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
 
+
 *Auditbeat*
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
