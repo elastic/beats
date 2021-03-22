@@ -1,0 +1,1641 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "Anomali indicators ingested by the threat intel Filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 18,
+              "i": "96feacb2-faa8-4154-ab78-71acfa3a0200",
+              "w": 18,
+              "x": 0,
+              "y": 0
+            },
+            "panelIndex": "96feacb2-faa8-4154-ab78-71acfa3a0200",
+            "panelRefName": "panel_0",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 18,
+              "i": "47fb30af-2e3a-4853-923e-401be3bcffd7",
+              "w": 11,
+              "x": 18,
+              "y": 0
+            },
+            "panelIndex": "47fb30af-2e3a-4853-923e-401be3bcffd7",
+            "panelRefName": "panel_1",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 18,
+              "i": "bcbc15d0-35c0-461d-b6f1-2a09b2e27e2a",
+              "w": 19,
+              "x": 29,
+              "y": 0
+            },
+            "panelIndex": "bcbc15d0-35c0-461d-b6f1-2a09b2e27e2a",
+            "panelRefName": "panel_2",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 18,
+              "i": "b3f8480e-2875-46d4-acd2-b2a910a704af",
+              "w": 14,
+              "x": 34,
+              "y": 18
+            },
+            "panelIndex": "b3f8480e-2875-46d4-acd2-b2a910a704af",
+            "panelRefName": "panel_3",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "vis": {
+                "params": {
+                  "colWidth": [
+                    {
+                      "colIndex": 0,
+                      "width": 173.36285400390625
+                    }
+                  ]
+                }
+              }
+            },
+            "gridData": {
+              "h": 18,
+              "i": "b334f158-4fc5-4712-a5aa-f172dd743ba7",
+              "w": 9,
+              "x": 0,
+              "y": 18
+            },
+            "panelIndex": "b334f158-4fc5-4712-a5aa-f172dd743ba7",
+            "panelRefName": "panel_4",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "table": null,
+              "vis": {
+                "params": {
+                  "colWidth": [
+                    {
+                      "colIndex": 0,
+                      "width": 346.36285400390625
+                    }
+                  ]
+                }
+              }
+            },
+            "gridData": {
+              "h": 18,
+              "i": "4125f3ee-6b0e-4198-a847-8a1113dfbc4a",
+              "w": 13,
+              "x": 9,
+              "y": 18
+            },
+            "panelIndex": "4125f3ee-6b0e-4198-a847-8a1113dfbc4a",
+            "panelRefName": "panel_5",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "vis": {
+                "params": {
+                  "colWidth": [
+                    {
+                      "colIndex": 0,
+                      "width": 296.36285400390625
+                    }
+                  ]
+                }
+              }
+            },
+            "gridData": {
+              "h": 18,
+              "i": "8f556ccd-ef24-4bfd-a344-3da3920eda9e",
+              "w": 12,
+              "x": 22,
+              "y": 18
+            },
+            "panelIndex": "8f556ccd-ef24-4bfd-a344-3da3920eda9e",
+            "panelRefName": "panel_6",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "vis": {
+                "params": {
+                  "colWidth": [
+                    {
+                      "colIndex": 0,
+                      "width": 390.36285400390625
+                    }
+                  ]
+                }
+              }
+            },
+            "gridData": {
+              "h": 18,
+              "i": "514b0734-f5bf-411c-b674-ad4fddfc1f25",
+              "w": 15,
+              "x": 0,
+              "y": 36
+            },
+            "panelIndex": "514b0734-f5bf-411c-b674-ad4fddfc1f25",
+            "panelRefName": "panel_7",
+            "version": "7.11.0"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {},
+              "vis": {
+                "params": {
+                  "colWidth": [
+                    {
+                      "colIndex": 0,
+                      "width": 1008.3628540039062
+                    }
+                  ]
+                }
+              }
+            },
+            "gridData": {
+              "h": 18,
+              "i": "6f8a890f-3d0f-43c5-a25b-bafc3fe75edd",
+              "w": 33,
+              "x": 15,
+              "y": 36
+            },
+            "panelIndex": "6f8a890f-3d0f-43c5-a25b-bafc3fe75edd",
+            "panelRefName": "panel_8",
+            "version": "7.11.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] Anomali",
+        "version": 1
+      },
+      "id": "68c48a30-739e-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "dashboard": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "55b5c280-76b7-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_0",
+          "type": "visualization"
+        },
+        {
+          "id": "28aca810-7394-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_1",
+          "type": "visualization"
+        },
+        {
+          "id": "09aaef80-7399-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_2",
+          "type": "visualization"
+        },
+        {
+          "id": "0e4aa470-739b-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_3",
+          "type": "visualization"
+        },
+        {
+          "id": "1a6a6430-739a-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_4",
+          "type": "visualization"
+        },
+        {
+          "id": "4360fe80-739a-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_5",
+          "type": "visualization"
+        },
+        {
+          "id": "5b7f0160-739a-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_6",
+          "type": "visualization"
+        },
+        {
+          "id": "a14694c0-7399-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_7",
+          "type": "visualization"
+        },
+        {
+          "id": "6ed5ada0-7399-11eb-a3e3-b3cc7c78a70f",
+          "name": "panel_8",
+          "type": "visualization"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "dashboard",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNTEsMl0="
+    },
+    {
+      "attributes": {
+        "description": "MISP tags for indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.misp"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.misp"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "tags"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "tags",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "MISP Tags [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "MISP Tags",
+                "field": "tags",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "MISP Tags [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "55b5c280-76b7-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDIsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Total number of Anomali indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Anomali Indicators"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Anomali Indicators [Filebeat Threat Intel]",
+          "type": "metric"
+        }
+      },
+      "id": "28aca810-7394-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDMsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Types of Anomali indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.type"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.type",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Indicator Type [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "threatintel.indicator.type",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": true,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Anomali Indicator Type [Filebeat Threat Intel]",
+          "type": "pie"
+        }
+      },
+      "id": "09aaef80-7399-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDQsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali email indicator ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.email.address"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.email.address",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Email Indicator [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali Email Indicator",
+                "field": "threatintel.indicator.email.address",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali Email Indicator [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "0e4aa470-739b-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDUsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali IP indicator ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.ip"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.ip",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali IP Indicator [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali IP Indicator",
+                "field": "threatintel.indicator.ip",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali IP Indicator [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "1a6a6430-739a-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDYsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali URL indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.url.full"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.url.full",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali URL Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali URL Indicator",
+                "field": "threatintel.indicator.url.full",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali URL Indicators [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "4360fe80-739a-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDcsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali domain indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.indicator.domain"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.indicator.domain",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Domain Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali Domain Indicator",
+                "field": "threatintel.indicator.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali Domain Indicators [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "5b7f0160-739a-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDgsMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali indicator name ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.anomali.name"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.anomali.name",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Indicator Name [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali Indicator Name",
+                "field": "threatintel.anomali.name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali Indicator Name [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "a14694c0-7399-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNDksMl0="
+    },
+    {
+      "attributes": {
+        "description": "Anomali indicator descriptions ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel.anomali"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.dataset": "threatintel.anomali"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "threatintel.anomali.description"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "threatintel.anomali.description",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Anomali Indicator Description [Filebeat Threat Intel]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "colWidth": [
+                {
+                  "colIndex": 0,
+                  "width": 753.3628540039062
+                }
+              ]
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customLabel": "Anomali Indicator Description",
+                "field": "threatintel.anomali.description",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "percentageCol": "",
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showToolbar": false,
+            "showTotal": false,
+            "totalFunc": "sum"
+          },
+          "title": "Anomali Indicator Description [Filebeat Threat Intel]",
+          "type": "table"
+        }
+      },
+      "id": "6ed5ada0-7399-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.11.0"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyNTAsMl0="
+    },
+    {
+      "attributes": {
+        "color": "#a548ae",
+        "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
+        "name": "threat intel"
+      },
+      "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+      "namespaces": [
+        "default"
+      ],
+      "references": [],
+      "type": "tag",
+      "updated_at": "2021-03-10T19:01:18.125Z",
+      "version": "WzIyMTcsMl0="
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.module",
+                  "negate": false,
+                  "params": {
+                    "query": "threatintel"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.module": "threatintel"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                  "key": "event.category",
+                  "negate": false,
+                  "params": {
+                    "query": "threat"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.category": "threat"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                  "key": "event.kind",
+                  "negate": false,
+                  "params": {
+                    "query": "enrichment"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.kind": "enrichment"
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+                  "key": "event.type",
+                  "negate": false,
+                  "params": {
+                    "query": "indicator"
+                  },
+                  "type": "phrase"
+                },
+                "query": {
+                  "match_phrase": {
+                    "event.type": "indicator"
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "query": {
+              "language": "kuery",
+              "query": ""
+            },
+            "version": true
+          }
+        },
+        "sort": [],
+        "title": "All Logs [Filebeat Threat Intel] ECS",
+        "version": 1
+      },
+      "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "search": "7.9.3"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "search",
+      "updated_at": "2021-03-10T19:01:19.048Z",
+      "version": "WzIyMTksMl0="
+    }
+  ],
+  "version": "7.11.1"
+}
