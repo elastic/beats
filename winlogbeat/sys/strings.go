@@ -18,57 +18,23 @@
 package sys
 
 import (
-	"errors"
-	"fmt"
 	"strings"
-	"unicode/utf16"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-var ErrBufferTooSmall = errors.New("buffer too small")
+// UTF16BytesToString converts the given UTF-16 bytes to a string.
+func UTF16BytesToString(b []byte) (string, error) {
+	// Use space from the ByteBuffer pool as working memory for the conversion.
+	bb := NewPooledByteBuffer()
+	defer bb.Free()
 
-// UTF16BytesToString returns a string that is decoded from the UTF-16 bytes.
-// The byte slice must be of even length otherwise an error will be returned.
-// The integer returned is the offset to the start of the next string with
-// buffer if it exists, otherwise -1 is returned.
-func UTF16BytesToString(b []byte) (string, int, error) {
-	if len(b)%2 != 0 {
-		return "", 0, fmt.Errorf("Slice must have an even length (length=%d)", len(b))
+	if err := common.UTF16ToUTF8Bytes(b, bb); err != nil {
+		return "", err
 	}
 
-	offset := -1
-
-	// Find the null terminator if it exists and re-slice the b.
-	if nullIndex := indexNullTerminator(b); nullIndex > -1 {
-		if len(b) > nullIndex+2 {
-			offset = nullIndex + 2
-		}
-
-		b = b[:nullIndex]
-	}
-
-	s := make([]uint16, len(b)/2)
-	for i := range s {
-		s[i] = uint16(b[i*2]) + uint16(b[(i*2)+1])<<8
-	}
-
-	return string(utf16.Decode(s)), offset, nil
-}
-
-// indexNullTerminator returns the index of a null terminator within a buffer
-// containing UTF-16 encoded data. If the null terminator is not found -1 is
-// returned.
-func indexNullTerminator(b []byte) int {
-	if len(b) < 2 {
-		return -1
-	}
-
-	for i := 0; i < len(b); i += 2 {
-		if b[i] == 0 && b[i+1] == 0 {
-			return i
-		}
-	}
-
-	return -1
+	// This copies the UTF-8 bytes to create a string.
+	return string(bb.Bytes()), nil
 }
 
 // RemoveWindowsLineEndings replaces carriage return line feed (CRLF) with
