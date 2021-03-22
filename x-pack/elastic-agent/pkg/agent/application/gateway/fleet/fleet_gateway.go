@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package fleet
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -55,18 +56,6 @@ type fleetReporter interface {
 	Events() ([]fleetapi.SerializableEvent, func())
 }
 
-// FleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
-// bidirectional communication requirements. The gateway aggregates events and will periodically
-// call the API to send the events and will receive actions to be executed locally.
-// The only supported action for now is a "ActionPolicyChange".
-type FleetGateway interface {
-	// Start starts the gateway.
-	Start() error
-
-	// Set the client for the gateway.
-	SetClient(client.Sender)
-}
-
 type stateStore interface {
 	Add(fleetapi.Action)
 	AckToken() string
@@ -94,7 +83,8 @@ type fleetGateway struct {
 	stateStore       stateStore
 }
 
-func newFleetGateway(
+// New creates a new fleet gateway
+func New(
 	ctx context.Context,
 	log *logger.Logger,
 	agentInfo agentInfo,
@@ -104,7 +94,7 @@ func newFleetGateway(
 	acker store.FleetAcker,
 	statusController status.Controller,
 	stateStore stateStore,
-) (FleetGateway, error) {
+) (gateway.FleetGateway, error) {
 
 	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
 	return newFleetGatewayWithScheduler(
@@ -134,7 +124,7 @@ func newFleetGatewayWithScheduler(
 	acker store.FleetAcker,
 	statusController status.Controller,
 	stateStore stateStore,
-) (FleetGateway, error) {
+) (gateway.FleetGateway, error) {
 
 	// Backoff implementation doesn't support the using context as the shutdown mechanism.
 	// So we keep a done channel that will be closed when the current context is shutdown.

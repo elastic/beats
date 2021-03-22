@@ -14,6 +14,9 @@ import (
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
+	fleetgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleet"
+	localgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleetserver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
@@ -55,6 +58,14 @@ type apiClient interface {
 	) (*http.Response, error)
 }
 
+type stateStore interface {
+	Add(fleetapi.Action)
+	AckToken() string
+	SetAckToken(ackToken string)
+	Save() error
+	Actions() []fleetapi.Action
+}
+
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
@@ -64,7 +75,7 @@ type Managed struct {
 	Config      configuration.FleetAgentConfig
 	api         apiClient
 	agentInfo   *info.AgentInfo
-	gateway     FleetGateway
+	gateway     gateway.FleetGateway
 	router      pipeline.Router
 	srv         *server.Server
 	stateStore  stateStore
@@ -256,7 +267,7 @@ func newManaged(
 		}
 	}
 
-	gateway, err := newFleetGateway(
+	gateway, err := fleetgateway.New(
 		managedApplication.bgContext,
 		log,
 		agentInfo,
@@ -270,7 +281,7 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	gateway, err = wrapLocalFleetServer(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
+	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
 	if err != nil {
 		return nil, err
 	}

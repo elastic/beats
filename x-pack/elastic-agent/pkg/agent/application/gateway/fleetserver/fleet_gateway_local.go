@@ -2,12 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package fleetserver
 
 import (
 	"context"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -40,17 +41,17 @@ type fleetServerWrapper struct {
 	log         *logger.Logger
 	cfg         *configuration.FleetAgentConfig
 	injectedCfg *config.Config
-	wrapped     FleetGateway
+	wrapped     gateway.FleetGateway
 	emitter     pipeline.EmitterFunc
 }
 
-func wrapLocalFleetServer(
+func New(
 	ctx context.Context,
 	log *logger.Logger,
 	cfg *configuration.FleetAgentConfig,
 	rawConfig *config.Config,
-	wrapped FleetGateway,
-	emitter pipeline.EmitterFunc) (FleetGateway, error) {
+	wrapped gateway.FleetGateway,
+	emitter pipeline.EmitterFunc) (gateway.FleetGateway, error) {
 	if cfg.Server == nil {
 		// not running a local Fleet Server
 		return wrapped, nil

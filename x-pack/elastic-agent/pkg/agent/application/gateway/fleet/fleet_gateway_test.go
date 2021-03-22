@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package fleet
 
 import (
 	"bytes"
@@ -20,6 +20,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
@@ -109,7 +110,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{}, 1)}
 }
 
-type withGatewayFunc func(*testing.T, FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
+type withGatewayFunc func(*testing.T, gateway.FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -176,7 +177,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send no event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -201,7 +202,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -296,7 +297,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -408,7 +409,7 @@ func TestRetriesOnFailures(t *testing.T) {
 	t.Run("When the gateway fails to communicate with the checkin API we will retry",
 		withGateway(agentInfo, settings, func(
 			t *testing.T,
-			gateway FleetGateway,
+			gateway gateway.FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
@@ -464,7 +465,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			Backoff:  backoffSettings{Init: 10 * time.Minute, Max: 20 * time.Minute},
 		}, func(
 			t *testing.T,
-			gateway FleetGateway,
+			gateway gateway.FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
