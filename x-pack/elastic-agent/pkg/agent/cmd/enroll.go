@@ -52,6 +52,7 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("kibana-url", "k", "", "URL of Kibana to enroll Agent into Fleet")
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().StringP("fleet-server", "", "", "Start and run a Fleet Server along side this Elastic Agent")
+	cmd.Flags().StringP("fleet-server-elasticsearch-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
 	cmd.Flags().StringP("fleet-server-policy", "", "", "Start and run a Fleet Server on this specific policy")
 	cmd.Flags().StringP("fleet-server-host", "", "", "Fleet Server HTTP binding host (overrides the policy)")
 	cmd.Flags().Uint16P("fleet-server-port", "", 0, "Fleet Server HTTP binding port (overrides the policy)")
@@ -75,6 +76,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		token, _ = cmd.Flags().GetString("enrollment-token")
 	}
 	fServer, _ := cmd.Flags().GetString("fleet-server")
+	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-elasticsearch-ca")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
@@ -98,6 +100,10 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	if fServer != "" {
 		args = append(args, "--fleet-server")
 		args = append(args, fServer)
+	}
+	if fElasticSearchCA != "" {
+		args = append(args, "--fleet-server-elasticsearch-ca")
+		args = append(args, fElasticSearchCA)
 	}
 	if fPolicy != "" {
 		args = append(args, "--fleet-server-policy")
@@ -187,6 +193,11 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
+	// enroll is invoked either manually or from install with redirected IO
+	// no need to log to file
+	cfg.Settings.LoggingConfig.ToFiles = false
+	cfg.Settings.LoggingConfig.ToStderr = true
+
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
 		return err
@@ -199,6 +210,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 	}
 	enrollmentToken, _ := cmd.Flags().GetString("enrollment-token")
 	fServer, _ := cmd.Flags().GetString("fleet-server")
+	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-elasticsearch-ca")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
@@ -222,13 +234,17 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
-		FleetServerConnStr:   fServer,
-		FleetServerPolicyID:  fPolicy,
-		FleetServerHost:      fHost,
-		FleetServerPort:      fPort,
-		FleetServerCert:      fCert,
-		FleetServerCertKey:   fCertKey,
-		FleetServerInsecure:  fInsecure,
+		FleetServer: application.EnrollCmdFleetServerOption{
+			ConnStr:         fServer,
+			ElasticsearchCA: fElasticSearchCA,
+			PolicyID:        fPolicy,
+			Host:            fHost,
+			Port:            fPort,
+			Cert:            fCert,
+			CertKey:         fCertKey,
+			Insecure:        fInsecure,
+			SpawnAgent:      !fromInstall,
+		},
 	}
 
 	c, err := application.NewEnrollCmd(

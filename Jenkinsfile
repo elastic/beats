@@ -157,7 +157,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
-                          analyzeFlakey: !isTag(), flakyReportIdx: "reporter-beats-beats-${getIdSuffix()}")
+                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
   }
@@ -166,11 +166,10 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 /**
 * There are only two supported branches, master and 7.x
 */
-def getIdSuffix() {
+def getFlakyBranch() {
   if(isPR()) {
     return getBranchIndice(env.CHANGE_TARGET)
-  }
-  if(isBranch()) {
+  } else {
     return getBranchIndice(env.BRANCH_NAME)
   }
 }
@@ -507,12 +506,18 @@ def target(Map args = [:]) {
 }
 
 /**
-* This method wraps the node call with some latency to avoid the known issue with the scalabitity in gobld.
+* This method wraps the node call for two reasons:
+*  1. with some latency to avoid the known issue with the scalabitity in gobld.
+*  2. allocate a new workspace to workaround the flakiness of windows workers with deleteDir
 */
 def withNode(String label, Closure body) {
   sleep randomNumber(min: 10, max: 200)
+  // this should workaround the existing issue with reusing workers with the Gobld
+  def uuid = UUID.randomUUID().toString()
   node(label) {
-    body()
+    ws("workspace/${JOB_BASE_NAME}-${BUILD_NUMBER}-${uuid}") {
+      body()
+    }
   }
 }
 
@@ -555,7 +560,12 @@ def withBeatsEnv(Map args = [:], Closure body) {
     gox_flags = '-arch 386'
   }
 
-  deleteDir()
+  // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+  //            Windows workers are ephemerals, so this should not really affect us.
+  if(isUnix()) {
+    deleteDir()
+  }
+
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
@@ -599,11 +609,24 @@ def withBeatsEnv(Map args = [:], Closure body) {
         if (archive) {
           archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
-        // Tear down the setup for the permamnent workers.
-        catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-          fixPermissions("${WORKSPACE}")
-          deleteDir()
-        }
+        tearDown()
+      }
+    }
+  }
+}
+
+/**
+* Tear down the setup for the permanent workers.
+*/
+def tearDown() {
+  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    cmd(label: 'Remove the entire module cache', script: 'go clean -modcache', returnStatus: true)
+    fixPermissions("${WORKSPACE}")
+    // IMPORTANT: Somehow windows workers got a different opinion regarding removing the workspace.
+    //            Windows workers are ephemerals, so this should not really affect us.
+    if (isUnix()) {
+      dir("${WORKSPACE}") {
+        deleteDir()
       }
     }
   }
@@ -618,6 +641,7 @@ def fixPermissions(location) {
   if(isUnix()) {
     sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
       set +x
+      echo "Cleaning up ${location}"
       source ./dev-tools/common.bash
       docker_setup
       script/fix_permissions.sh ${location}""", returnStatus: true)
@@ -640,7 +664,7 @@ def installTools(args) {
         git config --global user.name "beatsmachine"
       fi''')
   } else {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -675,14 +699,19 @@ def archiveTestOutput(Map args = [:]) {
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
     }
-    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py')
+    // Remove pycache directory and go vendors cache folders
+    if (isUnix()) {
+      dir('build') {
+        sh(label: 'Delete folders that are causing exceptions (See JENKINS-58421)', returnStatus: true,
+           script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
+      }
+    } else {
+      bat(label: 'Delete ve folder', returnStatus: true,
+          script: 'FOR /d /r . %%d IN ("ve") DO @IF EXIST "%%d" rmdir /s /q "%%d"')
+    }
+    cmd(label: 'Prepare test output', script: 'python .ci/scripts/pre_archive_test.py', returnStatus: true)
     dir('build') {
-      if (isUnix()) {
-        cmd(label: 'Delete folders that are causing exceptions (See JENKINS-58421)',
-            returnStatus: true,
-            script: 'rm -rf ve || true; find . -type d -name vendor -exec rm -r {} \\;')
-      } else { log(level: 'INFO', text: 'Delete folders that are causing exceptions (See JENKINS-58421) is disabled for Windows.') }
-        junit(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: args.testResults)
       if (args.upload) {
         tarAndUploadArtifacts(file: "test-build-artifacts-${args.id}.tgz", location: '.')
       }
@@ -707,10 +736,11 @@ def archiveTestOutput(Map args = [:]) {
 * disk space of the jenkins instance
 */
 def tarAndUploadArtifacts(Map args = [:]) {
-  tar(file: args.file, dir: args.location, archive: false, allowMissing: true)
+  def fileName = args.file.replaceAll('[^A-Za-z-0-9]','-')
+  tar(file: fileName, dir: args.location, archive: false, allowMissing: true)
   googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
                          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-                         pattern: "${args.file}",
+                         pattern: "${fileName}",
                          sharedPublicly: true)
 }
 

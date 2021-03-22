@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -43,6 +44,8 @@ type backoffSettings struct {
 	Max  time.Duration `config:"max"`
 }
 
+type fleetAcker = store.FleetAcker
+
 type dispatcher interface {
 	Dispatch(acker fleetAcker, actions ...action) error
 }
@@ -55,11 +58,6 @@ type fleetReporter interface {
 	Events() ([]fleetapi.SerializableEvent, func())
 }
 
-type fleetAcker interface {
-	Ack(ctx context.Context, action fleetapi.Action) error
-	Commit(ctx context.Context) error
-}
-
 // FleetGateway is a gateway between the Agent and the Fleet API, it's take cares of all the
 // bidirectional communication requirements. The gateway aggregates events and will periodically
 // call the API to send the events and will receive actions to be executed locally.
@@ -70,6 +68,14 @@ type FleetGateway interface {
 
 	// Set the client for the gateway.
 	SetClient(clienter)
+}
+
+type stateStore interface {
+	Add(fleetapi.Action)
+	AckToken() string
+	SetAckToken(ackToken string)
+	Save() error
+	Actions() []fleetapi.Action
 }
 
 type fleetGateway struct {
@@ -88,7 +94,7 @@ type fleetGateway struct {
 	unauthCounter    int
 	statusController status.Controller
 	statusReporter   status.Reporter
-	stateStore       *stateStore
+	stateStore       stateStore
 }
 
 func newFleetGateway(
@@ -100,7 +106,7 @@ func newFleetGateway(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
-	stateStore *stateStore,
+	stateStore stateStore,
 ) (FleetGateway, error) {
 
 	scheduler := scheduler.NewPeriodicJitter(defaultGatewaySettings.Duration, defaultGatewaySettings.Jitter)
@@ -130,7 +136,7 @@ func newFleetGatewayWithScheduler(
 	r fleetReporter,
 	acker fleetAcker,
 	statusController status.Controller,
-	stateStore *stateStore,
+	stateStore stateStore,
 ) (FleetGateway, error) {
 
 	// Backoff implementation doesn't support the using context as the shutdown mechanism.
@@ -180,14 +186,20 @@ func (f *fleetGateway) worker() {
 				actions[idx] = a
 			}
 
+			var errMsg string
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
-				msg := fmt.Sprintf("failed to dispatch actions, error: %s", err)
-				f.log.Error(msg)
-				f.statusReporter.Update(state.Degraded, msg)
+				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
+				f.log.Error(errMsg)
+				f.statusReporter.Update(state.Failed, errMsg)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-			f.statusReporter.Update(state.Healthy, "")
+			if errMsg != "" {
+				f.statusReporter.Update(state.Failed, errMsg)
+			} else {
+				f.statusReporter.Update(state.Healthy, "")
+			}
+
 		case <-f.bgContext.Done():
 			f.stop()
 			return

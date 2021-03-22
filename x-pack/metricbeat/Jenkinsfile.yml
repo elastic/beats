@@ -37,7 +37,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/metricbeat for macos"
@@ -75,10 +75,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-    windows-7-32:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
+    # windows-7-32 builder has been disabled due to https://github.com/elastic/beats/issues/24337
+    #windows-7-32:
+    #    mage: "mage build unitTest"
+    #    platforms:             ## override default labels in this specific stage.
+    #        - "windows-7-32-bit"
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

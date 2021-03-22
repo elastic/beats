@@ -15,12 +15,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -33,9 +36,10 @@ import (
 )
 
 const (
-	waitingForAgent        = "waiting for Elastic Agent to start"
-	waitingForFleetServer  = "waiting for Elastic Agent to start Fleet Server"
-	defaultFleetServerPort = 8220
+	maxRetriesstoreAgentInfo = 5
+	waitingForAgent          = "waiting for Elastic Agent to start"
+	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerPort   = 8220
 )
 
 var (
@@ -43,12 +47,12 @@ var (
 	daemonTimeout = 30 * time.Second // max amount of for communication to running Agent daemon
 )
 
-type store interface {
+type saver interface {
 	Save(io.Reader) error
 }
 
 type storeLoad interface {
-	store
+	saver
 	Load() (io.ReadCloser, error)
 }
 
@@ -70,8 +74,22 @@ type EnrollCmd struct {
 	log          *logger.Logger
 	options      *EnrollCmdOption
 	client       clienter
-	configStore  store
+	configStore  saver
 	kibanaConfig *kibana.Config
+	agentProc    *process.Info
+}
+
+// EnrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
+type EnrollCmdFleetServerOption struct {
+	ConnStr         string
+	ElasticsearchCA string
+	PolicyID        string
+	Host            string
+	Port            uint16
+	Cert            string
+	CertKey         string
+	Insecure        bool
+	SpawnAgent      bool
 }
 
 // EnrollCmdOption define all the supported enrollment option.
@@ -84,13 +102,7 @@ type EnrollCmdOption struct {
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 	Staging              string
-	FleetServerConnStr   string
-	FleetServerPolicyID  string
-	FleetServerHost      string
-	FleetServerPort      uint16
-	FleetServerCert      string
-	FleetServerCertKey   string
-	FleetServerInsecure  bool
+	FleetServer          EnrollCmdFleetServerOption
 }
 
 func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
@@ -129,7 +141,7 @@ func NewEnrollCmd(
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
 		DefaultAgentFleetConfig,
-		storage.NewDiskStore(info.AgentConfigFile()),
+		storage.NewDiskStore(paths.AgentConfigFile()),
 	)
 
 	return NewEnrollCmdWithStore(
@@ -145,7 +157,7 @@ func NewEnrollCmdWithStore(
 	log *logger.Logger,
 	options *EnrollCmdOption,
 	configPath string,
-	store store,
+	store saver,
 ) (*EnrollCmd, error) {
 	return &EnrollCmd{
 		log:         log,
@@ -157,7 +169,8 @@ func NewEnrollCmdWithStore(
 // Execute tries to enroll the agent into Fleet.
 func (c *EnrollCmd) Execute(ctx context.Context) error {
 	var err error
-	if c.options.FleetServerConnStr != "" {
+	defer c.stopAgent() // ensure its stopped no matter what
+	if c.options.FleetServer.ConnStr != "" {
 		err = c.fleetServerBootstrap(ctx)
 		if err != nil {
 			return err
@@ -185,18 +198,26 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 		return errors.New(err, "fail to enroll")
 	}
 
-	if c.daemonReload(ctx) != nil {
-		c.log.Info("Elastic Agent might not be running; unable to trigger restart")
+	if c.agentProc == nil {
+		if c.daemonReload(ctx) != nil {
+			c.log.Info("Elastic Agent might not be running; unable to trigger restart")
+		}
+		c.log.Info("Successfully triggered restart on running Elastic Agent.")
+		return nil
 	}
-	c.log.Info("Successfully triggered restart on running Elastic Agent.")
+	c.log.Info("Elastic Agent has been enrolled; start Elastic Agent")
 	return nil
 }
 
 func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
+	agentRunning := true
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
-		return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+		if !c.options.FleetServer.SpawnAgent {
+			return errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
+		}
+		agentRunning = false
 	}
 
 	err = c.prepareFleetTLS()
@@ -205,9 +226,9 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	}
 
 	fleetConfig, err := createFleetServerBootstrapConfig(
-		c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
-		c.options.FleetServerHost, c.options.FleetServerPort,
-		c.options.FleetServerCert, c.options.FleetServerCertKey)
+		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+		c.options.FleetServer.Host, c.options.FleetServer.Port,
+		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
@@ -215,13 +236,23 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save fleet server bootstrap information", errors.TypeFilesystem)
+
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
+		return err
 	}
 
-	err = c.daemonReload(ctx)
-	if err != nil {
-		return errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
+	if agentRunning {
+		// reload the already running agent
+		err = c.daemonReload(ctx)
+		if err != nil {
+			return errors.New(err, "failed to trigger elastic-agent daemon reload", errors.TypeApplication)
+		}
+	} else {
+		// spawn `run` as a subprocess so enroll can perform the bootstrap process of Fleet Server
+		err = c.startAgent()
+		if err != nil {
+			return err
+		}
 	}
 
 	err = waitForFleetServer(ctx, c.log)
@@ -232,25 +263,25 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 }
 
 func (c *EnrollCmd) prepareFleetTLS() error {
-	host := c.options.FleetServerHost
+	host := c.options.FleetServer.Host
 	if host == "" {
 		host = "localhost"
 	}
-	port := c.options.FleetServerPort
+	port := c.options.FleetServer.Port
 	if port == 0 {
 		port = defaultFleetServerPort
 	}
-	if c.options.FleetServerCert != "" && c.options.FleetServerCertKey == "" {
+	if c.options.FleetServer.Cert != "" && c.options.FleetServer.CertKey == "" {
 		return errors.New("certificate private key is required when certificate provided")
 	}
-	if c.options.FleetServerCertKey != "" && c.options.FleetServerCert == "" {
+	if c.options.FleetServer.CertKey != "" && c.options.FleetServer.Cert == "" {
 		return errors.New("certificate is required when certificate private key is provided")
 	}
-	if c.options.FleetServerCert == "" && c.options.FleetServerCertKey == "" {
-		if c.options.FleetServerInsecure {
+	if c.options.FleetServer.Cert == "" && c.options.FleetServer.CertKey == "" {
+		if c.options.FleetServer.Insecure {
 			// running insecure, force the binding to localhost (unless specified)
-			if c.options.FleetServerHost == "" {
-				c.options.FleetServerHost = "localhost"
+			if c.options.FleetServer.Host == "" {
+				c.options.FleetServer.Host = "localhost"
 			}
 			c.options.URL = fmt.Sprintf("http://%s:%d", host, port)
 			c.options.Insecure = true
@@ -270,8 +301,8 @@ func (c *EnrollCmd) prepareFleetTLS() error {
 		if err != nil {
 			return err
 		}
-		c.options.FleetServerCert = string(pair.Crt)
-		c.options.FleetServerCertKey = string(pair.Key)
+		c.options.FleetServer.Cert = string(pair.Crt)
+		c.options.FleetServer.CertKey = string(pair.Key)
 		c.options.URL = fmt.Sprintf("https://%s:%d", hostname, port)
 		c.options.CAs = []string{string(ca.Crt())}
 	}
@@ -295,8 +326,18 @@ func (c *EnrollCmd) enrollWithBackoff(ctx context.Context) error {
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
 
-	for errors.Is(err, fleetapi.ErrTooManyRequests) {
-		c.log.Warn("Too many requests on the remote server, will retry in a moment.")
+	for {
+		retry := false
+		if errors.Is(err, fleetapi.ErrTooManyRequests) {
+			c.log.Warn("Too many requests on the remote server, will retry in a moment.")
+			retry = true
+		} else if errors.Is(err, fleetapi.ErrConnRefused) {
+			c.log.Warn("Remote server is not ready to accept connections, will retry in a moment.")
+			retry = true
+		}
+		if !retry {
+			break
+		}
 		backExp.Wait()
 		c.log.Info("Retrying to enroll...")
 		err = c.enroll(ctx)
@@ -344,11 +385,11 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 			"sourceURI": staging,
 		}
 	}
-	if c.options.FleetServerConnStr != "" {
+	if c.options.FleetServer.ConnStr != "" {
 		serverConfig, err := createFleetServerBootstrapConfig(
-			c.options.FleetServerConnStr, c.options.FleetServerPolicyID,
-			c.options.FleetServerHost, c.options.FleetServerPort,
-			c.options.FleetServerCert, c.options.FleetServerCertKey)
+			c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
+			c.options.FleetServer.Host, c.options.FleetServer.Port,
+			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 		if err != nil {
 			return err
 		}
@@ -367,27 +408,44 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		return err
 	}
 
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
-	}
-
-	if _, err := info.NewAgentInfo(); err != nil {
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
 		return err
 	}
 
 	// clear action store
 	// fail only if file exists and there was a failure
-	if err := os.Remove(info.AgentActionStoreFile()); !os.IsNotExist(err) {
+	if err := os.Remove(paths.AgentActionStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 
 	// clear action store
 	// fail only if file exists and there was a failure
-	if err := os.Remove(info.AgentStateStoreFile()); !os.IsNotExist(err) {
+	if err := os.Remove(paths.AgentStateStoreFile()); !os.IsNotExist(err) {
 		return err
 	}
 
 	return nil
+}
+
+func (c *EnrollCmd) startAgent() error {
+	cmd, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	c.log.Info("Spawning Elastic Agent daemon as a subprocess to complete bootstrap process.")
+	proc, err := process.Start(c.log, cmd, nil, os.Geteuid(), os.Getegid(), "run")
+	if err != nil {
+		return err
+	}
+	c.agentProc = proc
+	return nil
+}
+
+func (c *EnrollCmd) stopAgent() {
+	if c.agentProc != nil {
+		c.agentProc.StopWait()
+		c.agentProc = nil
+	}
 }
 
 func yamlToReader(in interface{}) (io.Reader, error) {
@@ -461,6 +519,10 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 				// app has started and is running
 				resChan <- waitResult{}
 				break
+			} else if app.Status == proto.Status_FAILED {
+				// app completely failed; exit now
+				resChan <- waitResult{err: errors.New(app.Message)}
+				break
 			}
 			if app.Message != "" {
 				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
@@ -492,5 +554,36 @@ func getAppFromStatus(status *client.AgentStatus, name string) *client.Applicati
 			return app
 		}
 	}
+	return nil
+}
+
+func safelyStoreAgentInfo(s saver, reader io.Reader) error {
+	var err error
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 100*time.Millisecond, 3*time.Second)
+
+	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
+		backExp.Wait()
+		err = storeAgentInfo(s, reader)
+		if err != filelock.ErrAppAlreadyRunning {
+			break
+		}
+	}
+
+	close(signal)
+	return err
+}
+
+func storeAgentInfo(s saver, reader io.Reader) error {
+	fileLock := paths.AgentConfigFileLock()
+	if err := fileLock.TryLock(); err != nil {
+		return err
+	}
+	defer fileLock.Unlock()
+
+	if err := s.Save(reader); err != nil {
+		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
+	}
+
 	return nil
 }

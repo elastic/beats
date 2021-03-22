@@ -180,14 +180,14 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get system values")
 	}
-	defer bb.free()
+	defer bb.Free()
 
 	for i := 0; i < int(propertyCount); i++ {
 		property := EvtSystemPropertyID(i)
 		offset := i * int(sizeofEvtVariant)
-		evtVar := (*EvtVariant)(unsafe.Pointer(&bb.buf[offset]))
+		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
 
-		data, err := evtVar.Data(bb.buf)
+		data, err := evtVar.Data(bb.Bytes())
 		if err != nil || data == nil {
 			continue
 		}
@@ -247,7 +247,7 @@ func (r *Renderer) renderUser(handle EvtHandle, event *sys.Event) (values []inte
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "failed to get user values")
 	}
-	defer bb.free()
+	defer bb.Free()
 
 	if propertyCount == 0 {
 		return nil, 0, nil
@@ -261,10 +261,10 @@ func (r *Renderer) renderUser(handle EvtHandle, event *sys.Event) (values []inte
 	values = make([]interface{}, propertyCount)
 	for i := 0; i < propertyCount; i++ {
 		offset := i * int(sizeofEvtVariant)
-		evtVar := (*EvtVariant)(unsafe.Pointer(&bb.buf[offset]))
+		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
 		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type))
 
-		values[i], err = evtVar.Data(bb.buf)
+		values[i], err = evtVar.Data(bb.Bytes())
 		if err != nil {
 			r.log.Warnw("Failed to read event/user data value. Using nil.",
 				"provider", event.Provider.Name,
@@ -281,7 +281,7 @@ func (r *Renderer) renderUser(handle EvtHandle, event *sys.Event) (values []inte
 
 // render uses EvtRender to event data. The caller must free() the returned when
 // done accessing the bytes.
-func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*byteBuffer, int, error) {
+func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.PooledByteBuffer, int, error) {
 	var bufferUsed, propertyCount uint32
 
 	err := _EvtRender(context, eventHandle, EvtRenderEventValues, 0, nil, &bufferUsed, &propertyCount)
@@ -293,12 +293,12 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*byteBuffer
 		return nil, 0, nil
 	}
 
-	bb := newByteBuffer()
+	bb := sys.NewPooledByteBuffer()
 	bb.Reserve(int(bufferUsed))
 
-	err = _EvtRender(context, eventHandle, EvtRenderEventValues, uint32(len(bb.buf)), &bb.buf[0], &bufferUsed, &propertyCount)
+	err = _EvtRender(context, eventHandle, EvtRenderEventValues, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed, &propertyCount)
 	if err != nil {
-		bb.free()
+		bb.Free()
 		return nil, 0, errors.Wrap(err, "failed in EvtRender")
 	}
 
@@ -384,8 +384,8 @@ func (r *Renderer) formatMessage(publisherMeta *publisherMetadataStore,
 // formatMessageFromTemplate creates the message by executing the stored Go
 // text/template with the event/user data values.
 func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values []interface{}) (string, error) {
-	bb := newByteBuffer()
-	defer bb.free()
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
 
 	if err := msgTmpl.Execute(bb, values); err != nil {
 		return "", errors.Wrapf(err, "failed to execute template with data=%#v template=%v", values, msgTmpl.Root.String())

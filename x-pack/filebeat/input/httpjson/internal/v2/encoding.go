@@ -91,6 +91,9 @@ func encodeAsJSON(trReq transformable) ([]byte, error) {
 	if len(trReq.body()) == 0 {
 		return nil, nil
 	}
+	header := trReq.header()
+	header.Set("Content-Type", "application/json")
+	trReq.setHeader(header)
 	return json.Marshal(trReq.body())
 }
 
@@ -103,6 +106,9 @@ func encodeAsForm(trReq transformable) ([]byte, error) {
 	body := []byte(url.RawQuery)
 	url.RawQuery = ""
 	trReq.setURL(url)
+	header := trReq.header()
+	header.Set("Content-Type", "application/x-www-form-urlencoded")
+	trReq.setHeader(header)
 	return body, nil
 }
 

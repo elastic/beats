@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -71,7 +72,7 @@ func (c *InspectOutputCmd) inspectOutputs(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return listOutputsFromConfig(l, agentInfo, rawConfig, true)
 	}
 
@@ -124,7 +125,7 @@ func (c *InspectOutputCmd) inspectOutput(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return printOutputFromConfig(l, agentInfo, c.output, c.program, rawConfig, true)
 	}
 
@@ -209,7 +210,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		modifiers.Filters = append(modifiers.Filters, injectFleet(cfg, sysInfo.Info(), agentInfo))
 	}
 
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, status.NewController(log))
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, status.NewController(log))
 	if err != nil {
 		return nil, err
 	}
