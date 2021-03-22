@@ -461,7 +461,7 @@ processors:
         List values = new ArrayList();
         for (def item : actions) {
           def val = item.value;
-          if (val == null && (val = read_field(ctx, item.from)) == null) continue;
+          if (val == null && (val = read_field(ctx, item.from)) == null || val == "") continue;
           values.add([
             "to": item.to,
             "value": val
