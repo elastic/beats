@@ -40,6 +40,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
+- API address and shard ID are required settings in the Cloud Foundry input. {pull}21759[21759]
+- Remove `suricata.eve.timestamp` alias field. {issue}10535[10535] {pull}22095[22095]
+- Rename bad ECS field name tracing.trace.id to trace.id in aws elb fileset. {pull}22571[22571]
+- Fix parsing issues with nested JSON payloads in Elasticsearch audit log fileset. {pull}22975[22975]
+- Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
+- Rename `s3` input to `aws-s3` input. {pull}23469[23469]
+- Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 
 *Heartbeat*
 
@@ -169,6 +176,31 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add json body check for sqs message. {pull}21727[21727]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 to be consistent with ECS. {pull}23094[23094]
+- Fix cisco umbrella module config by adding input variable. {pull}22892[22892]
+- Fix network.direction logic in zeek connection fileset. {pull}22967[22967]
+- Fix aws s3 overview dashboard. {pull}23045[23045]
+- Fix bad `network.direction` values in Fortinet/firewall fileset. {pull}23072[23072]
+- Fix Cisco ASA/FTD module's parsing of WebVPN log message 716002. {pull}22966[22966]
+- Add support for organization and custom prefix in AWS/CloudTrail fileset. {issue}23109[23109] {pull}23126[23126]
+- Simplify regex for organization custom prefix in AWS/CloudTrail fileset. {issue}23203[23203] {pull}23204[23204]
+- Fix syslog header parsing in infoblox module. {issue}23272[23272] {pull}23273[23273]
+- Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
+- Fix concurrent modification exception in Suricata ingest node pipeline. {pull}23534[23534]
+- Change the `event.created` in Netflow events to be the time the event was created by Filebeat
+  to be consistent with ECS. {pull}23094[23094]
+- Fix Zoom module parameters for basic auth and url path. {pull}23779[23779]
+- Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
+- Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
+- Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
+- Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
+- aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
+- Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
+- Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
+- in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
+- Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
+- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
+- Fix `google_workspace` pagination. {pull}24668[24668]
+- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 
 *Heartbeat*
 
