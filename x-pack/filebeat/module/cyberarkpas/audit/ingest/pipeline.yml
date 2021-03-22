@@ -600,7 +600,28 @@ processors:
           - set: event.category
             value: ["network"]
           - set: event.type
-            value: ["access"]
+            value: ["connection", "start"]
+          - set: event.outcome
+            value: "success"
+
+        # 302 - PSM Disconnect
+        "302":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.protocol
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: _tmp.duration_hms
+            from: cyberarkpas.audit.extra_details.session_duration
+          - set: event.category
+            value: ["network"]
+          - set: event.type
+            value: ["connection", "end"]
           - set: event.outcome
             value: "success"
 
@@ -645,6 +666,32 @@ processors:
       field: event.outcome
       value: 'unknown'
       if: 'ctx.event?.outcome != null && !["success", "failure"].contains(ctx.event.outcome)'
+
+
+  #
+  # Process the flow duration "hh:mm:ss" present in some messages
+  #
+  - script:
+      lang: painless
+      if: "ctx._tmp?.duration_hms != null"
+      source: >
+        long parse_hms(String s) {
+            long cur = 0, total = 0;
+            for (char c: s.toCharArray()) {
+                if (c >= (char)'0' && c <= (char)'9') {
+                    cur = (cur*10) + (long)c - (char)'0';
+                } else if (c == (char)':') {
+                    total = (total + cur) * 60;
+                    cur = 0;
+                } else {
+                    return 0;
+                }
+            }
+            return total + cur;
+        }
+        long nanos = parse_hms(ctx._tmp.duration_hms) * 1000000000L;
+        ctx.event['duration'] = nanos;
+
   #
   # Populate ip/domain fields from address.
   #
