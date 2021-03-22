@@ -18,6 +18,7 @@ var:
     default: true
   - name: tags
     default: [forwarded]
+  - name: internal_networks
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 
