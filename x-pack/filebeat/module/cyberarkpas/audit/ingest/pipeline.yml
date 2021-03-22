@@ -421,7 +421,28 @@ processors:
             to: destination.user.name
           - from: cyberarkpas.audit.issuer
             to: source.user.name
-          - value: "info"
+          - value: ["info"]
+            to: event.type
+
+        # 23 - Action on closed safe
+        #
+        # Nothing remarkable.
+        #
+        # "23":
+
+        # 24 - CPM Change Password
+        "24":
+          - from: cyberarkpas.audit.ca_properties.address
+            to: destination.address # This could be host.* or user.target.* (doesn't exists).
+          - from: cyberarkpas.audit.ca_properties.cpm_status
+            to: event.outcome # TODO: Always success?
+          - from: cyberarkpas.audit.ca_properties.user_name
+            to: user.target.name
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - value: ["iam"]
+            to: event.category
+          - value: ["user", "change"]
             to: event.type
 
       source: >
