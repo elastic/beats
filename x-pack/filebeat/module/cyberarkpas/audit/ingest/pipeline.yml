@@ -521,8 +521,17 @@ processors:
 
           # 50 - Store File
           #
-          #
-          #"50":
+          # TODO: Right now I don't think it makes much
+          #       sense to enrich Vault file events as
+          #       "file" category.
+          #       This will involve probably constructing
+          #       a file.path that is prefixed by the VAULT host
+          #       and the safe.
+          #       And then these files events may be treated
+          #       as file events in SIEM, which can have
+          #       unwanted consequences.
+          # "50":
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
