@@ -32,6 +32,7 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -45,6 +46,10 @@ const (
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
+
+	// eventLoggingAPIName is the name used to identify the Event Logging API
+	// as both an event type and an API.
+	eventLoggingAPIName = "eventlogging"
 )
 
 type winEventLogConfig struct {
@@ -358,6 +363,11 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 	return r, nil
 }
 
+func newEventLogging(options *common.Config) (EventLog, error) {
+	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
+	return newWinEventLog(options)
+}
+
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options *common.Config) (EventLog, error) {
@@ -443,5 +453,6 @@ func init() {
 	available, _ := win.IsAvailable()
 	if available {
 		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
 	}
 }

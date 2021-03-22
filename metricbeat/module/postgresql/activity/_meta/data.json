@@ -1,45 +1,41 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "postgresql.activity",
         "duration": 115000,
         "module": "postgresql"
     },
     "metricset": {
-        "name": "activity"
+        "name": "activity",
+        "period": 10000
     },
     "postgresql": {
         "activity": {
             "application_name": "",
-            "backend_start": "2019-03-05T08:38:21.348Z",
+            "backend_start": "2021-03-05T19:01:40.467Z",
+            "backend_type": "client backend",
             "client": {
-                "address": "172.26.0.1",
+                "address": "192.168.128.1",
                 "hostname": "",
-                "port": 41582
+                "port": 33414
             },
             "database": {
                 "name": "postgres",
-                "oid": 12379
+                "oid": 13395
             },
-            "pid": 347,
+            "pid": 2236,
             "query": "SELECT * FROM pg_stat_activity",
-            "query_start": "2019-03-05T08:38:21.352Z",
-            "state": "active",
-            "state_change": "2019-03-05T08:38:21.352Z",
-            "transaction_start": "2019-03-05T08:38:21.352Z",
+            "query_start": "2021-03-05T19:01:40.469Z",
+            "state": "idle",
+            "state_change": "2021-03-05T19:01:40.471Z",
             "user": {
                 "id": 10,
                 "name": "postgres"
-            },
-            "waiting": false
+            }
         }
     },
     "service": {
-        "address": "172.26.0.2:5432",
+        "address": "192.168.128.2:5432",
         "type": "postgresql"
     }
 }
