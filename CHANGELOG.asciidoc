@@ -9,10 +9,6 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
-
 *Filebeat*
 
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
@@ -28,7 +24,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
-
+- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {issue}23820[23820] {pull}23858[23858]
 
 *Auditbeat*
 
@@ -57,33 +53,12 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
 
-*Heartbeat*
-
-
-*Heartbeat*
-
-
-*Journalbeat*
-
-
 *Metricbeat*
 
 - Add stack monitoring section to elasticsearch module documentation {pull}#23286[23286]
 - Fix ec2 metricset fields.yml and the integration test {pull}23726[23726]
 - Unskip s3_request integration test. {pull}23887[23887]
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
-
-*Packetbeat*
-
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -108,7 +83,6 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Update Auditbeat auditd module to ECS 1.8 {pull}23594[23594] {issue}23118[23118]
 
 *Filebeat*
-
 
 - Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
 - Added support for first_event context in filebeat httpjson input {pull}23437[23437]
@@ -154,10 +128,6 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 - Update Journalbeat to ECS 1.8. {pull}23737[23737]
 
-*Heartbeat*
-
-*Journalbeat*
-
 *Metricbeat*
 
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
@@ -167,7 +137,6 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 
 *Packetbeat*
-
 
 - Upgrade to ECS 1.8.0. {pull}23783[23783]
 - Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
@@ -187,35 +156,11 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Add new ECS 1.8 improvements. {pull}23563[23563]
 - Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
 
-*Elastic Log Driver*
-
-
 ==== Deprecated
 
 *Affecting all Beats*
 
-- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
+- Selecting `full` in `ssl.verification_mode` option will not treat CommonName field in x509 certificates as a hostname when Subject Alternative Name is not present from v8.0. Please update your certificates so it contains at least one DNSName instead of relying on CommonName in the new major version of Beats.
 
 
 [[release-notes-7.11.2]]
