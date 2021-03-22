@@ -417,7 +417,7 @@ processors:
           - from: cyberarkpas.audit.ca_properties.address
             to: destination.address
           - from: cyberarkpas.audit.ca_properties.cpm_status
-            to: event.outcome # TODO: Always success?
+            to: event.outcome
           - from: cyberarkpas.audit.ca_properties.user_name
             to: destination.user.name
           - from: cyberarkpas.audit.issuer
@@ -501,6 +501,24 @@ processors:
           - value: "success"
             to: event.outcome
 
+        # 38 - CPM Verify Password Failed
+        #
+        # Like 22 but failed.
+        "38":
+          # Address of device that hosts the account.
+          - from: cyberarkpas.audit.ca_properties.address
+            to: destination.address
+          - from: "failed"
+            to: event.outcome
+          - from: cyberarkpas.audit.ca_properties.cpm_error_details
+            to: error.message
+          - from: cyberarkpas.audit.ca_properties.user_name
+            to: destination.user.name
+          - from: cyberarkpas.audit.issuer
+            to: source.user.name
+          - value: ["error"]
+            to: event.type
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -534,6 +552,13 @@ processors:
           copy_from: '_ingest._value.value'
           ignore_empty_value: true
           override: true
+
+  # TODO:
+  # Mark the event somehow when it contains a legitimate (non-pipeline) error.
+  - append:
+      field: tags
+      value: upstream-error
+      if: 'ctx.error?.message != null'
 
   #
   # Populate ip/domain fields from address.
