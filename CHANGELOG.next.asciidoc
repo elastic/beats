@@ -252,6 +252,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Netlow module issue with missing `internal_networks` config parameter. {issue}24094[24094] {pull}24110[24110]
 - in httpjson input using encode_as "application/x-www-form-urlencoded" now sets Content-Type correctly {issue}24331[24331] {pull}24336[24336]
 - Fix default `scope` in `add_nomad_metadata`. {issue}24559[24559]
+- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
+- Fix `google_workspace` pagination. {pull}24668[24668]
 
 *Heartbeat*
 
