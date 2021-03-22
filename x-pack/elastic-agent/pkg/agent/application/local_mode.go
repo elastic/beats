@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
@@ -120,7 +121,7 @@ func newLocal(
 		composableCtrl,
 		router,
 		&pipeline.ConfigModifiers{
-			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
 			Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 		},
 		caps,

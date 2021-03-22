@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -45,7 +46,7 @@ func TestManagedModeRouting(t *testing.T) {
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)
-	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{injectMonitoring}}, nil)
+	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring}}, nil)
 	require.NoError(t, err)
 
 	actionDispatcher, err := dispatcher.New(ctx, log, handlers.NewDefault(log))
@@ -78,7 +79,7 @@ func TestManagedModeRouting(t *testing.T) {
 
 	confReq := defaultStreamStore.(*mockStreamStore).store[0]
 	assert.Equal(t, 3, len(confReq.ProgramNames()))
-	assert.Equal(t, monitoringName, confReq.ProgramNames()[2])
+	assert.Equal(t, modifiers.MonitoringName, confReq.ProgramNames()[2])
 }
 
 func testActions() ([]fleetapi.Action, error) {

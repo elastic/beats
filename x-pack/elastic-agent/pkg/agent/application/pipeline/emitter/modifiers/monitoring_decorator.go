@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package modifiers
 
 import (
 	"crypto/md5"
@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	monitoringName            = "FLEET_MONITORING"
+	MonitoringName            = "FLEET_MONITORING"
 	programsKey               = "programs"
 	monitoringChecksumKey     = "monitoring_checksum"
 	monitoringKey             = "agent.monitoring"
@@ -31,12 +31,12 @@ const (
 	defaultOutputName = "default"
 )
 
-func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
+func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
 	var err error
 	monitoringProgram := program.Program{
 		Spec: program.Spec{
-			Name: monitoringName,
-			Cmd:  monitoringName,
+			Name: MonitoringName,
+			Cmd:  MonitoringName,
 		},
 	}
 

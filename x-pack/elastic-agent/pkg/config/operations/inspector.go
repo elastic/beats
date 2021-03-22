@@ -19,9 +19,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
+var (
+	ErrNoFleetConfig = fmt.Errorf("no fleet config retrieved yet")
+)
+
 // LoadFullAgentConfig load agent config based on provided paths and defined capabilities.
 // In case fleet is used, config from policy action is returned.
-func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
+func LoadFullAgentConfig(cfgPath string, failOnFleetMissing bool) (*config.Config, error) {
 	rawConfig, err := loadConfig(cfgPath)
 	if err != nil {
 		return nil, err
@@ -40,6 +44,10 @@ func LoadFullAgentConfig(cfgPath string) (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	} else if fleetConfig == nil {
+		if failOnFleetMissing {
+			return nil, ErrNoFleetConfig
+		}
+
 		// resolving fleet config but not fleet config retrieved yet, returning last applied config
 		return rawConfig, nil
 	}
