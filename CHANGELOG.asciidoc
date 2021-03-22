@@ -13,32 +13,13 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 
-*Auditbeat*
-
 *Filebeat*
 
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 
 *Heartbeat*
+
 - Refactor synthetics configuration to new syntax. {pull}23467[23467]
-
-*Journalbeat*
-
-
-
-*Metricbeat*
-
-- Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
-- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -182,6 +163,8 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
 - Add support for Darwin/arm M1. {pull}24019[24019]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
+- Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
+- Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 
 *Packetbeat*
 
