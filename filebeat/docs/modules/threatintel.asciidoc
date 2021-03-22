@@ -382,7 +382,7 @@ Overview of the information provided by the Anomali Limo feed.
 image::./images/filebeat-threatintel-misp.png[]
 
 [float]
-Overview of the information provided by the MSIP feed.
+Overview of the information provided by the MISP feed.
 
 :modulename!:
 
