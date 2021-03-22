@@ -37,9 +37,6 @@ var (
 	defaultNumberOfRoutingShards   = 30
 	defaultMaxDocvalueFieldsSearch = 200
 
-	// Array to store dynamicTemplate parts in
-	dynamicTemplates []common.MapStr
-
 	defaultFields []string
 )
 
@@ -147,7 +144,6 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 	t.Lock()
 	defer t.Unlock()
 
-	dynamicTemplates = nil
 	defaultFields = nil
 
 	var err error
@@ -164,7 +160,8 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 	if err := processor.Process(fields, nil, properties); err != nil {
 		return nil, err
 	}
-	output := t.Generate(properties, dynamicTemplates)
+
+	output := t.Generate(properties, processor.dynamicTemplates)
 
 	return output, nil
 }
@@ -255,17 +252,16 @@ func (t *Template) GetPattern() string {
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	switch t.templateType {
 	case IndexTemplateLegacy:
-		return t.generateLegacy(properties)
+		return t.generateLegacy(properties, dynamicTemplates)
 	case IndexTemplateComponent:
-		return t.generateComponent(properties)
+		return t.generateComponent(properties, dynamicTemplates)
 	case IndexTemplateIndex:
-		return t.generateIndex(properties)
-	default:
+		return t.generateIndex(properties, dynamicTemplates)
 	}
 	return nil
 }
 
-func (t *Template) generateLegacy(properties common.MapStr) common.MapStr {
+func (t *Template) generateLegacy(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	return common.MapStr{
 		keyPattern: patterns,
@@ -284,7 +280,7 @@ func (t *Template) generateLegacy(properties common.MapStr) common.MapStr {
 	}
 }
 
-func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
+func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	return common.MapStr{
 		"template": common.MapStr{
 			"mappings": buildMappings(
@@ -302,8 +298,8 @@ func (t *Template) generateComponent(properties common.MapStr) common.MapStr {
 	}
 }
 
-func (t *Template) generateIndex(properties common.MapStr) common.MapStr {
-	tmpl := t.generateComponent(properties)
+func (t *Template) generateIndex(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	tmpl := t.generateComponent(properties, dynamicTemplates)
 	tmpl["priority"] = t.priority
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	tmpl[keyPattern] = patterns

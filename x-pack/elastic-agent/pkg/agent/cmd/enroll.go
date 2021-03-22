@@ -38,7 +38,6 @@ func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStr
 
 	addEnrollFlags(cmd)
 	cmd.Flags().BoolP("force", "f", false, "Force overwrite the current and do not prompt for confirmation")
-	cmd.Flags().Bool("no-restart", false, "Skip restarting the currently running daemon")
 
 	// used by install command
 	cmd.Flags().BoolP("from-install", "", false, "Set by install command to signal this was executed from install")
@@ -141,11 +140,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		}
 	}
 
-	noRestart, _ := cmd.Flags().GetBool("no-restart")
 	force, _ := cmd.Flags().GetBool("force")
 	if fromInstall {
 		force = true
-		noRestart = true
 	}
 
 	// prompt only when it is not forced and is already enrolled
@@ -159,6 +156,11 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 			return nil
 		}
 	}
+
+	// enroll is invoked either manually or from install with redirected IO
+	// no need to log to file
+	cfg.Settings.LoggingConfig.ToFiles = false
+	cfg.Settings.LoggingConfig.ToStderr = true
 
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
 	if err != nil {
@@ -192,7 +194,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		Staging:              staging,
 		FleetServerConnStr:   fServer,
 		FleetServerPolicyID:  fPolicy,
-		NoRestart:            noRestart,
 	}
 
 	c, err := application.NewEnrollCmd(
