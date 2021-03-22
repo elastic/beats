@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 )
 
 type mockEmitter struct {
@@ -34,7 +35,7 @@ func (m *mockEmitter) Emitter(policy *config.Config) error {
 
 func TestPolicyChange(t *testing.T) {
 	log, _ := logger.New("")
-	ack := newNoopAcker()
+	ack := noopacker.NewAcker()
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 
