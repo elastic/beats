@@ -7,6 +7,7 @@ package browser
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"os"
 	"os/user"
 	"sync"
@@ -39,6 +40,21 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		logp.Info("Synthetic monitor detected! Please note synthetic monitors are an experimental unsupported feature!")
 	})
 
+	parsedConfig := DefaultConfig()
+	err = cfg.Unpack(parsedConfig)
+	if err != nil {
+		return plugin.Plugin{}, fmt.Errorf("could not unpack config: %s", err)
+	}
+
+	return run(cfg)
+}
+
+type cloudBody struct {
+	Source source.Source `json:"source"`
+	Params map[string]interface{} `json:"params"`
+}
+
+func run(cfg *common.Config) (p plugin.Plugin, err error) {
 	curUser, err := user.Current()
 	if err != nil {
 		return plugin.Plugin{}, fmt.Errorf("could not determine current user for script monitor %w: ", err)
@@ -57,11 +73,19 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
 
-	var j jobs.Job
-	if src, ok := ss.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
+	var js []jobs.Job
+	close := ss.Close
+	if ss.suiteCfg.Cloud != nil {
+		for locName, locUrl := range ss.suiteCfg.Cloud.Locations {
+			j := synthexec.CloudJob(context.TODO(), ss.CloudExec, locName, locUrl)
+			js = append(js, j)
+		}
+		close = func() error { return nil}
+	} else if src, ok := ss.InlineSource(); ok {
+		j := synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
+		js = append(js, j)
 	} else {
-		j = func(event *beat.Event) ([]jobs.Job, error) {
+		j := func(event *beat.Event) ([]jobs.Job, error) {
 			err := ss.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
@@ -72,11 +96,12 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 			}
 			return sj(event)
 		}
+		js = append(js, j)
 	}
 
 	return plugin.Plugin{
-		Jobs:      []jobs.Job{j},
-		Close:     ss.Close,
+		Jobs:      js,
+		Close:     close,
 		Endpoints: 1,
 	}, nil
 }

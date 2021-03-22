@@ -21,19 +21,20 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- type: http
-  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+- type: browser
   id: my-monitor
-  # Human readable display name for this service in Uptime UI and elsewhere
   name: My Monitor
-  # List or urls to query
-  urls: ["http://localhost:9200"]
-  # Configure task schedule
-  schedule: '@every 10s'
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service.name: my-apm-service-name
+  schedule: '@every 1m'
+  source:
+    zip_url:
+      url: https://github.com/elastic/synthetics/archive/refs/heads/master.zip
+      folder: examples/todos
+  cloud:
+    username: synthetics
+    password: changeme
+    locations:
+      mpls: http://localhost:8080
+      singapore: http://localhost:8080
 
 # ======================= Elasticsearch template setting =======================
 
@@ -91,7 +92,6 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
@@ -102,8 +102,8 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:

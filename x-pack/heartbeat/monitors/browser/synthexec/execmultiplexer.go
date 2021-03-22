@@ -19,7 +19,7 @@ func (e ExecMultiplexer) Close() {
 	close(e.synthEvents)
 }
 
-func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
+func (e ExecMultiplexer) WriteSynthEvent(se *SynthEvent) {
 	if se == nil { // we skip writing nil events, since a nil means we're done
 		return
 	}

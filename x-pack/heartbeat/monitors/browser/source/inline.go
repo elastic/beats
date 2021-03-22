@@ -10,7 +10,7 @@ import (
 )
 
 type InlineSource struct {
-	Script string `config:"script"`
+	Script string `config:"script" json:"script"`
 	BaseSource
 }
 

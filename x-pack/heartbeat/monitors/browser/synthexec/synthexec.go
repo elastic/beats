@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -63,6 +65,23 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 	return startCmdJob(ctx, newCmd, &script, params)
 }
 
+func CloudJob(ctx context.Context, execReq func(url string) (*http.Response, error), locName string, locUrl string) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		mpx := NewExecMultiplexer()
+
+		resp, err := execReq(locUrl)
+		if err != nil {
+			return nil, fmt.Errorf("cloud exec err: %w", err)
+		}
+		go func() {
+			scanToSynthEvents(resp.Body, CloudJsonToSynthEvent, mpx.WriteSynthEvent)
+		}()
+
+		se := &StreamEnricher{locationName: locName}
+		return []jobs.Job{readResultsJob(ctx, mpx.synthEvents, se.Enrich)}, nil
+	}
+}
+
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
@@ -72,14 +91,24 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 		if err != nil {
 			return nil, err
 		}
-		senr := streamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich)}, nil
+		senr := StreamEnricher{}
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.Enrich)}, nil
+	}
+}
+
+func startCloudJob(ctx context.Context, url url.URL, body io.ReadCloser) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
+		mpx := NewExecMultiplexer()
+
+
+		senr := StreamEnricher{}
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.Enrich)}, nil
 	}
 }
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich Enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		select {
 		case se := <-synthEvents:
@@ -138,21 +167,21 @@ func runCmd(
 	stdoutPipe, err := cmd.StdoutPipe()
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
+		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.WriteSynthEvent)
 		wg.Done()
 	}()
 
 	stderrPipe, err := cmd.StderrPipe()
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
+		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.WriteSynthEvent)
 		wg.Done()
 	}()
 
 	// Send the test results into the output
 	wg.Add(1)
 	go func() {
-		scanToSynthEvents(jsonReader, jsonToSynthEvent, mpx.writeSynthEvent)
+		scanToSynthEvents(jsonReader, JsonToSynthEvent, mpx.WriteSynthEvent)
 		wg.Done()
 	}()
 	err = cmd.Start()
@@ -176,7 +205,7 @@ func runCmd(
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd.String())
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			mpx.writeSynthEvent(&SynthEvent{
+			mpx.WriteSynthEvent(&SynthEvent{
 				Type:  "cmd/status",
 				Error: &SynthError{Name: "cmdexit", Message: str},
 			})
@@ -234,9 +263,9 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 
 var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
 
-// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
+// JsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
 // nil res on empty lines.
-func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
+func JsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 	// Skip empty lines
 	if emptyStringRegexp.Match(bytes) {
 		return nil, nil
@@ -247,6 +276,25 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	if res.Type == "" {
+		return nil, fmt.Errorf("Unmarshal succeeded, but no type found for: %s", text)
+	}
+	return
+}
+
+func CloudJsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
+	// Skip empty lines
+	if emptyStringRegexp.Match(bytes) {
+		return nil, nil
+	}
+
+	res = &SynthEvent{}
+	err = json.Unmarshal(bytes, res)
+
+	if err != nil {
+		return lineToSynthEventFactory("cloud")(bytes, text)
 	}
 
 	if res.Type == "" {
