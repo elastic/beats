@@ -353,77 +353,77 @@ processors:
         #
         # TODO: Always a failure?
         "4":
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - value: ["authentication"]
-            to: event.category
-          - value: ["error"]
-            to: event.type
-          - value:  "authentication_failure"
-            to: event.action
-          - value: "failure"
-            to: event.outcome
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["authentication"]
+          - set: event.type
+            value: ["error"]
+          - set: event.action
+            value:  "authentication_failure"
+          - set: event.outcome
+            value: "failure"
 
         # 7 - Logon
         #
         # User logged on to the PVWA.
         "7":
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - value: [ "authentication", "session"]
-            to: event.category
-          - value: [ "start"]
-            to: event.type
-          - value:  "authentication_success"
-            to: event.action
-          - value: "success"
-            to: event.outcome
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: [ "authentication", "session"]
+          - set: event.type
+            value: [ "start"]
+          - set: event.action
+            value:  "authentication_success"
+          - set: event.outcome
+            value: "success"
 
         # 8 - Logoff
         #
         # User logged of from the PVWA.
         "8": # Logoff
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - value: [ "authentication", "session"]
-            to: event.category
-          - value: ["end"]
-            to: event.type
-          - value: "success"
-            to: event.outcome
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: [ "authentication", "session"]
+          - set: event.type
+            value: ["end"]
+          - set: event.outcome
+            value: "success"
 
         # 19 - Full gateway connection.
         # TODO: Not sure what this is, but not an "elevation".
         #       The source user is internal to the system?.
         #       Does this represents that a PSM has been added to the vault?
         "19":
-          - from: cyberarkpas.audit.source_user
-            to: source.user.name
+          - set: source.user.name
+            from: cyberarkpas.audit.source_user
           # TODO: source.user to user
-          - from: cyberarkpas.audit.issuer
-            to: destination.user.name
-          - value: ["network"]
-            to: event.category
-          - value: ["start"]
-            to: event.type
-          - value: "success"
-            to: event.outcome
+          - set: destination.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["network"]
+          - set: event.type
+            value: ["start"]
+          - set: event.outcome
+            value: "success"
 
         # 22 - CPM Verify Password
         #
         # Password on a target host is verified.
         "22":
           # Address of device that hosts the account.
-          - from: cyberarkpas.audit.ca_properties.address
-            to: destination.address
-          - from: cyberarkpas.audit.ca_properties.cpm_status
-            to: event.outcome
-          - from: cyberarkpas.audit.ca_properties.user_name
-            to: destination.user.name
-          - from: cyberarkpas.audit.issuer
-            to: source.user.name
-          - value: ["info"]
-            to: event.type
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.type
+            value: ["info"]
 
         # 23 - Action on closed safe
         #
@@ -433,18 +433,18 @@ processors:
 
         # 24 - CPM Change Password
         "24":
-          - from: cyberarkpas.audit.ca_properties.address
-            to: destination.address # This could be host.* or user.target.* (doesn't exists).
-          - from: cyberarkpas.audit.ca_properties.cpm_status
-            to: event.outcome # TODO: Always success?
-          - from: cyberarkpas.audit.ca_properties.user_name
-            to: user.target.name
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - value: ["iam"]
-            to: event.category
-          - value: ["user", "change"]
-            to: event.type
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome # TODO: Always success?
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
 
         # TODO: ca_properties.logon_domain
         # TODO: ca_properties.customer
@@ -455,18 +455,18 @@ processors:
         #       i.e. update pwd in vault from actual pwd in host.
         #       or the opposite, which means a change in user pwd?
         "31":
-          - from: cyberarkpas.audit.ca_properties.address
-            to: destination.address # This could be host.* or user.target.* (doesn't exists).
-          - from: cyberarkpas.audit.ca_properties.cpm_status
-            to: event.outcome # TODO: Always success?
-          - from: cyberarkpas.audit.ca_properties.user_name
-            to: user.target.name
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - value: ["iam"]
-            to: event.category
-          - value: ["user", "change"]
-            to: event.type
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome # TODO: Always success?
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
 
         # 32 - Add Owner
         #
@@ -475,50 +475,54 @@ processors:
         # TODO: Are fields reversed here? Who performs the action, source_user or issuer?
         #       Seems that source_user performs the action, docs suggest otherwise.
         "32":
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - from: cyberarkpas.audit.source_user
-            to: user.target.name
-          - value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
-            to: event.category
-          - value: ["admin", "change"]
-            to: event.type
-          - value: "success"
-            to: event.outcome
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.category
+            value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+          - set: event.type
+            value: ["admin", "change"]
+          - set: event.outcome
+            value: "success"
 
         # 33 - Update Owner
         #
         # Same as above
         "33":
-          - from: cyberarkpas.audit.issuer
-            to: user.name
-          - from: cyberarkpas.audit.source_user
-            to: user.target.name
-          - value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
-            to: event.category
-          - value: ["admin", "change"]
-            to: event.type
-          - value: "success"
-            to: event.outcome
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.category
+            value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+          - set: event.type
+            value: ["admin", "change"]
+          - set: event.outcome
+            value: "success"
 
         # 38 - CPM Verify Password Failed
         #
         # Like 22 but failed.
         "38":
           # Address of device that hosts the account.
-          - from: cyberarkpas.audit.ca_properties.address
-            to: destination.address
-          - from: "failed"
-            to: event.outcome
-          - from: cyberarkpas.audit.ca_properties.cpm_error_details
-            to: error.message
-          - from: cyberarkpas.audit.ca_properties.user_name
-            to: destination.user.name
-          - from: cyberarkpas.audit.issuer
-            to: source.user.name
-          - value: ["error"]
-            to: event.type
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            value: "failed"
+          - set: error.message
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.type
+            value: ["error"]
 
+          # 50 - Store File
+          #
+          #
+          #"50":
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -526,7 +530,7 @@ processors:
         def read_field(def map, String name) {
           if (map == null || !(map instanceof Map)) return null;
           int pos = name.indexOf(".");
-          return pos == -1? clone(map[name])
+          return pos == -1? map[name]
                           : read_field(map[name.substring(0, pos)], name.substring(pos+1));
         }
         String msgID = ctx.cyberarkpas.audit?.message_id;
@@ -537,8 +541,8 @@ processors:
           def val = item.value;
           if (val == null && (val = read_field(ctx, item.from)) == null || val == "") continue;
           values.add([
-            "to": item.to,
-            "value": val
+            "to": item.set,
+            "value": clone(val)
           ]);
         }
         if (!values.isEmpty()) ctx._tmp["values"] = values;
