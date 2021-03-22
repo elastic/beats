@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -121,11 +120,15 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Create temp directory for socket and possibly other things
 	// The unix domain socker path is limited to 108 chars and would
 	// not always be able to create in subdirectory
-	tmpdir, removeTmpDir, err := createTempDir()
+	tmpdir, removeTmpDir, err := createSockDir(bt.log)
 	if err != nil {
 		return err
 	}
-	defer removeTmpDir()
+	defer func() {
+		if removeTmpDir != nil {
+			removeTmpDir()
+		}
+	}()
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx, exedir)
@@ -159,6 +162,12 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	if err != nil {
 		bt.log.Errorf("Failed to create osqueryd client: %v", err)
 		return err
+	}
+
+	// Unlink socket path early
+	if removeTmpDir != nil {
+		removeTmpDir()
+		removeTmpDir = nil
 	}
 
 	// Watch input configuration updates
@@ -243,17 +252,6 @@ LOOP:
 // Stop stops osquerybeat.
 func (bt *osquerybeat) Stop() {
 	bt.close()
-}
-
-func createTempDir() (string, func(), error) {
-	tpath, err := ioutil.TempDir("", "")
-	if err != nil {
-		return "", func() {}, fmt.Errorf("failed to create temp dir: %w", err)
-	}
-
-	return tpath, func() {
-		os.RemoveAll(tpath)
-	}, nil
 }
 
 func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
@@ -359,13 +357,13 @@ func actionDataFromRequest(req map[string]interface{}) (ad actionData, err error
 // Execute handles the action request.
 func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
 
-	start := time.Now().UTC().Format(time.RFC3339Nano)
+	start := time.Now().UTC()
 	err := a.execute(ctx, req)
-	end := time.Now().UTC().Format(time.RFC3339Nano)
+	end := time.Now().UTC()
 
 	res := map[string]interface{}{
-		"started_at":   start,
-		"completed_at": end,
+		"started_at":   start.Format(time.RFC3339Nano),
+		"completed_at": end.Format(time.RFC3339Nano),
 	}
 
 	if err != nil {

@@ -27,13 +27,13 @@ const (
 	osqueryName            = "osquery"
 	osqueryDName           = "osqueryd"
 	osqueryPath            = "usr/local/bin"
-	osqueryVersion         = "4.6.0"
+	osqueryVersion         = "4.7.0"
 	osqueryMSIExt          = ".msi"
 	osqueryPkgExt          = ".pkg"
 
-	osqueryDistroDarwinSHA256  = "c037742f9f7e416955c0a38cf450e00989fad07f34aef60aba8d3a923502177c"
-	osqueryDistroLinuxSHA256   = "f74319fd264e16217f676c44b9780d967d46a90289b7bc75c440ba1c62a558ee"
-	osqueryDistroWindowsSHA256 = "18845659c46e7cde4e569b0b158d5158ef31eca1535a9d0174d825ae6e1c731f"
+	osqueryDistroDarwinSHA256  = "31244705a497f7b33eaee6b4995cea9a4b55a3b9b0f20ea4bab400ff8798cbb4"
+	osqueryDistroLinuxSHA256   = "2086b1e2bf47b25a5eb64e35d516f222b2bd1c50610a71916ebb29af9d0ec210"
+	osqueryDistroWindowsSHA256 = "54a98345e7f5ad6819f5516e7f340795cf42b83f4fda221c4a10bfd83f803758"
 )
 
 func OsquerydVersion() string {

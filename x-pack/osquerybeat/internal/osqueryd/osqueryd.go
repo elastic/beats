@@ -37,7 +37,7 @@ func (q *OsqueryD) Start(ctx context.Context) (<-chan error, error) {
 
 	dir := filepath.Join(q.RootDir, osquerySubdir)
 
-	if err := os.MkdirAll(dir, 0750); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, fmt.Errorf("failed to create dir %v, %w", dir, err)
 	}
 

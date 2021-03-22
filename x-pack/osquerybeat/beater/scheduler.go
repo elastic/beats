@@ -54,13 +54,9 @@ LOOP:
 }
 
 func (s *Scheduler) isCancelled() bool {
-	select {
-	case <-s.ctx.Done():
-		return true
-	default:
-		return false
-	}
+	return s.ctx.Err() != nil
 }
+
 func (s *Scheduler) stopRunners() {
 	s.load(nil)
 }
