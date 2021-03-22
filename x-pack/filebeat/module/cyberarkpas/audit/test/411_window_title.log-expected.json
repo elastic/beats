@@ -50,6 +50,7 @@
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
+        "message": "Window Title",
         "observer.hostname": "",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",

@@ -446,6 +446,15 @@ processors:
       allow_duplicates: false
 
   #
+  # Save message
+  # TODO: Correct?
+  #
+  - set:
+      field: message
+      value: '{{cyberarkpas.audit.message}}'
+      ignore_empty_value: true
+
+  #
   # Cleanup
   #
   - remove:
