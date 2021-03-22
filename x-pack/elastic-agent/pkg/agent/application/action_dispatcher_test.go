@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 )
 
 type mockHandler struct {
@@ -42,7 +44,7 @@ func (m *mockActionOther) Type() string   { return "mockActionOther" }
 func (m *mockActionOther) String() string { return "mockActionOther" }
 
 func TestActionDispatcher(t *testing.T) {
-	ack := newNoopAcker()
+	ack := noopacker.NewAcker()
 
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
 		def := &mockHandler{}

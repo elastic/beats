@@ -2,39 +2,28 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package router
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
-// defautlRK default routing keys until we implement the routing key / config matrix.
-var defautlRK = "DEFAULT"
-
-type routingKey = string
-
-type stream interface {
-	Execute(configrequest.Request) error
-	Close() error
-	Shutdown()
-}
-
-type streamFunc func(*logger.Logger, routingKey) (stream, error)
-
 type router struct {
 	log           *logger.Logger
 	routes        *sorted.Set
-	streamFactory streamFunc
+	streamFactory pipeline.StreamFunc
 }
 
-func newRouter(log *logger.Logger, factory streamFunc) (*router, error) {
+// New creates a new router.
+func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Dispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New("router")
@@ -45,7 +34,7 @@ func newRouter(log *logger.Logger, factory streamFunc) (*router, error) {
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
-func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) error {
+func (r *router) Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	s := sorted.NewSet()
 
 	// Make sure that starting and updating is always done in the same order.
@@ -84,7 +73,7 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 			strings.Join(req.ProgramNames(), ", "),
 		)
 
-		err = p.(stream).Execute(req)
+		err = p.(pipeline.Stream).Execute(req)
 		if err != nil {
 			return err
 		}
@@ -106,7 +95,7 @@ func (r *router) Dispatch(id string, grpProg map[routingKey][]program.Program) e
 
 		r.log.Debugf("Removing routing key %s", k)
 
-		p.(stream).Close()
+		p.(pipeline.Stream).Close()
 		r.routes.Remove(k)
 	}
 
@@ -121,7 +110,7 @@ func (r *router) Shutdown() {
 		if !ok {
 			continue
 		}
-		p.(stream).Shutdown()
+		p.(pipeline.Stream).Shutdown()
 		r.routes.Remove(k)
 	}
 }
