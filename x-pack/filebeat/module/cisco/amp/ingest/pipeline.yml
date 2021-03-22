@@ -199,6 +199,10 @@ processors:
     target_field: process.pid
     ignore_missing: true
 - rename:
+    field: cisco.amp.network_info.parent.process_id
+    target_field: process.pid
+    ignore_missing: true
+- rename:
     field: cisco.amp.file.parent.file_name
     target_field: process.name
     ignore_missing: true
@@ -214,10 +218,9 @@ processors:
     field: cisco.amp.file.parent.identity.md5
     target_field: process.hash.md5
     ignore_missing: true
-
 - rename:
-    field: cisco.amp.network_info.parent.process_id
-    target_field: process.pid
+    field: cisco.amp.file.parent.identity.md5
+    target_field: process.hash.md5
     ignore_missing: true
 - rename:
     field: cisco.amp.network_info.parent.file_name

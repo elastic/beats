@@ -160,7 +160,7 @@
       description: >
         SHA1 hash of the archived file related to the malicious event.
 
-    - name: file.archived_file.identify.sha256
+    - name: file.archived_file.identity.sha256
       type: keyword
       description: >
         SHA256 hash of the archived file related to the malicious event.
@@ -279,3 +279,13 @@
       type: keyword
       description: >
         Array of all related mitre technique ID's
+
+    - name: command_line.arguments
+      type: keyword
+      description: >
+        The CLI arguments related to the Cloud Threat IOC reported by Cisco.
+
+    - name: bp_data
+      type: flattened
+      description: >
+        Endpoint isolation information

