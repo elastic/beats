@@ -9,6 +9,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -74,7 +75,7 @@ func loadConfig(configPath string) (*config.Config, error) {
 	// merge local configuration and configuration persisted from fleet.
 	rawConfig.Merge(config)
 
-	if err := InjectAgentConfig(rawConfig); err != nil {
+	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 

@@ -8,10 +8,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 const gatewayWait = 2 * time.Second
@@ -39,7 +41,7 @@ type fleetServerWrapper struct {
 	cfg         *configuration.FleetAgentConfig
 	injectedCfg *config.Config
 	wrapped     FleetGateway
-	emitter     emitterFunc
+	emitter     pipeline.EmitterFunc
 }
 
 func wrapLocalFleetServer(
@@ -48,7 +50,7 @@ func wrapLocalFleetServer(
 	cfg *configuration.FleetAgentConfig,
 	rawConfig *config.Config,
 	wrapped FleetGateway,
-	emitter emitterFunc) (FleetGateway, error) {
+	emitter pipeline.EmitterFunc) (FleetGateway, error) {
 	if cfg.Server == nil {
 		// not running a local Fleet Server
 		return wrapped, nil
@@ -78,8 +80,8 @@ func (w *fleetServerWrapper) Start() error {
 }
 
 // SetClient sets the client for the wrapped gateway.
-func (w *fleetServerWrapper) SetClient(client clienter) {
-	w.wrapped.SetClient(client)
+func (w *fleetServerWrapper) SetClient(c client.Sender) {
+	w.wrapped.SetClient(c)
 }
 
 func injectFleetServer(rawConfig *config.Config) (*config.Config, error) {

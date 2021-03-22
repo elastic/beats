@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	fleetreporterConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
@@ -133,7 +134,7 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 			dispatcher,
 			scheduler,
 			rep,
-			newNoopAcker(),
+			noopacker.NewAcker(),
 			&noopController{},
 			stateStore,
 		)
@@ -262,7 +263,7 @@ func TestFleetGateway(t *testing.T) {
 			dispatcher,
 			scheduler,
 			getReporter(agentInfo, log, t),
-			newNoopAcker(),
+			noopacker.NewAcker(),
 			&noopController{},
 			stateStore,
 		)
@@ -356,7 +357,7 @@ func TestFleetGateway(t *testing.T) {
 			dispatcher,
 			scheduler,
 			getReporter(agentInfo, log, t),
-			newNoopAcker(),
+			noopacker.NewAcker(),
 			&noopController{},
 			stateStore,
 		)

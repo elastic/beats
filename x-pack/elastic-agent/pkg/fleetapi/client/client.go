@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package fleetapi
+package client
 
 import (
 	"context"
@@ -21,7 +21,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-type clienter interface {
+// Sender is an sender interface describing client behavior.
+type Sender interface {
 	Send(
 		ctx context.Context,
 		method string,
@@ -30,6 +31,8 @@ type clienter interface {
 		headers http.Header,
 		body io.Reader,
 	) (*http.Response, error)
+
+	URI() string
 }
 
 var baseRoundTrippers = func(rt http.RoundTripper) (http.RoundTripper, error) {
@@ -88,7 +91,8 @@ func NewWithConfig(log *logger.Logger, cfg *kibana.Config) (*kibana.Client, erro
 	return kibana.NewWithConfig(log, cfg, baseRoundTrippers)
 }
 
-func extract(resp io.Reader) error {
+// ExtractError extracts error from a fleet response
+func ExtractError(resp io.Reader) error {
 	// Lets try to extract a high level Kibana error.
 	e := &struct {
 		StatusCode int    `json:"statusCode"`

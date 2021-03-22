@@ -16,6 +16,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -30,6 +34,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/fleet"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/lazy"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
@@ -55,7 +62,7 @@ type Managed struct {
 	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     FleetGateway
-	router      *router
+	router      pipeline.Dispatcher
 	srv         *server.Server
 	stateStore  stateStore
 	upgrader    *upgrade.Upgrader
@@ -76,7 +83,7 @@ func newManaged(
 		return nil, err
 	}
 
-	client, err := fleetapi.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
@@ -120,7 +127,7 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusCtrl))
+	router, err := router.New(log, stream.Factory(managedApplication.bgContext, agentInfo, cfg.Settings, managedApplication.srv, combinedReporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -131,15 +138,15 @@ func newManaged(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
-	emit, err := emitter(
+	emit, err := emitter.New(
 		managedApplication.bgContext,
 		log,
 		agentInfo,
 		composableCtrl,
 		router,
-		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+		&pipeline.ConfigModifiers{
+			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		caps,
 		monitor,
@@ -147,12 +154,12 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	acker, err := newActionAcker(log, agentInfo, client)
+	acker, err := fleet.NewAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
 	}
 
-	batchedAcker := newLazyAcker(acker, log)
+	batchedAcker := lazy.NewAcker(acker, log)
 
 	// Create the state store that will persist the last good policy change on disk.
 	stateStore, err := store.NewStateStoreWithMigration(log, paths.AgentActionStoreFile(), paths.AgentStateStoreFile())
