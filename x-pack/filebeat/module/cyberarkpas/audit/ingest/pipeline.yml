@@ -349,6 +349,20 @@ processors:
   - script:
       lang: painless
       params:
+        # 4 - User Authentication
+        #
+        # TODO: Always a failure?
+        "4":
+          - from: cyberarkpas.audit.issuer
+            to: user.name
+          - value: [ "authentication"]
+            to: event.category
+          - value: [ "error"]
+            to: event.type
+          - value:  "authentication_failure"
+            to: event.action
+          - value: "failure"
+            to: event.outcome
 
         # 7 - Logon
         #
