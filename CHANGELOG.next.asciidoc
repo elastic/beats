@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 - Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
+- Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
@@ -523,6 +524,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system.hostfs configuration option for system module. {pull}23831[23831]
 - Fix GCP not able to request Cloudfunctions metrics if a region filter was set {pull}24218[24218]
 - Fix type of `uwsgi.status.worker.rss` type. {pull}24468[24468]
+- Ignore unsupported derive types for filesystem metricset. {issue}22501[22501] {pull}24502[24502]
 
 *Packetbeat*
 
@@ -1033,6 +1035,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Tuned the internal queue size to reduce the chances of events being dropped. {pull}22650[22650]
 - Add support for "http.request.mime_type" and "http.response.mime_type". {pull}22940[22940]
 - Upgrade to ECS 1.8.0. {pull}23783[23783]
+- Add `event.type: [connection]` to flow events and include `end` for final flows. {pull}24564[24564]
 
 *Functionbeat*
 
