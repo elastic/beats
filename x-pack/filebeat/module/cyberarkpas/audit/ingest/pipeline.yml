@@ -568,6 +568,23 @@ processors:
           - set: event.outcome
             from: cyberarkpas.audit.ca_properties.cpm_status
 
+        # 295 - Retrieve Password succeeded
+        "295":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            value: "success"
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -603,7 +620,7 @@ processors:
           override: true
 
   #
-  # Force event.outcome: unknown in case it gets a value other than the allowed.
+  # Force event.outcome: unknown in case it gets a value other than one of the allowed.
   #
   - set:
       field: event.outcome
