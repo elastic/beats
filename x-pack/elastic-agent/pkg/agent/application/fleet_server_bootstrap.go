@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -87,7 +88,7 @@ func newFleetServerBootstrap(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := router.New(log, streamFactory(bootstrapApp.bgContext, agentInfo, cfg.Settings, bootstrapApp.srv, reporter, monitor, statusCtrl))
+	router, err := router.New(log, stream.Factory(bootstrapApp.bgContext, agentInfo, cfg.Settings, bootstrapApp.srv, reporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -140,7 +141,7 @@ func (b *FleetServerBootstrap) AgentInfo() *info.AgentInfo {
 	return b.agentInfo
 }
 
-func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers) (emitterFunc, error) {
+func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers) (pipeline.EmitterFunc, error) {
 	ch := make(chan *config.Config)
 
 	go func() {

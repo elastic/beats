@@ -12,8 +12,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -29,13 +29,6 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
-
-// ConfigHandler is capable of handling config, perform actions at it, shutdown any long running process.
-type ConfigHandler interface {
-	HandleConfig(configrequest.Request) error
-	Close() error
-	Shutdown()
-}
 
 type discoverFunc func() ([]string, error)
 
@@ -107,7 +100,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := router.New(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusCtrl))
+	router, err := router.New(log, stream.Factory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}

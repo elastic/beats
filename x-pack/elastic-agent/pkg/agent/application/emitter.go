@@ -23,8 +23,6 @@ import (
 type decoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
 type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
-type emitterFunc func(*config.Config) error
-
 type reloadable interface {
 	Reload(cfg *config.Config) error
 }
@@ -160,7 +158,7 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, caps capabilities.Capability, reloadables ...reloadable) (emitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
 	init, _ := transpiler.NewVars(map[string]interface{}{})
@@ -185,7 +183,7 @@ func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo,
 	}, nil
 }
 
-func readfiles(files []string, emitter emitterFunc) error {
+func readfiles(files []string, emitter pipeline.EmitterFunc) error {
 	c, err := config.LoadFiles(files...)
 	if err != nil {
 		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)

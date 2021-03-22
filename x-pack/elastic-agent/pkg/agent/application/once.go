@@ -5,6 +5,7 @@
 package application
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -12,10 +13,10 @@ import (
 type once struct {
 	log      *logger.Logger
 	discover discoverFunc
-	emitter  emitterFunc
+	emitter  pipeline.EmitterFunc
 }
 
-func newOnce(log *logger.Logger, discover discoverFunc, emitter emitterFunc) *once {
+func newOnce(log *logger.Logger, discover discoverFunc, emitter pipeline.EmitterFunc) *once {
 	return &once{log: log, discover: discover, emitter: emitter}
 }
 

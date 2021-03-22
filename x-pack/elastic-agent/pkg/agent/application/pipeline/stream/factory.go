@@ -2,14 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package stream
 
 import (
 	"context"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
@@ -25,25 +24,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-type operatorStream struct {
-	configHandler ConfigHandler
-	log           *logger.Logger
-	monitor       monitoring.Monitor
-}
-
-func (b *operatorStream) Close() error {
-	return b.configHandler.Close()
-}
-
-func (b *operatorStream) Execute(cfg configrequest.Request) error {
-	return b.configHandler.HandleConfig(cfg)
-}
-
-func (b *operatorStream) Shutdown() {
-	b.configHandler.Shutdown()
-}
-
-func streamFactory(ctx context.Context, agentInfo *info.AgentInfo, cfg *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor, statusController status.Controller) func(*logger.Logger, pipeline.RoutingKey) (pipeline.Stream, error) {
+// Factory creates a new stream factory.
+func Factory(ctx context.Context, agentInfo *info.AgentInfo, cfg *configuration.SettingsConfig, srv *server.Server, r state.Reporter, m monitoring.Monitor, statusController status.Controller) func(*logger.Logger, pipeline.RoutingKey) (pipeline.Stream, error) {
 	return func(log *logger.Logger, id pipeline.RoutingKey) (pipeline.Stream, error) {
 		// new operator per stream to isolate processes without using tags
 		operator, err := newOperator(ctx, log, agentInfo, id, cfg, srv, r, m, statusController)

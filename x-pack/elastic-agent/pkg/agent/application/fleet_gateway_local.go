@@ -8,6 +8,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -40,7 +41,7 @@ type fleetServerWrapper struct {
 	cfg         *configuration.FleetAgentConfig
 	injectedCfg *config.Config
 	wrapped     FleetGateway
-	emitter     emitterFunc
+	emitter     pipeline.EmitterFunc
 }
 
 func wrapLocalFleetServer(
@@ -49,7 +50,7 @@ func wrapLocalFleetServer(
 	cfg *configuration.FleetAgentConfig,
 	rawConfig *config.Config,
 	wrapped FleetGateway,
-	emitter emitterFunc) (FleetGateway, error) {
+	emitter pipeline.EmitterFunc) (FleetGateway, error) {
 	if cfg.Server == nil {
 		// not running a local Fleet Server
 		return wrapped, nil

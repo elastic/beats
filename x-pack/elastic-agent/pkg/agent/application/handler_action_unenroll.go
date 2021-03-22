@@ -18,7 +18,7 @@ import (
 // For it to be operational again it needs to be either enrolled or reconfigured.
 type handlerUnenroll struct {
 	log        *logger.Logger
-	emitter    emitterFunc
+	emitter    pipeline.EmitterFunc
 	dispatcher programsDispatcher
 	closers    []context.CancelFunc
 	stateStore stateStore
