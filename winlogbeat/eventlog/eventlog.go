@@ -19,19 +19,15 @@ package eventlog
 
 import (
 	"expvar"
-	"fmt"
-	"reflect"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 // Debug selectors used in this package.
@@ -55,12 +51,6 @@ var (
 	readErrors = expvar.NewMap("read_errors")
 )
 
-// Keyword Constants
-const (
-	keywordAuditFailure = 0x10000000000000
-	keywordAuditSuccess = 0x20000000000000
-)
-
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
 	// Open the event log. state points to the last successfully read event
@@ -81,7 +71,7 @@ type EventLog interface {
 
 // Record represents a single event from the log.
 type Record struct {
-	sys.Event
+	winevent.Event
 	File   string                   // Source file when event is from a file.
 	API    string                   // The event log API type used to read the record.
 	XML    string                   // XML representation of the event.
@@ -90,78 +80,32 @@ type Record struct {
 
 // ToEvent returns a new beat.Event containing the data from this Record.
 func (e Record) ToEvent() beat.Event {
-	// Windows Log Specific data
-	win := common.MapStr{
-		"channel":       e.Channel,
-		"event_id":      e.EventIdentifier.ID,
-		"provider_name": e.Provider.Name,
-		"record_id":     e.RecordID,
-		"task":          e.Task,
-		"api":           e.API,
-	}
-	addOptional(win, "computer_name", e.Computer)
-	addOptional(win, "kernel_time", e.Execution.KernelTime)
-	addOptional(win, "keywords", e.Keywords)
-	addOptional(win, "opcode", e.Opcode)
-	addOptional(win, "processor_id", e.Execution.ProcessorID)
-	addOptional(win, "processor_time", e.Execution.ProcessorTime)
-	addOptional(win, "provider_guid", e.Provider.GUID)
-	addOptional(win, "session_id", e.Execution.SessionID)
-	addOptional(win, "task", e.Task)
-	addOptional(win, "user_time", e.Execution.UserTime)
-	addOptional(win, "version", e.Version)
-	// Correlation
-	addOptional(win, "activity_id", e.Correlation.ActivityID)
-	addOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
-	// Execution
-	addOptional(win, "process.pid", e.Execution.ProcessID)
-	addOptional(win, "process.thread.id", e.Execution.ThreadID)
+	win := e.Fields()
 
-	if e.User.Identifier != "" {
-		user := common.MapStr{
-			"identifier": e.User.Identifier,
-		}
-		win["user"] = user
-		addOptional(user, "name", e.User.Name)
-		addOptional(user, "domain", e.User.Domain)
-		addOptional(user, "type", e.User.Type.String())
-	}
-
-	addPairs(win, "event_data", e.EventData.Pairs)
-	userData := addPairs(win, "user_data", e.UserData.Pairs)
-	addOptional(userData, "xml_name", e.UserData.Name.Local)
+	_ = win.Delete("keywords_raw")
+	_, _ = win.Put("api", e.API)
 
 	m := common.MapStr{
 		"winlog": win,
 	}
 
-	// ECS data
-	m.Put("event.kind", "event")
-	m.Put("event.code", e.EventIdentifier.ID)
-	m.Put("event.provider", e.Provider.Name)
-	addOptional(m, "event.action", e.Task)
-	addOptional(m, "host.name", e.Computer)
+	// // ECS data
+	_, _ = m.Put("event.created", time.Now())
 
-	m.Put("event.created", time.Now())
+	_, _ = m.Put("event.kind", "event")
+	_, _ = m.Put("event.code", e.EventIdentifier.ID)
+	_, _ = m.Put("event.provider", e.Provider.Name)
 
-	if e.KeywordsRaw&keywordAuditFailure > 0 {
-		m.Put("event.outcome", "failure")
-	} else if e.KeywordsRaw&keywordAuditSuccess > 0 {
-		m.Put("event.outcome", "success")
-	}
+	rename(m, "winlog.outcome", "event.outcome")
+	rename(m, "winlog.level", "log.level")
+	rename(m, "winlog.message", "message")
+	rename(m, "winlog.error.code", "error.code")
+	rename(m, "winlog.error.message", "error.message")
 
-	addOptional(m, "log.file.path", e.File)
-	addOptional(m, "log.level", strings.ToLower(e.Level))
-	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
-	// Errors
-	addOptional(m, "error.code", e.RenderErrorCode)
-	if len(e.RenderErr) == 1 {
-		addOptional(m, "error.message", e.RenderErr[0])
-	} else {
-		addOptional(m, "error.message", e.RenderErr)
-	}
-
-	addOptional(m, "event.original", e.XML)
+	winevent.AddOptional(m, "log.file.path", e.File)
+	winevent.AddOptional(m, "event.original", e.XML)
+	winevent.AddOptional(m, "event.action", e.Task)
+	winevent.AddOptional(m, "host.name", e.Computer)
 
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
@@ -170,76 +114,14 @@ func (e Record) ToEvent() beat.Event {
 	}
 }
 
-// addOptional adds a key and value to the given MapStr if the value is not the
-// zero value for the type of v. It is safe to call the function with a nil
-// MapStr.
-func addOptional(m common.MapStr, key string, v interface{}) {
-	if m != nil && !isZero(v) {
-		m.Put(key, v)
+// rename will rename a map entry overriding any previous value
+func rename(m common.MapStr, oldKey, newKey string) {
+	v, err := m.GetValue(oldKey)
+	if err != nil {
+		return
 	}
-}
-
-// addPairs adds a new dictionary to the given MapStr. The key/value pairs are
-// added to the new dictionary. If any keys are duplicates, the first key/value
-// pair is added and the remaining duplicates are dropped.
-//
-// The new dictionary is added to the given MapStr and it is also returned for
-// convenience purposes.
-func addPairs(m common.MapStr, key string, pairs []sys.KeyValue) common.MapStr {
-	if len(pairs) == 0 {
-		return nil
-	}
-
-	h := make(common.MapStr, len(pairs))
-	for i, kv := range pairs {
-		// Ignore empty values.
-		if kv.Value == "" {
-			continue
-		}
-
-		// If the key name is empty or if it the default of "Data" then
-		// assign a generic name of paramN.
-		k := kv.Key
-		if k == "" || k == "Data" {
-			k = fmt.Sprintf("param%d", i+1)
-		}
-
-		// Do not overwrite.
-		_, exists := h[k]
-		if !exists {
-			h[k] = sys.RemoveWindowsLineEndings(kv.Value)
-		} else {
-			debugf("Dropping key/value (k=%s, v=%s) pair because key already "+
-				"exists. event=%+v", k, kv.Value, m)
-		}
-	}
-
-	if len(h) == 0 {
-		return nil
-	}
-
-	m[key] = h
-	return h
-}
-
-// isZero return true if the given value is the zero value for its type.
-func isZero(i interface{}) bool {
-	v := reflect.ValueOf(i)
-	switch v.Kind() {
-	case reflect.Array, reflect.String:
-		return v.Len() == 0
-	case reflect.Bool:
-		return !v.Bool()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return v.Int() == 0
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return v.Uint() == 0
-	case reflect.Float32, reflect.Float64:
-		return v.Float() == 0
-	case reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
-		return v.IsNil()
-	}
-	return false
+	_, _ = m.Put(newKey, v)
+	_ = m.Delete(oldKey)
 }
 
 // incrementMetric increments a value in the specified expvar.Map. The key

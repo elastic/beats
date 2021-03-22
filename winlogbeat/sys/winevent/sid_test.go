@@ -17,7 +17,7 @@
 
 // +build !integration
 
-package sys
+package winevent
 
 import (
 	"testing"
