@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -240,7 +241,7 @@ type inmemRouter struct {
 	programs map[string][]program.Program
 }
 
-func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Program) error {
+func (r *inmemRouter) Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	r.programs = grpProg
 	return nil
 }

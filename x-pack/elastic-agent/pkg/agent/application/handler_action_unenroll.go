@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -31,7 +32,7 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 	}
 
 	// Providing empty map will close all pipelines
-	noPrograms := make(map[routingKey][]program.Program)
+	noPrograms := make(map[pipeline.RoutingKey][]program.Program)
 	h.dispatcher.Dispatch(a.ID(), noPrograms)
 
 	if !action.IsDetected {

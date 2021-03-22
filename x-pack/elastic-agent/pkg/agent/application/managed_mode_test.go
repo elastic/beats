@@ -16,6 +16,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -24,8 +26,8 @@ import (
 )
 
 func TestManagedModeRouting(t *testing.T) {
-	streams := make(map[routingKey]stream)
-	streamFn := func(l *logger.Logger, r routingKey) (stream, error) {
+	streams := make(map[pipeline.RoutingKey]pipeline.Stream)
+	streamFn := func(l *logger.Logger, r pipeline.RoutingKey) (pipeline.Stream, error) {
 		m := newMockStreamStore()
 		streams[r] = m
 
@@ -36,7 +38,7 @@ func TestManagedModeRouting(t *testing.T) {
 	defer cancel()
 
 	log, _ := logger.New("")
-	router, _ := newRouter(log, streamFn)
+	router, _ := router.New(log, streamFn)
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)

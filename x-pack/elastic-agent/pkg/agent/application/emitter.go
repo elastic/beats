@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
@@ -22,6 +23,8 @@ import (
 type decoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
 type filterFunc = func(*logger.Logger, *transpiler.AST) error
 
+type emitterFunc func(*config.Config) error
+
 type reloadable interface {
 	Reload(cfg *config.Config) error
 }
@@ -32,7 +35,7 @@ type configModifiers struct {
 }
 
 type programsDispatcher interface {
-	Dispatch(id string, grpProg map[routingKey][]program.Program) error
+	Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error
 }
 
 type emitterController struct {
