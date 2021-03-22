@@ -2,11 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package emitter
 
 import (
-	"context"
-	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -24,7 +22,7 @@ type reloadable interface {
 	Reload(cfg *config.Config) error
 }
 
-type emitterController struct {
+type Controller struct {
 	logger      *logger.Logger
 	agentInfo   *info.AgentInfo
 	controller  composable.Controller
@@ -41,8 +39,32 @@ type emitterController struct {
 	vars       []*transpiler.Vars
 }
 
-func (e *emitterController) Update(c *config.Config) error {
-	if err := InjectAgentConfig(c); err != nil {
+// NewController creates a new emitter controller.
+func NewController(
+	log *logger.Logger,
+	agentInfo *info.AgentInfo,
+	controller composable.Controller,
+	router pipeline.Dispatcher,
+	modifiers *pipeline.ConfigModifiers,
+	caps capabilities.Capability,
+	reloadables ...reloadable,
+) *Controller {
+	init, _ := transpiler.NewVars(map[string]interface{}{})
+
+	return &Controller{
+		logger:      log,
+		agentInfo:   agentInfo,
+		controller:  controller,
+		router:      router,
+		modifiers:   modifiers,
+		reloadables: reloadables,
+		vars:        []*transpiler.Vars{init},
+		caps:        caps,
+	}
+}
+
+func (e *Controller) Update(c *config.Config) error {
+	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
 
@@ -83,7 +105,7 @@ func (e *emitterController) Update(c *config.Config) error {
 	return e.update()
 }
 
-func (e *emitterController) Set(vars []*transpiler.Vars) {
+func (e *Controller) Set(vars []*transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
@@ -97,7 +119,7 @@ func (e *emitterController) Set(vars []*transpiler.Vars) {
 	}
 }
 
-func (e *emitterController) update() error {
+func (e *Controller) update() error {
 	// locking whole update because it can be called concurrently via Set and Update method
 	e.updateLock.Lock()
 	defer e.updateLock.Unlock()
@@ -144,38 +166,4 @@ func (e *emitterController) update() error {
 	}
 
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
-}
-
-func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router pipeline.Dispatcher, modifiers *pipeline.ConfigModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
-	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
-
-	init, _ := transpiler.NewVars(map[string]interface{}{})
-	ctrl := &emitterController{
-		logger:      log,
-		agentInfo:   agentInfo,
-		controller:  controller,
-		router:      router,
-		modifiers:   modifiers,
-		reloadables: reloadables,
-		vars:        []*transpiler.Vars{init},
-		caps:        caps,
-	}
-	err := controller.Run(ctx, func(vars []*transpiler.Vars) {
-		ctrl.Set(vars)
-	})
-	if err != nil {
-		return nil, errors.New(err, "failed to start composable controller")
-	}
-	return func(c *config.Config) error {
-		return ctrl.Update(c)
-	}, nil
-}
-
-func readfiles(files []string, emitter pipeline.EmitterFunc) error {
-	c, err := config.LoadFiles(files...)
-	if err != nil {
-		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
-	}
-
-	return emitter(c)
 }

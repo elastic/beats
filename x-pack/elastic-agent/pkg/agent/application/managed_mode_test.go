@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -42,7 +43,7 @@ func TestManagedModeRouting(t *testing.T) {
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)
-	emit, err := emitter(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{injectMonitoring}}, nil)
+	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{injectMonitoring}}, nil)
 	require.NoError(t, err)
 
 	actionDispatcher, err := newActionDispatcher(ctx, log, &handlerDefault{log: log})

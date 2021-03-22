@@ -167,7 +167,7 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 }
 
 func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Dispatcher, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
-	if err := InjectAgentConfig(c); err != nil {
+	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
 
