@@ -274,6 +274,11 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 					"fail to decode POLICY_CHANGE action",
 					errors.TypeConfig)
 			}
+		case ActionTypePolicyReassign:
+			action = &ActionPolicyReassign{
+				ActionID:   response.ActionID,
+				ActionType: response.ActionType,
+			}
 		case ActionTypeInputAction:
 			action = &ActionApp{
 				ActionID:   response.ActionID,
