@@ -22,6 +22,7 @@ type reloadable interface {
 	Reload(cfg *config.Config) error
 }
 
+// Controller is an emitter controller handling config updates.
 type Controller struct {
 	logger      *logger.Logger
 	agentInfo   *info.AgentInfo
@@ -63,6 +64,7 @@ func NewController(
 	}
 }
 
+// Update applies config change and performes all steps necessary to apply it.
 func (e *Controller) Update(c *config.Config) error {
 	if err := info.InjectAgentConfig(c); err != nil {
 		return err
@@ -105,6 +107,7 @@ func (e *Controller) Update(c *config.Config) error {
 	return e.update()
 }
 
+// Set sets the transpiler vars for dynamic inputs resolution.
 func (e *Controller) Set(vars []*transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast

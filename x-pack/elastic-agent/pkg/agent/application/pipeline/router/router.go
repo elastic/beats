@@ -22,6 +22,7 @@ type router struct {
 	streamFactory pipeline.StreamFunc
 }
 
+// New creates a new router.
 func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Dispatcher, error) {
 	var err error
 	if log == nil {
