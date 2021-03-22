@@ -294,6 +294,10 @@ processors:
       field: event.severity
       value: 10
       if: 'ctx.cyberarkpas.audit.severity == "Critical"'
+  - set:
+      field: event.type
+      value: error
+      if: 'ctx.event?.severity > 6'
 
   - set:
       field: event.code
