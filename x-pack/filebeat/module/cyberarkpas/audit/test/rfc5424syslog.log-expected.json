@@ -43,6 +43,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -95,6 +98,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PasswordManager"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -289,6 +295,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",

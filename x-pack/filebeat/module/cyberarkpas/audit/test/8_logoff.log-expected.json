@@ -43,6 +43,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -95,6 +98,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -149,6 +155,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -201,6 +210,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -255,6 +267,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PasswordManager"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -307,6 +322,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "Prov_COMPONENTS"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -361,6 +379,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -413,6 +434,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -467,6 +491,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -519,6 +546,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -573,6 +603,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "PSMP_ADB_localhost.localdomain"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -625,6 +658,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPGW_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -679,6 +715,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -731,6 +770,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -785,6 +827,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -837,6 +882,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -891,6 +939,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -943,6 +994,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -997,6 +1051,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1049,6 +1106,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1103,6 +1163,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1155,6 +1218,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1209,6 +1275,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1261,6 +1330,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1315,6 +1387,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1367,6 +1442,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -1421,6 +1499,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -1473,6 +1554,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1527,6 +1611,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1579,6 +1666,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1633,6 +1723,9 @@
         "related.ip": [
             "127.0.0.1"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -1685,6 +1778,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1739,6 +1835,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1791,6 +1890,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1845,6 +1947,9 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -1897,6 +2002,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -1951,6 +2059,9 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2003,6 +2114,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -2057,6 +2171,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2109,6 +2226,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -2164,6 +2284,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -2217,6 +2340,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -2272,6 +2398,9 @@
         "related.ip": [
             "127.0.0.1"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2325,6 +2454,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -2380,6 +2512,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -2434,6 +2569,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2487,6 +2625,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -2546,6 +2687,9 @@
             "127.0.0.1",
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -2603,6 +2747,9 @@
         "related.ip": [
             "127.0.0.1",
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -2662,6 +2809,9 @@
             "10.0.2.2",
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
@@ -2715,6 +2865,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -2774,6 +2927,9 @@
             "10.0.2.2",
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
@@ -2832,6 +2988,9 @@
             "10.0.2.2",
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
@@ -2885,6 +3044,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -2940,6 +3102,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -2993,6 +3158,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3048,6 +3216,9 @@
         "related.ip": [
             "127.0.0.1"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -3101,6 +3272,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -3156,6 +3330,9 @@
         "related.ip": [
             "127.0.0.1"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -3209,6 +3386,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3264,6 +3444,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3317,6 +3500,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3372,6 +3558,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3425,6 +3614,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -3480,6 +3672,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3533,6 +3728,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3588,6 +3786,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3641,6 +3842,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3696,6 +3900,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -3749,6 +3956,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -3808,6 +4018,9 @@
             "10.0.2.2",
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
@@ -3861,6 +4074,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -3916,6 +4132,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "PSMPGW_VAGRANT"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -3969,6 +4188,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -4024,6 +4246,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -4077,6 +4302,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
@@ -4132,6 +4360,9 @@
         "related.ip": [
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "34.71.250.247",
         "source.ip": "34.71.250.247",
@@ -4185,6 +4416,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -4240,6 +4474,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -4293,6 +4530,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -4348,6 +4588,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -4401,6 +4644,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "127.0.0.1"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -4460,6 +4706,9 @@
             "81.32.170.205",
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -4517,6 +4766,9 @@
         "related.ip": [
             "81.32.170.205",
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -4576,6 +4828,9 @@
             "81.32.170.205",
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -4633,6 +4888,9 @@
         "related.ip": [
             "81.32.170.205",
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -4692,6 +4950,9 @@
             "81.32.170.205",
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -4749,6 +5010,9 @@
         "related.ip": [
             "81.32.170.205",
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -4808,6 +5072,9 @@
             "81.32.170.205",
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -4865,6 +5132,9 @@
         "related.ip": [
             "81.32.170.205",
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -4924,6 +5194,9 @@
             "81.32.170.205",
             "34.71.250.247"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -4977,6 +5250,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -5032,6 +5308,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -5085,6 +5364,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -5140,6 +5422,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -5193,6 +5478,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -5248,6 +5536,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -5302,6 +5593,9 @@
         "related.ip": [
             "10.0.1.20"
         ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
         "source.ip": "10.0.1.20",
@@ -5355,6 +5649,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
         ],
         "service.type": "cyberarkpas",
         "source.address": "10.0.1.20",
@@ -5413,6 +5710,9 @@
         "related.ip": [
             "81.32.170.205",
             "34.71.250.247"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",

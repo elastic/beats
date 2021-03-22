@@ -587,6 +587,26 @@ processors:
       value: '{{destination.ip}}'
       if: 'ctx.destination?.ip != null'
       allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{user.name}}'
+      if: 'ctx.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{source.user.name}}'
+      if: 'ctx.source?.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{destination.user.name}}'
+      if: 'ctx.destination?.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{user.target.name}}'
+      if: 'ctx.user?.target?.name != null'
+      allow_duplicates: false
 
   #
   # Save message

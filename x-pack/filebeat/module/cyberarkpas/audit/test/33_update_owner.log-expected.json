@@ -45,6 +45,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -100,6 +104,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -157,6 +165,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMApp_VAGRANT"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -212,6 +224,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -269,6 +285,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -324,6 +344,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -381,6 +405,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -436,6 +464,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -493,6 +525,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -548,6 +584,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "Vault Admins"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -605,6 +645,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -660,6 +704,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -717,6 +765,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -772,6 +824,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -829,6 +885,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -884,6 +944,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -941,6 +1005,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -996,6 +1064,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1053,6 +1125,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMApp_VAGRANT"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1108,6 +1184,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1165,6 +1245,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMApp_VAGRANT"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1220,6 +1304,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1277,6 +1365,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1332,6 +1424,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1389,6 +1485,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1444,6 +1544,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1501,6 +1605,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "Vault Admins"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1556,6 +1664,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1613,6 +1725,10 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -1668,6 +1784,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -1725,6 +1845,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -1780,6 +1904,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -1837,6 +1965,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -1892,6 +2024,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -1949,6 +2085,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2004,6 +2144,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2061,6 +2205,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2116,6 +2264,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2173,6 +2325,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2228,6 +2384,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "Vault Admins"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2285,6 +2445,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2340,6 +2504,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2397,6 +2565,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "Vault Admins"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2452,6 +2624,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PVWAAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2509,6 +2685,10 @@
         "related.ip": [
             "35.192.121.42"
         ],
+        "related.user": [
+            "Administrator",
+            "PSMMaster"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
         "source.ip": "35.192.121.42",
@@ -2564,6 +2744,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "35.192.121.42"
+        ],
+        "related.user": [
+            "Administrator",
+            "PSMAppUsers"
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
@@ -2621,6 +2805,10 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMPApp_VAGRANT",
+            "Auditors"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",

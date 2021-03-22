@@ -42,6 +42,9 @@
         "related.ip": [
             "81.32.170.205"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
         "source.ip": "81.32.170.205",
@@ -93,6 +96,9 @@
         "observer.version": "11.7.0000",
         "related.ip": [
             "81.32.170.205"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "81.32.170.205",
@@ -151,6 +157,9 @@
             "127.0.0.1",
             "10.0.1.20"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -207,6 +216,9 @@
         "related.ip": [
             "127.0.0.1",
             "10.0.1.20"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -265,6 +277,9 @@
             "127.0.0.1",
             "10.0.1.20"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -322,6 +337,9 @@
             "127.0.0.1",
             "10.0.1.20"
         ],
+        "related.user": [
+            "Administrator"
+        ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
@@ -378,6 +396,9 @@
         "related.ip": [
             "127.0.0.1",
             "10.0.1.20"
+        ],
+        "related.user": [
+            "Administrator"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
