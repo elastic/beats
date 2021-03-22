@@ -24,7 +24,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Fix `nested` subfield handling in generated Elasticsearch templates. {issue}23178[23178] {pull}23183[23183]
 - Fix CPU usage metrics on VMs with dynamic CPU config {pull}23154[23154]
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
-- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {issue}23820[23820] {pull}23858[23858]
+- Fix panic with inline SSL when the certificate or key was smaller than 256 bytes. {issue}23820[23820] {pull}23858[23858]
 
 *Auditbeat*
 
@@ -74,7 +74,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Added new decode_xml processor to libbeat that is available to all beat types. {pull}23678[23678]
 - Add deployment name in pod's meta. {pull}23610[23610]
 - Added ECS 1.8 `host.os.type` field to `add_host_metadata` processor. {pull}23513[23513]
-- Add `selector` information in kubernetes services' metadata. {pull}23730[23730]
+- Add `selector` information in Kubernetes services' metadata. {pull}23730[23730]
 
 *Auditbeat*
 
@@ -85,7 +85,7 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 *Filebeat*
 
 - Add parsing of tcp flags to AWS vpcflow fileset {issue}228020[22820] {pull}23157[23157]
-- Added support for first_event context in filebeat httpjson input {pull}23437[23437]
+- Added support for first_event context in Filebeat httpjson input {pull}23437[23437]
 - Adding Threat Intel module {pull}21795[21795]
 - Added username parsing from Cisco ASA message 302013. {pull}21196[21196]
 - Added `encode_as` and `decode_as` options to httpjson along with pluggable encoders/decoders {pull}23478[23478]
@@ -109,20 +109,20 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 - Upgrade Zeek to ECS 1.8.0. {issue}23118[23118] {pull}23847[23847]
 - Updated azure module to ECS 1.8. {issue}23118[23118] {pull}23927[23927]
 - Update aws/s3access to ECS 1.8. {issue}23118[23118] {pull}23920[23920]
-- Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
+- Upgrade panw module to ECS 1.8 {issue}23118[23118] {pull}23931[23931]
 - Updated aws/cloudtrail fileset to ECS 1.8. {issue}23118[23118] {pull}23911[23911]
-- Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
+- Upgrade juniper/srx to ECS 1.8.0. {issue}23118[23118] {pull}23936[23936]
 - Update mysqlenterprise module to ECS 1.8. {issue}23118[23118] {pull}23978[23978]
 - Upgrade sophos/xg fileset to ECS 1.8.0. {issue}23118[23118] {pull}23967[23967]
 - Upgrade system/auth to ECS 1.8 {issue}23118[23118] {pull}23961[23961]
 - Upgrade elasticsearch/audit to ECS 1.8 {issue}23118[23118] {pull}24000[24000]
-- Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
+- Upgrade okta to ECS 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 - Add fileset to ingest PostgreSQL CSV logs. {pull}23334[23334]
 
 *Heartbeat*
 
-- Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
+- Bundle synthetics dependencies with Heartbeat docker image. {pull}23274[23274]
 
 *Heartbeat*
 
@@ -130,9 +130,9 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 *Metricbeat*
 
-- Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
+- Enrich events of `state_service` metricset with Kubernetes services' metadata. {pull}23730[23730]
 - Add support for Darwin/arm M1. {pull}24019[24019]
-- Check fields are documented in aws metricsets. {pull}23887[23887]
+- Check fields are documented in AWS metricsets. {pull}23887[23887]
 - Add container.image.name and containe.name ECS fields for state_container. {pull}23802[23802]
 - Add support for the MemoryPressure, DiskPressure, OutOfDisk and PIDPressure status conditions in state_node. {pull}23905[23905]
 
@@ -152,9 +152,9 @@ https://github.com/elastic/beats/compare/v7.11.2...v7.12.0[View commits]
 
 *Winlogbeat*
 
-- Add Audit and Authentication Polixy Change Events and related.ip information {pull}20684[20684]
+- Add Audit and Authentication Policy Change Events and related.ip information {pull}20684[20684]
 - Add new ECS 1.8 improvements. {pull}23563[23563]
-- Remove deprecated eventlogging api that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
+- Remove deprecated eventlogging API that was used for Windows XP/2003 and associated unused code. {pull}24463[24463]
 
 ==== Deprecated
 
