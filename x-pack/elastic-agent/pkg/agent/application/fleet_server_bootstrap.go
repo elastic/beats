@@ -99,8 +99,8 @@ func newFleetServerBootstrap(
 		log,
 		agentInfo,
 		router,
-		&configModifiers{
-			Filters: []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+		&pipeline.ConfigModifiers{
+			Filters: []pipeline.FilterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 	)
 	if err != nil {
@@ -141,7 +141,7 @@ func (b *FleetServerBootstrap) AgentInfo() *info.AgentInfo {
 	return b.agentInfo
 }
 
-func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers) (pipeline.EmitterFunc, error) {
+func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *pipeline.ConfigModifiers) (pipeline.EmitterFunc, error) {
 	ch := make(chan *config.Config)
 
 	go func() {
@@ -166,7 +166,7 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 	}, nil
 }
 
-func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers, c *config.Config) error {
+func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
 	if err := InjectAgentConfig(c); err != nil {
 		return err
 	}

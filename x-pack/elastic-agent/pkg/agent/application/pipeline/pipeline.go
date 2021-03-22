@@ -5,8 +5,10 @@
 package pipeline
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -42,3 +44,15 @@ type Stream interface {
 
 // EmitterFunc emits configuration for processing.
 type EmitterFunc func(*config.Config) error
+
+// DecoratorFunc is a func for decorating a retrieved configuration before processing.
+type DecoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
+
+// FilterFunc is a func for filtering a retrieved configuration before processing.
+type FilterFunc = func(*logger.Logger, *transpiler.AST) error
+
+// ConfigModifiers is a collections of filters and decorators applied while processing configuration.
+type ConfigModifiers struct {
+	Filters    []FilterFunc
+	Decorators []DecoratorFunc
+}

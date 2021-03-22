@@ -118,9 +118,9 @@ func newLocal(
 		agentInfo,
 		composableCtrl,
 		router,
-		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker},
+		&pipeline.ConfigModifiers{
+			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 		},
 		caps,
 		monitor,

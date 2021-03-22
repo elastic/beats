@@ -143,9 +143,9 @@ func newManaged(
 		agentInfo,
 		composableCtrl,
 		router,
-		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+		&pipeline.ConfigModifiers{
+			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		caps,
 		monitor,

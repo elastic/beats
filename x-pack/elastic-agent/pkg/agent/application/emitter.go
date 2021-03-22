@@ -20,16 +20,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-type decoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
-type filterFunc = func(*logger.Logger, *transpiler.AST) error
-
 type reloadable interface {
 	Reload(cfg *config.Config) error
-}
-
-type configModifiers struct {
-	Filters    []filterFunc
-	Decorators []decoratorFunc
 }
 
 type programsDispatcher interface {
@@ -41,7 +33,7 @@ type emitterController struct {
 	agentInfo   *info.AgentInfo
 	controller  composable.Controller
 	router      programsDispatcher
-	modifiers   *configModifiers
+	modifiers   *pipeline.ConfigModifiers
 	reloadables []reloadable
 	caps        capabilities.Capability
 
@@ -158,7 +150,7 @@ func (e *emitterController) update() error {
 	return e.router.Dispatch(ast.HashStr(), programsToRun)
 }
 
-func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *configModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
+func emitter(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, controller composable.Controller, router programsDispatcher, modifiers *pipeline.ConfigModifiers, caps capabilities.Capability, reloadables ...reloadable) (pipeline.EmitterFunc, error) {
 	log.Debugf("Supported programs: %s", strings.Join(program.KnownProgramNames(), ", "))
 
 	init, _ := transpiler.NewVars(map[string]interface{}{})

@@ -196,9 +196,9 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		return nil, err
 	}
 	composableWaiter := newWaitForCompose(composableCtrl)
-	modifiers := &configModifiers{
-		Decorators: []decoratorFunc{injectMonitoring},
-		Filters:    []filterFunc{filters.StreamChecker},
+	modifiers := &pipeline.ConfigModifiers{
+		Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+		Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 	}
 
 	if !isStandalone {
