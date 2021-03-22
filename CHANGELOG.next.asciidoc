@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `s3` input to `aws-s3` input. {pull}23469[23469]
 - Possible values for Netflow's locality fields (source.locality, destination.locality and flow.locality) are now `internal` and `external`, instead of `private` and `public`. {issue}24272[24272] {pull}24295[24295]
 - Add User Agent Parser for Azure Sign In Logs Ingest Pipeline {pull}23201[23201]
+- Fixed spelling "MSIP" to "MISP" in `filebeat/docs/modules/threatintel.asciidoc` {pull}24682[24682]
 
 *Heartbeat*
 - Adds negative body match. {pull}20728[20728]
