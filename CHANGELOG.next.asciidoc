@@ -293,9 +293,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-
-*Filebeat*
-
 - cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
 - Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
 - Fixed dashboard for Cisco ASA Firewall. {issue}15420[15420] {pull}15553[15553]
@@ -1040,10 +1037,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 - Add support for multiple regions {pull}21065[21065]
-
-
-*Functionbeat*
-
 
 *Heartbeat*
 
