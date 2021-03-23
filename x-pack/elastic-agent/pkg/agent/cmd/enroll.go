@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
@@ -225,7 +224,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 
 	ctx := handleSignal(context.Background())
 
-	options := application.EnrollCmdOption{
+	options := enrollCmdOption{
 		ID:                   "", // TODO(ph), This should not be an empty string, will clarify in a new PR.
 		EnrollAPIKey:         enrollmentToken,
 		URL:                  url,
@@ -234,7 +233,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
-		FleetServer: application.EnrollCmdFleetServerOption{
+		FleetServer: enrollCmdFleetServerOption{
 			ConnStr:         fServer,
 			ElasticsearchCA: fElasticSearchCA,
 			PolicyID:        fPolicy,
@@ -247,7 +246,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		},
 	}
 
-	c, err := application.NewEnrollCmd(
+	c, err := newEnrollCmd(
 		logger,
 		&options,
 		pathConfigFile,
