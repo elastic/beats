@@ -36,6 +36,9 @@
             "target.destination.hostname.local",
             "Prod-host.name.addr"
         ],
+        "related.ip": [
+            "10.0.55.66"
+        ],
         "service.type": "cisco",
         "source.domain": "Prod-host.name.addr",
         "source.nat.ip": "10.0.55.66",
