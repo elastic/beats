@@ -1,6 +1,6 @@
 # Elastic Agent VM extension
 
-The ElasticAgent WM is a small application that provides post-deployment configuration and automation on Azure VMs.
+The ElasticAgent VM extension is a small application that provides post-deployment configuration and automation on Azure VMs.
 Once installed, it will download the elastic agent artifacts, install the elastic agent on the virtual machine, enroll it to Fleet and then start the agent service.
 
 The Elastic Agent VM extension can be managed using the Azure CLI, PowerShell, Resource Manager templates, and in the future the Azure portal.

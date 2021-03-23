@@ -10,51 +10,59 @@ $secondOperation = "uninstalling elastic agent and removing any elastic agent re
 $message = "Uninstall elastic agent"
 $subName = "Elastic Agent"
 
-$serviceName = 'elastic agent'
-
-function Uninstall-ElasticAgent {
+function Uninstall-Old-ElasticAgent {
     $INSTALL_LOCATION="C:\Program Files"
     $retries = 3
     $retryCount = 0
     $completed = $false
     while (-not $completed) {
-        Try {
+        Try
+        {
             $powershellVersion = Get-PowershellVersion
-            $kibanaUrl = Get-Kibana-URL $powershellVersion
-            if (-Not $kibanaUrl) {
+            $kibanaUrl = Get-Prev-Kibana-URL $powershellVersion
+            if (-Not $kibanaUrl)
+            {
                 throw "Kibana url could not be found"
             }
-            $password = Get-Password $powershellVersion
-            $base64Auth = Get-Base64Auth $powershellVersion
-            if (-Not $password -And -Not $base64Auth) {
-                throw "Password  or base64auto key could not be found"
+            Write-Log "Found Kibana url $kibanaUrl" "INFO"
+            $password = Get-Prev-Password $powershellVersion
+            $base64Auth = Get-Prev-Base64Auth $powershellVersion
+            if (-Not $password -And -Not $base64Auth)
+            {
+                throw "Password or base64auto key could not be found"
             }
-            $agentId=Get-Agent-Id "$INSTALL_LOCATION\Elastic\Agent\fleet.yml"
-            if (-Not $agentId) {
+            $agentId = Get-Agent-Id "$INSTALL_LOCATION\Elastic\Agent\fleet.yml"
+            if (-Not $agentId)
+            {
                 throw "Agent Id could not be found"
             }
             Write-Log "Unenroll elastic agent" "INFO"
             $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-            $headers.Add("Accept","application/json")
+            $headers.Add("Accept", "application/json")
             $headers.Add("kbn-xsrf", "true")
             #cred
             $encodedCredentials = ""
-            if ($password) {
-                $username = Get-Username $powershellVersion
-                if (-Not $username) {
+            if ($password)
+            {
+                $username = Get-Prev-Username $powershellVersion
+                if (-Not $username)
+                {
                     throw "Username could not be found"
                 }
-                $pair = "$($username):$($password)"
+                $pair = "$( $username ):$( $password )"
                 $encodedCredentials = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
-            } else {
+            }
+            else
+            {
                 $encodedCredentials = $base64Auth
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
-            $body=(@{'force' = $true} | ConvertTo-Json)
+            $body = (@{ 'force' = $true } | ConvertTo-Json)
+            $jsonResult = ''
             try {
-                $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/agents/$($agentId)/unenroll" -Body $body  -Method 'POST' -Headers $headers -UseBasicParsing -ContentType 'application/json; charset=utf-8'
+                $jsonResult = Invoke-WebRequest -Uri "$( $kibanaUrl )/api/fleet/agents/$( $agentId )/unenroll" -Body $body  -Method 'POST' -Headers $headers -UseBasicParsing -ContentType 'application/json; charset=utf-8'
             } catch {
-                $jsonResult = $_
+                $jsonResult =$_
             }
             if ($jsonResult.statuscode -eq '200')
             {
@@ -94,12 +102,3 @@ function Uninstall-ElasticAgent {
         }
     }
 }
-
-
-If (Get-Service $serviceName -ErrorAction SilentlyContinue) {
-    Uninstall-ElasticAgent
-} Else {
-    Write-Log "Elastic Agent has been previously uninstalled. Cannot be found as a service." "INFO"
-    Write-Status "$name" "$secondOperation" "success" "$message" "$subName" "success" "Elastic Agent service has been uninstalled"
-}
-

@@ -13,12 +13,11 @@ function Get-PowershellVersion {
   {
       $global:powershellVersion = $PSVersionTable.PSVersion.Major
   }
-  $powershellVersion
+  return $powershellVersion
 }
 
 function Run-Powershell2-With-Dot-Net4 {
   $powershellVersion = Get-PowershellVersion
-
   if ( $powershellVersion -lt 3 ) {
     reg add hklm\software\microsoft\.netframework /v OnlyUseLatestCLR /t REG_DWORD /d 1 /f
     reg add hklm\software\wow6432node\microsoft\.netframework /v OnlyUseLatestCLR /t REG_DWORD /d 1 /f
@@ -26,19 +25,19 @@ function Run-Powershell2-With-Dot-Net4 {
 }
 
 function Get-CloudId($powershellVersion) {
-  $cloudId = Get-PublicSettings-From-Config-Json "cloudId"  $powershellVersion
-  if ( $cloudId){
-    return $cloudId
-  }
-  return ""
+    $cloudId = Get-PublicSettings-From-Config-Json "cloudId"  $powershellVersion
+    if ( $cloudId){
+        return $cloudId
+    }
+    return ""
 }
 
 function Get-Username($powershellVersion) {
-  $username = Get-PublicSettings-From-Config-Json "username"  $powershellVersion
-  if ( $username){
-    return $username
-  }
-  return ""
+    $username = Get-PublicSettings-From-Config-Json "username"  $powershellVersion
+    if ( $username){
+        return $username
+    }
+    return ""
 }
 
 function Get-Elasticsearch-URL($powershellVersion) {
@@ -106,58 +105,50 @@ function Get-Stack-Version {
 }
 
 function Get-PublicSettings-From-Config-Json($key, $powershellVersion) {
-  Try
-  {
-    if(!$normalizedJson)
-    {
-      $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
-      $jsonContents = Get-Content $azureConfigFile
-      $global:normalizedJson = normalize-json($jsonContents)
-    }
-    if ( $powershellVersion -ge 3 ) {
-      $value = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
-
-    }
-    else {
-      $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-      $value = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.publicSettings.$key
-    }
-    $value
-  }
-  Catch
-  {
-    $ErrorMessage = $_.Exception.Message
-    $FailedItem = $_.Exception.ItemName
-    echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
-    throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
-  }
-}
-
-function Get-ProtectedSettings-From-Config-Json($key, $powershellVersion) {
     Try
     {
-        if(!$normalizedJson)
-        {
-            $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
-            $jsonContents = Get-Content $azureConfigFile
-            $global:normalizedJson = normalize-json($jsonContents)
-        }
+      $azureConfigFile = Get-Azure-Latest-Config-File($powershellVersion)
+      $jsonContents = Get-Content $azureConfigFile
+      $normalizedJson = normalize-json($jsonContents)
         if ( $powershellVersion -ge 3 ) {
-            $value = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings).$key
-
+            $keyVal = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
         }
         else {
             $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-            $value = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.$key
+            $keyVal = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.publicSettings.$key
         }
-        $value
+        return $keyVal
     }
     Catch
     {
         $ErrorMessage = $_.Exception.Message
         $FailedItem = $_.Exception.ItemName
-        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
         throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
+    }
+}
+
+function Get-ProtectedSettings-From-Config-Json($key, $powershellVersion) {
+    Try
+    {
+        $azureConfigFile = Get-Azure-Latest-Config-File($powershellVersion)
+        $jsonContents = Get-Content $azureConfigFile
+        $normalizedJson = normalize-json($jsonContents)
+        if ( $powershellVersion -ge 3 ) {
+            $keyVal = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings).$key
+        }
+        else {
+            $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+            $keyVal = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.$key
+        }
+        return $keyVal
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
+        throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse $azureConfigFile"
     }
 }
 
@@ -185,7 +176,7 @@ function Get-Azure-Logs-Path() {
   }
 }
 
-function Get-Azure-Config-Path($powershellVersion) {
+function Get-Azure-Latest-Config-File($powershellVersion) {
   Try
   {
     $handlerFile = "$extensionRoot\HandlerEnvironment.json"
@@ -199,7 +190,7 @@ function Get-Azure-Config-Path($powershellVersion) {
     }
 
     # Get the last .settings file
-    $configFileName = Get-Lastest-Settings-File($configFolder)
+    $configFileName = Get-Latest-Settings-File($configFolder)
     $azureConfigFile = "$configFolder\$configFileName"
     Write-Log "The latest configuration file is $azureConfigFile" "INFO"
     $configFileIsFolder = (Get-Item $azureConfigFile) -is [System.IO.DirectoryInfo]
@@ -208,10 +199,8 @@ function Get-Azure-Config-Path($powershellVersion) {
     # folder of the new extension. Hence using the n.settings file copied into
     # the C:\Elastic folder during enable
     if ( $configFileIsFolder ) {
-      Write-Log "n.settings file doesn't exist in the extension folder. Reading from C:\Elastic." "ERROR"
-      $configFolder = "C:\Elastic"
-      $configFileName = Get-Lastest-Settings-File($configFolder)
-      $azureConfigFile = "$configFolder\$configFileName"
+        Write-Log "n.settings file doesn't exist in the extension folder." "ERROR"
+        throw "Error in Get-Azure-Latest-Config-File. Missing settings file"
     }
     return $azureConfigFile
   }
@@ -220,7 +209,7 @@ function Get-Azure-Config-Path($powershellVersion) {
     $ErrorMessage = $_.Exception.Message
     $FailedItem = $_.Exception.ItemName
     Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
-    throw "Error in Get-Azure-Config-Path. Couldn't parse the HandlerEnvironment.json file"
+    throw "Error in Get-Azure-Latest-Config-File. Couldn't parse the HandlerEnvironment.json file"
   }
 }
 
@@ -248,7 +237,7 @@ function Get-Azure-Status-Path($powershellVersion) {
   }
 }
 
-function Get-Lastest-Settings-File($configFolder) {
+function Get-Latest-Settings-File($configFolder) {
   $configFiles = get-childitem $configFolder -recurse | where {$_.extension -eq ".settings"}
 
   if($configFiles -is [system.array]) {
@@ -263,7 +252,7 @@ function Get-Lastest-Settings-File($configFolder) {
 function Get-Sequence() {
     $settingsSequence = "0"
     $powershellVersion = Get-PowershellVersion
-    $azureConfigFile = Get-Azure-Config-Path($powershellVersion)
+    $azureConfigFile = Get-Azure-Latest-Config-File($powershellVersion)
     if ($azureConfigFile) {
         $outputFile = Split-Path $azureConfigFile -leaf
         $items = $outputFile.split(".")
@@ -296,7 +285,7 @@ function DownloadFile {
     while ($trials -lt $Retries)
 }
 
-function Get-Lastest-Status-File($statusFolder) {
+function Get-Latest-Status-File($statusFolder) {
   $statusFiles = get-childitem $statusFolder -recurse | where {$_.extension -eq ".status"}
 
   if($statusFiles -is [system.array]) {
@@ -458,13 +447,9 @@ function Get-Password($powershellVersion) {
         if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
             $jsonKeys = Decrypt $protectedSettings $thumbprint
             if ($jsonKeys) {
-                if(!$normalizedJsonKeys)
-                {
-                    $global:normalizedJsonKeys = normalize-json($jsonKeys)
-                }
+                $normalizedJsonKeys = normalize-json($jsonKeys)
                 if ( $powershellVersion -ge 3 ) {
                     $value = ($normalizedJsonKeys | ConvertFrom-Json).password
-
                 }
                 else {
                     $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
@@ -479,7 +464,7 @@ function Get-Password($powershellVersion) {
         $ErrorMessage = $_.Exception.Message
         $FailedItem = $_.Exception.ItemName
         Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
-        throw "Error in Get-PublicSettings-From-Config-Json. Couldn't parse configuration file"
+        throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
     }
 }
 
@@ -491,10 +476,176 @@ function Get-Base64Auth($powershellVersion) {
         if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
             $jsonKeys = Decrypt $protectedSettings $thumbprint
             if ($jsonKeys) {
-                if(!$normalizedJsonKeys)
-                {
-                    $global:normalizedJsonKeys = normalize-json($jsonKeys)
+                $normalizedJsonKeys = normalize-json($jsonKeys)
+                if ( $powershellVersion -ge 3 ) {
+                    $value = ($normalizedJsonKeys | ConvertFrom-Json).base64Auth
                 }
+                else {
+                    $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+                    $value = $ser.DeserializeObject($normalizedJsonKeys).base64Auth
+                }
+                Return $value
+            }
+        }
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
+        throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
+    }
+}
+
+
+#Env
+
+function Is-New-Config {
+    $currentSequence = [Environment]::GetEnvironmentVariable('ELASTICAGENTSEQUENCE', 'Machine')
+    $newSequence = [Environment]::GetEnvironmentVariable("ConfigSequenceNumber")
+    $isUpdate = [Environment]::GetEnvironmentVariable("ELASTICAGENTUPDATE")
+    Write-Log "Current sequence is $currentSequence and new sequence is $newSequence" "INFO"
+    if (!$newSequence) {
+        return $false
+     }
+    if ($isUpdate -eq "1") {
+        Write-Log "Part of update" "INFO"
+        return $false
+    }
+    if (!$newSequence) {
+        return $false
+    }
+    if ($currentSequence -eq $newSequence ) {
+        return $false
+    }
+    return $true
+}
+
+function Set-SequenceEnvVariables
+{
+    $newSequence = [Environment]::GetEnvironmentVariable("ConfigSequenceNumber")
+    if (!$newSequence) {
+        $newSequence = Get-Sequence
+    }
+    [Environment]::SetEnvironmentVariable("ELASTICAGENTSEQUENCE", $newSequence, "Machine")
+    [Environment]::SetEnvironmentVariable("ELASTICAGENTUPDATE", 0, "Machine")
+}
+
+function Set-UpdateEnvVariables
+{
+    [Environment]::SetEnvironmentVariable("ELASTICAGENTUPDATE", 1, "Machine")
+}
+
+function Get-Prev-Settings-File($configFolder) {
+    $configFiles = get-childitem $configFolder -recurse | where {$_.extension -eq ".settings"}
+    if($configFiles -is [system.array]) {
+        $configFileName = $configFiles[-2].Name
+    }
+    else {
+        $configFileName = $configFiles.Name
+    }
+    return $configFileName
+}
+
+function Get-Azure-Prev-Config-File($powershellVersion) {
+    Try
+    {
+        $handlerFile = "$extensionRoot\HandlerEnvironment.json"
+        if ( $powershellVersion -ge 3 ) {
+            $configFolder = (((Get-Content $handlerFile) | ConvertFrom-Json)[0] | Select -expand handlerEnvironment).configFolder
+        }
+        else {
+            add-type -assembly system.web.extensions
+            $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+            $configFolder = ($ser.DeserializeObject($(Get-Content $handlerFile)))[0].handlerEnvironment.configFolder
+        }
+        # Get the last .settings file
+        $configFileName = Get-Prev-Settings-File($configFolder)
+        $azureConfigFile = "$configFolder\$configFileName"
+        Write-Log "The previous file is $azureConfigFile" "INFO"
+        $configFileIsFolder = (Get-Item $azureConfigFile) -is [System.IO.DirectoryInfo]
+
+        # In case of update, the n.settings file doesn't exists initially in the
+        # folder of the new extension. Hence using the n.settings file copied into
+        # the C:\Elastic folder during enable
+        if ( $configFileIsFolder ) {
+            Write-Log "n.settings file doesn't exist in the extension folder." "ERROR"
+            throw "Error in Get-Azure-Prev-Config-File. Missing settings file"
+        }
+        return $azureConfigFile
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
+        throw "Error in Get-Azure-Prev-Config-File. Couldn't parse the HandlerEnvironment.json file"
+    }
+}
+
+
+function Get-Prev-ProtectedSettings-From-Config-Json($key, $powershellVersion) {
+    Try
+    {
+        $azureConfigFile = Get-Azure-Prev-Config-File($powershellVersion)
+        $jsonContents = Get-Content $azureConfigFile
+        $normalizedJson = normalize-json($jsonContents)
+        if ( $powershellVersion -ge 3 ) {
+            $keyVal = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings).$key
+        }
+        else {
+            $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+            $keyVal = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.$key
+        }
+        return $keyVal
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
+        throw "Error in Get-Prev-ProtectedSettings-From-Config-Json. Couldn't parse $azureConfigFile"
+    }
+}
+
+function Get-Prev-Password($powershellVersion) {
+    Try
+    {
+        $thumbprint = Get-Prev-ProtectedSettings-From-Config-Json "protectedSettingsCertThumbprint"  $powershellVersion
+        $protectedSettings = Get-Prev-ProtectedSettings-From-Config-Json "protectedSettings"  $powershellVersion
+        if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
+            $jsonKeys = Decrypt $protectedSettings $thumbprint
+            if ($jsonKeys) {
+                $normalizedJsonKeys = normalize-json($jsonKeys)
+                if ( $powershellVersion -ge 3 ) {
+                    $value = ($normalizedJsonKeys | ConvertFrom-Json).password
+                }
+                else {
+                    $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+                    $value = $ser.DeserializeObject($normalizedJsonKeys).password
+                }
+                Return $value
+            }
+        }
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
+        throw "Error in Get-Prev-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
+    }
+}
+
+function Get-Prev-Base64Auth($powershellVersion) {
+    Try
+    {
+        $thumbprint = Get-Prev-ProtectedSettings-From-Config-Json "protectedSettingsCertThumbprint"  $powershellVersion
+        $protectedSettings = Get-Prev-ProtectedSettings-From-Config-Json "protectedSettings"  $powershellVersion
+        if ( $thumbprint -ne "" -and $protectedSettings -ne "") {
+            $jsonKeys = Decrypt $protectedSettings $thumbprint
+            if ($jsonKeys) {
+                $normalizedJsonKeys = normalize-json($jsonKeys)
                 if ( $powershellVersion -ge 3 ) {
                     $value = ($normalizedJsonKeys | ConvertFrom-Json).base64Auth
 
@@ -512,6 +663,58 @@ function Get-Base64Auth($powershellVersion) {
         $ErrorMessage = $_.Exception.Message
         $FailedItem = $_.Exception.ItemName
         Write-Log "Failed to read file: $FailedItem. The error message was $ErrorMessage" "ERROR"
-        throw "Error in Get-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
+        throw "Error in Get-Prev-ProtectedSettings-From-Config-Json. Couldn't parse configuration file"
     }
+}
+
+function Get-Prev-PublicSettings-From-Config-Json($key, $powershellVersion) {
+    Try
+    {
+        $azureConfigFile = Get-Azure-Prev-Config-File($powershellVersion)
+        $jsonContents = Get-Content $azureConfigFile
+        $normalizedJson = normalize-json($jsonContents)
+        if ( $powershellVersion -ge 3 ) {
+            $keyVal = ($normalizedJson | ConvertFrom-Json | Select -expand runtimeSettings | Select -expand handlerSettings | Select -expand publicSettings).$key
+        }
+        else {
+            $ser = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+            $keyVal = $ser.DeserializeObject($normalizedJson).runtimeSettings[0].handlerSettings.publicSettings.$key
+        }
+        return $keyVal
+    }
+    Catch
+    {
+        $ErrorMessage = $_.Exception.Message
+        $FailedItem = $_.Exception.ItemName
+        echo "Failed to read file: $FailedItem. The error message was $ErrorMessage"
+        throw "Error in Get-Prev-PublicSettings-From-Config-Json. Couldn't parse $azureConfigFile"
+    }
+}
+
+function Get-Prev-CloudId($powershellVersion) {
+    $cloudId = Get-Prev-PublicSettings-From-Config-Json "cloudId"  $powershellVersion
+    if ( $cloudId){
+        return $cloudId
+    }
+    return ""
+}
+
+function Get-Prev-Username($powershellVersion) {
+    $username = Get-Prev-PublicSettings-From-Config-Json "username"  $powershellVersion
+    if ( $username){
+        return $username
+    }
+    return ""
+}
+
+function Get-Prev-Kibana-URL($powershellVersion) {
+    $cloudId = Get-Prev-CloudId $powershellVersion
+    if ( $cloudId -ne ""){
+        $cloudHash=$cloudId.split(":")[-1]
+        $cloudTokens=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($cloudHash))
+        $cloudElems=$cloudTokens.split("$")
+        $hostPort= $cloudElems[0]
+        return "https://$($cloudElems[2]).$(${hostPort})"
+    }
+    return ""
 }

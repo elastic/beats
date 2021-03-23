@@ -2,6 +2,8 @@ $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory log.ps1)
 $ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDirectory helper.ps1)
+$ScriptDirectory = Split-Path $MyInvocation.MyCommand.Path
+. (Join-Path $ScriptDirectory config-update.ps1)
 
 # for status enable
 $nameE = "Enable elastic agent"
@@ -22,7 +24,6 @@ function Install-ElasticAgent {
     $INSTALL_LOCATION="C:\Program Files"
     $OS_SUFFIX="-windows-x86_64"
     $ALGORITHM="512"
-    $INSTALL_LOCATION="C:\Program Files"
     $retries = 3
     $retryCount = 0
     $completed = $false
@@ -51,8 +52,8 @@ function Install-ElasticAgent {
             Rename-Item -Path "$INSTALL_LOCATION\$INSTALL" -NewName "Elastic-Agent" -Force
             Write-Log "Folder $INSTALL renamed to 'Agent'"
             Write-Log "Start retrieving KIBANA_URL" "INFO"
-            $kibana_url = Get-Kibana-URL $powershellVersion
-            if (-Not $kibana_url) {
+            $kibanaUrl = Get-Kibana-URL $powershellVersion
+            if (-Not $kibanaUrl) {
                 throw "Kibana url could not be found"
             }
             $password = Get-Password $powershellVersion
@@ -60,7 +61,7 @@ function Install-ElasticAgent {
             if (-Not $password -And -Not $base64Auth) {
                 throw "Password  or base64auto key could not be found"
             }
-            Write-Log "Found Kibana url $kibana_url" "INFO"
+            Write-Log "Found Kibana url $kibanaUrl" "INFO"
             $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
             $headers.Add("Accept","Application/Json")
             $headers.Add("kbn-xsrf", "true")
@@ -77,7 +78,7 @@ function Install-ElasticAgent {
                 $encodedCredentials = $base64Auth
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
-            $jsonResult = Invoke-WebRequest -Uri "$($kibana_url)/api/fleet/enrollment-api-keys"  -Method 'GET' -Headers $headers -UseBasicParsing
+            $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/enrollment-api-keys"  -Method 'GET' -Headers $headers -UseBasicParsing
             if ($jsonResult.statuscode -eq '200') {
                 $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "list"
                 $DEFAULT_POLICY = Get-Default-Policy $keyValue
@@ -89,13 +90,13 @@ function Install-ElasticAgent {
                     throw "No active policies were found. Please create a policy in Kibana Fleet"
                 }
                 Write-Log "Found enrollment_token id $DEFAULT_POLICY" "INFO"
-                $jsonResult = Invoke-WebRequest -Uri "$($kibana_url)/api/fleet/enrollment-api-keys/$($DEFAULT_POLICY)"  -Method 'GET' -Headers $headers -UseBasicParsing
+                $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/enrollment-api-keys/$($DEFAULT_POLICY)"  -Method 'GET' -Headers $headers -UseBasicParsing
                 if ($jsonResult.statuscode -eq '200') {
                     $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "item"
                     $enrollment_token=$keyValue.api_key
                     Write-Log "Found enrollment_token $enrollment_token" "INFO"
-                    Write-Log "Installing Elastic Agent and enrolling to Fleet $kibana_url" "INFO"
-                    & "$INSTALL_LOCATION\Elastic-Agent\elastic-agent.exe" install -f --kibana-url=$kibana_url --enrollment-token=$enrollment_token
+                    Write-Log "Installing Elastic Agent and enrolling to Fleet $kibanaUrl" "INFO"
+                    & "$INSTALL_LOCATION\Elastic-Agent\elastic-agent.exe" install -f --kibana-url=$kibanaUrl --enrollment-token=$enrollment_token
                     Write-Log "Elastic Agent has been enrolled" "INFO"
                 }else {
                     throw "Retrieving the enrollment tokens has failed, api request returned status $jsonResult.statuscode"
@@ -103,6 +104,8 @@ function Install-ElasticAgent {
             } else {
                 throw "Retrieving the enrollment token id has failed, api request returned status $jsonResult.statuscode"
             }
+            Write-Log "Setting Env Variable for sequence" "INFO"
+            Set-SequenceEnvVariables
             $completed = $true
             # write status for both install and enroll
             Write-Status "$name" "$firstOperation" "success" "$message" "$subName" "success" "Elastic Agent has been installed"
@@ -157,9 +160,47 @@ function Enable-ElasticAgent {
     }
 }
 
+function Reconfigure-ElasticAgent {
+    $retries = 3
+    $retryCount = 0
+    $completed = $false
+    while (-not $completed) {
+        Try {
+            Write-Log "Stopping Elastic Agent" "INFO"
+            Stop-Service "elastic agent"
+            Write-Log "Elastic Agent has been stopped" "INFO"
+            Uninstall-Old-ElasticAgent
+            Install-ElasticAgent
+            $completed = $true
+            Write-Status "$name" "$operationE" "success" "$message" "$subName" "success" "Elastic Agent has been reconfigured and reinstalled"
+        }
+        Catch {
+            if ($retryCount -ge $retries) {
+                Write-Log "Starting the Elastic Agent failed after 3 retries" "ERROR"
+                Write-Log $_ "ERROR"
+                Write-Log $_.ScriptStackTrace "ERROR"
+                Write-Status "$nameE" "$operationE" "error" "$messageE" "$subName" "error" "Elastic Agent service has not been reconfigured"
+                exit 1
+            } else {
+                Write-Log "Starting the Elastic Agent has failed. retrying in 20s" "ERROR"
+                Write-Log $_ "ERROR"
+                Write-Log $_.ScriptStackTrace "ERROR"
+                sleep 20
+                $retryCount++
+            }
+        }
+    }
+}
+
+
 If (Get-Service $serviceName -ErrorAction SilentlyContinue) {
+    If (Is-New-Config) {
+        Write-Log "New configuration file has been added. The elastic agent will reinstall" "INFO"
+        Reconfigure-ElasticAgent
+    }
     If ((Get-Service $serviceName).Status -eq 'Running') {
         Write-Log "Elastic Agent service is running" "INFO"
+        Write-Status "$nameE" "$operationE" "success" "$messageE" "$subName" "success" "Elastic Agent service is running"
     } Else {
         Enable-ElasticAgent
     }
