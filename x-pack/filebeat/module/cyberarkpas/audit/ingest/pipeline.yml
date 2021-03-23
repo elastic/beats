@@ -325,10 +325,15 @@ processors:
   - set:
       field: observer
       value:
-        hostname: '{{cyberarkpas.audit.hostname}}'
         vendor: '{{cyberarkpas.audit.vendor}}'
         product: '{{cyberarkpas.audit.product}}'
         version: '{{cyberarkpas.audit.version}}'
+
+  # Hostname is missing some times. Set it separately so it can be skipped.
+  - set:
+      field: observer.hostname
+      value: '{{cyberarkpas.audit.hostname}}'
+      ignore_empty_value: true
 
   #
   # Enrichment based on message_id

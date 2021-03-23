@@ -66,7 +66,6 @@
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 604,
-        "observer.hostname": "",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",

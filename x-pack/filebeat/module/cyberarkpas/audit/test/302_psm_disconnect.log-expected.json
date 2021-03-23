@@ -37,7 +37,7 @@
         "destination.user.name": "admin2",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -49,7 +49,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-LINUX-SSH-radiussrv.cyberark.local-admin2",
@@ -57,7 +56,6 @@
         "input.type": "log",
         "log.offset": 0,
         "network.protocol": "ssh",
-        "observer.hostname": "",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.6.0000",
@@ -115,7 +113,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -127,7 +125,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -195,7 +192,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -207,7 +204,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -275,7 +271,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -287,7 +283,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -355,7 +350,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -367,7 +362,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -435,7 +429,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -447,7 +441,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -515,7 +508,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -527,7 +520,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -601,7 +593,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -613,7 +605,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -687,7 +678,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -699,7 +690,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -771,7 +761,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -783,7 +773,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -855,7 +844,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -867,7 +856,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -939,7 +927,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -951,7 +939,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -1019,7 +1006,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -1031,7 +1018,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -1099,7 +1085,7 @@
         "destination.user.name": "adrian",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -1111,7 +1097,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSHKeys-34.123.103.115-adrian",
@@ -1187,7 +1172,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -1199,7 +1184,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
@@ -1275,7 +1259,7 @@
         "destination.user.name": "testark",
         "event.action": "psm disconnect",
         "event.category": [
-            "network"
+            "session"
         ],
         "event.code": "302",
         "event.dataset": "cyberarkpas.audit",
@@ -1287,7 +1271,6 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "connection",
             "end"
         ],
         "file.path": "Root\\\\Operating System-UnixSSH-34.123.103.115-testark",
