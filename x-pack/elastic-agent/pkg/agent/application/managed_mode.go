@@ -14,10 +14,16 @@ import (
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
+	fleetgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleet"
+	localgateway "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway/fleetserver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
@@ -31,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -56,6 +63,14 @@ type apiClient interface {
 	) (*http.Response, error)
 }
 
+type stateStore interface {
+	Add(fleetapi.Action)
+	AckToken() string
+	SetAckToken(ackToken string)
+	Save() error
+	Actions() []fleetapi.Action
+}
+
 // Managed application, when the application is run in managed mode, most of the configuration are
 // coming from the Fleet App.
 type Managed struct {
@@ -65,8 +80,8 @@ type Managed struct {
 	Config      configuration.FleetAgentConfig
 	api         apiClient
 	agentInfo   *info.AgentInfo
-	gateway     FleetGateway
-	router      pipeline.Dispatcher
+	gateway     gateway.FleetGateway
+	router      pipeline.Router
 	srv         *server.Server
 	stateStore  stateStore
 	upgrader    *upgrade.Upgrader
@@ -149,8 +164,8 @@ func newManaged(
 		composableCtrl,
 		router,
 		&pipeline.ConfigModifiers{
-			Decorators: []pipeline.DecoratorFunc{injectMonitoring},
-			Filters:    []pipeline.FilterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		caps,
 		monitor,
@@ -173,7 +188,7 @@ func newManaged(
 	managedApplication.stateStore = stateStore
 	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
-	actionDispatcher, err := newActionDispatcher(managedApplication.bgContext, log, &handlerDefault{log: log})
+	actionDispatcher, err := dispatcher.New(managedApplication.bgContext, log, handlers.NewDefault(log))
 	if err != nil {
 		return nil, err
 	}
@@ -188,17 +203,19 @@ func newManaged(
 		combinedReporter,
 		caps)
 
-	policyChanger := &handlerPolicyChange{
-		log:       log,
-		emitter:   emit,
-		agentInfo: agentInfo,
-		config:    cfg,
-		store:     storeSaver,
-	}
+	policyChanger := handlers.NewPolicyChange(
+		log,
+		emit,
+		agentInfo,
+		cfg,
+		storeSaver,
+	)
+
 	if cfg.Fleet.Server == nil {
 		// setters only set when not running a local Fleet Server
-		policyChanger.setters = []clientSetter{acker}
+		policyChanger.AddSetter(acker)
 	}
+
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -206,47 +223,42 @@ func newManaged(
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyReassign{},
-		&handlerPolicyReassign{log: log},
+		handlers.NewPolicyReassign(log),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
-		&handlerUnenroll{
-			log:        log,
-			emitter:    emit,
-			dispatcher: router,
-			closers:    []context.CancelFunc{managedApplication.cancelCtxFn},
-			stateStore: stateStore,
-		},
+		handlers.NewUnenroll(
+			log,
+			emit,
+			router,
+			[]context.CancelFunc{managedApplication.cancelCtxFn},
+			stateStore,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUpgrade{},
-		&handlerUpgrade{
-			upgrader: managedApplication.upgrader,
-			log:      log,
-		},
+		handlers.NewUpgrade(log, managedApplication.upgrader),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionSettings{},
-		&handlerSettings{
-			log:       log,
-			reexec:    reexec,
-			agentInfo: agentInfo,
-		},
+		handlers.NewSettings(
+			log,
+			reexec,
+			agentInfo,
+		),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionApp{},
-		&handlerAppAction{
-			log: log,
-		},
+		handlers.NewAppAction(log),
 	)
 
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnknown{},
-		&handlerUnknown{log: log},
+		handlers.NewUnknown(log),
 	)
 
 	actions := stateStore.Actions()
@@ -260,7 +272,7 @@ func newManaged(
 		}
 	}
 
-	gateway, err := newFleetGateway(
+	gateway, err := fleetgateway.New(
 		managedApplication.bgContext,
 		log,
 		agentInfo,
@@ -274,13 +286,13 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	gateway, err = wrapLocalFleetServer(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
+	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
 	if err != nil {
 		return nil, err
 	}
 	// add the gateway to setters, so the gateway can be updated
 	// when the hosts for Kibana are updated by the policy.
-	policyChanger.setters = append(policyChanger.setters, gateway)
+	policyChanger.AddSetter(gateway)
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil

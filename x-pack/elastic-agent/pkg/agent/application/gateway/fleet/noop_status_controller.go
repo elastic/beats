@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package fleet
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
