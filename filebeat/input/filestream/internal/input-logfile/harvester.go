@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -30,6 +31,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
+)
+
+var (
+	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
+	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
 )
 
 // Harvester is the reader which collects the lines from
@@ -46,11 +52,17 @@ type Harvester interface {
 
 type readerGroup struct {
 	mu    sync.Mutex
+	limit uint64
 	table map[string]context.CancelFunc
 }
 
 func newReaderGroup() *readerGroup {
+	return newReaderGroupWithLimit(0)
+}
+
+func newReaderGroupWithLimit(limit uint64) *readerGroup {
 	return &readerGroup{
+		limit: limit,
 		table: make(map[string]context.CancelFunc),
 	}
 }
@@ -65,8 +77,12 @@ func (r *readerGroup) newContext(id string, cancelation v2.Canceler) (context.Co
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	if 0 < r.limit && r.limit <= uint64(len(r.table)) {
+		return nil, nil, ErrHarvesterLimitReached
+	}
+
 	if _, ok := r.table[id]; ok {
-		return nil, nil, fmt.Errorf("harvester is already running for file")
+		return nil, nil, ErrHarvesterAlreadyRunning
 	}
 
 	ctx, cancel := context.WithCancel(ctxtool.FromCanceller(cancelation))
@@ -86,6 +102,14 @@ func (r *readerGroup) remove(id string) {
 
 	cancel()
 	delete(r.table, id)
+}
+
+func (r *readerGroup) hasID(id string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	_, ok := r.table[id]
+	return ok
 }
 
 // HarvesterGroup is responsible for running the
@@ -108,7 +132,6 @@ type defaultHarvesterGroup struct {
 	tg           unison.TaskGroup
 }
 
-// Start starts the Harvester for a Source. It does not block.
 func (hg *defaultHarvesterGroup) Start(ctx input.Context, s Source) {
 	sourceName := s.Name()
 

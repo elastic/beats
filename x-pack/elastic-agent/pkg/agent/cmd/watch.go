@@ -15,7 +15,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -67,9 +67,9 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return nil
 	}
 
-	locker := application.NewAppLocker(paths.Top(), watcherLockFile)
+	locker := filelock.NewAppLocker(paths.Top(), watcherLockFile)
 	if err := locker.TryLock(); err != nil {
-		if err == application.ErrAppAlreadyRunning {
+		if err == filelock.ErrAppAlreadyRunning {
 			log.Debugf("exiting, lock already exists")
 			return nil
 		}

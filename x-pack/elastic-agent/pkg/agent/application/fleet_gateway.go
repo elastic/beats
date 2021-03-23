@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -67,7 +68,7 @@ type FleetGateway interface {
 	Start() error
 
 	// Set the client for the gateway.
-	SetClient(clienter)
+	SetClient(client.Sender)
 }
 
 type stateStore interface {
@@ -82,7 +83,7 @@ type fleetGateway struct {
 	bgContext        context.Context
 	log              *logger.Logger
 	dispatcher       dispatcher
-	client           clienter
+	client           client.Sender
 	scheduler        scheduler.Scheduler
 	backoff          backoff.Backoff
 	settings         *fleetGatewaySettings
@@ -101,7 +102,7 @@ func newFleetGateway(
 	ctx context.Context,
 	log *logger.Logger,
 	agentInfo agentInfo,
-	client clienter,
+	client client.Sender,
 	d dispatcher,
 	r fleetReporter,
 	acker fleetAcker,
@@ -130,7 +131,7 @@ func newFleetGatewayWithScheduler(
 	log *logger.Logger,
 	settings *fleetGatewaySettings,
 	agentInfo agentInfo,
-	client clienter,
+	client client.Sender,
 	d dispatcher,
 	scheduler scheduler.Scheduler,
 	r fleetReporter,
@@ -186,14 +187,20 @@ func (f *fleetGateway) worker() {
 				actions[idx] = a
 			}
 
+			var errMsg string
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
-				msg := fmt.Sprintf("failed to dispatch actions, error: %s", err)
-				f.log.Error(msg)
-				f.statusReporter.Update(state.Degraded, msg)
+				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
+				f.log.Error(errMsg)
+				f.statusReporter.Update(state.Failed, errMsg)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
-			f.statusReporter.Update(state.Healthy, "")
+			if errMsg != "" {
+				f.statusReporter.Update(state.Failed, errMsg)
+			} else {
+				f.statusReporter.Update(state.Healthy, "")
+			}
+
 		case <-f.bgContext.Done():
 			f.stop()
 			return
@@ -235,7 +242,7 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	// retrieve ack token from the store
 	ackToken := f.stateStore.AckToken()
 	if ackToken != "" {
-		f.log.Debug("using previously saved ack token: %v", ackToken)
+		f.log.Debugf("using previously saved ack token: %v", ackToken)
 	}
 
 	// checkin
@@ -285,7 +292,7 @@ func (f *fleetGateway) shouldUnroll() bool {
 }
 
 func isUnauth(err error) bool {
-	return errors.Is(err, fleetapi.ErrInvalidAPIKey)
+	return errors.Is(err, client.ErrInvalidAPIKey)
 }
 
 func (f *fleetGateway) Start() error {
@@ -307,6 +314,6 @@ func (f *fleetGateway) stop() {
 	f.wg.Wait()
 }
 
-func (f *fleetGateway) SetClient(client clienter) {
-	f.client = client
+func (f *fleetGateway) SetClient(c client.Sender) {
+	f.client = c
 }
