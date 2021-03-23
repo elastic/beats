@@ -2,13 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package router
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -36,39 +37,39 @@ func (r *rOp) String() string {
 }
 
 type event struct {
-	rk routingKey
+	rk pipeline.RoutingKey
 	op rOp
 }
 
-type notifyFunc func(routingKey, rOp, ...interface{})
+type notifyFunc func(pipeline.RoutingKey, rOp, ...interface{})
 
 func TestRouter(t *testing.T) {
 	programs := []program.Program{program.Program{Spec: program.Supported[1]}}
 
 	t.Run("create new and destroy unused stream", func(t *testing.T) {
 		recorder := &recorder{}
-		r, err := newRouter(nil, recorder.factory)
+		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[routingKey][]program.Program{
-			defautlRK: programs,
+		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+			pipeline.DefaultRK: programs,
 		})
 
 		assertOps(t, []event{
-			e(defautlRK, createOp),
-			e(defautlRK, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
 
 		nk := "NEW_KEY"
-		r.Dispatch("hello-2", map[routingKey][]program.Program{
+		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
 		assertOps(t, []event{
 			e(nk, createOp),
 			e(nk, executeOp),
-			e(defautlRK, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 		}, recorder.events)
 	})
 
@@ -77,17 +78,17 @@ func TestRouter(t *testing.T) {
 		k2 := "KEY_2"
 
 		recorder := &recorder{}
-		r, err := newRouter(nil, recorder.factory)
+		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[routingKey][]program.Program{
-			defautlRK: programs,
-			k1:        programs,
-			k2:        programs,
+		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+			pipeline.DefaultRK: programs,
+			k1:                 programs,
+			k2:                 programs,
 		})
 
 		assertOps(t, []event{
-			e(defautlRK, createOp),
-			e(defautlRK, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 
 			e(k1, createOp),
 			e(k1, executeOp),
@@ -99,7 +100,7 @@ func TestRouter(t *testing.T) {
 		recorder.reset()
 
 		nk := "SECOND_DISPATCH"
-		r.Dispatch("hello-2", map[routingKey][]program.Program{
+		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
 			nk: programs,
 		})
 
@@ -107,7 +108,7 @@ func TestRouter(t *testing.T) {
 			e(nk, createOp),
 			e(nk, executeOp),
 
-			e(defautlRK, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
 		}, recorder.events)
@@ -115,25 +116,25 @@ func TestRouter(t *testing.T) {
 
 	t.Run("create new and delegate program to existing stream", func(t *testing.T) {
 		recorder := &recorder{}
-		r, err := newRouter(nil, recorder.factory)
+		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[routingKey][]program.Program{
-			defautlRK: programs,
+		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+			pipeline.DefaultRK: programs,
 		})
 
 		assertOps(t, []event{
-			e(defautlRK, createOp),
-			e(defautlRK, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 
 		recorder.reset()
 
-		r.Dispatch("hello-2", map[routingKey][]program.Program{
-			defautlRK: programs,
+		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{
+			pipeline.DefaultRK: programs,
 		})
 
 		assertOps(t, []event{
-			e(defautlRK, executeOp),
+			e(pipeline.DefaultRK, executeOp),
 		}, recorder.events)
 	})
 
@@ -142,17 +143,17 @@ func TestRouter(t *testing.T) {
 		k2 := "KEY_2"
 
 		recorder := &recorder{}
-		r, err := newRouter(nil, recorder.factory)
+		r, err := New(nil, recorder.factory)
 		require.NoError(t, err)
-		r.Dispatch("hello", map[routingKey][]program.Program{
-			defautlRK: programs,
-			k1:        programs,
-			k2:        programs,
+		r.Dispatch("hello", map[pipeline.RoutingKey][]program.Program{
+			pipeline.DefaultRK: programs,
+			k1:                 programs,
+			k2:                 programs,
 		})
 
 		assertOps(t, []event{
-			e(defautlRK, createOp),
-			e(defautlRK, executeOp),
+			e(pipeline.DefaultRK, createOp),
+			e(pipeline.DefaultRK, executeOp),
 			e(k1, createOp),
 			e(k1, executeOp),
 			e(k2, createOp),
@@ -161,10 +162,10 @@ func TestRouter(t *testing.T) {
 
 		recorder.reset()
 
-		r.Dispatch("hello-2", map[routingKey][]program.Program{})
+		r.Dispatch("hello-2", map[pipeline.RoutingKey][]program.Program{})
 
 		assertOps(t, []event{
-			e(defautlRK, closeOp),
+			e(pipeline.DefaultRK, closeOp),
 			e(k1, closeOp),
 			e(k2, closeOp),
 		}, recorder.events)
@@ -175,11 +176,11 @@ type recorder struct {
 	events []event
 }
 
-func (r *recorder) factory(_ *logger.Logger, rk routingKey) (stream, error) {
+func (r *recorder) factory(_ *logger.Logger, rk pipeline.RoutingKey) (pipeline.Stream, error) {
 	return newMockStream(rk, r.notify), nil
 }
 
-func (r *recorder) notify(rk routingKey, op rOp, args ...interface{}) {
+func (r *recorder) notify(rk pipeline.RoutingKey, op rOp, args ...interface{}) {
 	r.events = append(r.events, e(rk, op))
 }
 
@@ -188,11 +189,11 @@ func (r *recorder) reset() {
 }
 
 type mockStream struct {
-	rk     routingKey
+	rk     pipeline.RoutingKey
 	notify notifyFunc
 }
 
-func newMockStream(rk routingKey, notify notifyFunc) *mockStream {
+func newMockStream(rk pipeline.RoutingKey, notify notifyFunc) *mockStream {
 	notify(rk, createOp)
 	return &mockStream{
 		rk:     rk,
@@ -221,6 +222,6 @@ func assertOps(t *testing.T, expected []event, received []event) {
 	require.Equal(t, expected, received)
 }
 
-func e(rk routingKey, op rOp) event {
+func e(rk pipeline.RoutingKey, op rOp) event {
 	return event{rk: rk, op: op}
 }
