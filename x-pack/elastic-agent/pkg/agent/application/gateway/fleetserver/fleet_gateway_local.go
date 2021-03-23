@@ -45,6 +45,7 @@ type fleetServerWrapper struct {
 	emitter     pipeline.EmitterFunc
 }
 
+// New creates a new fleet server gateway wrapping another fleet gateway.
 func New(
 	ctx context.Context,
 	log *logger.Logger,

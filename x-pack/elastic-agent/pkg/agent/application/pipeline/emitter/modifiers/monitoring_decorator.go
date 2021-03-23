@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	// MonitoringName is a name used for artificial program generated when monitoring is needed.
 	MonitoringName            = "FLEET_MONITORING"
 	programsKey               = "programs"
 	monitoringChecksumKey     = "monitoring_checksum"
@@ -31,6 +32,7 @@ const (
 	defaultOutputName = "default"
 )
 
+// InjectMonitoring injects a monitoring configuration into a group of programs if needed.
 func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
 	var err error
 	monitoringProgram := program.Program{

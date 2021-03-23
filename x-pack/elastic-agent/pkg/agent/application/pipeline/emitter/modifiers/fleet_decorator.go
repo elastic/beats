@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+// InjectFleet injects fleet metadata into a configuration.
 func InjectFleet(cfg *config.Config, hostInfo types.HostInfo, agentInfo *info.AgentInfo) func(*logger.Logger, *transpiler.AST) error {
 	return func(logger *logger.Logger, rootAst *transpiler.AST) error {
 		ecsMeta, err := agentInfo.ECSMetadata()

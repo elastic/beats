@@ -246,7 +246,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args
 		},
 	}
 
-	c, err := NewEnrollCmd(
+	c, err := newEnrollCmd(
 		logger,
 		&options,
 		pathConfigFile,

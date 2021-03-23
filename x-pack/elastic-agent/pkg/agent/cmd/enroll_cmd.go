@@ -119,9 +119,9 @@ func (e *enrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	return cfg, nil
 }
 
-// NewEnrollCmd creates a new enroll command that will registers the current beats to the remote
+// newEnrollCmd creates a new enroll command that will registers the current beats to the remote
 // system.
-func NewEnrollCmd(
+func newEnrollCmd(
 	log *logger.Logger,
 	options *enrollCmdOption,
 	configPath string,
@@ -133,7 +133,7 @@ func NewEnrollCmd(
 		storage.NewDiskStore(paths.AgentConfigFile()),
 	)
 
-	return NewEnrollCmdWithStore(
+	return newEnrollCmdWithStore(
 		log,
 		options,
 		configPath,
@@ -141,8 +141,8 @@ func NewEnrollCmd(
 	)
 }
 
-//NewEnrollCmdWithStore creates an new enrollment and accept a custom store.
-func NewEnrollCmdWithStore(
+// newEnrollCmdWithStore creates an new enrollment and accept a custom store.
+func newEnrollCmdWithStore(
 	log *logger.Logger,
 	options *enrollCmdOption,
 	configPath string,

@@ -20,6 +20,7 @@ import (
 )
 
 var (
+	// ErrNoFleetConfig is returned when no configuration was retrieved from fleet just yet.
 	ErrNoFleetConfig = fmt.Errorf("no fleet config retrieved yet")
 )
 
