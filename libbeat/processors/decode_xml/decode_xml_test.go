@@ -57,7 +57,7 @@ func TestDecodeXML(t *testing.T) {
 				</catalog>`,
 			},
 			Output: common.MapStr{
-				"xml": map[string]interface{}{
+				"xml": common.MapStr{
 					"catalog": map[string]interface{}{
 						"book": map[string]interface{}{
 							"author": "William H. Gaddis",
@@ -125,7 +125,7 @@ func TestDecodeXML(t *testing.T) {
 				</catalog>`,
 			},
 			Output: common.MapStr{
-				"message": map[string]interface{}{
+				"message": common.MapStr{
 					"catalog": map[string]interface{}{
 						"book": map[string]interface{}{
 							"author": "William H. Gaddis",
@@ -158,7 +158,7 @@ func TestDecodeXML(t *testing.T) {
 				</catalog>`,
 			},
 			Output: common.MapStr{
-				"message": map[string]interface{}{
+				"message": common.MapStr{
 					"catalog": map[string]interface{}{
 						"book": []interface{}{
 							map[string]interface{}{
@@ -203,7 +203,7 @@ func TestDecodeXML(t *testing.T) {
 				</catalog>`,
 			},
 			Output: common.MapStr{
-				"message": map[string]interface{}{
+				"message": common.MapStr{
 					"catalog": map[string]interface{}{
 						"book": []interface{}{
 							map[string]interface{}{

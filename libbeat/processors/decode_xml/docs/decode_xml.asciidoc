@@ -55,15 +55,13 @@ Example XML input:
 
 [source,xml]
 -------------------------------------------------------------------------------
-{
-  <catalog>
-    <book seq="1">
-      <author>William H. Gaddis</author>
-      <title>The Recognitions</title>
-      <review>One of the great seminal American novels of the 20th century.</review>
-    </book>
-  </catalog>
-}
+<catalog>
+  <book seq="1">
+    <author>William H. Gaddis</author>
+    <title>The Recognitions</title>
+    <review>One of the great seminal American novels of the 20th century.</review>
+  </book>
+</catalog>
 -------------------------------------------------------------------------------
 
 Will produce the following output:
@@ -97,10 +95,13 @@ value (`target_field:`) is treated as if the field was not set at all.
 
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded XML object. The
-default value is false.
+default value is `true`.
 
 `to_lower`:: (Optional) Converts all keys to lowercase. Accepts either true or
-false. The default value is true.
+false. The default value is `true`.
+
+`schema`:: (Optional) Specifies the schema of the message. Accepted schemas: `wineventlog`.
+The default value is ``.
 
 `document_id`:: (Optional) XML key to use as the document ID. If configured, the
 field will be removed from the original XML document and stored in
