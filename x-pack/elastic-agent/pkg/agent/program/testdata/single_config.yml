@@ -1,13 +1,15 @@
 name: Production Website DB Servers
 fleet:
   enabled: true
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  protocol: https
+  hosts: [ localhost:5601 ]
+  timeout: 30s
   agent:
     id: fleet-agent-id
-  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
-  kibana:
-    protocol: https
-    host: localhost:5601
-    timeout: 30s
+    logging.level: error
+  host:
+    id: host-agent-id
   server:
     output:
       elasticsearch:

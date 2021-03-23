@@ -1060,11 +1060,33 @@ func Insert(a *AST, node Node, to Selector) error {
 		return fmt.Errorf("expecting Key and received %T", current)
 	}
 
-	switch node.(type) {
+	switch nt := node.(type) {
 	case *Dict:
 		d.value = node
 	case *List:
 		d.value = node
+	case *Key:
+		// adding key to existing dictionary
+		// should overwrite the current key if it exists
+		dValue, ok := d.value.(*Dict)
+		if !ok {
+			// not a dictionary (replace it all)
+			d.value = &Dict{[]Node{node}, nil}
+		} else {
+			// remove the duplicate key (if it exists)
+			for i, key := range dValue.value {
+				if k, ok := key.(*Key); ok {
+					if k.name == nt.name {
+						dValue.value[i] = dValue.value[len(dValue.value)-1]
+						dValue.value = dValue.value[:len(dValue.value)-1]
+						break
+					}
+				}
+			}
+			// add the new key
+			dValue.value = append(dValue.value, nt)
+			dValue.sort()
+		}
 	default:
 		d.value = &Dict{[]Node{node}, nil}
 	}

@@ -999,15 +999,35 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 
 	switch t := n.Value().(type) {
 	case *List:
-		return mapList(agentInfo, r, t)
+		l, err := mapList(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = l
+		return nil
 	case *Dict:
-		return mapDict(agentInfo, r, t)
+		d, err := mapDict(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = d
+		return nil
 	case *Key:
 		switch t := n.Value().(type) {
 		case *List:
-			return mapList(agentInfo, r, t)
+			l, err := mapList(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = l
+			return nil
 		case *Dict:
-			return mapDict(agentInfo, r, t)
+			d, err := mapDict(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = d
+			return nil
 		default:
 			return fmt.Errorf(
 				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
@@ -1022,7 +1042,7 @@ func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) error {
 	)
 }
 
-func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
+func mapList(agentInfo AgentInfo, r *MapRule, l *List) (*List, error) {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
@@ -1030,24 +1050,24 @@ func mapList(agentInfo AgentInfo, r *MapRule, l *List) error {
 		for _, rule := range r.Rules {
 			err := rule.Apply(agentInfo, newAST)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			values[idx] = newAST.root
 		}
 	}
-	return nil
+	return l, nil
 }
 
-func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) error {
+func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) (*Dict, error) {
 	newAST := &AST{root: l}
 	for _, rule := range r.Rules {
 		err := rule.Apply(agentInfo, newAST)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return newAST.root.(*Dict), nil
 }
 
 // MarshalYAML marshal a MapRule into a YAML document.

@@ -1,0 +1,34 @@
+name: Fleet Server Only
+fleet:
+  enabled: true
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  protocol: https
+  hosts: [ localhost:5601 ]
+  timeout: 30s
+  agent:
+    id: fleet-agent-id
+    logging.level: error
+  host:
+    id: host-agent-id
+  server:
+    output:
+      elasticsearch:
+        hosts: [ 127.0.0.1:9200, 127.0.0.1:9300 ]
+        username: fleet
+        password: fleetpassword
+
+outputs:
+  default:
+    type: elasticsearch
+    hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    username: elastic
+    password: changeme
+    api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
+    ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
+
+inputs:
+  - id: fleet-server-id
+    type: fleet-server
+    use_output: default
+    data_stream:
+      type: default
