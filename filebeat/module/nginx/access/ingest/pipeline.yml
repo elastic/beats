@@ -4,8 +4,11 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- grok:
+- rename:
     field: message
+    target_field: event.original
+- grok:
+    field: event.original
     patterns:
     - (%{NGINX_HOST} )?"?(?:%{NGINX_ADDRESS_LIST:nginx.access.remote_ip_list}|%{NOTSPACE:source.address})
       - (-|%{DATA:user.name}) \[%{HTTPDATE:nginx.access.time}\] "%{DATA:nginx.access.info}"
@@ -19,11 +22,27 @@ processors:
 - grok:
     field: nginx.access.info
     patterns:
-    - '%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}'
+    - '%{WORD:http.request.method} %{DATA:url_original_tmp} HTTP/%{NUMBER:http.version}'
     - ""
     ignore_missing: true
+- urldecode:
+    field: url_original_tmp
+    target_: url.original
+    ignore_missing: true
+    ignore_failure: true
+- urldecode:
+    field: http.request.referrer
+    ignore_missing: true
+    ignore_failure: true
+- grok:
+    field: url_original_tmp
+    patterns:
+    - '%{URIPATH:url.path}(\?%{DATA:url.query})?'
+    ignore_missing: true
 - remove:
-    field: nginx.access.info
+    field:
+      - nginx.access.info
+      - url_original_tmp
 - split:
     field: nginx.access.remote_ip_list
     separator: '"?,?\s+'
@@ -93,8 +112,6 @@ processors:
     patterns:
     - ^%{IP:source.ip}$
     ignore_failure: true
-- remove:
-    field: message
 - rename:
     field: '@timestamp'
     target_field: event.created

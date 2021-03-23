@@ -7,6 +7,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:49:33 +0200] \"GET / HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -55,6 +56,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:49:34 +0200] \"GET /favicon.ico HTTP/1.1\" 404 571 \"http://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -104,6 +106,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [25/Oct/2016:14:50:44 +0200] \"GET /adsasd HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -152,6 +155,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:34:43 +0100] \"GET / HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -200,6 +204,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:34:43 +0100] \"GET /favicon.ico HTTP/1.1\" 404 571 \"http://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -249,6 +254,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:18 +0100] \"GET /test HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -297,6 +303,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:21 +0100] \"GET /test HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -345,6 +352,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "77.179.66.156 - - [07/Dec/2016:10:43:23 +0100] \"GET /test1 HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -393,6 +401,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:37 +0100] \"GET /test1 HTTP/1.1\" 404 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -431,6 +440,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:58 +0100] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -469,6 +479,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:04:59 +0100] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -507,6 +518,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
+        "event.original": "127.0.0.1 - - [07/Dec/2016:11:05:07 +0100] \"GET /taga HTTP/1.1\" 404 169 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -536,5 +548,46 @@
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.12",
         "user_agent.version": "49.0."
+    },
+    {
+        "@timestamp": "2020-06-09T19:10:39.000Z",
+        "destination.domain": "lessons.example.com",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.access",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "lessons.example.com 192.168.0.1 - - [09/Jun/2020:12:10:39 -0700] \"GET /A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4 HTTP/1.1\" 206 7648063 \"http://lessons.example.com/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4\" \"Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36\"",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "access",
+        "http.request.method": "GET",
+        "http.request.referrer": "http://lessons.example.com/A Beka G1 Howe/029_AND_30/15 reading elephants.mp4",
+        "http.response.body.bytes": 7648063,
+        "http.response.status_code": 206,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 2346,
+        "nginx.access.remote_ip_list": [
+            "192.168.0.1"
+        ],
+        "related.ip": [
+            "192.168.0.1"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "url.original": "/A Beka G1 Howe/029_AND_30/15 reading elephants.mp4",
+        "user_agent.device.name": "Kindle",
+        "user_agent.name": "Amazon Silk",
+        "user_agent.original": "Mozilla/5.0 (Linux; Android 5.1.1; KFFOWI) AppleWebKit/537.36 (KHTML, like Gecko) Silk/81.2.16 like Chrome/81.0.4044.138 Safari/537.36",
+        "user_agent.os.full": "Android 5.1.1",
+        "user_agent.os.name": "Android",
+        "user_agent.os.version": "5.1.1",
+        "user_agent.version": "81.2.16"
     }
 ]
