@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package handlers
 
 import (
 	"context"
@@ -10,21 +10,48 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-// After running Unenroll agent is in idle state, non managed non standalone.
+type stateStore interface {
+	Add(fleetapi.Action)
+	AckToken() string
+	SetAckToken(ackToken string)
+	Save() error
+	Actions() []fleetapi.Action
+}
+
+// Unenroll results in  running agent entering idle state, non managed non standalone.
 // For it to be operational again it needs to be either enrolled or reconfigured.
-type handlerUnenroll struct {
+type Unenroll struct {
 	log        *logger.Logger
 	emitter    pipeline.EmitterFunc
-	dispatcher pipeline.Dispatcher
+	dispatcher pipeline.Router
 	closers    []context.CancelFunc
 	stateStore stateStore
 }
 
-func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker) error {
+// NewUnenroll creates a new Unenroll handler.
+func NewUnenroll(
+	log *logger.Logger,
+	emitter pipeline.EmitterFunc,
+	dispatcher pipeline.Router,
+	closers []context.CancelFunc,
+	stateStore stateStore,
+) *Unenroll {
+	return &Unenroll{
+		log:        log,
+		emitter:    emitter,
+		dispatcher: dispatcher,
+		closers:    closers,
+		stateStore: stateStore,
+	}
+}
+
+// Handle handles UNENROLL action.
+func (h *Unenroll) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerUnenroll: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionUnenroll)
 	if !ok {
@@ -33,7 +60,7 @@ func (h *handlerUnenroll) Handle(ctx context.Context, a action, acker fleetAcker
 
 	// Providing empty map will close all pipelines
 	noPrograms := make(map[pipeline.RoutingKey][]program.Program)
-	h.dispatcher.Dispatch(a.ID(), noPrograms)
+	h.dispatcher.Route(a.ID(), noPrograms)
 
 	if !action.IsDetected {
 		// ACK only events comming from fleet

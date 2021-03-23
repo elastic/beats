@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package dispatcher
 
 import (
 	"context"
@@ -10,16 +10,18 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 )
 
 type mockHandler struct {
-	received action
+	received fleetapi.Action
 	called   bool
 	err      error
 }
 
-func (h *mockHandler) Handle(_ context.Context, a action, acker fleetAcker) error {
+func (h *mockHandler) Handle(_ context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.called = true
 	h.received = a
 	return h.err
@@ -48,7 +50,7 @@ func TestActionDispatcher(t *testing.T) {
 
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
 		def := &mockHandler{}
-		d, err := newActionDispatcher(context.Background(), nil, def)
+		d, err := New(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		success1 := &mockHandler{}
@@ -76,7 +78,7 @@ func TestActionDispatcher(t *testing.T) {
 
 	t.Run("Unknown action are caught by the unknown handler", func(t *testing.T) {
 		def := &mockHandler{}
-		d, err := newActionDispatcher(context.Background(), nil, def)
+		d, err := New(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		action := &mockActionUnknown{}
@@ -91,7 +93,7 @@ func TestActionDispatcher(t *testing.T) {
 		success2 := &mockHandler{}
 
 		def := &mockHandler{}
-		d, err := newActionDispatcher(context.Background(), nil, def)
+		d, err := New(context.Background(), nil, def)
 		require.NoError(t, err)
 
 		err = d.Register(&mockAction{}, success1)

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package cmd
 
 import (
 	"bytes"
@@ -20,8 +20,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -55,18 +58,18 @@ type storeLoad interface {
 	Load() (io.ReadCloser, error)
 }
 
-// EnrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
-type EnrollCmd struct {
+// enrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
+type enrollCmd struct {
 	log          *logger.Logger
-	options      *EnrollCmdOption
+	options      *enrollCmdOption
 	client       fleetclient.Sender
 	configStore  saver
 	kibanaConfig *kibana.Config
 	agentProc    *process.Info
 }
 
-// EnrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
-type EnrollCmdFleetServerOption struct {
+// enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
+type enrollCmdFleetServerOption struct {
 	ConnStr         string
 	ElasticsearchCA string
 	PolicyID        string
@@ -78,8 +81,8 @@ type EnrollCmdFleetServerOption struct {
 	SpawnAgent      bool
 }
 
-// EnrollCmdOption define all the supported enrollment option.
-type EnrollCmdOption struct {
+// enrollCmdOption define all the supported enrollment option.
+type enrollCmdOption struct {
 	ID                   string
 	URL                  string
 	CAs                  []string
@@ -88,10 +91,10 @@ type EnrollCmdOption struct {
 	UserProvidedMetadata map[string]interface{}
 	EnrollAPIKey         string
 	Staging              string
-	FleetServer          EnrollCmdFleetServerOption
+	FleetServer          enrollCmdFleetServerOption
 }
 
-func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
+func (e *enrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	cfg, err := kibana.NewConfigFromURL(e.URL)
 	if err != nil {
 		return nil, err
@@ -116,21 +119,21 @@ func (e *EnrollCmdOption) kibanaConfig() (*kibana.Config, error) {
 	return cfg, nil
 }
 
-// NewEnrollCmd creates a new enroll command that will registers the current beats to the remote
+// newEnrollCmd creates a new enroll command that will registers the current beats to the remote
 // system.
-func NewEnrollCmd(
+func newEnrollCmd(
 	log *logger.Logger,
-	options *EnrollCmdOption,
+	options *enrollCmdOption,
 	configPath string,
-) (*EnrollCmd, error) {
+) (*enrollCmd, error) {
 
 	store := storage.NewReplaceOnSuccessStore(
 		configPath,
-		DefaultAgentFleetConfig,
+		application.DefaultAgentFleetConfig,
 		storage.NewDiskStore(paths.AgentConfigFile()),
 	)
 
-	return NewEnrollCmdWithStore(
+	return newEnrollCmdWithStore(
 		log,
 		options,
 		configPath,
@@ -138,14 +141,14 @@ func NewEnrollCmd(
 	)
 }
 
-//NewEnrollCmdWithStore creates an new enrollment and accept a custom store.
-func NewEnrollCmdWithStore(
+// newEnrollCmdWithStore creates an new enrollment and accept a custom store.
+func newEnrollCmdWithStore(
 	log *logger.Logger,
-	options *EnrollCmdOption,
+	options *enrollCmdOption,
 	configPath string,
 	store saver,
-) (*EnrollCmd, error) {
-	return &EnrollCmd{
+) (*enrollCmd, error) {
+	return &enrollCmd{
 		log:         log,
 		options:     options,
 		configStore: store,
@@ -153,7 +156,7 @@ func NewEnrollCmdWithStore(
 }
 
 // Execute tries to enroll the agent into Fleet.
-func (c *EnrollCmd) Execute(ctx context.Context) error {
+func (c *enrollCmd) Execute(ctx context.Context) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
 	if c.options.FleetServer.ConnStr != "" {
@@ -195,7 +198,7 @@ func (c *EnrollCmd) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
+func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
 	_, err := getDaemonStatus(ctx)
@@ -248,7 +251,7 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	return nil
 }
 
-func (c *EnrollCmd) prepareFleetTLS() error {
+func (c *enrollCmd) prepareFleetTLS() error {
 	host := c.options.FleetServer.Host
 	if host == "" {
 		host = "localhost"
@@ -295,7 +298,7 @@ func (c *EnrollCmd) prepareFleetTLS() error {
 	return nil
 }
 
-func (c *EnrollCmd) daemonReload(ctx context.Context) error {
+func (c *enrollCmd) daemonReload(ctx context.Context) error {
 	daemon := client.New()
 	err := daemon.Connect(ctx)
 	if err != nil {
@@ -305,7 +308,7 @@ func (c *EnrollCmd) daemonReload(ctx context.Context) error {
 	return daemon.Restart(ctx)
 }
 
-func (c *EnrollCmd) enrollWithBackoff(ctx context.Context) error {
+func (c *enrollCmd) enrollWithBackoff(ctx context.Context) error {
 	delay(ctx, enrollDelay)
 
 	err := c.enroll(ctx)
@@ -333,10 +336,10 @@ func (c *EnrollCmd) enrollWithBackoff(ctx context.Context) error {
 	return err
 }
 
-func (c *EnrollCmd) enroll(ctx context.Context) error {
+func (c *enrollCmd) enroll(ctx context.Context) error {
 	cmd := fleetapi.NewEnrollCmd(c.client)
 
-	metadata, err := metadata()
+	metadata, err := info.Metadata()
 	if err != nil {
 		return errors.New(err, "acquiring metadata failed")
 	}
@@ -413,7 +416,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 	return nil
 }
 
-func (c *EnrollCmd) startAgent() error {
+func (c *enrollCmd) startAgent() error {
 	cmd, err := os.Executable()
 	if err != nil {
 		return err
@@ -427,7 +430,7 @@ func (c *EnrollCmd) startAgent() error {
 	return nil
 }
 
-func (c *EnrollCmd) stopAgent() {
+func (c *enrollCmd) stopAgent() {
 	if c.agentProc != nil {
 		c.agentProc.StopWait()
 		c.agentProc = nil
@@ -572,4 +575,54 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	}
 
 	return nil
+}
+
+func createFleetServerBootstrapConfig(connStr string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
+	es, err := configuration.ElasticsearchFromConnStr(connStr)
+	if err != nil {
+		return nil, err
+	}
+	if esCA != "" {
+		es.TLS = &tlscommon.Config{
+			CAs: []string{esCA},
+		}
+	}
+	cfg := configuration.DefaultFleetAgentConfig()
+	cfg.Enabled = true
+	cfg.Server = &configuration.FleetServerConfig{
+		Bootstrap: true,
+		Output: configuration.FleetServerOutputConfig{
+			Elasticsearch: es,
+		},
+		Host: host,
+		Port: port,
+	}
+	if policyID != "" {
+		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
+	}
+	if cert != "" || key != "" {
+		cfg.Server.TLS = &tlscommon.Config{
+			Certificate: tlscommon.CertificateConfig{
+				Certificate: cert,
+				Key:         key,
+			},
+		}
+	}
+
+	if err := cfg.Valid(); err != nil {
+		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
+	}
+	return cfg, nil
+}
+
+func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
+	cfg := configuration.DefaultFleetAgentConfig()
+	cfg.Enabled = true
+	cfg.AccessAPIKey = accessAPIKey
+	cfg.Kibana = kbn
+
+	if err := cfg.Valid(); err != nil {
+		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
+	}
+	return cfg, nil
 }
