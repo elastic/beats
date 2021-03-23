@@ -598,9 +598,9 @@ processors:
           - set: network.protocol
             from: cyberarkpas.audit.extra_details.protocol
           - set: event.category
-            value: ["network"]
+            value: ["session"]
           - set: event.type
-            value: ["connection", "start"]
+            value: ["start"]
           - set: event.outcome
             value: "success"
 
@@ -619,9 +619,9 @@ processors:
           - set: _tmp.duration_hms
             from: cyberarkpas.audit.extra_details.session_duration
           - set: event.category
-            value: ["network"]
+            value: ["session"]
           - set: event.type
-            value: ["connection", "end"]
+            value: ["end"]
           - set: event.outcome
             value: "success"
 
@@ -641,6 +641,23 @@ processors:
             from: cyberarkpas.audit.ca_properties.cpm_status
           - set: event.reason
             from: cyberarkpas.audit.reason
+
+        # 361 - Keystroke logging
+        "361":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.protocol
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["info"]
 
       source: >
         def clone(def val) {
