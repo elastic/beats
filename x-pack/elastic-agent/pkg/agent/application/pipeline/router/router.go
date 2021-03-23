@@ -23,7 +23,7 @@ type router struct {
 }
 
 // New creates a new router.
-func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Dispatcher, error) {
+func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New("router")
@@ -34,7 +34,7 @@ func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Dispatcher, 
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
 }
 
-func (r *router) Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
+func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	s := sorted.NewSet()
 
 	// Make sure that starting and updating is always done in the same order.
