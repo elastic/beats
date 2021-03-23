@@ -15,19 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sys
+package winevent
 
 import (
 	"encoding/xml"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	libxml "github.com/elastic/beats/v7/libbeat/common/encoding/xml"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/winlogbeat/sys"
 )
 
-// UnmarshalEventXML unmarshals the given XML into a new Event.
-func UnmarshalEventXML(rawXML []byte) (Event, error) {
+// Debug selectors used in this package.
+const (
+	debugSelector = "winevent"
+)
+
+// Debug logging functions for this package.
+var (
+	debugf = logp.MakeDebug(debugSelector)
+)
+
+// Keyword Constants
+const (
+	keywordAuditFailure = 0x10000000000000
+	keywordAuditSuccess = 0x20000000000000
+)
+
+// UnmarshalXML unmarshals the given XML into a new Event.
+func UnmarshalXML(rawXML []byte) (Event, error) {
 	var event Event
 	decoder := xml.NewDecoder(libxml.NewSafeReader(rawXML))
 	err := decoder.Decode(&event)
@@ -66,6 +86,70 @@ type Event struct {
 	RenderErrorCode         uint32 `xml:"ProcessingErrorData>ErrorCode"`
 	RenderErrorDataItemName string `xml:"ProcessingErrorData>DataItemName"`
 	RenderErr               []string
+}
+
+func (e Event) Fields() common.MapStr {
+	// Windows Log Specific data
+	win := common.MapStr{}
+
+	AddOptional(win, "channel", e.Channel)
+	AddOptional(win, "event_id", e.EventIdentifier.ID)
+	AddOptional(win, "provider_name", e.Provider.Name)
+	AddOptional(win, "record_id", e.RecordID)
+	AddOptional(win, "task", e.Task)
+	AddOptional(win, "keywords_raw", e.KeywordsRaw)
+	AddOptional(win, "computer_name", e.Computer)
+	AddOptional(win, "keywords", e.Keywords)
+	AddOptional(win, "opcode", e.Opcode)
+	AddOptional(win, "provider_guid", e.Provider.GUID)
+	AddOptional(win, "task", e.Task)
+	AddOptional(win, "version", e.Version)
+
+	if e.KeywordsRaw&keywordAuditFailure > 0 {
+		_, _ = win.Put("outcome", "failure")
+	} else if e.KeywordsRaw&keywordAuditSuccess > 0 {
+		_, _ = win.Put("outcome", "success")
+	}
+
+	AddOptional(win, "level", strings.ToLower(e.Level))
+	AddOptional(win, "message", sys.RemoveWindowsLineEndings(e.Message))
+
+	if e.User.Identifier != "" {
+		user := common.MapStr{
+			"identifier": e.User.Identifier,
+		}
+		win["user"] = user
+		AddOptional(user, "domain", e.User.Domain)
+		AddOptional(user, "name", e.User.Name)
+		AddOptional(user, "type", e.User.Type.String())
+	}
+
+	AddPairs(win, "event_data", e.EventData.Pairs)
+	userData := AddPairs(win, "user_data", e.UserData.Pairs)
+	AddOptional(userData, "xml_name", e.UserData.Name.Local)
+
+	// Correlation
+	AddOptional(win, "activity_id", e.Correlation.ActivityID)
+	AddOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
+
+	// Execution
+	AddOptional(win, "kernel_time", e.Execution.KernelTime)
+	AddOptional(win, "process.pid", e.Execution.ProcessID)
+	AddOptional(win, "process.thread.id", e.Execution.ThreadID)
+	AddOptional(win, "processor_id", e.Execution.ProcessorID)
+	AddOptional(win, "processor_time", e.Execution.ProcessorTime)
+	AddOptional(win, "session_id", e.Execution.SessionID)
+	AddOptional(win, "user_time", e.Execution.UserTime)
+
+	// Errors
+	AddOptional(win, "error.code", e.RenderErrorCode)
+	if len(e.RenderErr) == 1 {
+		AddOptional(win, "error.message", e.RenderErr[0])
+	} else {
+		AddOptional(win, "error.message", e.RenderErr)
+	}
+
+	return win
 }
 
 // Provider identifies the provider that logged the event. The Name and GUID
