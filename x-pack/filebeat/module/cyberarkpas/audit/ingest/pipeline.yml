@@ -625,6 +625,23 @@ processors:
           - set: event.outcome
             value: "success"
 
+        # 308 - Use Password
+        "308":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
@@ -719,6 +736,8 @@ processors:
       value: '{{destination.ip}}'
       if: 'ctx.destination?.ip != null'
       allow_duplicates: false
+    # TODO: Append gateway_station to related.ip ?
+
   - append:
       field: related.user
       value: '{{user.name}}'
