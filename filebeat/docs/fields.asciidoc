@@ -21125,7 +21125,7 @@ type: keyword
 
 --
 
-*`cisco.amp.file.archived_file.identify.sha256`*::
+*`cisco.amp.file.archived_file.identity.sha256`*::
 +
 --
 SHA256 hash of the archived file related to the malicious event.
@@ -21335,10 +21335,50 @@ type: flattened
 
 --
 
+*`cisco.amp.mitre_tactics`*::
++
+--
+Array of all related mitre tactic ID's
+
+
+type: keyword
+
+--
+
 *`cisco.amp.techniques`*::
 +
 --
 List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.mitre_techniques`*::
++
+--
+Array of all related mitre technique ID's
+
+
+type: keyword
+
+--
+
+*`cisco.amp.command_line.arguments`*::
++
+--
+The CLI arguments related to the Cloud Threat IOC reported by Cisco.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.bp_data`*::
++
+--
+Endpoint isolation information
 
 
 type: flattened

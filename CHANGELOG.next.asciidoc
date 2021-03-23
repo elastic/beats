@@ -528,6 +528,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `application/x-ndjson` as decode option for httpjson input {pull}23521[23521]
 - Added `application/x-www-form-urlencoded` as encode option for httpjson input {pull}23521[23521]
 - Move aws-s3 input to GA. {pull}23631[23631]
+- Support X-Forwarder-For in IIS logs. {pull}19142[192142]
+- Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
+- Added NTP fileset to Zeek module {pull}24224[24224]
 
 *Heartbeat*
 
