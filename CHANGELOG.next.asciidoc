@@ -222,15 +222,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `google_workspace` pagination. {pull}24668[24668]
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
+- Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
-
-*Heartbeat*
-
 
 *Journalbeat*
 
