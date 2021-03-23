@@ -43,6 +43,7 @@ type clientObserver interface {
 
 type queueObserver interface {
 	queueACKed(n int)
+	queueMaxEvents(n int)
 }
 
 type outputObserver interface {
@@ -62,7 +63,10 @@ type outputObserver interface {
 // event-handlers only (e.g. the client centric events callbacks)
 type metricsObserver struct {
 	metrics *monitoring.Registry
+	vars    metricsObserverVars
+}
 
+type metricsObserverVars struct {
 	// clients metrics
 	clients *monitoring.Uint
 
@@ -72,7 +76,8 @@ type metricsObserver struct {
 	activeEvents                        *monitoring.Uint
 
 	// queue metrics
-	ackedQueue *monitoring.Uint
+	queueACKed     *monitoring.Uint
+	queueMaxEvents *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -83,18 +88,21 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 
 	return &metricsObserver{
 		metrics: metrics,
-		clients: monitoring.NewUint(reg, "clients"),
+		vars: metricsObserverVars{
+			clients: monitoring.NewUint(reg, "clients"),
 
-		events:    monitoring.NewUint(reg, "events.total"),
-		filtered:  monitoring.NewUint(reg, "events.filtered"),
-		published: monitoring.NewUint(reg, "events.published"),
-		failed:    monitoring.NewUint(reg, "events.failed"),
-		dropped:   monitoring.NewUint(reg, "events.dropped"),
-		retry:     monitoring.NewUint(reg, "events.retry"),
+			events:    monitoring.NewUint(reg, "events.total"),
+			filtered:  monitoring.NewUint(reg, "events.filtered"),
+			published: monitoring.NewUint(reg, "events.published"),
+			failed:    monitoring.NewUint(reg, "events.failed"),
+			dropped:   monitoring.NewUint(reg, "events.dropped"),
+			retry:     monitoring.NewUint(reg, "events.retry"),
 
-		ackedQueue: monitoring.NewUint(reg, "queue.acked"),
+			queueACKed:     monitoring.NewUint(reg, "queue.acked"),
+			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
-		activeEvents: monitoring.NewUint(reg, "events.active"),
+			activeEvents: monitoring.NewUint(reg, "events.active"),
+		},
 	}
 }
 
@@ -109,13 +117,13 @@ func (o *metricsObserver) cleanup() {
 //
 
 // (pipeline) pipeline did finish creating a new client instance
-func (o *metricsObserver) clientConnected() { o.clients.Inc() }
+func (o *metricsObserver) clientConnected() { o.vars.clients.Inc() }
 
 // (client) close being called on client
 func (o *metricsObserver) clientClosing() {}
 
 // (client) client finished processing close
-func (o *metricsObserver) clientClosed() { o.clients.Dec() }
+func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 
 //
 // client publish events
@@ -123,25 +131,25 @@ func (o *metricsObserver) clientClosed() { o.clients.Dec() }
 
 // (client) client is trying to publish a new event
 func (o *metricsObserver) newEvent() {
-	o.events.Inc()
-	o.activeEvents.Inc()
+	o.vars.events.Inc()
+	o.vars.activeEvents.Inc()
 }
 
 // (client) event is filtered out (on purpose or failed)
 func (o *metricsObserver) filteredEvent() {
-	o.filtered.Inc()
-	o.activeEvents.Dec()
+	o.vars.filtered.Inc()
+	o.vars.activeEvents.Dec()
 }
 
 // (client) managed to push an event into the publisher pipeline
 func (o *metricsObserver) publishedEvent() {
-	o.published.Inc()
+	o.vars.published.Inc()
 }
 
 // (client) client closing down or DropIfFull is set
 func (o *metricsObserver) failedPublishEvent() {
-	o.failed.Inc()
-	o.activeEvents.Dec()
+	o.vars.failed.Inc()
+	o.vars.activeEvents.Dec()
 }
 
 //
@@ -150,8 +158,13 @@ func (o *metricsObserver) failedPublishEvent() {
 
 // (queue) number of events ACKed by the queue/broker in use
 func (o *metricsObserver) queueACKed(n int) {
-	o.ackedQueue.Add(uint64(n))
-	o.activeEvents.Sub(uint64(n))
+	o.vars.queueACKed.Add(uint64(n))
+	o.vars.activeEvents.Sub(uint64(n))
+}
+
+// (queue) maximum queue event capacity
+func (o *metricsObserver) queueMaxEvents(n int) {
+	o.vars.queueMaxEvents.Set(uint64(n))
 }
 
 //
@@ -166,12 +179,12 @@ func (o *metricsObserver) eventsFailed(int) {}
 
 // (retryer) number of events dropped by retryer
 func (o *metricsObserver) eventsDropped(n int) {
-	o.dropped.Add(uint64(n))
+	o.vars.dropped.Add(uint64(n))
 }
 
 // (retryer) number of events pushed to the output worker queue
 func (o *metricsObserver) eventsRetry(n int) {
-	o.retry.Add(uint64(n))
+	o.vars.retry.Add(uint64(n))
 }
 
 // (output) number of events to be forwarded to the output client
@@ -193,6 +206,7 @@ func (*emptyObserver) filteredEvent()      {}
 func (*emptyObserver) publishedEvent()     {}
 func (*emptyObserver) failedPublishEvent() {}
 func (*emptyObserver) queueACKed(n int)    {}
+func (*emptyObserver) queueMaxEvents(int)  {}
 func (*emptyObserver) updateOutputGroup()  {}
 func (*emptyObserver) eventsFailed(int)    {}
 func (*emptyObserver) eventsDropped(int)   {}
