@@ -73,7 +73,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T17:38:26.000Z",
@@ -152,7 +153,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T17:47:01.000Z",
@@ -231,7 +233,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T17:48:40.000Z",
@@ -310,7 +313,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T17:55:02.000Z",
@@ -389,7 +393,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T17:56:42.000Z",
@@ -468,7 +473,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-11T20:23:30.000Z",
@@ -547,7 +553,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-14T13:49:54.000Z",
@@ -632,7 +639,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-14T13:51:35.000Z",
@@ -717,7 +725,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T10:33:30.000Z",
@@ -800,7 +809,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T10:34:50.000Z",
@@ -883,7 +893,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T11:12:09.000Z",
@@ -966,7 +977,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T13:18:36.000Z",
@@ -1045,7 +1057,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T14:08:11.000Z",
@@ -1124,7 +1137,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T14:08:36.000Z",
@@ -1211,7 +1225,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     },
     {
         "@timestamp": "2021-03-15T15:00:21.000Z",
@@ -1298,6 +1313,7 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "Administrator"
     }
 ]

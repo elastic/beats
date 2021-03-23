@@ -433,7 +433,8 @@ processors:
         "19":
           - set: source.user.name
             from: cyberarkpas.audit.source_user
-          # TODO: source.user to user
+          - set: user.name
+            from: cyberarkpas.audit.source_user
           - set: destination.user.name
             from: cyberarkpas.audit.issuer
           - set: event.category
@@ -455,6 +456,8 @@ processors:
           - set: destination.user.name
             from: cyberarkpas.audit.ca_properties.user_name
           - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
             from: cyberarkpas.audit.issuer
           - set: event.type
             value: ["info"]
@@ -550,6 +553,8 @@ processors:
             from: cyberarkpas.audit.ca_properties.user_name
           - set: source.user.name
             from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
           - set: event.category
             value: ["iam"]
           - set: event.type
@@ -610,6 +615,8 @@ processors:
             from: cyberarkpas.audit.ca_properties.user_name
           - set: source.user.name
             from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
           - set: event.category
             value: ["iam"]
           - set: event.type
@@ -628,6 +635,8 @@ processors:
           - set: source.address
             from: cyberarkpas.audit.extra_details.src_host
           - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
             from: cyberarkpas.audit.issuer
           - set: network.protocol
             from: cyberarkpas.audit.extra_details.protocol
@@ -648,6 +657,8 @@ processors:
             from: cyberarkpas.audit.extra_details.src_host
           - set: source.user.name
             from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
           - set: network.protocol
             from: cyberarkpas.audit.extra_details.protocol
           - set: _tmp.duration_hms
@@ -666,6 +677,8 @@ processors:
           - set: destination.user.name
             from: cyberarkpas.audit.ca_properties.user_name
           - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
             from: cyberarkpas.audit.issuer
           - set: event.category
             value: ["iam"]
@@ -686,6 +699,8 @@ processors:
             from: cyberarkpas.audit.extra_details.src_host
           - set: source.user.name
             from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
           - set: network.protocol
             from: cyberarkpas.audit.extra_details.protocol
           - set: event.category
@@ -702,6 +717,8 @@ processors:
           - set: source.address
             from: cyberarkpas.audit.extra_details.src_host
           - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
             from: cyberarkpas.audit.issuer
           - set: network.protocol
             from: cyberarkpas.audit.extra_details.protocol

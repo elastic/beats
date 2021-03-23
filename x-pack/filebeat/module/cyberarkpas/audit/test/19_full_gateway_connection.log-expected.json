@@ -58,7 +58,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-08T18:09:37.000Z",
@@ -119,7 +120,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-08T18:19:26.000Z",
@@ -180,7 +182,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-08T18:32:22.000Z",
@@ -241,7 +244,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-09T08:32:51.000Z",
@@ -302,7 +306,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-09T10:14:58.000Z",
@@ -363,7 +368,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-09T10:46:43.000Z",
@@ -424,7 +430,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-09T10:48:24.000Z",
@@ -485,7 +492,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-09T15:23:33.000Z",
@@ -546,7 +554,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T08:31:50.000Z",
@@ -606,7 +615,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T09:31:50.000Z",
@@ -666,7 +676,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T14:58:07.000Z",
@@ -726,7 +737,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T18:14:34.000Z",
@@ -786,7 +798,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T18:27:06.000Z",
@@ -847,7 +860,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:32:39.000Z",
@@ -908,7 +922,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:37:00.000Z",
@@ -969,7 +984,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:44:48.000Z",
@@ -1030,7 +1046,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:47:58.000Z",
@@ -1091,7 +1108,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:52:29.000Z",
@@ -1152,7 +1170,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-10T22:56:02.000Z",
@@ -1213,7 +1232,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T16:03:52.000Z",
@@ -1275,7 +1295,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T16:34:00.000Z",
@@ -1337,7 +1358,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T16:35:27.000Z",
@@ -1399,7 +1421,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T16:43:00.000Z",
@@ -1461,7 +1484,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T17:02:07.000Z",
@@ -1523,7 +1547,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T17:08:42.000Z",
@@ -1585,7 +1610,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T17:38:05.000Z",
@@ -1647,7 +1673,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T17:39:44.000Z",
@@ -1709,7 +1736,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T17:46:40.000Z",
@@ -1771,7 +1799,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T17:48:22.000Z",
@@ -1833,7 +1862,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T17:54:41.000Z",
@@ -1895,7 +1925,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T17:56:26.000Z",
@@ -1957,7 +1988,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T18:02:57.000Z",
@@ -2019,7 +2051,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T18:03:52.000Z",
@@ -2081,7 +2114,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T18:51:17.000Z",
@@ -2143,7 +2177,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:25:09.000Z",
@@ -2205,7 +2240,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:30:17.000Z",
@@ -2267,7 +2303,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:34:34.000Z",
@@ -2329,7 +2366,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:36:10.000Z",
@@ -2391,7 +2429,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:42:12.000Z",
@@ -2453,7 +2492,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T19:56:48.000Z",
@@ -2515,7 +2555,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T20:12:08.000Z",
@@ -2577,7 +2618,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T20:21:54.000Z",
@@ -2639,7 +2681,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-11T20:23:13.000Z",
@@ -2701,7 +2744,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_VAGRANT"
     },
     {
         "@timestamp": "2021-03-11T21:06:29.000Z",
@@ -2763,7 +2807,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T11:59:09.000Z",
@@ -2825,7 +2870,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T12:07:26.000Z",
@@ -2886,7 +2932,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T12:22:42.000Z",
@@ -2948,7 +2995,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T12:28:29.000Z",
@@ -3010,7 +3058,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:01:06.000Z",
@@ -3072,7 +3121,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:17:26.000Z",
@@ -3134,7 +3184,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:18:57.000Z",
@@ -3196,7 +3247,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:24:24.000Z",
@@ -3258,7 +3310,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:34:07.000Z",
@@ -3320,7 +3373,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-14T13:49:35.000Z",
@@ -3382,7 +3436,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-14T13:50:40.000Z",
@@ -3444,7 +3499,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T10:20:36.000Z",
@@ -3506,7 +3562,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T10:31:54.000Z",
@@ -3568,7 +3625,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T10:33:37.000Z",
@@ -3630,7 +3688,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T10:34:58.000Z",
@@ -3692,7 +3751,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T13:02:55.000Z",
@@ -3754,7 +3814,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T13:18:29.000Z",
@@ -3816,7 +3877,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T14:08:04.000Z",
@@ -3878,7 +3940,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T14:08:26.000Z",
@@ -3940,7 +4003,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T14:09:56.000Z",
@@ -4002,7 +4066,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T14:11:07.000Z",
@@ -4064,7 +4129,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     },
     {
         "@timestamp": "2021-03-15T15:04:09.000Z",
@@ -4126,7 +4192,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T16:08:45.000Z",
@@ -4188,7 +4255,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T16:17:41.000Z",
@@ -4250,7 +4318,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T16:38:11.000Z",
@@ -4312,7 +4381,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T16:53:49.000Z",
@@ -4374,7 +4444,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T16:54:55.000Z",
@@ -4436,7 +4507,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-15T17:03:35.000Z",
@@ -4498,7 +4570,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-16T09:52:52.000Z",
@@ -4560,7 +4633,8 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PVWAGWUser"
     },
     {
         "@timestamp": "2021-03-16T10:04:49.000Z",
@@ -4622,6 +4696,7 @@
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
-        ]
+        ],
+        "user.name": "PSMPGW_SSH"
     }
 ]
