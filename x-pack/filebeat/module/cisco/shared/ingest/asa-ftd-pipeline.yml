@@ -318,7 +318,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302022'"
       field: "message"
-      pattern: "Built %{} stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+      pattern: "Built %{} stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} %{} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302023'"
       field: "message"
@@ -1616,8 +1616,18 @@ processors:
       allow_duplicates: false
   - append:
       field: related.ip
+      value: "{{source.nat.ip}}"
+      if: "ctx?.source?.nat?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
       value: "{{destination.ip}}"
       if: "ctx?.destination?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: "{{destination.nat.ip}}"
+      if: "ctx?.destination?.nat?.ip != null"
       allow_duplicates: false
   - append:
       field: related.user
