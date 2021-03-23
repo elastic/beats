@@ -861,3 +861,6 @@ on_failure:
       field:
         - _tmp
       ignore_missing: true
+  - set:
+      field: event.kind
+      value: pipeline_error
