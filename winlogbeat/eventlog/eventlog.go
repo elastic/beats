@@ -82,19 +82,19 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
-	_ = win.Delete("keywords_raw")
-	_, _ = win.Put("api", e.API)
+	win.Delete("keywords_raw")
+	win.Put("api", e.API)
 
 	m := common.MapStr{
 		"winlog": win,
 	}
 
-	// // ECS data
-	_, _ = m.Put("event.created", time.Now())
+	// ECS data
+	m.Put("event.created", time.Now())
 
-	_, _ = m.Put("event.kind", "event")
-	_, _ = m.Put("event.code", e.EventIdentifier.ID)
-	_, _ = m.Put("event.provider", e.Provider.Name)
+	m.Put("event.kind", "event")
+	m.Put("event.code", e.EventIdentifier.ID)
+	m.Put("event.provider", e.Provider.Name)
 
 	rename(m, "winlog.outcome", "event.outcome")
 	rename(m, "winlog.level", "log.level")
@@ -120,8 +120,8 @@ func rename(m common.MapStr, oldKey, newKey string) {
 	if err != nil {
 		return
 	}
-	_, _ = m.Put(newKey, v)
-	_ = m.Delete(oldKey)
+	m.Put(newKey, v)
+	m.Delete(oldKey)
 }
 
 // incrementMetric increments a value in the specified expvar.Map. The key
