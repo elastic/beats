@@ -3,6 +3,16 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-6.8.15]]
+=== Beats version 6.8.15
+https://github.com/elastic/beats/compare/v6.8.14...v6.8.15[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Add timezone information to apache error fileset. {issue}12772[12772] {pull}13304[13304]
+
 [[release-notes-6.8.14]]
 === Beats version 6.8.14
 https://github.com/elastic/beats/compare/v6.8.13...v6.8.14[View commits]
