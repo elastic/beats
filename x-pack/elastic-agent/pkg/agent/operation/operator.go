@@ -36,6 +36,10 @@ const (
 	isMonitoringLogsFlag    = 1 << 1
 )
 
+type waiter interface {
+	Wait()
+}
+
 // Operator runs Start/Stop/Update operations
 // it is responsible for detecting reconnect to existing processes
 // based on backed up configuration
@@ -182,6 +186,13 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 // Shutdown handles shutting down the running apps for Agent shutdown.
 func (o *Operator) Shutdown() {
+	//  wait for installer and downloader
+	if awaitable, ok := o.installer.(waiter); ok {
+		o.logger.Infof("waiting for installer of pipeline '%s' to finish", o.pipelineID)
+		awaitable.Wait()
+		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
+	}
+
 	for _, app := range o.apps {
 		app.Shutdown()
 	}

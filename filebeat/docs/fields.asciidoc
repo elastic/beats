@@ -3573,6 +3573,124 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.authentication_requirement_policies`*::
++
+--
+Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.applied_conditional_access_policies`*::
++
+--
+Details of the conditional access policies being applied for the sign-in.
+
+
+type: nested
+
+--
+
+*`azure.signinlogs.properties.resource_tenant_id`*::
++
+--
+The resource tenantId for B2B(business-to-business) scenarios.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.authentication_details`*::
++
+--
+A record of each step of authentication undertaken in the sign-in.
+
+
+type: nested
+
+--
+
+*`azure.signinlogs.properties.authentication_processing_details`*::
++
+--
+Provides the details associated with authentication processor.
+
+
+type: flattened
+
+--
+
+*`azure.signinlogs.properties.flagged_for_review`*::
++
+--
+Event was flagged for review.
+
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.network_location_details`*::
++
+--
+Provides the details associated with authentication processor.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types`*::
++
+--
+The list of risk event types associated with the sign-in.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types_v2`*::
++
+--
+The list of risk event types associated with the sign-in.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.authentication_requirement`*::
++
+--
+Type of authentication required for the sign-in. If set to multiFactorAuthentication, an MFA step was required. If set to singleFactorAuthentication, no MFA was required
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resource_id`*::
++
+--
+ID of the resource that the user signed into.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_type`*::
++
+--
+User type.
+
+type: keyword
+
+--
+
 [[exported-fields-barracuda]]
 == Barracuda Web Application Firewall fields
 
@@ -21080,7 +21198,7 @@ type: keyword
 
 --
 
-*`cisco.amp.file.archived_file.identify.sha256`*::
+*`cisco.amp.file.archived_file.identity.sha256`*::
 +
 --
 SHA256 hash of the archived file related to the malicious event.
@@ -21290,10 +21408,50 @@ type: flattened
 
 --
 
+*`cisco.amp.mitre_tactics`*::
++
+--
+Array of all related mitre tactic ID's
+
+
+type: keyword
+
+--
+
 *`cisco.amp.techniques`*::
 +
 --
 List of all MITRE techniques related to the incident found.
+
+
+type: flattened
+
+--
+
+*`cisco.amp.mitre_techniques`*::
++
+--
+Array of all related mitre technique ID's
+
+
+type: keyword
+
+--
+
+*`cisco.amp.command_line.arguments`*::
++
+--
+The CLI arguments related to the Cloud Threat IOC reported by Cisco.
+
+
+type: keyword
+
+--
+
+*`cisco.amp.bp_data`*::
++
+--
+Endpoint isolation information
 
 
 type: flattened
@@ -86569,7 +86727,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -86582,7 +86740,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -159335,6 +159495,143 @@ Tree name given by the server in a CHALLENGE.
 
 
 type: keyword
+
+--
+
+[float]
+=== ntp
+
+Fields exported by the Zeek NTP log.
+
+
+
+*`zeek.ntp.version`*::
++
+--
+The NTP version number (1, 2, 3, 4).
+
+
+type: integer
+
+--
+
+*`zeek.ntp.mode`*::
++
+--
+The NTP mode being used.
+
+
+type: integer
+
+--
+
+*`zeek.ntp.stratum`*::
++
+--
+The stratum (primary server, secondary server, etc.).
+
+
+type: integer
+
+--
+
+*`zeek.ntp.poll`*::
++
+--
+The maximum interval between successive messages in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.precision`*::
++
+--
+The precision of the system clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.root_delay`*::
++
+--
+Total round-trip delay to the reference clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.root_disp`*::
++
+--
+Total dispersion to the reference clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.ref_id`*::
++
+--
+For stratum 0, 4 character string used for debugging. For stratum 1, ID assigned to the reference clock by IANA. Above stratum 1, when using IPv4, the IP address of the reference clock. Note that the NTP protocol did not originally specify a large enough field to represent IPv6 addresses, so they use the first four bytes of the MD5 hash of the reference clock’s IPv6 address (i.e. an IPv4 address here is not necessarily IPv4).
+
+
+type: keyword
+
+--
+
+*`zeek.ntp.ref_time`*::
++
+--
+Time when the system clock was last set or correct.
+
+
+type: date
+
+--
+
+*`zeek.ntp.org_time`*::
++
+--
+Time at the client when the request departed for the NTP server.
+
+
+type: date
+
+--
+
+*`zeek.ntp.rec_time`*::
++
+--
+Time at the server when the request arrived from the NTP client.
+
+
+type: date
+
+--
+
+*`zeek.ntp.xmt_time`*::
++
+--
+Time at the server when the response departed for the NTP client.
+
+
+type: date
+
+--
+
+*`zeek.ntp.num_exts`*::
++
+--
+Number of extension fields (which are not currently parsed).
+
+
+type: integer
 
 --
 
