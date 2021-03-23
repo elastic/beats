@@ -661,7 +661,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T07:45:56.000Z",
+        "@timestamp": "2021-03-08T07:45:56.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -711,7 +711,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T07:46:06.000Z",
+        "@timestamp": "2021-03-08T07:46:06.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "SCIM-user",
@@ -761,7 +761,7 @@
         "user.name": "SCIM-user"
     },
     {
-        "@timestamp": "2021-03-08T07:46:54.000Z",
+        "@timestamp": "2021-03-08T07:46:54.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAGWUser",
@@ -811,7 +811,7 @@
         "user.name": "PVWAGWUser"
     },
     {
-        "@timestamp": "2021-03-08T07:46:58.000Z",
+        "@timestamp": "2021-03-08T07:46:58.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -861,7 +861,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T07:47:13.000Z",
+        "@timestamp": "2021-03-08T07:47:13.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAAppUser",
@@ -911,7 +911,7 @@
         "user.name": "PVWAAppUser"
     },
     {
-        "@timestamp": "2021-03-08T07:47:27.000Z",
+        "@timestamp": "2021-03-08T07:47:27.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "Prov_COMPONENTS",
@@ -961,7 +961,7 @@
         "user.name": "Prov_COMPONENTS"
     },
     {
-        "@timestamp": "2021-03-08T07:56:09.000Z",
+        "@timestamp": "2021-03-08T07:56:09.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -1011,7 +1011,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T07:56:55.000Z",
+        "@timestamp": "2021-03-08T07:56:55.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "SCIM-user",
@@ -1556,7 +1556,7 @@
         "user.name": "SCIM-user"
     },
     {
-        "@timestamp": "2021-03-08T02:31:54.000Z",
+        "@timestamp": "2021-03-08T02:31:54.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAGWUser",
@@ -1606,7 +1606,7 @@
         "user.name": "PVWAGWUser"
     },
     {
-        "@timestamp": "2021-03-08T02:31:54.000Z",
+        "@timestamp": "2021-03-08T02:31:54.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -1656,7 +1656,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T02:31:59.000Z",
+        "@timestamp": "2021-03-08T02:31:59.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAAppUser",
@@ -1706,7 +1706,7 @@
         "user.name": "PVWAAppUser"
     },
     {
-        "@timestamp": "2021-03-08T02:32:15.000Z",
+        "@timestamp": "2021-03-08T02:32:15.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "Prov_COMPONENTS",
@@ -1756,7 +1756,7 @@
         "user.name": "Prov_COMPONENTS"
     },
     {
-        "@timestamp": "2021-03-08T02:40:01.000Z",
+        "@timestamp": "2021-03-08T02:40:01.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "SCIM-user",
@@ -1806,7 +1806,7 @@
         "user.name": "SCIM-user"
     },
     {
-        "@timestamp": "2021-03-08T02:42:57.000Z",
+        "@timestamp": "2021-03-08T02:42:57.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAAppUser",
@@ -1856,7 +1856,7 @@
         "user.name": "PVWAAppUser"
     },
     {
-        "@timestamp": "2021-03-08T02:43:15.000Z",
+        "@timestamp": "2021-03-08T02:43:15.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -1906,7 +1906,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T02:43:54.000Z",
+        "@timestamp": "2021-03-08T02:43:54.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PVWAGWUser",
@@ -1956,7 +1956,7 @@
         "user.name": "PVWAGWUser"
     },
     {
-        "@timestamp": "2021-03-08T02:44:36.000Z",
+        "@timestamp": "2021-03-08T02:44:36.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "Prov_COMPONENTS",
@@ -2006,7 +2006,7 @@
         "user.name": "Prov_COMPONENTS"
     },
     {
-        "@timestamp": "2021-03-08T02:45:15.000Z",
+        "@timestamp": "2021-03-08T02:45:15.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -2056,7 +2056,7 @@
         "user.name": "PasswordManager"
     },
     {
-        "@timestamp": "2021-03-08T02:51:01.000Z",
+        "@timestamp": "2021-03-08T02:51:01.000-02:00",
         "cyberarkpas.audit.action": "Logon",
         "cyberarkpas.audit.desc": "Logon",
         "cyberarkpas.audit.issuer": "SCIM-user",

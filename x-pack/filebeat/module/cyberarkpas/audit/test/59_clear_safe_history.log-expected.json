@@ -176,7 +176,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T03:10:31.000Z",
+        "@timestamp": "2021-03-08T03:10:31.000-02:00",
         "cyberarkpas.audit.action": "Clear Safe History",
         "cyberarkpas.audit.desc": "Clear Safe History",
         "cyberarkpas.audit.issuer": "PasswordManager",
@@ -215,7 +215,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T04:12:15.000Z",
+        "@timestamp": "2021-03-08T04:12:15.000-02:00",
         "cyberarkpas.audit.action": "Clear Safe History",
         "cyberarkpas.audit.desc": "Clear Safe History",
         "cyberarkpas.audit.issuer": "PasswordManager",

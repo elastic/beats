@@ -602,7 +602,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T02:32:56.000Z",
+        "@timestamp": "2021-03-08T02:32:56.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -640,7 +640,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T02:48:07.000Z",
+        "@timestamp": "2021-03-08T02:48:07.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -678,7 +678,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T03:03:20.000Z",
+        "@timestamp": "2021-03-08T03:03:20.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -716,7 +716,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T03:18:21.000Z",
+        "@timestamp": "2021-03-08T03:18:21.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -754,7 +754,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T03:33:22.000Z",
+        "@timestamp": "2021-03-08T03:33:22.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -792,7 +792,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T03:48:23.000Z",
+        "@timestamp": "2021-03-08T03:48:23.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -830,7 +830,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T04:03:25.000Z",
+        "@timestamp": "2021-03-08T04:03:25.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -868,7 +868,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T04:18:25.000Z",
+        "@timestamp": "2021-03-08T04:18:25.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -906,7 +906,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T04:33:27.000Z",
+        "@timestamp": "2021-03-08T04:33:27.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
@@ -944,7 +944,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T04:48:28.000Z",
+        "@timestamp": "2021-03-08T04:48:28.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",
