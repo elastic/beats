@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sys
+package xml
 
 import (
 	"bytes"
@@ -25,18 +25,18 @@ import (
 	"unicode/utf8"
 )
 
-// The type xmlSafeReader escapes UTF control characters in the io.Reader
+// A SafeReader escapes UTF control characters in the io.Reader
 // it wraps, so that it can be fed to Go's xml parser.
 // Characters for which `unicode.IsControl` returns true will be output as
 // an hexadecimal unicode escape sequence "\\uNNNN".
-type xmlSafeReader struct {
+type SafeReader struct {
 	inner   io.Reader
 	backing [256]byte
 	buf     []byte
 	code    []byte
 }
 
-var _ io.Reader = (*xmlSafeReader)(nil)
+var _ io.Reader = (*SafeReader)(nil)
 
 func output(n int) (int, error) {
 	if n == 0 {
@@ -46,7 +46,7 @@ func output(n int) (int, error) {
 }
 
 // Read implements the io.Reader interface.
-func (r *xmlSafeReader) Read(d []byte) (n int, err error) {
+func (r *SafeReader) Read(d []byte) (n int, err error) {
 	if len(r.code) > 0 {
 		n = copy(d, r.code)
 		r.code = r.code[n:]
@@ -73,6 +73,6 @@ func (r *xmlSafeReader) Read(d []byte) (n int, err error) {
 	return output(n)
 }
 
-func newXMLSafeReader(rawXML []byte) io.Reader {
-	return &xmlSafeReader{inner: bytes.NewReader(rawXML)}
+func NewSafeReader(rawXML []byte) *SafeReader {
+	return &SafeReader{inner: bytes.NewReader(rawXML)}
 }
