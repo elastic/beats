@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
@@ -147,7 +148,12 @@ func inspectOutputs(cfgPath string, agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	return listOutputsFromMap(l, agentInfo, fleetConfig, false)
+	isStandalone, err := isStandalone(fullCfg)
+	if err != nil {
+		return err
+	}
+
+	return listOutputsFromMap(l, agentInfo, fleetConfig, isStandalone)
 }
 
 func listOutputsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *config.Config, isStandalone bool) error {
@@ -322,4 +328,13 @@ func (w *waitForCompose) Run(ctx context.Context, cb composable.VarsCallback) er
 
 func (w *waitForCompose) Wait() {
 	<-w.done
+}
+
+func isStandalone(cfg *config.Config) (bool, error) {
+	c, err := configuration.NewFromConfig(cfg)
+	if err != nil {
+		return false, err
+	}
+
+	return configuration.IsStandalone(c.Fleet), nil
 }
