@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 
 	"github.com/gofrs/uuid"
 
@@ -114,6 +115,12 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 func (cm *ConfigManager) Enabled() bool {
 	return cm.config.Enabled
 }
+
+func (cm *ConfigManager) RegisterAction(action client.Action) {}
+
+func (cm *ConfigManager) UnregisterAction(action client.Action) {}
+
+func (cm *ConfigManager) SetPayload(map[string]interface{}) {}
 
 // Start the config manager
 func (cm *ConfigManager) Start(_ func()) {
