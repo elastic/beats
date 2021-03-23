@@ -1625,8 +1625,6 @@
         "cisco.asa.source_interface": "fw1111",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
-        "destination.nat.ip": "8.8.8.8",
-        "destination.nat.port": "10051",
         "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
@@ -1660,15 +1658,11 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.5",
-            "192.168.2.2",
-            "8.8.8.8"
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
         "source.ip": "10.10.10.10",
-        "source.nat.ip": "8.8.8.5",
-        "source.nat.port": "38540",
         "source.port": 38540,
         "tags": [
             "cisco-asa",
@@ -1681,8 +1675,6 @@
         "cisco.asa.source_interface": "fw111",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
-        "destination.nat.ip": "8.8.8.8",
-        "destination.nat.port": "10051",
         "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
@@ -1716,15 +1708,11 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.5",
-            "192.168.2.2",
-            "8.8.8.8"
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
         "source.ip": "10.10.10.10",
-        "source.nat.ip": "8.8.8.5",
-        "source.nat.port": "38540",
         "source.port": 38540,
         "tags": [
             "cisco-asa",
@@ -1737,8 +1725,6 @@
         "cisco.asa.source_interface": "fw111",
         "destination.address": "192.1682.2.2",
         "destination.domain": "192.1682.2.2",
-        "destination.nat.ip": "8.8.8.8",
-        "destination.nat.port": "10051",
         "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
@@ -1772,15 +1758,11 @@
             "192.1682.2.2"
         ],
         "related.ip": [
-            "10.10.10.10",
-            "8.8.8.5",
-            "8.8.8.8"
+            "10.10.10.10"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
         "source.ip": "10.10.10.10",
-        "source.nat.ip": "8.8.8.5",
-        "source.nat.port": "38540",
         "source.port": 38540,
         "tags": [
             "cisco-asa",
