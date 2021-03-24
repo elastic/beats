@@ -512,9 +512,6 @@ function Is-New-Config {
         Write-Log "Part of update" "INFO"
         return $false
     }
-    if (!$newSequence) {
-        return $false
-    }
     if ($currentSequence -eq $newSequence ) {
         return $false
     }
