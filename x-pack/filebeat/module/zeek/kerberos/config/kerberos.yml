@@ -101,6 +101,13 @@ processors:
       field: zeek.kerberos.client
       target_prefix: ""
   - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
   - add_fields:
       target: ''
       fields:
