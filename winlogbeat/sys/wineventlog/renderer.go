@@ -35,6 +35,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 const (
@@ -93,8 +94,8 @@ func (r *Renderer) Close() error {
 }
 
 // Render renders the event handle into an Event.
-func (r *Renderer) Render(handle EvtHandle) (*sys.Event, error) {
-	event := &sys.Event{}
+func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
+	event := &winevent.Event{}
 
 	if err := r.renderSystem(handle, event); err != nil {
 		return nil, errors.Wrap(err, "failed to render system properties")
@@ -175,7 +176,7 @@ func (r *Renderer) getPublisherMetadata(publisher string) (*publisherMetadataSto
 }
 
 // renderSystem writes all the system context properties into the event.
-func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
+func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	bb, propertyCount, err := r.render(r.systemContext, handle)
 	if err != nil {
 		return errors.Wrap(err, "failed to get system values")
@@ -208,7 +209,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 		case EvtSystemOpcode:
 			event.OpcodeRaw = data.(uint8)
 		case EvtSystemKeywords:
-			event.KeywordsRaw = sys.HexInt64(data.(hexInt64))
+			event.KeywordsRaw = winevent.HexInt64(data.(hexInt64))
 		case EvtSystemTimeCreated:
 			event.TimeCreated.SystemTime = data.(time.Time)
 		case EvtSystemEventRecordId:
@@ -230,9 +231,9 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 			event.User.Identifier = sid.String()
 			var accountType uint32
 			event.User.Name, event.User.Domain, accountType, _ = sid.LookupAccount("")
-			event.User.Type = sys.SIDType(accountType)
+			event.User.Type = winevent.SIDType(accountType)
 		case EvtSystemVersion:
-			event.Version = sys.Version(data.(uint8))
+			event.Version = winevent.Version(data.(uint8))
 		}
 	}
 
@@ -242,7 +243,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *sys.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(handle EvtHandle, event *sys.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "failed to get user values")
@@ -306,7 +307,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 }
 
 // addEventData adds the event/user data values to the event.
-func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, event *sys.Event) {
+func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, event *winevent.Event) {
 	if len(values) == 0 {
 		return
 	}
@@ -350,7 +351,7 @@ func (r *Renderer) addEventData(evtMeta *eventMetadata, values []interface{}, ev
 			strVal = fmt.Sprintf("%v", v)
 		}
 
-		event.EventData.Pairs = append(event.EventData.Pairs, sys.KeyValue{
+		event.EventData.Pairs = append(event.EventData.Pairs, winevent.KeyValue{
 			Key:   paramName(i),
 			Value: strVal,
 		})
@@ -397,7 +398,7 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 // enrichRawValuesWithNames adds the names associated with the raw system
 // property values. It enriches the event with keywords, opcode, level, and
 // task. The search order is defined in the EvtFormatMessage documentation.
-func enrichRawValuesWithNames(publisherMeta *publisherMetadataStore, event *sys.Event) {
+func enrichRawValuesWithNames(publisherMeta *publisherMetadataStore, event *winevent.Event) {
 	// Keywords. Each bit in the value can represent a keyword.
 	rawKeyword := int64(event.KeywordsRaw)
 	isClassic := keywordClassic&rawKeyword > 0

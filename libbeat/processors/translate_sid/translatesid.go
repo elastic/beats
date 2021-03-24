@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 const logName = "processor.translate_sid"
@@ -117,7 +117,7 @@ func (p *processor) translateSID(event *beat.Event) error {
 		}
 	}
 	if p.AccountTypeTarget != "" {
-		if _, err = event.PutValue(p.AccountTypeTarget, sys.SIDType(accountType).String()); err != nil {
+		if _, err = event.PutValue(p.AccountTypeTarget, winevent.SIDType(accountType).String()); err != nil {
 			errs = append(errs, err)
 		}
 	}

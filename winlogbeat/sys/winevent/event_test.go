@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sys
+package winevent
 
 import (
 	"encoding/json"
@@ -154,7 +154,7 @@ func TestXML(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		event, err := UnmarshalEventXML([]byte(test.xml))
+		event, err := UnmarshalXML([]byte(test.xml))
 		if err != nil {
 			t.Error(err)
 			continue
@@ -175,7 +175,7 @@ func TestXML(t *testing.T) {
 // when the event is decoded.
 func TestInvalidXML(t *testing.T) {
 	evXML := strings.Replace(allXML, "%1", "\t&#xD;\n\x1b", -1)
-	ev, err := UnmarshalEventXML([]byte(evXML))
+	ev, err := UnmarshalXML([]byte(evXML))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, "Creating WSMan shell on server with ResourceUri: \t\r\n\\u001b", ev.Message)
 }
@@ -236,14 +236,14 @@ const nonUnsignedIntVersion = `
 //
 // Reference: https://docs.microsoft.com/en-us/windows/win32/wes/schema-version-systempropertiestype-element
 func TestInvalidVersion(t *testing.T) {
-	ev, err := UnmarshalEventXML([]byte(nonUnsignedIntVersion))
+	ev, err := UnmarshalXML([]byte(nonUnsignedIntVersion))
 	assert.NoError(t, err)
 	assert.EqualValues(t, 0, ev.Version)
 }
 
 func BenchmarkXMLUnmarshal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := UnmarshalEventXML([]byte(allXML))
+		_, err := UnmarshalXML([]byte(allXML))
 		if err != nil {
 			b.Fatal(err)
 		}
