@@ -202,6 +202,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
+- Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 
 *Heartbeat*
 
