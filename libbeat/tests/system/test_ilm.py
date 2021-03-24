@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import pytest
+import re
 import shutil
 import unittest
 
@@ -286,12 +287,12 @@ class TestCommandExportILMPolicy(BaseTest):
         self.cmd = "ilm-policy"
 
     def assert_log_contains_policy(self):
-        assert self.log_contains('ILM policy successfully loaded.')
+        assert self.log_contains(re.compile('ILM policy .* successfully created.'))
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
 
     def assert_log_contains_write_alias(self):
-        assert self.log_contains('Write alias successfully generated.')
+        assert self.log_contains(re.compile('Index Alias .* successfully created.'))
 
     def test_default(self):
         """
