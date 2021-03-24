@@ -9,7 +9,8 @@ pipeline {
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
-    DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
+    DOCKERHUB_SECRET = 'secret/observability-team/ci/elastic-observability-dockerhub'
+    DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_COMPOSE_VERSION = "1.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
@@ -359,7 +360,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "USERPROFILE=${userProfile}"
   ]) {
     if(isDockerInstalled()) {
-      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
+      dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
     }
     dir("${env.BASE_DIR}") {
       installTools(args)
