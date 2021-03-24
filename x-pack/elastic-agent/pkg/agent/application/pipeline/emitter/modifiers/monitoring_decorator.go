@@ -42,7 +42,6 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 		},
 	}
 
-	config := make(map[string]interface{})
 	// if monitoring is not specified use default one where everything is enabled
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		monitoringNode := transpiler.NewDict([]transpiler.Node{
@@ -72,7 +71,7 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 		return programsToRun, err
 	}
 
-	config, err = ast.Map()
+	config, err := ast.Map()
 	if err != nil {
 		return programsToRun, err
 	}
