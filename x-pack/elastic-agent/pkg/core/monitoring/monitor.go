@@ -7,10 +7,8 @@ package monitoring
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
-	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 // Monitor is a monitoring interface providing information about the way
@@ -28,12 +26,6 @@ type Monitor interface {
 	WatchLogs() bool
 	WatchMetrics() bool
 	Close()
-}
-
-// TODO: changeme
-type wrappedConfig struct {
-	DownloadConfig   *artifact.Config                   `yaml:"agent.download" config:"agent.download"`
-	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"agent.monitoring" yaml:"agent.monitoring"`
 }
 
 // NewMonitor creates a monitor based on a process configuration.
