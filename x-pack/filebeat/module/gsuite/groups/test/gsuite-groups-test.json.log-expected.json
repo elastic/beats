@@ -56,7 +56,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "accept_invitation",
@@ -108,7 +111,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "approve_join_request",
@@ -162,7 +168,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "join",
@@ -214,7 +228,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "request_to_join",
@@ -266,7 +283,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_basic_setting",
@@ -321,7 +341,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "create_group",
@@ -372,7 +395,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "delete_group",
@@ -423,7 +449,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_identity_setting",
@@ -478,7 +507,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "add_info_setting",
@@ -532,7 +564,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_info_setting",
@@ -587,7 +622,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "remove_info_setting",
@@ -641,7 +679,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_new_members_restrictions_setting",
@@ -696,7 +737,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_post_replies_setting",
@@ -751,7 +795,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_spam_moderation_setting",
@@ -806,7 +853,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "change_topic_setting",
@@ -861,7 +911,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "moderate_message",
@@ -916,7 +969,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "always_post_from_user",
@@ -971,7 +1027,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "add_user",
@@ -1026,7 +1090,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "ban_user_with_moderation",
@@ -1081,7 +1153,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "revoke_invitation",
@@ -1135,7 +1215,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "invite_user",
@@ -1189,7 +1277,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "reject_join_request",
@@ -1243,7 +1339,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "reinvite_user",
@@ -1297,7 +1401,15 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     },
     {
         "event.action": "remove_user",
@@ -1351,6 +1463,14 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.group.domain": "example.com",
+        "user.target.group.name": "group",
+        "user.target.name": "user"
     }
 ]

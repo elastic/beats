@@ -71,7 +71,7 @@ processors:
   # Parse the date included in FTD logs
   #
   - date:
-      if: "ctx.event.timezone == null"
+      if: "ctx.event?.timezone == null && ctx._temp_?.raw_date != null"
       field: "_temp_.raw_date"
       target_field: "@timestamp"
       formats:
@@ -103,7 +103,7 @@ processors:
           },
         ]
   - date:
-      if: "ctx.event.timezone != null"
+      if: "ctx.event?.timezone != null && ctx._temp_?.raw_date != null"
       timezone: "{{ event.timezone }}"
       field: "_temp_.raw_date"
       target_field: "@timestamp"
@@ -318,7 +318,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302022'"
       field: "message"
-      pattern: "Built %{} stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}"
+      pattern: "Built %{} stub %{network.transport} connection for %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} %{} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '302023'"
       field: "message"
@@ -555,7 +555,7 @@ processors:
   - dissect:
       if: "ctx._temp_.cisco.message_id == '722051'"
       field: "message"
-      pattern: "Group %{} User %{source.user.name} IP %{source.address} IPv4 Address %{_temp_.cisco.assigned_ip} %{}"
+      pattern: "Group %{} User <%{source.user.name}> IP <%{source.address}> IPv4 Address <%{_temp_.cisco.assigned_ip}> %{}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '733100'"
       field: "message"
@@ -1613,14 +1613,37 @@ processors:
       field: related.ip
       value: "{{source.ip}}"
       if: "ctx?.source?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: "{{source.nat.ip}}"
+      if: "ctx?.source?.nat?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.ip
       value: "{{destination.ip}}"
       if: "ctx?.destination?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: "{{destination.nat.ip}}"
+      if: "ctx?.destination?.nat?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.user
       value: "{{user.name}}"
-      if: "ctx?.user?.name != null"
+      if: "ctx?.user?.name != null && ctx?.user?.name != ''"
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: "{{host.user.name}}"
+      if: ctx?.host?.user?.name != null && ctx?.host?.user?.name != ''
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: "{{source.user.name}}"
+      if: ctx?.source?.user?.name != null && ctx?.source?.user?.name != ''
+      allow_duplicates: false
   - append:
       field: related.user
       value: "{{destination.user.name}}"
@@ -1630,6 +1653,7 @@ processors:
       field: related.hash
       value: "{{file.hash.sha256}}"
       if: "ctx?.file?.hash?.sha256 != null"
+      allow_duplicates: false
   - append:
       field: related.hosts
       value: "{{host.hostname}}"

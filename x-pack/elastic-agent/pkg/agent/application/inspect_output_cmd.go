@@ -13,6 +13,9 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -71,7 +74,7 @@ func (c *InspectOutputCmd) inspectOutputs(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return listOutputsFromConfig(l, agentInfo, rawConfig, true)
 	}
 
@@ -124,7 +127,7 @@ func (c *InspectOutputCmd) inspectOutput(agentInfo *info.AgentInfo) error {
 		return err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		return printOutputFromConfig(l, agentInfo, c.output, c.program, rawConfig, true)
 	}
 
@@ -194,9 +197,9 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		return nil, err
 	}
 	composableWaiter := newWaitForCompose(composableCtrl)
-	modifiers := &configModifiers{
-		Decorators: []decoratorFunc{injectMonitoring},
-		Filters:    []filterFunc{filters.StreamChecker},
+	modifiers := &pipeline.ConfigModifiers{
+		Decorators: []pipeline.DecoratorFunc{injectMonitoring},
+		Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 	}
 
 	if !isStandalone {
@@ -209,12 +212,12 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		modifiers.Filters = append(modifiers.Filters, injectFleet(cfg, sysInfo.Info(), agentInfo))
 	}
 
-	caps, err := capabilities.Load(info.AgentCapabilitiesPath(), log, status.NewController(log))
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, status.NewController(log))
 	if err != nil {
 		return nil, err
 	}
 
-	emit, err := emitter(
+	emit, err := emitter.New(
 		ctx,
 		log,
 		agentInfo,
@@ -239,10 +242,12 @@ type inmemRouter struct {
 	programs map[string][]program.Program
 }
 
-func (r *inmemRouter) Dispatch(id string, grpProg map[routingKey][]program.Program) error {
+func (r *inmemRouter) Dispatch(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	r.programs = grpProg
 	return nil
 }
+
+func (r *inmemRouter) Shutdown() {}
 
 func newErrorLogger() (*logger.Logger, error) {
 	return logger.NewWithLogpLevel("", logp.ErrorLevel)

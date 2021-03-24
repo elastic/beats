@@ -38,16 +38,17 @@ func init() {
 }
 
 const (
-	module      = "module"
-	namespace   = "namespace"
-	hosts       = "hosts"
-	metricsets  = "metricsets"
-	period      = "period"
-	timeout     = "timeout"
-	ssl         = "ssl"
-	metricspath = "metrics_path"
-	username    = "username"
-	password    = "password"
+	module         = "module"
+	namespace      = "namespace"
+	hosts          = "hosts"
+	metricsets     = "metricsets"
+	period         = "period"
+	timeout        = "timeout"
+	ssl            = "ssl"
+	metricsfilters = "metrics_filters"
+	metricspath    = "metrics_path"
+	username       = "username"
+	password       = "password"
 
 	defaultTimeout = "3s"
 	defaultPeriod  = "1m"
@@ -138,6 +139,10 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 			"enabled":    true,
 			"ssl":        sslConf,
 			"processors": procs,
+		}
+
+		if mod == "prometheus" {
+			moduleConfig[metricsfilters] = m.getMetricsFilters(hint)
 		}
 
 		if ns != "" {
@@ -298,6 +303,14 @@ func (m *metricHints) getTimeout(hints common.MapStr) string {
 
 func (m *metricHints) getSSLConfig(hints common.MapStr) common.MapStr {
 	return builder.GetHintMapStr(hints, m.Key, ssl)
+}
+
+func (m *metricHints) getMetricsFilters(hints common.MapStr) common.MapStr {
+	mf := common.MapStr{}
+	for k := range builder.GetHintMapStr(hints, m.Key, metricsfilters) {
+		mf[k] = builder.GetHintAsList(hints, m.Key, metricsfilters+"."+k)
+	}
+	return mf
 }
 
 func (m *metricHints) getModuleConfigs(hints common.MapStr) []common.MapStr {

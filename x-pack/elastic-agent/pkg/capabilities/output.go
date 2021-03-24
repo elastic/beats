@@ -7,6 +7,8 @@ package capabilities
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -129,8 +131,9 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 		outputs[outputName] = output
 
 		if !isSupported {
-			c.log.Errorf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
-			c.reporter.Update(status.Degraded)
+			msg := fmt.Sprintf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
+			c.log.Errorf(msg)
+			c.reporter.Update(state.Degraded, msg)
 		}
 	}
 
@@ -179,11 +182,21 @@ func (c *multiOutputsCapability) cleanupOutput(cfgMap map[string]interface{}) (m
 		return cfgMap, nil
 	}
 
-	outputsMap, ok := outputsIface.(map[string]interface{})
-	if !ok {
+	switch outputsMap := outputsIface.(type) {
+	case map[string]interface{}:
+		handleOutputMapStr(outputsMap)
+		cfgMap[outputKey] = outputsMap
+	case map[interface{}]interface{}:
+		handleOutputMapIface(outputsMap)
+		cfgMap[outputKey] = outputsMap
+	default:
 		return nil, fmt.Errorf("outputs must be a map")
 	}
 
+	return cfgMap, nil
+}
+
+func handleOutputMapStr(outputsMap map[string]interface{}) {
 	for outputName, outputIface := range outputsMap {
 		acceptValue := true
 
@@ -205,7 +218,28 @@ func (c *multiOutputsCapability) cleanupOutput(cfgMap map[string]interface{}) (m
 
 		delete(outputMap, conditionKey)
 	}
+}
 
-	cfgMap[outputKey] = outputsMap
-	return cfgMap, nil
+func handleOutputMapIface(outputsMap map[interface{}]interface{}) {
+	for outputName, outputIface := range outputsMap {
+		acceptValue := true
+
+		outputMap, ok := outputIface.(map[interface{}]interface{})
+		if ok {
+			conditionIface, found := outputMap[conditionKey]
+			if found {
+				conditionVal, ok := conditionIface.(bool)
+				if ok {
+					acceptValue = conditionVal
+				}
+			}
+		}
+
+		if !acceptValue {
+			delete(outputsMap, outputName)
+			continue
+		}
+
+		delete(outputMap, conditionKey)
+	}
 }

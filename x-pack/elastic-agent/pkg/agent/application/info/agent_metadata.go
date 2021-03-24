@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -142,7 +141,7 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				BuildOriginal: release.Info().String(),
 				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
-				Upgradeable: release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
+				Upgradeable: release.Upgradeable() || (RunningInstalled() && RunningUnderSupervisor()),
 				LogLevel:    i.logLevel,
 			},
 		},

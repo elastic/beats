@@ -349,7 +349,7 @@ HTTP method to use when making requests. `GET` or `POST` are the options. Defaul
 [float]
 ==== `request.encode_as`
 
-ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application\x-www-form-urlencoded`. `application/x-www-form-encoded` will url encode the `url.params` and set them as the body. It is not set by default.
+ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application/x-www-form-urlencoded`. `application/x-www-form-urlencoded` will url encode the `url.params` and set them as the body. It is not set by default.
 
 [float]
 ==== `request.body`
@@ -499,7 +499,7 @@ filebeat.inputs:
 [float]
 ==== `response.split`
 
-Split operation to apply to the response once it is received. A split can convert a map or an array into multiple events.
+Split operation to apply to the response once it is received. A split can convert a map, array, or string into multiple events.
 
 [float]
 ==== `response.split[].target`
@@ -509,7 +509,7 @@ Defines the target field upon the split operation will be performed.
 [float]
 ==== `response.split[].type`
 
-Defines the field type of the target. Allowed values: `array`, `map`. Default: `array`.
+Defines the field type of the target. Allowed values: `array`, `map`, `string`. `string` requires the use of the `delimiter` options to specify what characters to split the string on.  `delimiter` always behaves as if `keep_parent` is set to `true`. Default: `array`.
 
 [float]
 ==== `response.split[].transforms`
@@ -528,6 +528,11 @@ NOTE: in this context, `body.*` will be the result of all the previous transform
 ==== `response.split[].keep_parent`
 
 If set to true, the fields from the parent document (at the same level as `target`) will be kept. Otherwise a new document will be created using `target` as the root. Default: `false`.
+
+[float]
+==== `response.split[].delimiter`
+
+Required if using split type of `string`.  This is the sub string used to split the string.  For example if `delimiter` was "\n" and the string was "line 1\nline 2", then the split would result in "line 1" and "line 2".
 
 [float]
 ==== `response.split[].key_field`
@@ -800,6 +805,56 @@ This will output:
   {
     "something": "something 2",
     "new": "will be added for each"
+  }
+]
+----
+
+- We have a response with a keys whose value is a string.  We want the string to be split on a delimiter and a document for each sub strings.
+
++
+["source","json",subs="attributes"]
+----
+{
+  "this": "is kept",
+  "lines": "Line 1\nLine 2\nLine 3"
+}
+----
+
++
+The config will look like:
+
++
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://example.com
+  response.split:
+    target: body.lines
+    type: string
+    delimiter: "\n"
+----
+
++
+This will output:
+
++
+["source","json",subs="attributes"]
+----
+[
+  {
+    "this": "is kept",
+    "lines": "Line 1"
+  },
+  {
+    "this": "is kept",
+    "lines": "Line 2"
+  },
+  {
+    "this": "is kept",
+    "lines": "Line 3"
   }
 ]
 ----

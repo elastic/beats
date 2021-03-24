@@ -50,7 +50,10 @@ var googleWorkspace = (function () {
             return;
         }
 
+        evt.Put("user.id", evt.Get("source.user.id"));
+        evt.Put("user.name", data[0]);
         evt.Put("source.user.name", data[0]);
+        evt.Put("user.domain", data[1]);
         evt.Put("source.user.domain", data[1]);
     };
 

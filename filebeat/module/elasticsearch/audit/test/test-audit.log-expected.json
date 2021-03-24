@@ -216,5 +216,197 @@
         "source.port": 58955,
         "url.original": "/_search",
         "user.name": "elastic-admin"
+    },
+    {
+        "@timestamp": "2020-12-30T21:17:28.308Z",
+        "elasticsearch.audit.layer": "security_config_change",
+        "elasticsearch.audit.request.id": "qvLIgw_eTvyK3cgV-GaLVg",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "change_disable_user",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 2509,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T23:17:28,308+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"security_config_change\", \"event.action\":\"change_disable_user\", \"request.id\":\"qvLIgw_eTvyK3cgV-GaLVg\", \"change\":{\"disable\":{\"user\":{\"name\":\"user1\"}}}}",
+        "related.user": [
+            "user1"
+        ],
+        "service.type": "elasticsearch",
+        "user.name": "user1"
+    },
+    {
+        "@timestamp": "2020-12-30T21:17:34.843Z",
+        "elasticsearch.audit.layer": "security_config_change",
+        "elasticsearch.audit.request.id": "BO3QU3qeTb-Ei0G0rUOalQ",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "change_enable_user",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 2770,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T23:17:34,843+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"security_config_change\", \"event.action\":\"change_enable_user\", \"request.id\":\"BO3QU3qeTb-Ei0G0rUOalQ\", \"change\":{\"enable\":{\"user\":{\"name\":\"user1\"}}}}",
+        "related.user": [
+            "user1"
+        ],
+        "service.type": "elasticsearch",
+        "user.name": "user1"
+    },
+    {
+        "@timestamp": "2020-12-30T20:19:41.345Z",
+        "elasticsearch.audit.layer": "security_config_change",
+        "elasticsearch.audit.request.id": "au5a1Cc3RrebDMitMGGNCw",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "delete_user",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 3029,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T22:19:41,345+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"security_config_change\", \"event.action\":\"delete_user\", \"request.id\":\"au5a1Cc3RrebDMitMGGNCw\", \"delete\":{\"user\":{\"name\":\"jacknich\"}}}",
+        "related.user": [
+            "jacknich"
+        ],
+        "service.type": "elasticsearch",
+        "user.name": "jacknich"
+    },
+    {
+        "@timestamp": "2020-12-30T22:36:30.247Z",
+        "elasticsearch.audit.invalidate.apikeys.owned_by_authenticated_user": false,
+        "elasticsearch.audit.layer": "security_config_change",
+        "elasticsearch.audit.request.id": "7lyIQU9QTFqSrTxD0CqnTQ",
+        "elasticsearch.audit.user.realm": "native1",
+        "elasticsearch.node.id": "9clhpgjJRR-iKzOw20xBNQ",
+        "event.action": "invalidate_apikeys",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "9clhpgjJRR-iKzOw20xBNQ",
+        "input.type": "log",
+        "log.offset": 3273,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-31T00:36:30,247+0200\", \"node.id\":\"9clhpgjJRR-iKzOw20xBNQ\", \"event.type\":\"security_config_change\", \"event.action\":\"invalidate_apikeys\", \"request.id\":\"7lyIQU9QTFqSrTxD0CqnTQ\", \"invalidate\":{\"apikeys\":{\"owned_by_authenticated_user\":false,\"user\":{\"name\":\"myuser\",\"realm\":\"native1\"}}}}",
+        "related.user": [
+            "myuser"
+        ],
+        "service.type": "elasticsearch",
+        "user.name": "myuser"
+    },
+    {
+        "@timestamp": "2020-12-30T20:10:09.749Z",
+        "elasticsearch.audit.layer": "security_config_change",
+        "elasticsearch.audit.request.id": "VIiSvhp4Riim_tpkQCVSQA",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "put_user",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 3592,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T22:10:09,749+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"security_config_change\", \"event.action\":\"put_user\", \"request.id\":\"VIiSvhp4Riim_tpkQCVSQA\", \"put\":{\"user\":{\"name\":\"user1\",\"enabled\":false,\"roles\":[\"admin\",\"other_role1\"],\"full_name\":\"Jack Sparrow\",\"email\":\"jack@blackpearl.com\",\"has_password\":true,\"metadata\":{\"cunning\":10}}}}",
+        "related.user": [
+            "user1"
+        ],
+        "service.type": "elasticsearch",
+        "user.email": "jack@blackpearl.com",
+        "user.full_name": "Jack Sparrow",
+        "user.name": "user1"
+    },
+    {
+        "@timestamp": "2020-12-30T20:49:34.859Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            "alias1"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "RcaSt872RG-R_WJBEGfYXA",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "default_native",
+        "elasticsearch.audit.user.roles": [
+            "test_role"
+        ],
+        "elasticsearch.audit.user.run_as.name": "user1",
+        "elasticsearch.audit.user.run_as.realm": "default_native",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "run_as_denied",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 3978,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T22:49:34,859+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"transport\", \"event.action\":\"run_as_denied\", \"user.name\":\"user1\", \"user.run_as.name\":\"user1\", \"user.realm\":\"default_native\", \"user.run_as.realm\":\"default_native\", \"user.roles\":[\"test_role\"], \"origin.type\":\"rest\", \"origin.address\":\"[::1]:52662\", \"request.id\":\"RcaSt872RG-R_WJBEGfYXA\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\"alias1\"]}",
+        "related.user": [
+            "user1",
+            "user1"
+        ],
+        "service.type": "elasticsearch",
+        "source.address": "[::1]:52662",
+        "source.ip": "::1",
+        "source.port": 52662,
+        "user.effective.name": "user1",
+        "user.name": "user1"
+    },
+    {
+        "@timestamp": "2020-12-30T20:44:42.068Z",
+        "elasticsearch.audit.action": "indices:data/read/search",
+        "elasticsearch.audit.indices": [
+            "alias1"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "dGqPTdEQSX2TAPS3cvc1qA",
+        "elasticsearch.audit.request.name": "SearchRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "superuser"
+        ],
+        "elasticsearch.audit.user.run_as.name": "user1",
+        "elasticsearch.audit.user.run_as.realm": "default_native",
+        "elasticsearch.node.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "event.action": "run_as_granted",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "host.id": "0RMNyghkQYCc_gVd1G6tZQ",
+        "input.type": "log",
+        "log.offset": 4463,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2020-12-30T22:44:42,068+0200\", \"node.id\":\"0RMNyghkQYCc_gVd1G6tZQ\", \"event.type\":\"transport\", \"event.action\":\"run_as_granted\", \"user.name\":\"elastic\", \"user.run_as.name\":\"user1\", \"user.realm\":\"reserved\", \"user.run_as.realm\":\"default_native\", \"user.roles\":[\"superuser\"], \"origin.type\":\"rest\", \"origin.address\":\"[::1]:52623\", \"request.id\":\"dGqPTdEQSX2TAPS3cvc1qA\", \"action\":\"indices:data/read/search\", \"request.name\":\"SearchRequest\", \"indices\":[\"alias1\"]}",
+        "related.user": [
+            "elastic",
+            "user1"
+        ],
+        "service.type": "elasticsearch",
+        "source.address": "[::1]:52623",
+        "source.ip": "::1",
+        "source.port": 52623,
+        "user.effective.name": "user1",
+        "user.name": "elastic"
     }
 ]

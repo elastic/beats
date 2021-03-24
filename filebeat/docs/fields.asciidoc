@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-oracle>>
 * <<exported-fields-osquery>>
 * <<exported-fields-panw>>
+* <<exported-fields-pensando>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
 * <<exported-fields-proofpoint>>
@@ -523,54 +524,6 @@ type: keyword
 --
 Name of the group.
 
-
-type: keyword
-
---
-
-[float]
-=== effective
-
-Effective user information.
-
-
-*`user.effective.id`*::
-+
---
-Effective user ID.
-
-type: keyword
-
---
-
-*`user.effective.name`*::
-+
---
-Effective user name.
-
-type: keyword
-
---
-
-[float]
-=== group
-
-Effective group information.
-
-
-*`user.effective.group.id`*::
-+
---
-Effective group ID.
-
-type: keyword
-
---
-
-*`user.effective.group.name`*::
-+
---
-Effective group name.
 
 type: keyword
 
@@ -41371,7 +41324,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -41424,7 +41377,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -42615,6 +42568,19 @@ example: darwin
 
 --
 
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`host.os.version`*::
 +
 --
@@ -43689,6 +43655,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -43856,6 +43835,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -47010,6 +47002,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -47185,6 +47178,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -47192,6 +47298,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -47288,6 +47507,119 @@ type: text
 --
 
 *`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -47411,6 +47743,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -47999,11 +48344,6 @@ example: 0
 
 --
 
-[float]
-=== audit
-
-
-
 
 *`elasticsearch.audit.layer`*::
 +
@@ -48064,6 +48404,27 @@ Roles to which the principal belongs
 type: keyword
 
 example: ['kibana_admin', 'beats_admin']
+
+--
+
+*`elasticsearch.audit.user.run_as.name`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.user.run_as.realm`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.component`*::
++
+--
+type: keyword
 
 --
 
@@ -48160,6 +48521,13 @@ alias to: user.name
 +
 --
 type: text
+
+--
+
+*`elasticsearch.audit.invalidate.apikeys.owned_by_authenticated_user`*::
++
+--
+type: boolean
 
 --
 
@@ -86239,7 +86607,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -86252,7 +86620,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -86639,6 +87009,13 @@ key and value debugging information.
 
 
 type: object
+
+--
+
+*`logstash.log.log_event.action`*::
++
+--
+type: keyword
 
 --
 
@@ -104148,6 +104525,13 @@ Fields from Office 365 Management API audit logs.
 
 
 
+*`o365.audit.AADGroupId`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.Actor`*::
 +
 --
@@ -104288,6 +104672,13 @@ type: text
 
 --
 
+*`o365.audit.CommunicationType`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.CorrelationId`*::
 +
 --
@@ -104323,7 +104714,21 @@ type: keyword
 
 --
 
+*`o365.audit.DoNotDistributeEvent`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.EntityType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ErrorNumber`*::
 +
 --
 type: keyword
@@ -104362,6 +104767,13 @@ type: object
 +
 --
 type: keyword
+
+--
+
+*`o365.audit.FromApp`*::
++
+--
+type: boolean
 
 --
 
@@ -104414,6 +104826,13 @@ type: keyword
 
 --
 
+*`o365.audit.IsDocLib`*::
++
+--
+type: boolean
+
+--
+
 *`o365.audit.Item.*`*::
 +
 --
@@ -104425,6 +104844,13 @@ type: object
 +
 --
 type: object
+
+--
+
+*`o365.audit.ItemCount`*::
++
+--
+type: long
 
 --
 
@@ -104442,7 +104868,42 @@ type: keyword
 
 --
 
+*`o365.audit.ListBaseTemplateType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListBaseType`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListColor`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListIcon`*::
++
+--
+type: keyword
+
+--
+
 *`o365.audit.ListId`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.ListTitle`*::
 +
 --
 type: keyword
@@ -104723,6 +105184,13 @@ type: keyword
 --
 
 *`o365.audit.TeamGuid`*::
++
+--
+type: keyword
+
+--
+
+*`o365.audit.TemplateTypeId`*::
 +
 --
 type: keyword
@@ -105865,6 +106333,147 @@ Specifies the sub type of the log
 
 --
 
+[[exported-fields-pensando]]
+== Pensando fields
+
+pensando Module
+
+
+
+[float]
+=== pensando
+
+Fields from Pensando logs.
+
+
+
+[float]
+=== dfw
+
+Fields for Pensando DFW
+
+
+
+*`pensando.dfw.action`*::
++
+--
+Action on the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.app_id`*::
++
+--
+Application ID 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.destination_address`*::
++
+--
+Address of destination. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.destination_port`*::
++
+--
+Port of destination. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.direction`*::
++
+--
+Direction of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.protocol`*::
++
+--
+Protocol of the flow 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.rule_id`*::
++
+--
+Rule ID that was matched. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.session_id`*::
++
+--
+Session ID of the flow 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.session_state`*::
++
+--
+Session state of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_address`*::
++
+--
+Source address of the flow. 
+
+
+type: keyword
+
+--
+
+*`pensando.dfw.source_port`*::
++
+--
+Source port of the flow. 
+
+
+type: integer
+
+--
+
+*`pensando.dfw.timestamp`*::
++
+--
+Timestamp of the log. 
+
+
+type: date
+
+--
+
 [[exported-fields-postgresql]]
 == PostgreSQL fields
 
@@ -105900,7 +106509,52 @@ The timestamp from the log line.
 *`postgresql.log.core_id`*::
 +
 --
-Core id
+
+deprecated:[8.0.0]
+
+Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
+
+
+type: alias
+
+alias to: postgresql.log.session_line_number
+
+--
+
+*`postgresql.log.client_addr`*::
++
+--
+Host where the connection originated from.
+
+
+example: 127.0.0.1
+
+--
+
+*`postgresql.log.client_port`*::
++
+--
+Port where the connection originated from.
+
+
+example: 59700
+
+--
+
+*`postgresql.log.session_id`*::
++
+--
+PostgreSQL session.
+
+
+example: 5ff1dd98.22
+
+--
+
+*`postgresql.log.session_line_number`*::
++
+--
+Line number inside a session. (%l in `log_line_prefix`).
 
 
 type: long
@@ -105910,17 +106564,17 @@ type: long
 *`postgresql.log.database`*::
 +
 --
-Name of database
+Name of database.
 
 
-example: mydb
+example: postgres
 
 --
 
 *`postgresql.log.query`*::
 +
 --
-Query statement.
+Query statement. In the case of CSV parse, look at command_tag to get more context.
 
 
 example: SELECT * FROM users;
@@ -105930,7 +106584,7 @@ example: SELECT * FROM users;
 *`postgresql.log.query_step`*::
 +
 --
-Statement step when using extended query protocol (one of statement, parse, bind or execute)
+Statement step when using extended query protocol (one of statement, parse, bind or execute).
 
 
 example: parse
@@ -105947,12 +106601,144 @@ example: pdo_stmt_00000001
 
 --
 
+*`postgresql.log.command_tag`*::
++
+--
+Type of session's current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
+
+
+example: SELECT
+
+--
+
+*`postgresql.log.session_start_time`*::
++
+--
+Time when this session started.
+
+
+type: date
+
+--
+
+*`postgresql.log.virtual_transaction_id`*::
++
+--
+Backend local transaction id.
+
+
+--
+
+*`postgresql.log.transaction_id`*::
++
+--
+The id of current transaction.
+
+
+type: long
+
+--
+
+*`postgresql.log.sql_state_code`*::
++
+--
+State code returned by Postgres (if any). See also https://www.postgresql.org/docs/current/errcodes-appendix.html
+
+
+type: keyword
+
+--
+
+*`postgresql.log.detail`*::
++
+--
+More information about the message, parameters in case of a parametrized query. e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
+
+
+--
+
+*`postgresql.log.hint`*::
++
+--
+A possible solution to solve an error.
+
+
+--
+
+*`postgresql.log.internal_query`*::
++
+--
+Internal query that led to the error (if any).
+
+
+--
+
+*`postgresql.log.internal_query_pos`*::
++
+--
+Character count of the internal query (if any).
+
+
+type: long
+
+--
+
+*`postgresql.log.context`*::
++
+--
+Error context.
+
+
+--
+
+*`postgresql.log.query_pos`*::
++
+--
+Character count of the error position (if any).
+
+
+type: long
+
+--
+
+*`postgresql.log.location`*::
++
+--
+Location of the error in the PostgreSQL source code (if log_error_verbosity is set to verbose).
+
+
+--
+
+*`postgresql.log.application_name`*::
++
+--
+Name of the application of this event. It is defined by the client.
+
+
+--
+
+*`postgresql.log.backend_type`*::
++
+--
+Type of backend of this event. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. In addition, background workers registered by extensions may have additional types.
+
+
+example: client backend
+
+--
+
 *`postgresql.log.error.code`*::
 +
 --
-Error code returned by Postgres (if any)
 
-type: long
+deprecated:[8.0.0]
+
+Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
+
+
+type: alias
+
+alias to: postgresql.log.sql_state_code
 
 --
 
@@ -105962,15 +106748,6 @@ type: long
 type: alias
 
 alias to: event.timezone
-
---
-
-*`postgresql.log.thread_id`*::
-+
---
-type: alias
-
-alias to: process.pid
 
 --
 
@@ -105986,7 +106763,12 @@ alias to: user.name
 *`postgresql.log.level`*::
 +
 --
+Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
+
+
 type: alias
+
+example: LOG
 
 alias to: log.level
 
@@ -141559,6 +142341,15 @@ type: keyword
 --
 
 
+*`suricata.eve.alert.metadata`*::
++
+--
+Metadata about the alert.
+
+type: flattened
+
+--
+
 *`suricata.eve.alert.category`*::
 +
 --
@@ -152498,6 +153289,143 @@ type: keyword
 --
 
 [float]
+=== ntp
+
+Fields exported by the Zeek NTP log.
+
+
+
+*`zeek.ntp.version`*::
++
+--
+The NTP version number (1, 2, 3, 4).
+
+
+type: integer
+
+--
+
+*`zeek.ntp.mode`*::
++
+--
+The NTP mode being used.
+
+
+type: integer
+
+--
+
+*`zeek.ntp.stratum`*::
++
+--
+The stratum (primary server, secondary server, etc.).
+
+
+type: integer
+
+--
+
+*`zeek.ntp.poll`*::
++
+--
+The maximum interval between successive messages in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.precision`*::
++
+--
+The precision of the system clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.root_delay`*::
++
+--
+Total round-trip delay to the reference clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.root_disp`*::
++
+--
+Total dispersion to the reference clock in seconds.
+
+
+type: double
+
+--
+
+*`zeek.ntp.ref_id`*::
++
+--
+For stratum 0, 4 character string used for debugging. For stratum 1, ID assigned to the reference clock by IANA. Above stratum 1, when using IPv4, the IP address of the reference clock. Note that the NTP protocol did not originally specify a large enough field to represent IPv6 addresses, so they use the first four bytes of the MD5 hash of the reference clock’s IPv6 address (i.e. an IPv4 address here is not necessarily IPv4).
+
+
+type: keyword
+
+--
+
+*`zeek.ntp.ref_time`*::
++
+--
+Time when the system clock was last set or correct.
+
+
+type: date
+
+--
+
+*`zeek.ntp.org_time`*::
++
+--
+Time at the client when the request departed for the NTP server.
+
+
+type: date
+
+--
+
+*`zeek.ntp.rec_time`*::
++
+--
+Time at the server when the request arrived from the NTP client.
+
+
+type: date
+
+--
+
+*`zeek.ntp.xmt_time`*::
++
+--
+Time at the server when the response departed for the NTP client.
+
+
+type: date
+
+--
+
+*`zeek.ntp.num_exts`*::
++
+--
+Number of extension fields (which are not currently parsed).
+
+
+type: integer
+
+--
+
+[float]
 === ocsp
 
 Fields exported by the Zeek OCSP log
@@ -153170,6 +154098,73 @@ type: integer
 +
 --
 Height of the screen that is being shared.
+
+
+type: integer
+
+--
+
+[float]
+=== signature
+
+Fields exported by the Zeek Signature log.
+
+
+
+*`zeek.signature.note`*::
++
+--
+Notice associated with signature event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_id`*::
++
+--
+The name of the signature that matched.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.event_msg`*::
++
+--
+A more descriptive message of the signature-matching event.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sub_msg`*::
++
+--
+Extracted payload data or extra message.
+
+
+type: keyword
+
+--
+
+*`zeek.signature.sig_count`*::
++
+--
+Number of sigs, usually from summary count.
+
+
+type: integer
+
+--
+
+*`zeek.signature.host_count`*::
++
+--
+Number of hosts, from a summary count.
 
 
 type: integer

@@ -156,6 +156,8 @@
               type: text
             - name: index
               type: integer
+            - name: status
+              type: keyword
         - name: journey
           type: group
           fields:

@@ -2038,7 +2038,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -2091,7 +2091,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -3282,6 +3282,19 @@ example: darwin
 
 --
 
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`host.os.version`*::
 +
 --
@@ -4356,6 +4369,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -4523,6 +4549,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -7677,6 +7716,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -7852,6 +7892,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -7859,6 +8012,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -7955,6 +8221,119 @@ type: text
 --
 
 *`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -8078,6 +8457,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -8810,7 +9202,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -8823,7 +9215,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 

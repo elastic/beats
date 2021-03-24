@@ -6,6 +6,7 @@ package container
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
 
@@ -53,12 +54,17 @@ type containerReporter struct {
 
 func (r *containerReporter) Event(event mb.Event) bool {
 	cpuPctKey := "cloudfoundry.container.cpu.pct"
-	found, err := cloudfoundry.HasNonNumericFloat(event.RootFields, cpuPctKey)
+	value, err := event.RootFields.GetValue(cpuPctKey)
 	if err != nil {
 		r.logger.Debugf("Unexpected failure while checking for non-numeric values: %v", err)
-	}
-	if found {
-		event.RootFields.Delete(cpuPctKey)
+	} else {
+		if value, ok := value.(float64); ok {
+			if math.IsNaN(value) || math.IsInf(value, 0) {
+				event.RootFields.Delete(cpuPctKey)
+			} else {
+				event.RootFields.Put(cpuPctKey, value/100)
+			}
+		}
 	}
 	return r.PushReporterV2.Event(event)
 }
