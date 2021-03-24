@@ -374,6 +374,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Cisco ASA parser for message 722051. {pull}24410[24410]
 - Fix `google_workspace` pagination. {pull}24668[24668]
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
+- Fix Cisco AMP `@metadata._id` calculation {issue}24717[24717] {pull}24718[24718]
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
 - Fix date parsing in GSuite/login fileset. {issue}24694[24694]

@@ -1025,6 +1025,79 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T14:41:03.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Gen.20gl.1201",
+        "cisco.amp.detection_id": "6419229322845880359",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 950000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419229322845880000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
+        "file.hash.sha1": "e889544aff85ffaf8b0d0da705105dee7c97fe26",
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "file.name": "mssecsvc.exe",
+        "file.path": "\\\\?\\C:\\Windows\\mssecsvc.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 21793,
+        "process.hash.md5": "4e568dbe3fff1a0025eb432dc929b78f",
+        "process.hash.sha1": "7abcc82dc5a05b4f53fd0fbd386738e5555025cf",
+        "process.hash.sha256": "26f36ca31a1b977685f8df5f8436848b7d4143b47ec0dae68f8382c1b52a6c71",
+        "process.name": "lsass.exe",
+        "process.pid": 708,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+            "db349b97c37d22f5ea1d1841e3c89eb4",
+            "e889544aff85ffaf8b0d0da705105dee7c97fe26"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
         "@timestamp": "2021-01-14T14:37:40.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
@@ -1188,6 +1261,187 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T14:37:40.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.DD6D4FEDD3-100.SBX.TG",
+        "cisco.amp.detection_id": "6411488666497056775",
+        "cisco.amp.event_type_id": 553648147,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 398000000,
+        "event.action": "Retrospective Detection",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411488666497057000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91",
+        "file.name": "qYf.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\Documents\\qYf.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 26906,
+        "related.hash": [
+            "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:37:40.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.DD6D4FEDD3-100.SBX.TG",
+        "cisco.amp.detection_id": "6411488666497056774",
+        "cisco.amp.event_type_id": 553648147,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 398000000,
+        "event.action": "Retrospective Detection",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411488666497057000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91",
+        "file.name": "4191700.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Local\\Temp\\4191700.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 28140,
+        "related.hash": [
+            "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T14:37:40.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.DD6D4FEDD3-100.SBX.TG",
+        "cisco.amp.detection_id": "6411488666497056773",
+        "cisco.amp.event_type_id": 553648147,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 398000000,
+        "event.action": "Retrospective Detection",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411488666497057000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.md5": "6894b3834bd541fa85df79e44568acac",
+        "file.hash.sha1": "8cf0ca99a8f5019d8583133b9a9379299c45470c",
+        "file.hash.sha256": "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91",
+        "file.name": "MspthrdHash.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Local\\MspthrdHash\\MspthrdHash.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 29393,
+        "related.hash": [
+            "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91",
+            "6894b3834bd541fa85df79e44568acac",
+            "8cf0ca99a8f5019d8583133b9a9379299c45470c"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
         "@timestamp": "2021-01-14T14:09:00.000Z",
         "cisco.amp.cloud_ioc.description": "Qakbot is a worm that spreads through network shares and removable drives. It downloads additional files, steals information, and opens a back door on the compromised computer. The worm also contains rootkit functionality to allow it to hide its presence. A command or file path similar to one used by Qakbot for spreading across the network or persistence was seen.",
         "cisco.amp.cloud_ioc.short_description": "W32.Qakbot.ioc",
@@ -1285,6 +1539,69 @@
         "log.offset": 32509,
         "related.hash": [
             "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b"
+        ],
+        "related.hosts": [
+            "Demo_Low_Prev_Retro"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:46:00.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "df:d1:ed:2d:c8:fc"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.D5221F6847-100.SBX.TG",
+        "cisco.amp.detection_id": "6264772016730013699",
+        "cisco.amp.event_type_id": 553648147,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "df:d1:ed:2d:c8:fc"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 65000000,
+        "event.action": "Retrospective Detection",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6264772016730014000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.md5": "48a0bf05b9706a00d2a0ff6260412f11",
+        "file.hash.sha1": "5058b16a86beee96927371210b9a9f682976a50a",
+        "file.hash.sha256": "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b",
+        "file.name": "report.pdf.exe",
+        "file.path": "\\\\?\\C:\\Users\\rsteadman\\Downloads\\report.pdf.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Low_Prev_Retro",
+        "host.name": "Demo_Low_Prev_Retro",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 33628,
+        "related.hash": [
+            "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b",
+            "48a0bf05b9706a00d2a0ff6260412f11",
+            "5058b16a86beee96927371210b9a9f682976a50a"
         ],
         "related.hosts": [
             "Demo_Low_Prev_Retro"
@@ -1406,6 +1723,73 @@
         "related.ip": [
             "8.8.8.8",
             "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:43:32.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.ED01EBFBC9-100.SBX.TG",
+        "cisco.amp.detection_id": "6419214500913741862",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 366000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419214500913742000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
+        "file.hash.sha1": "e889544aff85ffaf8b0d0da705105dee7c97fe26",
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "file.name": "mssecsvc.exe",
+        "file.path": "\\\\?\\C:\\Windows\\mssecsvc.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 37453,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+            "db349b97c37d22f5ea1d1841e3c89eb4",
+            "e889544aff85ffaf8b0d0da705105dee7c97fe26"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1753,6 +2137,59 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T13:43:32.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419214500913741856",
+        "cisco.amp.event_type_id": 553648143,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 709000000,
+        "event.action": "Threat Quarantined",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419214500913742000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 45976,
+        "related.hash": [
+            "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
         "@timestamp": "2021-01-14T13:43:30.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
@@ -1798,6 +2235,79 @@
         "related.ip": [
             "8.8.8.8",
             "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:43:29.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6419214488028839966",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 916000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419214488028840000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "84c82835a5d21bbcf75a61706d8ab549",
+        "file.hash.sha1": "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "file.name": "tasksche.exe",
+        "file.path": "\\\\?\\C:\\Windows\\tasksche.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 48216,
+        "process.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
+        "process.hash.sha1": "e889544aff85ffaf8b0d0da705105dee7c97fe26",
+        "process.hash.sha256": "24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c",
+        "process.name": "mssecsvc.exe",
+        "process.pid": 5580,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "84c82835a5d21bbcf75a61706d8ab549",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2002,6 +2512,69 @@
         "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 53134,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:06:19.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6419204910251769881",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 34000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419204910251770000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "file.name": "tasksche.exe",
+        "file.path": "\\\\?\\C:\\ProgramData\\qzkbplcgew884\\tasksche.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 54407,
         "related.hash": [
             "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
@@ -2360,6 +2933,122 @@
         ],
         "related.user": [
             "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:06:18.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.File.MalParent",
+        "cisco.amp.detection_id": "6419204905956802580",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 286000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419204905956803000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+        "file.name": "tasksche.exe",
+        "file.path": "\\\\?\\C:\\ProgramData\\qzkbplcgew884\\tasksche.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 63166,
+        "related.hash": [
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T13:06:18.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6419204905956802579",
+        "cisco.amp.event_type_id": 553648143,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 800000000,
+        "event.action": "Threat Quarantined",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6419204905956803000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 64439,
+        "related.hash": [
+            "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
         ],
         "service.type": "cisco",
         "tags": [
