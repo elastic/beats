@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
+- Set `cleanup_timeout` to zero by default in docker and kubernetes autodiscover in all beats except Filebeat where it is kept to 60 seconds. {pull}24681[24681]
 
 *Auditbeat*
 
@@ -223,6 +224,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
 - Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
+- Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 
 *Heartbeat*
 
@@ -497,6 +499,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Update zoom module to ECS 1.8. {pull}23904[23904] {issue}23118[23118]
 - Support X-Forwarder-For in IIS logs. {pull}19142[192142]
+- Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Added NTP fileset to Zeek module {pull}24224[24224]
 
 *Heartbeat*
