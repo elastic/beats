@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package handlers
 
 import (
 	"context"
@@ -50,7 +50,7 @@ func TestPolicyChange(t *testing.T) {
 		}
 
 		cfg := configuration.DefaultConfiguration()
-		handler := &handlerPolicyChange{
+		handler := &PolicyChange{
 			log:       log,
 			emitter:   emitter.Emitter,
 			agentInfo: agentInfo,
@@ -75,7 +75,7 @@ func TestPolicyChange(t *testing.T) {
 		}
 
 		cfg := configuration.DefaultConfiguration()
-		handler := &handlerPolicyChange{
+		handler := &PolicyChange{
 			log:       log,
 			emitter:   emitter.Emitter,
 			agentInfo: agentInfo,
@@ -108,7 +108,7 @@ func TestPolicyAcked(t *testing.T) {
 		}
 
 		cfg := configuration.DefaultConfiguration()
-		handler := &handlerPolicyChange{
+		handler := &PolicyChange{
 			log:       log,
 			emitter:   emitter.Emitter,
 			agentInfo: agentInfo,
@@ -137,7 +137,7 @@ func TestPolicyAcked(t *testing.T) {
 		}
 
 		cfg := configuration.DefaultConfiguration()
-		handler := &handlerPolicyChange{
+		handler := &PolicyChange{
 			log:       log,
 			emitter:   emitter.Emitter,
 			agentInfo: agentInfo,

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package modifiers
 
 import (
 	"crypto/md5"
@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	monitoringName            = "FLEET_MONITORING"
+	// MonitoringName is a name used for artificial program generated when monitoring is needed.
+	MonitoringName            = "FLEET_MONITORING"
 	programsKey               = "programs"
 	monitoringChecksumKey     = "monitoring_checksum"
 	monitoringKey             = "agent.monitoring"
@@ -31,16 +32,16 @@ const (
 	defaultOutputName = "default"
 )
 
-func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
+// InjectMonitoring injects a monitoring configuration into a group of programs if needed.
+func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *transpiler.AST, programsToRun []program.Program) ([]program.Program, error) {
 	var err error
 	monitoringProgram := program.Program{
 		Spec: program.Spec{
-			Name: monitoringName,
-			Cmd:  monitoringName,
+			Name: MonitoringName,
+			Cmd:  MonitoringName,
 		},
 	}
 
-	config := make(map[string]interface{})
 	// if monitoring is not specified use default one where everything is enabled
 	if _, found := transpiler.Lookup(rootAst, monitoringKey); !found {
 		monitoringNode := transpiler.NewDict([]transpiler.Node{
@@ -70,7 +71,7 @@ func injectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 		return programsToRun, err
 	}
 
-	config, err = ast.Map()
+	config, err := ast.Map()
 	if err != nil {
 		return programsToRun, err
 	}

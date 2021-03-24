@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package fleet
 
 import (
 	"bytes"
@@ -20,10 +20,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
@@ -68,7 +70,7 @@ func newTestingClient() *testingClient {
 	return &testingClient{received: make(chan struct{}, 1)}
 }
 
-type testingDispatcherFunc func(...action) error
+type testingDispatcherFunc func(...fleetapi.Action) error
 
 type testingDispatcher struct {
 	sync.Mutex
@@ -76,7 +78,7 @@ type testingDispatcher struct {
 	received chan struct{}
 }
 
-func (t *testingDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
+func (t *testingDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
@@ -108,7 +110,7 @@ func newTestingDispatcher() *testingDispatcher {
 	return &testingDispatcher{received: make(chan struct{}, 1)}
 }
 
-type withGatewayFunc func(*testing.T, FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
+type withGatewayFunc func(*testing.T, gateway.FleetGateway, *testingClient, *testingDispatcher, *scheduler.Stepper, repo.Backend)
 
 func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGatewayFunc) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -162,7 +164,7 @@ func wrapStrToResp(code int, body string) *http.Response {
 		ProtoMinor:    1,
 		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
 		ContentLength: int64(len(body)),
-		Header:        make(http.Header, 0),
+		Header:        make(http.Header),
 	}
 }
 
@@ -175,7 +177,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send no event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -186,7 +188,7 @@ func TestFleetGateway(t *testing.T) {
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
 			}),
-			dispatcher.Answer(func(actions ...action) error {
+			dispatcher.Answer(func(actions ...fleetapi.Action) error {
 				require.Equal(t, 0, len(actions))
 				return nil
 			}),
@@ -200,7 +202,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("Successfully connects and receives a series of actions", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -230,7 +232,7 @@ func TestFleetGateway(t *testing.T) {
 	`)
 				return resp, nil
 			}),
-			dispatcher.Answer(func(actions ...action) error {
+			dispatcher.Answer(func(actions ...fleetapi.Action) error {
 				require.Equal(t, 2, len(actions))
 				return nil
 			}),
@@ -275,7 +277,7 @@ func TestFleetGateway(t *testing.T) {
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
 			}),
-			dispatcher.Answer(func(actions ...action) error {
+			dispatcher.Answer(func(actions ...fleetapi.Action) error {
 				require.Equal(t, 0, len(actions))
 				return nil
 			}),
@@ -295,7 +297,7 @@ func TestFleetGateway(t *testing.T) {
 
 	t.Run("send event and receive no action", withGateway(agentInfo, settings, func(
 		t *testing.T,
-		gateway FleetGateway,
+		gateway gateway.FleetGateway,
 		client *testingClient,
 		dispatcher *testingDispatcher,
 		scheduler *scheduler.Stepper,
@@ -319,7 +321,7 @@ func TestFleetGateway(t *testing.T) {
 				resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 				return resp, nil
 			}),
-			dispatcher.Answer(func(actions ...action) error {
+			dispatcher.Answer(func(actions ...fleetapi.Action) error {
 				require.Equal(t, 0, len(actions))
 				return nil
 			}),
@@ -364,7 +366,7 @@ func TestFleetGateway(t *testing.T) {
 
 		require.NoError(t, err)
 
-		ch1 := dispatcher.Answer(func(actions ...action) error { return nil })
+		ch1 := dispatcher.Answer(func(actions ...fleetapi.Action) error { return nil })
 		ch2 := client.Answer(func(headers http.Header, body io.Reader) (*http.Response, error) {
 			resp := wrapStrToResp(http.StatusOK, `{ "actions": [] }`)
 			return resp, nil
@@ -407,7 +409,7 @@ func TestRetriesOnFailures(t *testing.T) {
 	t.Run("When the gateway fails to communicate with the checkin API we will retry",
 		withGateway(agentInfo, settings, func(
 			t *testing.T,
-			gateway FleetGateway,
+			gateway gateway.FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,
@@ -448,7 +450,7 @@ func TestRetriesOnFailures(t *testing.T) {
 					return resp, nil
 				}),
 
-				dispatcher.Answer(func(actions ...action) error {
+				dispatcher.Answer(func(actions ...fleetapi.Action) error {
 					require.Equal(t, 0, len(actions))
 					return nil
 				}),
@@ -463,7 +465,7 @@ func TestRetriesOnFailures(t *testing.T) {
 			Backoff:  backoffSettings{Init: 10 * time.Minute, Max: 20 * time.Minute},
 		}, func(
 			t *testing.T,
-			gateway FleetGateway,
+			gateway gateway.FleetGateway,
 			client *testingClient,
 			dispatcher *testingDispatcher,
 			scheduler *scheduler.Stepper,

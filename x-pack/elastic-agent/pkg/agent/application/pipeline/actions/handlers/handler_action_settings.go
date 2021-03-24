@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package handlers
 
 import (
 	"context"
@@ -10,19 +10,37 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-// handlerSettings handles settings change coming from fleet and updates log level.
-type handlerSettings struct {
+type reexecManager interface {
+	ReExec(argOverrides ...string)
+}
+
+// Settings handles settings change coming from fleet and updates log level.
+type Settings struct {
 	log       *logger.Logger
 	reexec    reexecManager
 	agentInfo *info.AgentInfo
 }
 
+// NewSettings creates a new Settings handler.
+func NewSettings(
+	log *logger.Logger,
+	reexec reexecManager,
+	agentInfo *info.AgentInfo,
+) *Settings {
+	return &Settings{
+		log:       log,
+		reexec:    reexec,
+		agentInfo: agentInfo,
+	}
+}
+
 // Handle handles SETTINGS action.
-func (h *handlerSettings) Handle(ctx context.Context, a action, acker fleetAcker) error {
+func (h *Settings) Handle(ctx context.Context, a fleetapi.Action, acker store.FleetAcker) error {
 	h.log.Debugf("handlerUpgrade: action '%+v' received", a)
 	action, ok := a.(*fleetapi.ActionSettings)
 	if !ok {
