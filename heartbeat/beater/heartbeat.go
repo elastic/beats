@@ -19,6 +19,7 @@ package beater
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"time"
 
 	"github.com/pkg/errors"
@@ -82,6 +83,14 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
+	if bt.config.OneShot != nil {
+		err := bt.RunOneShot(b)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
 		return err
@@ -120,6 +129,43 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	<-bt.done
 
 	logp.Info("Shutting down.")
+	return nil
+}
+
+func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
+	logp.Info("Starting one-shot run")
+	cfg := bt.config.OneShot
+	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
+	if err != nil {
+		return fmt.Errorf("could not get stdmon fields: %w", err)
+	}
+	pluginFactory, exists := plugin.GlobalPluginsReg.Get(sf.Type)
+	if !exists {
+		return fmt.Errorf("no plugin for type: %s", sf.Type)
+	}
+	plugin, err := pluginFactory.Builder(sf.Type, cfg)
+	if err != nil {
+		return err
+	}
+	defer plugin.Close()
+
+	publishClient, err := b.Publisher.Connect()
+	if err != nil {
+		return fmt.Errorf("could not connect to publisher: %w", err)
+	}
+
+	results := plugin.RunWrapped(sf)
+
+	for {
+		event := <-results
+		if event == nil {
+			break
+		}
+		publishClient.Publish(*event)
+	}
+	publishClient.Close()
+
+	logp.Info("Ending one-shot run")
 	return nil
 }
 

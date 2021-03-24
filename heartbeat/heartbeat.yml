@@ -19,9 +19,10 @@ heartbeat.config.monitors:
   # How often to check for changes
   reload.period: 5s
 
+
 # Configure monitors inline
-heartbeat.monitors:
-- type: http
+heartbeat.one_shot:
+  type: http
   # ID used to uniquely identify this monitor in elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere

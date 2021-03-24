@@ -20,6 +20,9 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"sort"
 	"strings"
 
@@ -40,8 +43,43 @@ type PluginFactoryCreate func(string, *common.Config) (p Plugin, err error)
 
 type Plugin struct {
 	Jobs      []jobs.Job
-	Close     func() error
+	DoClose     func() error
 	Endpoints int
+}
+
+func (p Plugin) Close() error {
+	if p.DoClose != nil {
+		return p.DoClose()
+	}
+	return nil
+}
+
+func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
+	wj := wrappers.WrapCommon(p.Jobs, fields)
+	results := make (chan *beat.Event)
+
+	var runJob func (j jobs.Job)
+	runJob = func (j jobs.Job) {
+		e := &beat.Event{}
+		conts, err := j(e)
+		// No error handling since WrapCommon handles all errors
+		if err != nil {
+			panic(fmt.Sprintf("unexpected error on wrapped job!", err))
+		}
+		results <- e
+		for _, c := range conts {
+			runJob(c)
+		}
+	}
+
+	go func() {
+		for _, j := range wj {
+			runJob(j)
+		}
+		close(results)
+	}()
+
+	return results
 }
 
 var pluginKey = "heartbeat.monitor"
