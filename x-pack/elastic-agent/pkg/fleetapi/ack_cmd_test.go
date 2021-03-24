@@ -43,7 +43,7 @@ func TestAck(t *testing.T) {
 				id := responses.Events[0].ActionID
 				require.Equal(t, "my-id", id)
 
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,

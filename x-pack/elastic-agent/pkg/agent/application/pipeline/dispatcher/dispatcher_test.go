@@ -84,6 +84,7 @@ func TestActionDispatcher(t *testing.T) {
 		action := &mockActionUnknown{}
 		err = d.Dispatch(ack, action)
 
+		require.NoError(t, err)
 		require.True(t, def.called)
 		require.Equal(t, action, def.received)
 	})

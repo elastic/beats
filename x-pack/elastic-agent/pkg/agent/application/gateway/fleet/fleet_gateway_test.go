@@ -164,7 +164,7 @@ func wrapStrToResp(code int, body string) *http.Response {
 		ProtoMinor:    1,
 		Body:          ioutil.NopCloser(bytes.NewBufferString(body)),
 		ContentLength: int64(len(body)),
-		Header:        make(http.Header, 0),
+		Header:        make(http.Header),
 	}
 }
 

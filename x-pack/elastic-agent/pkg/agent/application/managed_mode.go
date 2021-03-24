@@ -7,9 +7,6 @@ package application
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
 
 	"github.com/elastic/go-sysinfo"
 
@@ -48,16 +45,6 @@ import (
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
 
-type apiClient interface {
-	Send(
-		method string,
-		path string,
-		params url.Values,
-		headers http.Header,
-		body io.Reader,
-	) (*http.Response, error)
-}
-
 type stateStore interface {
 	Add(fleetapi.Action)
 	AckToken() string
@@ -73,7 +60,6 @@ type Managed struct {
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
 	Config      configuration.FleetAgentConfig
-	api         apiClient
 	agentInfo   *info.AgentInfo
 	gateway     gateway.FleetGateway
 	router      pipeline.Router
