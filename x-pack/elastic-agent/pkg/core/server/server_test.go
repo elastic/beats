@@ -777,7 +777,7 @@ func waitFor(check func() error) error {
 		if err == nil {
 			return nil
 		}
-		if time.Now().Sub(started) >= 5*time.Second {
+		if time.Since(started) >= 5*time.Second {
 			return fmt.Errorf("check timed out after 5 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)
