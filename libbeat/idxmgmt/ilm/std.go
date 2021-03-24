@@ -105,11 +105,12 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 func (m *stdManager) EnsureAlias() error {
 	log := m.log
 	overwrite := m.Overwrite()
+	name := m.alias.Name
 
 	var exists bool
 	if m.checkExists && !overwrite {
 		var err error
-		exists, err = m.client.HasAlias(m.alias.Name)
+		exists, err = m.client.HasAlias(name)
 		if err != nil {
 			return err
 		}
@@ -117,21 +118,21 @@ func (m *stdManager) EnsureAlias() error {
 
 	switch {
 	case exists && !overwrite:
-		log.Infof("Index Alias %v exists already", m.alias.Name)
+		log.Infof("Index Alias %v exists already.", name)
 		return nil
 
 	case !exists || overwrite:
 		err := m.client.CreateAlias(m.alias)
 		if err != nil {
 			if ErrReason(err) != ErrAliasAlreadyExists {
-				log.Errorf("Index Alias %v setup failed: %v", m.alias.Name, err)
+				log.Errorf("Index Alias %v setup failed: %v.", name, err)
 				return err
 			}
-			log.Infof("Index Alias %v exists already", m.alias.Name)
+			log.Infof("Index Alias %v exists already.", name)
 			return nil
 		}
 
-		log.Info("Index Alias %v successfully created", m.alias.Name)
+		log.Infof("Index Alias %v successfully created.", name)
 		return nil
 
 	default:
@@ -143,11 +144,12 @@ func (m *stdManager) EnsureAlias() error {
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
 	overwrite = overwrite || m.Overwrite()
+	name := m.policy.Name
 
 	var exists bool
 	if m.checkExists && !overwrite {
 		var err error
-		exists, err = m.client.HasILMPolicy(m.policy.Name)
+		exists, err = m.client.HasILMPolicy(name)
 		if err != nil {
 			return false, err
 		}
@@ -155,21 +157,21 @@ func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 
 	switch {
 	case exists && !overwrite:
-		log.Infof("ILM policy %v exists already", m.policy)
+		log.Infof("ILM policy %v exists already.", name)
 		return false, nil
 
 	case !exists || overwrite:
 		err := m.client.CreateILMPolicy(m.policy)
 		if err != nil {
-			log.Errorf("ILM policy %v creation failed: %v", m.policy, err)
+			log.Errorf("ILM policy %v creation failed: %v", name, err)
 			return false, err
 		}
 
-		log.Infof("ILM policy %v successfully created", m.policy)
+		log.Infof("ILM policy %v successfully created.", name)
 		return true, err
 
 	default:
-		log.Infof("ILM policy not created: exists=%v, overwrite=%v", exists, overwrite)
+		log.Infof("ILM policy not created: exists=%v, overwrite=%v.", exists, overwrite)
 		return false, nil
 	}
 }
