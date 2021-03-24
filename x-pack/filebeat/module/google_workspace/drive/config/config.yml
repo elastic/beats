@@ -11,6 +11,9 @@ request.url: https://www.googleapis.com/admin/reports/v1/activity/users/{{ .user
 {{ if .http_client_timeout }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
   - set:
       target: url.params.startTime
