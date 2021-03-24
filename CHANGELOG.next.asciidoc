@@ -378,6 +378,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
 - Fix date parsing in GSuite/login fileset. {issue}24694[24694]
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Fix usage of unallowed ECS event.outcome values in Cisco ASA/FTD pipeline. {pull}24744[24744].
 
 *Heartbeat*
 
@@ -803,6 +804,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `alternative_host` option to google pubsub input {pull}23215[23215]
 - Support X-Forwarder-For in IIS logs. {pull}19142[192142]
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
+- Added fifteen new message IDs to Cisco ASA/FTD pipeline. {pull}24744[24744]
 - Added NTP fileset to Zeek module {pull}24224[24224]
 
 *Heartbeat*
