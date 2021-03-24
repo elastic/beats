@@ -152,7 +152,7 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	o.statusController.UpdateStateID(stateID)
 
 	for _, step := range steps {
-		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
+		if !strings.EqualFold(step.ProgramSpec.Cmd, monitoringName) {
 			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
 				// mark failed, new config cannot be run
 				msg := fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd)
@@ -343,9 +343,4 @@ func (o *Operator) deleteApp(p Descriptor) {
 
 	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
 	delete(o.apps, id)
-}
-
-func isMonitorable(descriptor Descriptor) bool {
-	isSidecar := app.IsSidecar(descriptor)
-	return !isSidecar // everything is monitorable except sidecar
 }
