@@ -62,14 +62,14 @@ processors:
       fields: [message]
       target: json
   - if:
-      has_fields: ["json.data.id"]
+      has_fields: ["json.data.detection_id"]
     then:
       - fingerprint:
-          fields: ["json.data.id"]
+          fields: ["json.data.detection_id"]
           target_field: "@metadata._id"
     else:
       - fingerprint:
-          fields: ["json.data.timestamp", "json.data.event_type_id", "json.data.connector_guid"]
+          fields: ["json.data.timestamp", "json.data.timestamp_nanoseconds", "json.data.event_type_id", "json.data.connector_guid"]
           target_field: "@metadata._id"
   - add_fields:
       target: ''
