@@ -64,7 +64,7 @@ var login = (function () {
                 // this is a timestamp in microseconds
                 case "timestamp":
                     var millis = p.intValue / 1000;
-                    evt.Put("event.start", new Date(millis).toUTCString());
+                    evt.Put("event.start", new Date(millis));
                     break;
                 case "challenge_status":
                     if (p.value === "Challenge Passed") {

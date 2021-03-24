@@ -5,6 +5,7 @@
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "Outside",
         "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
         "destination.port": 53,
