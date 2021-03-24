@@ -68,8 +68,7 @@ install_dependencies() {
 get_logs_location()
 {
   SCRIPT=$(readlink -f "$0")
-  cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
+  ES_EXT_DIR=$(dirname "$SCRIPT")
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]; then
     LOGS_FOLDER=$(jq -r '.[0].handlerEnvironment.logFolder' $ES_EXT_DIR/HandlerEnvironment.json)
   else
@@ -80,8 +79,7 @@ get_logs_location()
 get_status_location()
 {
   SCRIPT=$(readlink -f "$0")
-  cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
+  ES_EXT_DIR=$(dirname "$SCRIPT")
    if [ -e $ES_EXT_DIR/HandlerEnvironment.json ]
 then
     STATUS_FOLDER=$(jq -r '.[0].handlerEnvironment.statusFolder' $ES_EXT_DIR/HandlerEnvironment.json)
@@ -135,8 +133,7 @@ write_status() {
 get_configuration_location()
 {
   SCRIPT=$(readlink -f "$0")
-  cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
+  ES_EXT_DIR=$(dirname "$SCRIPT")
   log "INFO" "[get_configuration_location] main directory found $ES_EXT_DIR"
   log "INFO" "[get_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
@@ -360,7 +357,7 @@ write_status() {
     log "[write_status] Configuration file not found" "ERROR"
     exit 1
     fi
-  json="[{  \"version\":\"1.0\",\"timestampUTC\":\"$timestampUTC\",\"status\":\"$mainStatus\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$message\"},\"substatus\": [{ \"name\":\"$subName\", \"status\":\"$subStatus\",\"code\":\"$code\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"subMessage\"}}] }]"
+  json="[{\"version\":\"1.0\",\"timestampUTC\":\"$timestampUTC\",\"status\":{\"name\":\"$name\",\"operation\":\"$operation\",\"status\":\"$mainStatus\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$message\"},\"substatus\": [{ \"name\":\"$subName\", \"status\":\"$subStatus\",\"code\":\"$code\",\"formattedMessage\": { \"lang\":\"en-US\", \"message\":\"$subMessage\"}}]}} ]"
   echo $json > "$STATUS_FOLDER"/"$sequenceNumber".status
   fi
 }
@@ -494,8 +491,7 @@ function set_sequence_env_variables
 get_prev_configuration_location()
 {
   SCRIPT=$(readlink -f "$0")
-  cmd_path=$(dirname "$SCRIPT")
-  ES_EXT_DIR=$(cd "$( dirname "${cmd_path}" )" >/dev/null 2>&1 && pwd)
+  ES_EXT_DIR=$(dirname "$SCRIPT")
   log "INFO" "[get_prev_configuration_location] main directory found $ES_EXT_DIR"
   log "INFO" "[get_prev_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
