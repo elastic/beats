@@ -22,19 +22,63 @@ on Debian.
 include::../include/running-modules.asciidoc[]
 
 [float]
-=== Example dashboards
+=== Supported log formats
 
-This module comes with two sample dashboards.
+This module can collect any logs from PostgreSQL servers, but to be able to
+better analyze their contents and extract more information, they should be
+formatted in a determined way.
 
-The first dashboard is for regular logs.
+There are some settings to take into account for the log format.
 
-[role="screenshot"]
-image::./images/filebeat-postgresql-overview.png[]
+Log lines should be preffixed with the timestamp in milliseconds, the process
+id, the user id and the database name. This uses to be the default in most
+distributions, and is translated to this setting in the configuration file:
 
-The second one shows the slowlogs of PostgreSQL.
+["source","sh"]
+----------------------------
+log_line_prefix = '%m [%p] %q%u@%d '
+----------------------------
 
-[role="screenshot"]
-image::./images/filebeat-postgresql-slowlog-overview.png[]
+PostgreSQL server can be configured to log statements and their durations and
+this module is able to collect this information. To be able to correlate each
+duration with their statements, they must be logged in the same line. This
+happens when the following options are used:
+
+["source","sh"]
+----------------------------
+log_duration = 'on'
+log_statement = 'none'
+log_min_duration_statement = 0
+----------------------------
+
+Setting a zero value in `log_min_duration_statement` will log all statements
+executed by a client. You probably want to configure it to a higher value, so it
+logs only slower statements. This value is configured in milliseconds.
+
+When using `log_statement` and `log_duration` together, statements and durations
+are logged in different lines, and {beatname_uc} is not able to correlate both
+values, for this reason it is recommended to disable `log_statement`.
+
+NOTE: The PostgreSQL module of Metricbeat is also able to collect information
+about all statements executed in the server. You may chose which one is better
+for your needings. An important difference is that the Metricbeat module
+collects aggregated information when the statement is executed several times,
+but cannot know when each statement was executed. This information can be
+obtained from logs.
+
+Other logging options that you may consider to enable are the following ones:
+
+["source","sh"]
+----------------------------
+log_checkpoints = 'on';
+log_connections = 'on';
+log_disconnections = 'on';
+log_lock_waits = 'on';
+----------------------------
+
+Both `log_connections` and `log_disconnections` can cause a lot of events if you
+don't have persistent connections, so enable with care.
+
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -69,6 +113,21 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+[float]
+=== Example dashboards
+
+This module comes with two sample dashboards.
+
+The first dashboard is for regular logs.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-overview.png[]
+
+The second one shows the slowlogs of PostgreSQL. If `log_min_duration_statement`
+is not used, this dashboard will show incomplete or no data.
+
+[role="screenshot"]
+image::./images/filebeat-postgresql-slowlog-overview.png[]
 
 :has-dashboards!:
 
