@@ -118,7 +118,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 	}
 
 	log := logp.NewLogger("kibana")
-	log.Infof("Kibana url: %s\n", kibanaURL)
+	log.Infof("Kibana url: %s", kibanaURL)
 
 	var dialer, tlsDialer transport.Dialer
 
