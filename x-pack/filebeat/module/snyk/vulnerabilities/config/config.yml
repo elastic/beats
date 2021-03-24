@@ -7,6 +7,9 @@ interval: {{ .interval }}
 request.url: {{ .url }}
 request.method: POST
 request.ssl: {{ .ssl | tojson }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
 - set:
     target: header.Authorization
