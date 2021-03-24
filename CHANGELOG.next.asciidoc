@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Use alias to report container image in k8s metadata. {pull}24380[24380]
+- Set `cleanup_timeout` to zero by default in docker and kubernetes autodiscover in all beats except Filebeat where it is kept to 60 seconds. {pull}24681[24681]
 
 *Auditbeat*
 
