@@ -23,6 +23,10 @@ date_cursor.initial_interval: {{ .initial_interval }}
 pagination.id_field: nextPageToken
 pagination.url_field: pageToken
 
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 type: log
 paths:

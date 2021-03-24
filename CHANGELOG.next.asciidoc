@@ -501,6 +501,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support X-Forwarder-For in IIS logs. {pull}19142[192142]
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Added NTP fileset to Zeek module {pull}24224[24224]
+- Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
 
 *Heartbeat*
 
