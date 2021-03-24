@@ -216,52 +216,43 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 
 // process gets the top of the work queue and processes the object that is received.
 func (w *watcher) process(ctx context.Context) bool {
-	keyObj, quit := w.queue.Get()
+	obj, quit := w.queue.Get()
 	if quit {
 		return false
 	}
+	defer w.queue.Done(obj)
 
-	err := func(obj interface{}) error {
-		defer w.queue.Done(obj)
-
-		var entry *item
-		var ok bool
-		if entry, ok = obj.(*item); !ok {
-			w.queue.Forget(obj)
-			utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
-			return nil
-		}
-
-		key := entry.object.(string)
-
-		o, exists, err := w.store.GetByKey(key)
-		if err != nil {
-			return nil
-		}
-		if !exists {
-			if entry.state == delete {
-				w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
-				// delete anyway in order to clean states
-				w.handler.OnDelete(entry.objectRaw)
-			}
-			return nil
-		}
-
-		switch entry.state {
-		case add:
-			w.handler.OnAdd(o)
-		case update:
-			w.handler.OnUpdate(o)
-		case delete:
-			w.handler.OnDelete(o)
-		}
-
-		return nil
-	}(keyObj)
-
-	if err != nil {
-		utilruntime.HandleError(err)
+	var entry *item
+	var ok bool
+	if entry, ok = obj.(*item); !ok {
+		w.queue.Forget(obj)
+		utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
 		return true
+	}
+
+	key := entry.object.(string)
+
+	o, exists, err := w.store.GetByKey(key)
+	if err != nil {
+		utilruntime.HandleError(fmt.Errorf("getting object %#v from cache: %w", obj, err))
+		return true
+	}
+	if !exists {
+		if entry.state == delete {
+			w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
+			// delete anyway in order to clean states
+			w.handler.OnDelete(entry.objectRaw)
+		}
+		return true
+	}
+
+	switch entry.state {
+	case add:
+		w.handler.OnAdd(o)
+	case update:
+		w.handler.OnUpdate(o)
+	case delete:
+		w.handler.OnDelete(o)
 	}
 
 	return true

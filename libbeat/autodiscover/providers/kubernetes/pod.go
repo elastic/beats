@@ -124,40 +124,9 @@ func (p *pod) OnAdd(obj interface{}) {
 // if it is terminating, a stop event is scheduled, if not, a stop and a start
 // events are sent sequentially to recreate the resources assotiated to the pod.
 func (p *pod) OnUpdate(obj interface{}) {
-	pod := obj.(*kubernetes.Pod)
-
-	p.logger.Debugf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
-	switch pod.Status.Phase {
-	case kubernetes.PodSucceeded, kubernetes.PodFailed:
-		// If Pod is in a phase where all containers in the have terminated emit a stop event
-		p.logger.Debugf("Watcher Pod update (terminated): %+v", obj)
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-		return
-	case kubernetes.PodPending:
-		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
-		return
-	}
-
-	// here handle the case when a Pod is in `Terminating` phase.
-	// In this case the pod is neither `PodSucceeded` nor `PodFailed` and
-	// hence requires special handling.
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
-		// Pod is terminating, don't reload its configuration and ignore the event
-		// if some pod is still running, we will receive more events when containers
-		// terminate.
-		for _, container := range pod.Status.ContainerStatuses {
-			if container.State.Running != nil {
-				return
-			}
-		}
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-		return
-	}
-
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
-	p.emit(pod, "stop")
-	p.emit(pod, "start")
+	p.emit(obj.(*kubernetes.Pod), "stop")
+	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
 // OnDelete stops pod objects that are deleted
@@ -257,14 +226,16 @@ func (p *pod) Stop() {
 	}
 }
 
-func (p *pod) emit(pod *kubernetes.Pod, flag string) {
-	containers, statuses := getContainersInPod(pod)
-	p.emitEvents(pod, flag, containers, statuses)
+type containerInPod struct {
+	id      string
+	runtime string
+	spec    kubernetes.Container
+	status  kubernetes.PodContainerStatus
 }
 
 // getContainersInPod returns all the containers defined in a pod and their statuses.
 // It includes init and ephemeral containers.
-func getContainersInPod(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
+func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
 	var containers []kubernetes.Container
 	var statuses []kubernetes.PodContainerStatus
 
@@ -284,11 +255,28 @@ func getContainersInPod(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernet
 	}
 	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
 
-	return containers, statuses
+	containersInPod := make([]*containerInPod, len(containers))
+	for i, c := range containers {
+		cp := containerInPod{spec: c}
+		containersInPod[i] = &cp
+
+		// This nested loop can be a problem in pods with hundreds of containers, does it exist?
+		// Alternative would be to create a map, but can be worse for few containers.
+		for _, s := range statuses {
+			if s.Name == c.Name {
+				cid, runtime := kubernetes.ContainerIDWithRuntime(s)
+				cp.id = cid
+				cp.runtime = runtime
+				cp.status = s
+				break
+			}
+		}
+	}
+
+	return containersInPod
 }
 
-func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
+func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 	host := pod.Status.PodIP
 
 	// If the container doesn't exist in the runtime or its network
@@ -298,20 +286,6 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	// If stopping, emit the event in any case to ensure cleanup.
 	if host == "" && flag != "stop" {
 		return
-	}
-
-	// Collect all runtimes from status information.
-	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
-	for _, c := range containerstatuses {
-		// If the container is not being stopped then add the container only if it is in running state.
-		// This makes sure that we dont keep tailing init container logs after they have stopped.
-		// Emit the event in case that the pod is being stopped.
-		if flag == "stop" || c.State.Running != nil {
-			cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-			containerIDs[c.Name] = cid
-			runtimes[c.Name] = runtime
-		}
 	}
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
@@ -336,26 +310,25 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 	}
 
 	// Emit container and port information
+	containers := getContainersInPod(pod)
 	for _, c := range containers {
-		// If it doesn't have an ID, container doesn't exist in
-		// the runtime, emit only an event if we are stopping, so
+		// If it is not running, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.Name]
-		if cid == "" && flag != "stop" {
+		if (c.id == "" || c.status.State.Running == nil) && flag != "stop" {
 			continue
 		}
 
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
 
-		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.Name))
+		meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
 
 		cmeta := common.MapStr{
-			"id":      cid,
-			"runtime": runtimes[c.Name],
+			"id":      c.id,
+			"runtime": c.runtime,
 			"image": common.MapStr{
-				"name": c.Image,
+				"name": c.spec.Image,
 			},
 		}
 
@@ -363,10 +336,10 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 		kubemeta := meta.Clone()
 		kubemeta["annotations"] = annotations
 		kubemeta["container"] = common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
+			"id":      c.id,
+			"name":    c.spec.Name,
+			"image":   c.spec.Image,
+			"runtime": c.runtime,
 		}
 		if len(nsAnn) != 0 {
 			kubemeta["namespace_annotations"] = nsAnn
@@ -374,7 +347,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 
 		var events []bus.Event
 		// Without this check there would be overlapping configurations with and without ports.
-		if len(c.Ports) == 0 {
+		if len(c.spec.Ports) == 0 {
 			// Set a zero port on the event to signify that the event is from a container
 			event := bus.Event{
 				"provider":   p.uuid,
@@ -392,7 +365,7 @@ func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernet
 			events = append(events, event)
 		}
 
-		for _, port := range c.Ports {
+		for _, port := range c.spec.Ports {
 			podPorts[port.Name] = port.ContainerPort
 			event := bus.Event{
 				"provider":   p.uuid,
