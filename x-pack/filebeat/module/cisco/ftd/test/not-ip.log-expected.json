@@ -17,7 +17,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list AL-DMZ-LB-IN denied tcp LB-DMZ/WHAT-IS-THIS-A-HOSTNAME-192.0.2.244(27218) -> OUTSIDE/203.0.113.42(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -123,7 +123,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-338204: Dynamic filter dropped greylisted TCP traffic from eth0:10.10.10.1/1234 (source.example.net/11234) to wan:172.24.177.3/80 (www.example.org/80), destination malicious address resolved from dynamic list: example.org, threat-level: high, category: malware",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
