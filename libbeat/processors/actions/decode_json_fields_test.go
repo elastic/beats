@@ -448,6 +448,25 @@ func TestExpandKeysError(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestOverwriteMetadata(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":         fields,
+		"target":         "",
+		"overwrite_keys": true,
+	})
+
+	input := common.MapStr{
+		"msg": "{\"@metadata\":{\"beat\":\"libbeat\"},\"msg\":\"overwrite metadata test\"}",
+	}
+
+	expected := common.MapStr{
+		"msg": "overwrite metadata test",
+	}
+	actual := getActualValue(t, testConfig, input)
+
+	assert.Equal(t, expected, actual)
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	log := logp.NewLogger("decode_json_fields_test")
 
