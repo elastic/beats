@@ -1,0 +1,2356 @@
+[
+    {
+        "@timestamp": "2021-01-14T10:33:46.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.12081E6CA3-95.SBX.TG",
+        "cisco.amp.detection_id": "6411425813945647105",
+        "cisco.amp.event_type_id": 553648147,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 742000000,
+        "event.action": "Retrospective Detection",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411425813945647000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.md5": "c877b67a5733c59d0d8ed8d519df0c91",
+        "file.hash.sha1": "128aa78059540cf0cdae2a3cea30cd80e00f2046",
+        "file.hash.sha256": "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837",
+        "file.name": "MspthrdHash.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Local\\MspthrdHash\\MspthrdHash.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.hash": [
+            "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837",
+            "c877b67a5733c59d0d8ed8d519df0c91",
+            "128aa78059540cf0cdae2a3cea30cd80e00f2046"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:15:29.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648130,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 596000000,
+        "event.action": "Policy Update",
+        "event.dataset": "cisco.amp",
+        "event.id": 6533243623469744000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "input.type": "log",
+        "log.offset": 1358,
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:06:39.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Overdrive.RET",
+        "cisco.amp.detection_id": "6533241347137077251",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 657000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6533241347137077000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "0fe5be3811a98ee6a9c997d3812d911a",
+        "file.hash.sha1": "cf162622e29bca072d01b274fbbc3ceaacdd13c7",
+        "file.hash.sha256": "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
+        "file.name": "BIT657.tmp",
+        "file.path": "\\\\?\\C:\\BIT657.tmp",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 2295,
+        "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
+        "process.hash.sha1": "4af001b3c3816b860660cf2de2c0fd3c1dfb4878",
+        "process.hash.sha256": "121118a0f5e0e8c933efd28c9901e54e42792619a8a3a6d11e1f0025a7324bc2",
+        "process.name": "svchost.exe",
+        "process.pid": 896,
+        "related.hash": [
+            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
+            "0fe5be3811a98ee6a9c997d3812d911a",
+            "cf162622e29bca072d01b274fbbc3ceaacdd13c7"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6533241145273614337",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 525000000,
+        "event.action": "Quarantine Failure",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6533241145273614000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "input.type": "log",
+        "log.offset": 5008,
+        "related.hash": [
+            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.Overdrive.RET",
+        "cisco.amp.detection_id": "6533241145273614338",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 619000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6533241145273614000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "0fe5be3811a98ee6a9c997d3812d911a",
+        "file.hash.sha1": "cf162622e29bca072d01b274fbbc3ceaacdd13c7",
+        "file.hash.sha256": "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
+        "file.name": "SqGGuYXyy.exe",
+        "file.path": "\\\\?\\C:\\SqGGuYXyy.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 6204,
+        "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
+        "process.hash.sha1": "4af001b3c3816b860660cf2de2c0fd3c1dfb4878",
+        "process.hash.sha256": "121118a0f5e0e8c933efd28c9901e54e42792619a8a3a6d11e1f0025a7324bc2",
+        "process.name": "svchost.exe",
+        "process.pid": 896,
+        "related.hash": [
+            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
+            "0fe5be3811a98ee6a9c997d3812d911a",
+            "cf162622e29bca072d01b274fbbc3ceaacdd13c7"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
+        "cisco.amp.cloud_ioc.description": "The Windows Scripting Host (WScript.exe) was used to execute a file with a fake benign extension prior to a scripting extension. This is indicative of an attempt to conceal the malicious intent of the file and to trick the user into opening it.",
+        "cisco.amp.cloud_ioc.short_description": "W32.WScriptExecuteFakeExtension.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 875739000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1521138739875754000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T10:05:50.000Z",
+        "file.hash.sha256": "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0",
+        "file.name": "WScript.exe",
+        "file.path": "/C:/Windows/System32/WScript.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "input.type": "log",
+        "log.offset": 10424,
+        "process.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
+        "related.hash": [
+            "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
+        "cisco.amp.cloud_ioc.description": "Bitsadmin is a command-line tool that can be used to create, download or upload jobs and monitor their progress. However, it can also be used to maintain persistence and evade checks for usual persistence mechanisms. An attacker with Administrator's rights can use the setnotifycmdline option to create a persistent job and then specify a /Resume option at a later time to execute the job. This mechanism allows the malware to survive reboots since the job is run repeatedly after a system restart. Moreover, Bitsadmin by default downloads files unless the destination server is running IIS with the required server component and /UPLOAD is specified in the command-line. While this is not by itself malicious, the command-line needs to be reviewed to ascertain the origin and intent.",
+        "cisco.amp.cloud_ioc.short_description": "W32.Bitsadmin.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 868146000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1521138739868158500,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T10:05:50.000Z",
+        "file.hash.sha256": "838670c83e6d1984d0c46e39c196028d292b3a6d2df96183f2f6e408f1a16e00",
+        "file.name": "bitsadmin.exe",
+        "file.path": "/C:/Windows/System32/bitsadmin.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "input.type": "log",
+        "log.offset": 12096,
+        "process.hash.sha256": "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0",
+        "related.hash": [
+            "838670c83e6d1984d0c46e39c196028d292b3a6d2df96183f2f6e408f1a16e00"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
+        "cisco.amp.cloud_ioc.description": "Windows Script Host (wscript.exe) was used to execute a JavaScript file inside a zip archive. This attack vector is increasingly being used by ransomware. This may not be necessarily malicious but it needs further investigation to determine if the executed JavaScript is indeed malicious.",
+        "cisco.amp.cloud_ioc.short_description": "W32.WScriptLaunchedZippedJS.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "24:78:d8:fd:c4:75"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "24:78:d8:fd:c4:75"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 846943000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1521138739846959000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T10:05:50.000Z",
+        "file.hash.sha256": "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0",
+        "file.name": "WScript.exe",
+        "file.path": "/C:/Windows/System32/WScript.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Threat_Quarantined",
+        "host.name": "Demo_AMP_Threat_Quarantined",
+        "input.type": "log",
+        "log.offset": 14294,
+        "process.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
+        "related.hash": [
+            "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Threat_Quarantined"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:04:56.000Z",
+        "cisco.amp.cloud_ioc.description": "Shadow copies are snapshots of part of the filesystem, used for backups and restore points. Ransomware may delete these to prevent the user from restoring files that it has encrypted or destroyed. Aside from ransomware, shadow copy deletion may also be used by other types of malware to remove forensic evidence of malicious activity.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PossibleRansomwareShadowCopyDeletion.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 48000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1494576726048000300,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T10:04:56.000Z",
+        "file.hash.sha256": "e09bf4d27555ec7567a598ba89ccc33667252cef1fb0b604315ea7562d18ad10",
+        "file.name": "vssadmin.exe",
+        "file.path": "/C:/windows/system32/vssadmin.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 16006,
+        "process.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
+        "related.hash": [
+            "e09bf4d27555ec7567a598ba89ccc33667252cef1fb0b604315ea7562d18ad10"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:04:49.000Z",
+        "cisco.amp.cloud_ioc.description": "The BCDEdit command displays and modifies information about the boot options for Windows Vista and later Windows operating systems. In this case, it was used to disable automatic start up of recovery mode at boot susequent to a failure. Malware, such as ransomware, may use this to prevent the user from booting Windows into a safe mode or recovering a previous setting.",
+        "cisco.amp.cloud_ioc.short_description": "W32.BCDEditDisableRecovery.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "53:74:31:cb:37:50"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "53:74:31:cb:37:50"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 672000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1494576727672000300,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 1,
+        "event.start": "2021-01-14T10:04:49.000Z",
+        "file.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
+        "file.name": "cmd.exe",
+        "file.path": "/C:/windows/system32/cmd.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_WannaCry_Ransomware",
+        "host.name": "Demo_WannaCry_Ransomware",
+        "input.type": "log",
+        "log.offset": 17775,
+        "process.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
+        "related.hash": [
+            "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae"
+        ],
+        "related.hosts": [
+            "Demo_WannaCry_Ransomware"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:03:40.000Z",
+        "cisco.amp.cloud_ioc.description": "A file containing a benign extension prior to the .exe extension was executed. This is indicative of suspicious behaviour in an attempt to conceal the malicious intent of the file.",
+        "cisco.amp.cloud_ioc.short_description": "W32.FakeExtensionExec.RET",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "df:d1:ed:2d:c8:fc"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "df:d1:ed:2d:c8:fc"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 791000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1458617561791000300,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T10:03:40.000Z",
+        "file.hash.sha256": "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b",
+        "file.name": "report.pdf.exe",
+        "file.path": "/c:/users/rsteadman/downloads/report.pdf.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Low_Prev_Retro",
+        "host.name": "Demo_Low_Prev_Retro",
+        "input.type": "log",
+        "log.offset": 19558,
+        "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
+        "related.hash": [
+            "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b"
+        ],
+        "related.hosts": [
+            "Demo_Low_Prev_Retro"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:01:51.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "be:b0:d5:89:e2:96"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6880587034675642558",
+        "cisco.amp.error.description": "Object path not found",
+        "cisco.amp.error.error_code": 3221225530,
+        "cisco.amp.event_type_id": 2164260880,
+        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "be:b0:d5:89:e2:96"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 396000000,
+        "event.action": "Quarantine Failure",
+        "event.dataset": "cisco.amp",
+        "event.id": 6880587034675643000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "5c84acc90941b0501acc22ea959b533ddf1e1cbebc57f42e4f8c724bffaf3a6e",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_BP_WMIPRVSE",
+        "host.name": "Demo_BP_WMIPRVSE",
+        "input.type": "log",
+        "log.offset": 21167,
+        "related.hash": [
+            "5c84acc90941b0501acc22ea959b533ddf1e1cbebc57f42e4f8c724bffaf3a6e"
+        ],
+        "related.hosts": [
+            "Demo_BP_WMIPRVSE"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T10:01:50.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "be:b0:d5:89:e2:96"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "Generic.Malware.WX.9E93D282",
+        "cisco.amp.detection_id": "6880587021790740668",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Unknown",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "be:b0:d5:89:e2:96"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 737000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6880587030380676000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "1e5d8b8b8e0d8b74643f7a68430f8dc703290190cc60dcdb4f08c9ecae342b48",
+        "file.name": "p3fci4nu.dll",
+        "file.path": "\\\\?\\C:\\Windows\\Temp\\p3fci4nu\\p3fci4nu.dll",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_BP_WMIPRVSE",
+        "host.name": "Demo_BP_WMIPRVSE",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 27082,
+        "process.hash.md5": "23ee3d381cfe3b9f6229483e2ce2f9e1",
+        "process.hash.sha1": "93cf877f5627e55ec076a656e935042fac39950e",
+        "process.hash.sha256": "4240a12e0b246c9d69af1f697488fe7da1b497df20f4a6f95135b4d5fe180a57",
+        "process.name": "csc.exe",
+        "process.pid": 6708,
+        "related.hash": [
+            "1e5d8b8b8e0d8b74643f7a68430f8dc703290190cc60dcdb4f08c9ecae342b48"
+        ],
+        "related.hosts": [
+            "Demo_BP_WMIPRVSE"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T09:56:55.000Z",
+        "cisco.amp.cloud_ioc.description": "The psexec utility was executed as admin.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PsexecAsAdmin.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "04:e6:4d:d5:7a:b5"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "04:e6:4d:d5:7a:b5"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 615000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 460392585524661250,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T09:56:55.000Z",
+        "file.hash.sha256": "3337e3875b05e0bfba69ab926532e3f179e8cfbf162ebb60ce58a0281437a7ef",
+        "file.name": "PsExec.exe",
+        "file.path": "file:///C%3A/share%24/PsExec.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_MAP_FriedEx",
+        "host.name": "Demo_AMP_MAP_FriedEx",
+        "input.type": "log",
+        "log.offset": 28604,
+        "process.hash.sha256": "db06c3534964e3fc79d2763144ba53742d7fa250ca336f4a0fe724b75aaff386",
+        "related.hash": [
+            "3337e3875b05e0bfba69ab926532e3f179e8cfbf162ebb60ce58a0281437a7ef"
+        ],
+        "related.hosts": [
+            "Demo_AMP_MAP_FriedEx"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T07:56:40.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648173,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 758406329,
+        "event.action": "File Fetch Completed",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6508191586038317000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "file.hash.md5": "41476df3138717868118d8542cf3d1d6",
+        "file.hash.sha1": "5ca4bef8de6def53519d4b22632675bb4c1e470b",
+        "file.hash.sha256": "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
+        "file.name": "resume.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\Desktop\\resume.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 30050,
+        "related.hash": [
+            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
+            "41476df3138717868118d8542cf3d1d6",
+            "5ca4bef8de6def53519d4b22632675bb4c1e470b"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T05:49:06.000Z",
+        "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a shell was launched with an encoded command or to use Base64 to decode or encode an existing file or command. Malware authors may use this technique to bypass antivirus tools.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PowershellEncodedBuffer.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "04:e6:4d:d5:7a:b5"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "04:e6:4d:d5:7a:b5"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 403000000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 7007136035192884000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-14T05:49:06.000Z",
+        "file.hash.sha256": "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8",
+        "file.name": "powershell.exe",
+        "file.path": "file:///C%3A/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_MAP_FriedEx",
+        "host.name": "Demo_AMP_MAP_FriedEx",
+        "input.type": "log",
+        "log.offset": 31276,
+        "process.hash.sha256": "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8",
+        "related.hash": [
+            "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8"
+        ],
+        "related.hosts": [
+            "Demo_AMP_MAP_FriedEx"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T00:37:44.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296278,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "event.action": "Threat Detected in Low Prevalence Executable",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1515350231459808800,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
+        "file.name": "resume.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 33023,
+        "related.hash": [
+            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T00:27:10.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648173,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 579890366,
+        "event.action": "File Fetch Completed",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6508191586038317000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "file.hash.md5": "41476df3138717868118d8542cf3d1d6",
+        "file.hash.sha1": "5ca4bef8de6def53519d4b22632675bb4c1e470b",
+        "file.hash.sha256": "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
+        "file.name": "resume.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\Desktop\\resume.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "input.type": "log",
+        "log.offset": 34132,
+        "related.hash": [
+            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
+            "41476df3138717868118d8542cf3d1d6",
+            "5ca4bef8de6def53519d4b22632675bb4c1e470b"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-14T00:02:08.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "04:e6:4d:d5:7a:b5"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648130,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "04:e6:4d:d5:7a:b5"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 614000000,
+        "event.action": "Policy Update",
+        "event.dataset": "cisco.amp",
+        "event.id": 6583671182384431000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_MAP_FriedEx",
+        "host.name": "Demo_AMP_MAP_FriedEx",
+        "input.type": "log",
+        "log.offset": 35358,
+        "related.hosts": [
+            "Demo_AMP_MAP_FriedEx"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6411132837046517762",
+        "cisco.amp.error.description": "Object name not found",
+        "cisco.amp.error.error_code": 3221225524,
+        "cisco.amp.event_type_id": 2164260893,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 695000000,
+        "event.action": "Retrospective Quarantine Attempt Failed",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411132837046518000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "input.type": "log",
+        "log.offset": 36288,
+        "related.hash": [
+            "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "f9:65:da:22:2a:41"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6411132837046517761",
+        "cisco.amp.event_type_id": 553648155,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "f9:65:da:22:2a:41"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 691000000,
+        "event.action": "Retrospective Quarantine",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6411132837046518000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "file.hash.sha256": "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_Qakbot_1",
+        "host.name": "Demo_Qakbot_1",
+        "input.type": "log",
+        "log.offset": 37489,
+        "related.hash": [
+            "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
+        ],
+        "related.hosts": [
+            "Demo_Qakbot_1"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T10:37:33.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296279,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.cve": [
+            "CVE-2014-0260",
+            "CVE-2014-1761",
+            "CVE-2014-6357",
+            "CVE-2015-0085",
+            "CVE-2015-0086",
+            "CVE-2015-1641",
+            "CVE-2015-1650",
+            "CVE-2015-1682",
+            "CVE-2015-2379",
+            "CVE-2015-2380",
+            "CVE-2015-2424",
+            "CVE-2016-0127",
+            "CVE-2016-7193",
+            "CVE-2017-0292",
+            "CVE-2017-11826"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "cisco.amp.vulnerabilities": [
+            {
+                "cve": "CVE-2014-0260",
+                "name": "Microsoft Office",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0260",
+                "version": "2013"
+            },
+            {
+                "cve": "CVE-2014-1761",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-1761"
+            },
+            {
+                "cve": "CVE-2014-6357",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-6357"
+            },
+            {
+                "cve": "CVE-2015-0085",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0085"
+            },
+            {
+                "cve": "CVE-2015-0086",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0086"
+            },
+            {
+                "cve": "CVE-2015-1641",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-1641"
+            },
+            {
+                "cve": "CVE-2015-1650",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-1650"
+            },
+            {
+                "cve": "CVE-2015-1682",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-1682"
+            },
+            {
+                "cve": "CVE-2015-2379",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2379"
+            },
+            {
+                "cve": "CVE-2015-2380",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2380"
+            },
+            {
+                "cve": "CVE-2015-2424",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2424"
+            },
+            {
+                "cve": "CVE-2016-0127",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-0127"
+            },
+            {
+                "cve": "CVE-2016-7193",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-7193"
+            },
+            {
+                "cve": "CVE-2017-0292",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0292"
+            },
+            {
+                "cve": "CVE-2017-11826",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11826"
+            }
+        ],
+        "event.action": "Vulnerable Application Detected",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 15152998206589,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 1,
+        "event.start": "2021-01-13T10:37:33.000Z",
+        "file.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
+        "file.name": "WINWORD.EXE",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 41214,
+        "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
+        "related.hash": [
+            "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T10:23:35.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648130,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 349000000,
+        "event.action": "Policy Update",
+        "event.dataset": "cisco.amp",
+        "event.id": 6508159571352093000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 44193,
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T10:13:13.000Z",
+        "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 312509000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1515298360312529000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "event.start": "2021-01-13T10:13:13.000Z",
+        "file.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "file.name": "PowerShell.exe",
+        "file.path": "/C:/Windows/SysWOW64/WindowsPowerShell/v1.0/PowerShell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 45111,
+        "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
+        "related.hash": [
+            "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T10:13:08.000Z",
+        "cisco.amp.cloud_ioc.description": "Microsoft Word launched PowerShell. This is indicative of multiple dropper variants that make use of Visual Basic Application macros to perform nefarious activities, such as downloading and executing malicious executables.",
+        "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 162019000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1515298355162029000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2021-01-13T10:13:08.000Z",
+        "file.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "file.name": "PowerShell.exe",
+        "file.path": "/C:/Windows/SysWOW64/WindowsPowerShell/v1.0/PowerShell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 46862,
+        "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
+        "related.hash": [
+            "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-13T10:00:07.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "38:1e:eb:ba:2c:15"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection_id": "6508153524038139905",
+        "cisco.amp.event_type_id": 553648143,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "38:1e:eb:ba:2c:15"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 606000000,
+        "event.action": "Threat Quarantined",
+        "event.category": [
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6508153524038140000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.sha256": "4a45dbc60436fc72fbd8a8bf81995c378575142e0022015f29a4b25546e19cef",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP",
+        "host.name": "Demo_AMP",
+        "input.type": "log",
+        "log.offset": 48509,
+        "related.hash": [
+            "4a45dbc60436fc72fbd8a8bf81995c378575142e0022015f29a4b25546e19cef"
+        ],
+        "related.hosts": [
+            "Demo_AMP"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-12T10:24:47.000Z",
+        "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "d2:78:15:4a:f4:a2"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "d2:78:15:4a:f4:a2"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 693632000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1521062325693667300,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "event.start": "2021-01-12T10:24:47.000Z",
+        "file.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "file.name": "powershell.exe",
+        "file.path": "/C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
+        "host.name": "Demo_AMP_Exploit_Prevention_Audit",
+        "input.type": "log",
+        "log.offset": 49613,
+        "process.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
+        "related.hash": [
+            "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Exploit_Prevention_Audit"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-12T10:15:22.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "d2:78:15:4a:f4:a2"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648130,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "d2:78:15:4a:f4:a2"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 872000000,
+        "event.action": "Policy Update",
+        "event.dataset": "cisco.amp",
+        "event.id": 6532910514396201000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
+        "host.name": "Demo_AMP_Exploit_Prevention_Audit",
+        "input.type": "log",
+        "log.offset": 51389,
+        "related.hosts": [
+            "Demo_AMP_Exploit_Prevention_Audit"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:49:09.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "W32.GenericKD:Malwaregen.21do.1201",
+        "cisco.amp.detection_id": "6525520937264087041",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 661000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6525520937264087000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "cfdd16225e67471f5ef54cab9b3a5558",
+        "file.hash.sha1": "26de43cc558a4e0e60eddd4dc9321bcb5a0a181c",
+        "file.hash.sha256": "edb1ff2521fb4bf748111f92786d260d40407a2e8463dcd24bb09f908ee13eb9",
+        "file.name": "OLD.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\Desktop\\OLD.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 52332,
+        "process.hash.md5": "38ae1b3c38faef56fe4907922f0385ba",
+        "process.hash.sha1": "84123a3decdaa217e3588a1de59fe6cee1998004",
+        "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
+        "process.name": "explorer.exe",
+        "process.pid": 2632,
+        "related.hash": [
+            "edb1ff2521fb4bf748111f92786d260d40407a2e8463dcd24bb09f908ee13eb9",
+            "cfdd16225e67471f5ef54cab9b3a5558",
+            "26de43cc558a4e0e60eddd4dc9321bcb5a0a181c"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:30:44.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.detection": "Auto.F2863A.211556.in02",
+        "cisco.amp.detection_id": "6525516191325224961",
+        "cisco.amp.event_type_id": 1090519054,
+        "cisco.amp.file.disposition": "Malicious",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 500000000,
+        "event.action": "Threat Detected",
+        "event.category": [
+            "file",
+            "malware"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 6525516191325225000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "file.hash.md5": "c624d61b8f076c3ef05f74eeb96c8954",
+        "file.hash.sha1": "7d9518ea3f98d037745352b23861fab05d3777dc",
+        "file.hash.sha256": "f2863a775c7faa85aefa3814530d9356ff700ae8bf534584652c2b4b720ee117",
+        "file.name": "twhy.exe",
+        "file.path": "\\\\?\\C:\\Users\\johndoe\\AppData\\Roaming\\twhy.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "host.os.family": "windows",
+        "host.os.platform": "windows",
+        "host.user.name": "user@testdomain.com",
+        "input.type": "log",
+        "log.offset": 55057,
+        "process.hash.md5": "92f44e405db16ac55d97e3bfe3b132fa",
+        "process.hash.sha1": "04c5d2b4da9a0f3fa8a45702d4256cee42d8c48d",
+        "process.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "process.name": "powershell.exe",
+        "process.pid": 4868,
+        "related.hash": [
+            "f2863a775c7faa85aefa3814530d9356ff700ae8bf534584652c2b4b720ee117",
+            "c624d61b8f076c3ef05f74eeb96c8954",
+            "7d9518ea3f98d037745352b23861fab05d3777dc"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "related.user": [
+            "user@testdomain.com"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:30:41.000Z",
+        "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
+        "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 516130000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1519340132516139000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 3,
+        "event.start": "2020-12-25T05:30:41.000Z",
+        "file.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "file.name": "powershell.exe",
+        "file.path": "/C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 57784,
+        "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
+        "related.hash": [
+            "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:30:41.000Z",
+        "cisco.amp.cloud_ioc.description": "Microsoft Word launched PowerShell. This is indicative of multiple dropper variants that make use of Visual Basic Application macros to perform nefarious activities, such as downloading and executing malicious executables.",
+        "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296274,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 474861000,
+        "event.action": "Cloud IOC",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 1519340132474871000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 2,
+        "event.start": "2020-12-25T05:30:41.000Z",
+        "file.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
+        "file.name": "powershell.exe",
+        "file.path": "/C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell.exe",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 59541,
+        "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
+        "related.hash": [
+            "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:02:27.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296279,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.cve": [
+            "CVE-2018-0762",
+            "CVE-2018-0772"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "cisco.amp.vulnerabilities": [
+            {
+                "cve": "CVE-2018-0762",
+                "name": "Microsoft Internet Explorer",
+                "score": "7.6",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-0762",
+                "version": "11"
+            },
+            {
+                "cve": "CVE-2018-0772",
+                "score": "7.6",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-0772"
+            }
+        ],
+        "event.action": "Vulnerable Application Detected",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 15193384389977,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 1,
+        "event.start": "2020-12-25T05:02:27.000Z",
+        "file.hash.sha256": "d1bea74ac9d85b3dcd4abc1af42af6c37b9349defc8e6577993611b773f56ca0",
+        "file.name": "mshtml.dll",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 61194,
+        "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
+        "related.hash": [
+            "d1bea74ac9d85b3dcd4abc1af42af6c37b9349defc8e6577993611b773f56ca0"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T05:02:26.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296279,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.cve": [
+            "CVE-2018-0762",
+            "CVE-2018-0772"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "cisco.amp.vulnerabilities": [
+            {
+                "cve": "CVE-2018-0762",
+                "name": "Microsoft Internet Explorer",
+                "score": "7.6",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-0762",
+                "version": "11"
+            },
+            {
+                "cve": "CVE-2018-0772",
+                "score": "7.6",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-0772"
+            }
+        ],
+        "event.action": "Vulnerable Application Detected",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 15193384371995,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 1,
+        "event.start": "2020-12-25T05:02:26.000Z",
+        "file.hash.sha256": "1dc5d15a26a79bb46519952a60b15aa4acb36f6ce3247ebf50df9c157bc4fcf4",
+        "file.name": "mshtml.dll",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 62768,
+        "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
+        "related.hash": [
+            "1dc5d15a26a79bb46519952a60b15aa4acb36f6ce3247ebf50df9c157bc4fcf4"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T04:32:53.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 1107296279,
+        "cisco.amp.file.disposition": "Clean",
+        "cisco.amp.file.parent.disposition": "Clean",
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.cve": [
+            "CVE-2017-0106",
+            "CVE-2017-11774",
+            "CVE-2017-8506",
+            "CVE-2017-8507",
+            "CVE-2017-8571",
+            "CVE-2017-8663",
+            "CVE-2018-0791"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 0,
+        "cisco.amp.vulnerabilities": [
+            {
+                "cve": "CVE-2017-0106",
+                "name": "Microsoft Office",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0106",
+                "version": "2016"
+            },
+            {
+                "cve": "CVE-2017-11774",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11774"
+            },
+            {
+                "cve": "CVE-2017-8506",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8506"
+            },
+            {
+                "cve": "CVE-2017-8507",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8507"
+            },
+            {
+                "cve": "CVE-2017-8571",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8571"
+            },
+            {
+                "cve": "CVE-2017-8663",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8663"
+            },
+            {
+                "cve": "CVE-2018-0791",
+                "score": "9.3",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2018-0791"
+            }
+        ],
+        "event.action": "Vulnerable Application Detected",
+        "event.category": [
+            "file"
+        ],
+        "event.dataset": "cisco.amp",
+        "event.id": 15193366641599,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 1,
+        "event.start": "2020-12-25T04:32:53.000Z",
+        "file.hash.sha256": "465f398ae8e3c32395eb7c04bc8cd24595068e6a127e243bed3e9b4931556bfc",
+        "file.name": "OUTLOOK.EXE",
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 64342,
+        "process.hash.sha256": "71854d2c40664493e05c0a7e4f0c7cc74ada1a63eec1d4fe32350f6af8728243",
+        "related.hash": [
+            "465f398ae8e3c32395eb7c04bc8cd24595068e6a127e243bed3e9b4931556bfc"
+        ],
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T04:22:45.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 553648130,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.timestamp_nanoseconds": 878000000,
+        "event.action": "Policy Update",
+        "event.dataset": "cisco.amp",
+        "event.id": 6525498672153625000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 66455,
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T04:07:21.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 554696715,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.scan.clean": true,
+        "cisco.amp.scan.description": "Flash Scan",
+        "cisco.amp.scan.malicious_detections": 0,
+        "cisco.amp.scan.scanned_files": 2872,
+        "cisco.amp.scan.scanned_paths": 0,
+        "cisco.amp.scan.scanned_processes": 49,
+        "cisco.amp.timestamp_nanoseconds": 928000000,
+        "event.action": "Scan Completed, No Detections",
+        "event.dataset": "cisco.amp",
+        "event.id": 6525494703603843000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 67379,
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2020-12-25T04:06:40.000Z",
+        "cisco.amp.computer.active": true,
+        "cisco.amp.computer.connector_guid": "test_connector_guid",
+        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.network_addresses": [
+            {
+                "ip": "10.10.10.10",
+                "mac": "e6:44:a0:56:f3:9a"
+            }
+        ],
+        "cisco.amp.connector_guid": "test_connector_guid",
+        "cisco.amp.event_type_id": 554696714,
+        "cisco.amp.group_guids": [
+            "test_group_guid"
+        ],
+        "cisco.amp.related.mac": [
+            "e6:44:a0:56:f3:9a"
+        ],
+        "cisco.amp.scan.description": "Flash Scan",
+        "cisco.amp.timestamp_nanoseconds": 537000000,
+        "event.action": "Scan Started",
+        "event.dataset": "cisco.amp",
+        "event.id": 6525494527510184000,
+        "event.kind": "alert",
+        "event.module": "cisco",
+        "event.severity": 0,
+        "fileset.name": "amp",
+        "host.hostname": "Demo_AMP_Intel",
+        "host.name": "Demo_AMP_Intel",
+        "input.type": "log",
+        "log.offset": 68455,
+        "related.hosts": [
+            "Demo_AMP_Intel"
+        ],
+        "related.ip": [
+            "8.8.8.8",
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-amp",
+            "forwarded"
+        ]
+    }
+]

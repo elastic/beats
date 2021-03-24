@@ -21,6 +21,9 @@ func (a *Application) externalProcess(proc *os.Process) {
 		return
 	}
 
+	for range time.After(1 * time.Second) {
+
+	}
 	for {
 		select {
 		case <-time.After(1 * time.Second):

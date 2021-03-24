@@ -29,7 +29,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			}, "abc123"))
 			return mux
 		}, func(t *testing.T, host string) {
@@ -58,7 +58,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 			}, "secret"))
 			return mux
 		}, func(t *testing.T, host string) {
@@ -82,7 +82,7 @@ func TestHTTPClient(t *testing.T) {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, msg)
+				fmt.Fprint(w, msg)
 				require.Equal(t, r.Header.Get("User-Agent"), "Elastic Agent v8.0.0")
 			})
 			return mux
@@ -116,6 +116,7 @@ func TestHTTPClient(t *testing.T) {
 		client, err := kibana.NewWithRawConfig(nil, cfg, func(wrapped http.RoundTripper) (http.RoundTripper, error) {
 			return NewFleetAuthRoundTripper(wrapped, "abc123")
 		})
+		require.NoError(t, err)
 
 		_, err = client.Send(timeoutCtx, "GET", "/echo-hello", nil, nil, nil)
 		require.Error(t, err)

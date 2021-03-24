@@ -442,6 +442,7 @@
         "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.222",
+            "192.0.2.43",
             "10.123.1.35"
         ],
         "service.type": "cisco",
@@ -543,7 +544,8 @@
         "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.2.1",
-            "10.123.3.42"
+            "10.123.3.42",
+            "10.123.3.130"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.1",
@@ -796,7 +798,8 @@
         "observer.vendor": "Cisco",
         "related.ip": [
             "192.0.0.17",
-            "192.168.3.42"
+            "192.168.3.42",
+            "10.0.0.130"
         ],
         "service.type": "cisco",
         "source.address": "192.0.0.17",
@@ -3321,6 +3324,7 @@
         ],
         "related.ip": [
             "10.1.1.45",
+            "192.88.99.1",
             "192.88.99.129"
         ],
         "server.domain": "bad.example.com",
@@ -3379,7 +3383,9 @@
         "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.1.1",
-            "192.0.2.223"
+            "10.2.1.1",
+            "192.0.2.223",
+            "192.0.2.225"
         ],
         "service.type": "cisco",
         "source.address": "10.1.1.1",
@@ -3436,6 +3442,7 @@
         "observer.vendor": "Cisco",
         "related.ip": [
             "10.1.1.1",
+            "10.2.1.1",
             "192.0.2.223"
         ],
         "service.type": "cisco",

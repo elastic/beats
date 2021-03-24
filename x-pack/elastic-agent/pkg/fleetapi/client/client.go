@@ -110,10 +110,10 @@ func ExtractError(resp io.Reader) error {
 		// System errors doesn't return a message, fleet code can return a Message key which has more
 		// information.
 		if len(e.Message) == 0 {
-			return fmt.Errorf("Status code: %d, Kibana returned an error: %s", e.StatusCode, e.Error)
+			return fmt.Errorf("status code: %d, Kibana returned an error: %s", e.StatusCode, e.Error)
 		}
 		return fmt.Errorf(
-			"Status code: %d, Kibana returned an error: %s, message: %s",
+			"status code: %d, Kibana returned an error: %s, message: %s",
 			e.StatusCode,
 			e.Error,
 			e.Message,
