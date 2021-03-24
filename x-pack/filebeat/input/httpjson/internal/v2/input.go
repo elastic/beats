@@ -149,17 +149,22 @@ func run(
 
 func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig, log *logp.Logger) (*httpClient, error) {
 	timeout := config.Request.getTimeout()
+	proxy_url := config.Request.ProxyURL
 
 	// Make retryable HTTP client
+	transport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout: timeout,
+		}).DialContext,
+		TLSClientConfig:   tlsConfig.ToConfig(),
+		DisableKeepAlives: true,
+	}
+	if proxy_url != nil && proxy_url.URL != nil {
+		transport.Proxy = http.ProxyURL(proxy_url.URL)
+	}
 	client := &retryablehttp.Client{
 		HTTPClient: &http.Client{
-			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout: timeout,
-				}).DialContext,
-				TLSClientConfig:   tlsConfig.ToConfig(),
-				DisableKeepAlives: true,
-			},
+			Transport:     transport,
 			Timeout:       timeout,
 			CheckRedirect: checkRedirect(config.Request, log),
 		},

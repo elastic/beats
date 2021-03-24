@@ -6,6 +6,9 @@ interval: {{ .interval }}
 
 request.method: POST
 request.ssl: {{ .ssl | tojson }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.url: {{ .url }}
 request.timeout: {{ .http_client_timeout }}
 request.body: {{ .http_request_body | tojson }}

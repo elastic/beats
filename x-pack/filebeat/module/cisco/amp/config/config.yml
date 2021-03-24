@@ -17,6 +17,9 @@ request.timeout: {{ .request_timeout }}
 {{ if .ssl }}
 request.ssl: {{ .ssl | tojson }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
 - set:
     target: url.params.start_date
