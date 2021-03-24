@@ -3,43 +3,30 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- grok:
-    field: message
-    patterns:
-    - '%{TIMESTAMP_ISO8601:mongodb.log.timestamp}%{SPACE}%{MONGO3_SEVERITY:log.level}%{SPACE}%{MONGO3_COMPONENT:mongodb.log.component}%{SPACE}(?:\[%{DATA:mongodb.log.context}\])?%{SPACE}%{GREEDYDATA:message}'
-    ignore_missing: true
 - rename:
     field: '@timestamp'
     target_field: event.created
-- date:
-    field: mongodb.log.timestamp
-    target_field: '@timestamp'
-    formats:
-    - yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-- remove:
-    field: mongodb.log.timestamp
+- grok:
+    field: message
+    patterns:
+    - ^%{CHAR:first_char}
+    pattern_definitions:
+      CHAR: .
+- pipeline:
+    if: ctx.first_char != '{'
+    name: '{< IngestPipeline "pipeline-plaintext" >}'
+- pipeline:
+    if: ctx.first_char == '{'
+    name: '{< IngestPipeline "pipeline-json" >}'
 - set:
     field: event.kind
     value: event
 - append:
     field: event.category
     value: database
-- append:
-    field: event.type
-    value: access
-    if: "ctx?.mongodb?.log?.component == 'ACCESS'"
-- append:
-    field: event.type
-    value: change
-    if: "ctx?.mongodb?.log?.component == 'WRITE'"
-- append:
-    field: event.type
-    value: info
-    if: "ctx?.mongodb?.log?.component != 'WRITE' && ctx?.mongodb?.log?.component != 'ACCESS'"
-- append:
-    field: event.type
-    value: error
-    if: "ctx?.log?.level == 'F' || ctx?.log?.level == 'E'"
+- remove:
+    field:
+    - first_char
 on_failure:
 - set:
     field: error.message

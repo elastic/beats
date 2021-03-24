@@ -1,0 +1,32 @@
+description: Pipeline for parsing MongoDB logs in JSON format
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- date:
+    field: t.$date
+    target_field: '@timestamp'
+    formats:
+    - yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+- remove:
+    field: t.$date
+- append:
+    field: event.type
+    value: access
+    if: "ctx.c == 'ACCESS'"
+- append:
+    field: event.type
+    value: change
+    if: "ctx.c == 'WRITE'"
+- append:
+    field: event.type
+    value: info
+    if: "ctx.c != 'WRITE' && ctx.c != 'ACCESS'"
+- append:
+    field: event.type
+    value: error
+    if: "ctx.s == 'F' || ctx.s == 'E'"
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
