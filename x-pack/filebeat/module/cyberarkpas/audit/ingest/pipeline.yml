@@ -575,6 +575,23 @@ processors:
           #       unwanted consequences.
           # "50":
 
+        # 57 - CPM Change Password Failed
+        "57":
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            value: "failure"
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change", "error"]
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+
         # 60 - CPM Reconcile Password Failed
         "60":
           - set: destination.address # This could be host.* or user.target.* (doesn't exists).
