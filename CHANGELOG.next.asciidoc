@@ -812,6 +812,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
 - Add support for upper case field names in Sophos XG module {pull}24693[24693]
 - Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
+- Update Cisco IOS module to parse additional log messages. {issue}24642[24642] {pull}24757[24757]
 
 *Heartbeat*
 

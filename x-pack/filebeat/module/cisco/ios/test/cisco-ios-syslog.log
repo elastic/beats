@@ -32,3 +32,9 @@ Jun 20 02:43:40 198.51.100.2 1663329: Jun 20 02:43:39.350: %SEC-6-IPACCESSLOGP: 
 Jun 20 02:43:45 198.51.100.2 1663330: Jun 20 02:43:44.173: %SEC-6-IPACCESSLOGP: list 150 denied udp 198.51.100.20(138) -> 198.51.100.255(138), 1 packet
 Jun 20 02:43:46 198.51.100.2 1663331: Jun 20 02:43:45.356: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(42988) -> 198.51.100.255(15600), 1 packet
 Jun 20 02:43:51 198.51.100.2 1663332: Jun 20 02:43:50.473: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59836) -> 172.217.10.46(80), 1 packet
+Mar 24 12:09:35 198.51.100.2 1991217: Mar 24 12:09:35.367: %OSPF-4-NOVALIDKEY: No valid authentication send key is available on interface eth0
+Mar 24 12:06:47 198.51.100.2 1991218: Mar 24 12:06:47.099: %CCH323-6-CALL_PRESERVED: cch323_h225_handle_conn_loss: H.323 call preserved due to socket closure or error, Call Id = 6527, fd = 19
+Mar 24 18:06:03 198.51.100.2 1991219: Mar 24 18:06:03.424 UTC: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: john.smith] [Source: 10.2.55.3] [localport: 22] at 12:06:03 MST Wed Mar 24 2021
+Mar 24 18:06:00 198.51.100.2 1991220: Mar 24 18:06:00.364 UTC: %SYS-6-LOGOUT: User john.smith has exited tty session 5(10.5.36.9)
+Mar 24 17:37:39 198.51.100.2 1991221: Mar 24 17:37:39 UTC: %PIM-SW1-6-INVALID_RP_JOIN: Received (*, 10.36.2.78) Join from 10.4.5.66 for invalid RP 10.3.66.3
+

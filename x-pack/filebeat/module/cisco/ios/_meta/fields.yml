@@ -8,6 +8,11 @@
     description: >
       Name of the IP access list.
 
+  - name: action
+    type: keyword
+    description: >
+      Name of the IP access list.
+
   - name: facility
     type: keyword
     example: SEC
@@ -16,3 +21,29 @@
       forth). A facility can be a hardware device, a protocol, or a module of
       the system software. It denotes the source or the cause of the system
       message.
+
+  - name: outcome
+    type: keyword
+    description: >
+      The result of the event
+
+  - name: session
+    type: group
+    description: >
+      Fields for Session information
+    fields:
+    - name: id
+      type: integer
+      description: >
+        Session ID
+
+    - name: type
+      type: keyword
+      example: tty
+      description: >
+        Session type
+
+  - name: tree
+    type: keyword
+    description: >
+
