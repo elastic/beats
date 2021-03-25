@@ -18,6 +18,7 @@ var:
     default: 24h
   - name: interval
     default: 60m
+  - name: proxy_url
 
 ingest_pipeline:
   - ingest/pipeline.yml

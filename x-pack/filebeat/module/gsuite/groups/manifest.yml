@@ -15,6 +15,7 @@ var:
     default: 2h
   - name: tags
     default: [forwarded]
+  - name: proxy_url
 
 input: config/config.yml
 ingest_pipeline: ../ingest/common.yml

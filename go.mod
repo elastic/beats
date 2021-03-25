@@ -60,7 +60,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.8.0
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20200709172729-d43b7ad5833a
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210308165121-7dd05ee2b5a5
 	github.com/elastic/go-concert v0.1.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
 	github.com/elastic/go-licenser v0.3.1
@@ -87,13 +87,13 @@ require (
 	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.1
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.1
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
 	github.com/google/go-cmp v0.5.2
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
-	github.com/google/uuid v1.1.2-0.20190416172445-c2e93f3ae59f
+	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
