@@ -459,8 +459,10 @@ processors:
             from: cyberarkpas.audit.issuer
           - set: user.name
             from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
           - set: event.type
-            value: ["info"]
+            value: ["admin", "info"]
 
         # 23 - Action on closed safe
         #
@@ -730,6 +732,26 @@ processors:
             value: ["process", "session"]
           - set: event.type
             value: ["access", "info"]
+
+        # 414 - CPM Verify SSH Key
+        #
+        # SSH-key on a target host is verified.
+        "414":
+          # Address of device that hosts the account.
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "info"]
 
       source: >
         def clone(def val) {
