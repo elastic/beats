@@ -27,8 +27,6 @@ const (
 	unchangedState                        // UNCHANGED
 )
 
-type id string
-
 // state represent the SHOULD state of the system, contains a reference to the actual bundle of
 // configuration received by the upstream call and keep track of the last change executed on a program.
 //

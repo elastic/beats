@@ -124,7 +124,7 @@ func uninstallPrograms(ctx context.Context, cfgFile string) error {
 		return err
 	}
 
-	cfg, err := operations.LoadFullAgentConfig(cfgFile)
+	cfg, err := operations.LoadFullAgentConfig(cfgFile, false)
 	if err != nil {
 		return err
 	}
@@ -176,6 +176,9 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 	}
 
 	ppMap, err := program.Programs(agentInfo, ast)
+	if err != nil {
+		return nil, errors.New("failed to get programs from config", err)
+	}
 
 	var pp []program.Program
 	check := make(map[string]bool)
@@ -196,6 +199,10 @@ func programsFromConfig(cfg *config.Config) ([]program.Program, error) {
 
 func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) (*config.Config, error) {
 	cfgMap, err := cfg.ToMapStr()
+	if err != nil {
+		return nil, err
+	}
+
 	ast, err := transpiler.NewAST(cfgMap)
 	if err != nil {
 		return nil, err
@@ -204,7 +211,7 @@ func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) 
 	// apply dynamic inputs
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		varsArray := make([]*transpiler.Vars, 0, 0)
+		varsArray := make([]*transpiler.Vars, 0)
 		var wg sync.WaitGroup
 		wg.Add(1)
 		varsCallback := func(vv []*transpiler.Vars) {
@@ -246,5 +253,9 @@ func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) 
 	}
 
 	finalConfig, err := newAst.Map()
+	if err != nil {
+		return nil, err
+	}
+
 	return config.NewConfigFrom(finalConfig)
 }
