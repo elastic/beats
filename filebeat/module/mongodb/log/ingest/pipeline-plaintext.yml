@@ -1,8 +1,5 @@
 description: Pipeline for parsing MongoDB logs in plaintext
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
 - grok:
     field: message
     patterns:
