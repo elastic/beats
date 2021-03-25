@@ -16,30 +16,33 @@ import (
 )
 
 type SynthEvent struct {
-	Type                 string        `json:"type"`
-	PackageVersion       string        `json:"package_version"`
-	Step                 *Step         `json:"step"`
-	Journey              *Journey      `json:"journey"`
-	TimestampEpochMicros float64       `json:"@timestamp"`
-	Payload              common.MapStr `json:"payload"`
-	Blob                 string        `json:"blob"`
-	BlobMime             string        `json:"blob_mime"`
-	Error                *SynthError   `json:"error"`
-	URL                  string        `json:"url"`
-	Status               string        `json:"status"`
+	Type                 string                 `json:"type"`
+	PackageVersion       string                 `json:"package_version"`
+	Step                 *Step                  `json:"step"`
+	Journey              *Journey               `json:"journey"`
+	TimestampEpochMicros float64                `json:"@timestamp"`
+	Payload              common.MapStr          `json:"payload"`
+	Blob                 string                 `json:"blob"`
+	BlobMime             string                 `json:"blob_mime"`
+	Error                *SynthError            `json:"error"`
+	URL                  string                 `json:"url"`
+	Status               string                 `json:"status"`
+	RootFields           map[string]interface{} `json:"root_fields"`
 	index                int
 }
 
 func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	m = common.MapStr{
+	// Use the root fields as a base, and layer additional, stricter, fields on top
+	m = se.RootFields
+	m.DeepUpdate(common.MapStr{
 		"synthetics": common.MapStr{
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
 			"payload":         se.Payload,
 			"index":           se.index,
 		},
-	}
+	})
 	if se.Blob != "" {
 		m.Put("synthetics.blob", se.Blob)
 	}
