@@ -101,7 +101,7 @@ default value is `true`.
 false. The default value is `true`.
 
 `schema`:: (Optional) Specifies the schema of the message. Accepted schemas: `wineventlog`.
-The default value is ``.
+If no schema is specified it defaults to using the regular XML to JSON conversion.
 
 `document_id`:: (Optional) XML key to use as the document ID. If configured, the
 field will be removed from the original XML document and stored in
@@ -125,7 +125,8 @@ The ouput of the parsing will be specific to that schema.
 
 The `wineventlog` schema decodes Windows Events.
 
-The decoder will always output the fields formatted in the same way, the `to_lower` option will be ignored when using this schema decoder.
+The decoder will always output the fields formatted in the same way, the
+`to_lower` option will be ignored when using this schema decoder.
 
 Example:
 
