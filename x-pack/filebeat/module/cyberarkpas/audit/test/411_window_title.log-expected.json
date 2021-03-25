@@ -45,8 +45,7 @@
         "destination.user.name": "Administrator2",
         "event.action": "window title",
         "event.category": [
-            "process",
-            "session"
+            "process"
         ],
         "event.code": "411",
         "event.dataset": "cyberarkpas.audit",
@@ -63,7 +62,7 @@
         "fileset.name": "audit",
         "input.type": "log",
         "log.offset": 0,
-        "network.protocol": "rdp",
+        "network.application": "rdp",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.6.0000",

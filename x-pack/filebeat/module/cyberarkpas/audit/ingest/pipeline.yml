@@ -657,7 +657,7 @@ processors:
             from: cyberarkpas.audit.issuer
           - set: user.name
             from: cyberarkpas.audit.issuer
-          - set: network.protocol
+          - set: network.application
             from: cyberarkpas.audit.extra_details.protocol
           - set: event.category
             value: ["session"]
@@ -678,7 +678,7 @@ processors:
             from: cyberarkpas.audit.issuer
           - set: user.name
             from: cyberarkpas.audit.issuer
-          - set: network.protocol
+          - set: network.application
             from: cyberarkpas.audit.extra_details.protocol
           - set: _tmp.duration_hms
             from: cyberarkpas.audit.extra_details.session_duration
@@ -734,12 +734,33 @@ processors:
             from: cyberarkpas.audit.issuer
           - set: user.name
             from: cyberarkpas.audit.issuer
-          - set: network.protocol
+          - set: network.application
             from: cyberarkpas.audit.extra_details.protocol
           - set: event.category
             value: ["session"]
           - set: event.type
             value: ["info"]
+
+        # 359 - SQL Command
+        "359":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["database"]
+          - set: event.type
+            value: ["access"]
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
 
         # 411 - Window Title
         "411":
@@ -753,14 +774,14 @@ processors:
             from: cyberarkpas.audit.issuer
           - set: user.name
             from: cyberarkpas.audit.issuer
-          - set: network.protocol
+          - set: network.application
             from: cyberarkpas.audit.extra_details.protocol
           - set: process.pid
             from: cyberarkpas.audit.extra_details.process_id
           - set: process.name
             from: cyberarkpas.audit.extra_details.process_name
           - set: event.category
-            value: ["process", "session"]
+            value: ["process"]
           - set: event.type
             value: ["access", "info"]
 
@@ -929,10 +950,10 @@ processors:
   #    ignore_empty_value: true
 
   #
-  # sometimes network protocol is capitalized.
+  # sometimes application is capitalized.
   #
   - lowercase:
-      field: network.protocol
+      field: network.application
       ignore_missing: true
   #
   # Cleanup
