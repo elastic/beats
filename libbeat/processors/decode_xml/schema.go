@@ -20,7 +20,6 @@ package decode_xml
 import (
 	"bytes"
 	"errors"
-	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
@@ -78,7 +77,7 @@ func newSchemaLessDecoder(cfg decodeXMLConfig) decoder {
 
 		out, err := dec.Decode()
 		if err != nil {
-			return nil, fmt.Errorf("error decoding XML field: %w", err)
+			return nil, err
 		}
 
 		return common.MapStr(out), nil

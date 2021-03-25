@@ -113,7 +113,7 @@ func (x *decodeXML) run(event *beat.Event) error {
 
 	xmlOutput, err := x.decode([]byte(text))
 	if err != nil {
-		return err
+		return fmt.Errorf("error decoding XML field: %w", err)
 	}
 
 	var id string
