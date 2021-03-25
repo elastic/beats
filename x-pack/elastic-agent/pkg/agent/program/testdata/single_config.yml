@@ -40,6 +40,8 @@ inputs:
   use_output: default
   streams:
     - metricset: status
+      processors:
+      - null
       data_stream:
         dataset: docker.status
     - metricset: info
