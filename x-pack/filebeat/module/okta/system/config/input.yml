@@ -12,6 +12,11 @@ request.ssl: {{ .ssl | tojson }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
 
+
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
 request.method: GET
 request.url: {{ .url }}
 request.rate_limit:

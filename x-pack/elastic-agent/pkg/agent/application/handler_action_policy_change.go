@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 
 	"gopkg.in/yaml.v2"
 
@@ -30,12 +32,12 @@ const (
 )
 
 type clientSetter interface {
-	SetClient(clienter)
+	SetClient(client.Sender)
 }
 
 type handlerPolicyChange struct {
 	log       *logger.Logger
-	emitter   emitterFunc
+	emitter   pipeline.EmitterFunc
 	agentInfo *info.AgentInfo
 	config    *configuration.Configuration
 	store     storage.Store
@@ -98,7 +100,7 @@ func (h *handlerPolicyChange) handleKibanaHosts(ctx context.Context, c *config.C
 		}
 	}()
 
-	client, err := fleetapi.NewAuthWithConfig(h.log, h.config.Fleet.AccessAPIKey, h.config.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(h.log, h.config.Fleet.AccessAPIKey, h.config.Fleet.Kibana)
 	if err != nil {
 		return errors.New(
 			err, "fail to create API client with updated hosts",
