@@ -11220,6 +11220,18 @@ required: False
 
 --
 
+*`winlog.keywords_raw`*::
++
+--
+The raw keywords used to classify an event.
+
+
+type: long
+
+required: False
+
+--
+
 *`winlog.channel`*::
 +
 --
