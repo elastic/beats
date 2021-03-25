@@ -28,7 +28,7 @@ const (
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 )
 
-func getMonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
+func MonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
 	if endpoint, ok := spec.MetricEndpoints[operatingSystem]; ok {
 		return endpoint
 	}

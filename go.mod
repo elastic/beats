@@ -95,7 +95,7 @@ require (
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
-	github.com/gorilla/mux v1.7.2 // indirect
+	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
 	github.com/hashicorp/go-multierror v1.1.0

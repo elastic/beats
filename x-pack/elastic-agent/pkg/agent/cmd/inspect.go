@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
 )
 
@@ -297,6 +298,10 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 
 type inmemRouter struct {
 	programs map[string][]program.Program
+}
+
+func (r *inmemRouter) Routes() *sorted.Set {
+	return nil
 }
 
 func (r *inmemRouter) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
