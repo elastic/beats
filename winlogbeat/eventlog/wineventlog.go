@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
@@ -317,14 +318,14 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 
 func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
 	includeXML := l.config.IncludeXML
-	e, err := sys.UnmarshalEventXML(x)
+	e, err := winevent.UnmarshalXML(x)
 	if err != nil {
 		e.RenderErr = append(e.RenderErr, err.Error())
 		// Add raw XML to event.original when decoding fails
 		includeXML = true
 	}
 
-	err = sys.PopulateAccount(&e.User)
+	err = winevent.PopulateAccount(&e.User)
 	if err != nil {
 		debugf("%s SID %s account lookup failed. %v", l.logPrefix,
 			e.User.Identifier, err)

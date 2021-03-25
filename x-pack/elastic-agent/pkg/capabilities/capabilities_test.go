@@ -57,6 +57,8 @@ func TestLoadCapabilities(t *testing.T) {
 			defer resultCloser.Close()
 
 			expectedMap, err := expectedConfig.ToMapStr()
+			assert.NoError(t, err)
+
 			fixInputsType(expectedMap)
 			fixInputsType(resultConfig)
 

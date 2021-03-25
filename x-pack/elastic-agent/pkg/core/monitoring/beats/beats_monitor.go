@@ -223,9 +223,7 @@ func monitoringDrop(path string) (drop string) {
 		return ""
 	}
 
-	if strings.HasPrefix(path, httpPlusPrefix) {
-		path = strings.TrimPrefix(path, httpPlusPrefix)
-	}
+	path = strings.TrimPrefix(path, httpPlusPrefix)
 
 	// npipe is virtual without a drop
 	if isNpipe(path) {

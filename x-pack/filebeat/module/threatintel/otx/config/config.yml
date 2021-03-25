@@ -8,6 +8,9 @@ request.method: GET
 {{ if .ssl }}
 request.ssl: {{ .ssl | tojson }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 {{ if .http_client_timeout }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
