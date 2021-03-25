@@ -34,7 +34,11 @@ type SynthEvent struct {
 func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
 	// Use the root fields as a base, and layer additional, stricter, fields on top
-	m = se.RootFields
+	if se.RootFields != nil {
+		m = se.RootFields
+	} else {
+		m = common.MapStr{}
+	}
 	m.DeepUpdate(common.MapStr{
 		"synthetics": common.MapStr{
 			"type":            se.Type,
