@@ -27,9 +27,7 @@ custom_definitions:
 {{end}}
 {{end}}
 
-{{ if .detect_sequence_reset}}
 detect_sequence_reset: {{.detect_sequence_reset}}
-{{end}}
 
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}

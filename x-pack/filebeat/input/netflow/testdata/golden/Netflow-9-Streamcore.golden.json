@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "10.231.128.150",
-          "locality": "private",
+          "locality": "internal",
           "port": 50073
         },
         "event": {
@@ -26,7 +26,7 @@
         },
         "flow": {
           "id": "wdxUeEaOBho",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.231.128.150",
@@ -71,7 +71,7 @@
         "source": {
           "bytes": 128,
           "ip": "100.78.40.201",
-          "locality": "public",
+          "locality": "external",
           "packets": 3,
           "port": 8080
         }
@@ -85,7 +85,7 @@
       "Fields": {
         "destination": {
           "ip": "100.78.40.201",
-          "locality": "public",
+          "locality": "external",
           "port": 8080
         },
         "event": {
@@ -104,7 +104,7 @@
         },
         "flow": {
           "id": "wdxUeEaOBho",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "100.78.40.201",
@@ -149,7 +149,7 @@
         "source": {
           "bytes": 172,
           "ip": "10.231.128.150",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 50073
         }
@@ -163,7 +163,7 @@
       "Fields": {
         "destination": {
           "ip": "10.27.8.20",
-          "locality": "private",
+          "locality": "internal",
           "port": 53483
         },
         "event": {
@@ -182,7 +182,7 @@
         },
         "flow": {
           "id": "6_Ia6lqx2cg",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.27.8.20",
@@ -227,7 +227,7 @@
         "source": {
           "bytes": 3943,
           "ip": "100.78.40.201",
-          "locality": "public",
+          "locality": "external",
           "packets": 10,
           "port": 8080
         }
@@ -241,7 +241,7 @@
       "Fields": {
         "destination": {
           "ip": "100.78.40.201",
-          "locality": "public",
+          "locality": "external",
           "port": 8080
         },
         "event": {
@@ -260,7 +260,7 @@
         },
         "flow": {
           "id": "6_Ia6lqx2cg",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "100.78.40.201",
@@ -305,7 +305,7 @@
         "source": {
           "bytes": 3052,
           "ip": "10.27.8.20",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 53483
         }

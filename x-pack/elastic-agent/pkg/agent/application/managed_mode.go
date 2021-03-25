@@ -194,6 +194,11 @@ func newManaged(
 	)
 
 	actionDispatcher.MustRegister(
+		&fleetapi.ActionPolicyReassign{},
+		&handlerPolicyReassign{log: log},
+	)
+
+	actionDispatcher.MustRegister(
 		&fleetapi.ActionUnenroll{},
 		&handlerUnenroll{
 			log:        log,
@@ -276,6 +281,11 @@ func (m *Managed) Start() error {
 	if m.wasUnenrolled() {
 		m.log.Warnf("agent was previously unenrolled. To reactivate please reconfigure or enroll again.")
 		return nil
+	}
+
+	// reload ID because of win7 sync issue
+	if err := m.agentInfo.ReloadID(); err != nil {
+		return err
 	}
 
 	err := m.upgrader.Ack(m.bgContext)

@@ -15,27 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package eventlog
+package sys
 
-// retry invokes the retriable function. If the retriable function returns an
-// error then the corrective action function is invoked and passed the error.
-// The correctiveAction function should attempt to correct the error so that
-// retriable can be invoked again.
-func retry(retriable func() error, correctiveAction func(error) error) error {
-	err := retriable()
-	if err != nil {
-		caErr := correctiveAction(err)
-		if caErr != nil {
-			// Something went wrong, return original error.
-			return err
-		}
+import (
+	"sync"
+)
 
-		retryErr := retriable()
-		if retryErr != nil {
-			// The second attempt failed, return original error.
-			return err
-		}
+// bufferPool contains a pool of PooledByteBuffer objects.
+var bufferPool = sync.Pool{
+	New: func() interface{} { return &PooledByteBuffer{ByteBuffer: NewByteBuffer(1024)} },
+}
+
+// PooledByteBuffer is an expandable buffer backed by a byte slice.
+type PooledByteBuffer struct {
+	*ByteBuffer
+}
+
+// NewPooledByteBuffer return a PooledByteBuffer from the pool. The returned value must
+// be released with Free().
+func NewPooledByteBuffer() *PooledByteBuffer {
+	b := bufferPool.Get().(*PooledByteBuffer)
+	b.Reset()
+	return b
+}
+
+// Free returns the PooledByteBuffer to the pool.
+func (b *PooledByteBuffer) Free() {
+	if b == nil {
+		return
 	}
-
-	return nil
+	bufferPool.Put(b)
 }

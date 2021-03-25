@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
@@ -36,9 +36,10 @@ import (
 )
 
 const (
-	waitingForAgent        = "waiting for Elastic Agent to start"
-	waitingForFleetServer  = "waiting for Elastic Agent to start Fleet Server"
-	defaultFleetServerPort = 8220
+	maxRetriesstoreAgentInfo = 5
+	waitingForAgent          = "waiting for Elastic Agent to start"
+	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerPort   = 8220
 )
 
 var (
@@ -80,14 +81,15 @@ type EnrollCmd struct {
 
 // EnrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type EnrollCmdFleetServerOption struct {
-	ConnStr    string
-	PolicyID   string
-	Host       string
-	Port       uint16
-	Cert       string
-	CertKey    string
-	Insecure   bool
-	SpawnAgent bool
+	ConnStr         string
+	ElasticsearchCA string
+	PolicyID        string
+	Host            string
+	Port            uint16
+	Cert            string
+	CertKey         string
+	Insecure        bool
+	SpawnAgent      bool
 }
 
 // EnrollCmdOption define all the supported enrollment option.
@@ -226,7 +228,7 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
-		c.options.FleetServer.Cert, c.options.FleetServer.CertKey)
+		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
@@ -234,8 +236,9 @@ func (c *EnrollCmd) fleetServerBootstrap(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save fleet server bootstrap information", errors.TypeFilesystem)
+
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
+		return err
 	}
 
 	if agentRunning {
@@ -386,7 +389,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
-			c.options.FleetServer.Cert, c.options.FleetServer.CertKey)
+			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
 		if err != nil {
 			return err
 		}
@@ -405,11 +408,7 @@ func (c *EnrollCmd) enroll(ctx context.Context) error {
 		return err
 	}
 
-	if err := c.configStore.Save(reader); err != nil {
-		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
-	}
-
-	if _, err := info.NewAgentInfo(); err != nil {
+	if err := safelyStoreAgentInfo(c.configStore, reader); err != nil {
 		return err
 	}
 
@@ -555,5 +554,36 @@ func getAppFromStatus(status *client.AgentStatus, name string) *client.Applicati
 			return app
 		}
 	}
+	return nil
+}
+
+func safelyStoreAgentInfo(s saver, reader io.Reader) error {
+	var err error
+	signal := make(chan struct{})
+	backExp := backoff.NewExpBackoff(signal, 100*time.Millisecond, 3*time.Second)
+
+	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
+		backExp.Wait()
+		err = storeAgentInfo(s, reader)
+		if err != filelock.ErrAppAlreadyRunning {
+			break
+		}
+	}
+
+	close(signal)
+	return err
+}
+
+func storeAgentInfo(s saver, reader io.Reader) error {
+	fileLock := paths.AgentConfigFileLock()
+	if err := fileLock.TryLock(); err != nil {
+		return err
+	}
+	defer fileLock.Unlock()
+
+	if err := s.Save(reader); err != nil {
+		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
+	}
+
 	return nil
 }

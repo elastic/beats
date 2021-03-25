@@ -18,7 +18,6 @@
 package sys
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,57 +29,11 @@ func TestUTF16BytesToString(t *testing.T) {
 	input := "abc白鵬翔\u145A6"
 	utf16Bytes := common.StringToUTF16Bytes(input)
 
-	output, _, err := UTF16BytesToString(utf16Bytes)
+	output, err := UTF16BytesToString(utf16Bytes)
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Equal(t, input, output)
-}
-
-func TestUTF16BytesToStringOffset(t *testing.T) {
-	in := bytes.Join([][]byte{common.StringToUTF16Bytes("one"), common.StringToUTF16Bytes("two"), common.StringToUTF16Bytes("three")}, []byte{0, 0})
-
-	output, offset, err := UTF16BytesToString(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "one", output)
-	assert.Equal(t, 8, offset)
-
-	in = in[offset:]
-	output, offset, err = UTF16BytesToString(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "two", output)
-	assert.Equal(t, 8, offset)
-
-	in = in[offset:]
-	output, offset, err = UTF16BytesToString(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "three", output)
-	assert.Equal(t, -1, offset)
-}
-
-func TestUTF16BytesToStringOffsetWithEmptyString(t *testing.T) {
-	in := bytes.Join([][]byte{common.StringToUTF16Bytes(""), common.StringToUTF16Bytes("two")}, []byte{0, 0})
-
-	output, offset, err := UTF16BytesToString(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "", output)
-	assert.Equal(t, 2, offset)
-
-	in = in[offset:]
-	output, offset, err = UTF16BytesToString(in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, "two", output)
-	assert.Equal(t, -1, offset)
 }
 
 func BenchmarkUTF16BytesToString(b *testing.B) {

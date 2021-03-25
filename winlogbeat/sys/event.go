@@ -22,12 +22,14 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	libxml "github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 )
 
 // UnmarshalEventXML unmarshals the given XML into a new Event.
 func UnmarshalEventXML(rawXML []byte) (Event, error) {
 	var event Event
-	decoder := xml.NewDecoder(newXMLSafeReader(rawXML))
+	decoder := xml.NewDecoder(libxml.NewSafeReader(rawXML))
 	err := decoder.Decode(&event)
 	return event, err
 }
