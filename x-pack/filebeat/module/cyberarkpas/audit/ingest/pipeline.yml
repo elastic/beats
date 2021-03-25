@@ -708,6 +708,20 @@ processors:
           - set: event.reason
             from: cyberarkpas.audit.reason
 
+        # 309 - Undefined user logon
+        #
+        "309":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["authentication"]
+          - set: event.type
+            value: ["error"]
+          - set: event.action
+            value:  "authentication_failure"
+          - set: event.outcome
+            value: "failure"
+
         # 361 - Keystroke logging
         "361":
           - set: destination.address
