@@ -753,6 +753,25 @@ processors:
           - set: event.type
             value: ["admin", "info"]
 
+        # 428 - Retrieve SSH Key
+        "428":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            value: "success"
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+
       source: >
         def clone(def val) {
             return val instanceof List? new ArrayList(val) : val;
