@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package cmd
 
 import (
 	"bytes"
@@ -81,9 +81,9 @@ func TestEnroll(t *testing.T) {
 
 			url := "https://" + host
 			store := &mockStore{Err: errors.New("fail to save")}
-			cmd, err := NewEnrollCmdWithStore(
+			cmd, err := newEnrollCmdWithStore(
 				log,
-				&EnrollCmdOption{
+				&enrollCmdOption{
 					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{caFile},
@@ -134,9 +134,9 @@ func TestEnroll(t *testing.T) {
 
 			url := "https://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmdWithStore(
+			cmd, err := newEnrollCmdWithStore(
 				log,
-				&EnrollCmdOption{
+				&enrollCmdOption{
 					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{caFile},
@@ -191,9 +191,9 @@ func TestEnroll(t *testing.T) {
 		}, func(t *testing.T, host string) {
 			url := "http://" + host + "/"
 			store := &mockStore{}
-			cmd, err := NewEnrollCmdWithStore(
+			cmd, err := newEnrollCmdWithStore(
 				log,
-				&EnrollCmdOption{
+				&enrollCmdOption{
 					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},
@@ -251,9 +251,9 @@ func TestEnroll(t *testing.T) {
 		}, func(t *testing.T, host string) {
 			url := "http://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmdWithStore(
+			cmd, err := newEnrollCmdWithStore(
 				log,
-				&EnrollCmdOption{
+				&enrollCmdOption{
 					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},
@@ -296,9 +296,9 @@ func TestEnroll(t *testing.T) {
 		}, func(t *testing.T, host string) {
 			url := "http://" + host
 			store := &mockStore{}
-			cmd, err := NewEnrollCmdWithStore(
+			cmd, err := newEnrollCmdWithStore(
 				log,
-				&EnrollCmdOption{
+				&enrollCmdOption{
 					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},

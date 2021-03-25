@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package dispatcher
 
 import (
 	"context"
@@ -10,27 +10,25 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-type action = fleetapi.Action
+type actionHandlers map[string]actions.Handler
 
-type actionHandler interface {
-	Handle(ctx context.Context, a action, acker fleetAcker) error
-}
-
-type actionHandlers map[string]actionHandler
-
-type actionDispatcher struct {
+// ActionDispatcher processes actions coming from fleet using registered set of handlers.
+type ActionDispatcher struct {
 	ctx      context.Context
 	log      *logger.Logger
 	handlers actionHandlers
-	def      actionHandler
+	def      actions.Handler
 }
 
-func newActionDispatcher(ctx context.Context, log *logger.Logger, def actionHandler) (*actionDispatcher, error) {
+// New creates a new action dispatcher.
+func New(ctx context.Context, log *logger.Logger, def actions.Handler) (*ActionDispatcher, error) {
 	var err error
 	if log == nil {
 		log, err = logger.New("action_dispatcher")
@@ -43,7 +41,7 @@ func newActionDispatcher(ctx context.Context, log *logger.Logger, def actionHand
 		return nil, errors.New("missing default handler")
 	}
 
-	return &actionDispatcher{
+	return &ActionDispatcher{
 		ctx:      ctx,
 		log:      log,
 		handlers: make(actionHandlers),
@@ -51,7 +49,8 @@ func newActionDispatcher(ctx context.Context, log *logger.Logger, def actionHand
 	}, nil
 }
 
-func (ad *actionDispatcher) Register(a action, handler actionHandler) error {
+// Register registers a new handler for action.
+func (ad *ActionDispatcher) Register(a fleetapi.Action, handler actions.Handler) error {
 	k := ad.key(a)
 	_, ok := ad.handlers[k]
 	if ok {
@@ -61,18 +60,21 @@ func (ad *actionDispatcher) Register(a action, handler actionHandler) error {
 	return nil
 }
 
-func (ad *actionDispatcher) MustRegister(a action, handler actionHandler) {
+// MustRegister registers a new handler for action.
+// Panics if not successful.
+func (ad *ActionDispatcher) MustRegister(a fleetapi.Action, handler actions.Handler) {
 	err := ad.Register(a, handler)
 	if err != nil {
 		panic("could not register action, error: " + err.Error())
 	}
 }
 
-func (ad *actionDispatcher) key(a action) string {
+func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 	return reflect.TypeOf(a).String()
 }
 
-func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error {
+// Dispatch dispatches an action using pre-registered set of handlers.
+func (ad *ActionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
 	if len(actions) == 0 {
 		ad.log.Debug("No action to dispatch")
 		return nil
@@ -99,7 +101,7 @@ func (ad *actionDispatcher) Dispatch(acker fleetAcker, actions ...action) error 
 	return acker.Commit(ad.ctx)
 }
 
-func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
+func (ad *ActionDispatcher) dispatchAction(a fleetapi.Action, acker store.FleetAcker) error {
 	handler, found := ad.handlers[(ad.key(a))]
 	if !found {
 		return ad.def.Handle(ad.ctx, a, acker)
@@ -108,7 +110,7 @@ func (ad *actionDispatcher) dispatchAction(a action, acker fleetAcker) error {
 	return handler.Handle(ad.ctx, a, acker)
 }
 
-func detectTypes(actions []action) []string {
+func detectTypes(actions []fleetapi.Action) []string {
 	str := make([]string, len(actions))
 	for idx, action := range actions {
 		str[idx] = reflect.TypeOf(action).String()

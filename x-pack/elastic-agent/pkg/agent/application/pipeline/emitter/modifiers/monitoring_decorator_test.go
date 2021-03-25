@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package application
+package modifiers
 
 import (
 	"fmt"
@@ -35,7 +35,7 @@ func TestMonitoringInjection(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -47,7 +47,7 @@ GROUPLOOP:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
@@ -114,7 +114,7 @@ func TestMonitoringInjectionDefaults(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -126,7 +126,7 @@ GROUPLOOP:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
@@ -193,7 +193,7 @@ func TestMonitoringInjectionDisabled(t *testing.T) {
 GROUPLOOP:
 	for group, ptr := range programsToRun {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, ast, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, ast, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOP
@@ -205,7 +205,7 @@ GROUPLOOP:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
@@ -299,7 +299,7 @@ func TestChangeInMonitoringWithChangeInInput(t *testing.T) {
 GROUPLOOPBEFORE:
 	for group, ptr := range programsToRunBefore {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, astBefore, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, astBefore, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOPBEFORE
@@ -311,7 +311,7 @@ GROUPLOOPBEFORE:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
@@ -322,7 +322,7 @@ GROUPLOOPBEFORE:
 GROUPLOOPAFTER:
 	for group, ptr := range programsToRunAfter {
 		programsCount := len(ptr)
-		newPtr, err := injectMonitoring(agentInfo, group, astAfter, ptr)
+		newPtr, err := InjectMonitoring(agentInfo, group, astAfter, ptr)
 		if err != nil {
 			t.Error(err)
 			continue GROUPLOOPAFTER
@@ -334,7 +334,7 @@ GROUPLOOPAFTER:
 		}
 
 		for _, p := range newPtr {
-			if p.Spec.Name != monitoringName {
+			if p.Spec.Name != MonitoringName {
 				continue
 			}
 
