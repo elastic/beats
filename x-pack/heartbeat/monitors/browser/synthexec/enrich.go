@@ -17,15 +17,22 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func(event *beat.Event, se *SynthEvent) error
+type Enricher func(event *beat.Event, se *SynthEvent) error
 
-type streamEnricher struct {
+type StreamEnricher struct {
 	je *journeyEnricher
+	locationName string
 }
 
-func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (e *StreamEnricher) Enrich(event *beat.Event, se *SynthEvent) error {
 	if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
+	}
+
+	if e.locationName != "" {
+		eventext.MergeEventFields(event, common.MapStr{
+			"observer": common.MapStr{"geo": common.MapStr{"name": e.locationName}},
+		})
 	}
 
 	return e.je.enrich(event, se)

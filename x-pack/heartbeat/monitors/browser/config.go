@@ -17,6 +17,12 @@ func DefaultConfig() *Config {
 	}
 }
 
+type CloudConfig struct {
+	Username string `config:"username"`
+	Password string `config:"password"`
+	Locations map[string]string `config:"locations"`
+}
+
 type Config struct {
 	Schedule  string                 `config:"schedule"`
 	Params    map[string]interface{} `config:"params"`
@@ -27,6 +33,7 @@ type Config struct {
 	// Id is optional for lightweight checks but required for browsers
 	Id      string `config:"id"`
 	Sandbox bool   `config:"sandbox"`
+	Cloud *CloudConfig `config:"cloud"`
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

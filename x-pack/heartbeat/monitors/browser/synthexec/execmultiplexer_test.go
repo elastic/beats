@@ -56,7 +56,7 @@ func TestExecMultiplexer(t *testing.T) {
 	var results []*SynthEvent
 	go func() {
 		for _, se := range testEvents {
-			em.writeSynthEvent(se)
+			em.WriteSynthEvent(se)
 		}
 		em.Close()
 	}()

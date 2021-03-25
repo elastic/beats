@@ -5,8 +5,11 @@
 package browser
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -39,6 +42,27 @@ func ErrBadConfig(err error) error {
 
 func (s *SyntheticSuite) String() string {
 	panic("implement me")
+}
+
+func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
+	body, err := json.Marshal(cloudBody{
+		Source: *s.suiteCfg.Source,
+		Params: s.suiteCfg.Params,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal cloud body", err)
+	}
+	req, err := http.NewRequest("POST", locUrl, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("could not post to cloud: %w", err)
+	}
+	req.SetBasicAuth(s.suiteCfg.Cloud.Username, s.suiteCfg.Cloud.Password)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not exec post to cloud: %w", err)
+	}
+
+	return resp, nil
 }
 
 func (s *SyntheticSuite) Fetch() error {

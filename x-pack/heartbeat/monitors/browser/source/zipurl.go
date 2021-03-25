@@ -11,8 +11,10 @@ import (
 )
 
 type ZipURLSource struct {
-	URL    string `config:"url"`
-	Subdirectory string `config:"subdirectory"`
+	URL    string `config:"url" json:"url"`
+	Folder string `config:"folder" json:"folder"`
+	Username string `config:"username" json:"username"`
+	Password string `config:"password" json:"password"`
 	BaseSource
 	// Etag from last successful fetch
 	etag string
