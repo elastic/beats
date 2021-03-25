@@ -61,16 +61,16 @@ processors:
   - decode_json_fields:
       fields: [message]
       target: json
-  - if:
-      has_fields: ["json.data.id"]
-    then:
-      - fingerprint:
-          fields: ["json.data.id"]
-          target_field: "@metadata._id"
-    else:
-      - fingerprint:
-          fields: ["json.data.timestamp", "json.data.event_type_id", "json.data.connector_guid"]
-          target_field: "@metadata._id"
+  - fingerprint:
+      fields:
+        - "json.data.timestamp"
+        - "json.data.timestamp_nanoseconds"
+        - "json.data.event_type_id"
+        - "json.data.connector_guid"
+        - "json.data.id"
+        - "json.data.detection_id"
+      target_field: "@metadata._id"
+      ignore_missing: true
   - add_fields:
       target: ''
       fields:
