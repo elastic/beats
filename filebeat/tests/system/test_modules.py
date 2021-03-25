@@ -151,8 +151,8 @@ class Test(BaseTest):
 
         # List of errors to check in filebeat output logs
         errors = [
-            "Error loading pipeline for fileset",
-            "Cannot index event"
+            "rror loading pipeline for fileset",
+            "annot index event"
         ]
         # Checks if the output of filebeat includes errors
         contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
