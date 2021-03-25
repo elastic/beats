@@ -34,13 +34,13 @@ const (
 	watcherLockFile = "watcher.lock"
 )
 
-func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newWatchCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "watch",
 		Short: "Watch watches Elastic Agent for failures and initiates rollback.",
 		Long:  `Watch watches Elastic Agent for failures and initiates rollback.`,
 		Run: func(c *cobra.Command, args []string) {
-			if err := watchCmd(streams, c, flags, args); err != nil {
+			if err := watchCmd(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -50,8 +50,8 @@ func newWatchCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStre
 	return cmd
 }
 
-func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
-	log, err := configuredLogger(flags)
+func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
+	log, err := configuredLogger()
 	if err != nil {
 		return err
 	}
@@ -181,8 +181,8 @@ func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
 	return false, gracePeriodDuration
 }
 
-func configuredLogger(flags *globalFlags) (*logger.Logger, error) {
-	pathConfigFile := flags.Config()
+func configuredLogger() (*logger.Logger, error) {
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, errors.New(err,

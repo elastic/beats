@@ -7,6 +7,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"os"
 	"os/signal"
 	"strconv"
@@ -23,13 +24,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-func newEnrollCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "enroll",
 		Short: "Enroll the Agent into Fleet",
 		Long:  "This will enroll the Agent into Fleet.",
 		Run: func(c *cobra.Command, args []string) {
-			if err := enroll(streams, c, flags, args); err != nil {
+			if err := enroll(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -145,13 +146,13 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	return args
 }
 
-func enroll(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fromInstall, _ := cmd.Flags().GetBool("from-install")
 	if !fromInstall {
 		warn.PrintNotGA(streams.Out)
 	}
 
-	pathConfigFile := flags.Config()
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return errors.New(err,

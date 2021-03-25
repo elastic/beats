@@ -48,7 +48,7 @@ var (
 	tokenNameStrip = regexp.MustCompile(`\s\([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\)$`)
 )
 
-func newContainerCommand(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newContainerCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := cobra.Command{
 		Hidden: true, // not exposed over help; used by container entrypoint only
 		Use:    "container",
@@ -119,9 +119,9 @@ occurs on every start of the container set FLEET_FORCE to 1.
 		Run: func(c *cobra.Command, args []string) {
 			var err error
 			if _, cloud := os.LookupEnv("ELASTIC_AGENT_CLOUD"); cloud {
-				err = containerCloudCmd(streams, c, flags, args)
+				err = containerCloudCmd(streams, c, args)
 			} else {
-				err = containerCmd(streams, c, flags, defaultAccessConfig())
+				err = containerCmd(streams, c, defaultAccessConfig())
 			}
 			if err != nil {
 				logError(streams, err)
@@ -140,7 +140,7 @@ func logInfo(streams *cli.IOStreams, msg string) {
 	fmt.Fprintln(streams.Out, msg)
 }
 
-func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	logInfo(streams, "Elastic Agent container in cloud mode")
 	// sync main process and apm-server legacy process
 	var wg sync.WaitGroup
@@ -192,7 +192,7 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *global
 			if err := readYaml(filepath.Join(paths.Config(), "credentials.yml"), &cfg); err != nil {
 				return errors.New(err, "parsing credentials.yml")
 			}
-			return containerCmd(streams, cmd, flags, cfg)
+			return containerCmd(streams, cmd, cfg)
 		}(); err != nil {
 			logError(streams, err)
 		}
@@ -207,7 +207,7 @@ func containerCloudCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *global
 	return nil
 }
 
-func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, cfg setupConfig) error {
+func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) error {
 	var err error
 	var client *kibana.Client
 	executable, err := os.Executable()
@@ -215,10 +215,20 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		return err
 	}
 
+	// set paths early so all action below use the defined paths
+	if cfg.Agent.Paths.Data != "" {
+		paths.SetTop(cfg.Agent.Paths.Data)
+		// when custom top path is provided the home directory is not versioned
+		paths.SetVersionHome(false)
+	}
+	if cfg.Agent.Paths.Logs != "" {
+		paths.SetLogs(cfg.Agent.Paths.Logs)
+	}
+
 	_, err = os.Stat(paths.AgentConfigFile())
 	if !os.IsNotExist(err) && !cfg.Fleet.Force {
 		// already enrolled, just run the standard run
-		return run(flags, streams)
+		return run(streams)
 	}
 
 	if cfg.Kibana.Fleet.Setup {
@@ -272,11 +282,21 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	}
 
-	return run(flags, streams)
+	return run(streams)
 }
 
 func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, error) {
-	args := []string{"enroll", "-f"}
+	args := []string{
+		"enroll", "-f",
+		"--path.home", paths.Top(), // --path.home actually maps to paths.Top()
+		"--path.config", paths.Config(),
+		"-c", paths.ConfigFile(),
+		"--path.logs", paths.Logs(),
+		"--path.data", paths.Data(),
+	}
+	if !paths.IsVersionHome() {
+		args = append(args, "--path.home.unversioned")
+	}
 	if cfg.FleetServer.Enable {
 		connStr, err := buildFleetServerConnStr(cfg.FleetServer)
 		if err != nil {
@@ -599,9 +619,19 @@ type kibanaAPIKeyDetail struct {
 // setup configuration
 
 type setupConfig struct {
+	Agent       agentConfig       `config:"agent"`
 	Fleet       fleetConfig       `config:"fleet"`
 	FleetServer fleetServerConfig `config:"fleet_server"`
 	Kibana      kibanaConfig      `config:"kibana"`
+}
+
+type agentPathsConfig struct {
+	Data string `config:"data"`
+	Logs string `config:"logs"`
+}
+
+type agentConfig struct {
+	Paths agentPathsConfig `config:"paths"`
 }
 
 type elasticsearchConfig struct {
@@ -648,6 +678,12 @@ type kibanaFleetConfig struct {
 
 func defaultAccessConfig() setupConfig {
 	return setupConfig{
+		Agent: agentConfig{
+			Paths: agentPathsConfig{
+				Data: envWithDefault("", "DATA_PATH"),
+				Logs: envWithDefault("", "LOGS_PATH"),
+			},
+		},
 		Fleet: fleetConfig{
 			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			Enroll:          envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
