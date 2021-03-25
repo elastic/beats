@@ -38,7 +38,7 @@ func TestStateResolverAcking(t *testing.T) {
 		ack()
 
 		// Current sate is not empty lets try to resolve the same configuration.
-		_, _, steps, ack, err = r.Resolve(submit)
+		_, _, steps, _, err = r.Resolve(submit)
 		require.NoError(t, err)
 		require.Equal(t, 0, len(steps))
 	})

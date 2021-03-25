@@ -129,7 +129,7 @@ func waitFor(t *testing.T, check func() error) {
 		if err == nil {
 			return
 		}
-		if time.Now().Sub(started) >= 15*time.Second {
+		if time.Since(started) >= 15*time.Second {
 			t.Fatalf("check timed out after 15 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)

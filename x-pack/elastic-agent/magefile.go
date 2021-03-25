@@ -326,6 +326,9 @@ func Package() {
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
+		if _, ok := os.LookupEnv(snapshotEnv); ok {
+			version += "-SNAPSHOT"
+		}
 		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
 		path := filepath.Join(basePath, "build", "distributions", packageName)
 

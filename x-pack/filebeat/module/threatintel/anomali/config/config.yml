@@ -14,6 +14,9 @@ request.method: GET
 {{ if .ssl }}
 request.ssl: {{ .ssl | tojson }}
 {{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.url: {{ .url }}
 request.redirect.forward_headers: true
 request.transforms:
