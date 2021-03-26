@@ -474,7 +474,7 @@ processors:
         "24":
           - set: destination.address # This could be host.* or user.target.* (doesn't exists).
             from: cyberarkpas.audit.ca_properties.address
-          - set: event.outcome # TODO: Always success?
+          - set: event.outcome
             from: cyberarkpas.audit.ca_properties.cpm_status
           - set: user.target.name
             from: cyberarkpas.audit.ca_properties.user_name
@@ -485,18 +485,12 @@ processors:
           - set: event.type
             value: ["user", "change"]
 
-        # TODO: ca_properties.logon_domain
-        # TODO: ca_properties.customer
-
         # 31 - CPM Reconcile Password
         #
-        # TODO: Is this is an internal change in the Vault?
-        #       i.e. update pwd in vault from actual pwd in host.
-        #       or the opposite, which means a change in user pwd?
         "31":
           - set: destination.address # This could be host.* or user.target.* (doesn't exists).
             from: cyberarkpas.audit.ca_properties.address
-          - set: event.outcome # TODO: Always success?
+          - set: event.outcome
             from: cyberarkpas.audit.ca_properties.cpm_status
           - set: user.target.name
             from: cyberarkpas.audit.ca_properties.user_name
