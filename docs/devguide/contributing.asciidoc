@@ -117,7 +117,7 @@ make fmt
 --------------------------------------------------------------------------------
 
 Both of these commands should be run before submitting a PR. You can view all
-the available make targets with `make help`.
+the available make targets with `mage`.
 
 These commands have the following dependencies:
 
