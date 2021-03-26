@@ -28,6 +28,7 @@ const (
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 )
 
+// MonitoringEndpoint is an endpoint where process is exposing its metrics.
 func MonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
 	if endpoint, ok := spec.MetricEndpoints[operatingSystem]; ok {
 		return endpoint

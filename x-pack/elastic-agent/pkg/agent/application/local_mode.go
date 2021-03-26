@@ -158,6 +158,7 @@ func newLocal(
 	return localApplication, nil
 }
 
+// Routes returns a list of routes handled by agent.
 func (l *Local) Routes() *sorted.Set {
 	return l.router.Routes()
 }

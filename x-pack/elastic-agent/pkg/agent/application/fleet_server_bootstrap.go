@@ -114,6 +114,7 @@ func newFleetServerBootstrap(
 	return bootstrapApp, nil
 }
 
+// Routes returns a list of routes handled by server.
 func (b *FleetServerBootstrap) Routes() *sorted.Set {
 	return b.router.Routes()
 }

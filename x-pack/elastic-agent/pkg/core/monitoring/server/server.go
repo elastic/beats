@@ -11,12 +11,13 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/gorilla/mux"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
-	"github.com/gorilla/mux"
 )
 
 // New creates a new server exposing metrics and process information.

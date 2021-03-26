@@ -14,11 +14,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 )
 
 var (
+	// ErrProgramNotSupported returned when requesting metrics for not supported program.
 	ErrProgramNotSupported = errors.New("specified program is not supported")
 )
 

@@ -280,6 +280,7 @@ func newManaged(
 	return managedApplication, nil
 }
 
+// Routes returns a list of routes handled by agent.
 func (m *Managed) Routes() *sorted.Set {
 	return m.router.Routes()
 }

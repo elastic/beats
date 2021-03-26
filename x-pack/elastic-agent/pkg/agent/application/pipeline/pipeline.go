@@ -31,7 +31,7 @@ type RoutingKey = string
 
 // Router is an interace routes programs to correspongind stream
 type Router interface {
-	Routes()*sorted.Set
+	Routes() *sorted.Set
 	Route(id string, grpProg map[RoutingKey][]program.Program) error
 	Shutdown()
 }
