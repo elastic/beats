@@ -609,7 +609,10 @@
             "forwarded"
         ],
         "url.domain": "eu-central-1.ec2.archive.ubuntu.com",
+        "url.extension": "deb",
         "url.original": "http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.path": "/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "Debian APT-HTTP/1.3 (1.6.11)"
@@ -822,7 +825,10 @@
             "forwarded"
         ],
         "url.domain": "www.eicar.org",
+        "url.extension": "zip",
         "url.original": "http://www.eicar.org/download/eicar_com.zip",
+        "url.path": "/download/eicar_com.zip",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"
@@ -1014,8 +1020,15 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.domain": "10.0.100.30:8000",
+        "url.domain": [
+            "10.0.100.30",
+            "10.0.100.30:8000"
+        ],
+        "url.extension": "zip",
         "url.original": "http://10.0.100.30:8000/eicar_com.zip",
+        "url.path": "/eicar_com.zip",
+        "url.port": 8000,
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"

@@ -2499,7 +2499,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.message_id": "304001",
@@ -2631,7 +2634,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.connection_id": "2751765169",
