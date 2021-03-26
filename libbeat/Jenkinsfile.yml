@@ -23,13 +23,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
           - "arm"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test libbeat for arm"
-            labels:
-                - "arm"
-            parameters:
-                - "armTest"
     build:
         mage: "mage build test"
     crosscompile:

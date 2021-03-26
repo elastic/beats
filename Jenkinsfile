@@ -127,6 +127,42 @@ pipeline {
         }
       }
     }
+    stage('Extended') {
+      options { skipDefaultCheckout() }
+      when {
+        // Always when running builds on branches/tags
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          not { changeRequest() }                           // If no PR
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          script {
+            def mapParallelTasks = [:]
+            def content = readYaml(file: 'Jenkinsfile.yml')
+            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+            } else {
+              content['projects'].each { projectName ->
+                generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.ext.yml').each { k,v ->
+                  mapParallelTasks["${k}"] = v
+                }
+              }
+              parallel(mapParallelTasks)
+            }
+          }
+        }
+      }
+    }
     stage('Packaging') {
       agent none
       options { skipDefaultCheckout() }
@@ -197,8 +233,9 @@ def getBranchIndice(String compare) {
 def generateStages(Map args = [:]) {
   def projectName = args.project
   def changeset = args.changeset
+  def definition = args.get('definition', 'Jenkinsfile.yml')
   def mapParallelStages = [:]
-  def fileName = "${projectName}/Jenkinsfile.yml"
+  def fileName = "${projectName}/${definition}"
   if (fileExists(fileName)) {
     def content = readYaml(file: fileName)
     // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
