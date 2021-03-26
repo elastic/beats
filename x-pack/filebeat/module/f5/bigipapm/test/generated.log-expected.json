@@ -771,7 +771,13 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/olli/rever.html?rsp=oluptat#metco"
+        "url.domain": "www5.example.com",
+        "url.extension": "html",
+        "url.fragment": "metco",
+        "url.original": "https://www5.example.com/olli/rever.html?rsp=oluptat#metco",
+        "url.path": "/olli/rever.html",
+        "url.query": "rsp=oluptat",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-03-18T20:24:33.000Z",
@@ -2131,7 +2137,13 @@
             "f5.bigipapm",
             "forwarded"
         ],
-        "url.original": "https://example.net/equamn/scipi.txt?eiu=maliquam#gnama"
+        "url.domain": "example.net",
+        "url.extension": "txt",
+        "url.fragment": "gnama",
+        "url.original": "https://example.net/equamn/scipi.txt?eiu=maliquam#gnama",
+        "url.path": "/equamn/scipi.txt",
+        "url.query": "eiu=maliquam",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2019-04-01T02:38:14.000Z",
