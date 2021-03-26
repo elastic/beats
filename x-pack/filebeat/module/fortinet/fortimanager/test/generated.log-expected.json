@@ -155,8 +155,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "roinBCS",
         "url.original": "https://www.example.net/orisn/cca.htm?ofdeF=metcons#roinBCS",
-        "url.query": "taspe",
+        "url.path": "/orisn/cca.htm",
+        "url.query": "ofdeF=metcons",
+        "url.scheme": "https",
         "user.name": "oluptas"
     },
     {
@@ -188,9 +193,9 @@
             "ccaecat"
         ],
         "related.ip": [
+            "10.94.103.117",
             "10.15.159.80",
-            "10.200.188.142",
-            "10.94.103.117"
+            "10.200.188.142"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -383,8 +388,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "saute",
         "url.original": "https://api.example.com/iumto/aboreetd.gif?dun=enim#saute",
-        "url.query": "nsect",
+        "url.path": "/iumto/aboreetd.gif",
+        "url.query": "dun=enim",
+        "url.scheme": "https",
         "user.name": "rveli"
     },
     {
@@ -476,8 +486,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "txt",
+        "url.fragment": "picia",
         "url.original": "https://www.example.net/tasuntex/sunt.txt?ume=incidi#picia",
-        "url.query": "nsec",
+        "url.path": "/tasuntex/sunt.txt",
+        "url.query": "ume=incidi",
+        "url.scheme": "https",
         "user.name": "aperia"
     },
     {
@@ -569,8 +584,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "tlabore",
         "url.original": "https://www.example.org/inesci/serror.html?mqu=apariat#tlabore",
-        "url.query": "nsectet",
+        "url.path": "/inesci/serror.html",
+        "url.query": "mqu=apariat",
+        "url.scheme": "https",
         "user.name": "nnum"
     },
     {
@@ -673,8 +693,8 @@
             "eturadi6608.mail.host"
         ],
         "related.ip": [
-            "10.23.62.94",
-            "10.61.163.4"
+            "10.61.163.4",
+            "10.23.62.94"
         ],
         "related.user": [
             "non"
@@ -729,8 +749,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "htm",
+        "url.fragment": "issus",
         "url.original": "https://api.example.com/nimid/itatione.htm?umwr=oluptate#issus",
-        "url.query": "atem",
+        "url.path": "/nimid/itatione.htm",
+        "url.query": "umwr=oluptate",
+        "url.scheme": "https",
         "user.name": "non"
     },
     {
@@ -761,8 +786,8 @@
         "observer.vendor": "Fortinet",
         "observer.version": "1.2580",
         "related.hosts": [
-            "ecte",
             "tani",
+            "ecte",
             "ipsumdol4488.api.localdomain"
         ],
         "related.ip": [
@@ -822,8 +847,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "htm",
+        "url.fragment": "pora",
         "url.original": "https://example.com/tetu/stru.htm?tlabore=Exc#pora",
-        "url.query": "atno",
+        "url.path": "/tetu/stru.htm",
+        "url.query": "tlabore=Exc",
+        "url.scheme": "https",
         "user.name": "cons"
     },
     {
@@ -856,8 +886,8 @@
         ],
         "related.ip": [
             "10.106.162.153",
-            "10.58.214.16",
-            "10.238.164.74"
+            "10.238.164.74",
+            "10.58.214.16"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -922,9 +952,9 @@
             "tenimad"
         ],
         "related.ip": [
-            "10.225.141.20",
+            "10.217.150.196",
             "10.110.31.190",
-            "10.217.150.196"
+            "10.225.141.20"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -1049,8 +1079,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "htm",
+        "url.fragment": "isnisi",
         "url.original": "https://api.example.com/isnostr/umqu.htm?emquia=inesci#isnisi",
-        "url.query": "uptate",
+        "url.path": "/isnostr/umqu.htm",
+        "url.query": "emquia=inesci",
+        "url.scheme": "https",
         "user.name": "proide"
     },
     {
@@ -1209,8 +1244,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "txt",
+        "url.fragment": "urerepr",
         "url.original": "https://example.org/tiaec/rumwrit.txt?oconsequ=edquiac#urerepr",
-        "url.query": "iaeco",
+        "url.path": "/tiaec/rumwrit.txt",
+        "url.query": "oconsequ=edquiac",
+        "url.scheme": "https",
         "user.name": "tetur"
     },
     {
@@ -1242,8 +1282,8 @@
             "xea"
         ],
         "related.ip": [
-            "10.233.120.207",
             "10.51.213.42",
+            "10.233.120.207",
             "10.98.194.212"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -1380,8 +1420,8 @@
             "tore7088.www.invalid"
         ],
         "related.ip": [
-            "10.212.214.4",
-            "10.199.47.220"
+            "10.199.47.220",
+            "10.212.214.4"
         ],
         "related.user": [
             "atv"
@@ -1436,8 +1476,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "itlab",
         "url.original": "https://mail.example.org/ptassita/its.gif?risnis=uov#itlab",
-        "url.query": "hil",
+        "url.path": "/ptassita/its.gif",
+        "url.query": "risnis=uov",
+        "url.scheme": "https",
         "user.name": "atv"
     },
     {
@@ -1529,8 +1574,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "htm",
+        "url.fragment": "toditaut",
         "url.original": "https://www.example.org/redol/gnaa.htm?aliquamq=dtempori#toditaut",
-        "url.query": "quames",
+        "url.path": "/redol/gnaa.htm",
+        "url.query": "aliquamq=dtempori",
+        "url.scheme": "https",
         "user.name": "orese"
     },
     {
@@ -1622,8 +1672,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "jpg",
+        "url.fragment": "offici",
         "url.original": "https://example.net/aparia/tatnon.jpg?rever=ore#offici",
-        "url.query": "essecill",
+        "url.path": "/aparia/tatnon.jpg",
+        "url.query": "rever=ore",
+        "url.scheme": "https",
         "user.name": "enim"
     },
     {
@@ -1715,8 +1770,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "equamnih",
         "url.original": "https://www.example.com/tali/BCS.txt?iqu=niamqu#equamnih",
-        "url.query": "quiineav",
+        "url.path": "/tali/BCS.txt",
+        "url.query": "iqu=niamqu",
+        "url.scheme": "https",
         "user.name": "inculp"
     },
     {
@@ -1808,8 +1868,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "mexer",
         "url.original": "https://www.example.com/iame/orroquis.htm?tiumd=ntmoll#mexer",
-        "url.query": "tec",
+        "url.path": "/iame/orroquis.htm",
+        "url.query": "tiumd=ntmoll",
+        "url.scheme": "https",
         "user.name": "olorem"
     },
     {
@@ -1901,8 +1966,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "mnisi",
         "url.original": "https://www.example.net/iame/laudanti.htm?stquido=rsitvolu#mnisi",
-        "url.query": "serror",
+        "url.path": "/iame/laudanti.htm",
+        "url.query": "stquido=rsitvolu",
+        "url.scheme": "https",
         "user.name": "lmo"
     },
     {
@@ -1935,9 +2005,9 @@
             "oluptat"
         ],
         "related.ip": [
+            "10.168.20.20",
             "10.117.63.181",
-            "10.247.53.179",
-            "10.168.20.20"
+            "10.247.53.179"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2063,8 +2133,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "rQuisaut",
         "url.original": "https://www.example.org/ess/quiad.jpg?ten=litanim#rQuisaut",
-        "url.query": "emp",
+        "url.path": "/ess/quiad.jpg",
+        "url.query": "ten=litanim",
+        "url.scheme": "https",
         "user.name": "amqu"
     },
     {
@@ -2157,8 +2232,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "txt",
+        "url.fragment": "Finibus",
         "url.original": "https://example.com/xeac/llitanim.txt?oreverit=scip#Finibus",
-        "url.query": "atura",
+        "url.path": "/xeac/llitanim.txt",
+        "url.query": "oreverit=scip",
+        "url.scheme": "https",
         "user.name": "iconsequ"
     },
     {
@@ -2250,8 +2330,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "gif",
+        "url.fragment": "iameaque",
         "url.original": "https://api.example.org/orio/gna.gif?aaliquaU=olu#iameaque",
-        "url.query": "tatio",
+        "url.path": "/orio/gna.gif",
+        "url.query": "aaliquaU=olu",
+        "url.scheme": "https",
         "user.name": "iosamni"
     },
     {
@@ -2287,8 +2372,8 @@
             "uido2046.mail.lan"
         ],
         "related.ip": [
-            "10.70.7.23",
-            "10.130.240.11"
+            "10.130.240.11",
+            "10.70.7.23"
         ],
         "related.user": [
             "eavolup"
@@ -2343,8 +2428,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "txt",
+        "url.fragment": "umtota",
         "url.original": "https://mail.example.org/nimadmin/lumqui.txt?iquip=tinculpa#umtota",
-        "url.query": "iuta",
+        "url.path": "/nimadmin/lumqui.txt",
+        "url.query": "iquip=tinculpa",
+        "url.scheme": "https",
         "user.name": "eavolup"
     },
     {
@@ -2570,8 +2660,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "quisn",
         "url.original": "https://internal.example.com/temse/caecat.jpg?emeu=tatemac#quisn",
-        "url.query": "mveniam",
+        "url.path": "/temse/caecat.jpg",
+        "url.query": "emeu=tatemac",
+        "url.scheme": "https",
         "user.name": "usanti"
     },
     {
@@ -2603,9 +2698,9 @@
             "iam"
         ],
         "related.ip": [
-            "10.38.168.190",
             "10.77.105.81",
-            "10.174.17.46"
+            "10.174.17.46",
+            "10.38.168.190"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2931,8 +3026,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "isni",
         "url.original": "https://www5.example.com/elit/sam.htm?nevolu=unt#isni",
-        "url.query": "onoru",
+        "url.path": "/elit/sam.htm",
+        "url.query": "nevolu=unt",
+        "url.scheme": "https",
         "user.name": "estiaec"
     },
     {
@@ -2968,8 +3068,8 @@
             "itaspe3216.localdomain"
         ],
         "related.ip": [
-            "10.94.177.125",
-            "10.116.82.108"
+            "10.116.82.108",
+            "10.94.177.125"
         ],
         "related.user": [
             "ecatc"
@@ -3024,8 +3124,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "iadeseru",
         "url.original": "https://example.org/porro/issu.htm?inculpa=ruredol#iadeseru",
-        "url.query": "olorsit",
+        "url.path": "/porro/issu.htm",
+        "url.query": "inculpa=ruredol",
+        "url.scheme": "https",
         "user.name": "ecatc"
     },
     {
@@ -3118,8 +3223,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "suntexpl",
         "url.original": "https://mail.example.org/uamquaer/texplica.gif?sequa=lorum#suntexpl",
-        "url.query": "udexerci",
+        "url.path": "/uamquaer/texplica.gif",
+        "url.query": "sequa=lorum",
+        "url.scheme": "https",
         "user.name": "norumetM"
     },
     {
@@ -3211,8 +3321,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "gif",
+        "url.fragment": "rsit",
         "url.original": "https://www5.example.org/aqu/utemvele.gif?serrorsi=tsedquia#rsit",
-        "url.query": "nihilmol",
+        "url.path": "/aqu/utemvele.gif",
+        "url.query": "serrorsi=tsedquia",
+        "url.scheme": "https",
         "user.name": "dictasun"
     },
     {
@@ -3244,9 +3359,9 @@
             "lors"
         ],
         "related.ip": [
+            "10.205.83.138",
             "10.99.55.115",
-            "10.98.52.184",
-            "10.205.83.138"
+            "10.98.52.184"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3485,8 +3600,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "txt",
+        "url.fragment": "adeserun",
         "url.original": "https://www5.example.com/etcon/chit.txt?erspici=itinvolu#adeserun",
-        "url.query": "tinvolu",
+        "url.path": "/etcon/chit.txt",
+        "url.query": "erspici=itinvolu",
+        "url.scheme": "https",
         "user.name": "tcons"
     },
     {
@@ -3578,8 +3698,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "nseq",
         "url.original": "https://api.example.org/fug/liquid.txt?ptate=lloi#nseq",
-        "url.query": "undeo",
+        "url.path": "/fug/liquid.txt",
+        "url.query": "ptate=lloi",
+        "url.scheme": "https",
         "user.name": "eumiure"
     },
     {
@@ -3745,9 +3870,9 @@
             "usantiu"
         ],
         "related.ip": [
-            "10.5.67.140",
             "10.140.59.161",
-            "10.118.111.183"
+            "10.118.111.183",
+            "10.5.67.140"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3872,8 +3997,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "html",
+        "url.fragment": "litess",
         "url.original": "https://example.net/aturQui/tquii.html?uiac=squ#litess",
-        "url.query": "Loremip",
+        "url.path": "/aturQui/tquii.html",
+        "url.query": "uiac=squ",
+        "url.scheme": "https",
         "user.name": "itsed"
     },
     {
@@ -3965,8 +4095,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "htm",
+        "url.fragment": "aturvel",
         "url.original": "https://mail.example.org/mvele/teveli.htm?Nequepor=luptate#aturvel",
-        "url.query": "lab",
+        "url.path": "/mvele/teveli.htm",
+        "url.query": "Nequepor=luptate",
+        "url.scheme": "https",
         "user.name": "rporis"
     },
     {
@@ -3998,8 +4133,8 @@
             "sitv"
         ],
         "related.ip": [
-            "10.251.183.113",
             "10.217.145.137",
+            "10.251.183.113",
             "10.22.149.132"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -4065,9 +4200,9 @@
             "nisi"
         ],
         "related.ip": [
-            "10.183.16.252",
             "10.51.60.203",
-            "10.203.66.175"
+            "10.203.66.175",
+            "10.183.16.252"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4147,8 +4282,8 @@
         "rsa.investigations.event_vcat": "nisiuta",
         "rsa.misc.OS": "olu",
         "rsa.misc.action": [
-            "tquov",
-            "accept"
+            "accept",
+            "tquov"
         ],
         "rsa.misc.category": "quatD",
         "rsa.misc.client": "acomm",
@@ -4192,8 +4327,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "jpg",
+        "url.fragment": "etc",
         "url.original": "https://example.org/tem/iadeseru.jpg?olorsita=odoco#etc",
-        "url.query": "natu",
+        "url.path": "/tem/iadeseru.jpg",
+        "url.query": "olorsita=odoco",
+        "url.scheme": "https",
         "user.name": "nimadmi"
     },
     {
@@ -4285,8 +4425,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "gif",
+        "url.fragment": "tobe",
         "url.original": "https://mail.example.net/epteurs/usmodtem.gif?itvo=asi#tobe",
-        "url.query": "equepor",
+        "url.path": "/epteurs/usmodtem.gif",
+        "url.query": "itvo=asi",
+        "url.scheme": "https",
         "user.name": "nimadmin"
     },
     {
@@ -4378,8 +4523,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "eav",
         "url.original": "https://www.example.com/iadolo/cidu.txt?aliquide=redolori#eav",
-        "url.query": "tiu",
+        "url.path": "/iadolo/cidu.txt",
+        "url.query": "aliquide=redolori",
+        "url.scheme": "https",
         "user.name": "msequin"
     },
     {
@@ -4426,8 +4576,8 @@
         "rsa.investigations.event_vcat": "uia",
         "rsa.misc.OS": "mquae",
         "rsa.misc.action": [
-            "deny",
-            "tenatus"
+            "tenatus",
+            "deny"
         ],
         "rsa.misc.category": "abo",
         "rsa.misc.client": "umtota",
@@ -4471,8 +4621,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "boreetd",
         "url.original": "https://internal.example.com/isc/umdol.jpg?atn=sectet#boreetd",
-        "url.query": "odic",
+        "url.path": "/isc/umdol.jpg",
+        "url.query": "atn=sectet",
+        "url.scheme": "https",
         "user.name": "tat"
     },
     {
@@ -4505,9 +4660,9 @@
             "nonnumq"
         ],
         "related.ip": [
-            "10.249.16.201",
+            "10.34.41.75",
             "10.107.168.208",
-            "10.34.41.75"
+            "10.249.16.201"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4632,8 +4787,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "ptat",
         "url.original": "https://www.example.com/imadm/ugiat.txt?Nequepor=nisiu#ptat",
-        "url.query": "stiaec",
+        "url.path": "/imadm/ugiat.txt",
+        "url.query": "Nequepor=nisiu",
+        "url.scheme": "https",
         "user.name": "ommodoc"
     },
     {
@@ -4725,8 +4885,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "sed",
         "url.original": "https://mail.example.net/ionemu/nul.jpg?volupt=ori#sed",
-        "url.query": "radipi",
+        "url.path": "/ionemu/nul.jpg",
+        "url.query": "volupt=ori",
+        "url.scheme": "https",
         "user.name": "aed"
     },
     {
@@ -4825,9 +4990,9 @@
             "litsedq"
         ],
         "related.ip": [
-            "10.251.212.166",
+            "10.77.105.160",
             "10.90.229.92",
-            "10.77.105.160"
+            "10.251.212.166"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4952,8 +5117,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "html",
+        "url.fragment": "henderi",
         "url.original": "https://mail.example.org/asuntex/uovolup.html?amali=uiav#henderi",
-        "url.query": "eriti",
+        "url.path": "/asuntex/uovolup.html",
+        "url.query": "amali=uiav",
+        "url.scheme": "https",
         "user.name": "urmag"
     },
     {
@@ -5045,8 +5215,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "dminimve",
         "url.original": "https://example.org/mnisiut/porinci.htm?norum=emUten#dminimve",
-        "url.query": "texplica",
+        "url.path": "/mnisiut/porinci.htm",
+        "url.query": "norum=emUten",
+        "url.scheme": "https",
         "user.name": "lpaquiof"
     },
     {
@@ -5145,9 +5320,9 @@
             "llumdo"
         ],
         "related.ip": [
-            "10.242.119.111",
             "10.188.131.18",
-            "10.239.231.168"
+            "10.239.231.168",
+            "10.242.119.111"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5272,8 +5447,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "gif",
+        "url.fragment": "rai",
         "url.original": "https://api.example.net/nsec/smo.gif?etq=trumexe#rai",
-        "url.query": "ipsu",
+        "url.path": "/nsec/smo.gif",
+        "url.query": "etq=trumexe",
+        "url.scheme": "https",
         "user.name": "ainci"
     },
     {
@@ -5412,8 +5592,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "upta",
         "url.original": "https://internal.example.com/dolo/exeacom.txt?tlab=eufugiat#upta",
-        "url.query": "Lor",
+        "url.path": "/dolo/exeacom.txt",
+        "url.query": "tlab=eufugiat",
+        "url.scheme": "https",
         "user.name": "erspici"
     },
     {
@@ -5505,8 +5690,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "txt",
+        "url.fragment": "utod",
         "url.original": "https://www5.example.org/orumet/aliqu.txt?tion=sun#utod",
-        "url.query": "con",
+        "url.path": "/orumet/aliqu.txt",
+        "url.query": "tion=sun",
+        "url.scheme": "https",
         "user.name": "Sedutp"
     },
     {
@@ -5732,8 +5922,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "gif",
+        "url.fragment": "iscin",
         "url.original": "https://internal.example.com/nonnumqu/isciveli.gif?wri=aute#iscin",
-        "url.query": "eca",
+        "url.path": "/nonnumqu/isciveli.gif",
+        "url.query": "wri=aute",
+        "url.scheme": "https",
         "user.name": "ciduntut"
     },
     {
@@ -5825,8 +6020,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "html",
+        "url.fragment": "upta",
         "url.original": "https://www5.example.org/utlabo/scip.html?voluptas=inv#upta",
-        "url.query": "atnu",
+        "url.path": "/utlabo/scip.html",
+        "url.query": "voluptas=inv",
+        "url.scheme": "https",
         "user.name": "nulapar"
     },
     {
@@ -5918,8 +6118,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "obeata",
         "url.original": "https://internal.example.com/ssusci/snostrud.txt?dolo=siutaliq#obeata",
-        "url.query": "ptat",
+        "url.path": "/ssusci/snostrud.txt",
+        "url.query": "dolo=siutaliq",
+        "url.scheme": "https",
         "user.name": "moenimi"
     },
     {
@@ -6011,8 +6216,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "ptasn",
         "url.original": "https://api.example.com/temporai/umw.jpg?mveniamq=litsed#ptasn",
-        "url.query": "lore",
+        "url.path": "/temporai/umw.jpg",
+        "url.query": "mveniamq=litsed",
+        "url.scheme": "https",
         "user.name": "idolo"
     },
     {
@@ -6044,9 +6254,9 @@
             "eleumiu"
         ],
         "related.ip": [
-            "10.221.100.157",
             "10.120.212.78",
-            "10.236.211.111"
+            "10.236.211.111",
+            "10.221.100.157"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6171,8 +6381,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "umiurere",
         "url.original": "https://mail.example.org/ngelit/dipiscin.gif?serro=ctet#umiurere",
-        "url.query": "diconseq",
+        "url.path": "/ngelit/dipiscin.gif",
+        "url.query": "serro=ctet",
+        "url.scheme": "https",
         "user.name": "riatur"
     },
     {
@@ -6398,8 +6613,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "htm",
+        "url.fragment": "lestia",
         "url.original": "https://internal.example.net/inc/riaturEx.htm?mnihilm=itinvo#lestia",
-        "url.query": "icaboN",
+        "url.path": "/inc/riaturEx.htm",
+        "url.query": "mnihilm=itinvo",
+        "url.scheme": "https",
         "user.name": "udantiu"
     },
     {
@@ -6498,9 +6718,9 @@
             "datatno"
         ],
         "related.ip": [
-            "10.238.49.73",
             "10.74.88.209",
-            "10.92.3.166"
+            "10.92.3.166",
+            "10.238.49.73"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6633,8 +6853,8 @@
         ],
         "related.ip": [
             "10.135.213.17",
-            "10.167.128.229",
-            "10.30.239.222"
+            "10.30.239.222",
+            "10.167.128.229"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6759,8 +6979,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "txt",
+        "url.fragment": "rExce",
         "url.original": "https://api.example.net/ita/esse.txt?amquis=iatquovo#rExce",
-        "url.query": "ididun",
+        "url.path": "/ita/esse.txt",
+        "url.query": "amquis=iatquovo",
+        "url.scheme": "https",
         "user.name": "emq"
     },
     {
@@ -6852,8 +7077,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "txt",
+        "url.fragment": "rat",
         "url.original": "https://www5.example.net/culpa/isun.txt?cola=tura#rat",
-        "url.query": "orumwrit",
+        "url.path": "/culpa/isun.txt",
+        "url.query": "cola=tura",
+        "url.scheme": "https",
         "user.name": "caecatcu"
     },
     {
@@ -6886,8 +7116,8 @@
         ],
         "related.ip": [
             "10.224.212.88",
-            "10.53.82.96",
-            "10.35.240.70"
+            "10.35.240.70",
+            "10.53.82.96"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6952,9 +7182,9 @@
             "oeius"
         ],
         "related.ip": [
-            "10.66.149.234",
+            "10.186.253.240",
             "10.233.128.7",
-            "10.186.253.240"
+            "10.66.149.234"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7087,8 +7317,8 @@
         ],
         "related.ip": [
             "10.69.130.207",
-            "10.170.236.123",
-            "10.205.18.11"
+            "10.205.18.11",
+            "10.170.236.123"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7213,8 +7443,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "aborios",
         "url.original": "https://example.com/loremag/mqu.gif?bore=lapari#aborios",
-        "url.query": "sequa",
+        "url.path": "/loremag/mqu.gif",
+        "url.query": "bore=lapari",
+        "url.scheme": "https",
         "user.name": "epor"
     },
     {
@@ -7246,9 +7481,9 @@
             "ineavol"
         ],
         "related.ip": [
-            "10.9.41.221",
             "10.204.98.238",
-            "10.81.58.91"
+            "10.81.58.91",
+            "10.9.41.221"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7427,9 +7662,9 @@
             "aturvel"
         ],
         "related.ip": [
+            "10.207.207.106",
             "10.143.65.84",
-            "10.199.201.26",
-            "10.207.207.106"
+            "10.199.201.26"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7495,8 +7730,8 @@
         ],
         "related.ip": [
             "10.163.236.253",
-            "10.41.61.88",
-            "10.204.27.48"
+            "10.204.27.48",
+            "10.41.61.88"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7689,8 +7924,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "ido",
         "url.original": "https://api.example.com/aco/empo.jpg?iumdol=iusm#ido",
-        "url.query": "ipsamv",
+        "url.path": "/aco/empo.jpg",
+        "url.query": "iumdol=iusm",
+        "url.scheme": "https",
         "user.name": "aquaeab"
     },
     {
@@ -7782,8 +8022,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "ect",
         "url.original": "https://example.org/uidolor/turve.htm?temporai=uasiarch#ect",
-        "url.query": "quatDui",
+        "url.path": "/uidolor/turve.htm",
+        "url.query": "temporai=uasiarch",
+        "url.scheme": "https",
         "user.name": "maperia"
     },
     {
@@ -7875,8 +8120,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "odtempo",
         "url.original": "https://www.example.net/Maloru/lapariat.htm?tlabori=rehender#odtempo",
-        "url.query": "isiutali",
+        "url.path": "/Maloru/lapariat.htm",
+        "url.query": "tlabori=rehender",
+        "url.scheme": "https",
         "user.name": "modo"
     },
     {
@@ -7923,8 +8173,8 @@
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.OS": "rumw",
         "rsa.misc.action": [
-            "tali",
-            "block"
+            "block",
+            "tali"
         ],
         "rsa.misc.category": "itsedq",
         "rsa.misc.client": "esciu",
@@ -7968,8 +8218,13 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "html",
+        "url.fragment": "one",
         "url.original": "https://www5.example.com/xea/ssecill.html?quianonn=quun#one",
-        "url.query": "tasper",
+        "url.path": "/xea/ssecill.html",
+        "url.query": "quianonn=quun",
+        "url.scheme": "https",
         "user.name": "dolo"
     }
 ]
