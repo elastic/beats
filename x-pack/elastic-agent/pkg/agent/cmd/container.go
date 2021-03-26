@@ -97,7 +97,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
-  FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy)
+  FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 127.0.0.1. If run inside a container and needs to be accessible, 0.0.0.0 has to be used or a specific ip.
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
   FLEET_SERVER_CERT - path to certificate to use for HTTPS endpoint
   FLEET_SERVER_CERT_KEY - path to private key for certificate to use for HTTPS endpoint
