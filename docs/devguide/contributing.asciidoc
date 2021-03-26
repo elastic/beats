@@ -77,13 +77,13 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
-Then you can compile a particular Beat by using the Makefile. For example, for
+Then you can compile a particular Beat by using mage commands. For example, for
 Packetbeat:
 
 [source,shell]
 --------------------------------------------------------------------------------
 cd beats/packetbeat
-make
+mage build
 --------------------------------------------------------------------------------
 
 Some of the Beats might have extra development requirements, in which case
