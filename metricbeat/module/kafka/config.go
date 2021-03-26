@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
 )
 
 type metricsetConfig struct {
@@ -31,6 +32,7 @@ type metricsetConfig struct {
 	Username string            `config:"username"`
 	Password string            `config:"password"`
 	ClientID string            `config:"client_id"`
+	Sasl     kafka.SaslConfig  `config:"sasl"`
 }
 
 var defaultConfig = metricsetConfig{
