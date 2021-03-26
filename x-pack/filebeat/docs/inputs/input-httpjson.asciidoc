@@ -134,6 +134,7 @@ Appends a value to a list. If the field does not exist, the first entry will be 
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
 ==== `delete`
@@ -164,6 +165,7 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
 ==== Value templates
