@@ -33,7 +33,6 @@ type DynamicProvider interface {
 	Run(DynamicProviderComm) error
 }
 
-
 // DynamicProviderBuilder creates a new dynamic provider based on the given config and returns it.
 type DynamicProviderBuilder func(log *logger.Logger, config *config.Config) (DynamicProvider, error)
 

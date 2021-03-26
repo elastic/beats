@@ -24,7 +24,7 @@ func init() {
 }
 
 
-type dynamicProviderSecrets struct {
+type contextProviderK8sSecrets struct {
 	logger *logger.Logger
 	config *Config
 }
@@ -39,15 +39,15 @@ func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.C
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
-	return &dynamicProviderSecrets{logger, &cfg}, nil
+	return &contextProviderK8sSecrets{logger, &cfg}, nil
 }
 
-func (p *dynamicProviderSecrets) Fetch(value string) (string, error) {
+func (p *contextProviderK8sSecrets) Fetch(value string) (string, error) {
 	// TODO: add actual call to k8s api here to get the secret
 	return "someSecret42", nil
 }
 
-// Run runs the environment context provider.
-func (p *dynamicProviderSecrets) Run(comm corecomp.ContextProviderComm) error {
+// Run runs the k8s secrets context provider.
+func (p *contextProviderK8sSecrets) Run(comm corecomp.ContextProviderComm) error {
 	return nil
 }
