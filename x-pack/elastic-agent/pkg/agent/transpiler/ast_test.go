@@ -1616,7 +1616,7 @@ func TestHash(t *testing.T) {
 }
 
 func mustMakeVars(mapping map[string]interface{}) *Vars {
-	v, err := NewVars(mapping)
+	v, err := NewVars(mapping, nil)
 	if err != nil {
 		panic(err)
 	}

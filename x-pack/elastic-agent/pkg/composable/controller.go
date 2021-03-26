@@ -122,9 +122,9 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	}
 
 	// manually register providers that want to pass to the Vars
-	var dynamicProviders map[string]corecomp.DynamicProvider
-	k8sProvider := c.dynamicProviders["kubernetes"]
-	dynamicProviders["kubernetes"] = k8sProvider.provider
+	dynamicProviders := make(map[string]corecomp.DynamicProvider, 1)
+	k8sSecretsProvider := c.dynamicProviders["kubernetes_secrets"]
+	dynamicProviders["kubernetes_secrets"] = k8sSecretsProvider.provider
 
 	go func() {
 		for {
@@ -157,7 +157,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				mapping[name] = state.Current()
 			}
 			// this is ensured not to error, by how the mappings states are verified
-			vars[0], _ = transpiler.NewVars(mapping)
+			vars[0], _ = transpiler.NewVars(mapping, nil)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
@@ -166,6 +166,10 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
 					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, dynamicProviders)
+					vars = append(vars, v)
+				}
+				if name == "kubernetes_secrets" {
+					v, _ := transpiler.NewVarsWithProcessors(nil, name, nil, dynamicProviders)
 					vars = append(vars, v)
 				}
 			}
@@ -195,7 +199,7 @@ func (c *contextProviderState) Set(mapping map[string]interface{}) error {
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}
@@ -250,7 +254,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, priority int, mapping map[
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}

@@ -27,8 +27,8 @@ type Vars struct {
 }
 
 // NewVars returns a new instance of vars.
-func NewVars(mapping map[string]interface{}) (*Vars, error) {
-	return NewVarsWithProcessors(mapping, "", nil, nil)
+func NewVars(mapping map[string]interface{}, dynamicProviders map[string]composable.DynamicProvider) (*Vars, error) {
+	return NewVarsWithProcessors(mapping, "", nil, dynamicProviders)
 }
 
 // NewVarsWithProcessors returns a new instance of vars with attachment of processors.
@@ -47,7 +47,8 @@ func (v *Vars) Replace(value string) (Node, error) {
 	if !validBrackets(value, matchIdxs) {
 		return nil, fmt.Errorf("starting ${ is missing ending }")
 	}
-
+	fmt.Println("hahahaha")
+	fmt.Println(v.dynamicProviders)
 	result := ""
 	lastIndex := 0
 	for _, r := range matchIdxs {
@@ -58,10 +59,13 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
-				fmt.Println(val.Value)
-				if (v.processorsKey == "kubernetes_secret"){
+				fmt.Println("hehehehere is the Value")
+				fmt.Println(val.Value())
+				fmt.Println("hehehehere is the processorsKey")
+				fmt.Println(v.processorsKey)
+				if (v.processorsKey == "kubernetes_secrets"){
 					fmt.Println("I'm in kubernetes Secrettt!!!!")
-					fmt.Println(val.Value)
+					fmt.Println(val.Value())
 					k8sProvider := v.dynamicProviders[v.processorsKey]
 					k8sProviderSecrets := k8sProvider.(composable.DynamicProviderSecrets)
 					k8sProviderSecrets.Fetch()
