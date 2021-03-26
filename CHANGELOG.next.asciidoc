@@ -141,7 +141,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow configuring credential_profile_name and shared_credential_file when using role_arn. {pull}24174[24174]
 - Fix ILM setup log reporting that a policy or an alias was created, even though the creation of any resource was disabled. {issue}24046[24046] {pull}24480[24480]
 - Fix ILM alias not being created if `setup.ilm.check_exists: false` and `setup.ilm.overwrite: true` has been configured. {pull}24480[24480]
-- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
 - Allow cgroup self-monitoring to see alternate `hostfs` paths {pull}24334[24334]
 
 
