@@ -1,0 +1,28 @@
+name: Osquerybeat
+cmd: osquerybeat
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+action_input_types:
+- osquery
+
+rules:
+- fix_stream: {}
+- inject_index:
+    type: logs
+
+- inject_stream_processor:
+    on_conflict: insert_after
+    type: logs
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - osquery
+
+- filter:
+    selectors:
+    - inputs
+    - output
+
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+constraints: ${runtime.arch} != 'arm64'
