@@ -10,13 +10,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Masterminds/semver"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -26,8 +30,82 @@ import (
 
 const debugSelector = "synthexec"
 
+// ensure compatability of synthetics by enforcing the installed
+// version never goes beyond this range
+const ExpectedSynthVersion = "<2.0.0"
+
+type PackageJSON struct {
+	Dependencies struct {
+		SynthVersion string `json:"@elastic/synthetics"`
+	} `json:"dependencies"`
+	DevDependencies struct {
+		SynthVersion string `json:"@elastic/synthetics"`
+	} `json:"devDependencies"`
+}
+
+var numberRegex = regexp.MustCompile("[^0-9]+")
+
+// parsed a given dep version by ignoring all range tags (^, = , >, <)
+func parseVersion(version string) string {
+	dotParts := strings.SplitN(version, ".", 4)
+	parsed := []string{}
+
+	for _, v := range dotParts[:3] {
+		value := numberRegex.ReplaceAllString(v, "")
+		parsed = append(parsed, value)
+	}
+	return strings.Join(parsed, ".")
+}
+
+func validateVersion(expected string, current string) error {
+	expectedRange, err := semver.NewConstraint(expected)
+	if err != nil {
+		return err
+	}
+
+	parsed := parseVersion(current)
+	currentVersion, err := semver.NewVersion(parsed)
+	if err != nil {
+		fmt.Println("error parsing synthetics version: %w", err)
+	}
+
+	isValid := expectedRange.Check(currentVersion)
+	if !isValid {
+		return fmt.Errorf("provided synthetics version %s is not compatible", current)
+	}
+	return nil
+}
+
+func validatePackageJSON(path string) error {
+	pkgData, err := ioutil.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("could not read file:%s %w", path, err)
+	}
+	pkgJson := PackageJSON{}
+	err = json.Unmarshal(pkgData, &pkgJson)
+	if err != nil {
+		return fmt.Errorf("could not unmarshall @elastic/synthetics version:%w", err)
+	}
+
+	synthVersion := pkgJson.Dependencies.SynthVersion
+	if synthVersion == "" {
+		synthVersion = pkgJson.DevDependencies.SynthVersion
+	}
+	err = validateVersion(ExpectedSynthVersion, synthVersion)
+	if err != nil {
+		return fmt.Errorf("could not validate @elastic/synthetics version:%w", err)
+	}
+	return nil
+}
+
 // SuiteJob will run a single journey by name from the given suite.
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
+	// ensure the used synthetics version dep used in suite does not
+	// exceed our supported range
+	err := validatePackageJSON(path.Join(suitePath, "package.json"))
+	if err != nil {
+		return nil, err
+	}
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".", "--screenshots")...)
