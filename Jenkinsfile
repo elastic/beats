@@ -1028,6 +1028,8 @@ def stageStatusCache(Map args, Closure body){
   if(readStageStatus(args) == false || isUserTrigger() || env.BUILD_ID == "1"){
     body()
     saveStageStatus(args)
+  } else {
+    log(level: 'INFO', text: "The stage skiped because it is in the execution cache.")
   }
 }
 
