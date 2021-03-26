@@ -46,7 +46,12 @@ function Install-ElasticAgent {
             # write status
             Write-Status "$name" "$firstOperation" "transitioning" "$message" "$subName" "success" "Elastic Agent package has been downloaded"
             Write-Log "Unzip elastic agent archive" "INFO"
-            Expand-Archive -LiteralPath $SAVEDFILE -DestinationPath $INSTALL_LOCATION -Force
+            if ( $powershellVersion -le 3 ) {
+                Add-Type -Assembly "System.IO.Compression.Filesystem"
+                [System.IO.Compression.ZipFile]::ExtractToDirectory($SAVEDFILE,$INSTALL_LOCATION )
+            }else {
+                Expand-Archive -LiteralPath $SAVEDFILE -DestinationPath $INSTALL_LOCATION -Force
+            }
             Write-Log "Elastic agent unzipped location $INSTALL_LOCATION" "INFO"
             Write-Log "Rename folder ..."
             Rename-Item -Path "$INSTALL_LOCATION\$INSTALL" -NewName "Elastic-Agent" -Force
@@ -63,7 +68,6 @@ function Install-ElasticAgent {
             }
             Write-Log "Found Kibana url $kibanaUrl" "INFO"
             $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-            $headers.Add("Accept","Application/Json")
             $headers.Add("kbn-xsrf", "true")
             #cred
             $encodedCredentials = ""
@@ -78,7 +82,11 @@ function Install-ElasticAgent {
                 $encodedCredentials = $base64Auth
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
-
+            if ( $powershellVersion -le 3 ) {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            }else {
+                $headers.Add("Accept","application/json")
+            }
             #enable Fleet
             $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/setup"  -Method 'POST' -Headers $headers -UseBasicParsing
             if ($jsonResult.statuscode -eq '200') {

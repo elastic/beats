@@ -35,7 +35,6 @@ function Uninstall-ElasticAgent {
             }
             Write-Log "Unenroll elastic agent" "INFO"
             $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-            $headers.Add("Accept","application/json")
             $headers.Add("kbn-xsrf", "true")
             #cred
             $encodedCredentials = ""
@@ -51,16 +50,21 @@ function Uninstall-ElasticAgent {
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
             $body=(@{'force' = $true} | ConvertTo-Json)
+            if ( $powershellVersion -le 3 ) {
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            }else {
+                $headers.Add("Accept","application/json")
+            }
             try {
                 $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/agents/$($agentId)/unenroll" -Body $body  -Method 'POST' -Headers $headers -UseBasicParsing -ContentType 'application/json; charset=utf-8'
             } catch {
-                $jsonResult = $_
+                $jsonResult = ConvertFrom-Json $result.ErrorDetails.Message  | Select-Object
             }
             if ($jsonResult.statuscode -eq '200')
             {
                 Write-Log "Unenrollment succeeded" "INFO"
             }
-            elseif ($jsonResult.statuscode -eq '404' -And $jsonResult.error -eq "Not Found") {
+            elseif ($jsonResult.statuscode -eq '404' -And $jsonResult.error -eq "Not Found" ) {
                 Write-Log "Elastic agent was previously unenrolled" "INFO"
             }
             else {

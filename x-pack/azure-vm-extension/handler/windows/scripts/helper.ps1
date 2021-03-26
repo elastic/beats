@@ -77,7 +77,11 @@ function Get-Stack-Version {
       throw "Password  or base64auto key could not be found"
   }
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-  $headers.Add("Accept","application/json")
+  if ( $powershellVersion -le 3 ) {
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  }else {
+      $headers.Add("Accept","application/json")
+  }
   #cred
   $encodedCredentials = ""
   if ($password) {
