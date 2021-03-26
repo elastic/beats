@@ -18,7 +18,7 @@ import (
 // version never goes beyond this range
 const ExpectedSynthVersion = "<2.0.0"
 
-type PackageJSON struct {
+type packageJson struct {
 	Dependencies struct {
 		SynthVersion string `json:"@elastic/synthetics"`
 	} `json:"dependencies"`
@@ -32,8 +32,8 @@ var nonNumberRegex = regexp.MustCompile("\\D")
 // parsed a given dep version by ignoring all range tags (^, = , >, <)
 func parseVersion(version string) string {
 	dotParts := strings.SplitN(version, ".", 4)
-	parsed := []string{}
 
+	parsed := []string{}
 	for _, v := range dotParts[:3] {
 		value := nonNumberRegex.ReplaceAllString(v, "")
 		parsed = append(parsed, value)
@@ -65,7 +65,7 @@ func validatePackageJSON(path string) error {
 	if err != nil {
 		return fmt.Errorf("could not read file '%s': %w", path, err)
 	}
-	pkgJson := PackageJSON{}
+	pkgJson := packageJson{}
 	err = json.Unmarshal(pkgData, &pkgJson)
 	if err != nil {
 		return fmt.Errorf("could not unmarshall @elastic/synthetics version: %w", err)
