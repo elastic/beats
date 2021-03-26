@@ -13,7 +13,7 @@ when:
     tags: true                 ## for all the tags
 platform: "windows-2019"       ## default label for all the stages
 stages:
-    Lint:
+    lint:
         make: |
           make -C x-pack/winlogbeat check;
           make -C x-pack/winlogbeat update;

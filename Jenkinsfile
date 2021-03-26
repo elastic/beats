@@ -90,6 +90,44 @@ pipeline {
         }
       }
     }
+    stage('BeatsLint') {
+      options { skipDefaultCheckout() }
+      when {
+        // Always when running builds on branches/tags
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          not { changeRequest() }                           // If no PR
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          script {
+            def mapParallelTasks = [:]
+            def content = readYaml(file: 'Jenkinsfile.yml')
+            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+            } else {
+              content['projects'].each { projectName ->
+                generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.yml').each { k,v ->
+                  if (k.endsWith('lint')) {
+                    mapParallelTasks["${k}"] = v
+                  }
+                }
+              }
+              parallel(mapParallelTasks)
+            }
+          }
+        }
+      }
+    }
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -117,7 +155,9 @@ pipeline {
             } else {
               content['projects'].each { projectName ->
                 generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                  mapParallelTasks["${k}"] = v
+                  if (!k.endsWith('lint')) {
+                    mapParallelTasks["${k}"] = v
+                  }
                 }
               }
               notifyBuildReason()

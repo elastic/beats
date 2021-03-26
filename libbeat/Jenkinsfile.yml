@@ -12,7 +12,7 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    Lint:
+    lint:
         make: |
           make -C libbeat check;
           make -C libbeat update;

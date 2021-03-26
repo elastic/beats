@@ -13,7 +13,7 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    Lint:
+    lint:
         make: |
           make -C metricbeat check;
           make -C metricbeat update;
