@@ -73,18 +73,20 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        withGithubNotify(context: "Lint") {
-          withBeatsEnv(archive: false, id: "lint") {
-            dumpVariables()
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-            whenTrue(env.ONLY_DOCS == 'true') {
-              cmd(label: "make check", script: "make check")
-            }
-            whenTrue(env.ONLY_DOCS == 'false') {
-              cmd(label: "make check-python", script: "make check-python")
-              cmd(label: "make check-go", script: "make check-go")
-              cmd(label: "make notice", script: "make notice")
-              cmd(label: "Check for changes", script: "make check-no-changes")
+        stageStatusCache(id: 'Lint'){
+          withGithubNotify(context: "Lint") {
+            withBeatsEnv(archive: false, id: "lint") {
+              dumpVariables()
+              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+              whenTrue(env.ONLY_DOCS == 'true') {
+                cmd(label: "make check", script: "make check")
+              }
+              whenTrue(env.ONLY_DOCS == 'false') {
+                cmd(label: "make check-python", script: "make check-python")
+                cmd(label: "make check-go", script: "make check-go")
+                cmd(label: "make notice", script: "make notice")
+                cmd(label: "Check for changes", script: "make check-no-changes")
+              }
             }
           }
         }
@@ -959,40 +961,42 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
     super(args)
   }
   public run(Map args = [:]){
-    def withModule = args.content.get('withModule', false)
-    if(args?.content?.containsKey('make')) {
-      steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
-    }
-    if(args?.content?.containsKey('mage')) {
-      steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
-    }
-    if(args?.content?.containsKey('packaging-arm')) {
-      steps.packagingArm(context: args.context,
-                         command: args.content.get('packaging-arm'),
-                         directory: args.project,
-                         label: args.label,
-                         isMage: true,
-                         id: args.id,
-                         e2e: args.content.get('e2e'),
-                         package: true,
-                         dockerArch: 'arm64')
-    }
-    if(args?.content?.containsKey('packaging-linux')) {
-      steps.packagingLinux(context: args.context,
-                           command: args.content.get('packaging-linux'),
+    stageStatusCache(args){
+      def withModule = args.content.get('withModule', false)
+      if(args?.content?.containsKey('make')) {
+        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+      }
+      if(args?.content?.containsKey('mage')) {
+        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+      }
+      if(args?.content?.containsKey('packaging-arm')) {
+        steps.packagingArm(context: args.context,
+                           command: args.content.get('packaging-arm'),
                            directory: args.project,
                            label: args.label,
                            isMage: true,
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'amd64')
-    }
-    if(args?.content?.containsKey('k8sTest')) {
-      steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
-    }
-    if(args?.content?.containsKey('cloud')) {
-      steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+                           dockerArch: 'arm64')
+      }
+      if(args?.content?.containsKey('packaging-linux')) {
+        steps.packagingLinux(context: args.context,
+                             command: args.content.get('packaging-linux'),
+                             directory: args.project,
+                             label: args.label,
+                             isMage: true,
+                             id: args.id,
+                             e2e: args.content.get('e2e'),
+                             package: true,
+                             dockerArch: 'amd64')
+      }
+      if(args?.content?.containsKey('k8sTest')) {
+        steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
+      }
+      if(args?.content?.containsKey('cloud')) {
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+      }
     }
   }
 }
@@ -1013,4 +1017,50 @@ class GetProjectDependencies extends co.elastic.beats.BeatsFunction {
     }
     return output?.split('\n').collect{ item -> item as String }
   }
+}
+
+/**
+  Execute the body if there is not stage status file for the stage and the commit we are building.
+  User triggered builds will execute all stages always.
+  If the stage success the status is save in a file.
+*/
+def stageStatusCache(Map args, Closure body){
+  if(readStageStatus(args) == false || isUserTrigger()){
+    body()
+    saveStageStatus(args)
+  }
+}
+
+/**
+  Save the status file of the stage.
+*/
+def saveStageStatus(Map args){
+  def statusFileName = stageStatusId(args)
+  writeFile(file: statusFileName, text: "OK")
+  googleStorageUploadExt(bucket: "${JOB_GCS_BUCKET}/ci/cache",
+    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+    pattern: "${statusFileName}",
+    sharedPublicly: true)
+}
+
+/**
+  Read the status file of the stage if it exists.
+*/
+def readStageStatus(Map args){
+  def statusFileName = stageStatusId(args)
+  try {
+    googleStorageDownload(bucketUri: "${JOB_GCS_BUCKET}/ci/cache/${statusFileName}",
+      credentialsId: "${JOB_GCS_CREDENTIALS}")
+  } catch(e) {
+    log(level: 'WARN', text: "There is no cache file for the current stage.")
+  } finally {
+    return fileExists("${statusFileName}")
+  }
+}
+
+/**
+  generate an unique ID for the stage and commit.
+*/
+def stageStatusId(Map args){
+  return base64encode(text: "${args.id}${GIT_BASE_COMMIT}", encoding: "UTF-8")
 }
