@@ -1025,7 +1025,7 @@ class GetProjectDependencies extends co.elastic.beats.BeatsFunction {
   If the stage success the status is save in a file.
 */
 def stageStatusCache(Map args, Closure body){
-  if(readStageStatus(args) == false || isUserTrigger()){
+  if(readStageStatus(args) == false || isUserTrigger() || env.BUILD_ID == "1"){
     body()
     saveStageStatus(args)
   }
