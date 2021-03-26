@@ -18,3 +18,7 @@ benchmark:
 .PHONY: create-tcp-protocol
 create-tcp-protocol: python-env
 	@${PYTHON_ENV_EXE} ${ES_BEATS}/packetbeat/scripts/create_tcp_protocol.py
+
+.PHONY: unit
+unit: mage
+	mage unitTest
