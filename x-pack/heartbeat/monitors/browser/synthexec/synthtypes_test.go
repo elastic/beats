@@ -6,10 +6,11 @@ package synthexec
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-lookslike"
@@ -36,7 +37,7 @@ func TestToMap(t *testing.T) {
 		{
 			"root fields with URL",
 			common.MapStr{
-				"type": "journey/start",
+				"type":            "journey/start",
 				"package_version": "1.2.3",
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
@@ -48,21 +49,21 @@ func TestToMap(t *testing.T) {
 			},
 			common.MapStr{
 				"synthetics": common.MapStr{
-					"type":   "journey/start",
+					"type":            "journey/start",
 					"package_version": "1.2.3",
-					"nested": "v1",
+					"nested":          "v1",
 				},
-				"url": wrappers.URLFields(testUrl),
+				"url":           wrappers.URLFields(testUrl),
 				"truly_at_root": "v2",
 			},
 		},
 		{
 			"root fields, step metadata",
 			common.MapStr{
-				"type": "step/start",
+				"type":            "step/start",
 				"package_version": "1.2.3",
-				"journey": common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-				"step": common.MapStr{"name": "MyStep", "status": "success", "index": 42},
+				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
+				"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42},
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
 						"nested": "v1",
@@ -72,11 +73,11 @@ func TestToMap(t *testing.T) {
 			},
 			common.MapStr{
 				"synthetics": common.MapStr{
-					"type":   "step/start",
+					"type":            "step/start",
 					"package_version": "1.2.3",
-					"nested": "v1",
-					"journey": common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-					"step": common.MapStr{"name": "MyStep", "status": "success", "index": 42},
+					"nested":          "v1",
+					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
+					"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42},
 				},
 				"truly_at_root": "v2",
 			},
@@ -84,30 +85,30 @@ func TestToMap(t *testing.T) {
 		{
 			"weird error, and blob, no URL",
 			common.MapStr{
-				"type": "someType",
+				"type":            "someType",
 				"package_version": "1.2.3",
-				"journey": common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-				"step": common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
+				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
+				"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
 				"error": common.MapStr{
-					"name": "MyErrorName",
+					"name":    "MyErrorName",
 					"message": "MyErrorMessage",
-					"stack": "MyErrorStack",
+					"stack":   "MyErrorStack",
 				},
-				"blob": "ablob",
+				"blob":      "ablob",
 				"blob_mime": "application/weird",
 			},
 			common.MapStr{
 				"synthetics": common.MapStr{
-					"type":   "someType",
+					"type":            "someType",
 					"package_version": "1.2.3",
-					"journey": common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-					"step": common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
+					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
+					"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
 					"error": common.MapStr{
-						"name": "MyErrorName",
+						"name":    "MyErrorName",
 						"message": "MyErrorMessage",
-						"stack": "MyErrorStack",
+						"stack":   "MyErrorStack",
 					},
-					"blob": "ablob",
+					"blob":      "ablob",
 					"blob_mime": "application/weird",
 				},
 			},

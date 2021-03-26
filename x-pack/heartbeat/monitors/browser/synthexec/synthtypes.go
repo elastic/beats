@@ -16,18 +16,18 @@ import (
 )
 
 type SynthEvent struct {
-	Type                 string                 `json:"type"`
-	PackageVersion       string                 `json:"package_version"`
-	Step                 *Step                  `json:"step"`
-	Journey              *Journey               `json:"journey"`
-	TimestampEpochMicros float64                `json:"@timestamp"`
-	Payload              common.MapStr          `json:"payload"`
-	Blob                 string                 `json:"blob"`
-	BlobMime             string                 `json:"blob_mime"`
-	Error                *SynthError            `json:"error"`
-	URL                  string                 `json:"url"`
-	Status               string                 `json:"status"`
-	RootFields           common.MapStr			`json:"root_fields"`
+	Type                 string        `json:"type"`
+	PackageVersion       string        `json:"package_version"`
+	Step                 *Step         `json:"step"`
+	Journey              *Journey      `json:"journey"`
+	TimestampEpochMicros float64       `json:"@timestamp"`
+	Payload              common.MapStr `json:"payload"`
+	Blob                 string        `json:"blob"`
+	BlobMime             string        `json:"blob_mime"`
+	Error                *SynthError   `json:"error"`
+	URL                  string        `json:"url"`
+	Status               string        `json:"status"`
+	RootFields           common.MapStr `json:"root_fields"`
 	index                int
 }
 
