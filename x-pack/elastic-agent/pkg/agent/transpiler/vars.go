@@ -23,21 +23,21 @@ type Vars struct {
 	tree          *AST
 	processorsKey string
 	processors    Processors
-	dynamicProviders map[string]composable.DynamicProvider
+	extraContextProviders map[string]composable.ContextProvider
 }
 
 // NewVars returns a new instance of vars.
-func NewVars(mapping map[string]interface{}, dynamicProviders map[string]composable.DynamicProvider) (*Vars, error) {
-	return NewVarsWithProcessors(mapping, "", nil, dynamicProviders)
+func NewVars(mapping map[string]interface{}, extraContextProviders map[string]composable.ContextProvider) (*Vars, error) {
+	return NewVarsWithProcessors(mapping, "", nil, extraContextProviders)
 }
 
 // NewVarsWithProcessors returns a new instance of vars with attachment of processors.
-func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, dynamicProviders map[string]composable.DynamicProvider) (*Vars, error) {
+func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, extraContextProviders map[string]composable.ContextProvider) (*Vars, error) {
 	tree, err := NewAST(mapping)
 	if err != nil {
 		return nil, err
 	}
-	return &Vars{tree, processorKey, processors, dynamicProviders}, nil
+	return &Vars{tree, processorKey, processors, extraContextProviders}, nil
 }
 
 // Replace returns a new value based on variable replacement.
@@ -47,8 +47,6 @@ func (v *Vars) Replace(value string) (Node, error) {
 	if !validBrackets(value, matchIdxs) {
 		return nil, fmt.Errorf("starting ${ is missing ending }")
 	}
-	fmt.Println("hahahaha")
-	fmt.Println(v.dynamicProviders)
 	result := ""
 	lastIndex := 0
 	for _, r := range matchIdxs {
@@ -59,16 +57,13 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
-				fmt.Println("hehehehere is the Value")
-				fmt.Println(val.Value())
-				fmt.Println("hehehehere is the processorsKey")
-				fmt.Println(v.processorsKey)
-				if (v.processorsKey == "kubernetes_secrets"){
-					fmt.Println("I'm in kubernetes Secrettt!!!!")
-					fmt.Println(val.Value())
-					k8sProvider := v.dynamicProviders[v.processorsKey]
-					k8sProviderSecrets := k8sProvider.(composable.DynamicProviderSecrets)
-					k8sProviderSecrets.Fetch()
+				if varPrefixMatched(val.Value(), "kubernetes_secrets") && len(v.extraContextProviders) > 0 {
+					k8sProvider := v.extraContextProviders["kubernetes_secrets"]
+					k8sProviderSecrets := k8sProvider.(composable.ContextProviderK8sSecrets)
+					vall, _ := k8sProviderSecrets.Fetch(val.Value())
+					result += value[lastIndex:r[0]] + vall
+					set = true
+					continue
 				}
 				switch val.(type) {
 				case *constString:

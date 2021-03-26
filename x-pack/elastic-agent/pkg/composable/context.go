@@ -5,30 +5,16 @@
 package composable
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
-// ContextProviderComm is the interface that a context provider uses to communicate back to Elastic Agent.
-type ContextProviderComm interface {
-	context.Context
-
-	// Set sets the current mapping for this context.
-	Set(map[string]interface{}) error
-}
-
-// ContextProvider is the interface that a context provider must implement.
-type ContextProvider interface {
-	// Run runs the context provider.
-	Run(ContextProviderComm) error
-}
-
 // ContextProviderBuilder creates a new context provider based on the given config and returns it.
-type ContextProviderBuilder func(log *logger.Logger, config *config.Config) (ContextProvider, error)
+type ContextProviderBuilder func(log *logger.Logger, config *config.Config) (corecomp.ContextProvider, error)
 
 // AddContextProvider adds a new ContextProviderBuilder
 func (r *providerRegistry) AddContextProvider(name string, builder ContextProviderBuilder) error {

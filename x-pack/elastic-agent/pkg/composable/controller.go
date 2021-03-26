@@ -122,9 +122,9 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	}
 
 	// manually register providers that want to pass to the Vars
-	dynamicProviders := make(map[string]corecomp.DynamicProvider, 1)
-	k8sSecretsProvider := c.dynamicProviders["kubernetes_secrets"]
-	dynamicProviders["kubernetes_secrets"] = k8sSecretsProvider.provider
+	extraContextProviders := make(map[string]corecomp.ContextProvider, 1)
+	k8sSecretsProvider := c.contextProviders["kubernetes_secrets"]
+	extraContextProviders["kubernetes_secrets"] = k8sSecretsProvider.provider
 
 	go func() {
 		for {
@@ -157,7 +157,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				mapping[name] = state.Current()
 			}
 			// this is ensured not to error, by how the mappings states are verified
-			vars[0], _ = transpiler.NewVars(mapping, nil)
+			vars[0], _ = transpiler.NewVars(mapping, extraContextProviders)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
@@ -165,11 +165,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
-					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, dynamicProviders)
-					vars = append(vars, v)
-				}
-				if name == "kubernetes_secrets" {
-					v, _ := transpiler.NewVarsWithProcessors(nil, name, nil, dynamicProviders)
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, extraContextProviders)
 					vars = append(vars, v)
 				}
 			}
@@ -185,7 +181,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 type contextProviderState struct {
 	context.Context
 
-	provider ContextProvider
+	provider corecomp.ContextProvider
 	lock     sync.RWMutex
 	mapping  map[string]interface{}
 	signal   chan bool
@@ -232,7 +228,7 @@ type dynamicProviderMapping struct {
 type dynamicProviderState struct {
 	context.Context
 
-	provider corecomp.DynamicProvider
+	provider DynamicProvider
 	lock     sync.RWMutex
 	mappings map[string]dynamicProviderMapping
 	signal   chan bool

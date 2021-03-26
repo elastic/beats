@@ -5,9 +5,6 @@
 package kubernetes_secrets
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -23,7 +20,7 @@ const (
 )
 
 func init() {
-	composable.Providers.AddDynamicProvider("kubernetes_secrets", DynamicProviderBuilder)
+	composable.Providers.AddContextProvider("kubernetes_secrets", ContextProviderBuilder)
 }
 
 
@@ -32,14 +29,8 @@ type dynamicProviderSecrets struct {
 	config *Config
 }
 
-type eventWatcher struct {
-	logger         *logger.Logger
-	cleanupTimeout time.Duration
-	comm           corecomp.DynamicProviderComm
-}
-
 // DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.DynamicProvider, error) {
+func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.ContextProvider, error) {
 	var cfg Config
 	if c == nil {
 		c = config.New()
@@ -51,13 +42,12 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.D
 	return &dynamicProviderSecrets{logger, &cfg}, nil
 }
 
-func (p *dynamicProviderSecrets) Fetch(comm corecomp.DynamicProviderComm) string {
-	fmt.Println("I FETCHEEED the secrets providerrrrr")
-	return "someSecret"
+func (p *dynamicProviderSecrets) Fetch(value string) (string, error) {
+	// TODO: add actual call to k8s api here to get the secret
+	return "someSecret42", nil
 }
 
 // Run runs the environment context provider.
-func (p *dynamicProviderSecrets) Run(comm corecomp.DynamicProviderComm) error {
-	fmt.Println("I started the secrets providerrrrr")
+func (p *dynamicProviderSecrets) Run(comm corecomp.ContextProviderComm) error {
 	return nil
 }

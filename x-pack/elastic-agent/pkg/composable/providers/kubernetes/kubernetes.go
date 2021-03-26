@@ -13,7 +13,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
-	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
 const (
@@ -35,11 +34,11 @@ type dynamicProvider struct {
 type eventWatcher struct {
 	logger         *logger.Logger
 	cleanupTimeout time.Duration
-	comm           corecomp.DynamicProviderComm
+	comm           composable.DynamicProviderComm
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
-func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.DynamicProvider, error) {
+func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable.DynamicProvider, error) {
 	var cfg Config
 	if c == nil {
 		c = config.New()
@@ -52,7 +51,7 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.D
 }
 
 // Run runs the environment context provider.
-func (p *dynamicProvider) Run(comm corecomp.DynamicProviderComm) error {
+func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
