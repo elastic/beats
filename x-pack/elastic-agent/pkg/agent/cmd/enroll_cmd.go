@@ -51,11 +51,6 @@ type saver interface {
 	Save(io.Reader) error
 }
 
-type storeLoad interface {
-	saver
-	Load() (io.ReadCloser, error)
-}
-
 // enrollCmd is an enroll subcommand that interacts between the Kibana API and the Agent.
 type enrollCmd struct {
 	log          *logger.Logger
@@ -216,6 +211,10 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) error {
 		c.options.FleetServer.ConnStr, c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
+	if err != nil {
+		return err
+	}
+
 	configToStore := map[string]interface{}{
 		"fleet": fleetConfig,
 	}
