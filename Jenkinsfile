@@ -1039,7 +1039,7 @@ def stageStatusCache(Map args, Closure body){
 def saveStageStatus(Map args){
   def statusFileName = stageStatusId(args)
   writeFile(file: statusFileName, text: "OK")
-  googleStorageUploadExt(bucket: "${JOB_GCS_BUCKET}/ci/cache",
+  googleStorageUploadExt(bucket: "gs://${JOB_GCS_BUCKET}/ci/cache",
     credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
     pattern: "${statusFileName}",
     sharedPublicly: true)
