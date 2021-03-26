@@ -71,9 +71,9 @@ The following actions are possible and grouped based on the actions.
 
   FLEET_ENROLL - set to 1 for enrollment into fleet-server. If not set, Elastic Agent is run in standalone mode.
   FLEET_URL - URL of the Fleet Server to enroll into
-  FLEET_ENROLLMENT_TOKEN - token to use for enrollment.
+  FLEET_ENROLLMENT_TOKEN - token to use for enrollment. This is not needed in case FLEET_SERVER_ENABLED and FLEET_ENROLL is set. Then the token is fetched from Kibana.
   FLEET_CA - path to certificate authority to use with communicate with Fleet Server [$KIBANA_CA]
-  FLEET_INSECURE - communicate with Fleet with either insecure HTTP or un-verified HTTPS
+  FLEET_INSECURE - communicate with Fleet with either insecure HTTP or unverified HTTPS
 
   The following vars are need in the scenario that Elastic Agent should automatically fetch its own token.
 
