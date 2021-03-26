@@ -14,23 +14,23 @@ checkOS
 
 Unenroll_Old_ElasticAgent_DEB_RPM()
 {
-  log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Unenrolling elastic agent"
+  log "INFO" "[Unenroll_Old_ElasticAgent_DEB_RPM] Unenrolling elastic agent"
   get_prev_kibana_host
   if [[ "$OLD_KIBANA_URL" = "" ]]; then
-    log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] Kibana URL could not be found/parsed"
+    log "ERROR" "[Unenroll_Old_ElasticAgent_DEB_RPM] Kibana URL could not be found/parsed"
     return 1
   fi
   get_prev_password
   get_prev_base64Auth
   if [ "$OLD_PASSWORD" = "" ] && [ "$OLD_BASE64_AUTH" = "" ]; then
-    log "ERROR" "[Enroll_ElasticAgent] Password could not be found/parsed"
+    log "ERROR" "[Unenroll_Old_ElasticAgent_DEB_RPM] Password could not be found/parsed"
     return 1
   fi
   local cred=""
   if [[ "$OLD_PASSWORD" != "" ]] && [ "$OLD_PASSWORD" != "null" ]; then
     get_prev_username
     if [[ "$OLD_USERNAME" = "" ]]; then
-      log "ERROR" "[Enroll_ElasticAgent] Username could not be found/parsed"
+      log "ERROR" "[Unenroll_Old_ElasticAgent_DEB_RPM] Username could not be found/parsed"
       return 1
     fi
     cred=${OLD_USERNAME}:${OLD_PASSWORD}
@@ -39,17 +39,17 @@ Unenroll_Old_ElasticAgent_DEB_RPM()
   fi
   eval $(parse_yaml "/etc/elastic-agent/fleet.yml")
   if [[ "$agent_id" = "" ]]; then
-    log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] Password could not be found/parsed"
+    log "ERROR" "[Unenroll_Old_ElasticAgent_DEB_RPM] Password could not be found/parsed"
     return 1
   fi
-  log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Agent ID is $agent_id"
+  log "INFO" "[Unenroll_Old_ElasticAgent_DEB_RPM] Agent ID is $agent_id"
   jsonResult=$(curl -X POST "${OLD_KIBANA_URL}/api/fleet/agents/$agent_id/unenroll"  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" --data '{"force":"true"}' )
   local EXITCODE=$?
   if [ $EXITCODE -ne 0 ]; then
-    log "ERROR" "[Unenroll_ElasticAgent_DEB_RPM] error calling $OLD_KIBANA_URL/api/fleet/agents/$agent_id/unenroll in order to unenroll the agent"
+    log "ERROR" "[Unenroll_Old_ElasticAgent_DEB_RPM] error calling $OLD_KIBANA_URL/api/fleet/agents/$agent_id/unenroll in order to unenroll the agent"
     return $EXITCODE
   fi
-  log "INFO" "[Unenroll_ElasticAgent_DEB_RPM] Agent has been unenrolled"
+  log "INFO" "[Unenroll_Old_ElasticAgent_DEB_RPM] Agent has been unenrolled"
   write_status "$name" "$first_operation" "success" "$message" "$sub_name" "success" "Elastic Agent service has been unenrolled"
 }
 
@@ -57,7 +57,7 @@ Uninstall_Old_ElasticAgent_DEB_RPM() {
    if [ "$DISTRO_OS" = "RPM" ]; then
       sudo rpm -e elastic-agent
    fi
-   log "INFO" "[Uninstall_ElasticAgent] removing Elastic Agent directories"
+   log "INFO" "[Uninstall_Old_ElasticAgent_DEB_RPM] removing Elastic Agent directories"
    sudo systemctl stop elastic-agent
    sudo systemctl disable elastic-agent
    sudo rm -rf /usr/share/elastic-agent
@@ -70,18 +70,18 @@ Uninstall_Old_ElasticAgent_DEB_RPM() {
      sudo dpkg -r elastic-agent
      sudo dpkg -P elastic-agent
    fi
-   log "INFO" "[uninstall_es_agent] Elastic Agent removed"
+   log "INFO" "[Uninstall_Old_ElasticAgent_DEB_RPM] Elastic Agent removed"
 }
 
 
 Uninstall_Old_ElasticAgent()
 {
-  log "INFO" "[Uninstall_ElasticAgent] Unenrolling Elastic Agent"
+  log "INFO" "[Uninstall_Old_ElasticAgent] Unenrolling Elastic Agent"
   retry_backoff Unenroll_Old_ElasticAgent_DEB_RPM
-  log "INFO" "[Uninstall_ElasticAgent] Elastic Agent has been unenrolled"
+  log "INFO" "[Uninstall_Old_ElasticAgent] Elastic Agent has been unenrolled"
   if [ "$(pidof systemd && echo "systemd" || echo "other")" == "other" ]; then
     sudo elastic-agent uninstall
-    log "INFO" "[Uninstall_ElasticAgent] Elastic Agent removed"
+    log "INFO" "[Uninstall_Old_ElasticAgent] Elastic Agent removed"
   else
     retry_backoff Uninstall_Old_ElasticAgent_DEB_RPM
   fi

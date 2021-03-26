@@ -78,6 +78,22 @@ function Install-ElasticAgent {
                 $encodedCredentials = $base64Auth
             }
             $headers.Add('Authorization', "Basic $encodedCredentials")
+
+            #enable Fleet
+            $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/setup"  -Method 'POST' -Headers $headers -UseBasicParsing
+            if ($jsonResult.statuscode -eq '200') {
+                Write-Log "Enable Fleet is now available $jsonResult" "INFO"
+                $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/agents/setup"  -Method 'POST' -Headers $headers -UseBasicParsing
+                if ($jsonResult.statuscode -eq '200') {
+                    Write-Log "Enable Fleet agents if now available $jsonResult" "INFO"
+                }else {
+                    throw "Enabling Fleet Agents failed with $jsonResult.statuscode"
+                }
+            }
+            else {
+                throw "Enabling Fleet failed with $jsonResult.statuscode"
+            }
+            # end enable Fleet
             $jsonResult = Invoke-WebRequest -Uri "$($kibanaUrl)/api/fleet/enrollment-api-keys"  -Method 'GET' -Headers $headers -UseBasicParsing
             if ($jsonResult.statuscode -eq '200') {
                 $keyValue= ConvertFrom-Json $jsonResult.Content | Select-Object -expand "list"

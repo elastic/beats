@@ -166,6 +166,20 @@ Enroll_ElasticAgent() {
   else
     cred=$(echo "$BASE64_AUTH" | base64 --decode)
   fi
+  #enable Fleet
+  result=$(curl -X POST "${KIBANA_URL}"/api/fleet/setup  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" )
+  local EXITCODE=$?
+  if [ $EXITCODE -ne 0 ]; then
+    log "ERROR" "[Enroll_ElasticAgent] error calling $KIBANA_URL/api/fleet/setup in order to enable Kibana Fleet $result"
+    return $EXITCODE
+  fi
+  result=$(curl -X POST "${KIBANA_URL}"/api/fleet/agents/setup  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" )
+  local EXITCODE=$?
+  if [ $EXITCODE -ne 0 ]; then
+    log "ERROR" "[Enroll_ElasticAgent] error calling $KIBANA_URL/api/fleet/setup in order to enable Kibana Fleet Agents $result"
+    return $EXITCODE
+  fi
+  #end enable Fleet
   local ENROLLMENT_TOKEN=""
   jsonResult=$(curl "${KIBANA_URL}"/api/fleet/enrollment-api-keys  -H 'Content-Type: application/json' -H 'kbn-xsrf: true' -u "$cred" )
   local EXITCODE=$?
@@ -199,9 +213,18 @@ Enroll_ElasticAgent() {
   fi
   log "INFO" "[Enroll_ElasticAgent] ENROLLMENT_TOKEN is $ENROLLMENT_TOKEN"
   log "INFO" "[Enroll_ElasticAgent] Enrolling the Elastic Agent to Fleet ${KIBANA_URL}"
-  sudo elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
+    if [[ $STACK_VERSION = "" ]]; then
+         get_cloud_stack_version
+       fi
+       echo $STACK_VERSION
+  if [[ $STACK_VERSION = 7.12*  ]]; then
+    sudo elastic-agent enroll  --kibana-url="${KIBANA_URL}" --enrollment-token="$ENROLLMENT_TOKEN" -f
+  else
+    sudo elastic-agent enroll  "${KIBANA_URL}" "$ENROLLMENT_TOKEN" -f
+  fi
+
   write_status "$name" "$second_operation" "success" "$message" "$sub_name" "success" "Elastic Agent has been enrolled"
-  set_sequence_env_variables
+  set_sequence_to_file
 }
 
 
@@ -239,7 +262,7 @@ Reconfigure_Elastic_agent_DEB_RPM() {
    log "INFO" "[Reconfigure_Elastic_agent_DEB_RPM] Stopping Elastic Agent"
    sudo systemctl stop elastic-agent
    log "INFO" "[Reconfigure_Elastic_agent_DEB_RPM] Elastic Agent stopped"
-   Uninstall_Old_ElasticAgent
+   retry_backoff Uninstall_Old_ElasticAgent
    Install_ElasticAgent
    retry_backoff Start_ElasticAgent
    write_status "$name_en" "$operation_en" "success" "$message_en" "$sub_name" "success" "Elastic Agent service has started"

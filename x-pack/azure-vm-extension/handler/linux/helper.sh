@@ -23,7 +23,6 @@ OLD_CONFIG_FILE=""
 OLD_CLOUD_ID=""
 OLD_PROTECTED_SETTINGS=""
 OLD_THUMBPRINT=""
-#LINUX_CERT_PATH="/mnt/c/Users/maria/Downloads/test/waagent"
 
 checkOS()
 {
@@ -134,12 +133,9 @@ get_configuration_location()
 {
   SCRIPT=$(readlink -f "$0")
   ES_EXT_DIR=$(dirname "$SCRIPT")
-  log "INFO" "[get_configuration_location] main directory found $ES_EXT_DIR"
-  log "INFO" "[get_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
     log "INFO" "[get_configuration_location] HandlerEnvironment.json file found"
     config_folder=$(jq -r '.[0].handlerEnvironment.configFolder' "$ES_EXT_DIR/HandlerEnvironment.json")
-    log "INFO" "[get_configuration_location]  configuration folder $config_folder found"
     config_files_path="$config_folder/*.settings"
     CONFIG_FILE=$(ls $config_files_path 2>/dev/null | sort -V | tail -1)
     log "INFO" "[get_configuration_location] configuration file $CONFIG_FILE found"
@@ -154,7 +150,6 @@ get_cloud_id()
 {
   get_configuration_location
   if [ "$CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_cloud_id] Found configuration file $CONFIG_FILE"
     CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloudId' $CONFIG_FILE)
     log "INFO" "[get_cloud_id] Found cloud id $CLOUD_ID"
   else
@@ -167,9 +162,8 @@ get_protected_settings()
 {
   get_configuration_location
   if [ "$CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_protected_settings] Found configuration file $CONFIG_FILE"
     PROTECTED_SETTINGS=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $CONFIG_FILE)
-    log "INFO" "[get_protected_settings] Found protected settings $PROTECTED_SETTINGS"
+    log "INFO" "[get_protected_settings] Found protected settings"
   else
     log "[get_protected_settings] Configuration file not found" "ERROR"
     exit 1
@@ -180,7 +174,6 @@ get_thumbprint()
 {
   get_configuration_location
   if [ "$CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_thumbprint] Found configuration file $CONFIG_FILE"
     THUMBPRINT=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $CONFIG_FILE)
     log "INFO" "[get_thumbprint] Found thumbprint $THUMBPRINT"
   else
@@ -193,7 +186,6 @@ get_thumbprint()
 get_username()
 {
   get_configuration_location
-  log "INFO" "[get_username] Found configuration file $CONFIG_FILE"
   if [ "$CONFIG_FILE" != "" ]; then
     USERNAME=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.username' $CONFIG_FILE)
     log "INFO" "[get_username] Found username  $USERNAME"
@@ -414,39 +406,35 @@ get_base64Auth() {
 
 # update config
 
-set_update_env_var() {
-  echo "export ELASTICAGENTUPDATE=1" >> ~/.bashrc
-}
-
 is_new_config(){
   currentSequence=""
   newSequence=""
   isUpdate=""
-  if [[ ! -v ELASTICAGENTSEQUENCE ]]; then
-    currentSequence=""
-  elif [[ -z "$ELASTICAGENTSEQUENCE" ]]; then
-    currentSequence=""
+  get_configuration_location
+  if [ "$CONFIG_FILE" != "" ]; then
+    filename="$(basename -- $CONFIG_FILE)"
+    newSequence=$(echo $filename | cut -f1 -d.)
   else
-   currentSequence="${ELASTICAGENTSEQUENCE}"
+    log "[get_sequence] Configuration file not found" "ERROR"
+    exit 1
   fi
-  if [[ ! -v ConfigSequenceNumber ]]; then
-    newSequence=""
-  elif [[ -z "$ConfigSequenceNumber" ]]; then
-    newSequence=""
-  else
-   newSequence="${ConfigSequenceNumber}"
+  if [ "$LOGS_FOLDER" = "" ]; then
+      get_logs_location
   fi
-  if [[ ! -v ELASTICAGENTUPDATE ]]; then
-    isUpdate=""
-  elif [[ -z "$ELASTICAGENTUPDATE" ]]; then
-    isUpdate=""
+  if [ -f "$LOGS_FOLDER/update.txt" ]; then
+    isUpdate=true
   else
-   isUpdate="${ELASTICAGENTUPDATE}"
+    isUpdate=false
+  fi
+  if [ -f "$LOGS_FOLDER/current.sequence" ]; then
+    currentSequence=$(< "$LOGS_FOLDER/current.sequence")
+  else
+    currentSequence=""
   fi
   log "INFO" "[is_new_config] Current sequence is $currentSequence and new sequence is $newSequence"
   if [[ "$newSequence" = "" ]]; then
     IS_NEW_CONFIG=false
-  elif   [[ "$isUpdate" = "1" ]]; then
+  elif   [[ "$isUpdate" = true ]]; then
     log "INFO" "[is_new_config] Part of the update"
     IS_NEW_CONFIG=false
   elif   [[ "$newSequence" = "$currentSequence" ]]; then
@@ -455,37 +443,32 @@ is_new_config(){
       IS_NEW_CONFIG=true
   fi
 }
-
-
-function set_sequence_env_variables
-{
-  newSequence=""
-  if [[ ! -v ConfigSequenceNumber ]]; then
-    get_configuration_location
-    if [ "$CONFIG_FILE" != "" ]; then
-      log "INFO" "[set_sequence_env_variables] Found configuration file $CONFIG_FILE"
-      filename="$(basename -- $CONFIG_FILE)"
-      newSequence=$(echo $filename | cut -f1 -d.)
-    else
-      log "[get_sequence] Configuration file not found" "ERROR"
-      exit 1
-    fi
-  elif [[ -z "$ConfigSequenceNumber" ]]; then
-    get_configuration_location
-    if [ "$CONFIG_FILE" != "" ]; then
-      log "INFO" "[set_sequence_env_variables] Found configuration file $CONFIG_FILE"
-      filename="$(basename -- $CONFIG_FILE)"
-      newSequence=$(echo $filename | cut -f1 -d.)
-    else
-      log "[get_sequence] Configuration file not found" "ERROR"
-      exit 1
-    fi
-  else
-     newSequence="${ConfigSequenceNumber}"
+set_update_var() {
+  log "INFO" "[set_update_var] Verified update"
+  if [ "$LOGS_FOLDER" = "" ]; then
+      get_logs_location
   fi
-  echo "export ELASTICAGENTSEQUENCE=$newSequence" >> ~/.bashrc
-  echo "export ELASTICAGENTUPDATE=0" >> ~/.bashrc
+  echo "1" > "$LOGS_FOLDER/update.txt"
+}
 
+function set_sequence_to_file
+{
+  log "INFO" "[set_sequence_to_file] Setting new sequence"
+  get_configuration_location
+  if [ "$CONFIG_FILE" != "" ]; then
+    filename="$(basename -- $CONFIG_FILE)"
+    newSequence=$(echo $filename | cut -f1 -d.)
+    if [ "$LOGS_FOLDER" = "" ]; then
+      get_logs_location
+    fi
+    #json="{\"sequence\":\"$newSequence\",\"update\":\"false\"}"
+    echo "$newSequence" > "$LOGS_FOLDER/current.sequence"
+    rm "$LOGS_FOLDER/update.txt"
+    log "INFO" "[set_sequence_to_file] Sequence has been set"
+  else
+    log "[set_sequence_to_file] Configuration file not found" "ERROR"
+    exit 1
+  fi
 }
 
 get_prev_configuration_location()
@@ -493,13 +476,12 @@ get_prev_configuration_location()
   SCRIPT=$(readlink -f "$0")
   ES_EXT_DIR=$(dirname "$SCRIPT")
   log "INFO" "[get_prev_configuration_location] main directory found $ES_EXT_DIR"
-  log "INFO" "[get_prev_configuration_location] looking for HandlerEnvironment.json file"
   if [ -e "$ES_EXT_DIR/HandlerEnvironment.json" ]; then
     log "INFO" "[get_prev_configuration_location] HandlerEnvironment.json file found"
     config_folder=$(jq -r '.[0].handlerEnvironment.configFolder' "$ES_EXT_DIR/HandlerEnvironment.json")
     log "INFO" "[get_prev_configuration_location]  configuration folder $config_folder found"
     config_files_path="$config_folder/*.settings"
-    OLD_CONFIG_FILE=$(ls $config_files_path 2>/dev/null | sort -V | tail -2)
+    OLD_CONFIG_FILE=$(ls $config_files_path 2>/dev/null | sort -V | tail -n 2 | head -n 1)
     log "INFO" "[get_prev_configuration_location] configuration file $OLD_CONFIG_FILE found"
   else
     log "ERROR" "[get_prev_configuration_location] HandlerEnvironment.json file not found"
@@ -510,7 +492,6 @@ get_prev_configuration_location()
 get_prev_username()
 {
   get_prev_configuration_location
-  log "INFO" "[get_prev_username] Found configuration file $OLD_CONFIG_FILE"
   if [ "$OLD_CONFIG_FILE" != "" ]; then
     OLD_USERNAME=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.username' $OLD_CONFIG_FILE)
     log "INFO" "[get_prev_username] Found username  OLD_USERNAME"
@@ -524,7 +505,6 @@ get_prev_cloud_id()
 {
   get_prev_configuration_location
   if [ "$OLD_CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_prev_cloud_id] Found configuration file $OLD_CONFIG_FILE"
     OLD_CLOUD_ID=$(jq -r '.runtimeSettings[0].handlerSettings.publicSettings.cloudId' $OLD_CONFIG_FILE)
     log "INFO" "[get_prev_cloud_id] Found cloud id $OLD_CLOUD_ID"
   else
@@ -552,11 +532,10 @@ get_prev_protected_settings()
 {
   get_prev_configuration_location
   if [ "$OLD_CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_protected_settings] Found configuration file $OLD_CONFIG_FILE"
     OLD_PROTECTED_SETTINGS=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettings' $OLD_CONFIG_FILE)
-    log "INFO" "[get_protected_settings] Found protected settings $OLD_PROTECTED_SETTINGS"
+    log "INFO" "[get_prev_protected_settings] Found protected settings $OLD_PROTECTED_SETTINGS"
   else
-    log "[get_protected_settings] Configuration file not found" "ERROR"
+    log "[get_prev_protected_settings] Configuration file not found" "ERROR"
     exit 1
   fi
 }
@@ -565,11 +544,10 @@ get_prev_thumbprint()
 {
   get_prev_configuration_location
   if [ "$OLD_CONFIG_FILE" != "" ]; then
-    log "INFO" "[get_thumbprint] Found configuration file $OLD_CONFIG_FILE"
     OLD_THUMBPRINT=$(jq -r '.runtimeSettings[0].handlerSettings.protectedSettingsCertThumbprint' $OLD_CONFIG_FILE)
-    log "INFO" "[get_thumbprint] Found thumbprint $OLD_THUMBPRINT"
+    log "INFO" "[get_prev_thumbprint] Found thumbprint $OLD_THUMBPRINT"
   else
-    log "[get_thumbprint] Configuration file not found" "ERROR"
+    log "[get_prev_thumbprint] Configuration file not found" "ERROR"
     exit 1
   fi
 }
@@ -579,11 +557,12 @@ get_prev_password() {
   get_prev_thumbprint
   cert_path="$LINUX_CERT_PATH/$OLD_THUMBPRINT.crt"
   private_key_path="$LINUX_CERT_PATH/$OLD_THUMBPRINT.prv"
+  log "INFO" "Found cerficate $cert_path and $private_key_path"
   if [[ -f "$cert_path" ]] && [[ -f "$private_key_path" ]]; then
     protected_settings=$(openssl cms -decrypt -in <(echo "$OLD_PROTECTED_SETTINGS" | base64 --decode) -inkey "$private_key_path" -recip "$cert_path" -inform dem)
     OLD_PASSWORD=$(echo "$protected_settings" | jq -r '.password')
   else
-    log "ERROR" "[get_password] Decryption failed. Could not find certificates"
+    log "ERROR" "[get_prev_password] Decryption failed. Could not find certificates"
     exit 1
   fi
 }
@@ -597,7 +576,7 @@ get_prev_base64Auth() {
     protected_settings=$(openssl cms -decrypt -in <(echo "$OLD_PROTECTED_SETTINGS" | base64 --decode) -inkey "$private_key_path" -recip "$cert_path" -inform dem)
     OLD_BASE64_AUTH=$(echo "${protected_settings}" | jq -r '.base64Auth')
   else
-    log "ERROR" "[get_base64Auth] Decryption failed. Could not find certificates"
+    log "ERROR" "[get_prev_base64Auth] Decryption failed. Could not find certificates"
     exit 1
   fi
 }
