@@ -151,6 +151,7 @@
             "suricata"
         ],
         "url.domain": "192.168.86.28",
+        "url.extension": "xml",
         "url.original": "/dd.xml",
         "url.path": "/dd.xml",
         "user_agent.device.name": "Mac",
@@ -164,7 +165,7 @@
     {
         "@timestamp": "2018-07-05T19:44:33.222Z",
         "destination.address": "192.168.86.85",
-        "destination.domain": "192.168.86.28",
+        "destination.domain": "192.168.86.85",
         "destination.ip": "192.168.86.85",
         "destination.port": 56118,
         "event.category": [
@@ -173,7 +174,7 @@
         "event.dataset": "suricata.eve",
         "event.kind": "event",
         "event.module": "suricata",
-        "event.original": "{\"timestamp\":\"2018-07-05T15:44:33.222441-0400\",\"flow_id\":2211411903323127,\"in_iface\":\"en0\",\"event_type\":\"fileinfo\",\"src_ip\":\"192.168.86.28\",\"src_port\":8008,\"dest_ip\":\"192.168.86.85\",\"dest_port\":56118,\"proto\":\"TCP\",\"http\":{\"hostname\":\"192.168.86.28\",\"url\":\"\\/ssdp\\/device-desc.xml\",\"http_user_agent\":\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit\\/537.36 (KHTML, like Gecko) Chrome\\/67.0.3396.99 Safari\\/537.36\",\"http_content_type\":\"application\\/xml\",\"http_method\":\"GET\",\"protocol\":\"HTTP\\/1.1\",\"status\":200,\"length\":1071},\"app_proto\":\"http\",\"fileinfo\":{\"filename\":\"\\/ssdp\\/device-desc.xml\",\"gaps\":false,\"state\":\"CLOSED\",\"md5\":\"427b7337ff37eeb24d74f47d8e04cf21\",\"sha1\":\"313573490192c685e9e53abef25453ed0d5e2aee\",\"sha256\":\"f610428ebddf6f8cf9e39322e672583c45fcdcf885efad0ab48fd53a3dfc2c4b\",\"stored\":false,\"size\":1071,\"tx_id\":0}}",
+        "event.original": "{\"timestamp\":\"2018-07-05T15:44:33.222441-0400\",\"flow_id\":2211411903323127,\"in_iface\":\"en0\",\"event_type\":\"fileinfo\",\"src_ip\":\"192.168.86.28\",\"src_port\":8008,\"dest_ip\":\"192.168.86.85\",\"dest_port\":56118,\"proto\":\"TCP\",\"http\":{\"hostname\":\"192.168.86.85\",\"url\":\"\\/ssdp\\/device-desc.xml\",\"http_user_agent\":\"Mozilla\\/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit\\/537.36 (KHTML, like Gecko) Chrome\\/67.0.3396.99 Safari\\/537.36\",\"http_content_type\":\"application\\/xml\",\"http_method\":\"GET\",\"protocol\":\"HTTP\\/1.1\",\"status\":200,\"length\":1071},\"app_proto\":\"http\",\"fileinfo\":{\"filename\":\"\\/ssdp\\/device-desc.xml\",\"gaps\":false,\"state\":\"CLOSED\",\"md5\":\"427b7337ff37eeb24d74f47d8e04cf21\",\"sha1\":\"313573490192c685e9e53abef25453ed0d5e2aee\",\"sha256\":\"f610428ebddf6f8cf9e39322e672583c45fcdcf885efad0ab48fd53a3dfc2c4b\",\"stored\":false,\"size\":1071,\"tx_id\":0}}",
         "file.path": "/ssdp/device-desc.xml",
         "file.size": 1071,
         "fileset.name": "eve",
@@ -186,7 +187,7 @@
         "network.protocol": "http",
         "network.transport": "tcp",
         "related.hosts": [
-            "192.168.86.28"
+            "192.168.86.85"
         ],
         "related.ip": [
             "192.168.86.28",
@@ -211,7 +212,8 @@
         "tags": [
             "suricata"
         ],
-        "url.domain": "192.168.86.28",
+        "url.domain": "192.168.86.85",
+        "url.extension": "xml",
         "url.original": "/ssdp/device-desc.xml",
         "url.path": "/ssdp/device-desc.xml",
         "user_agent.device.name": "Mac",
@@ -582,9 +584,11 @@
             "suricata"
         ],
         "url.domain": "ctldl.windowsupdate.com",
+        "url.extension": "cab",
         "url.original": "http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab?111111111111",
-        "url.path": "http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab",
+        "url.path": "/msdownload/update/v3/static/trustedr/en/pinrulesstl.cab",
         "url.query": "111111111111",
+        "url.scheme": "http",
         "user_agent.device.name": "Other",
         "user_agent.name": "Microsoft-CryptoAPI",
         "user_agent.original": "Microsoft-CryptoAPI/10.0",

@@ -596,8 +596,8 @@
             "lamcolab3252.www.invalid"
         ],
         "related.ip": [
-            "10.179.124.125",
-            "10.177.36.38"
+            "10.177.36.38",
+            "10.179.124.125"
         ],
         "rsa.email.email_dst": "ectio",
         "rsa.email.email_src": "sequine",
@@ -1011,8 +1011,8 @@
             "lapariat7287.internal.host"
         ],
         "related.ip": [
-            "10.140.7.83",
-            "10.68.246.187"
+            "10.68.246.187",
+            "10.140.7.83"
         ],
         "rsa.email.email_dst": "gna",
         "rsa.email.email_src": "icabo",
@@ -3131,8 +3131,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "modi6930.internal.test",
-            "taevitae6868.www.corp"
+            "taevitae6868.www.corp",
+            "modi6930.internal.test"
         ],
         "related.ip": [
             "10.60.164.100",
@@ -3845,8 +3845,8 @@
             "ncu3839.www.localhost"
         ],
         "related.ip": [
-            "10.201.105.58",
-            "10.251.183.113"
+            "10.251.183.113",
+            "10.201.105.58"
         ],
         "rsa.email.email_dst": "ionemu",
         "rsa.email.email_src": "ent",

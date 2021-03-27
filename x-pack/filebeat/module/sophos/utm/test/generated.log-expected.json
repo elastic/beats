@@ -103,7 +103,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "iciatisu",
         "url.original": "https://mail.example.net/tati/utaliqu.html?iquaUten=santium#iciatisu",
+        "url.path": "/tati/utaliqu.html",
+        "url.query": "iquaUten=santium",
+        "url.scheme": "https",
         "user.name": "sunt"
     },
     {
@@ -638,8 +644,8 @@
             "10.54.169.175"
         ],
         "related.user": [
-            "scipit",
-            "taspe"
+            "taspe",
+            "scipit"
         ],
         "rsa.identity.logon_type": "olores",
         "rsa.internal.event_desc": "secil",
@@ -1033,13 +1039,13 @@
             "nostrum6305.internal.localhost"
         ],
         "related.ip": [
-            "10.17.51.153",
-            "10.89.41.97"
+            "10.89.41.97",
+            "10.17.51.153"
         ],
         "related.user": [
             "tcustatuscode=eumiu",
-            "tio",
-            "pteurs"
+            "pteurs",
+            "tio"
         ],
         "rsa.db.index": "eavolupt",
         "rsa.identity.logon_type": "ursintoc",
@@ -1084,7 +1090,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "txt",
+        "url.fragment": "ssequamn",
         "url.original": "https://mail.example.net/velillu/ecatcupi.txt?rsitamet=leumiur#ssequamn",
+        "url.path": "/velillu/ecatcupi.txt",
+        "url.query": "rsitamet=leumiur",
+        "url.scheme": "https",
         "user.name": "tio"
     },
     {
@@ -1237,7 +1249,13 @@
             "sophos.utm",
             "forwarded"
         ],
-        "url.original": "https://www5.example.com/dantium/ors.htm?sinto=edi#eumiure"
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "eumiure",
+        "url.original": "https://www5.example.com/dantium/ors.htm?sinto=edi#eumiure",
+        "url.path": "/dantium/ors.htm",
+        "url.query": "sinto=edi",
+        "url.scheme": "https"
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
@@ -1899,7 +1917,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "enbyCi",
         "url.original": "https://api.example.org/iono/secillum.txt?apariat=tse#enbyCi",
+        "url.path": "/iono/secillum.txt",
+        "url.query": "apariat=tse",
+        "url.scheme": "https",
         "user.name": "hen"
     },
     {
@@ -2033,10 +2057,10 @@
             "10.92.93.236"
         ],
         "related.user": [
-            "dolorsistatuscode=acc",
-            "Sedutper",
             "ntoccae",
-            "ulpaq"
+            "Sedutper",
+            "ulpaq",
+            "dolorsistatuscode=acc"
         ],
         "rsa.db.index": "snisiut",
         "rsa.identity.logon_type": "umdol",
@@ -2082,8 +2106,16 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "tru",
         "url.original": "https://www.example.org/imipsamv/doeiu.jpg?nderit=ficia#tru",
-        "url.query": "exerc",
+        "url.path": "/imipsamv/doeiu.jpg",
+        "url.query": [
+            "exerc",
+            "nderit=ficia"
+        ],
+        "url.scheme": "https",
         "user.name": "Sedutper"
     },
     {
@@ -2124,9 +2156,9 @@
             "10.180.169.49"
         ],
         "related.user": [
-            "atatno",
+            "iscivelistatuscode=urve",
             "tasu",
-            "iscivelistatuscode=urve"
+            "atatno"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -2168,7 +2200,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "html",
+        "url.fragment": "adm",
         "url.original": "https://mail.example.net/isqua/deF.html?iameaq=orainci#adm",
+        "url.path": "/isqua/deF.html",
+        "url.query": "iameaq=orainci",
+        "url.scheme": "https",
         "user.name": "atatno"
     },
     {
@@ -2362,7 +2400,13 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "oditautf",
         "url.original": "https://www5.example.org/etcons/aecatc.jpg?ditem=tut#oditautf",
+        "url.path": "/etcons/aecatc.jpg",
+        "url.query": "ditem=tut",
+        "url.scheme": "https",
         "user.name": "eturadip"
     },
     {
@@ -2481,8 +2525,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "antium",
-            "etconsec"
+            "etconsec",
+            "antium"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2632,6 +2676,8 @@
             "10.210.175.52"
         ],
         "related.user": [
+            "reetd",
+            "inimastatuscode=emipsum",
             "Loremi",
             "inimastatuscode=emipsum",
             "reetd",
@@ -2678,8 +2724,16 @@
             "sophos.utm",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "agnaaliq",
         "url.original": "https://internal.example.com/ritat/dipi.jpg?aliquide=aliqui#agnaaliq",
-        "url.query": "iatquovo",
+        "url.path": "/ritat/dipi.jpg",
+        "url.query": [
+            "iatquovo",
+            "aliquide=aliqui"
+        ],
+        "url.scheme": "https",
         "user.name": "reetd"
     },
     {
@@ -2707,8 +2761,8 @@
             "itametc1599.api.test"
         ],
         "related.ip": [
-            "10.115.166.48",
-            "10.133.45.45"
+            "10.133.45.45",
+            "10.115.166.48"
         ],
         "rsa.internal.event_desc": "Authentication",
         "rsa.internal.messageid": "ulogd",

@@ -247,8 +247,8 @@
         "rsa.internal.event_desc": "snostrud",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "cancel",
-            "dol"
+            "dol",
+            "cancel"
         ],
         "rsa.misc.category": "nama",
         "rsa.misc.disposition": "quisnos",
@@ -273,8 +273,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "html",
+        "url.fragment": "eumfug",
         "url.original": "https://internal.example.net/namali/taevit.html?nsecte=itame#eumfug",
-        "url.query": "lit",
+        "url.path": "/namali/taevit.html",
+        "url.query": [
+            "lit",
+            "nsecte=itame"
+        ],
+        "url.scheme": "https",
         "user.name": "occae"
     },
     {
@@ -342,8 +350,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "gif",
+        "url.fragment": "giatnu",
         "url.original": "https://example.net/tlabo/uames.gif?mpo=offi#giatnu",
-        "url.query": "ulapa",
+        "url.path": "/tlabo/uames.gif",
+        "url.query": [
+            "ulapa",
+            "mpo=offi"
+        ],
+        "url.scheme": "https",
         "user.name": "ncidid"
     },
     {
@@ -375,8 +391,8 @@
         ],
         "related.user": [
             "labor",
-            "eveli",
-            "orema"
+            "orema",
+            "eveli"
         ],
         "rsa.counters.dclass_c1": 6855,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -432,8 +448,8 @@
             "pora6854.www5.home"
         ],
         "related.ip": [
-            "10.214.191.180",
-            "10.112.250.193"
+            "10.112.250.193",
+            "10.214.191.180"
         ],
         "related.user": [
             "ipsumdol",
@@ -498,8 +514,8 @@
         ],
         "related.user": [
             "ovol",
-            "iquipe",
-            "tnonpro"
+            "tnonpro",
+            "iquipe"
         ],
         "rsa.counters.dclass_c1": 3645,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -556,8 +572,8 @@
         ],
         "related.user": [
             "idunt",
-            "archite",
-            "boree"
+            "boree",
+            "archite"
         ],
         "rsa.counters.dclass_c1": 248,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -679,9 +695,9 @@
             "10.49.167.57"
         ],
         "related.user": [
-            "sau",
+            "ccaeca",
             "tali",
-            "ccaeca"
+            "sau"
         ],
         "rsa.counters.dclass_c1": 6818,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -743,8 +759,8 @@
             "10.216.125.252"
         ],
         "related.user": [
-            "llamco",
             "dolore",
+            "llamco",
             "lorsita"
         ],
         "rsa.counters.event_counter": 4603,
@@ -779,8 +795,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "html",
+        "url.fragment": "elit",
         "url.original": "https://example.org/umwrit/uptate.html?ctetura=aveni#elit",
-        "url.query": "seosqui",
+        "url.path": "/umwrit/uptate.html",
+        "url.query": [
+            "seosqui",
+            "ctetura=aveni"
+        ],
+        "url.scheme": "https",
         "user.name": "llamco"
     },
     {
@@ -848,8 +872,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "mvele",
         "url.original": "https://api.example.org/roidents/tem.txt?tametcon=liqua#mvele",
-        "url.query": "isis",
+        "url.path": "/roidents/tem.txt",
+        "url.query": [
+            "isis",
+            "tametcon=liqua"
+        ],
+        "url.scheme": "https",
         "user.name": "rum"
     },
     {
@@ -879,8 +911,8 @@
             "10.34.148.166"
         ],
         "related.user": [
-            "icabo",
             "untutlab",
+            "icabo",
             "miu"
         ],
         "rsa.counters.dclass_c1": 5427,
@@ -937,9 +969,9 @@
             "10.134.5.40"
         ],
         "related.user": [
-            "licabo",
+            "siu",
             "conse",
-            "siu"
+            "licabo"
         ],
         "rsa.counters.dclass_c1": 6356,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1153,7 +1185,8 @@
         "related.user": [
             "proident",
             "boru",
-            "ritati"
+            "ritati",
+            "proident"
         ],
         "rsa.counters.dclass_c1": 5923,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -1275,8 +1308,8 @@
             "10.167.252.183"
         ],
         "related.user": [
-            "redol",
             "asnu",
+            "redol",
             "ationul"
         ],
         "rsa.counters.dclass_c1": 6606,
@@ -1339,8 +1372,8 @@
             "10.81.184.7"
         ],
         "related.user": [
-            "lmole",
             "undeomni",
+            "lmole",
             "iameaque"
         ],
         "rsa.counters.event_counter": 6344,
@@ -1375,8 +1408,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "gif",
+        "url.fragment": "tetur",
         "url.original": "https://mail.example.com/lorsi/repreh.gif?sitamet=utlabo#tetur",
-        "url.query": "tionula",
+        "url.path": "/lorsi/repreh.gif",
+        "url.query": [
+            "tionula",
+            "sitamet=utlabo"
+        ],
+        "url.scheme": "https",
         "user.name": "undeomni"
     },
     {
@@ -1507,8 +1548,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "idolo",
         "url.original": "https://example.org/etconsec/elillum.htm?mporinc=onsectet#idolo",
-        "url.query": "atemUte",
+        "url.path": "/etconsec/elillum.htm",
+        "url.query": [
+            "atemUte",
+            "mporinc=onsectet"
+        ],
+        "url.scheme": "https",
         "user.name": "pta"
     },
     {
@@ -1541,6 +1590,7 @@
         "related.user": [
             "doeiu",
             "mquisn",
+            "doeiu",
             "litan"
         ],
         "rsa.counters.dclass_c1": 3474,
@@ -1638,8 +1688,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "remipsu",
         "url.original": "https://internal.example.net/atnula/ditautf.jpg?iquidex=olup#remipsu",
-        "url.query": "tan",
+        "url.path": "/atnula/ditautf.jpg",
+        "url.query": [
+            "tan",
+            "iquidex=olup"
+        ],
+        "url.scheme": "https",
         "user.name": "emUte"
     },
     {
@@ -1672,6 +1730,7 @@
         "related.user": [
             "eFini",
             "urau",
+            "eFini",
             "eufug"
         ],
         "rsa.counters.dclass_c1": 3348,
@@ -1856,8 +1915,8 @@
             "10.165.182.111"
         ],
         "related.user": [
-            "ames",
             "sis",
+            "ames",
             "Bonorum"
         ],
         "rsa.counters.dclass_c1": 6401,
@@ -1984,8 +2043,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "madmi",
         "url.original": "https://www.example.net/hender/ptatemU.htm?mquisnos=tnulapa#madmi",
-        "url.query": "tlabore",
+        "url.path": "/hender/ptatemU.htm",
+        "url.query": [
+            "tlabore",
+            "mquisnos=tnulapa"
+        ],
+        "url.scheme": "https",
         "user.name": "uian"
     },
     {
@@ -2012,8 +2079,8 @@
             "turQuis4046.api.test"
         ],
         "related.ip": [
-            "10.90.50.149",
-            "10.168.225.209"
+            "10.168.225.209",
+            "10.90.50.149"
         ],
         "related.user": [
             "olu",
@@ -2079,8 +2146,8 @@
         ],
         "related.user": [
             "luptat",
-            "qua",
-            "mtota"
+            "mtota",
+            "qua"
         ],
         "rsa.counters.dclass_c1": 6112,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2325,8 +2392,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "gif",
+        "url.fragment": "temqui",
         "url.original": "https://example.net/itati/oidentsu.gif?eporroqu=aturve#temqui",
-        "url.query": "lup",
+        "url.path": "/itati/oidentsu.gif",
+        "url.query": [
+            "lup",
+            "eporroqu=aturve"
+        ],
+        "url.scheme": "https",
         "user.name": "ttenb"
     },
     {
@@ -2387,8 +2462,8 @@
             "10.116.1.130"
         ],
         "related.user": [
-            "eturadip",
             "reseo",
+            "eturadip",
             "amco"
         ],
         "rsa.counters.event_counter": 1295,
@@ -2423,8 +2498,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "gif",
+        "url.fragment": "pteurs",
         "url.original": "https://api.example.org/uamqua/Neq.gif?eumiu=nim#pteurs",
-        "url.query": "ercitati",
+        "url.path": "/uamqua/Neq.gif",
+        "url.query": [
+            "ercitati",
+            "eumiu=nim"
+        ],
+        "url.scheme": "https",
         "user.name": "eturadip"
     },
     {
@@ -2517,9 +2600,9 @@
             "10.152.213.228"
         ],
         "related.user": [
-            "itationu",
+            "ptatev",
             "velillum",
-            "ptatev"
+            "itationu"
         ],
         "rsa.counters.dclass_c1": 7245,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2607,9 +2690,9 @@
             "10.208.33.55"
         ],
         "related.user": [
-            "inimv",
+            "ulapari",
             "mremaper",
-            "ulapari"
+            "inimv"
         ],
         "rsa.counters.dclass_c1": 6433,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2789,13 +2872,13 @@
             "tat50.mail.host"
         ],
         "related.ip": [
-            "10.45.152.205",
-            "10.224.217.153"
+            "10.224.217.153",
+            "10.45.152.205"
         ],
         "related.user": [
             "eriti",
-            "imav",
-            "utlabo"
+            "utlabo",
+            "imav"
         ],
         "rsa.counters.dclass_c1": 922,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -2892,8 +2975,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "htm",
+        "url.fragment": "emipsumq",
         "url.original": "https://api.example.net/quam/saute.htm?nostru=docons#emipsumq",
-        "url.query": "orinr",
+        "url.path": "/quam/saute.htm",
+        "url.query": [
+            "orinr",
+            "nostru=docons"
+        ],
+        "url.scheme": "https",
         "user.name": "ugi"
     },
     {
@@ -2981,9 +3072,9 @@
             "10.86.121.152"
         ],
         "related.user": [
+            "nimv",
             "ine",
-            "consecte",
-            "nimv"
+            "consecte"
         ],
         "rsa.counters.dclass_c1": 2771,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3043,9 +3134,9 @@
             "10.204.223.184"
         ],
         "related.user": [
-            "teni",
+            "tuserror",
             "rcit",
-            "tuserror"
+            "teni"
         ],
         "rsa.counters.dclass_c1": 4113,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3105,9 +3196,9 @@
             "10.223.56.33"
         ],
         "related.user": [
-            "elitsedd",
             "magnido",
-            "Nequepo"
+            "Nequepo",
+            "elitsedd"
         ],
         "rsa.counters.dclass_c1": 3243,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3178,8 +3269,8 @@
         "rsa.internal.event_desc": "atuse",
         "rsa.internal.messageid": "Imperva",
         "rsa.misc.action": [
-            "cancel",
-            "eruntmol"
+            "eruntmol",
+            "cancel"
         ],
         "rsa.misc.category": "imad",
         "rsa.misc.disposition": "tura",
@@ -3205,8 +3296,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "htm",
+        "url.fragment": "asia",
         "url.original": "https://internal.example.com/imide/uiineav.htm?lloinve=eni#asia",
-        "url.query": "edquiac",
+        "url.path": "/imide/uiineav.htm",
+        "url.query": [
+            "edquiac",
+            "lloinve=eni"
+        ],
+        "url.scheme": "https",
         "user.name": "tuserror"
     },
     {
@@ -3236,9 +3335,9 @@
             "10.65.174.196"
         ],
         "related.user": [
+            "iin",
             "tione",
-            "uta",
-            "iin"
+            "uta"
         ],
         "rsa.counters.dclass_c1": 5836,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3296,9 +3395,9 @@
             "10.224.148.48"
         ],
         "related.user": [
-            "niam",
             "iosamn",
-            "equepor"
+            "equepor",
+            "niam"
         ],
         "rsa.counters.event_counter": 7468,
         "rsa.db.database": "erspicia",
@@ -3332,8 +3431,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "iumd",
         "url.original": "https://api.example.com/ptatem/mporain.gif?corpo=commod#iumd",
-        "url.query": "ntore",
+        "url.path": "/ptatem/mporain.gif",
+        "url.query": [
+            "ntore",
+            "corpo=commod"
+        ],
+        "url.scheme": "https",
         "user.name": "niam"
     },
     {
@@ -3427,8 +3534,8 @@
         ],
         "related.user": [
             "tevelite",
-            "iarchit",
-            "iamquisn"
+            "iamquisn",
+            "iarchit"
         ],
         "rsa.counters.dclass_c1": 639,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3491,8 +3598,8 @@
         ],
         "related.user": [
             "animide",
-            "modtempo",
-            "nofde"
+            "nofde",
+            "modtempo"
         ],
         "rsa.counters.event_counter": 7580,
         "rsa.db.database": "Lore",
@@ -3525,8 +3632,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "gif",
+        "url.fragment": "onsequa",
         "url.original": "https://www5.example.net/aUten/edutpers.gif?apariatu=mnisis#onsequa",
-        "url.query": "sunt",
+        "url.path": "/aUten/edutpers.gif",
+        "url.query": [
+            "sunt",
+            "apariatu=mnisis"
+        ],
+        "url.scheme": "https",
         "user.name": "modtempo"
     },
     {
@@ -3555,8 +3670,8 @@
             "mquis319.api.local"
         ],
         "related.ip": [
-            "10.111.22.134",
-            "10.178.79.217"
+            "10.178.79.217",
+            "10.111.22.134"
         ],
         "related.user": [
             "tqui",
@@ -3594,8 +3709,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "iaeco",
         "url.original": "https://www.example.net/mvolup/pidat.jpg?ents=nsec#iaeco",
-        "url.query": "ommodoco",
+        "url.path": "/mvolup/pidat.jpg",
+        "url.query": [
+            "ommodoco",
+            "ents=nsec"
+        ],
+        "url.scheme": "https",
         "user.name": "ccusan"
     },
     {
@@ -3687,9 +3810,9 @@
             "10.186.133.184"
         ],
         "related.user": [
-            "boriosa",
+            "acons",
             "sci",
-            "acons"
+            "boriosa"
         ],
         "rsa.counters.dclass_c1": 1578,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3864,9 +3987,9 @@
             "10.108.130.106"
         ],
         "related.user": [
-            "uisautei",
+            "colab",
             "exeacomm",
-            "colab"
+            "uisautei"
         ],
         "rsa.counters.dclass_c1": 1044,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -3963,8 +4086,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.org",
+        "url.extension": "txt",
+        "url.fragment": "rautod",
         "url.original": "https://internal.example.org/aev/uovolup.txt?aqueip=aqueip#rautod",
-        "url.query": "tur",
+        "url.path": "/aev/uovolup.txt",
+        "url.query": [
+            "tur",
+            "aqueip=aqueip"
+        ],
+        "url.scheme": "https",
         "user.name": "Sedut"
     },
     {
@@ -4047,8 +4178,8 @@
             "qui5978.api.test"
         ],
         "related.ip": [
-            "10.115.203.143",
-            "10.134.135.22"
+            "10.134.135.22",
+            "10.115.203.143"
         ],
         "related.user": [
             "orpori",
@@ -4115,7 +4246,9 @@
         "related.user": [
             "inculp",
             "gnido",
-            "uptat"
+            "uptat",
+            "gnido",
+            "inculp"
         ],
         "rsa.counters.dclass_c1": 6947,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4205,6 +4338,7 @@
         "related.user": [
             "mqu",
             "tesseq",
+            "mqu",
             "uatDuisa"
         ],
         "rsa.counters.dclass_c1": 1623,
@@ -4353,9 +4487,9 @@
             "10.106.166.105"
         ],
         "related.user": [
-            "avolup",
             "usa",
-            "olupt"
+            "olupt",
+            "avolup"
         ],
         "rsa.counters.dclass_c1": 2658,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4473,9 +4607,9 @@
             "10.129.234.200"
         ],
         "related.user": [
-            "dquia",
             "tevelit",
-            "tisundeo"
+            "tisundeo",
+            "dquia"
         ],
         "rsa.counters.dclass_c1": 6709,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4536,8 +4670,8 @@
         ],
         "related.user": [
             "scive",
-            "ali",
-            "oloremi"
+            "oloremi",
+            "ali"
         ],
         "rsa.counters.dclass_c1": 6155,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4660,8 +4794,8 @@
         ],
         "related.user": [
             "apar",
-            "isn",
-            "ptasn"
+            "ptasn",
+            "isn"
         ],
         "rsa.counters.dclass_c1": 758,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4717,8 +4851,8 @@
             "iatisund424.mail.localdomain"
         ],
         "related.ip": [
-            "10.42.135.34",
-            "10.178.190.123"
+            "10.178.190.123",
+            "10.42.135.34"
         ],
         "related.user": [
             "orsi",
@@ -4874,6 +5008,7 @@
         "related.user": [
             "nseq",
             "litesseq",
+            "nseq",
             "oNe"
         ],
         "rsa.counters.dclass_c1": 3218,
@@ -4930,9 +5065,9 @@
             "10.86.180.150"
         ],
         "related.user": [
-            "itasper",
             "mnisis",
-            "etconsec"
+            "etconsec",
+            "itasper"
         ],
         "rsa.counters.dclass_c1": 4564,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -4994,8 +5129,8 @@
             "10.220.175.201"
         ],
         "related.user": [
-            "dolo",
-            "rrors"
+            "rrors",
+            "dolo"
         ],
         "rsa.counters.event_counter": 4098,
         "rsa.db.database": "tsed",
@@ -5028,8 +5163,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "amnisiu",
         "url.original": "https://internal.example.com/architec/incul.txt?aborios=mco#amnisiu",
-        "url.query": "suntincu",
+        "url.path": "/architec/incul.txt",
+        "url.query": [
+            "suntincu",
+            "aborios=mco"
+        ],
+        "url.scheme": "https",
         "user.name": "dolo"
     },
     {
@@ -5211,9 +5354,9 @@
             "10.69.5.227"
         ],
         "related.user": [
+            "ntocc",
             "rumw",
-            "doloreme",
-            "ntocc"
+            "doloreme"
         ],
         "rsa.counters.dclass_c1": 5201,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5270,8 +5413,8 @@
         ],
         "related.user": [
             "ate",
-            "nrep",
-            "epteurs"
+            "epteurs",
+            "nrep"
         ],
         "rsa.counters.dclass_c1": 6260,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5368,8 +5511,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "gif",
+        "url.fragment": "edut",
         "url.original": "https://www.example.com/sit/ugi.gif?sitametc=rur#edut",
-        "url.query": "sitametc",
+        "url.path": "/sit/ugi.gif",
+        "url.query": [
+            "sitametc",
+            "sitametc=rur"
+        ],
+        "url.scheme": "https",
         "user.name": "aboris"
     },
     {
@@ -5402,9 +5553,9 @@
             "10.81.108.232"
         ],
         "related.user": [
+            "uaturve",
             "neavolup",
-            "aco",
-            "uaturve"
+            "aco"
         ],
         "rsa.counters.event_counter": 5098,
         "rsa.db.database": "lapa",
@@ -5438,8 +5589,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "amrem",
         "url.original": "https://internal.example.net/obeatae/sedqui.jpg?nulap=onseq#amrem",
-        "url.query": "plicab",
+        "url.path": "/obeatae/sedqui.jpg",
+        "url.query": [
+            "plicab",
+            "nulap=onseq"
+        ],
+        "url.scheme": "https",
         "user.name": "aco"
     },
     {
@@ -5472,9 +5631,9 @@
             "10.230.48.97"
         ],
         "related.user": [
+            "usmodte",
             "untex",
-            "erit",
-            "usmodte"
+            "erit"
         ],
         "rsa.counters.event_counter": 4029,
         "rsa.db.database": "ommodi",
@@ -5508,8 +5667,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "mail.example.com",
+        "url.extension": "htm",
+        "url.fragment": "itinvo",
         "url.original": "https://mail.example.com/iaturE/inc.htm?uisaut=mnihilm#itinvo",
-        "url.query": "lestia",
+        "url.path": "/iaturE/inc.htm",
+        "url.query": [
+            "lestia",
+            "uisaut=mnihilm"
+        ],
+        "url.scheme": "https",
         "user.name": "erit"
     },
     {
@@ -5540,9 +5707,9 @@
             "10.115.42.231"
         ],
         "related.user": [
+            "res",
             "sequamn",
-            "tasnul",
-            "res"
+            "tasnul"
         ],
         "rsa.counters.dclass_c1": 4846,
         "rsa.counters.dclass_c1_str": "Affected Rows",
@@ -5604,9 +5771,9 @@
             "10.226.75.20"
         ],
         "related.user": [
-            "fugia",
+            "tema",
             "maccusan",
-            "tema"
+            "fugia"
         ],
         "rsa.counters.event_counter": 3711,
         "rsa.db.database": "psa",
@@ -5640,8 +5807,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "htm",
+        "url.fragment": "eip",
         "url.original": "https://www5.example.org/elaud/temsequ.htm?dolo=iciatisu#eip",
-        "url.query": "iquaUte",
+        "url.path": "/elaud/temsequ.htm",
+        "url.query": [
+            "iquaUte",
+            "dolo=iciatisu"
+        ],
+        "url.scheme": "https",
         "user.name": "tema"
     },
     {
@@ -5766,8 +5941,16 @@
             "imperva.securesphere",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "htm",
+        "url.fragment": "ema",
         "url.original": "https://mail.example.net/teturad/nimide.htm?ueporroq=writ#ema",
-        "url.query": "ioffici",
+        "url.path": "/teturad/nimide.htm",
+        "url.query": [
+            "ioffici",
+            "ueporroq=writ"
+        ],
+        "url.scheme": "https",
         "user.name": "ide"
     },
     {
@@ -5794,8 +5977,8 @@
             "colabo6686.internal.invalid"
         ],
         "related.ip": [
-            "10.28.77.79",
-            "10.144.14.15"
+            "10.144.14.15",
+            "10.28.77.79"
         ],
         "related.user": [
             "rspic",

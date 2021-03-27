@@ -11,21 +11,26 @@ processors:
         field: user_agent.original
         ignore_missing: true
   # URL
-  - set:
-      field: _temp_.url_domain
-      value: "{{url.domain}}"
-      ignore_failure: true
-      if: ctx?.url?.domain != null
   - uri_parts:
       field: url.original
+      target_field: _temp_.url
       ignore_failure: true
       if: ctx?.url?.original != null
-  - append:
-      field: url.domain
-      value: "{{_temp_.url_domain}}"
-      ignore_failure: true
-      allow_duplicates: false
-      if: ctx?._temp_?.url_domain != null
+  - script:
+      lang: painless
+      description: Updates the URL ECS fields from the results of the URI parts processor to not overwrite the RSA mappings
+      if: ctx?._temp_?.url != null
+      source: |
+        for (entry in ctx._temp_.url.entrySet()) {
+          if (entry != null && entry.getValue() != null) {
+            if(ctx.url[entry.getKey()] == null) {
+              ctx.url[entry.getKey()] = entry.getValue();
+            } else if (!ctx.url[entry.getKey()].contains(entry.getValue())) {
+              ctx.url[entry.getKey()] = [ctx.url[entry.getKey()]];
+              ctx.url[entry.getKey()].add(entry.getValue());
+            }
+          }
+        }
   - remove:
       field: _temp_
       ignore_missing: true
@@ -36,7 +41,6 @@ processors:
   - urldecode:
       field: http.request.referrer
       ignore_missing: true
-      ignore_failure: true
   # IP Geolocation Lookup
   - geoip:
         field: source.ip

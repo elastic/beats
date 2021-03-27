@@ -220,7 +220,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "aspx",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -298,7 +302,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "aspx",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Forms/All.aspx",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -377,7 +385,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -455,7 +467,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -612,7 +628,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -690,7 +710,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -768,7 +792,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
@@ -846,7 +874,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem-my.sharepoint.com",
+        "url.extension": "png",
         "url.original": "https://testsiem-my.sharepoint.com/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.path": "/personal/asr_testsiem_onmicrosoft_com/Documents/Screenshot.png",
+        "url.scheme": "https",
         "user.domain": "testsiem.onmicrosoft.com",
         "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
