@@ -19,22 +19,36 @@ heartbeat.config.monitors:
   # How often to check for changes
   reload.period: 5s
 
-# Configure monitors inline
-heartbeat.monitors:
-- type: browser
+heartbeat.one_shot:
+  type: browser
   id: my-monitor
   name: My Monitor
-  schedule: '@every 1m'
+  schedule: "@every 1m"
+  dryrun: false
   source:
     zip_url:
       url: https://github.com/elastic/synthetics/archive/refs/heads/master.zip
       folder: examples/todos
-  cloud:
-    username: synthetics
-    password: changeme
-    locations:
-      mpls: http://localhost:8080
-      singapore: http://localhost:8080
+      target_directory: "/Users/vigneshh/go/src/github.com/elastic/synthsrv/test"
+
+output.console: ~
+
+# Configure monitors inline
+# heartbeat.monitors:
+#   - type: browser
+#     id: my-monitor
+#     name: My Monitor
+#     schedule: "@every 1m"
+#     source:
+#       zip_url:
+#         url: https://github.com/elastic/synthetics/archive/refs/heads/master.zip
+#         folder: examples/todos
+#     cloud:
+#       username: synthetics
+#       password: changeme
+#       locations:
+#         mpls: http://localhost:8080
+#         singapore: http://localhost:8080
 
 # ======================= Elasticsearch template setting =======================
 
@@ -57,7 +71,6 @@ setup.template.settings:
 # output.
 #fields:
 #  env: staging
-
 
 # =================================== Kibana ===================================
 
@@ -93,32 +106,32 @@ setup.kibana:
 
 # Configure what output to use when sending the data collected by the beat.
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+# output.elasticsearch:
+#   # Array of hosts to connect to.
+#   hosts: ["localhost:9200"]
 
-  # Protocol - either `http` (default) or `https`.
-  #protocol: "https"
+#   # Protocol - either `http` (default) or `https`.
+#   #protocol: "https"
 
-  # Authentication credentials - either API key or username/password.
-  #api_key: "id:api_key"
-  username: "elastic"
-  password: "changeme"
+#   # Authentication credentials - either API key or username/password.
+#   #api_key: "id:api_key"
+#   username: "elastic"
+#   password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
-  # The Logstash hosts
-  #hosts: ["localhost:5044"]
+# The Logstash hosts
+#hosts: ["localhost:5044"]
 
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+# Optional SSL. By default is off.
+# List of root certificates for HTTPS server verifications
+#ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
+# Certificate for SSL client authentication
+#ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
+# Client Certificate Key
+#ssl.key: "/etc/pki/client/cert.key"
 
 # ================================= Processors =================================
 
@@ -126,12 +139,10 @@ processors:
   - add_observer_metadata:
       # Optional, but recommended geo settings for the location Heartbeat is running in
       #geo:
-        # Token describing this location
-        #name: us-east-1a
-        # Lat, Lon "
-        #location: "37.926868, -78.024902"
-
-
+      # Token describing this location
+      #name: us-east-1a
+      # Lat, Lon "
+      #location: "37.926868, -78.024902"
 # ================================== Logging ===================================
 
 # Sets log level. The default log level is info.
@@ -169,23 +180,22 @@ processors:
 
 # Instrumentation support for the heartbeat.
 #instrumentation:
-    # Set to true to enable instrumentation of heartbeat.
-    #enabled: false
+# Set to true to enable instrumentation of heartbeat.
+#enabled: false
 
-    # Environment in which heartbeat is running on (eg: staging, production, etc.)
-    #environment: ""
+# Environment in which heartbeat is running on (eg: staging, production, etc.)
+#environment: ""
 
-    # APM Server hosts to report instrumentation results to.
-    #hosts:
-    #  - http://localhost:8200
+# APM Server hosts to report instrumentation results to.
+#hosts:
+#  - http://localhost:8200
 
-    # API Key for the APM Server(s).
-    # If api_key is set then secret_token will be ignored.
-    #api_key:
+# API Key for the APM Server(s).
+# If api_key is set then secret_token will be ignored.
+#api_key:
 
-    # Secret token for the APM Server(s).
-    #secret_token:
-
+# Secret token for the APM Server(s).
+#secret_token:
 
 # ================================= Migration ==================================
 

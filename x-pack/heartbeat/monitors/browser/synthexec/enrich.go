@@ -20,7 +20,7 @@ import (
 type Enricher func(event *beat.Event, se *SynthEvent) error
 
 type StreamEnricher struct {
-	je *journeyEnricher
+	je           *journeyEnricher
 	locationName string
 }
 

@@ -100,7 +100,6 @@ func startCloudJob(ctx context.Context, url url.URL, body io.ReadCloser) jobs.Jo
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		mpx := NewExecMultiplexer()
 
-
 		senr := StreamEnricher{}
 		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.Enrich)}, nil
 	}
@@ -110,14 +109,12 @@ func startCloudJob(ctx context.Context, url url.URL, body io.ReadCloser) jobs.Jo
 // to read all output.
 func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich Enricher) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
-		select {
-		case se := <-synthEvents:
-			err = enrich(event, se)
-			if se != nil {
-				return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
-			} else {
-				return nil, err
-			}
+		se := <-synthEvents
+		err = enrich(event, se)
+		if se != nil {
+			return []jobs.Job{readResultsJob(ctx, synthEvents, enrich)}, err
+		} else {
+			return nil, err
 		}
 	}
 }

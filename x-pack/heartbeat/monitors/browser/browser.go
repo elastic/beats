@@ -7,10 +7,11 @@ package browser
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 	"os"
 	"os/user"
 	"sync"
+
+	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -50,7 +51,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 }
 
 type cloudBody struct {
-	Source source.Source `json:"source"`
+	Source source.Source          `json:"source"`
 	Params map[string]interface{} `json:"params"`
 }
 
@@ -73,6 +74,10 @@ func run(cfg *common.Config) (p plugin.Plugin, err error) {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
 
+	if ss.suiteCfg.DryRun {
+		extraArgs = append(extraArgs, "--dry-run")
+	}
+
 	var js []jobs.Job
 	close := ss.Close
 	if ss.suiteCfg.Cloud != nil {
@@ -80,7 +85,7 @@ func run(cfg *common.Config) (p plugin.Plugin, err error) {
 			j := synthexec.CloudJob(context.TODO(), ss.CloudExec, locName, locUrl)
 			js = append(js, j)
 		}
-		close = func() error { return nil}
+		close = func() error { return nil }
 	} else if src, ok := ss.InlineSource(); ok {
 		j := synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
 		js = append(js, j)
@@ -101,7 +106,7 @@ func run(cfg *common.Config) (p plugin.Plugin, err error) {
 
 	return plugin.Plugin{
 		Jobs:      js,
-		Close:     close,
+		DoClose:   close,
 		Endpoints: 1,
 	}, nil
 }

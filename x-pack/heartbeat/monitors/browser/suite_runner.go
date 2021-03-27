@@ -12,6 +12,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
@@ -66,6 +67,7 @@ func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
 }
 
 func (s *SyntheticSuite) Fetch() error {
+	logp.Warn("Did not reach here")
 	return s.suiteCfg.Source.Active().Fetch()
 }
 

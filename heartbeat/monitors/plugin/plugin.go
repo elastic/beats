@@ -20,11 +20,12 @@ package plugin
 import (
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"sort"
-	"strings"
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"

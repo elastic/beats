@@ -19,8 +19,9 @@ package beater
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"time"
+
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 
 	"github.com/pkg/errors"
 
