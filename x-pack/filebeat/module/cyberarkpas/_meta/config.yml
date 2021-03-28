@@ -2,11 +2,19 @@
   audit:
     enabled: true
 
-    # Set which input to use between udp (default), tcp, tls or file.
-    # TODO
+    # Set which input to use between udp (default), tcp, or file.
+    #
     # var.input: udp
+
     # var.syslog_host: localhost
-    # var.syslog_port: 9527
+    # var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    #ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
 
     # Set paths for the log files when file input is used.
     # var.paths:

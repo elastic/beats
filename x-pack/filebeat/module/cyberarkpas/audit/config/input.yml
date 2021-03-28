@@ -11,6 +11,7 @@ exclude_files: [".gz$"]
 
 type: {{.input}}
 host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
 
 {{ end }}
 

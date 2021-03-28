@@ -7,9 +7,10 @@ var:
   - name: syslog_host
     default: localhost
   - name: syslog_port
-    default: 9543
+    default: 9301
   - name: input
-    default: udp # TODO: Check what's the default.
+    default: udp
+  - name: ssl
   - name: community_id
     default: true
 
