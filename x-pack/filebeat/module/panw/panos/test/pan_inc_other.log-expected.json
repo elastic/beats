@@ -800,6 +800,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.ip": [
             "192.168.0.2",
             "204.232.231.46",

@@ -68,6 +68,7 @@ processors:
         server.user.name: 13
         destination.user.name: 13
         network.application: 14
+        panw.panos.virtual_sys: 15
         panw.panos.source.zone: 16
         observer.ingress.zone: 16
         panw.panos.destination.zone: 17
@@ -130,6 +131,7 @@ processors:
         server.user.name: 13
         destination.user.name: 13
         network.application: 14
+        panw.panos.virtual_sys: 15
         panw.panos.source.zone: 16
         observer.ingress.zone: 16
         panw.panos.destination.zone: 17
