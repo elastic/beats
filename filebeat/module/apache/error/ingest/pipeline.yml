@@ -20,19 +20,10 @@ processors:
 - grok:
     field: message
     patterns:
-    - "File does not exist: %{URIPATH:_tmp.url_orig}, referer: %{URI:http.request.referrer}"
-    - "File does not exist: %{URIPATH:_tmp.url_orig}"
+    - "File does not exist: %{URIPATH:file.path}, referer: %{URI:http.request.referrer}"
+    - "File does not exist: %{URIPATH:file.path}"
     ignore_missing: true
     ignore_failure: true
-- uri_parts:
-    field: _tmp.url_orig
-    ignore_failure: true
-    if: ctx._tmp?.url_orig != null
-- urldecode:
-    field: url.original
-    ignore_missing: true
-    ignore_failure: true
-    if: ctx._tmp?.url?.original != null
 - urldecode:
     field: http.request.referrer
     ignore_missing: true

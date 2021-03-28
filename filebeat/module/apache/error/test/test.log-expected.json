@@ -8,6 +8,7 @@
         "event.original": "[Mon Dec 26 16:22:08 2016] [error] [client 192.168.33.1] File does not exist: /var/www/favicon.ico",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/favicon.ico",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -15,10 +16,7 @@
         "message": "File does not exist: /var/www/favicon.ico",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.extension": "ico",
-        "url.original": "/var/www/favicon.ico",
-        "url.path": "/var/www/favicon.ico"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:15:55.103-02:00",
@@ -48,6 +46,7 @@
         "event.original": "[Fri Sep 09 10:42:29.902022 2011] [core:error] [pid 35708:tid 4328636416] [client 72.15.99.187] File does not exist: /usr/local/apache2/htdocs/favicon.ico",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/usr/local/apache2/htdocs/favicon.ico",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -67,10 +66,7 @@
         "source.geo.location.lon": -84.8154,
         "source.geo.region_iso_code": "US-GA",
         "source.geo.region_name": "Georgia",
-        "source.ip": "72.15.99.187",
-        "url.extension": "ico",
-        "url.original": "/usr/local/apache2/htdocs/favicon.ico",
-        "url.path": "/usr/local/apache2/htdocs/favicon.ico"
+        "source.ip": "72.15.99.187"
     },
     {
         "@timestamp": "2019-06-27T06:58:09.169-02:00",

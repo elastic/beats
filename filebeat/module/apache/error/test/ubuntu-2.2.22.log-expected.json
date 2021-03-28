@@ -24,6 +24,7 @@
         "event.original": "[Mon Dec 26 16:22:00 2016] [error] [client 192.168.33.1] File does not exist: /var/www/favicon.ico, referer: http://192.168.33.72/",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/favicon.ico",
         "fileset.name": "error",
         "http.request.referrer": "http://192.168.33.72/",
         "input.type": "log",
@@ -32,10 +33,7 @@
         "message": "File does not exist: /var/www/favicon.ico, referer: http://192.168.33.72/",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.extension": "ico",
-        "url.original": "/var/www/favicon.ico",
-        "url.path": "/var/www/favicon.ico"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000-02:00",
@@ -46,6 +44,7 @@
         "event.original": "[Mon Dec 26 16:22:08 2016] [error] [client 192.168.33.1] File does not exist: /var/www/favicon.ico",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/favicon.ico",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -53,10 +52,7 @@
         "message": "File does not exist: /var/www/favicon.ico",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.extension": "ico",
-        "url.original": "/var/www/favicon.ico",
-        "url.path": "/var/www/favicon.ico"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:22:08.000-02:00",
@@ -67,6 +63,7 @@
         "event.original": "[Mon Dec 26 16:22:08 2016] [error] [client 192.168.33.1] File does not exist: /var/www/favicon.ico",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/favicon.ico",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -74,10 +71,7 @@
         "message": "File does not exist: /var/www/favicon.ico",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.extension": "ico",
-        "url.original": "/var/www/favicon.ico",
-        "url.path": "/var/www/favicon.ico"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:22:10.000-02:00",
@@ -88,6 +82,7 @@
         "event.original": "[Mon Dec 26 16:22:10 2016] [error] [client 192.168.33.1] File does not exist: /var/www/test",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/test",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -95,9 +90,7 @@
         "message": "File does not exist: /var/www/test",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.original": "/var/www/test",
-        "url.path": "/var/www/test"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:22:13.000-02:00",
@@ -108,6 +101,7 @@
         "event.original": "[Mon Dec 26 16:22:13 2016] [error] [client 192.168.33.1] File does not exist: /var/www/hello",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/hello",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -115,9 +109,7 @@
         "message": "File does not exist: /var/www/hello",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.original": "/var/www/hello",
-        "url.path": "/var/www/hello"
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:22:17.000-02:00",
@@ -128,6 +120,7 @@
         "event.original": "[Mon Dec 26 16:22:17 2016] [error] [client 192.168.33.1] File does not exist: /var/www/crap",
         "event.timezone": "-02:00",
         "event.type": "error",
+        "file.path": "/var/www/crap",
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "error",
@@ -135,8 +128,6 @@
         "message": "File does not exist: /var/www/crap",
         "service.type": "apache",
         "source.address": "192.168.33.1",
-        "source.ip": "192.168.33.1",
-        "url.original": "/var/www/crap",
-        "url.path": "/var/www/crap"
+        "source.ip": "192.168.33.1"
     }
 ]

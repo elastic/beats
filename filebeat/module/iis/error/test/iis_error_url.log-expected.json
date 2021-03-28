@@ -117,7 +117,8 @@
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
-        "source.port": 12345
+        "source.port": 12345,
+        "url.original": "/..\\\\pixfir~1\\\\how_to_login.html"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -155,7 +156,8 @@
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
-        "source.port": 12345
+        "source.port": 12345,
+        "url.original": "..\\\\..\\\\..\\\\..\\\\..\\\\..\\\\winnt\\\\win.ini"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
@@ -234,7 +236,8 @@
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "149.42.83.135",
-        "source.port": 12345
+        "source.port": 12345,
+        "url.original": "/nessus\\\\..\\\\..\\\\..\\\\..\\\\..\\\\..\\\\winnt\\\\win.ini"
     },
     {
         "@timestamp": "2018-05-05T05:05:55.000Z",
