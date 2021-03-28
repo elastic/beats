@@ -20,6 +20,8 @@ var:
     default: false
   - name: debug
     default: false
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

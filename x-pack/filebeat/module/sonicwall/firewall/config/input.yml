@@ -39,6 +39,13 @@ processors:
 {{ if .community_id }}
 - community_id: ~
 {{ end }}
+{{ if .internal_networks }}
+- add_network_direction:
+    source: source.ip
+    destination: destination.ip
+    target: network.direction
+    internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
 - registered_domain:
     ignore_missing: true
     ignore_failure: true

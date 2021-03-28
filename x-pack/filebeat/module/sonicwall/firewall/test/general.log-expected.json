@@ -29,9 +29,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36701,
         "tags": [
             "forwarded",
@@ -95,9 +93,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36702,
         "tags": [
             "forwarded",
@@ -246,9 +242,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36703,
         "tags": [
             "forwarded",
@@ -312,9 +306,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36704,
         "tags": [
             "forwarded",
@@ -350,9 +342,7 @@
         "source.geo.country_name": "New Zealand",
         "source.geo.location.lat": -41.0,
         "source.geo.location.lon": 174.0,
-        "source.ip": [
-            "219.89.19.223"
-        ],
+        "source.ip": "219.89.19.223",
         "source.port": 1026,
         "tags": [
             "forwarded",
@@ -439,9 +429,7 @@
         "source.geo.country_name": "Australia",
         "source.geo.location.lat": -33.494,
         "source.geo.location.lon": 143.2104,
-        "source.ip": [
-            "1.1.1.1"
-        ],
+        "source.ip": "1.1.1.1",
         "source.port": 500,
         "tags": [
             "forwarded",
@@ -491,9 +479,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.115.10"
-        ],
+        "source.ip": "192.168.115.10",
         "source.port": 11549,
         "tags": [
             "forwarded",
@@ -523,9 +509,7 @@
         "rsa.network.sinterface": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "rsa.time.event_time": "2007-01-03T16:48:17.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.5.64"
-        ],
+        "source.ip": "192.168.5.64",
         "source.port": 3182,
         "tags": [
             "forwarded",
@@ -611,9 +595,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "rsa.time.event_time": "2007-01-03T16:48:20.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.125.75"
-        ],
+        "source.ip": "192.168.125.75",
         "source.port": 524,
         "tags": [
             "forwarded",
@@ -643,9 +625,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:21.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.6.10"
-        ],
+        "source.ip": "192.168.6.10",
         "source.port": 28503,
         "tags": [
             "forwarded",
