@@ -215,7 +215,8 @@ func TestVars_ReplaceWithProcessors(t *testing.T) {
 			},
 		},
 		"dynamic",
-		processers)
+		processers,
+		nil)
 	require.NoError(t, err)
 
 	res, err := vars.Replace("${testing.key1}")
