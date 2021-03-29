@@ -439,7 +439,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(output interface{}) (map[string
 		"namespace":  "agent",
 		"period":     "10s",
 		"path":       "/stats",
-		"hosts":      []string{beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS())},
+		"hosts":      []string{beats.AgentPrefixedMonitoringEndpoint(o.config.DownloadConfig.OS(), o.config.MonitoringConfig.Port)},
 		"index":      fmt.Sprintf("metrics-elastic_agent.%s-default", fixedAgentName),
 		"processors": []map[string]interface{}{
 			{

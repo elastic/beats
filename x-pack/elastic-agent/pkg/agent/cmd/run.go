@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	monitoringServer "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
@@ -142,7 +143,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		return err
 	}
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), app)
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
 		return err
 	}
@@ -250,7 +251,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	return defaultLogLevel
 }
 
-func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, app application.Application) (func() error, error) {
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, cfg *monitoringCfg.MonitoringConfig, app application.Application) (func() error, error) {
 	// use libbeat to setup metrics
 	if err := metrics.SetupMetrics(agentName); err != nil {
 		return nil, err
@@ -259,7 +260,7 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	// start server for stats
 	endpointConfig := api.Config{
 		Enabled: true,
-		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.Port),
 	}
 
 	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes)

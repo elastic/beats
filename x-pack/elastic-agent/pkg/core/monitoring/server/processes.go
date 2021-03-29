@@ -64,12 +64,7 @@ func processesHandler(routesFetchFn func() *sorted.Set) func(http.ResponseWriter
 
 		processes, err := processesFromRoutes(routesFetchFn)
 		if err != nil {
-			resp := errResponse{
-				Type:   "UNEXPECTED",
-				Reason: err.Error(),
-			}
-
-			writeResponse(w, resp)
+			writeResponse(w, unexpectedErrorWithReason(err.Error()))
 			return
 		}
 

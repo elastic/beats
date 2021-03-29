@@ -9,6 +9,7 @@ type MonitoringConfig struct {
 	Enabled        bool `yaml:"enabled" config:"enabled"`
 	MonitorLogs    bool `yaml:"logs" config:"logs"`
 	MonitorMetrics bool `yaml:"metrics" config:"metrics"`
+	Port           int  `yaml:"port" config:"port"`
 }
 
 // DefaultConfig creates a config with pre-set default values.
@@ -17,5 +18,6 @@ func DefaultConfig() *MonitoringConfig {
 		Enabled:        true,
 		MonitorLogs:    true,
 		MonitorMetrics: true,
+		Port:           0,
 	}
 }

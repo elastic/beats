@@ -23,10 +23,11 @@ import (
 )
 
 const (
-	procuctIDKey     = "processID"
-	monitoringSuffix = "-monitoring"
-	separator        = "-"
-	timeout          = 10 * time.Second
+	processIDKey      = "processID"
+	monitoringSuffix  = "-monitoring"
+	separator         = "-"
+	timeout           = 10 * time.Second
+	errTypeUnexpected = "UNEXPECTED"
 
 	httpPlusPrefix = "http+"
 )
@@ -41,26 +42,19 @@ func processHandler() func(http.ResponseWriter, *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		vars := mux.Vars(r)
-		id, found := vars[procuctIDKey]
+		id, found := vars[processIDKey]
 
 		if !found {
-			resp := errResponse{
-				Type:   "UNEXPECTED",
-				Reason: "productID not found",
-			}
-
-			writeResponse(w, resp)
+			writeResponse(
+				w,
+				unexpectedErrorWithReason("productID not found"),
+			)
 			return
 		}
 
 		metricsBytes, metricsErr := processMetrics(r.Context(), id)
 		if metricsErr != nil {
-			resp := errResponse{
-				Type:   "UNEXPECTED",
-				Reason: fmt.Sprintf("failed fetching metrics: %s", metricsErr.Error()),
-			}
-
-			writeResponse(w, resp)
+			writeResponse(w, unexpectedErrorWithReason("failed fetching metrics: %s", metricsErr.Error()))
 			return
 		}
 
@@ -155,4 +149,11 @@ func parseID(id string) (programDetail, error) {
 	detail.output = strings.TrimPrefix(id, detail.binaryName+separator)
 
 	return detail, nil
+}
+
+func unexpectedErrorWithReason(reason string, args ...interface{}) errResponse {
+	return errResponse{
+		Type:   errTypeUnexpected,
+		Reason: fmt.Sprintf(reason, args...),
+	}
 }
