@@ -81,48 +81,7 @@ pipeline {
               cmd(label: "make check", script: "make check")
             }
             whenTrue(env.ONLY_DOCS == 'false') {
-              cmd(label: "make check-python", script: "make check-python")
-              cmd(label: "make check-go", script: "make check-go")
-              cmd(label: "make notice", script: "make notice")
-              cmd(label: "Check for changes", script: "make check-no-changes")
-            }
-          }
-        }
-      }
-    }
-    stage('BeatsLint') {
-      options { skipDefaultCheckout() }
-      when {
-        // Always when running builds on branches/tags
-        // On a PR basis, skip if changes are only related to docs.
-        // Always when forcing the input parameter
-        anyOf {
-          not { changeRequest() }                           // If no PR
-          allOf {                                           // If PR and no docs changes
-            expression { return env.ONLY_DOCS == "false" }
-            changeRequest()
-          }
-          expression { return params.runAllStages }         // If UI forced
-        }
-      }
-      steps {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          script {
-            def mapParallelTasks = [:]
-            def content = readYaml(file: 'Jenkinsfile.yml')
-            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-            } else {
-              content['projects'].each { projectName ->
-                generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.yml').each { k,v ->
-                  if (k.endsWith('lint')) {
-                    mapParallelTasks["${k}"] = v
-                  }
-                }
-              }
-              parallel(mapParallelTasks)
+              runLinting()
             }
           }
         }
@@ -144,27 +103,7 @@ pipeline {
         }
       }
       steps {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          script {
-            def mapParallelTasks = [:]
-            def content = readYaml(file: 'Jenkinsfile.yml')
-            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-            } else {
-              content['projects'].each { projectName ->
-                generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                  if (!k.endsWith('lint')) {
-                    mapParallelTasks["${k}"] = v
-                  }
-                }
-              }
-              notifyBuildReason()
-              parallel(mapParallelTasks)
-            }
-          }
-        }
+        runBuildAndTest(definition: 'Jenkinsfile.yml')
       }
     }
     stage('Extended') {
@@ -183,24 +122,7 @@ pipeline {
         }
       }
       steps {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          script {
-            def mapParallelTasks = [:]
-            def content = readYaml(file: 'Jenkinsfile.yml')
-            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-            } else {
-              content['projects'].each { projectName ->
-                generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.ext.yml').each { k,v ->
-                  mapParallelTasks["${k}"] = v
-                }
-              }
-              parallel(mapParallelTasks)
-            }
-          }
-        }
+        runBuildAndTest(definition: 'Jenkinsfile.ext.yml')
       }
     }
     stage('Packaging') {
@@ -265,6 +187,47 @@ def getBranchIndice(String compare) {
   return 'master'
 }
 
+def runLinting() {
+  def mapParallelTasks = [:]
+  def content = readYaml(file: 'Jenkinsfile.yml')
+  content['projects'].each { projectName ->
+    generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.yml').each { k,v ->
+      if (k.endsWith('lint')) {
+        mapParallelTasks["${k}"] = v
+      }
+    }
+  }
+  mapParallelTasks['default'] = {
+                                cmd(label: "make check-python", script: "make check-python")
+                                cmd(label: "make check-go", script: "make check-go")
+                                cmd(label: "make notice", script: "make notice")
+                                cmd(label: "Check for changes", script: "make check-no-changes")
+                              }
+
+  parallel(mapParallelTasks)
+}
+
+runBuildAndTest(Map args = [:]) {
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  dir("${BASE_DIR}"){
+    def mapParallelTasks = [:]
+    def content = readYaml(file: 'Jenkinsfile.yml')
+    if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+      error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+    } else {
+      content['projects'].each { projectName ->
+        generateStages(project: projectName, changeset: content['changeset'], definition: args.definition).each { k,v ->
+          if (!k.endsWith('lint')) {
+            mapParallelTasks["${k}"] = v
+          }
+        }
+      }
+      notifyBuildReason()
+      parallel(mapParallelTasks)
+    }
+  }
+}
 
 /**
 * This method is the one used for running the parallel stages, therefore
