@@ -8,6 +8,7 @@ import (
 	"context"
 	"strings"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -43,12 +44,9 @@ func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.C
 }
 
 func (p *contextProviderK8sSecrets) Fetch(key string) (string, error) {
-	// TODO: add actual call to k8s api here to get the secret
-	return "someSecret42", nil
-	// actual code
 	// key = "kubernetes_secrets.somenamespace.somesecret.value"
 	tokens := strings.Split(key, ".")
-	if len(tokens) > 0 && tokens[0] != "kubernetes" {
+	if len(tokens) > 0 && tokens[0] != "kubernetes_secrets" {
 		return "", keystore.ErrKeyDoesntExists
 	}
 	if len(tokens) != 4 {
@@ -82,7 +80,6 @@ func (p *contextProviderK8sSecrets) Fetch(key string) (string, error) {
 func (p *contextProviderK8sSecrets) Run(comm corecomp.ContextProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
-		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes_secrets provider skipped, unable to connect: %s", err)
 		return nil
 	}
