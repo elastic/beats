@@ -1,7 +1,7 @@
 # libbeat - Framework for building the Beats
 
 libbeat is a Go library containing the common packages for all the
-[Beats](https://www.elastic.co/products/beats).
+[Beats](https://www.elastic.co/beats).
 It is Apache licensed and actively maintained by the Elastic team.
 
 If you want to create a new project that reads some sort of operational data
