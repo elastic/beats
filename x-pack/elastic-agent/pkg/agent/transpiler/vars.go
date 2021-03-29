@@ -63,7 +63,7 @@ func (v *Vars) Replace(value string) (Node, error) {
 						fval, _ := fetchProvider.Fetch(val.Value())
 						result += value[lastIndex:r[0]] + fval
 						set = true
-						continue
+						break
 					}
 				}
 				if set {
