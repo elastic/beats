@@ -16,7 +16,9 @@ import (
 )
 
 const (
+	// DefaultConfigName is the default name of the configuration file.
 	DefaultConfigName = "elastic-agent.yml"
+	// AgentLockFileName is the name of the overall Elastic Agent file lock.
 	AgentLockFileName = "agent.lock"
 	tempSubdir        = "tmp"
 )
