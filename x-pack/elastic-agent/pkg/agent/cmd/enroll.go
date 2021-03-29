@@ -7,11 +7,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 
 	"github.com/spf13/cobra"
 
@@ -198,7 +199,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	cfg.Settings.LoggingConfig.ToFiles = false
 	cfg.Settings.LoggingConfig.ToStderr = true
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 	if err != nil {
 		return err
 	}

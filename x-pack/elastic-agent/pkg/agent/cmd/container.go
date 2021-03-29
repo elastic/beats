@@ -20,11 +20,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -38,8 +39,9 @@ import (
 )
 
 const (
-	requestRetrySleep = 1 * time.Second // sleep 1 sec between retries for HTTP requests
-	maxRequestRetries = 30              // maximum number of retries for HTTP requests
+	requestRetrySleep     = 1 * time.Second                  // sleep 1 sec between retries for HTTP requests
+	maxRequestRetries     = 30                               // maximum number of retries for HTTP requests
+	defaultStateDirectory = "/usr/share/elastic-agent/state" // directory that will hold the state data
 )
 
 var (
@@ -216,19 +218,15 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) e
 	}
 
 	// set paths early so all action below use the defined paths
-	if cfg.Agent.Paths.Data != "" {
-		paths.SetTop(cfg.Agent.Paths.Data)
-		// when custom top path is provided the home directory is not versioned
-		paths.SetVersionHome(false)
-	}
-	if cfg.Agent.Paths.Logs != "" {
-		paths.SetLogs(cfg.Agent.Paths.Logs)
+	err = handlePaths(cfg.Agent.Paths)
+	if err != nil {
+		return err
 	}
 
 	_, err = os.Stat(paths.AgentConfigFile())
 	if !os.IsNotExist(err) && !cfg.Fleet.Force {
 		// already enrolled, just run the standard run
-		return run(streams)
+		return run(streams, logToStderr)
 	}
 
 	if cfg.Kibana.Fleet.Setup {
@@ -282,17 +280,16 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig) e
 		}
 	}
 
-	return run(streams)
+	return run(streams, logToStderr)
 }
 
 func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, error) {
 	args := []string{
 		"enroll", "-f",
+		"-c", paths.ConfigFile(),
 		"--path.home", paths.Top(), // --path.home actually maps to paths.Top()
 		"--path.config", paths.Config(),
-		"-c", paths.ConfigFile(),
 		"--path.logs", paths.Logs(),
-		"--path.data", paths.Data(),
 	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
@@ -560,7 +557,7 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string, args []string) (*pr
 	if err != nil {
 		return nil, errors.New(err, fmt.Sprintf("absPath for %s", files[0]))
 	}
-	log, err := logger.New("apm-server")
+	log, err := logger.New("apm-server", false)
 	if err != nil {
 		return nil, err
 	}
@@ -586,6 +583,85 @@ func readYaml(f string, cfg *setupConfig) error {
 		return err
 	}
 	return c.Unpack(cfg)
+}
+
+func logToStderr(cfg *configuration.Configuration) {
+	// container forces logging to stderr
+	cfg.Settings.LoggingConfig.ToStderr = true
+	cfg.Settings.LoggingConfig.ToFiles = false
+}
+
+func handlePaths(pathCfg agentPathsConfig) error {
+	if pathCfg.State == "" {
+		return errors.New("STATE_PATH cannot be set to an empty string")
+	}
+	// ensure that the directory and sub-directory data exists
+	if err := os.MkdirAll(filepath.Join(pathCfg.State, "data"), 0755); err != nil {
+		return fmt.Errorf("preparing STATE_PATH(%s) failed: %s", pathCfg.State, err)
+	}
+	// ensure that the elastic-agent.yml exists in the state directory
+	if _, err := os.Stat(filepath.Join(pathCfg.State, paths.DefaultConfigName)); os.IsNotExist(err) {
+		if err := copyFile(filepath.Join(pathCfg.State, paths.DefaultConfigName), paths.ConfigFile(), 0); err != nil {
+			return err
+		}
+	}
+	// sync the downloads to the data directory
+	if err := syncDownloads(pathCfg.State); err != nil {
+		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", pathCfg.State, err)
+	}
+	paths.SetTop(filepath.Join(pathCfg.State, "data"))
+	paths.SetConfig(pathCfg.State)
+	// when custom top path is provided the home directory is not versioned
+	paths.SetVersionHome(false)
+	// ensure that the logs directory exists
+	if err := os.MkdirAll(filepath.Join(pathCfg.Logs), 0755); err != nil {
+		return fmt.Errorf("preparing LOGS_PATH(%s) failed: %s", pathCfg.Logs, err)
+	}
+	paths.SetLogs(pathCfg.Logs)
+	return nil
+}
+
+func syncDownloads(dataPath string) error {
+	srcDownloads := filepath.Join(paths.Home(), "downloads")
+	destDownloads := filepath.Join(dataPath, "data", "downloads")
+	return filepath.Walk(srcDownloads, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relativePath := strings.TrimPrefix(path, srcDownloads)
+		if info.IsDir() {
+			err = os.MkdirAll(filepath.Join(destDownloads, relativePath), info.Mode())
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		return copyFile(filepath.Join(destDownloads, relativePath), path, info.Mode())
+	})
+}
+
+func copyFile(destPath string, srcPath string, mode os.FileMode) error {
+	// if mode is unset; set to the same as the source file
+	if mode == 0 {
+		info, err := os.Stat(srcPath)
+		if err == nil {
+			// ignoring error because; os.Open will also error if the file cannot be stat'd
+			mode = info.Mode()
+		}
+	}
+
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	dest, err := os.OpenFile(destPath, os.O_CREATE|os.O_WRONLY, mode)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+	_, err = io.Copy(dest, src)
+	return err
 }
 
 type kibanaPolicy struct {
@@ -626,8 +702,8 @@ type setupConfig struct {
 }
 
 type agentPathsConfig struct {
-	Data string `config:"data"`
-	Logs string `config:"logs"`
+	State string `config:"state"`
+	Logs  string `config:"logs"`
 }
 
 type agentConfig struct {
@@ -677,11 +753,11 @@ type kibanaFleetConfig struct {
 }
 
 func defaultAccessConfig() setupConfig {
-	return setupConfig{
+	cfg := setupConfig{
 		Agent: agentConfig{
 			Paths: agentPathsConfig{
-				Data: envWithDefault("", "DATA_PATH"),
-				Logs: envWithDefault("", "LOGS_PATH"),
+				State: envWithDefault(defaultStateDirectory, "STATE_PATH"),
+				Logs:  envWithDefault("", "LOGS_PATH"),
 			},
 		},
 		Fleet: fleetConfig{
@@ -723,4 +799,9 @@ func defaultAccessConfig() setupConfig {
 			},
 		},
 	}
+	if cfg.Agent.Paths.Logs == "" {
+		// default the logs directory is nested under state directory
+		cfg.Agent.Paths.Logs = filepath.Join(cfg.Agent.Paths.State, "logs")
+	}
+	return cfg
 }

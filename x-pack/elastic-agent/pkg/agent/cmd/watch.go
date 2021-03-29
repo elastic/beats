@@ -201,7 +201,7 @@ func configuredLogger() (*logger.Logger, error) {
 
 	cfg.Settings.LoggingConfig.Beat = watcherName
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 	if err != nil {
 		return nil, err
 	}

@@ -129,7 +129,7 @@ func printConfig(cfg *config.Config) error {
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 }
 
 func inspectOutputs(cfgPath string, agentInfo *info.AgentInfo) error {

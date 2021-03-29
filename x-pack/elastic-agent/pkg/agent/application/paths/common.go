@@ -94,6 +94,14 @@ func Config() string {
 	return configPath
 }
 
+// SetConfig overrides the Config path.
+//
+// Used by the container subcommand to adjust the overall config path allowing state can be maintained between container
+// restarts.
+func SetConfig(path string) {
+	configPath = path
+}
+
 // ConfigFile returns the path to the configuration file.
 func ConfigFile() string {
 	if configFilePath == "" || configFilePath == DefaultConfigName {

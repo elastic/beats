@@ -46,12 +46,14 @@ const (
 	agentName = "elastic-agent"
 )
 
+type cfgOverrider func(cfg *configuration.Configuration)
+
 func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	return &cobra.Command{
 		Use:   "run",
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
-			if err := run(streams); err != nil {
+			if err := run(streams, nil); err != nil {
 				fmt.Fprintf(streams.Err, "%v\n", err)
 				os.Exit(1)
 			}
@@ -59,7 +61,7 @@ func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	}
 }
 
-func run(streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark service as stopped.
 	// After this is run, the service is considered by the OS to be stopped.
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
@@ -102,6 +104,10 @@ func run(streams *cli.IOStreams) error { // Windows: Mark service as stopped.
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
+	if override != nil {
+		override(cfg)
+	}
+
 	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
 	if err != nil {
 		return errors.New(err,
@@ -110,7 +116,7 @@ func run(streams *cli.IOStreams) error { // Windows: Mark service as stopped.
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
 		return err
 	}
