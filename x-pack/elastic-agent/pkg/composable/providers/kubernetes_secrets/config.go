@@ -9,5 +9,5 @@ package kubernetes_secrets
 
 // Config for kubernetes provider
 type Config struct {
-	KubeConfig     string        `config:"kube_config"`
+	KubeConfig string `config:"kube_config"`
 }

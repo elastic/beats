@@ -5,13 +5,13 @@
 package kubernetes_secrets
 
 import (
-	"strings"
 	"context"
+	"strings"
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -22,7 +22,6 @@ import (
 func init() {
 	composable.Providers.AddContextProvider("kubernetes_secrets", ContextProviderBuilder)
 }
-
 
 type contextProviderK8sSecrets struct {
 	logger *logger.Logger

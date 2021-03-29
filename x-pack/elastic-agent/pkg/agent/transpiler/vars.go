@@ -20,9 +20,9 @@ var ErrNoMatch = fmt.Errorf("no matching vars")
 
 // Vars is a context of variables that also contain a list of processors that go with the mapping.
 type Vars struct {
-	tree          *AST
-	processorsKey string
-	processors    Processors
+	tree                  *AST
+	processorsKey         string
+	processors            Processors
 	extraContextProviders map[string]composable.ContextProvider
 }
 

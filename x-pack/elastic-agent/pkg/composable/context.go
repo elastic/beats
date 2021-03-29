@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // ContextProviderBuilder creates a new context provider based on the given config and returns it.
