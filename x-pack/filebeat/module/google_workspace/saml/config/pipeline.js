@@ -32,14 +32,7 @@ var saml = (function () {
             // all saml event parameters are strings.
             // for this reason we know for sure they are in the 'value' field.
             // https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml
-            switch (p.name) {
-                case "status_code":
-                case "second_level_status_code":
-                    evt.Put("google_workspace.saml."+p.name, parseInt(p.value));
-                    break;
-                default:
-                    evt.Put("google_workspace.saml."+p.name, p.value);
-            }
+            evt.Put("google_workspace.saml."+p.name, p.value);
         });
 
         evt.Delete("json.events.parameters");
