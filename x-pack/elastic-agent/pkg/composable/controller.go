@@ -22,6 +22,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+var contextProviders = map[string]string{
+	"kubernetes_secrets": "",
+}
+
 // VarsCallback is callback called when the current vars state changes.
 type VarsCallback func([]*transpiler.Vars)
 
@@ -99,6 +103,8 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
+	extraContextProviders := make(map[string]corecomp.ContextProvider, len(contextProviders))
+
 	// run all the enabled context providers
 	for name, state := range c.contextProviders {
 		state.Context = localCtx
@@ -107,6 +113,10 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		if err != nil {
 			cancel()
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
+		}
+		// manually register providers that want to pass to the Vars
+		if _, ok := contextProviders[name]; ok {
+			extraContextProviders[name] = state.provider
 		}
 	}
 
@@ -120,11 +130,6 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
 	}
-
-	// manually register providers that want to pass to the Vars
-	extraContextProviders := make(map[string]corecomp.ContextProvider, 1)
-	k8sSecretsProvider := c.contextProviders["kubernetes_secrets"]
-	extraContextProviders["kubernetes_secrets"] = k8sSecretsProvider.provider
 
 	go func() {
 		for {
