@@ -60,7 +60,7 @@ your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 NOTE: One deterministic manner to install Go in the proper version to work with Beats is using
 https://github.com/andrewkroh/gvm[GVM] Go version manager. An example for Mac users would be:
 
-[source,shell]
+[source,shell,subs=attributes+]
 ----------------------------------------------------------------------
 gvm use {go-version}
 export GOROOT="/Users/${USER}/.gvm/versions/go{go-version}.darwin.amd64"
