@@ -207,7 +207,7 @@ def runLinting() {
   parallel(mapParallelTasks)
 }
 
-runBuildAndTest(Map args = [:]) {
+def runBuildAndTest(Map args = [:]) {
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}"){
