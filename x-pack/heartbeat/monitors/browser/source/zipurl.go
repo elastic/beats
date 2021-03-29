@@ -66,7 +66,7 @@ func (z *ZipURLSource) Fetch() error {
 	return nil
 }
 
-func unzip(tf *os.File, dir string, folder string) error {
+func unzip(tf *os.File, targetDir string, folder string) error {
 	stat, err := tf.Stat()
 	if err != nil {
 		return err
@@ -78,10 +78,10 @@ func unzip(tf *os.File, dir string, folder string) error {
 	}
 
 	for _, f := range rdr.File {
-		err = unzipFile(dir, folder, f)
+		err = unzipFile(targetDir, folder, f)
 		if err != nil {
-			// TODO: err handler
-			os.RemoveAll(dir)
+			// TODO: err handlers
+			os.RemoveAll(targetDir)
 			return err
 		}
 	}
@@ -100,31 +100,23 @@ func unzipFile(workdir string, folder string, f *zip.File) error {
 
 	sansFolder := strings.Split(f.Name, string(filepath.Separator))[folderDepth:]
 	destPath := filepath.Join(workdir, filepath.Join(sansFolder...))
-	outName, err := filepath.Rel(workdir, destPath)
 
 	// Never unpack node modules
-	if strings.HasPrefix(outName, "node_modules/") {
+	if strings.HasPrefix(destPath, "node_modules/") {
 		return nil
 	}
 
-	if err != nil {
-		return fmt.Errorf("relpath err: %s", err)
-	}
-	// if !strings.HasPrefix(outName, workdir) {
-	// 	return fmt.Errorf("security error unpacking zip: %s -> %s", f.Name, outName)
-	// }
-
 	if f.FileInfo().IsDir() {
-		err := os.MkdirAll(outName, 0755)
+		err := os.MkdirAll(destPath, 0755)
 		if err != nil {
-			return fmt.Errorf("could not make dest zip dir '%s': %w", outName, err)
+			return fmt.Errorf("could not make dest zip dir '%s': %w", destPath, err)
 		}
 		return nil
 	}
 
-	dest, err := os.Create(outName)
+	dest, err := os.Create(destPath)
 	if err != nil {
-		return fmt.Errorf("could not open dest file for zip '%s': %w", outName, err)
+		return fmt.Errorf("could not open dest file for zip '%s': %w", destPath, err)
 	}
 	defer dest.Close()
 
