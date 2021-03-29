@@ -1053,7 +1053,8 @@ def readStageStatus(Map args){
   try {
     googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/ci/cache/${statusFileName}",
       credentialsId: "${JOB_GCS_CREDENTIALS}",
-      localDirectory: '.')
+      localDirectory: '.',
+      pathPrefix: 'ci/cache/')
   } catch(e) {
     log(level: 'WARN', text: "There is no cache file for the current stage.")
   } finally {
