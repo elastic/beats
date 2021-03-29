@@ -6,8 +6,9 @@ package composable
 
 import "context"
 
-// ContextProviderComm is the interface that a context provider uses to communicate back to Elastic Agent.
-type ContextProviderK8sSecrets interface {
+// FetchContextProvider is the interface that a context provider uses so as to be able to be called
+// explicitely on demand by by vars framework in order to fetch specific target values like a k8s secret.
+type FetchContextProvider interface {
 	// Run runs the inventory provider.
 	Run(ContextProviderComm) error
 	// Run runs the inventory provider.

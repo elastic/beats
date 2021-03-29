@@ -23,21 +23,21 @@ type Vars struct {
 	tree                  *AST
 	processorsKey         string
 	processors            Processors
-	extraContextProviders map[string]composable.ContextProvider
+	fetchContextProviders map[string]composable.ContextProvider
 }
 
 // NewVars returns a new instance of vars.
-func NewVars(mapping map[string]interface{}, extraContextProviders map[string]composable.ContextProvider) (*Vars, error) {
-	return NewVarsWithProcessors(mapping, "", nil, extraContextProviders)
+func NewVars(mapping map[string]interface{}, fetchContextProviders map[string]composable.ContextProvider) (*Vars, error) {
+	return NewVarsWithProcessors(mapping, "", nil, fetchContextProviders)
 }
 
 // NewVarsWithProcessors returns a new instance of vars with attachment of processors.
-func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, extraContextProviders map[string]composable.ContextProvider) (*Vars, error) {
+func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, fetchContextProviders map[string]composable.ContextProvider) (*Vars, error) {
 	tree, err := NewAST(mapping)
 	if err != nil {
 		return nil, err
 	}
-	return &Vars{tree, processorKey, processors, extraContextProviders}, nil
+	return &Vars{tree, processorKey, processors, fetchContextProviders}, nil
 }
 
 // Replace returns a new value based on variable replacement.
@@ -57,12 +57,16 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
-				if varPrefixMatched(val.Value(), "kubernetes_secrets") && len(v.extraContextProviders) > 0 {
-					k8sProvider := v.extraContextProviders["kubernetes_secrets"]
-					k8sProviderSecrets := k8sProvider.(composable.ContextProviderK8sSecrets)
-					vall, _ := k8sProviderSecrets.Fetch(val.Value())
-					result += value[lastIndex:r[0]] + vall
-					set = true
+				for name, provider := range v.fetchContextProviders {
+					if varPrefixMatched(val.Value(), name) {
+						fetchProvider := provider.(composable.FetchContextProvider)
+						fval, _ := fetchProvider.Fetch(val.Value())
+						result += value[lastIndex:r[0]] + fval
+						set = true
+						continue
+					}
+				}
+				if set {
 					continue
 				}
 				switch val.(type) {

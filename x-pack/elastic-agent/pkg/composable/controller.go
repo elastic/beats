@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-var contextProviders = map[string]string{
+var FetchContextProviders = map[string]string{
 	"kubernetes_secrets": "",
 }
 
@@ -103,7 +103,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
-	extraContextProviders := make(map[string]corecomp.ContextProvider, len(contextProviders))
+	fetchContextProviders := make(map[string]corecomp.ContextProvider, len(FetchContextProviders))
 
 	// run all the enabled context providers
 	for name, state := range c.contextProviders {
@@ -114,9 +114,9 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 			cancel()
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
-		// manually register providers that want to pass to the Vars
-		if _, ok := contextProviders[name]; ok {
-			extraContextProviders[name] = state.provider
+		// manually register providers that want to pass to the Vars as "fetch" providers
+		if _, ok := FetchContextProviders[name]; ok {
+			fetchContextProviders[name] = state.provider
 		}
 	}
 
@@ -162,7 +162,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				mapping[name] = state.Current()
 			}
 			// this is ensured not to error, by how the mappings states are verified
-			vars[0], _ = transpiler.NewVars(mapping, extraContextProviders)
+			vars[0], _ = transpiler.NewVars(mapping, fetchContextProviders)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
@@ -170,7 +170,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
-					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, extraContextProviders)
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, fetchContextProviders)
 					vars = append(vars, v)
 				}
 			}
