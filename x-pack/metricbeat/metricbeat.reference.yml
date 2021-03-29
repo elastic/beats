@@ -1121,6 +1121,10 @@ metricbeat.modules:
     # Stats about every PostgreSQL process
     - activity
 
+    # Stats about every statement executed in the server. It requires the
+    # `pg_stats_statement` library to be configured in the server.
+    #- statement
+
   period: 10s
 
   # The host must be passed as PostgreSQL URL. Example:
