@@ -103,7 +103,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(definition: 'Jenkinsfile.yml')
+        runBuildAndTest(markerfile: 'Jenkinsfile.yml')
       }
     }
     stage('Extended') {
@@ -122,7 +122,7 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(definition: 'Jenkinsfile.ext.yml')
+        runBuildAndTest(markerfile: 'Jenkinsfile.ext.yml')
       }
     }
     stage('Packaging') {
@@ -191,7 +191,7 @@ def runLinting() {
   def mapParallelTasks = [:]
   def content = readYaml(file: 'Jenkinsfile.yml')
   content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset'], definition: 'Jenkinsfile.yml').each { k,v ->
+    generateStages(project: projectName, changeset: content['changeset'], markerfile: 'Jenkinsfile.yml').each { k,v ->
       if (k.endsWith('lint')) {
         mapParallelTasks["${k}"] = v
       }
@@ -217,7 +217,7 @@ runBuildAndTest(Map args = [:]) {
       error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
     } else {
       content['projects'].each { projectName ->
-        generateStages(project: projectName, changeset: content['changeset'], definition: args.definition).each { k,v ->
+        generateStages(project: projectName, changeset: content['changeset'], markerfile: args.markerfile).each { k,v ->
           if (!k.endsWith('lint')) {
             mapParallelTasks["${k}"] = v
           }
@@ -236,9 +236,9 @@ runBuildAndTest(Map args = [:]) {
 def generateStages(Map args = [:]) {
   def projectName = args.project
   def changeset = args.changeset
-  def definition = args.get('definition', 'Jenkinsfile.yml')
+  def markerfile = args.get('markerfile', 'Jenkinsfile.yml')
   def mapParallelStages = [:]
-  def fileName = "${projectName}/${definition}"
+  def fileName = "${projectName}/${markerfile}"
   if (fileExists(fileName)) {
     def content = readYaml(file: fileName)
     // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
