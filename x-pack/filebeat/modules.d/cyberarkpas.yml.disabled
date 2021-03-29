@@ -13,7 +13,7 @@
     # var.syslog_port: 9301
 
     # With tcp input, set the optional tls configuration:
-    #ssl:
+    #var.ssl:
     #  enabled: true
     #  certificate: /path/to/cert.pem
     #  key: /path/to/privatekey.pem
