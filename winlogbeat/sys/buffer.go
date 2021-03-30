@@ -61,3 +61,24 @@ func (b *ByteBuffer) Bytes() []byte {
 func (b *ByteBuffer) Len() int {
 	return b.offset
 }
+
+// PtrAt returns a pointer to the given offset of the buffer.
+func (b *ByteBuffer) PtrAt(offset int) *byte {
+	if offset > b.offset-1 {
+		return nil
+	}
+	return &b.buf[offset]
+}
+
+// Reserve reserves n bytes by increasing the buffer's length. It may allocate
+// a new underlying buffer discarding any existing contents.
+func (b *ByteBuffer) Reserve(n int) {
+	b.offset = n
+
+	if n > cap(b.buf) {
+		// Allocate new larger buffer with len=n.
+		b.buf = make([]byte, n)
+	} else {
+		b.buf = b.buf[:n]
+	}
+}

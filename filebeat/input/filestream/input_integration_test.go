@@ -43,18 +43,22 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	// prospector.scanner.check_interval must be set to a bigger interval
+	// than close.on_state_change.check_interval to make sure
+	// the Harvester detects the rename first thus allowing
+	// the output to receive the event and then close the source file.
 	inp := env.mustCreateInput(map[string]interface{}{
 		"paths":                                []string{env.abspath(testlogName) + "*"},
-		"prospector.scanner.check_interval":    "1ms",
+		"prospector.scanner.check_interval":    "10ms",
 		"close.on_state_change.check_interval": "1ms",
 		"close.on_state_change.renamed":        "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -87,11 +91,11 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 		"close.on_state_change.removed":        "true",
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	testlines := []byte("first log line\n")
 	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -217,9 +221,6 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 		"paths": []string{env.abspath(testlogName)},
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
-
 	// BOM: 0xEF,0xBB,0xBF
 	lines := append([]byte{0xEF, 0xBB, 0xBF}, []byte(`#Software: Microsoft Exchange Server
 #Version: 14.0.0.0
@@ -230,6 +231,9 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 2016-04-05T00:00:02.145Z,,,,,"MDB:61914740-3f1b-4ddb-94e0-557196870cfa, Mailbox:49cb09c6-5b76-415d-a085-da0ad9079682, Event:269492711, MessageClass:IPM.Note.StorageQuotaWarning.Warning, CreationTime:2016-04-05T00:00:01.038Z, ClientType:System",,STOREDRIVER,NOTIFYMAPI,,,,,,,,,,,,,,,,,S:ItemEntryId=00-00-00-00-97-8F-07-43-51-44-61-4A-AD-BD-29-D4-97-4E-20-A0-07-00-0E-D6-03-16-80-DC-8C-44-9D-30-07-23-ED-71-B7-F7-00-8E-8F-BD-EB-57-00-00-3D-FB-CE-26-A4-8D-46-4C-A4-35-0F-A7-9B-FA-D7-B9-00-00-37-44-2F-CA-00-00
 `)...)
 	env.mustWriteLinesToFile(testlogName, lines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(7)
 
@@ -259,9 +263,6 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 				"encoding": name,
 			})
 
-			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, inp)
-
 			line := []byte("first line\n")
 			buf := bytes.NewBuffer(nil)
 			writer := transform.NewWriter(buf, encoder)
@@ -269,6 +270,9 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			writer.Close()
 
 			env.mustWriteLinesToFile(testlogName, buf.Bytes())
+
+			ctx, cancelInput := context.WithCancel(context.Background())
+			env.startInput(ctx, inp)
 
 			env.waitUntilEventCount(1)
 

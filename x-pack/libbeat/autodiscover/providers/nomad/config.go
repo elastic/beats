@@ -64,7 +64,7 @@ func (c *Config) Validate() error {
 	case ScopeNode:
 	case ScopeCluster:
 	default:
-		return fmt.Errorf("invalid value for `scope`, select `%s` or `%s`", ScopeNode, ScopeCluster)
+		return fmt.Errorf("invalid value for `scope`: %s, select `%s` or `%s`", c.Scope, ScopeNode, ScopeCluster)
 	}
 	return nil
 }

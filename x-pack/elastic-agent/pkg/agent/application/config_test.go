@@ -5,11 +5,8 @@
 package application
 
 import (
-	"io/ioutil"
 	"testing"
 	"time"
-
-	"gopkg.in/yaml.v2"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -76,10 +73,4 @@ func mustWithConfigMode(standalone bool) *config.Config {
 			},
 		},
 	)
-}
-
-func dumpToYAML(t *testing.T, out string, in interface{}) {
-	b, err := yaml.Marshal(in)
-	require.NoError(t, err)
-	ioutil.WriteFile(out, b, 0600)
 }

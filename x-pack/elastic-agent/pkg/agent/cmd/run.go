@@ -329,7 +329,7 @@ func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(st
 			} else {
 				content = string(bytes)
 			}
-			fmt.Fprintf(w, content)
+			fmt.Fprint(w, content)
 		}
 	}
 
