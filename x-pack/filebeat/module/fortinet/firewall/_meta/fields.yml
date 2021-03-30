@@ -2006,6 +2006,12 @@
           description: >
             Security action performed by UTM
 
+        - name: utmref
+          type: keyword
+          description: >
+            Reference to UTM
+
+
         - name: vap
           type: keyword
           description: >
