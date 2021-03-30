@@ -19,6 +19,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
+var _ corecomp.FetchContextProvider = (*contextProviderK8sSecrets)(nil)
+
 func init() {
 	composable.Providers.AddContextProvider("kubernetes_secrets", ContextProviderBuilder)
 }
@@ -29,7 +31,7 @@ type contextProviderK8sSecrets struct {
 	client k8sclient.Interface
 }
 
-// DynamicProviderBuilder builds the dynamic provider.
+// ContextProviderBuilder builds the context provider.
 func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.ContextProvider, error) {
 	var cfg Config
 	if c == nil {
@@ -75,7 +77,7 @@ func (p *contextProviderK8sSecrets) Fetch(key string) (string, bool) {
 	return string(secretString), true
 }
 
-// Run runs the k8s secrets context provider.
+// Run initializes the k8s secrets context provider.
 func (p *contextProviderK8sSecrets) Run(comm corecomp.ContextProviderComm) error {
 	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
