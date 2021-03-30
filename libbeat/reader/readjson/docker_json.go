@@ -20,7 +20,6 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"runtime"
 	"strings"
 	"time"
@@ -191,10 +190,6 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 
-		if message.Bytes == 0 {
-			message.Bytes = bytes
-			return message, io.EOF
-		}
 		// keep the right bytes count even if we return an error
 		bytes += message.Bytes
 		message.Bytes = bytes
@@ -214,10 +209,6 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
 
-			if next.Bytes == 0 {
-				message.Bytes = bytes
-				return message, io.EOF
-			}
 			// keep the right bytes count even if we return an error
 			bytes += next.Bytes
 			message.Bytes = bytes

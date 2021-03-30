@@ -363,7 +363,7 @@ func (m *mockReader) Next() (reader.Message, error) {
 		return reader.Message{
 			Content: []byte{},
 			Bytes:   0,
-		}, nil
+		}, io.EOF
 	}
 	message := m.messages[0]
 	m.messages = m.messages[1:]
