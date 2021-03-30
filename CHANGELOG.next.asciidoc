@@ -204,6 +204,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Cisco AMP `@metadata._id` calculation {issue}24717[24717] {pull}24718[24718]
 - Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
+- Improve PanOS parsing and ingest pipeline. {issue}22413[22413] {issue}22748[22748] {pull}24799[24799]
 
 *Heartbeat*
 
