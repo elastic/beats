@@ -23,6 +23,11 @@ exclude_files: [".gz$"]
 
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+fields_under_root: true
+fields:
+  observer.vendor: Fortinet
+  observer.product: Fortigate
+  observer.type: firewall
 
 processors:
   - add_fields:
