@@ -15,11 +15,11 @@ import (
 // streams:
 // - id: '123456'
 //   data_stream:
-// 	dataset: osquery_managed.result
+// 	dataset: osquery_manager.result
 // 	type: logs
 //   query: select * from usb_devices
 
-const DefaultStreamIndex = "logs-osquery_managed.result-default"
+const DefaultStreamIndex = "logs-osquery_manager.result-default"
 
 type StreamConfig struct {
 	ID       string        `config:"id"`
