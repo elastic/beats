@@ -63,12 +63,6 @@ type BrokerSettings struct {
 	Sasl                     kafka.SaslConfig
 }
 
-//const (
-//	saslTypePlaintext   = sarama.SASLTypePlaintext
-//	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
-//	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
-//)
-
 type GroupDescription struct {
 	Members map[string]MemberDescription
 }
