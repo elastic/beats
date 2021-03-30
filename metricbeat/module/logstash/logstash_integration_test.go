@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
@@ -84,14 +85,20 @@ func TestXPackEnabled(t *testing.T) {
 	config := getXPackConfig(lsService.Host())
 	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
 	for _, metricSet := range metricSets {
-		events, errs := mbtest.ReportingFetchV2Error(metricSet)
-		require.Empty(t, errs)
-		require.NotEmpty(t, events)
+		t.Run(metricSet.Name(), func(t *testing.T) {
+			events, errs := mbtest.ReportingFetchV2Error(metricSet)
+			require.Empty(t, errs)
+			require.NotEmpty(t, events)
 
-		event := events[0]
-		require.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
-		require.Equal(t, clusterUUID, event.RootFields["cluster_uuid"])
-		require.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
+			event := events[0]
+			assert.Equal(t, metricSetToTypeMap[metricSet.Name()], event.RootFields["type"])
+			assert.Equal(t, clusterUUID, event.RootFields["cluster_uuid"])
+			assert.Regexp(t, `^.monitoring-logstash-\d-mb`, event.Index)
+
+			if t.Failed() {
+				t.Logf("event: %+v", event)
+			}
+		})
 	}
 }
 
