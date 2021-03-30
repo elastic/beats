@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "uwsgi.status",
+        "duration": 115000,
+        "module": "uwsgi"
+    },
+    "metricset": {
+        "name": "status",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.28.0.3:9191",
+        "type": "uwsgi"
+    },
+    "uwsgi": {
+        "status": {
+            "worker": {
+                "accepting": 1,
+                "avg_rt": 74,
+                "delta_requests": 2,
+                "exceptions": 0,
+                "harakiri_count": 0,
+                "id": 1,
+                "pid": 8,
+                "requests": 2,
+                "respawn_count": 1,
+                "rss": 6791168,
+                "running_time": 202,
+                "signal_queue": 0,
+                "signals": 0,
+                "status": "idle",
+                "tx": 110,
+                "vsz": 9187328
+            }
+        }
+    }
+}

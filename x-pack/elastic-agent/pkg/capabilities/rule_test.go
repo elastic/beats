@@ -15,7 +15,7 @@ import (
 
 func TestUnmarshal(t *testing.T) {
 	t.Run("valid json", func(t *testing.T) {
-		rr := &ruleDefinitions{Capabilities: make([]ruler, 0, 0)}
+		rr := &ruleDefinitions{Capabilities: make([]ruler, 0)}
 
 		err := json.Unmarshal(jsonDefinitionValid, &rr)
 
@@ -35,7 +35,7 @@ func TestUnmarshal(t *testing.T) {
 	})
 
 	t.Run("valid yaml", func(t *testing.T) {
-		rr := &ruleDefinitions{Capabilities: make([]ruler, 0, 0)}
+		rr := &ruleDefinitions{Capabilities: make([]ruler, 0)}
 
 		err := yaml.Unmarshal(yamlDefinitionValid, &rr)
 

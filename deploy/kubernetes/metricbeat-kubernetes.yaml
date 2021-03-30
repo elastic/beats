@@ -36,6 +36,7 @@ data:
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
+                    - state_service
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -242,9 +243,13 @@ rules:
   - namespaces
   - events
   - pods
-  - secrets
   - services
   verbs: ["get", "list", "watch"]
+# Enable this rule only if planing to use Kubernetes keystore
+#- apiGroups: [""]
+#  resources:
+#  - secrets
+#  verbs: ["get"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets

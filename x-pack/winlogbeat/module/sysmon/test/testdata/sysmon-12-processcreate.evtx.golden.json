@@ -60,6 +60,7 @@
     },
     "user": {
       "domain": "VAGRANT",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {

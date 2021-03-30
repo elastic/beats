@@ -13,6 +13,7 @@ var:
   - name: tags
     default: [forwarded]
   - name: url
+  - name: proxy_url
   - name: initial_interval
     default: 24h
 

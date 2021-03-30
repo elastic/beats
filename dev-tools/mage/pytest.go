@@ -192,6 +192,12 @@ func PythonVirtualenv() (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
 
+	// When upgrading pip we might run into an error with the cryptography package
+	// (pip dependency) will not compile if no recent rust development environment is available.
+	// We set `CRYPTOGRAPHY_DONT_BUILD_RUST=1`, to disable the need for python.
+	// See: https://github.com/pyca/cryptography/issues/5771
+	os.Setenv("CRYPTOGRAPHY_DONT_BUILD_RUST", "1")
+
 	// Determine the location of the virtualenv.
 	ve, err := pythonVirtualenvPath()
 	if err != nil {

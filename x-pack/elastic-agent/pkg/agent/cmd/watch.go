@@ -15,7 +15,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -67,9 +67,9 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 		return nil
 	}
 
-	locker := application.NewAppLocker(paths.Top(), watcherLockFile)
+	locker := filelock.NewAppLocker(paths.Top(), watcherLockFile)
 	if err := locker.TryLock(); err != nil {
-		if err == application.ErrAppAlreadyRunning {
+		if err == filelock.ErrAppAlreadyRunning {
 			log.Debugf("exiting, lock already exists")
 			return nil
 		}
@@ -81,7 +81,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, ar
 
 	isWithinGrace, tilGrace := gracePeriod(marker)
 	if !isWithinGrace {
-		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn.String(), time.Now().Sub(marker.UpdatedOn).String())
+		log.Debugf("not within grace [updatedOn %v] %v", marker.UpdatedOn.String(), time.Since(marker.UpdatedOn).String())
 		// if it is started outside of upgrade loop
 		// if we're not within grace and marker is still there it might mean
 		// that cleanup was not performed ok, cleanup everything except current version
@@ -172,7 +172,7 @@ WATCHLOOP:
 // gracePeriod returns true if it is within grace period and time until grace period ends.
 // otherwise it returns false and 0
 func gracePeriod(marker *upgrade.UpdateMarker) (bool, time.Duration) {
-	sinceUpdate := time.Now().Sub(marker.UpdatedOn)
+	sinceUpdate := time.Since(marker.UpdatedOn)
 
 	if 0 < sinceUpdate && sinceUpdate < gracePeriodDuration {
 		return true, gracePeriodDuration - sinceUpdate

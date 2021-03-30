@@ -56,6 +56,14 @@ var testMonFields = stdfields.StdMonitorFields{
 	Timeout:  1,
 }
 
+var testBrowserMonFields = stdfields.StdMonitorFields{
+	ID:       "myid",
+	Name:     "myname",
+	Type:     "browser",
+	Schedule: schedule.MustParse("@every 1s"),
+	Timeout:  1,
+}
+
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Run(tt.name, func(t *testing.T) {
 		wrapped := WrapCommon(tt.jobs, tt.stdFields)
@@ -386,4 +394,106 @@ func TestTimespan(t *testing.T) {
 			}
 		})
 	}
+}
+
+func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
+	parsed, err := url.Parse(u)
+	require.NoError(t, err)
+	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.MergeEventFields(event, common.MapStr{
+			"url": URLFields(parsed),
+			"monitor": common.MapStr{
+				"check_group": "inline-check-group",
+			},
+		})
+		return nil, nil
+	}
+}
+
+// Inline browser jobs function very similarly to lightweight jobs
+// in that they don't override the ID.
+// They do not, however, get a summary field added, nor duration.
+func TestInlineBrowserJob(t *testing.T) {
+	fields := testBrowserMonFields
+	testCommonWrap(t, testDef{
+		"simple",
+		fields,
+		[]jobs.Job{makeInlineBrowserJob(t, "http://foo.com")},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, "http://foo.com"),
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{
+							"id":          testMonFields.ID,
+							"name":        testMonFields.Name,
+							"type":        fields.Type,
+							"status":      "up",
+							"check_group": "inline-check-group",
+						},
+					}),
+					hbtestllext.MonitorTimespanValidator,
+				),
+			),
+		},
+		nil,
+	})
+}
+
+var suiteBrowserJobValues = struct {
+	id         string
+	name       string
+	checkGroup string
+}{
+	id:         "journey_1",
+	name:       "Journey 1",
+	checkGroup: "journey-1-check-group",
+}
+
+func makeSuiteBrowserJob(t *testing.T, u string) jobs.Job {
+	parsed, err := url.Parse(u)
+	require.NoError(t, err)
+	return func(event *beat.Event) (i []jobs.Job, e error) {
+		eventext.MergeEventFields(event, common.MapStr{
+			"url": URLFields(parsed),
+			"monitor": common.MapStr{
+				"id":          suiteBrowserJobValues.id,
+				"name":        suiteBrowserJobValues.name,
+				"check_group": suiteBrowserJobValues.checkGroup,
+			},
+		})
+		return nil, nil
+	}
+}
+
+func TestSuiteBrowserJob(t *testing.T) {
+	fields := testBrowserMonFields
+	urlStr := "http://foo.com"
+	urlU, _ := url.Parse(urlStr)
+	testCommonWrap(t, testDef{
+		"simple",
+		fields,
+		[]jobs.Job{makeSuiteBrowserJob(t, urlStr)},
+		[]validator.Validator{
+			lookslike.Compose(
+				urlValidator(t, urlStr),
+				lookslike.Strict(
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{
+							"id":          fmt.Sprintf("%s-%s", testMonFields.ID, suiteBrowserJobValues.id),
+							"name":        fmt.Sprintf("%s - %s", testMonFields.Name, suiteBrowserJobValues.name),
+							"type":        fields.Type,
+							"check_group": suiteBrowserJobValues.checkGroup,
+							"status":      "up",
+							"timespan": common.MapStr{
+								"gte": hbtestllext.IsTime,
+								"lt":  hbtestllext.IsTime,
+							},
+						},
+						"url": URLFields(urlU),
+					}),
+				),
+			)},
+		nil,
+	})
 }

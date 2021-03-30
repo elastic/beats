@@ -24,6 +24,7 @@ processors:
         - {from: suricata.eve.dest_ip, to: destination.address}
         - {from: suricata.eve.dest_port, to: destination.port, type: long}
         - {from: suricata.eve.proto, to: network.transport}
+        - {from: suricata.eve.flow_id, type: string}
   - convert:
       ignore_missing: true
       fail_on_error: false
@@ -57,4 +58,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

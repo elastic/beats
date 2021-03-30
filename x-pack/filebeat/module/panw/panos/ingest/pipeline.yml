@@ -385,21 +385,25 @@ processors:
  - append:
      if: 'ctx?.source?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{source.ip}}'
  - append:
      if: 'ctx?.destination?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{destination.ip}}'
  - append:
      if: 'ctx?.source?.nat?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{source.nat.ip}}'
  - append:
      if: 'ctx?.destination?.nat?.ip != null'
      field: related.ip
+     allow_duplicates: false
      value:
        - '{{destination.nat.ip}}'
 
@@ -528,43 +532,51 @@ processors:
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{client.user.name}}"
      if: "ctx?.client?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{source.user.name}}"
      if: "ctx?.source?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{server.user.name}}"
      if: "ctx?.server?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{destination.user.name}}"
      if: "ctx?.destination?.user?.name != null"
 
  - append:
      field: related.user
+     allow_duplicates: false
      value: "{{url.username}}"
      if: "ctx?.url?.username != null && ctx?.url?.username != ''"
      allow_duplicates: false
 
  - append:
      field: related.hash
+     allow_duplicates: false
      value: "{{panw.panos.file.hash}}"
      if: "ctx?.panw?.panos?.file?.hash != null"
 
  - append:
      field: related.hosts
+     allow_duplicates: false
      value: "{{observer.hostname}}"
      if: "ctx?.observer?.hostname != null && ctx.observer?.hostname != ''"
      allow_duplicates: false
 
  - append:
      field: related.hosts
+     allow_duplicates: false
      value: "{{url.domain}}"
      if: "ctx?.url?.domain != null && ctx.url?.domain != ''"
      allow_duplicates: false

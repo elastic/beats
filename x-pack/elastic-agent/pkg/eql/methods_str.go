@@ -84,9 +84,8 @@ func number(args []interface{}) (interface{}, error) {
 			return nil, fmt.Errorf("number: argument 1 must be an integer; recieved %T", args[1])
 		}
 	}
-	if strings.HasPrefix(input, "0x") {
-		input = input[2:]
-	}
+	input = strings.TrimPrefix(input, "0x")
+
 	n, err := strconv.ParseInt(input, base, 64)
 	if err != nil {
 		return nil, fmt.Errorf("number: failed to convert '%s' to integer", input)

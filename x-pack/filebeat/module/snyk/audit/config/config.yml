@@ -13,6 +13,9 @@ request.url: https://snyk.io/api/v1/org/{{.audit_id}}/audit?page=1&sortOrder=ASC
 {{ end }}
 request.method: POST
 request.ssl: {{ .ssl | tojson }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
 request.transforms:
 - set:
     target: header.Authorization
@@ -73,4 +76,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.6.0
+        ecs.version: 1.8.0
