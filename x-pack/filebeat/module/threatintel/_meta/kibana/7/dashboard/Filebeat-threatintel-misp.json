@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "MSIP indicators ingested by the threat intel Filebeat module.",
+        "description": "MISP indicators ingested by the threat intel Filebeat module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
