@@ -226,14 +226,14 @@ func (c *s3Collector) changeVisibilityTimeout(queueURL string, visibilityTimeout
 	return err
 }
 
-func getRegionFromQueueURL(queueURL string) (string, error) {
+func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	// get region from queueURL
 	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
 	queueURLSplit := strings.Split(queueURL, ".")
-	if queueURLSplit[0] == "https://sqs" && queueURLSplit[2] == "amazonaws" {
+	if queueURLSplit[0] == "https://sqs" && ((endpoint != "" && strings.Join(queueURLSplit[2:], ".") == endpoint) || queueURLSplit[2] == "amazonaws") {
 		return queueURLSplit[1], nil
 	}
-	return "", fmt.Errorf("queueURL is not in format: https://sqs.{REGION_ENDPOINT}.amazonaws.com/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+	return "", fmt.Errorf("queueURL is not in format: https://sqs.{REGION_ENDPOINT}.amazonaws.com/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 }
 
 // handle message
