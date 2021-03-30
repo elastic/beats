@@ -10,6 +10,8 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 )
 
@@ -23,16 +25,16 @@ type Vars struct {
 	tree                  *AST
 	processorsKey         string
 	processors            Processors
-	fetchContextProviders map[string]composable.ContextProvider
+	fetchContextProviders common.MapStr
 }
 
 // NewVars returns a new instance of vars.
-func NewVars(mapping map[string]interface{}, fetchContextProviders map[string]composable.ContextProvider) (*Vars, error) {
+func NewVars(mapping map[string]interface{}, fetchContextProviders common.MapStr) (*Vars, error) {
 	return NewVarsWithProcessors(mapping, "", nil, fetchContextProviders)
 }
 
 // NewVarsWithProcessors returns a new instance of vars with attachment of processors.
-func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, fetchContextProviders map[string]composable.ContextProvider) (*Vars, error) {
+func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, fetchContextProviders common.MapStr) (*Vars, error) {
 	tree, err := NewAST(mapping)
 	if err != nil {
 		return nil, err
@@ -57,13 +59,17 @@ func (v *Vars) Replace(value string) (Node, error) {
 			}
 			set := false
 			for _, val := range vars {
-				for name, provider := range v.fetchContextProviders {
-					if varPrefixMatched(val.Value(), name) {
+				for providerName, provider := range v.fetchContextProviders {
+					if varPrefixMatched(val.Value(), providerName) {
 						fetchProvider := provider.(composable.FetchContextProvider)
-						fval, _ := fetchProvider.Fetch(val.Value())
-						result += value[lastIndex:r[0]] + fval
-						set = true
-						break
+						fval, found := fetchProvider.Fetch(val.Value())
+						if found {
+							result += value[lastIndex:r[0]] + fval
+							set = true
+							break
+						} else {
+							return NewStrVal(""), ErrNoMatch
+						}
 					}
 				}
 				if set {

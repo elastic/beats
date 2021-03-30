@@ -8,12 +8,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
-
 	"reflect"
 	"sort"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
@@ -21,10 +22,6 @@ import (
 	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
-
-var FetchContextProviders = map[string]string{
-	"kubernetes_secrets": "",
-}
 
 // VarsCallback is callback called when the current vars state changes.
 type VarsCallback func([]*transpiler.Vars)
@@ -103,7 +100,8 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
-	fetchContextProviders := make(map[string]corecomp.ContextProvider, len(FetchContextProviders))
+	//fetchContextProviders := make(map[string]corecomp.ContextProvider, len(FetchContextProviders))
+	fetchContextProviders := common.MapStr{}
 
 	// run all the enabled context providers
 	for name, state := range c.contextProviders {
@@ -114,9 +112,8 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 			cancel()
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
 		}
-		// manually register providers that want to pass to the Vars as "fetch" providers
-		if _, ok := FetchContextProviders[name]; ok {
-			fetchContextProviders[name] = state.provider
+		if p, ok := state.provider.(corecomp.FetchContextProvider); ok {
+			fetchContextProviders.Put(name, p)
 		}
 	}
 

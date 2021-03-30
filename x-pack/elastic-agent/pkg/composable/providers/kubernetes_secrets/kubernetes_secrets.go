@@ -12,7 +12,6 @@ import (
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -43,11 +42,11 @@ func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.C
 	return &contextProviderK8sSecrets{logger, &cfg, nil}, nil
 }
 
-func (p *contextProviderK8sSecrets) Fetch(key string) (string, error) {
+func (p *contextProviderK8sSecrets) Fetch(key string) (string, bool) {
 	// key = "kubernetes_secrets.somenamespace.somesecret.value"
 	tokens := strings.Split(key, ".")
 	if len(tokens) > 0 && tokens[0] != "kubernetes_secrets" {
-		return "", keystore.ErrKeyDoesntExists
+		return "", false
 	}
 	if len(tokens) != 4 {
 		p.logger.Debugf(
@@ -55,7 +54,7 @@ func (p *contextProviderK8sSecrets) Fetch(key string) (string, error) {
 			key,
 			"kubernetes_secrets.somenamespace.somesecret.value",
 		)
-		return "", keystore.ErrKeyDoesntExists
+		return "", false
 	}
 	ns := tokens[1]
 	secretName := tokens[2]
@@ -66,14 +65,14 @@ func (p *contextProviderK8sSecrets) Fetch(key string) (string, error) {
 	secret, err := secretIntefrace.Get(ctx, secretName, metav1.GetOptions{})
 	if err != nil {
 		p.logger.Errorf("Could not retrieve secret from k8s API: %v", err)
-		return "", keystore.ErrKeyDoesntExists
+		return "", false
 	}
 	if _, ok := secret.Data[secretVar]; !ok {
 		p.logger.Errorf("Could not retrieve value %v for secret %v", secretVar, secretName)
-		return "", keystore.ErrKeyDoesntExists
+		return "", false
 	}
 	secretString := secret.Data[secretVar]
-	return string(secretString), nil
+	return string(secretString), true
 }
 
 // Run runs the k8s secrets context provider.
