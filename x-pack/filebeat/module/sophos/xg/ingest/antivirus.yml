@@ -331,6 +331,14 @@ processors:
 - lowercase:
       field: event.info
       ignore_failure: true
+- rename:
+    field: sophos.xg.FTP_direction
+    target_field: sophos.xg.ftp_direction
+    ignore_missing: true
+- rename:
+    field: sophos.xg.FTP_url
+    target_field: sophos.xg.ftp_url
+    ignore_missing: true
 - remove:
     field:
     - sophos.xg.dst_port
