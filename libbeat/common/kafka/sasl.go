@@ -34,11 +34,11 @@ const (
 	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
 )
 
-func (c *SaslConfig) ConfigureSarama(config *sarama.Config) error {
+func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
 	case "":
 		// SASL is not enabled
-		return nil
+		return
 	case saslTypePlaintext:
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
 	case saslTypeSCRAMSHA256:
@@ -54,17 +54,15 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) error {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
 		}
 	default:
-		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+		panic(fmt.Sprintf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism))
 	}
-
-	return nil
 }
 
 func (c *SaslConfig) Validate() error {
 	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
-	case "", saslTypePlaintext, saslTypeSCRAMSHA256,  saslTypeSCRAMSHA512:
+	case "", saslTypePlaintext, saslTypeSCRAMSHA256, saslTypeSCRAMSHA512:
 	default:
-		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
 	}
 	return nil
 }

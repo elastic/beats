@@ -92,11 +92,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.Enable = true
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
-		err := settings.Sasl.ConfigureSarama(cfg)
-
-		if err != nil {
-			return nil
-		}
+		settings.Sasl.ConfigureSarama(cfg)
 	}
 	cfg.Version, _ = settings.Version.Get()
 
