@@ -66266,7 +66266,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -66276,7 +66276,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67530,7 +67530,7 @@ type: keyword
 SAML status code.
 
 
-type: long
+type: keyword
 
 --
 
@@ -67540,7 +67540,7 @@ type: long
 SAML second level status code.
 
 
-type: long
+type: keyword
 
 --
 
