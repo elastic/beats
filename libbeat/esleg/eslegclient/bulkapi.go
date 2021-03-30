@@ -227,7 +227,7 @@ func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, err
 func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
 	for _, obj := range body {
 		if err := out.AddRaw(obj); err != nil {
-			log.Debugf("Failed to encode message: %s", err)
+			log.Debugf("Failed to encode message: %v %s", obj, err)
 			return err
 		}
 	}

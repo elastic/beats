@@ -14,7 +14,6 @@ import (
 
 // Bucket is a Token Bucket for rate limiting
 type Bucket struct {
-	size       int
 	dropAmount int
 	rateChan   chan struct{}
 	closeChan  chan struct{}

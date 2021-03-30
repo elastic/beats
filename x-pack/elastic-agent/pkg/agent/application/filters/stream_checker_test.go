@@ -16,8 +16,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
-const semiLongString = ""
-
 func TestStreamCheck(t *testing.T) {
 	type testCase struct {
 		name      string

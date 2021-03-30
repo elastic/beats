@@ -12,6 +12,7 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 const ackPath = "/api/fleet/agents/%s/acks"
@@ -63,12 +64,12 @@ func (e *AckResponse) Validate() error {
 
 // AckCmd is a fleet API command.
 type AckCmd struct {
-	client clienter
+	client client.Sender
 	info   agentInfo
 }
 
 // NewAckCmd creates a new api command.
-func NewAckCmd(info agentInfo, client clienter) *AckCmd {
+func NewAckCmd(info agentInfo, client client.Sender) *AckCmd {
 	return &AckCmd{
 		client: client,
 		info:   info,
@@ -99,7 +100,7 @@ func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, erro
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
 	ackResponse := &AckResponse{}

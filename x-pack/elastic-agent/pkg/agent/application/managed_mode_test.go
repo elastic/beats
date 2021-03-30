@@ -10,11 +10,18 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions/handlers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/dispatcher"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -23,8 +30,8 @@ import (
 )
 
 func TestManagedModeRouting(t *testing.T) {
-	streams := make(map[routingKey]stream)
-	streamFn := func(l *logger.Logger, r routingKey) (stream, error) {
+	streams := make(map[pipeline.RoutingKey]pipeline.Stream)
+	streamFn := func(l *logger.Logger, r pipeline.RoutingKey) (pipeline.Stream, error) {
 		m := newMockStreamStore()
 		streams[r] = m
 
@@ -35,32 +42,32 @@ func TestManagedModeRouting(t *testing.T) {
 	defer cancel()
 
 	log, _ := logger.New("")
-	router, _ := newRouter(log, streamFn)
+	router, _ := router.New(log, streamFn)
 	agentInfo, _ := info.NewAgentInfo()
 	nullStore := &storage.NullStore{}
 	composableCtrl, _ := composable.New(log, nil)
-	emit, err := emitter(ctx, log, agentInfo, composableCtrl, router, &configModifiers{Decorators: []decoratorFunc{injectMonitoring}}, nil)
+	emit, err := emitter.New(ctx, log, agentInfo, composableCtrl, router, &pipeline.ConfigModifiers{Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring}}, nil)
 	require.NoError(t, err)
 
-	actionDispatcher, err := newActionDispatcher(ctx, log, &handlerDefault{log: log})
+	actionDispatcher, err := dispatcher.New(ctx, log, handlers.NewDefault(log))
 	require.NoError(t, err)
 
 	cfg := configuration.DefaultConfiguration()
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
-		&handlerPolicyChange{
-			log:       log,
-			emitter:   emit,
-			agentInfo: agentInfo,
-			config:    cfg,
-			store:     nullStore,
-		},
+		handlers.NewPolicyChange(
+			log,
+			emit,
+			agentInfo,
+			cfg,
+			nullStore,
+		),
 	)
 
 	actions, err := testActions()
 	require.NoError(t, err)
 
-	err = actionDispatcher.Dispatch(newNoopAcker(), actions...)
+	err = actionDispatcher.Dispatch(noopacker.NewAcker(), actions...)
 	require.NoError(t, err)
 
 	// has 1 config request for fb, mb and monitoring?
@@ -72,10 +79,10 @@ func TestManagedModeRouting(t *testing.T) {
 
 	confReq := defaultStreamStore.(*mockStreamStore).store[0]
 	assert.Equal(t, 3, len(confReq.ProgramNames()))
-	assert.Equal(t, monitoringName, confReq.ProgramNames()[2])
+	assert.Equal(t, modifiers.MonitoringName, confReq.ProgramNames()[2])
 }
 
-func testActions() ([]action, error) {
+func testActions() ([]fleetapi.Action, error) {
 	checkinResponse := &fleetapi.CheckinResponse{}
 	if err := json.Unmarshal([]byte(fleetResponse), &checkinResponse); err != nil {
 		return nil, err

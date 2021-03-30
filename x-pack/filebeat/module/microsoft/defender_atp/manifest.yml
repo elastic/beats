@@ -8,6 +8,7 @@ var:
   - name: tags
     default: [defender-atp, forwarded]
   - name: oauth2
+  - name: proxy_url
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/atp.yml
