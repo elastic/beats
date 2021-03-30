@@ -108,7 +108,7 @@ The fileset configuration allows to set the polling interval, how far back it sh
     var.input: httpjson
     var.url: https://SERVER/events/restSearch
     var.api_token: xVfaM3DSt8QEwO2J1ix00V4ZHJs14nq5GMsHcK6Z
-    var.initial_interval: 24h
+    var.first_interval: 24h
     var.interval: 60m
 ----
 
@@ -128,7 +128,7 @@ The below filters is only examples, for a full list of all fields please referen
     var.filters:
       - type: ["md5", "sha256", "url", "ip-src"]
       - threat_level: 4
-    var.initial_interval: 24h
+    var.first_interval: 24h
     var.interval: 60m
 ----
 
