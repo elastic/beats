@@ -6,8 +6,6 @@ config_version: "2"
 interval: {{ .interval }}
 
 auth.oauth2: {{ .oauth2 | tojson }}
-auth.oauth2.provider: azure
-auth.oauth2.azure.resource: https://api.securitycenter.windows.com/
 
 {{ if .proxy_url }}
 request.proxy_url: {{ .proxy_url }}
