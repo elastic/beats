@@ -215,12 +215,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
-- Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
-- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
-- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
-- Fix `google_workspace` pagination. {pull}24668[24668]
-- Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
-- Fix Cisco AMP `@metadata._id` calculation {issue}24717[24717] {pull}24718[24718]
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
 - Zoom module pipeline failed to ingest some chat_channel events. {pull}23904[23904]
@@ -519,8 +513,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Updating field mappings for Cisco AMP module, fixing certain fields. {pull}24661[24661]
 - Added NTP fileset to Zeek module {pull}24224[24224]
 - Add `proxy_url` config for httpjson v2 input. {issue}24615[24615] {pull}24662[24662]
-- Add support for upper case field names in Sophos XG module {pull}24693[24693]
-- Add `fail_on_template_error` option for httpjson input. {pull}24784[24784]
 
 *Heartbeat*
 
