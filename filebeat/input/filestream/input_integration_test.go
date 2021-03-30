@@ -374,6 +374,38 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
+func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "24h",
+		"close.on_state_change.check_interval": "10ms",
+		"close.on_state_change.inactive":       "100ms",
+		// reader is not stopped when file is removed to see if the reader can still detect
+		// if the file has been inactive even if it have been removed in the meantime
+		"close.on_state_change.removed": "false",
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\n")
+	env.mustWriteLinesToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, len(testlines))
+
+	newFileName := "test_rotated.log"
+	env.mustRenameFile(testlogName, newFileName)
+
+	env.waitUntilHarvesterIsDone()
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
 // test_close_inactive_file_rotation_and_removal from test_input.py
 func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
