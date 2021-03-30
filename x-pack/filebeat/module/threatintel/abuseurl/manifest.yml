@@ -10,6 +10,7 @@ var:
   - name: ssl
   - name: tags
     default: [threatintel-abuseurls, forwarded]
+  - name: proxy_url
 
 ingest_pipeline:
   - ingest/pipeline.yml
