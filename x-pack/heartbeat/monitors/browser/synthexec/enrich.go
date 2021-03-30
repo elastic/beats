@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
@@ -25,7 +26,11 @@ type StreamEnricher struct {
 }
 
 func (e *StreamEnricher) Enrich(event *beat.Event, se *SynthEvent) error {
-	if e.je == nil || (se != nil && se.Type == "journey/start") {
+	// TODO: Decide on where to put this event
+	if se != nil && se.Type == "synthetics/metadata" {
+		logp.Info("%s event: %s", se.Type, se.RootFields)
+		return nil
+	} else if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
 	}
 

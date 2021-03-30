@@ -28,15 +28,15 @@ func (e ExecMultiplexer) WriteSynthEvent(se *SynthEvent) {
 		e.currentJourney.Store(true)
 		e.eventCounter.Store(-1)
 	}
-	hasCurrentJourney := e.currentJourney.Load()
+	// hasCurrentJourney := e.currentJourney.Load()
 	if se.Type == "journey/end" {
 		e.currentJourney.Store(false)
 	}
 
 	se.index = e.eventCounter.Inc()
-	if hasCurrentJourney {
+	// if hasCurrentJourney {
 		e.synthEvents <- se
-	}
+	// }
 }
 
 // SynthEvents returns a read only channel for synth events
