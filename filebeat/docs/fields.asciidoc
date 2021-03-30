@@ -106331,6 +106331,16 @@ Specifies the sub type of the log
 
 --
 
+*`panw.panos.virtual_sys`*::
++
+--
+Virtual system instance
+
+
+type: keyword
+
+--
+
 [[exported-fields-pensando]]
 == Pensando fields
 

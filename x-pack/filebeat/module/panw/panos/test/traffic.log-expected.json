@@ -80,6 +80,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -189,6 +190,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -301,6 +303,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -410,6 +413,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -522,6 +526,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -631,6 +636,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -740,6 +746,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -849,6 +856,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -958,6 +966,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1067,6 +1076,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1176,6 +1186,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1285,6 +1296,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1394,6 +1406,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1503,6 +1516,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1612,6 +1626,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1721,6 +1736,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1830,6 +1846,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -1939,6 +1956,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2048,6 +2066,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2157,6 +2176,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2266,6 +2286,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2375,6 +2396,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2487,6 +2509,7 @@
         "panw.panos.sub_type": "start",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2597,6 +2620,7 @@
         "panw.panos.sub_type": "drop",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2706,6 +2730,7 @@
         "panw.panos.sub_type": "deny",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2811,6 +2836,7 @@
         "panw.panos.source.zone": "trust",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -2917,6 +2943,7 @@
         "panw.panos.sub_type": "test",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3026,6 +3053,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3138,6 +3166,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3247,6 +3276,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3356,6 +3386,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3465,6 +3496,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3574,6 +3606,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3684,6 +3717,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3796,6 +3830,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -3908,6 +3943,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4017,6 +4053,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4126,6 +4163,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4238,6 +4276,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4345,6 +4384,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "insufficient-content",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4457,6 +4497,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4566,6 +4607,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4678,6 +4720,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4790,6 +4833,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -4899,6 +4943,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5008,6 +5053,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5120,6 +5166,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5229,6 +5276,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5336,6 +5384,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5441,6 +5490,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5550,6 +5600,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5659,6 +5710,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5768,6 +5820,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5877,6 +5930,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -5986,6 +6040,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6095,6 +6150,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6204,6 +6260,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6313,6 +6370,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6422,6 +6480,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6531,6 +6590,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6640,6 +6700,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6749,6 +6810,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6858,6 +6920,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -6970,6 +7033,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7079,6 +7143,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7188,6 +7253,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7297,6 +7363,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7406,6 +7473,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7515,6 +7583,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7627,6 +7696,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "computer-and-internet-info",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7736,6 +7806,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7845,6 +7916,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -7957,6 +8029,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8066,6 +8139,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8175,6 +8249,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8284,6 +8359,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8393,6 +8469,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8501,6 +8578,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8609,6 +8687,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8717,6 +8796,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8827,6 +8907,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -8936,6 +9017,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9045,6 +9127,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9154,6 +9237,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9266,6 +9350,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9378,6 +9463,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9490,6 +9576,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9599,6 +9686,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "web-advertisements",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9711,6 +9799,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9823,6 +9912,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -9935,6 +10025,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10047,6 +10138,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10159,6 +10251,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10268,6 +10361,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10377,6 +10471,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10486,6 +10581,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10595,6 +10691,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10704,6 +10801,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10813,6 +10911,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
@@ -10922,6 +11021,7 @@
         "panw.panos.sub_type": "end",
         "panw.panos.type": "TRAFFIC",
         "panw.panos.url.category": "any",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220"
         ],
