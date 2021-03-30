@@ -29635,6 +29635,213 @@ alias to: kibana.stats.process.uptime.ms
 
 --
 
+*`kibana_stats.process.memory.heap.size_limit`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.memory.heap.size_limit.bytes
+
+--
+
+*`kibana_stats.concurrent_connections`*::
++
+--
+type: alias
+
+alias to: kibana.stats.concurrent_connections
+
+--
+
+*`kibana_stats.process.memory.resident_set_size_in_bytes`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.memory.resident_set_size.bytes
+
+--
+
+*`kibana_stats.os.load.1m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.1m
+
+--
+
+*`kibana_stats.os.load.5m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.5m
+
+--
+
+*`kibana_stats.os.load.15m`*::
++
+--
+type: alias
+
+alias to: kibana.stats.os.load.15m
+
+--
+
+*`kibana_stats.process.event_loop_delay`*::
++
+--
+type: alias
+
+alias to: kibana.stats.process.event_loop_delay.ms
+
+--
+
+*`kibana_stats.requests.total`*::
++
+--
+type: alias
+
+alias to: kibana.stats.request.total
+
+--
+
+*`kibana_stats.requests.disconnects`*::
++
+--
+type: alias
+
+alias to: kibana.stats.request.disconnects
+
+--
+
+*`kibana_stats.response_times.max`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.max.ms
+
+--
+
+*`kibana_stats.response_times.average`*::
++
+--
+type: alias
+
+alias to: kibana.stats.response_time.avg.ms
+
+--
+
+*`kibana_stats.kibana.uuid`*::
++
+--
+type: alias
+
+alias to: kibana.stats.uuid
+
+--
+
+
+
+*`kibana.stats.uuid`*::
++
+--
+type: keyword
+
+--
+
+
+
+*`kibana.stats.process.event_loop_delay.ms`*::
++
+--
+type: float
+
+--
+
+
+
+*`kibana.stats.process.memory.resident_set_size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.stats.os.distro`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.distroRelease`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platform`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.platformRelease`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.stats.os.memory.free_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.memory.total_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.memory.used_in_bytes`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.stats.os.load.1m`*::
++
+--
+type: half_float
+
+--
+
+*`kibana.stats.os.load.5m`*::
++
+--
+type: half_float
+
+--
+
+*`kibana.stats.os.load.15m`*::
++
+--
+type: half_float
+
+--
 
 [float]
 === settings
