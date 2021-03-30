@@ -66,7 +66,17 @@ func statusCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error 
 		return fmt.Errorf("failed to communicate with Elastic Agent daemon: %s", err)
 	}
 
-	return outputFunc(streams.Out, status)
+	err = outputFunc(streams.Out, status)
+	if err != nil {
+		return err
+	}
+	// exit 0 only if the Elastic Agent daemon is healthy
+	if status.Status == client.Healthy {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
+	return nil
 }
 
 func humanOutput(w io.Writer, status *client.AgentStatus) error {
