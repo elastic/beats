@@ -504,7 +504,7 @@ ifdef::autodiscoverAWSEC2[]
 [float]
 ===== Amazon EC2s
 
-*Note: This provider is experimental*
+experimental[]
 
 The Amazon EC2 autodiscover provider discovers https://aws.amazon.com/ec2/[EC2 instances].
 This is useful for users to launch {beatname_uc} modules to monitor services running on AWS EC2 instances.
