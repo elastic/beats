@@ -191,7 +191,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 
-		if message.Bytes == 0 || err == io.EOF {
+		if message.Bytes == 0 {
 			message.Bytes = bytes
 			return message, io.EOF
 		}
@@ -214,7 +214,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
 
-			if next.Bytes == 0 || err == io.EOF {
+			if next.Bytes == 0 {
 				message.Bytes = bytes
 				return message, io.EOF
 			}
