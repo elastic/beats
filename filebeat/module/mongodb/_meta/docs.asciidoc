@@ -13,7 +13,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The +{modulename}+ module was tested with logs from versions v3.2.11 on Debian.
+The +{modulename}+ module was tested with plaintext logs from version v3.2.11 on Debian and json logs from version v4.4.4 on Ubuntu.
 
 include::../include/configuring-intro.asciidoc[]
 
