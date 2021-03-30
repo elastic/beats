@@ -1,39 +1,74 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
-        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
+        "id": "7d2acd63-b764-47b5-9c1e-ea00ef8ef0b9",
+        "type": "metricbeat",
         "stats": {
+            "memstats": {
+                "gc_next": 53878368,
+                "memory": {
+                    "alloc": 39812088,
+                    "total": 1370631200
+                },
+                "rss": 123310080
+            },
+            "uptime": {
+                "ms": 2488348
+            },
+            "runtime": {
+                "goroutines": 61
+            },
+            "handles": {
+                "open": 12,
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                }
+            },
             "libbeat": {
-                "output": {
+                "pipeline": {
+                    "clients": 10,
+                    "queue": {
+                        "acked": 0
+                    },
                     "events": {
-                        "acked": 0,
-                        "active": 0,
+                        "active": 2336,
+                        "dropped": 0,
+                        "failed": 0,
+                        "filtered": 42,
+                        "published": 2336,
+                        "retry": 681,
+                        "total": 2378
+                    }
+                },
+                "config": {
+                    "running": 3,
+                    "starts": 3,
+                    "stops": 0
+                },
+                "output": {
+                    "type": "elasticsearch",
+                    "events": {
                         "batches": 0,
                         "dropped": 0,
                         "duplicates": 0,
                         "failed": 0,
                         "toomany": 0,
-                        "total": 0
+                        "total": 0,
+                        "acked": 0,
+                        "active": 0
                     },
                     "read": {
                         "bytes": 0,
                         "errors": 0
                     },
-                    "type": "elasticsearch",
                     "write": {
-                        "bytes": 0,
-                        "errors": 0
+                        "errors": 0,
+                        "bytes": 0
                     }
                 }
-            },
-            "runtime": {
-                "goroutines": 39
-            },
-            "uptime": {
-                "ms": 12019
             }
-        },
-        "type": "metricbeat"
+        }
     },
     "event": {
         "dataset": "beat.stats",
@@ -41,10 +76,11 @@
         "module": "beat"
     },
     "metricset": {
-        "name": "stats"
+        "name": "stats",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:5066",
+        "address": "172.20.0.2:5066",
         "name": "beat",
         "type": "beat"
     }

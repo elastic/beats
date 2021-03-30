@@ -2,11 +2,30 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "state": {
+            "beat": {
+                "host": "c6242501b92b",
+                "name": "c6242501b92b",
+                "type": "metricbeat",
+                "uuid": "2c7647a3-3839-455e-939d-04f10b7cd788",
+                "version": "7.10.0"
+            },
+            "cluster": {
+                "uuid": "foobar"
+            },
+            "host": {
+                "containerized": "containerized",
+                "os": {
+                    "kernel": "5.6.10-arch1-1",
+                    "name": "CentOS Linux",
+                    "platform": "centos",
+                    "version": "7 (Core)"
+                }
+            },
             "management": {
                 "enabled": false
             },
             "module": {
-                "count": 3
+                "count": 10
             },
             "output": {
                 "name": "elasticsearch"
@@ -21,13 +40,16 @@
         "duration": 115000,
         "module": "beat"
     },
+    "host": {
+        "architecture": "x86_64",
+        "hostname": "c6242501b92b"
+    },
     "metricset": {
-        "name": "state"
+        "name": "state",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:5066",
-        "id": "1f0c187b-f2ef-4950-b9cc-dd6864b9191a",
-        "name": "Shaunaks-MacBook-Pro-2.local",
-        "type": "metricbeat"
+        "address": "172.20.0.2:5066",
+        "type": "beat"
     }
 }

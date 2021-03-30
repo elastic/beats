@@ -4,6 +4,37 @@
     Beat state
   release: ga
   fields:
+    - name: beat
+      type: group
+      fields:
+        - name: host
+          type: keyword
+        - name: name
+          type: keyword
+        - name: type
+          type: keyword
+        - name: uuid
+          type: keyword
+        - name: version
+          type: keyword
+    - name: cluster.uuid
+      type: keyword
+    - name: host
+      type: group
+      fields:
+        - name: containerized
+          type: keyword
+        - name: os
+          type: group
+          fields:
+            - name: kernel
+              type: keyword
+            - name: name
+              type: keyword
+            - name: platform
+              type: keyword
+            - name: version
+              type: keyword
     - name: management.enabled
       type: boolean
       description: >

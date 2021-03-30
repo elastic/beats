@@ -4,6 +4,26 @@
     Beat stats
   release: ga
   fields:
+    - name: memstats
+      type: group
+      fields:
+        - name: gc_next
+          type: long
+        - name: memory.alloc
+          type: long
+        - name: memory.total
+          type: long
+        - name: rss
+          type: long
+    - name: handles
+      type: group
+      fieldS:
+        - name: open
+          type: long
+        - name: limit.hard
+          type: long
+        - name: limit.soft
+          type: long
     - name: uptime.ms
       type: long
       description: >
