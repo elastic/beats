@@ -7,5 +7,8 @@ var:
     os.windows:
       - c:\data\log\mongod.log
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/pipeline-plaintext.yml
+  - ingest/pipeline-json.yml
 input: config/log.yml
