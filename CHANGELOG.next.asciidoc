@@ -215,7 +215,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of ModifiedProperties field in Office 365. {pull}23777[23777]
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
-- Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
 - Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 - Fix Logstash module handling of logstash.log.log_event.action field. {issue}20709[20709]
 - aws/s3access dataset was populating event.duration using the wrong unit. {pull}23920[23920]
