@@ -19,16 +19,18 @@ var errNewURLValueNotSet = errors.New("the new url.value was not set")
 const setName = "set"
 
 type setConfig struct {
-	Target  string    `config:"target"`
-	Value   *valueTpl `config:"value"`
-	Default *valueTpl `config:"default"`
+	Target              string    `config:"target"`
+	Value               *valueTpl `config:"value"`
+	Default             *valueTpl `config:"default"`
+	FailOnTemplateError bool      `config:"fail_on_template_error"`
 }
 
 type set struct {
-	log          *logp.Logger
-	targetInfo   targetInfo
-	value        *valueTpl
-	defaultValue *valueTpl
+	log                 *logp.Logger
+	targetInfo          targetInfo
+	value               *valueTpl
+	defaultValue        *valueTpl
+	failOnTemplateError bool
 
 	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
 }
@@ -105,15 +107,19 @@ func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 	}
 
 	return set{
-		log:          log,
-		targetInfo:   ti,
-		value:        c.Value,
-		defaultValue: c.Default,
+		log:                 log,
+		targetInfo:          ti,
+		value:               c.Value,
+		defaultValue:        c.Default,
+		failOnTemplateError: c.FailOnTemplateError,
 	}, nil
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value := set.value.Execute(ctx, tr, set.defaultValue, set.log)
+	value, err := set.value.Execute(ctx, tr, set.defaultValue, set.log)
+	if err != nil && set.failOnTemplateError {
+		return transformable{}, err
+	}
 	if err := set.runFunc(ctx, tr, set.targetInfo.Name, value); err != nil {
 		return transformable{}, err
 	}
@@ -155,11 +161,6 @@ func setURLParams(ctx *transformContext, transformable transformable, key, value
 }
 
 func setURLValue(ctx *transformContext, transformable transformable, _, value string) error {
-	// if the template processing did not find any value
-	// we fail without parsing
-	if value == "<no value>" || value == "" {
-		return errNewURLValueNotSet
-	}
 	url, err := url.Parse(value)
 	if err != nil {
 		return errNewURLValueNotSet
