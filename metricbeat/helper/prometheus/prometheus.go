@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-const acceptHeader = `application/openmetrics-text; version=0.0.1,text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {

@@ -78,12 +78,10 @@ type Client interface {
 
 // client manages the state and communication to the Elastic Agent.
 type client struct {
-	ctx     context.Context
-	cancel  context.CancelFunc
-	wg      sync.WaitGroup
-	client  proto.ElasticAgentControlClient
-	cfgLock sync.RWMutex
-	obsLock sync.RWMutex
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup
+	client proto.ElasticAgentControlClient
 }
 
 // New creates a client connection to Elastic Agent.

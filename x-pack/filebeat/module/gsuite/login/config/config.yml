@@ -23,6 +23,10 @@ date_cursor.initial_interval: {{ .initial_interval }}
 pagination.id_field: nextPageToken
 pagination.url_field: pageToken
 
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 type: log
 paths:
@@ -39,7 +43,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0
   - script:
       lang: javascript
       id: gsuite-common

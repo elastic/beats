@@ -48,7 +48,13 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     },
     {
         "event.action": "CREATE_ROLE",
@@ -97,7 +103,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_ROLE",
@@ -146,7 +155,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "ADD_PRIVILEGE",
@@ -196,7 +208,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "REMOVE_PRIVILEGE",
@@ -246,7 +261,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "RENAME_ROLE",
@@ -295,7 +313,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_ROLE",
@@ -344,7 +365,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UNASSIGN_ROLE",
@@ -395,6 +419,12 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo",
+        "user.target.domain": "example.com",
+        "user.target.email": "user@example.com",
+        "user.target.name": "user"
     }
 ]

@@ -87,6 +87,7 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 		file.MaxSizeBytes(c.RotateEveryKb*1024),
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),
+		file.RotateOnStartup(c.RotateOnStartup),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
 	)
 	if err != nil {

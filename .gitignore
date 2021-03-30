@@ -23,6 +23,7 @@ coverage.out
 .python-version
 beat.db
 *.keystore
+go_env.properties
 mage_output_file.go
 x-pack/functionbeat/*/fields.yml
 x-pack/functionbeat/provider/*/functionbeat-*

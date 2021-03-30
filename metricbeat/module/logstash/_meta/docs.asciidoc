@@ -8,7 +8,12 @@ The `logstash` module works with {ls} 7.3.0 and later.
 [float]
 === Usage for Stack Monitoring
 
-The `logstash` module can be used to collect metrics shown in our {stack} {monitor-features}
+The `logstash` module can be used to collect metrics shown in our {stack-monitor-app}
 UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
 from the module's configuration. Alternatively, run `metricbeat modules disable logstash` and
 `metricbeat modules enable logstash-xpack`.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].

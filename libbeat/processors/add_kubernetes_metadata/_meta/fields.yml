@@ -72,9 +72,10 @@
         - name: container.name
           type: keyword
           description: >
-            Kubernetes container name
+            Kubernetes container name (different than the name from the runtime)
 
         - name: container.image
-          type: keyword
+          type: alias
+          path: container.image.name
           description: >
             Kubernetes container image

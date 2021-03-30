@@ -36,6 +36,10 @@ const (
 	isMonitoringLogsFlag    = 1 << 1
 )
 
+type waiter interface {
+	Wait()
+}
+
 // Operator runs Start/Stop/Update operations
 // it is responsible for detecting reconnect to existing processes
 // based on backed up configuration
@@ -103,7 +107,7 @@ func NewOperator(
 		reporter:         reporter,
 		monitor:          monitor,
 		statusController: statusController,
-		statusReporter:   statusController.Register("operator-" + pipelineID),
+		statusReporter:   statusController.RegisterComponent("operator-" + pipelineID),
 	}
 
 	operator.initHandlerMap()
@@ -142,17 +146,18 @@ func (o *Operator) Close() error {
 func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		o.statusReporter.Update(status.Failed)
+		o.statusReporter.Update(state.Failed, err.Error())
 		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
 	}
 	o.statusController.UpdateStateID(stateID)
 
 	for _, step := range steps {
-		if strings.ToLower(step.ProgramSpec.Cmd) != strings.ToLower(monitoringName) {
+		if !strings.EqualFold(step.ProgramSpec.Cmd, monitoringName) {
 			if _, isSupported := program.SupportedMap[strings.ToLower(step.ProgramSpec.Cmd)]; !isSupported {
 				// mark failed, new config cannot be run
-				o.statusReporter.Update(status.Failed)
-				return errors.New(fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd),
+				msg := fmt.Sprintf("program '%s' is not supported", step.ProgramSpec.Cmd)
+				o.statusReporter.Update(state.Failed, msg)
+				return errors.New(msg,
 					errors.TypeApplication,
 					errors.M(errors.MetaKeyAppName, step.ProgramSpec.Cmd))
 			}
@@ -160,18 +165,20 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 		handler, found := o.handlers[step.ID]
 		if !found {
-			o.statusReporter.Update(status.Failed)
-			return errors.New(fmt.Sprintf("operator: received unexpected event '%s'", step.ID), errors.TypeConfig)
+			msg := fmt.Sprintf("operator: received unexpected event '%s'", step.ID)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(msg, errors.TypeConfig)
 		}
 
 		if err := handler(step); err != nil {
-			o.statusReporter.Update(status.Failed)
-			return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err))
+			msg := fmt.Sprintf("operator: failed to execute step %s, error: %v", step.ID, err)
+			o.statusReporter.Update(state.Failed, msg)
+			return errors.New(err, errors.TypeConfig, msg)
 		}
 	}
 
 	// Ack the resolver should state for next call.
-	o.statusReporter.Update(status.Healthy)
+	o.statusReporter.Update(state.Healthy, "")
 	ack()
 
 	return nil
@@ -179,6 +186,13 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) error {
 
 // Shutdown handles shutting down the running apps for Agent shutdown.
 func (o *Operator) Shutdown() {
+	//  wait for installer and downloader
+	if awaitable, ok := o.installer.(waiter); ok {
+		o.logger.Infof("waiting for installer of pipeline '%s' to finish", o.pipelineID)
+		awaitable.Wait()
+		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
+	}
+
 	for _, app := range o.apps {
 		app.Shutdown()
 	}
@@ -329,9 +343,4 @@ func (o *Operator) deleteApp(p Descriptor) {
 
 	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
 	delete(o.apps, id)
-}
-
-func isMonitorable(descriptor Descriptor) bool {
-	isSidecar := app.IsSidecar(descriptor)
-	return !isSidecar // everything is monitorable except sidecar
 }

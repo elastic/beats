@@ -6,24 +6,20 @@
         "module": "uwsgi"
     },
     "metricset": {
-        "name": "status"
+        "name": "status",
+        "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:9192",
+        "address": "172.28.0.3:9191",
         "type": "uwsgi"
     },
     "uwsgi": {
         "status": {
-            "core": {
-                "id": 1,
+            "total": {
+                "exceptions": 0,
+                "pid": 1,
                 "read_errors": 0,
-                "requests": {
-                    "offloaded": 0,
-                    "routed": 0,
-                    "static": 0,
-                    "total": 941
-                },
-                "worker_pid": 7,
+                "requests": 2,
                 "write_errors": 0
             }
         }

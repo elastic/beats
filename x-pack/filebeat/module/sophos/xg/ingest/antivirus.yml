@@ -315,22 +315,32 @@ processors:
 - append:
     field: related.ip
     value: '{{source.ip}}'
+    allow_duplicates: false
     if: 'ctx?.source?.ip != null'
 - append:
     field: related.ip
     value: '{{destination.ip}}'
+    allow_duplicates: false
     if: 'ctx?.destination?.ip != null'
 - append:
     field: related.user
     value: "{{source.user.name}}"
+    allow_duplicates: false
     if: "ctx.source?.user?.name != null"
-
 #############
 ## Cleanup ##
 #############
 - lowercase:
       field: event.info
       ignore_failure: true
+- rename:
+    field: sophos.xg.FTP_direction
+    target_field: sophos.xg.ftp_direction
+    ignore_missing: true
+- rename:
+    field: sophos.xg.FTP_url
+    target_field: sophos.xg.ftp_url
+    ignore_missing: true
 - remove:
     field:
     - sophos.xg.dst_port

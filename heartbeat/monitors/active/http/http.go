@@ -22,7 +22,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -32,8 +33,7 @@ import (
 )
 
 func init() {
-	monitors.RegisterActive("http", create)
-	monitors.RegisterActive("synthetics/http", create)
+	plugin.Register("http", create, "synthetics/http")
 }
 
 var debugf = logp.MakeDebug("http")
@@ -42,15 +42,15 @@ var debugf = logp.MakeDebug("http")
 func create(
 	name string,
 	cfg *common.Config,
-) (js []jobs.Job, endpoints int, err error) {
+) (p plugin.Plugin, err error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	tls, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	var body []byte
@@ -61,13 +61,13 @@ func create(
 		compression := config.Check.Request.Compression
 		enc, err = getContentEncoder(compression.Type, compression.Level)
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		buf := bytes.NewBuffer(nil)
 		err = enc.Encode(buf, bytes.NewBufferString(config.Check.Request.SendBody))
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		body = buf.Bytes()
@@ -75,7 +75,7 @@ func create(
 
 	validator, err := makeValidateResponse(&config.Check.Response)
 	if err != nil {
-		return nil, 0, err
+		return plugin.Plugin{}, err
 	}
 
 	// Determine whether we're using a proxy or not and then use that to figure out how to
@@ -87,7 +87,7 @@ func create(
 	if config.ProxyURL != "" || config.MaxRedirects > 0 {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
@@ -99,16 +99,16 @@ func create(
 		}
 	}
 
-	js = make([]jobs.Job, len(config.Hosts))
+	js := make([]jobs.Job, len(config.Hosts))
 	for i, urlStr := range config.Hosts {
 		u, _ := url.Parse(urlStr)
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		job, err := makeJob(urlStr)
 		if err != nil {
-			return nil, 0, err
+			return plugin.Plugin{}, err
 		}
 
 		// Assign any execution errors to the error field and
@@ -116,7 +116,7 @@ func create(
 		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return js, len(config.Hosts), nil
+	return plugin.Plugin{Jobs: js, Close: nil, Endpoints: len(config.Hosts)}, nil
 }
 
 func newRoundTripper(config *Config, tls *tlscommon.TLSConfig) (*http.Transport, error) {
