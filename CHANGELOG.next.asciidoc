@@ -520,6 +520,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 - Handle datastreams for fleet. {pull}24223[24223]
 - Add --sandbox option for browser monitor. {pull}24172[24172]
+- Support additional 'root' fields from synthetics. {pull}24770[24770]
 
 *Heartbeat*
 
