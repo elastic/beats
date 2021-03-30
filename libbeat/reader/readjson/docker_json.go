@@ -20,6 +20,7 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"runtime"
 	"strings"
 	"time"
@@ -190,6 +191,10 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 	for {
 		message, err := p.reader.Next()
 
+		if message.Bytes == 0 || err == io.EOF {
+			message.Bytes = bytes
+			return message, io.EOF
+		}
 		// keep the right bytes count even if we return an error
 		bytes += message.Bytes
 		message.Bytes = bytes
@@ -202,13 +207,17 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		err = p.parseLine(&message, &logLine)
 		if err != nil {
 			p.logger.Errorf("Parse line error: %v", err)
-			return message, reader.ErrLineUnparsable
+			continue
 		}
 
 		// Handle multiline messages, join partial lines
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
 
+			if next.Bytes == 0 || err == io.EOF {
+				message.Bytes = bytes
+				return message, io.EOF
+			}
 			// keep the right bytes count even if we return an error
 			bytes += next.Bytes
 			message.Bytes = bytes
@@ -219,7 +228,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
 				p.logger.Errorf("Parse line error: %v", err)
-				return message, reader.ErrLineUnparsable
+				continue
 			}
 			message.Content = append(message.Content, next.Content...)
 		}

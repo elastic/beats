@@ -18,6 +18,7 @@
 package readjson
 
 import (
+	"io"
 	"testing"
 	"time"
 
@@ -53,7 +54,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong JSON",
 			input:         [][]byte{[]byte(`this is not JSON`)},
 			stream:        "all",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 16,
 			},
@@ -73,7 +74,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout`)},
 			stream:        "all",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 37,
 			},
@@ -82,7 +83,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Wrong CRI",
 			input:         [][]byte{[]byte(`{this is not JSON nor CRI`)},
 			stream:        "all",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 25,
 			},
@@ -91,7 +92,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Missing time",
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -218,7 +219,7 @@ func TestDockerJSON(t *testing.T) {
 			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
 			stream:        "all",
 			format:        "cri",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 82,
 			},
@@ -228,7 +229,7 @@ func TestDockerJSON(t *testing.T) {
 			input:         [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
 			stream:        "all",
 			format:        "docker",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 115,
 			},
@@ -300,7 +301,7 @@ func TestDockerJSON(t *testing.T) {
 				[]byte(`{"log":"shutdown...\n","stream`),
 			},
 			stream:        "stdout",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 139,
 			},
@@ -324,7 +325,7 @@ func TestDockerJSON(t *testing.T) {
 			name:          "Corrupted log message line",
 			input:         [][]byte{[]byte(`36.276 # User requested shutdown...\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`)},
 			stream:        "all",
-			expectedError: reader.ErrLineUnparsable,
+			expectedError: io.EOF,
 			expectedMessage: reader.Message{
 				Bytes: 97,
 			},
@@ -358,6 +359,12 @@ type mockReader struct {
 }
 
 func (m *mockReader) Next() (reader.Message, error) {
+	if len(m.messages) < 1 {
+		return reader.Message{
+			Content: []byte{},
+			Bytes:   0,
+		}, nil
+	}
 	message := m.messages[0]
 	m.messages = m.messages[1:]
 	return reader.Message{

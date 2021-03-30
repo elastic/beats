@@ -101,7 +101,7 @@ class Test(BaseTest):
         # Check that file exist
         data = self.get_registry()
         logs = self.log_access()
-        assert logs.contains("Skipping unparsable line in file") == True
+        assert logs.contains("Parse line error") == True
         # bytes of healthy file are 2244 so for the corrupted one should
         # be 2244-1=2243 since we removed one character
         assert data[0]["offset"] == 2243
