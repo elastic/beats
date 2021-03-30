@@ -6,7 +6,7 @@ processors:
 - set:
     field: event.kind
     value: alert
-    if: "ctx.fortinet?.firewall?.attack != null"
+    if: "['virus', 'ips'].contains(ctx.fortinet?.firewall?.subtype) || ctx.fortinet?.firewall?.attack != null"
 - set:
     field: event.action
     value: "{{fortinet.firewall.action}}"
