@@ -59,3 +59,18 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) error {
 
 	return nil
 }
+
+func (c *SaslConfig) Validate() error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "":
+		// SASL is not enabled
+		return nil
+	case saslTypePlaintext:
+		return nil
+	case saslTypeSCRAMSHA256:
+		return nil
+	case saslTypeSCRAMSHA512:
+		return nil
+	}
+	return fmt.Errorf("Validate(): not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+}
