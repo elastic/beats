@@ -39,8 +39,9 @@ import (
 
 const (
 	maxRetriesstoreAgentInfo = 5
-	waitingForAgent          = "waiting for Elastic Agent to start"
-	waitingForFleetServer    = "waiting for Elastic Agent to start Fleet Server"
+	waitingForAgent          = "Waiting for Elastic Agent to start"
+	waitingForFleetServer    = "Waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerHost   = "0.0.0.0"
 	defaultFleetServerPort   = 8220
 )
 
@@ -421,7 +422,16 @@ func (c *enrollCmd) startAgent() error {
 		return err
 	}
 	c.log.Info("Spawning Elastic Agent daemon as a subprocess to complete bootstrap process.")
-	proc, err := process.Start(c.log, cmd, nil, os.Geteuid(), os.Getegid(), "run")
+	args := []string{
+		"run", "-c", paths.ConfigFile(),
+		"--path.home", paths.Top(), "--path.config", paths.Config(),
+		"--path.logs", paths.Logs(),
+	}
+	if !paths.IsVersionHome() {
+		args = append(args, "--path.home.unversioned")
+	}
+	proc, err := process.Start(
+		c.log, cmd, nil, os.Geteuid(), os.Getegid(), args...)
 	if err != nil {
 		return err
 	}
@@ -478,6 +488,7 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 	defer innerCancel()
 	go func() {
 		msg := ""
+		msgCount := 0
 		for {
 			<-time.After(1 * time.Second)
 			status, err := getDaemonStatus(innerCtx)
@@ -486,29 +497,50 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 				return
 			}
 			if err != nil {
-				log.Debug(waitingForAgent)
+				log.Debugf("%s: %s", waitingForAgent, err)
 				if msg != waitingForAgent {
 					msg = waitingForAgent
+					msgCount = 0
 					log.Info(waitingForAgent)
+				} else {
+					msgCount += 1
+					if msgCount > 5 {
+						msgCount = 0
+						log.Infof("%s: %s", waitingForAgent, err)
+					}
 				}
 				continue
 			}
 			app := getAppFromStatus(status, "fleet-server")
 			if app == nil {
-				log.Debug(waitingForFleetServer)
+				err = errors.New("no fleet-server application running")
+				log.Debugf("%s: %s", waitingForFleetServer, err)
 				if msg != waitingForFleetServer {
 					msg = waitingForFleetServer
+					msgCount = 0
 					log.Info(waitingForFleetServer)
+				} else {
+					msgCount += 1
+					if msgCount > 5 {
+						msgCount = 0
+						log.Infof("%s: %s", waitingForFleetServer, err)
+					}
 				}
 				continue
 			}
-			log.Debugf("fleet-server status: %s - %s", app.Status, app.Message)
+			log.Debugf("%s: %s - %s", waitingForFleetServer, app.Status, app.Message)
 			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
 				// app has started and is running
+				if app.Message != "" {
+					log.Infof("Fleet Server - %s", app.Message)
+				}
 				resChan <- waitResult{}
 				break
 			} else if app.Status == proto.Status_FAILED {
 				// app completely failed; exit now
+				if app.Message != "" {
+					log.Infof("Fleet Server - %s", app.Message)
+				}
 				resChan <- waitResult{err: errors.New(app.Message)}
 				break
 			}
@@ -516,7 +548,14 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 				appMsg := fmt.Sprintf("Fleet Server - %s", app.Message)
 				if msg != appMsg {
 					msg = appMsg
+					msgCount = 0
 					log.Info(appMsg)
+				} else {
+					msgCount += 1
+					if msgCount > 5 {
+						msgCount = 0
+						log.Info(appMsg)
+					}
 				}
 			}
 		}
@@ -585,6 +624,12 @@ func createFleetServerBootstrapConfig(connStr string, policyID string, host stri
 		es.TLS = &tlscommon.Config{
 			CAs: []string{esCA},
 		}
+	}
+	if host == "" {
+		host = defaultFleetServerHost
+	}
+	if port == 0 {
+		port = defaultFleetServerPort
 	}
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
