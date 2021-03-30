@@ -4,6 +4,132 @@ processors:
   - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
+  - grok:
+      field: message
+      patterns:
+        - "%%{DATA:cisco.ios.facility}-%{POSINT:_event_severity}-%{DATA:event.code}: %{GREEDYDATA:_message}"
+  - remove:
+      field:
+        - message
+        - event.severity
+      ignore_missing: true
+  - convert:
+      field: _event_severity
+      target_field: event.severity
+      type: long
+#   - script:
+#       lang: painless
+#       source: |
+#         if (ctx?.log == null) {
+#             ctx.log = new HashMap();
+#         }
+#         def options = ["emergencies","alerts","critical","errors","warnings","notifications","informational","debugging"];
+#         # def i = Integer.parseInt(ctx.event.severity);
+#         # if (options[i] != null) {
+#         #   ctx.log.level = options[i];
+#         # }
+#         ctx.log.level = options[0];
+#       if: ctx?.event?.severity != null
+#       ignore_failure: true
+  - grok:
+      field: _message
+      patterns:
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address}\(%{POSINT:source.port}\) -> %{IP:destination.address}\(%{POSINT:destination.port}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:icmp.type}/%{POSINT:icmp.code}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{WORD:network.transport} %{IP:source.address} -> %{IP:destination.address} \(%{POSINT:igmp.type}\), %{POSINT:source.packets} packet'
+        - 'list %{NOTSPACE:cisco.ios.access_list} %{WORD:cisco.ios.outcome} %{POSINT:network.iana_number} %{IP:source.address} -> %{IP:destination.address}, %{POSINT:source.packets} packet'
+        - '%{WORD:cisco.ios.action} %{WORD:cisco.ios.outcome} \[user: %{USERNAME:source.user.name}\] \[Source: %{IP:source.address}\] \[localport: %{POSINT:destination.port}\] at %{GREEDYDATA}'
+        - 'User %{USERNAME:source.user.name} has %{WORD:cisco.ios.action} %{WORD:cisco.ios.session.type} session %{POSINT:cisco.ios.session.number}\(%{IP:source.address}\)'
+        - 'Received \(%{DATA:cisco.ios.tree}, %{DATA:cisco.ios.multicast.group}\) %{WORD:cisco.ios.action} from %{IP:source.address} for %{WORD:cisco.ios.outcome} RP %{IP:destination.address}'
+      ignore_failure: true
+  - set:
+      field: message
+      value: "{{_message}}"
+  - remove:
+      field:
+        - _message
+        - _event_severity
+      ignore_missing: true
+  - convert:
+      field: destination.address
+      target_field: destination.ip
+      type: ip
+      ignore_missing: true
+  - convert:
+      field: destination.port
+      type: long
+      ignore_missing: true
+  - convert:
+      field: source.address
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+  - convert:
+      field: source.port
+      type: long
+      ignore_missing: true
+  - convert:
+      field: source.packets
+      type: long
+      ignore_missing: true
+  - convert:
+      field: source.packets
+      target_field: network.packets
+      type: long
+      ignore_missing: true
+  - lowercase:
+      field: cisco.ios.outcome
+      ignore_missing: true
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx.cisco?.ios?.outcome != null && ["denied","invalid"].contains(ctx.cisco.ios.outcome)
+  - append:
+      field: event.type
+      value: denied
+      allow_duplicates: false
+      if: ctx.cisco?.ios?.outcome != null && ["denied"].contains(ctx.cisco.ios.outcome)
+  - append:
+      field: event.type
+      value: error
+      allow_duplicates: false
+      if: ctx.cisco?.ios?.outcome != null && ["invalid"].contains(ctx.cisco.ios.outcome)
+  - set:
+      field: event.outcome
+      value: success
+      if: ctx.cisco?.ios?.outcome != null && ["success","permitted"].contains(ctx.cisco.ios.outcome)
+  - append:
+      field: event.type
+      value: allowed
+      allow_duplicates: false
+      if: ctx.cisco?.ios?.outcome != null && ["success","permitted"].contains(ctx.cisco.ios.outcome)
+  - set:
+      field: network.type
+      value: ipv4
+      if: ctx.source?.ip != null && ctx.source?.ip.contains('.')
+  - set:
+      field: network.type
+      value: ipv6
+      if: ctx.source?.ip != null && ctx.source?.ip.contains(':')
+  - append:
+      field: related.ip
+      value: "{{source.ip}}"
+      allow_duplicates: false
+      if: ctx.source?.ip != null
+  - append:
+      field: related.ip
+      value: "{{destination.ip}}"
+      allow_duplicates: false
+      if: ctx.destination?.ip != null
+  - append:
+      field: related.user
+      value: "{{source.user.name}}"
+      allow_duplicates: false
+      if: ctx.source?.user?.name != null
+  - community_id:
+      ignore_missing: true
+      ignore_failure: true
   # IP Geolocation Lookup
   - geoip:
       field: source.ip

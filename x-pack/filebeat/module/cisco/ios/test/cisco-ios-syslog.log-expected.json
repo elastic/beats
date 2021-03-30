@@ -18,13 +18,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 0,
         "log.original": "Feb  8 04:00:48 198.51.100.2 585917: Feb  8 04:00:47.272: %SEC-6-IPACCESSLOGRP: list 177 denied igmp 198.51.100.197 -> 224.0.0.22, 1 packet",
         "log.source.address": "198.51.100.2",
@@ -65,14 +64,13 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "igmp.type": "20",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 140,
         "log.original": "Feb  9 04:00:48 198.51.100.2 585918: Feb  9 04:00:47.272: %SEC-6-IPACCESSLOGSP: list INBOUND-ON-F11 denied igmp 198.51.100.2 -> 224.0.0.2 (20), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -113,20 +111,18 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 293,
         "log.original": "Feb 10 04:00:48 198.51.100.2 585919: Feb 10 04:00:47.272: %SEC-6-IPACCESSLOGNP: list 171 denied 0 198.51.100.1 -> 255.255.255.255, 1 packet",
         "log.source.address": "198.51.100.2",
         "message": "list 171 denied 0 198.51.100.1 -> 255.255.255.255, 1 packet",
-        "network.community_id": "1:1JDZaxA1TK/7igCVzK1nGJRzc8s=",
-        "network.iana_number": "0",
         "network.packets": 1,
+        "network.transport": "0",
         "network.type": "ipv4",
         "related.ip": [
             "198.51.100.1",
@@ -161,13 +157,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "connection",
-            "firewall"
+            "firewall",
+            "allowed"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 433,
         "log.original": "May  3 19:11:33 198.51.100.2 585920: May  3 19:11:32.619: %IPV6-6-ACCESSLOGP: list ACL-IPv6-E0/0-IN/10 permitted tcp 2001:DB8::3(1027) -> 2001:DB8:1000::1(22), 9 packets",
         "log.source.address": "198.51.100.2",
@@ -210,13 +205,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 603,
         "log.original": "Jun 20 02:41:40 198.51.100.2 1663303: Jun 20 02:41:39.326: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(55250) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -258,15 +252,14 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "icmp.code": "4",
         "icmp.type": "3",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 760,
         "log.original": "Jun 20 02:41:45 198.51.100.2 1663304: Jun 20 02:41:44.921: %SEC-6-IPACCESSLOGDP: list 151 denied icmp 198.51.100.1 -> 198.51.100.2 (3/4), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -308,13 +301,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 907,
         "log.original": "Jun 20 02:41:52 198.51.100.2 1663305: Jun 20 02:41:51.330: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(60677) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -364,13 +356,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1064,
         "log.original": "Jun 20 02:41:56 198.51.100.2 1663306: Jun 20 02:41:55.222: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59825) -> 172.217.10.46(80), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -413,13 +404,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1216,
         "log.original": "Jun 20 02:41:58 198.51.100.2 1663307: Jun 20 02:41:57.328: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(56723) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -462,13 +452,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1373,
         "log.original": "Jun 20 02:42:04 198.51.100.2 1663308: Jun 20 02:42:03.334: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(54473) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -511,13 +500,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1530,
         "log.original": "Jun 20 02:42:10 198.51.100.2 1663309: Jun 20 02:42:09.332: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(33568) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -560,13 +548,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1687,
         "log.original": "Jun 20 02:42:16 198.51.100.2 1663310: Jun 20 02:42:15.330: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(35207) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -609,13 +596,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 1844,
         "log.original": "Jun 20 02:42:22 198.51.100.2 1663311: Jun 20 02:42:21.336: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(37063) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -658,13 +644,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2001,
         "log.original": "Jun 20 02:42:28 198.51.100.2 1663312: Jun 20 02:42:27.342: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(54309) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -689,15 +674,23 @@
     },
     {
         "cisco.ios.facility": "SEC",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.sequence": 1663313,
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2158,
         "log.original": "Jun 20 02:42:28 198.51.100.2 1663313: Jun 20 02:42:28.374: %SEC-6-IPACCESSLOGRL: access-list logging rate-limited or missed 18 packets",
         "log.source.address": "198.51.100.2",
@@ -728,13 +721,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2293,
         "log.original": "Jun 20 02:42:34 198.51.100.2 1663314: Jun 20 02:42:33.340: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(43989) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -777,13 +769,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2450,
         "log.original": "Jun 20 02:42:40 198.51.100.2 1663315: Jun 20 02:42:39.338: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(53432) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -826,13 +817,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2607,
         "log.original": "Jun 20 02:42:46 198.51.100.2 1663316: Jun 20 02:42:45.336: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(58674) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -882,13 +872,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2764,
         "log.original": "Jun 20 02:42:48 198.51.100.2 1663317: Jun 20 02:42:47.466: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59830) -> 172.217.10.46(80), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -931,13 +920,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 2916,
         "log.original": "Jun 20 02:42:52 198.51.100.2 1663318: Jun 20 02:42:51.342: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(52377) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -980,13 +968,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3073,
         "log.original": "Jun 20 02:42:58 198.51.100.2 1663319: Jun 20 02:42:57.340: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(42695) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1029,13 +1016,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3230,
         "log.original": "Jun 20 02:43:04 198.51.100.2 1663320: Jun 20 02:43:03.346: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(58393) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1085,13 +1071,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3387,
         "log.original": "Jun 20 02:43:09 198.51.100.2 1663321: Jun 20 02:43:08.454: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59832) -> 172.217.10.46(80), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1134,13 +1119,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3539,
         "log.original": "Jun 20 02:43:16 198.51.100.2 1663322: Jun 20 02:43:15.350: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(60908) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1190,13 +1174,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3696,
         "log.original": "Jun 20 02:43:20 198.51.100.2 1663323: Jun 20 02:43:20.346: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(59415) -> 8.8.8.8(53), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1239,13 +1222,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3843,
         "log.original": "Jun 20 02:43:22 198.51.100.2 1663324: Jun 20 02:43:21.348: %SEC-6-IPACCESSLOGP: list 177 denied udp 8.8.8.8(53) -> 198.51.100.195(59415), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1277,15 +1259,23 @@
     },
     {
         "cisco.ios.facility": "SEC",
+        "event.category": [
+            "network",
+            "network_traffic"
+        ],
         "event.code": "IPACCESSLOGRL",
         "event.dataset": "cisco.ios",
+        "event.kind": "event",
         "event.module": "cisco",
         "event.sequence": 1663325,
         "event.severity": 6,
         "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "firewall"
+        ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 3990,
         "log.original": "Jun 20 02:43:29 198.51.100.2 1663325: Jun 20 02:43:28.403: %SEC-6-IPACCESSLOGRL: access-list logging rate-limited or missed 23 packets",
         "log.source.address": "198.51.100.2",
@@ -1315,15 +1305,14 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "icmp.code": "3",
         "icmp.type": "3",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4125,
         "log.original": "Jun 20 02:43:29 198.51.100.2 1663326: Jun 20 02:43:28.403: %SEC-6-IPACCESSLOGDP: list 150 denied icmp 198.51.100.12 -> 198.51.100.1 (3/3), 32 packets",
         "log.source.address": "198.51.100.2",
@@ -1372,13 +1361,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4275,
         "log.original": "Jun 20 02:43:30 198.51.100.2 1663327: Jun 20 02:43:29.451: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59834) -> 172.217.10.46(80), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1421,13 +1409,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4427,
         "log.original": "Jun 20 02:43:34 198.51.100.2 1663328: Jun 20 02:43:33.352: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(54532) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1470,13 +1457,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4584,
         "log.original": "Jun 20 02:43:40 198.51.100.2 1663329: Jun 20 02:43:39.350: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(57831) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1519,13 +1505,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4741,
         "log.original": "Jun 20 02:43:45 198.51.100.2 1663330: Jun 20 02:43:44.173: %SEC-6-IPACCESSLOGP: list 150 denied udp 198.51.100.20(138) -> 198.51.100.255(138), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1568,13 +1553,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 4893,
         "log.original": "Jun 20 02:43:46 198.51.100.2 1663331: Jun 20 02:43:45.356: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(42988) -> 198.51.100.255(15600), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1624,13 +1608,12 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
             "connection",
-            "firewall"
+            "firewall",
+            "denied"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 5050,
         "log.original": "Jun 20 02:43:51 198.51.100.2 1663332: Jun 20 02:43:50.473: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59836) -> 172.217.10.46(80), 1 packet",
         "log.source.address": "198.51.100.2",
@@ -1672,10 +1655,10 @@
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "warnings",
         "log.offset": 5202,
         "log.original": "Mar 24 12:09:35 198.51.100.2 1991217: Mar 24 12:09:35.367: %OSPF-4-NOVALIDKEY: No valid authentication send key is available on interface eth0",
         "log.source.address": "198.51.100.2",
+        "message": "No valid authentication send key is available on interface eth0",
         "service.type": "cisco",
         "tags": [
             "cisco-ios",
@@ -1701,10 +1684,10 @@
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 5345,
         "log.original": "Mar 24 12:06:47 198.51.100.2 1991218: Mar 24 12:06:47.099: %CCH323-6-CALL_PRESERVED: cch323_h225_handle_conn_loss: H.323 call preserved due to socket closure or error, Call Id = 6527, fd = 19",
         "log.source.address": "198.51.100.2",
+        "message": "cch323_h225_handle_conn_loss: H.323 call preserved due to socket closure or error, Call Id = 6527, fd = 19",
         "service.type": "cisco",
         "tags": [
             "cisco-ios",
@@ -1714,8 +1697,7 @@
     {
         "cisco.ios.action": "Login",
         "cisco.ios.facility": "SEC_LOGIN",
-        "cisco.ios.outcome": "Success",
-        "client.address": "10.2.55.3",
+        "cisco.ios.outcome": "success",
         "destination.port": 22,
         "event.category": [
             "network",
@@ -1730,30 +1712,37 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "connection",
-            "firewall"
+            "firewall",
+            "allowed"
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "notifications",
         "log.offset": 5537,
         "log.original": "Mar 24 18:06:03 198.51.100.2 1991219: Mar 24 18:06:03.424 UTC: %SEC_LOGIN-5-LOGIN_SUCCESS: Login Success [user: john.smith] [Source: 10.2.55.3] [localport: 22] at 12:06:03 MST Wed Mar 24 2021",
         "log.source.address": "198.51.100.2",
+        "message": "Login Success [user: john.smith] [Source: 10.2.55.3] [localport: 22] at 12:06:03 MST Wed Mar 24 2021",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.2.55.3"
+        ],
+        "related.user": [
+            "john.smith"
+        ],
         "service.type": "cisco",
         "source.address": "10.2.55.3",
+        "source.ip": "10.2.55.3",
+        "source.user.name": "john.smith",
         "tags": [
             "cisco-ios",
             "forwarded"
-        ],
-        "user.name": "john.smith"
+        ]
     },
     {
         "cisco.ios.action": "exited",
         "cisco.ios.facility": "SYS",
-        "cisco.ios.session.id": 5,
+        "cisco.ios.session.number": "5",
         "cisco.ios.session.type": "tty",
-        "client.address": "10.5.36.9",
         "event.category": [
             "network",
             "network_traffic"
@@ -1771,16 +1760,24 @@
         ],
         "fileset.name": "ios",
         "input.type": "log",
-        "log.level": "informational",
         "log.offset": 5729,
         "log.original": "Mar 24 18:06:00 198.51.100.2 1991220: Mar 24 18:06:00.364 UTC: %SYS-6-LOGOUT: User john.smith has exited tty session 5(10.5.36.9)",
         "log.source.address": "198.51.100.2",
+        "message": "User john.smith has exited tty session 5(10.5.36.9)",
+        "network.type": "ipv4",
+        "related.ip": [
+            "10.5.36.9"
+        ],
+        "related.user": [
+            "john.smith"
+        ],
         "service.type": "cisco",
         "source.address": "10.5.36.9",
+        "source.ip": "10.5.36.9",
+        "source.user.name": "john.smith",
         "tags": [
             "cisco-ios",
             "forwarded"
-        ],
-        "user.name": "john.smith"
+        ]
     }
 ]

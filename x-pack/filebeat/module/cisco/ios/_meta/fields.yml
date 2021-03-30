@@ -22,6 +22,16 @@
       the system software. It denotes the source or the cause of the system
       message.
 
+  - name: multicast
+    type: group
+    description: >
+      Fields for XXXX
+    fields:
+    - name: group
+      type: integer
+      description: >
+        XXXX
+
   - name: outcome
     type: keyword
     description: >
@@ -32,7 +42,7 @@
     description: >
       Fields for Session information
     fields:
-    - name: id
+    - name: number
       type: integer
       description: >
         Session ID
