@@ -100,7 +100,6 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
-	//fetchContextProviders := make(map[string]corecomp.ContextProvider, len(FetchContextProviders))
 	fetchContextProviders := common.MapStr{}
 
 	// run all the enabled context providers
