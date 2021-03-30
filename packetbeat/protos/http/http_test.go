@@ -921,6 +921,36 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 	assert.True(t, proxyObscured)
 }
 
+func TestExtractBasicAuthUser(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
+
+	http := httpModForTests(nil)
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+
+	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
+		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
+		"Content-Type: text/xml; charset=utf-8\r\n" +
+		"SOAPAction: \"\"\r\n" +
+		"Authorization: Basic ZHVtbXk6NmQlc1AwOC1XemZ3Cg\r\n" +
+		"Proxy-Authorization: Basic cHJveHk6MWM3MGRjM2JhZDIwCg==\r\n" +
+		"Host: production.example.com\r\n" +
+		"Content-Length: 0\r\n" +
+		"Expect: 100-continue\r\n" +
+		"Accept-Encoding: gzip\r\n" +
+		"X-Forwarded-For: 10.216.89.132\r\n" +
+		"\r\n")
+
+	st := &stream{data: data, message: new(message)}
+
+	ok, _ := testParseStream(http, st, 0)
+
+	username := extractBasicAuthUser(st.message.headers)
+
+	assert.True(t, ok)
+	assert.Equal(t, "dummy", username)
+}
+
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 	http := httpModForTests(nil)
 	http.redactAuthorization = true

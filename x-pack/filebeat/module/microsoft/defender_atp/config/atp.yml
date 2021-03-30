@@ -9,6 +9,10 @@ auth.oauth2: {{ .oauth2 | tojson }}
 auth.oauth2.provider: azure
 auth.oauth2.azure.resource: https://api.securitycenter.windows.com/
 
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
 request.url: "https://api.securitycenter.windows.com/api/alerts"
 request.method: GET
 request.transforms:
@@ -54,4 +58,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.7.0
+        ecs.version: 1.8.0

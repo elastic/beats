@@ -30,6 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 var (
@@ -295,7 +296,7 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 
 	// By parsing the XML we can get the names of the parameters even if the
 	// publisher metadata is unavailable or is out of sync with the events.
-	event, err := sys.UnmarshalEventXML([]byte(xml))
+	event, err := winevent.UnmarshalXML([]byte(xml))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal XML")
 	}

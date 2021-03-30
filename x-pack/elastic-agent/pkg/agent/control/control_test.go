@@ -8,6 +8,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -20,7 +22,7 @@ import (
 )
 
 func TestServerClient_Version(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil)
+	srv := server.New(newErrorLogger(t), nil, nil, nil)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
@@ -39,6 +41,29 @@ func TestServerClient_Version(t *testing.T) {
 		BuildTime: release.BuildTime(),
 		Snapshot:  release.Snapshot(),
 	}, ver)
+}
+
+func TestServerClient_Status(t *testing.T) {
+	l := newErrorLogger(t)
+	statusCtrl := status.NewController(l)
+	srv := server.New(l, nil, statusCtrl, nil)
+	err := srv.Start()
+	require.NoError(t, err)
+	defer srv.Stop()
+
+	c := client.New()
+	err = c.Connect(context.Background())
+	require.NoError(t, err)
+	defer c.Disconnect()
+
+	status, err := c.Status(context.Background())
+	require.NoError(t, err)
+
+	assert.Equal(t, &client.AgentStatus{
+		Status:       client.Healthy,
+		Message:      "",
+		Applications: []*client.ApplicationStatus{},
+	}, status)
 }
 
 func newErrorLogger(t *testing.T) *logger.Logger {

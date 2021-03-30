@@ -6,19 +6,29 @@ interval: {{ .interval }}
 
 request.method: GET
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
 {{ end }}
 request.url: {{ .url }}
 request.transforms:
 - set:
     target: header.Content-Type
     value: application/json
+{{ if .api_token }}
 - set:
     target: header.X-OTX-API-KEY
     value: {{ .api_token }}
+{{ end }}
+{{ if .types }}
 - set:
     target: url.params.types
     value: {{ .types }}
+{{ end }}
 - set:
     target: url.params.modified_since
     value: '[[.cursor.timestamp]]'
@@ -52,8 +62,10 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - decode_json_fields:
       fields: [message]
-      document_id: id
       target: json
+  - fingerprint:
+      fields: ["json.id"]
+      target_field: "@metadata._id"
   - add_fields:
       target: ''
       fields:

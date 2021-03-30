@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 )
 
@@ -41,7 +42,7 @@ func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, hos
 func withServerWithAuthClient(
 	m func(t *testing.T) *http.ServeMux,
 	apiKey string,
-	test func(t *testing.T, client clienter),
+	test func(t *testing.T, client client.Sender),
 ) func(t *testing.T) {
 
 	return withServer(m, func(t *testing.T, host string) {
@@ -50,7 +51,7 @@ func withServerWithAuthClient(
 			Host: host,
 		}
 
-		client, err := NewAuthWithConfig(log, apiKey, cfg)
+		client, err := client.NewAuthWithConfig(log, apiKey, cfg)
 		require.NoError(t, err)
 		test(t, client)
 	})

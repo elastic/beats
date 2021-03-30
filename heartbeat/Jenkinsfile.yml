@@ -38,7 +38,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test heartbeat for macos"
@@ -84,3 +84,9 @@ stages:
         packaging-linux: "mage package"
         e2e:
             enabled: false
+    packaging-arm:
+        packaging-arm: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default label in this specific stage.
+          - "arm"

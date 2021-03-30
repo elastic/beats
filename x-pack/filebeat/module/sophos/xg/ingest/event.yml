@@ -151,6 +151,11 @@ processors:
     field: source.user.name
     value: '{{sophos.xg.name}}'
     if: "ctx.sophos?.xg?.name != null"
+- set:
+    field: user.name
+    value: '{{source.user.name}}'
+    ignore_empty_value: true
+    if: 'ctx.sophos?.xg?.log_subtype == "Authentication"'
 - rename:
     field: sophos.xg.usergroupname
     target_field: source.user.group.name

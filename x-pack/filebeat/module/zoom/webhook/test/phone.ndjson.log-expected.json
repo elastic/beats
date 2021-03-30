@@ -20,6 +20,7 @@
             "cadsd32wA"
         ],
         "service.type": "zoom",
+        "source.user.id": "cadsd32wA",
         "tags": [
             "zoom-webhook",
             "forwarded"
@@ -56,6 +57,7 @@
             "cajhdsf3wA"
         ],
         "service.type": "zoom",
+        "source.user.id": "cajhdsf3wA",
         "tags": [
             "zoom-webhook",
             "forwarded"
@@ -93,6 +95,7 @@
             "z8yCxjgjsuyd58uQ"
         ],
         "service.type": "zoom",
+        "source.user.id": "z8yCxjgjsuyd58uQ",
         "tags": [
             "zoom-webhook",
             "forwarded"
@@ -108,6 +111,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:38:40Z"
     },
     {
+        "destination.user.id": "z8yCDSSQWSSWuQ",
         "event.action": "phone.callee_answered",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -145,6 +149,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T01:41:56Z"
     },
     {
+        "destination.user.id": "z66jfgjdg2QgCfp8uQ",
         "event.action": "phone.callee_missed",
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -178,6 +183,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
+        "destination.user.id": "z66jfgjdg2QgCfp8uQ",
         "event.action": "phone.callee_ended",
         "event.dataset": "zoom.webhook",
         "event.duration": 4000000000,
@@ -215,6 +221,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
+        "destination.user.id": "z66jfgjdg2QgCfp8uQ",
         "event.action": "phone.caller_ended",
         "event.dataset": "zoom.webhook",
         "event.duration": 4000000000,
@@ -252,6 +259,7 @@
         "zoom.phone.caller.phone_number": "+1000000"
     },
     {
+        "destination.user.id": "sfcg43FOCYw",
         "event.action": "phone.callee_rejected",
         "event.dataset": "zoom.webhook",
         "event.duration": 6000000000,
@@ -288,6 +296,7 @@
         "zoom.phone.ringing_start_time": "2020-07-22T21:06:33Z"
     },
     {
+        "destination.user.id": "543234",
         "event.action": "phone.voicemail_received",
         "event.dataset": "zoom.webhook",
         "event.kind": [

@@ -1,15 +1,15 @@
 [
     {
         "event.action": "user.created",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
         ],
         "event.module": "zoom",
         "event.timezone": "-02:00",
-        "event.type": [
-            "iam"
-        ],
         "fileset.name": "webhook",
         "input.type": "log",
         "log.offset": 0,
@@ -23,6 +23,10 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "anawesomeuser@email.com",
+        "user.target.email": "henrysemail@email.com",
+        "user.target.full_name": "Henry Phan",
+        "user.target.id": "abcD3ojfdbjfg",
         "zoom.account_id": "AAAAAA",
         "zoom.creation_type": "create",
         "zoom.operator": "anawesomeuser@email.com",
@@ -34,6 +38,9 @@
     },
     {
         "event.action": "user.invitation_accepted",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -41,7 +48,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation"
         ],
         "fileset.name": "webhook",
@@ -57,6 +63,9 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "maria@maria.developer.dfgfdgf",
+        "user.full_name": "Maria CoolPerson",
+        "user.id": "sbyjt3ODg",
         "zoom.account_id": "EPjyjVYxHMA",
         "zoom.user.email": "maria@maria.developer.dfgfdgf",
         "zoom.user.first_name": "Maria",
@@ -66,6 +75,9 @@
     },
     {
         "event.action": "user.updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -73,7 +85,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -91,6 +102,9 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "shrija2016+dev_ma@gmail.com",
+        "user.id": "uLobbbbbbbb_qQsQ",
+        "user.target.id": "uLobbbbbbbb_qQsQ",
         "zoom.account_id": "lAA_EBBBBBBB",
         "zoom.old_values.company": "NotZoom",
         "zoom.old_values.id": "uLobbbbbbbb_qQsQ",
@@ -102,7 +116,8 @@
     {
         "event.action": "user.settings_updated",
         "event.category": [
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -111,7 +126,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -129,6 +143,9 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "iamtheoperator@gmail.com",
+        "user.id": "uLoRgfbbTayCX6r2Q_qQsQ",
+        "user.target.id": "uL34AAbbbbAAAAAAQsQ",
         "zoom.account_id": "CAl6ByEyAq8KK_CCCCCC",
         "zoom.old_values.id": "uL34AAbbbbAAAAAAQsQ",
         "zoom.old_values.settings.in_meeting.private_chat": true,
@@ -140,7 +157,8 @@
     {
         "event.action": "user.settings_updated",
         "event.category": [
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
@@ -149,7 +167,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -167,6 +184,9 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "somememail@randommailer28.com",
+        "user.id": "fdhjfdhsj536274gfd",
+        "user.target.id": "fdhjfdhsj536274gfd",
         "zoom.account_id": "EPbbbbb@@@@@2sfdfdA",
         "zoom.old_values.id": "fdhjfdhsj536274gfd",
         "zoom.old_values.settings.meeting_authentication": true,
@@ -177,6 +197,9 @@
     },
     {
         "event.action": "user.deactivated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -184,7 +207,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -202,6 +224,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "anawesomeuser@email.com",
+        "user.id": "z8yCxjabcdEFGHfp8uQ",
+        "user.target.email": "henrysemail@email.com",
+        "user.target.full_name": "Henry Phan",
+        "user.target.id": "abcD3ojfdbjfg",
         "zoom.account_id": "AAAAAABBBB",
         "zoom.operator": "anawesomeuser@email.com",
         "zoom.operator_id": "z8yCxjabcdEFGHfp8uQ",
@@ -213,6 +240,9 @@
     },
     {
         "event.action": "user.activated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -220,7 +250,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -238,6 +267,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "anawesomeuser@email.com",
+        "user.id": "z8yCxjabcdEFGHfp8uQ",
+        "user.target.email": "henrysemail@email.com",
+        "user.target.full_name": "Henry Phan",
+        "user.target.id": "abcD3ojfdbjfg",
         "zoom.account_id": "AAAAAABBBB",
         "zoom.operator": "anawesomeuser@email.com",
         "zoom.operator_id": "z8yCxjabcdEFGHfp8uQ",
@@ -249,6 +283,9 @@
     },
     {
         "event.action": "user.disassociated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -256,7 +293,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -274,6 +310,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "anawesomeuser@email.com",
+        "user.id": "z8yCxjabcdEFGHfp8uQ",
+        "user.target.email": "henrysemail@email.com",
+        "user.target.full_name": "Henry Phan",
+        "user.target.id": "abcD3ojfdbjfg",
         "zoom.account_id": "AAAAAABBBB",
         "zoom.operator": "anawesomeuser@email.com",
         "zoom.operator_id": "z8yCxjabcdEFGHfp8uQ",
@@ -285,6 +326,9 @@
     },
     {
         "event.action": "user.deleted",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -292,7 +336,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "deletion"
         ],
@@ -310,6 +353,11 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "anawesomeuser@email.com",
+        "user.id": "z8yCxjabcdEFGHfp8uQ",
+        "user.target.email": "henrysemail@email.com",
+        "user.target.full_name": "Henry Phan",
+        "user.target.id": "abcD3ojfdbjfg",
         "zoom.account_id": "AAAAAABBBB",
         "zoom.operator": "anawesomeuser@email.com",
         "zoom.operator_id": "z8yCxjabcdEFGHfp8uQ",
@@ -321,6 +369,9 @@
     },
     {
         "event.action": "user.presence_status_updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -328,7 +379,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -345,6 +395,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "sfdhfghfgh@dkjdfd.com",
+        "user.id": "z8ycx1223fq",
         "zoom.account_id": "EPjfyjxHMA",
         "zoom.user.email": "sfdhfghfgh@dkjdfd.com",
         "zoom.user.id": "z8ycx1223fq",
@@ -352,6 +404,9 @@
     },
     {
         "event.action": "user.personal_notes_updated",
+        "event.category": [
+            "iam"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -359,7 +414,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "iam",
             "creation",
             "change"
         ],
@@ -376,6 +430,10 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "sdfsgdfg@fjghg.ghm",
+        "user.id": "z8aggp8uq",
+        "user.target.email": "sdfsgdfg@fjghg.ghm",
+        "user.target.id": "z8aggp8uq",
         "zoom.account_id": "EPfhhdrYxHMA",
         "zoom.old_values.personal_notes": "this is the old note",
         "zoom.user.email": "sdfsgdfg@fjghg.ghm",
@@ -384,6 +442,9 @@
     },
     {
         "event.action": "user.signed_in",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -391,7 +452,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication",
             "creation",
             "start"
         ],
@@ -408,6 +468,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "awesomeuser@awesomemeail.ghkgf",
+        "user.id": "djkglfdgkjdflghfdpe",
         "zoom.account_id": "dsjfosdfpdosgifdjg",
         "zoom.user.client_type": "android",
         "zoom.user.email": "awesomeuser@awesomemeail.ghkgf",
@@ -416,6 +478,9 @@
     },
     {
         "event.action": "user.signed_out",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "zoom.webhook",
         "event.kind": [
             "event"
@@ -423,7 +488,6 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication",
             "creation",
             "end"
         ],
@@ -440,6 +504,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "awesomeuser@awesomemeail.ghkgf",
+        "user.id": "djkglfdgkjdflghfdpe",
         "zoom.account_id": "dsjfosdfpdosgifdjg",
         "zoom.user.client_type": "android",
         "zoom.user.email": "awesomeuser@awesomemeail.ghkgf",

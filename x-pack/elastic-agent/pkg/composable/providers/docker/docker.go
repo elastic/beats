@@ -91,9 +91,7 @@ func (c *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 				})
 				stoppers[data.container.ID] = stopper
 			case data := <-stopTrigger:
-				if _, ok := stoppers[data.container.ID]; ok {
-					delete(stoppers, data.container.ID)
-				}
+				delete(stoppers, data.container.ID)
 				comm.Remove(data.container.ID)
 			}
 		}

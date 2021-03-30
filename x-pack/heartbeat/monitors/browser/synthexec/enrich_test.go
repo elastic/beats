@@ -30,6 +30,11 @@ func TestJourneyEnricher(t *testing.T) {
 		Name:    "my-errname",
 		Stack:   "my\nerr\nstack",
 	}
+	otherErr := &SynthError{
+		Message: "last-errmsg",
+		Name:    "last-errname",
+		Stack:   "last\nerr\nstack",
+	}
 	journeyStart := &SynthEvent{
 		Type:                 "journey/start",
 		TimestampEpochMicros: 1000,
@@ -44,12 +49,12 @@ func TestJourneyEnricher(t *testing.T) {
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
-	makeStepEvent := func(typ string, ts float64, name string, index int, urlstr string, err *SynthError) *SynthEvent {
+	makeStepEvent := func(typ string, ts float64, name string, index int, status string, urlstr string, err *SynthError) *SynthEvent {
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: 1000 + ts,
 			PackageVersion:       "1.0.0",
-			Step:                 &Step{Name: name, Index: index},
+			Step:                 &Step{Name: name, Index: index, Status: status},
 			Error:                err,
 			Payload:              common.MapStr{},
 			URL:                  urlstr,
@@ -61,12 +66,12 @@ func TestJourneyEnricher(t *testing.T) {
 
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "", nil),
-		makeStepEvent("step/end", 30, "Step2", 1, url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1, "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, url3, nil),
+		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
+		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", 1, "", url3, otherErr),
 		journeyEnd,
 	}
 
@@ -75,12 +80,12 @@ func TestJourneyEnricher(t *testing.T) {
 	// We need an expectation for each input
 	// plus a final expectation for the summary which comes
 	// on the nil data.
-	for idx, se := range append(synthEvents, nil) {
+	for idx, se := range synthEvents {
 		e := &beat.Event{}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se)
 
-			if se != nil {
+			if se != nil && se.Type != "journey/end" {
 				// Test that the created event includes the mapped
 				// version of the event
 				testslike.Test(t, lookslike.MustCompile(se.ToMap()), e.Fields)
@@ -89,7 +94,7 @@ func TestJourneyEnricher(t *testing.T) {
 				if se.Error != nil {
 					require.Equal(t, stepError(se.Error), enrichErr)
 				}
-			} else {
+			} else { // journey end gets a summary
 				require.Equal(t, stepError(syntherr), enrichErr)
 
 				u, _ := url.Parse(url1)
