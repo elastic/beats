@@ -57,6 +57,8 @@ func TestLoadCapabilities(t *testing.T) {
 			defer resultCloser.Close()
 
 			expectedMap, err := expectedConfig.ToMapStr()
+			assert.NoError(t, err)
+
 			fixInputsType(expectedMap)
 			fixInputsType(resultConfig)
 
@@ -135,7 +137,7 @@ func TestCapabilityManager(t *testing.T) {
 			caps: []Capability{
 				filterKeywordCap{keyWord: "filter"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -160,7 +162,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -185,7 +187,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				blockCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -210,7 +212,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -235,7 +237,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				keepAsIsCap{},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -260,7 +262,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "filter"},
 				filterKeywordCap{keyWord: "key"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)
@@ -283,7 +285,7 @@ func TestCapabilityManager(t *testing.T) {
 				filterKeywordCap{keyWord: "key"},
 				filterKeywordCap{keyWord: "filter"},
 			},
-			reporter: status.NewController(l).Register("test"),
+			reporter: status.NewController(l).RegisterComponent("test"),
 		}
 
 		newIn, err := mgr.Apply(m)

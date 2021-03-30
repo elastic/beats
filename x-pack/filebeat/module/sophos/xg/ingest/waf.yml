@@ -250,19 +250,30 @@ processors:
 - append:
     field: related.ip
     value: '{{source.ip}}'
+    allow_duplicates: false
     if: 'ctx?.source?.ip != null'
 - append:
     field: related.ip
     value: '{{destination.ip}}'
+    allow_duplicates: false
     if: 'ctx?.destination?.ip != null'
 - append:
     field: related.user
     value: "{{source.user.name}}"
+    allow_duplicates: false
     if: "ctx.source?.user?.name != null"
 
 #############
 ## Cleanup ##
 #############
+- rename:
+    field: sophos.xg.SQLi
+    target_field: sophos.xg.sqli
+    ignore_missing: true
+- rename:
+    field: sophos.xg.XSS
+    target_field: sophos.xg.xss
+    ignore_missing: true
 - remove:
     field:
      - sophos.xg.bytesrcv

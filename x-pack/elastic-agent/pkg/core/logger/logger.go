@@ -43,7 +43,7 @@ func NewWithLogpLevel(name string, level logp.Level) (*Logger, error) {
 	return new(name, defaultCfg)
 }
 
-//NewFromConfig takes the user configuration and generate the right logger.
+// NewFromConfig takes the user configuration and generate the right logger.
 // TODO: Finish implementation, need support on the library that we use.
 func NewFromConfig(name string, cfg *Config) (*Logger, error) {
 	return new(name, cfg)
@@ -54,11 +54,18 @@ func new(name string, cfg *Config) (*Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	internal, err := makeInternalFileOutput(cfg)
-	if err != nil {
-		return nil, err
+
+	var outputs []zapcore.Core
+	if cfg.ToFiles {
+		internal, err := makeInternalFileOutput(cfg)
+		if err != nil {
+			return nil, err
+		}
+
+		outputs = append(outputs, internal)
 	}
-	if err := configure.LoggingWithOutputs("", commonCfg, internal); err != nil {
+
+	if err := configure.LoggingWithOutputs("", commonCfg, outputs...); err != nil {
 		return nil, fmt.Errorf("error initializing logging: %v", err)
 	}
 	return logp.NewLogger(name), nil
@@ -87,6 +94,7 @@ func DefaultLoggingConfig() *Config {
 	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
 	cfg.Beat = agentName
 	cfg.Level = logp.InfoLevel
+	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
 	cfg.Files.Name = fmt.Sprintf("%s.log", agentName)
 

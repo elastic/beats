@@ -24,6 +24,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someoperatoremail@somekindofmailservice123.com",
+        "user.id": "zfdgdfgdfgfp8uQ",
         "zoom.account_id": "EPsdvdsgfdgxHMA",
         "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
         "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",
@@ -59,6 +61,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someoperatoremail@somekindofmailservice123.com",
+        "user.id": "zfdgdfgdfgfp8uQ",
         "zoom.account_id": "EPsdvdsgfdgxHMA",
         "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
         "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",
@@ -94,6 +98,8 @@
             "zoom-webhook",
             "forwarded"
         ],
+        "user.email": "someoperatoremail@somekindofmailservice123.com",
+        "user.id": "zfdgdfgdfgfp8uQ",
         "zoom.account_id": "EPsdvdsgfdgxHMA",
         "zoom.chat_message.channel_id": "fsdgdgdgdfgdfgdfgdfgb10",
         "zoom.chat_message.channel_name": "AlwaysBeCodingChannel",

@@ -28,6 +28,9 @@
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "CR750iNG-XP",
@@ -76,6 +79,9 @@
         "observer.vendor": "Sophos",
         "related.hash": [
             "83cd339302bf5e8ed5240ca6383418089c337a81"
+        ],
+        "related.hosts": [
+            "firewall.localgroup.local"
         ],
         "related.ip": [
             "10.198.47.112"
@@ -130,6 +136,9 @@
         "observer.serial_number": "C44313350024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "CR750iNG-XP",
@@ -177,6 +186,9 @@
         "observer.vendor": "Sophos",
         "related.hash": [
             "3ce799580908df9ca0dc649aa8c2d06ab267e8c8"
+        ],
+        "related.hosts": [
+            "firewall.localgroup.local"
         ],
         "related.ip": [
             "10.198.47.112"
@@ -237,6 +249,9 @@
         "related.hash": [
             "3ce799580908df9ca0dc649aa8c2d06ab267e8c8"
         ],
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.47.112"
         ],
@@ -295,6 +310,9 @@
         "observer.vendor": "Sophos",
         "related.hash": [
             "d910c4a81122c360fe57f67a04999425a65249db"
+        ],
+        "related.hosts": [
+            "firewall.localgroup.local"
         ],
         "related.ip": [
             "172.16.34.24"

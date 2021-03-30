@@ -77,3 +77,7 @@
       type: keyword
       description: >
         The operating system's kernel version.
+    - name: type
+      type: keyword
+      description: >
+        OS type (see ECS os.type).

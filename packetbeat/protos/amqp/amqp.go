@@ -455,6 +455,10 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 	}
 	fields["amqp"] = t.amqp
 
+	if userID, found := t.amqp["user-id"]; found {
+		fields["user.id"] = userID
+	}
+
 	//let's try to convert request/response to a readable format
 	if amqp.sendRequest {
 		if t.method == "basic.publish" {

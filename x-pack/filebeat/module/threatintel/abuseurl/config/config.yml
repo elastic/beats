@@ -6,7 +6,10 @@ interval: {{ .interval }}
 
 request.method: GET
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
 {{ end }}
 request.url: {{ .url }}
 request.transforms:
@@ -33,9 +36,11 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - decode_json_fields:
-      document_id: "id"
       fields: [message]
       target: json
+  - fingerprint:
+      fields: ["json.id"]
+      target_field: "@metadata._id"
   - add_fields:
       target: ''
       fields:

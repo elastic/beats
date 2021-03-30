@@ -12,14 +12,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
 )
-
-const (
-	defaultThreshold = 1000
-	agentIDKey       = "elastic.agent.id"
-)
-
-type ackFn func()
 
 type event struct {
 	AgentID   string                 `json:"agent_id"`
@@ -57,7 +51,7 @@ type agentInfo interface {
 }
 
 // NewReporter creates a new fleet reporter.
-func NewReporter(agentInfo agentInfo, l *logger.Logger, c *Config) (*Reporter, error) {
+func NewReporter(agentInfo agentInfo, l *logger.Logger, c *config.Config) (*Reporter, error) {
 	r := &Reporter{
 		info:      agentInfo,
 		queue:     make([]fleetapi.SerializableEvent, 0),

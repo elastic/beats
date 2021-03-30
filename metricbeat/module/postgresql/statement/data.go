@@ -22,7 +22,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 )
 
-// Based on: https://www.postgresql.org/docs/9.2/static/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
+// Based on: https://www.postgresql.org/docs/13/pgstatstatements.html
 var schema = s.Schema{
 	"user": s.Object{
 		"id": c.Int("userid"),
@@ -31,16 +31,16 @@ var schema = s.Schema{
 		"oid": c.Int("dbid"),
 	},
 	"query": s.Object{
-		"id":    c.Str("queryid"),
+		"id":    c.Int("queryid"),
 		"text":  c.Str("query"),
 		"calls": c.Int("calls"),
 		"rows":  c.Int("rows"),
 		"time": s.Object{
-			"total":  s.Object{"ms": c.Float("total_time")},
-			"min":    s.Object{"ms": c.Float("min_time")},
-			"max":    s.Object{"ms": c.Float("max_time")},
-			"mean":   s.Object{"ms": c.Float("mean_time")},
-			"stddev": s.Object{"ms": c.Float("stddev_time")},
+			"total":  s.Object{"ms": c.Float("total_exec_time")},
+			"min":    s.Object{"ms": c.Float("min_exec_time")},
+			"max":    s.Object{"ms": c.Float("max_exec_time")},
+			"mean":   s.Object{"ms": c.Float("mean_exec_time")},
+			"stddev": s.Object{"ms": c.Float("stddev_exec_time")},
 		},
 		"memory": s.Object{
 			"shared": s.Object{
@@ -59,6 +59,21 @@ var schema = s.Schema{
 				"read":    c.Int("temp_blks_read"),
 				"written": c.Int("temp_blks_written"),
 			},
+		},
+	},
+}
+
+// PostgreSQL 13 renames fields with stats about execution time from *_time to *_exec_time,
+// keep this for compatibility with older versions.
+// Based on: https://www.postgresql.org/docs/9.6/pgstatstatements.html
+var schemaOldTime = s.Schema{
+	"query": s.Object{
+		"time": s.Object{
+			"total":  s.Object{"ms": c.Float("total_time")},
+			"min":    s.Object{"ms": c.Float("min_time")},
+			"max":    s.Object{"ms": c.Float("max_time")},
+			"mean":   s.Object{"ms": c.Float("mean_time")},
+			"stddev": s.Object{"ms": c.Float("stddev_time")},
 		},
 	},
 }

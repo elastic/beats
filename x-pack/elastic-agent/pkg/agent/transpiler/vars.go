@@ -97,7 +97,7 @@ func (v *Vars) Lookup(name string) (interface{}, bool) {
 func nodeToValue(node Node) Node {
 	switch n := node.(type) {
 	case *Key:
-		return n.value.(Node)
+		return n.value
 	}
 	return node
 }

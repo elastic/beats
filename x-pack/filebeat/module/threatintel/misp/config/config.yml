@@ -6,7 +6,10 @@ interval: {{ .interval }}
 
 request.method: POST
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
 {{ end }}
 request.url: {{ .url }}
 request.body:
@@ -17,9 +20,11 @@ request.body:
     {{ range $key, $value := .filters}}{{$key}}: {{$value | tojson}}{{end}}
 {{end}}
 request.transforms:
+{{ if .api_token }}
 - set:
     target: header.Authorization
     value: {{ .api_token }}
+{{end}}
 - set:
     target: body.timestamp
     value: '[[.cursor.timestamp]]'
