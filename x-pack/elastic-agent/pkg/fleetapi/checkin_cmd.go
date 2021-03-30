@@ -15,12 +15,15 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
+	Status   string              `json:"status"`
+	AckToken string              `json:"ack_token,omitempty"`
 	Events   []SerializableEvent `json:"events"`
 	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }
@@ -48,7 +51,8 @@ func (e *CheckinRequest) Validate() error {
 // CheckinResponse is the response send back from the server which contains all the action that
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
-	Actions Actions `json:"actions"`
+	AckToken string  `json:"ack_token"`
+	Actions  Actions `json:"actions"`
 }
 
 // Validate validates the response send from the server.
@@ -58,7 +62,7 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client clienter
+	client client.Sender
 	info   agentInfo
 }
 
@@ -67,7 +71,7 @@ type agentInfo interface {
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client client.Sender) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,
@@ -98,7 +102,7 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
 	rs, _ := ioutil.ReadAll(resp.Body)

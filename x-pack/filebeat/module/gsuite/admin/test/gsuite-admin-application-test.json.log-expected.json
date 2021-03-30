@@ -2,7 +2,8 @@
     {
         "event.action": "CHANGE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -53,12 +54,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -108,12 +113,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_APPLICATION_SETTING",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -163,7 +172,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "REORDER_GROUP_BASED_POLICIES_EVENT",
@@ -217,12 +229,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "GPLUS_PREMIUM_FEATURES",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -266,7 +282,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "CREATE_MANAGED_CONFIGURATION",
@@ -315,7 +334,10 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "DELETE_MANAGED_CONFIGURATION",
@@ -364,12 +386,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "UPDATE_MANAGED_CONFIGURATION",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -413,12 +439,16 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     },
     {
         "event.action": "FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED",
         "event.category": [
-            "iam"
+            "iam",
+            "configuration"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",
@@ -461,6 +491,9 @@
         "source.user.name": "foo",
         "tags": [
             "forwarded"
-        ]
+        ],
+        "user.domain": "bar.com",
+        "user.id": "1",
+        "user.name": "foo"
     }
 ]

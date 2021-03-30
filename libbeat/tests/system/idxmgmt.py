@@ -56,10 +56,27 @@ class IdxMgmt(unittest.TestCase):
         with pytest.raises(NotFoundError):
             self._client.transport.perform_request('GET', '/_template/' + template)
 
-    def assert_index_template_loaded(self, template):
+    def assert_legacy_index_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_template/' + template)
         assert template in resp
         assert "lifecycle" not in resp[template]["settings"]["index"]
+
+    def assert_index_template_loaded(self, template):
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
+        found = False
+        for index_template in resp['index_templates']:
+            if index_template['name'] == template:
+                found = True
+        assert found
+
+    def assert_component_template_loaded(self, template):
+        resp = self._client.transport.perform_request('GET', '/_component_template/' + template)
+        found = False
+        print(resp)
+        for index_template in resp['component_templates']:
+            if index_template['name'] == template:
+                found = True
+        assert found
 
     def assert_ilm_template_loaded(self, template, policy, alias):
         resp = self._client.transport.perform_request('GET', '/_template/' + template)

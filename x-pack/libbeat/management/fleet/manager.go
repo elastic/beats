@@ -39,6 +39,7 @@ type Manager struct {
 	lock      sync.Mutex
 	status    management.Status
 	msg       string
+	payload   map[string]interface{}
 
 	stopFunc func()
 }
@@ -169,11 +170,25 @@ func (cm *Manager) OnConfig(s string) {
 
 	if errs := cm.apply(blocks); !errs.IsEmpty() {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
-		cm.UpdateStatus(management.Degraded, errs.Error())
+		cm.UpdateStatus(management.Failed, errs.Error())
 		return
 	}
 
-	cm.client.Status(proto.StateObserved_HEALTHY, "Running", nil)
+	cm.client.Status(proto.StateObserved_HEALTHY, "Running", cm.payload)
+}
+
+func (cm *Manager) RegisterAction(action client.Action) {
+	cm.client.RegisterAction(action)
+}
+
+func (cm *Manager) UnregisterAction(action client.Action) {
+	cm.client.UnregisterAction(action)
+}
+
+func (cm *Manager) SetPayload(payload map[string]interface{}) {
+	cm.lock.Lock()
+	cm.payload = payload
+	cm.lock.Unlock()
 }
 
 func (cm *Manager) OnStop() {

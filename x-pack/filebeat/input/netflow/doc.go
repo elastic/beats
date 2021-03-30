@@ -4,4 +4,5 @@
 
 package netflow
 
-//go:generate go run fields_gen.go -output _meta/fields.yml --column-name=2 --column-type=3 --header _meta/fields.header.yml decoder/fields/ipfix-information-elements.csv
+// Generate fields.yml for all Netflow fields.
+//go:generate go run fields_gen.go --header _meta/fields.header.yml -output _meta/fields.yml decoder/fields/ipfix-information-elements.csv,2,3,true decoder/fields/cert_pen6871.csv,3,4,true decoder/fields/cisco.csv,1,4,true decoder/fields/assorted.csv,3,4,true

@@ -28,6 +28,20 @@
 - Fix Windows service installation script {pull}20203[20203]
 - Fix timeout issue stopping service applications {pull}20256[20256]
 - Fix incorrect hash when upgrading agent {pull}22322[22322]
+- Fix refresh of monitoring configuration {pull}23619[23619]
+- Fixed nil pointer during unenroll {pull}23609[23609]
+- Fixed reenroll scenario {pull}23686[23686]
+- Fixed Monitoring filebeat and metricbeat not connecting to Agent over GRPC {pull}23843[23843]
+- Fixed make status readable in the log. {pull}23849[23849]
+- Windows agent doesn't uninstall with a lowercase `c:` drive in the path {pull}23998[23998]
+- Fix reloading of log level for services {pull}[24055]24055
+- Fix: Successfully installed and enrolled agent running standalone{pull}[24128]24128
+- Make installer atomic on windows {pull}[24253]24253
+- Remove installed services on agent uninstall {pull}[24151]24151
+- Fix failing installation on windows 7 {pull}[24387]24387
+- Fix capabilities resolution in inspect command {pull}[24346]24346
+- Fix windows installer during enroll {pull}[24343]24343
+- Logging to file disabled on enroll {issue}[24173]24173
 
 ==== New features
 
@@ -47,6 +61,7 @@
 - Add --staging option to enroll command {pull}20026[20026]
 - Add `event.dataset` to all events {pull}20076[20076]
 - Send datastreams fields {pull}20416[20416]
+- Agent supports capabilities definition {pull}23848[23848]
 
 [[release-notes-7.8.0]]
 === Elastic Agent version 7.8.0

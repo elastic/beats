@@ -7,9 +7,8 @@ var:
     default: 5m
   - name: tags
     default: [m365-defender, forwarded]
-  - name: url
-    default: "https://api.security.microsoft.com/api/incidents"
   - name: oauth2
+  - name: proxy_url
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/defender.yml

@@ -47,7 +47,7 @@
     "availableBytes": 98727014400,
     "capacityBytes": 101258067968,
     "usedBytes": 2514276352,
-    "inodesFree": 6120096,
+    "inodesFree": 18446744073709551615,
     "inodes": 6258720,
     "inodesUsed": 138624
    },
@@ -56,7 +56,7 @@
      "availableBytes": 98727014400,
      "capacityBytes": 101258067968,
      "usedBytes": 860204379,
-     "inodesFree": 6120096,
+     "inodesFree": 18446744073709551615,
      "inodes": 6258720,
      "inodesUsed": 138624
     }

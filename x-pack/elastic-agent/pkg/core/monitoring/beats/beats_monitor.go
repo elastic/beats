@@ -85,7 +85,12 @@ func (b *Monitor) generateLoggingFile(spec program.Spec, pipelineID string) stri
 
 func (b *Monitor) generateLoggingPath(spec program.Spec, pipelineID string) string {
 	return filepath.Dir(b.generateLoggingFile(spec, pipelineID))
+}
 
+func (b *Monitor) ownLoggingPath(spec program.Spec) bool {
+	// if the spec file defines a custom log path then agent will not take ownership of the logging path
+	_, ok := spec.LogPaths[b.operatingSystem]
+	return !ok
 }
 
 // EnrichArgs enriches arguments provided to application, in order to enable
@@ -114,6 +119,7 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 		logFile = fmt.Sprintf("%s-json.log", logFile)
 		appendix = append(appendix,
 			"-E", "logging.json=true",
+			"-E", "logging.ecs=true",
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",
@@ -138,6 +144,12 @@ func (b *Monitor) Cleanup(spec program.Spec, pipelineID string) error {
 
 // Prepare executes steps in order for monitoring to work correctly
 func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) error {
+	if !b.ownLoggingPath(spec) {
+		// spec file passes a log path; so its up to the application to ensure the
+		// path exists and the write permissions are set so Elastic Agent can read it
+		return nil
+	}
+
 	drops := []string{b.generateLoggingPath(spec, pipelineID)}
 	if drop := b.monitoringDrop(spec, pipelineID); drop != "" {
 		drops = append(drops, drop)
@@ -211,9 +223,7 @@ func monitoringDrop(path string) (drop string) {
 		return ""
 	}
 
-	if strings.HasPrefix(path, httpPlusPrefix) {
-		path = strings.TrimPrefix(path, httpPlusPrefix)
-	}
+	path = strings.TrimPrefix(path, httpPlusPrefix)
 
 	// npipe is virtual without a drop
 	if isNpipe(path) {

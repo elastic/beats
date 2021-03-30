@@ -5,6 +5,13 @@ max_message_size: '{{.max_message_size}}'
 expiration_timeout: '{{.expiration_timeout}}'
 queue_size: {{.queue_size}}
 
+{{if .internal_networks}}
+internal_networks:
+{{range .internal_networks}}
+- '{{ . }}'
+{{end}}
+{{end}}
+
 {{if .timeout}}
 timeout: '{{.timeout}}'
 {{end}}
@@ -20,9 +27,7 @@ custom_definitions:
 {{end}}
 {{end}}
 
-{{ if .detect_sequence_reset}}
 detect_sequence_reset: {{.detect_sequence_reset}}
-{{end}}
 
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
@@ -31,4 +36,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.6.0
+        ecs.version: 1.8.0

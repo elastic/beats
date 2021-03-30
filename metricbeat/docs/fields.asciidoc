@@ -17,6 +17,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
+* <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
@@ -2325,7 +2326,7 @@ type: scaled_float
 
 --
 
-*`aws.ec2.diskio.read.ops`*::
+*`aws.ec2.diskio.read.count`*::
 +
 --
 Total completed read operations from all instance store volumes available to the instance in collection period.
@@ -2335,7 +2336,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.read.ops_per_sec`*::
+*`aws.ec2.diskio.read.count_per_sec`*::
 +
 --
 Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
@@ -2345,7 +2346,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops`*::
+*`aws.ec2.diskio.write.count`*::
 +
 --
 Total completed write operations to all instance store volumes available to the instance in collection period.
@@ -2355,7 +2356,7 @@ type: long
 
 --
 
-*`aws.ec2.diskio.write.ops_per_sec`*::
+*`aws.ec2.diskio.write.count_per_sec`*::
 +
 --
 Completed write operations per second to all instance store volumes available to the instance in a specified period of time.
@@ -4589,6 +4590,544 @@ type: double
 
 --
 
+[[exported-fields-awsfargate]]
+== AWS Fargate fields
+
+`awsfargate` module collects AWS fargate metrics from task metadata endpoint.
+
+
+
+[float]
+=== task_stats
+
+`task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
+
+
+
+*`task_stats.identifier`*::
++
+--
+Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
+
+
+type: keyword
+
+--
+
+[float]
+=== cpu
+
+Runtime CPU metrics.
+
+
+*`task_stats.cpu.kernel.pct`*::
++
+--
+Percentage of time in kernel space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.kernel.norm.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.kernel.ticks`*::
++
+--
+CPU ticks in kernel space.
+
+
+type: long
+
+--
+
+*`task_stats.cpu.system.pct`*::
++
+--
+Percentage of total CPU time in the system.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.system.norm.pct`*::
++
+--
+Percentage of total CPU time in the system normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.system.ticks`*::
++
+--
+CPU system ticks.
+
+
+type: long
+
+--
+
+*`task_stats.cpu.user.pct`*::
++
+--
+Percentage of time in user space.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.user.norm.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.user.ticks`*::
++
+--
+CPU ticks in user space.
+
+
+type: long
+
+--
+
+*`task_stats.cpu.total.pct`*::
++
+--
+Total CPU usage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`task_stats.cpu.total.norm.pct`*::
++
+--
+Total CPU usage normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
+=== diskio
+
+Disk I/O metrics.
+
+
+[float]
+=== read
+
+Accumulated reads during the life of the container
+
+
+
+*`task_stats.diskio.read.ops`*::
++
+--
+Number of reads during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.bytes`*::
++
+--
+Bytes read during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.rate`*::
++
+--
+Number of current reads per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.reads`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current reads per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== write
+
+Accumulated writes during the life of the container
+
+
+
+*`task_stats.diskio.read.write.ops`*::
++
+--
+Number of writes during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.bytes`*::
++
+--
+Bytes written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.write.rate`*::
++
+--
+Number of current writes per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.write.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.writes`*::
++
+--
+
+deprecated:[6.4]
+
+Number of current writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== summary
+
+Accumulated reads and writes during the life of the container
+
+
+
+*`task_stats.diskio.read.summary.ops`*::
++
+--
+Number of I/O operations during the life of the container
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.bytes`*::
++
+--
+Bytes read and written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.diskio.read.summary.rate`*::
++
+--
+Number of current operations per second
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.service_time`*::
++
+--
+Total time to service IO requests, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.wait_time`*::
++
+--
+Total time requests spent waiting in queues for service, in nanoseconds
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.summary.queued`*::
++
+--
+Total number of queued requests
+
+
+type: long
+
+--
+
+*`task_stats.diskio.read.total`*::
++
+--
+
+deprecated:[6.4]
+
+Number of reads and writes per second
+
+
+type: scaled_float
+
+--
+
+[float]
+=== memory
+
+Memory metrics.
+
+
+*`task_stats.memory.stats.*`*::
++
+--
+Raw memory stats from the cgroups memory.stat interface
+
+
+type: object
+
+--
+
+[float]
+=== network
+
+Network metrics.
+
+
+*`task_stats.network.interface`*::
++
+--
+Network interface name.
+
+
+type: keyword
+
+--
+
+[float]
+=== inbound
+
+Incoming network stats since the container started.
+
+
+
+*`task_stats.network.inbound.bytes`*::
++
+--
+Total number of incoming bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.network.inbound.dropped`*::
++
+--
+Total number of dropped incoming packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.inbound.errors`*::
++
+--
+Total errors on incoming packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.inbound.packets`*::
++
+--
+Total number of incoming packets.
+
+
+type: long
+
+--
+
+[float]
+=== outbound
+
+Outgoing network stats since the container started.
+
+
+
+*`task_stats.network.outbound.bytes`*::
++
+--
+Total number of outgoing bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`task_stats.network.outbound.dropped`*::
++
+--
+Total number of dropped outgoing packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.outbound.errors`*::
++
+--
+Total errors on outgoing packets.
+
+
+type: long
+
+--
+
+*`task_stats.network.outbound.packets`*::
++
+--
+Total number of outgoing packets.
+
+
+type: long
+
+--
+
 [[exported-fields-azure]]
 == Azure fields
 
@@ -6541,7 +7080,7 @@ type: long
 CPU usage percentage.
 
 
-type: float
+type: scaled_float
 
 --
 
@@ -9782,6 +10321,18 @@ example: example.com
 
 --
 
+*`client.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`client.top_level_domain`*::
 +
 --
@@ -10155,8 +10706,8 @@ example: docker
 [float]
 === destination
 
-Destination fields describe details about the destination of a packet/event.
-Destination fields are usually populated in conjunction with source fields.
+Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Destination fields are usually populated in conjunction with source fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`destination.address`*::
@@ -10382,6 +10933,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`destination.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -10799,7 +11362,7 @@ Expected values are: AA, TC, RD, RA, AD, CD, DO.
 
 type: keyword
 
-example: ['RD', 'RA']
+example: ["RD", "RA"]
 
 --
 
@@ -10904,7 +11467,7 @@ The `answers` array can be difficult to use, because of the variety of data form
 
 type: ip
 
-example: ['10.10.10.10', '10.10.10.11']
+example: ["10.10.10.10", "10.10.10.11"]
 
 --
 
@@ -11171,7 +11734,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -11224,7 +11787,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -11464,7 +12027,8 @@ example: C
 *`file.extension`*::
 +
 --
-File extension.
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -12414,6 +12978,19 @@ example: darwin
 
 --
 
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`host.os.version`*::
 +
 --
@@ -12623,6 +13200,18 @@ example: GET, POST, PUT, PoST
 
 --
 
+*`http.request.mime_type`*::
++
+--
+Mime type of the body of the request.
+This value must only be populated based on the content of the request body, not on the `Content-Type` header. Comparing the mime type of a request with the request's Content-Type header can be helpful in detecting threats or misconfigured clients.
+
+type: keyword
+
+example: image/gif
+
+--
+
 *`http.request.referrer`*::
 +
 --
@@ -12675,6 +13264,18 @@ type: long
 example: 1437
 
 format: bytes
+
+--
+
+*`http.response.mime_type`*::
++
+--
+Mime type of the body of the response.
+This value must only be populated based on the content of the response body, not on the `Content-Type` header. Comparing the mime type of a response with the response's Content-Type header can be helpful in detecting misconfigured servers.
+
+type: keyword
+
+example: image/gif
 
 --
 
@@ -12956,14 +13557,17 @@ example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
 --
 Direction of the network traffic.
 Recommended values are:
+  * ingress
+  * egress
   * inbound
   * outbound
   * internal
   * external
   * unknown
 
-When mapping events from a host-based monitoring context, populate this field from the host's point of view.
-When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+When mapping events from a host-based monitoring context, populate this field from the host's point of view, using the values "ingress" or "egress".
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of the network perimeter, using the values "inbound", "outbound", "internal" or "external".
+Note that "internal" is not crossing perimeter boundaries, and is meant to describe communication between two hosts within the perimeter. Note also that "external" is meant to describe traffic between two hosts that are external to the perimeter. This could for example be useful for ISPs or VPN service providers.
 
 type: keyword
 
@@ -12996,7 +13600,7 @@ example: 6
 *`network.inner`*::
 +
 --
-Network.inner fields are added in addition to network.vlan fields to describe  the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include  vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+Network.inner fields are added in addition to network.vlan fields to describe the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
 
 type: object
 
@@ -13461,6 +14065,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -13628,6 +14245,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -13893,7 +14523,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -14092,7 +14722,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -14818,7 +15448,7 @@ Name, organization, or pseudonym of the author or authors who created the rule u
 
 type: keyword
 
-example: ['Star-Lord']
+example: ["Star-Lord"]
 
 --
 
@@ -15156,6 +15786,18 @@ example: example.com
 
 --
 
+*`server.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`server.top_level_domain`*::
 +
 --
@@ -15376,8 +16018,8 @@ example: 3.2.4
 [float]
 === source
 
-Source fields describe details about the source of a packet/event.
-Source fields are usually populated in conjunction with destination fields.
+Source fields capture details about the sender of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Source fields are usually populated in conjunction with destination fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`source.address`*::
@@ -15606,6 +16248,18 @@ example: example.com
 
 --
 
+*`source.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`source.top_level_domain`*::
 +
 --
@@ -15752,55 +16406,55 @@ example: MITRE ATT&CK
 *`threat.tactic.id`*::
 +
 --
-The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: TA0040
+example: TA0002
 
 --
 
 *`threat.tactic.name`*::
 +
 --
-Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/)
+Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/)
 
 type: keyword
 
-example: impact
+example: Execution
 
 --
 
 *`threat.tactic.reference`*::
 +
 --
-The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: https://attack.mitre.org/tactics/TA0040/
+example: https://attack.mitre.org/tactics/TA0002/
 
 --
 
 *`threat.technique.id`*::
 +
 --
-The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: T1499
+example: T1059
 
 --
 
 *`threat.technique.name`*::
 +
 --
-The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: Endpoint Denial of Service
+example: Command and Scripting Interpreter
 
 --
 
@@ -15814,11 +16468,51 @@ type: text
 *`threat.technique.reference`*::
 +
 --
-The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: https://attack.mitre.org/techniques/T1499/
+example: https://attack.mitre.org/techniques/T1059/
+
+--
+
+*`threat.technique.subtechnique.id`*::
++
+--
+The full id of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: T1059.001
+
+--
+
+*`threat.technique.subtechnique.name`*::
++
+--
+The name of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: PowerShell
+
+--
+
+*`threat.technique.subtechnique.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.technique.subtechnique.reference`*::
++
+--
+The reference url of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: https://attack.mitre.org/techniques/T1059/001/
 
 --
 
@@ -15857,7 +16551,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -15967,7 +16661,7 @@ Array of ciphers offered by the client during the client hello.
 
 type: keyword
 
-example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+example: ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "..."]
 
 --
 
@@ -16293,7 +16987,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -16671,13 +17365,7 @@ example: tls
 
 --
 
-[float]
-=== tracing
-
-Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
-
-
-*`tracing.span.id`*::
+*`span.id`*::
 +
 --
 Unique identifier of the span within the scope of its trace.
@@ -16689,7 +17377,7 @@ example: 3ff9a8981b7ccd5a
 
 --
 
-*`tracing.trace.id`*::
+*`trace.id`*::
 +
 --
 Unique identifier of the trace.
@@ -16701,7 +17389,7 @@ example: 4bf92f3577b34da6a3ce929d0e0e4736
 
 --
 
-*`tracing.transaction.id`*::
+*`transaction.id`*::
 +
 --
 Unique identifier of the transaction within the scope of its trace.
@@ -16724,6 +17412,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -16734,9 +17423,10 @@ example: www.elastic.co
 *`url.extension`*::
 +
 --
-The field contains the file extension from the original request url.
+The field contains the file extension from the original request url, excluding the leading dot.
 The file extension is only set if it exists, as not every url has a file extension.
 The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -16858,6 +17548,18 @@ example: https
 
 --
 
+*`url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`url.top_level_domain`*::
 +
 --
@@ -16886,6 +17588,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -16893,6 +17708,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -16989,6 +17917,119 @@ type: text
 --
 
 *`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -17112,6 +18153,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -17330,7 +18384,9 @@ example: Critical
 [float]
 === x509
 
-This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk. When only a single certificate is logged in an event, it should be nested under `file`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`). For events that contain certificate information for both sides of the connection, the x509 object could be nested under the respective side of the connection information (e.g. `tls.server.x509`).
+This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk.
+When the certificate relates to a file, use the fields at `file.x509`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`).
+Events that contain certificate information about network connections, should use the x509 fields under the relevant TLS fields: `tls.server.x509` and/or `tls.client.x509`.
 
 
 *`x509.alternative_names`*::
@@ -22946,7 +24002,7 @@ iis module
 [float]
 === application_pool
 
-application_pool
+Application pool process stats.
 
 
 
@@ -22960,23 +24016,873 @@ type: keyword
 
 --
 
-*`iis.webserver.*.*`*::
+[float]
+=== process
+
+Worker process overview.
+
+
+
+*`iis.application_pool.process.handle_count`*::
 +
 --
-webserver
+The number of handles.
 
 
-type: object
+type: long
 
 --
 
-*`iis.website.*.*`*::
+*`iis.application_pool.process.io_read_operations_per_sec`*::
 +
 --
-website
+IO read operations per sec.
 
 
-type: object
+type: float
+
+--
+
+*`iis.application_pool.process.io_write_operations_per_sec`*::
++
+--
+IO write operations per sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.virtual_bytes`*::
++
+--
+Memory virtual bytes.
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.cpu_usage_perc`*::
++
+--
+The CPU usage percentage.
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.thread_count`*::
++
+--
+The number of threats.
+
+
+type: long
+
+--
+
+*`iis.application_pool.process.working_set`*::
++
+--
+Memory working set.
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.private_bytes`*::
++
+--
+Memory private bytes.
+
+
+type: float
+
+--
+
+*`iis.application_pool.process.page_faults_per_sec`*::
++
+--
+Memory page faults.
+
+
+type: float
+
+--
+
+[float]
+=== net_clr
+
+Common Language Runtime overview.
+
+
+
+*`iis.application_pool.net_clr.finallys_per_sec`*::
++
+--
+The number of finallys per sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.throw_to_catch_depth_per_sec`*::
++
+--
+Throw to catch depth count per sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.total_exceptions_thrown`*::
++
+--
+Total number of exceptions thrown.
+
+
+type: long
+
+--
+
+*`iis.application_pool.net_clr.filters_per_sec`*::
++
+--
+Number of filters per sec.
+
+
+type: float
+
+--
+
+[float]
+=== webserver
+
+Webserver related metrics.
+
+
+
+[float]
+=== process
+
+The process related stats.
+
+
+
+*`iis.webserver.process.cpu_usage_perc`*::
++
+--
+The CPU usage percentage.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.handle_count`*::
++
+--
+The number of handles.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.virtual_bytes`*::
++
+--
+Memory virtual bytes.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.thread_count`*::
++
+--
+The number of threads.
+
+
+type: long
+
+--
+
+*`iis.webserver.process.working_set`*::
++
+--
+Memory working set.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.private_bytes`*::
++
+--
+Memory private bytes.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.worker_process_count`*::
++
+--
+Number of worker processes running.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.page_faults_per_sec`*::
++
+--
+Memory page faults.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.io_read_operations_per_sec`*::
++
+--
+IO read operations per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.process.io_write_operations_per_sec`*::
++
+--
+IO write operations per sec.
+
+
+type: float
+
+--
+
+[float]
+=== asp_net
+
+Common Language Runtime overview.
+
+
+
+*`iis.webserver.asp_net.application_restarts`*::
++
+--
+Number of applications restarts.
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net.request_wait_time`*::
++
+--
+Request wait time.
+
+
+type: long
+
+--
+
+[float]
+=== asp_net_application
+
+ASP.NET application overview.
+
+
+
+*`iis.webserver.asp_net_application.errors_total_per_sec`*::
++
+--
+Total number of errors per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.pipeline_instance_count`*::
++
+--
+The pipeline instance count.
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_per_sec`*::
++
+--
+Number of requests per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_executing`*::
++
+--
+Number of requests executing.
+
+
+type: float
+
+--
+
+*`iis.webserver.asp_net_application.requests_in_application_queue`*::
++
+--
+Number of requests in the application queue.
+
+
+type: float
+
+--
+
+[float]
+=== cache
+
+The cache overview.
+
+
+
+*`iis.webserver.cache.current_file_cache_memory_usage`*::
++
+--
+The current file cache memory usage size.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.current_files_cached`*::
++
+--
+The number of current files cached.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.current_uris_cached`*::
++
+--
+The number of current uris cached.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.file_cache_hits`*::
++
+--
+The number of file cache hits.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.file_cache_misses`*::
++
+--
+The number of file cache misses.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.maximum_file_cache_memory_usage`*::
++
+--
+The max file cache size.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_current_items`*::
++
+--
+The number of output cache current items.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_current_memory_usage`*::
++
+--
+The output cache memory usage size.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_total_hits`*::
++
+--
+The output cache total hits count.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.output_cache_total_misses`*::
++
+--
+The output cache total misses count.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.total_files_cached`*::
++
+--
+the total number of files cached.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.total_uris_cached`*::
++
+--
+The total number of URIs cached.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.uri_cache_hits`*::
++
+--
+The number of URIs cached hits.
+
+
+type: float
+
+--
+
+*`iis.webserver.cache.uri_cache_misses`*::
++
+--
+The number of URIs cache misses.
+
+
+type: float
+
+--
+
+[float]
+=== network
+
+The network related stats.
+
+
+
+*`iis.webserver.network.anonymous_users_per_sec`*::
++
+--
+The number of anonymous users per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.bytes_received_per_sec`*::
++
+--
+The size of bytes received per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.bytes_sent_per_sec`*::
++
+--
+The size of bytes sent per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_anonymous_users`*::
++
+--
+The number of current anonymous users.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_connections`*::
++
+--
+The number of current connections.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.current_non_anonymous_users`*::
++
+--
+The number of current non anonymous users.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.delete_requests_per_sec`*::
++
+--
+Number of DELETE requests per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.get_requests_per_sec`*::
++
+--
+Number of GET requests per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.maximum_connections`*::
++
+--
+Number of maximum connections.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.post_requests_per_sec`*::
++
+--
+Number of POST requests per sec.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.service_uptime`*::
++
+--
+Service uptime.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_anonymous_users`*::
++
+--
+Total number of anonymous users.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_bytes_received`*::
++
+--
+Total size of bytes received.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_bytes_sent`*::
++
+--
+Total size of bytes sent.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_connection_attempts`*::
++
+--
+The total number of connection attempts.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_delete_requests`*::
++
+--
+The total number of DELETE requests.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_get_requests`*::
++
+--
+The total number of GET requests.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_non_anonymous_users`*::
++
+--
+The total number of non anonymous users.
+
+
+type: float
+
+--
+
+*`iis.webserver.network.total_post_requests`*::
++
+--
+The total number of POST requests.
+
+
+type: float
+
+--
+
+[float]
+=== website
+
+Website related metrics.
+
+
+
+*`iis.website.name`*::
++
+--
+website name
+
+
+type: keyword
+
+--
+
+[float]
+=== network
+
+The network overview.
+
+
+
+*`iis.website.network.bytes_received_per_sec`*::
++
+--
+The bytes received per sec size.
+
+
+type: float
+
+--
+
+*`iis.website.network.bytes_sent_per_sec`*::
++
+--
+The bytes sent per sec size.
+
+
+type: float
+
+--
+
+*`iis.website.network.current_connections`*::
++
+--
+The number of current connections.
+
+
+type: float
+
+--
+
+*`iis.website.network.delete_requests_per_sec`*::
++
+--
+The number of DELETE requests per sec.
+
+
+type: float
+
+--
+
+*`iis.website.network.get_requests_per_sec`*::
++
+--
+The number of GET requests per sec.
+
+
+type: float
+
+--
+
+*`iis.website.network.maximum_connections`*::
++
+--
+The number of maximum connections.
+
+
+type: float
+
+--
+
+*`iis.website.network.post_requests_per_sec`*::
++
+--
+The number of POST requests per sec.
+
+
+type: float
+
+--
+
+*`iis.website.network.put_requests_per_sec`*::
++
+--
+The number of PUT requests per sec.
+
+
+type: float
+
+--
+
+*`iis.website.network.service_uptime`*::
++
+--
+The service uptime.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_bytes_received`*::
++
+--
+The total number of bytes received.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_bytes_sent`*::
++
+--
+The  total number of bytes sent.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_connection_attempts`*::
++
+--
+The total number of connection attempts.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_delete_requests`*::
++
+--
+The total number of DELETE requests.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_get_requests`*::
++
+--
+The total number of GET requests.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_post_requests`*::
++
+--
+The total number of POST requests.
+
+
+type: float
+
+--
+
+*`iis.website.network.total_put_requests`*::
++
+--
+The total number of PUT requests.
+
+
+type: float
 
 --
 
@@ -25516,6 +27422,16 @@ type: object
 
 --
 
+*`kubernetes.service.selectors.*`*::
++
+--
+Kubernetes Service selectors map
+
+
+type: object
+
+--
+
 *`kubernetes.replicaset.name`*::
 +
 --
@@ -25549,7 +27465,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -25562,7 +27478,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -26032,7 +27950,7 @@ CPU usage metrics
 Container CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -26042,7 +27960,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -26084,7 +28002,7 @@ Logs info
 Logs available capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26097,7 +28015,7 @@ format: bytes
 Logs total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26110,7 +28028,7 @@ format: bytes
 Logs used capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26123,7 +28041,7 @@ format: bytes
 Total available inodes
 
 
-type: long
+type: double
 
 --
 
@@ -26133,7 +28051,7 @@ type: long
 Total free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -26143,7 +28061,7 @@ type: long
 Total used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -26155,7 +28073,7 @@ type: long
 Total available memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26168,7 +28086,7 @@ format: bytes
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26205,7 +28123,7 @@ format: percent
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26218,7 +28136,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26230,7 +28148,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -26240,7 +28158,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -26252,7 +28170,7 @@ type: long
 Root filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26265,7 +28183,7 @@ format: bytes
 Root filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26278,7 +28196,7 @@ format: bytes
 Root filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26291,7 +28209,7 @@ format: bytes
 Used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -26872,7 +28790,7 @@ CPU usage metrics
 Node CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -26882,7 +28800,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -26894,7 +28812,7 @@ type: long
 Total available memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26907,7 +28825,7 @@ format: bytes
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26920,7 +28838,7 @@ format: bytes
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26933,7 +28851,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26945,7 +28863,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -26955,7 +28873,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -26967,7 +28885,7 @@ type: long
 Received bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -26979,7 +28897,7 @@ format: bytes
 Rx errors
 
 
-type: long
+type: double
 
 --
 
@@ -26990,7 +28908,7 @@ type: long
 Transmitted bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27002,7 +28920,7 @@ format: bytes
 Tx errors
 
 
-type: long
+type: double
 
 --
 
@@ -27014,7 +28932,7 @@ type: long
 Filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27027,7 +28945,7 @@ format: bytes
 Filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27040,7 +28958,7 @@ format: bytes
 Filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27053,7 +28971,7 @@ format: bytes
 Number of used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -27063,7 +28981,7 @@ type: long
 Number of inodes
 
 
-type: long
+type: double
 
 --
 
@@ -27073,7 +28991,7 @@ type: long
 Number of free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -27086,7 +29004,7 @@ type: long
 Image filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27099,7 +29017,7 @@ format: bytes
 Image filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27112,7 +29030,7 @@ format: bytes
 Image filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27143,7 +29061,7 @@ type: date
 Received bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27155,7 +29073,7 @@ format: bytes
 Rx errors
 
 
-type: long
+type: double
 
 --
 
@@ -27166,7 +29084,7 @@ type: long
 Transmitted bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27178,7 +29096,7 @@ format: bytes
 Tx errors
 
 
-type: long
+type: double
 
 --
 
@@ -27196,7 +29114,7 @@ CPU usage metrics
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -27232,7 +29150,7 @@ format: percent
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27269,7 +29187,7 @@ format: percent
 Total memory available
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27282,7 +29200,7 @@ format: bytes
 Total working set memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27295,7 +29213,7 @@ format: bytes
 Total resident set size memory
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -27307,7 +29225,7 @@ format: bytes
 Total page faults
 
 
-type: long
+type: double
 
 --
 
@@ -27317,7 +29235,7 @@ type: long
 Total major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28287,6 +30205,46 @@ type: boolean
 
 --
 
+*`kubernetes.node.status.memory_pressure`*::
++
+--
+Node MemoryPressure status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.status.disk_pressure`*::
++
+--
+Node DiskPressure status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.status.out_of_disk`*::
++
+--
+Node OutOfDisk status (true, false or unknown)
+
+
+type: keyword
+
+--
+
+*`kubernetes.node.status.pid_pressure`*::
++
+--
+Node PIDPressure status (true, false or unknown)
+
+
+type: keyword
+
+--
+
 
 *`kubernetes.node.cpu.allocatable.cores`*::
 +
@@ -28891,7 +30849,7 @@ CPU usage metrics
 CPU Core usage nanoseconds
 
 
-type: long
+type: double
 
 --
 
@@ -28901,7 +30859,7 @@ type: long
 CPU used nanocores
 
 
-type: long
+type: double
 
 --
 
@@ -28913,7 +30871,7 @@ type: long
 Total memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28926,7 +30884,7 @@ format: bytes
 RSS memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28939,7 +30897,7 @@ format: bytes
 Working set memory usage
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -28951,7 +30909,7 @@ format: bytes
 Number of page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28961,7 +30919,7 @@ type: long
 Number of major page faults
 
 
-type: long
+type: double
 
 --
 
@@ -28990,7 +30948,7 @@ type: keyword
 Filesystem total capacity in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29003,7 +30961,7 @@ format: bytes
 Filesystem total available in bytes
 
 
-type: long
+type: double
 
 format: bytes
 
@@ -29016,9 +30974,21 @@ format: bytes
 Filesystem total used in bytes
 
 
-type: long
+type: double
 
 format: bytes
+
+--
+
+*`kubernetes.volume.fs.used.pct`*::
++
+--
+Percentage of used storage
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -29029,7 +30999,7 @@ format: bytes
 Used inodes
 
 
-type: long
+type: double
 
 --
 
@@ -29039,7 +31009,7 @@ type: long
 Free inodes
 
 
-type: long
+type: double
 
 --
 
@@ -29049,7 +31019,7 @@ type: long
 Total inodes
 
 
-type: long
+type: double
 
 --
 
@@ -37001,6 +38971,14 @@ type: long
 
 --
 
+*`postgresql.activity.backend_type`*::
++
+--
+Type of the current backend. Possible types are autovacuum launcher, autovacuum worker, logical replication launcher, logical replication worker, parallel worker, background writer, client backend, checkpointer, startup, walreceiver, walsender and walwriter. Extensions may register workers with additional backend types.
+
+
+--
+
 *`postgresql.activity.backend_start`*::
 +
 --
@@ -37073,6 +39051,22 @@ Current overall state of this backend. Possible values are:
 +
 --
 Text of this backend's most recent query. If state is active this field shows the currently executing query. In all other states, it shows the last query that was executed.
+
+
+--
+
+*`postgresql.activity.wait_event`*::
++
+--
+Wait event name if the backend is currently waiting.
+
+
+--
+
+*`postgresql.activity.wait_event_type`*::
++
+--
+The type of event for which the backend is waiting.
 
 
 --
@@ -37204,7 +39198,7 @@ One row per database, showing database-wide statistics. Collected by querying pg
 *`postgresql.database.oid`*::
 +
 --
-OID of the database this backend is connected to.
+OID of the database this backend is connected to, or 0 for shared resources.
 
 
 type: long
@@ -37214,7 +39208,7 @@ type: long
 *`postgresql.database.name`*::
 +
 --
-Name of the database this backend is connected to.
+Name of the database this backend is connected to, empty for shared resources.
 
 
 type: keyword
@@ -40356,6 +42350,57 @@ System status metrics, like CPU and memory usage, that are collected from the op
 
 
 [float]
+=== process
+
+Process metrics.
+
+
+
+*`process.state`*::
++
+--
+The process state. For example: "running".
+
+
+type: keyword
+
+--
+
+*`process.cpu.pct`*::
++
+--
+The percentage of CPU time spent by the process since the last event. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`process.cpu.start_time`*::
++
+--
+The time when the process was started.
+
+
+type: date
+
+--
+
+*`process.memory.pct`*::
++
+--
+The percentage of memory the process occupied in main memory (RAM).
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+[float]
 === system
 
 `system` contains local system metrics.
@@ -40965,6 +43010,16 @@ type: long
 +
 --
 The total number of of milliseconds spent doing I/Os.
+
+
+type: long
+
+--
+
+*`system.diskio.io.ops`*::
++
+--
+The total number of I/Os in progress.
 
 
 type: long
@@ -42132,7 +44187,7 @@ format: bytes
 *`system.process.memory.rss.bytes`*::
 +
 --
-The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes. Not available on Windows.
+The Resident Set Size. The amount of memory the process occupied in main memory (RAM). On Windows this represents the current working set size, in bytes.
 
 
 type: long
@@ -42144,31 +44199,7 @@ format: bytes
 *`system.process.memory.rss.pct`*::
 +
 --
-The percentage of memory the process occupied in main memory (RAM). Not available on Windows.
-
-
-type: scaled_float
-
-format: percent
-
---
-
-*`system.process.memory.wss.bytes`*::
-+
---
-The Working Set Size. The amount of memory the process occupied in main memory (RAM). Windows only.
-
-
-type: long
-
-format: bytes
-
---
-
-*`system.process.memory.wss.pct`*::
-+
---
-The percentage of memory the process occupied in main memory (RAM). Windows only.
+The percentage of memory the process occupied in main memory (RAM).
 
 
 type: scaled_float
@@ -42180,7 +44211,7 @@ format: percent
 *`system.process.memory.share`*::
 +
 --
-The shared memory the process uses. Not available on Windows.
+The shared memory the process uses.
 
 
 type: long
@@ -44280,7 +46311,7 @@ type: keyword
 Resident Set Size. memory currently used by a process. if always zero try `--memory-report` option of uwsgi
 
 
-type: keyword
+type: long
 
 --
 
@@ -44496,7 +46527,7 @@ format: bytes
 Used percent of the datastore
 
 
-type: long
+type: scaled_float
 
 format: percent
 

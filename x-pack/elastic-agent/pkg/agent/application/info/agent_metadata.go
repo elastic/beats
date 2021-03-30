@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -40,6 +40,9 @@ type AgentECSMeta struct {
 	BuildOriginal string `json:"build.original"`
 	// Upgradeable is a flag specifying if it is possible for agent to be upgraded.
 	Upgradeable bool `json:"upgradeable"`
+	// LogLevel describes currently set log level.
+	// Possible values: "debug"|"info"|"warning"|"error"
+	LogLevel string `json:"log_level"`
 }
 
 // SystemECSMeta is a collection of operating system metadata in ECS compliant object form.
@@ -116,6 +119,21 @@ const (
 	hostMACKey = "host.mac"
 )
 
+// Metadata loads metadata from disk.
+func Metadata() (*ECSMeta, error) {
+	agentInfo, err := NewAgentInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	meta, err := agentInfo.ECSMetadata()
+	if err != nil {
+		return nil, errors.New(err, "failed to gather host metadata")
+	}
+
+	return meta, nil
+}
+
 // ECSMetadata returns an agent ECS compliant metadata.
 func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 	hostname, err := os.Hostname()
@@ -139,7 +157,8 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				BuildOriginal: release.Info().String(),
 				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
-				Upgradeable: release.Upgradeable() || (install.RunningInstalled() && install.RunningUnderSupervisor()),
+				Upgradeable: release.Upgradeable() || (RunningInstalled() && RunningUnderSupervisor()),
+				LogLevel:    i.logLevel,
 			},
 		},
 		Host: &HostECSMeta{

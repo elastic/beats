@@ -330,13 +330,16 @@ var sysmon = (function () {
     };
 
     var addUser = function (evt) {
+        var id = evt.Get("winlog.user.identifier");
+        if (id) {
+            evt.Put("user.id", id);
+        }
         var userParts = evt.Get("winlog.event_data.User");
         if (!userParts) {
             return;
         }
         userParts = userParts.split("\\");
         if (userParts.length === 2) {
-            evt.Delete("user");
             evt.Put("user.domain", userParts[0]);
             evt.Put("user.name", userParts[1]);
             evt.AppendTo("related.user", userParts[1]);
@@ -357,10 +360,10 @@ var sysmon = (function () {
     var addNetworkDirection = function (evt) {
         switch (evt.Get("winlog.event_data.Initiated")) {
             case "true":
-                evt.Put("network.direction", "outbound");
+                evt.Put("network.direction", "egress");
                 break;
             case "false":
-                evt.Put("network.direction", "inbound");
+                evt.Put("network.direction", "ingress");
                 break;
         }
         evt.Delete("winlog.event_data.Initiated");
@@ -1190,6 +1193,13 @@ var sysmon = (function () {
     // Event ID 12 - Registry object added or deleted.
     var event12 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration", "registry"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1222,6 +1232,13 @@ var sysmon = (function () {
     // Event ID 13 - Registry value set.
     var event13 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration", "registry"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1254,6 +1271,13 @@ var sysmon = (function () {
     // Event ID 14 - Registry object renamed.
     var event14 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration", "registry"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                     from: "winlog.event_data.UtcTime",
@@ -1330,6 +1354,13 @@ var sysmon = (function () {
     // Event ID 16 - Sysmon config state changed.
     var event16 = new processor.Chain()
         .Add(parseUtcTime)
+        .AddFields({
+            fields: {
+                category: ["configuration"],
+                type: ["change"],
+            },
+            target: "event",
+        })
         .Convert({
             fields: [{
                 from: "winlog.event_data.UtcTime",
@@ -1535,6 +1566,8 @@ var sysmon = (function () {
             ignore_missing: true,
             field: "dns.question.name",
             target_field: "dns.question.registered_domain",
+            target_subdomain_field: "dns.question.subdomain",
+            target_etld_field: "dns.question.top_level_domain",
         })
         .Add(setRuleName)
         .Add(translateDnsQueryStatus)

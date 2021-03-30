@@ -24,9 +24,9 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/beats/v7/metricbeat/module/system/raid/blockinfo"
 )
 
@@ -45,10 +45,6 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	systemModule, ok := base.Module().(*system.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
 
 	// Additional configuration options
 	config := struct {
@@ -60,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if config.MountPoint == "" {
-		config.MountPoint = systemModule.HostFS
+		config.MountPoint = paths.Paths.Hostfs
 	}
 
 	mountPoint := filepath.Join(config.MountPoint, procfs.DefaultMountPoint)

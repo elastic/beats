@@ -1,0 +1,26 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 60m
+  - name: first_interval
+    default: 24h
+  - name: api_token
+  - name: ssl
+  - name: http_client_timeout
+    default: 120s
+  - name: types
+    default: "domain,IPv4,hostname,url,FileHash-SHA256,FileHash-MD5"
+  - name: lookback_range
+    default: 2h
+  - name: url
+    default: "https://otx.alienvault.com/api/v1/indicators/export"
+  - name: tags
+    default: [threatintel-otx, forwarded]
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

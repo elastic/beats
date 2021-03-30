@@ -99,7 +99,7 @@ func init() {
 // queueFactory matches the queue.Factory interface, and is used to add the
 // disk queue to the registry.
 func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, _ int, // input queue size param is unused.
 ) (queue.Queue, error) {
 	settings, err := SettingsForUserConfig(cfg)
 	if err != nil {

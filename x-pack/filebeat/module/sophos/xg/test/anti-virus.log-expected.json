@@ -46,6 +46,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.93"
@@ -124,6 +127,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "172.16.34.24",
             "13.226.155.18"
@@ -199,6 +205,9 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
             "82.165.194.211",
             "186.8.209.194"
@@ -284,6 +293,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "23.254.247.78",
             "185.7.209.194"
@@ -365,6 +377,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.16.121",
             "10.198.234.240"
@@ -436,6 +451,9 @@
         "observer.serial_number": "S4000806149EE49",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.16.121",
             "10.198.234.240"
@@ -509,6 +527,9 @@
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.146.13.49",
             "10.8.142.181"
@@ -574,6 +595,9 @@
         "observer.serial_number": "SFDemo-2df0960",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.146.13.49",
             "10.8.142.181"

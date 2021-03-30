@@ -64,4 +64,6 @@ include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
 
+include::redirects.asciidoc[]
+
 

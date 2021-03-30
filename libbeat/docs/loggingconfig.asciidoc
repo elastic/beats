@@ -156,6 +156,12 @@ To see which selectors are available, run {beatname_uc} in debug mode
 after the log level and is enclosed in brackets.
 =====
 
+To configure multiple selectors, use the following {beats-ref}/config-file-format.html[YAML list syntax]:
+["source","yaml",subs="attributes"]
+----
+logging.selectors: [ harvester, input ]
+----
+
 ifndef::serverless[]
 To override selectors at the command line, use the `-d` global flag (`-d` also
 sets the debug log level). For more information, see <<command-line-options>>.
@@ -164,10 +170,11 @@ endif::serverless[]
 [float]
 ==== `logging.metrics.enabled`
 
-If enabled, {beatname_uc} periodically logs its internal metrics that have
+By default, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
 value at the beginning of the period is logged. Also, the total values for all
-non-zero internal metrics are logged on shutdown. The default is true.
+non-zero internal metrics are logged on shutdown. Set this to false to disable 
+this behavior. The default is true.
 
 Here is an example log line:
 

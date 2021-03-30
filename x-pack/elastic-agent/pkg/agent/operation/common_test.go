@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
@@ -69,13 +70,13 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 		t.Fatal(err)
 	}
 
-	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor())
+	operator, err := NewOperator(context.Background(), l, agentInfo, "p1", operatorCfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, noop.NewMonitor(), status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	operator.config.DownloadConfig.OperatingSystem = "darwin"
-	operator.config.DownloadConfig.Architecture = "32"
+	operator.config.DownloadConfig.Architecture = "64"
 
 	// make the download path so the `operation_verify` can ensure the path exists
 	downloadConfig := operator.config.DownloadConfig
@@ -100,7 +101,7 @@ func getProgram(binary, version string) *app.Descriptor {
 	downloadCfg := &artifact.Config{
 		InstallPath:     installPath,
 		OperatingSystem: "darwin",
-		Architecture:    "32",
+		Architecture:    "64",
 	}
 	return app.NewDescriptor(spec, version, downloadCfg, nil)
 }
@@ -128,7 +129,7 @@ func waitFor(t *testing.T, check func() error) {
 		if err == nil {
 			return
 		}
-		if time.Now().Sub(started) >= 15*time.Second {
+		if time.Since(started) >= 15*time.Second {
 			t.Fatalf("check timed out after 15 second: %s", err)
 		}
 		time.Sleep(10 * time.Millisecond)

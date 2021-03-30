@@ -11,12 +11,16 @@ check_install:
     path: "endpoint-security"
     args:
     - "verify"
+    - "--log"
+    - "stderr"
     timeout: 30
 post_install:
 - exec_file:
     path: "endpoint-security"
     args:
     - "install"
+    - "--log"
+    - "stderr"
     - "--upgrade"
     - "--resources"
     - "endpoint-security-resources.zip"
@@ -26,6 +30,8 @@ pre_uninstall:
     path: "endpoint-security"
     args:
       - "uninstall"
+      - "--log"
+      - "stderr"
     timeout: 600
 rules:
 - fix_stream: {}
@@ -53,6 +59,8 @@ rules:
         key: access_api_key
     - remove_key:
         key: kibana
+    - remove_key:
+        key: server
 
 - filter:
     selectors:
@@ -62,3 +70,4 @@ rules:
     - revision
 
 when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+constraints: ${runtime.arch} != 'arm64'

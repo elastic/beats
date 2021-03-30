@@ -62,6 +62,8 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		if err != nil {
 			return err
 		}
+		// Set input types from the spec
+		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
 	if a.state.Status != state.Stopped {
@@ -140,6 +142,8 @@ func injectLogLevel(logLevel string, args []string) []string {
 		level = "info"
 	case "debug":
 		level = "debug"
+	case "warning":
+		level = "warning"
 	case "error":
 		level = "error"
 	}

@@ -41,8 +41,11 @@ import (
 const pluginName = "filestream"
 
 type state struct {
+	Offset int64 `json:"offset" struct:"offset"`
+}
+
+type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
-	Offset         int64  `json:"offset" struct:"offset"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
@@ -50,14 +53,8 @@ type state struct {
 // are actively written by other applications.
 type filestream struct {
 	readerConfig    readerConfig
-	bufferSize      int
-	tailFile        bool // TODO
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
-	lineTerminator  readfile.LineTerminator
-	excludeLines    []match.Matcher
-	includeLines    []match.Matcher
-	maxBytes        int
 	closerConfig    closerConfig
 }
 
@@ -84,37 +81,47 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	prospector, err := newFileProspector(
-		config.Paths,
-		config.IgnoreOlder,
-		config.FileWatcher,
-		config.FileIdentity,
-	)
+	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("error while creating filewatcher %v", err)
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Encoding)
+	identifier, err := newFileIdentifier(config.FileIdentity)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
+	}
+
+	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	return prospector, &filestream{
-		readerConfig:    config.readerConfig,
-		bufferSize:      config.BufferSize,
+	prospector := &fileProspector{
+		filewatcher:       filewatcher,
+		identifier:        identifier,
+		ignoreOlder:       config.IgnoreOlder,
+		cleanRemoved:      config.CleanRemoved,
+		stateChangeCloser: config.Close.OnStateChange,
+	}
+
+	filestream := &filestream{
+		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
-		lineTerminator:  config.LineTerminator,
-		excludeLines:    config.ExcludeLines,
-		includeLines:    config.IncludeLines,
-		maxBytes:        config.MaxBytes,
 		closerConfig:    config.Close,
-	}, nil
+	}
+
+	return prospector, filestream, nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
 
 func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, state{})
+	fs, ok := src.(fileSource)
+	if !ok {
+		return fmt.Errorf("not file source")
+	}
+
+	reader, err := inp.open(ctx.Logger, ctx.Cancelation, fs.newPath, 0)
 	if err != nil {
 		return err
 	}
@@ -135,13 +142,13 @@ func (inp *filestream) Run(
 	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
 	state := initState(log, cursor, fs)
 
-	r, err := inp.open(log, ctx.Cancelation, state)
+	r, err := inp.open(log, ctx.Cancelation, fs.newPath, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
 
-	_, streamCancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
+	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {
@@ -154,7 +161,7 @@ func (inp *filestream) Run(
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
-	state := state{Source: s.newPath, IdentifierName: s.identifierGenerator}
+	var state state
 	if c.IsNew() {
 		return state
 	}
@@ -167,13 +174,13 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, s state) (reader.Reader, error) {
-	f, err := inp.openFile(s.Source, s.Offset)
+func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
+	f, err := inp.openFile(path, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debug("newLogFileReader with config.MaxBytes:", inp.maxBytes)
+	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
@@ -193,13 +200,13 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, s state) 
 	// for the worst case scenario where incoming UTF32 charchers are decoded to the single byte UTF-8 characters.
 	// This limit serves primarily to avoid memory bload or potential OOM with expectedly long lines in the file.
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
-	encReaderMaxBytes := inp.maxBytes * 4
+	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      inp.encoding,
-		BufferSize: inp.bufferSize,
-		Terminator: inp.lineTerminator,
+		BufferSize: inp.readerConfig.BufferSize,
+		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
@@ -207,8 +214,8 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, s state) 
 		return nil, err
 	}
 
-	r = readfile.NewStripNewline(r, inp.lineTerminator)
-	r = readfile.NewLimitReader(r, inp.maxBytes)
+	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
+	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
 	return r, nil
 }
@@ -300,13 +307,13 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
+		s.Offset += int64(message.Bytes)
+
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
 		event := inp.eventFromMessage(message, path)
-		s.Offset += int64(message.Bytes)
-
 		if err := p.Publish(event, s); err != nil {
 			return err
 		}
@@ -317,14 +324,14 @@ func (inp *filestream) readFromSource(
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
 func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
-	if len(inp.includeLines) > 0 {
-		if !matchAny(inp.includeLines, line) {
+	if len(inp.readerConfig.IncludeLines) > 0 {
+		if !matchAny(inp.readerConfig.IncludeLines, line) {
 			log.Debug("Drop line as it does not match any of the include patterns %s", line)
 			return true
 		}
 	}
-	if len(inp.excludeLines) > 0 {
-		if matchAny(inp.excludeLines, line) {
+	if len(inp.readerConfig.ExcludeLines) > 0 {
+		if matchAny(inp.readerConfig.ExcludeLines, line) {
 			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
 			return true
 		}

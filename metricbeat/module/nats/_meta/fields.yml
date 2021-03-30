@@ -3,6 +3,7 @@
   description: >
     nats Module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: nats
       type: group

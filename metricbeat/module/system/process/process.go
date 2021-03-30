@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
@@ -83,8 +84,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
-			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", paths.Paths.Hostfs)
+			m.cgroup, err = cgroup.NewReader(paths.Paths.Hostfs, true)
 			if err != nil {
 				if err == cgroup.ErrCgroupsMissing {
 					logp.Warn("cgroup data collection will be disabled: %v", err)
@@ -139,9 +140,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 
 		// Duplicate system.process.cmdline with ECS name process.command_line
-		if v, ok := proc["cmdline"]; ok {
-			rootFields.Put("process.command_line", v)
-		}
+		rootFields = getAndCopy(proc, "cmdline", rootFields, "process.command_line")
+
+		// Duplicate system.process.state with process.state
+		rootFields = getAndCopy(proc, "state", rootFields, "process.state")
+
+		// Duplicate system.process.cpu.start_time with process.cpu.start_time
+		rootFields = getAndCopy(proc, "cpu.start_time", rootFields, "process.cpu.start_time")
+
+		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
+		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.pct")
+
+		// Duplicate system.process.memory.rss.pct with process.memory.pct
+		rootFields = getAndCopy(proc, "memory.rss.pct", rootFields, "process.memory.pct")
 
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
 			rootFields.Put("process.working_directory", cwd)
@@ -179,4 +190,14 @@ func getAndRemove(from common.MapStr, field string) interface{} {
 		return v
 	}
 	return nil
+}
+
+func getAndCopy(from common.MapStr, field string, to common.MapStr, toField string) common.MapStr {
+	v, err := from.GetValue(field)
+	if err != nil {
+		return to
+	}
+
+	_, err = to.Put(toField, v)
+	return to
 }

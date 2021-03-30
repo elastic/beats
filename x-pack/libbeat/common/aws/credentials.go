@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -24,7 +25,7 @@ type ConfigAWS struct {
 	SharedCredentialFile string `config:"shared_credential_file"`
 	Endpoint             string `config:"endpoint"`
 	RoleArn              string `config:"role_arn"`
-	AWSPartition         string `config:"aws_partition"`
+	AWSPartition         string `config:"aws_partition"` // Deprecated.
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -54,19 +55,6 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, nil
 	}
 
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role_arn for AWS credential")
-		awsConfig, err := external.LoadDefaultAWSConfig()
-		if err != nil {
-			return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed when using role_arn")
-		}
-		stsSvc := sts.New(awsConfig)
-		stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-		awsConfig.Credentials = stsCredProvider
-		return awsConfig, nil
-	}
-
 	// If accessKeyID, secretAccessKey or sessionToken is not given, iam_role is not given, then load from default config
 	// Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 	// with more details.
@@ -87,8 +75,18 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
-		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed when using shared credential profile")
+		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
+
+	if config.RoleArn == "" {
+		return awsConfig, nil
+	}
+
+	// Assume IAM role if iam_role config parameter is given
+	logger.Debug("Using role_arn for AWS credential")
+	stsSvc := sts.New(awsConfig)
+	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+	awsConfig.Credentials = stsCredProvider
 	return awsConfig, nil
 }
 
@@ -103,4 +101,12 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 		}
 	}
 	return awsConfig
+}
+
+// Validate checks for deprecated config option
+func (c ConfigAWS) Validate() error {
+	if c.AWSPartition != "" {
+		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint instead.")
+	}
+	return nil
 }

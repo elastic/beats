@@ -17,6 +17,8 @@ stages:
         make: |
           make -C metricbeat check;
           make -C metricbeat update;
+          make -C x-pack/metricbeat check;
+          make -C x-pack/metricbeat update;
           make check-no-changes;
     unitTest:
         mage: "mage build unitTest"
@@ -31,7 +33,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test metricbeat for macos"
@@ -45,60 +47,41 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19800
-            #- "windows-7-32-bit" https://github.com/elastic/beats/issues/19835
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test metricbeat for windows-2016"
-            labels:
-                - "windows-2016"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test metricbeat for windows-2012"
-            labels:
-                - "windows-2012"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test metricbeat for windows-10"
-            labels:
-                - "windows-10"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test metricbeat for windows-8"
-            labels:
-                - "windows-8"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
+    windows-2008:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2008-r2"
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-        when:                  ## Override the top-level when.
-            comments:
-                - "/test metricbeat for windows-7"
-            labels:
-                - "windows-7"
-            branches: true     ## for all the branches
-            tags: true         ## for all the tags
+    windows-7-32:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-7-32-bit"
+    packaging-linux:
+        packaging-linux: "mage package"
+        e2e:
+            enabled: false     ## e2e is enabled only for x-pack beats
+    packaging-arm:
+        packaging-arm: "mage package"
+        e2e:
+            enabled: false
+        platforms:             ## override default label in this specific stage.
+          - "arm"

@@ -9,29 +9,28 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/capabilities"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/dir"
+	acker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 )
-
-type emitterFunc func(*config.Config) error
-
-// ConfigHandler is capable of handling config, perform actions at it, shutdown any long running process.
-type ConfigHandler interface {
-	HandleConfig(configrequest.Request) error
-	Close() error
-	Shutdown()
-}
 
 type discoverFunc func() ([]string, error)
 
@@ -44,7 +43,7 @@ type Local struct {
 	bgContext   context.Context
 	cancelCtxFn context.CancelFunc
 	log         *logger.Logger
-	router      *router
+	router      pipeline.Router
 	source      source
 	agentInfo   *info.AgentInfo
 	srv         *server.Server
@@ -62,8 +61,15 @@ func newLocal(
 	pathConfigFile string,
 	rawConfig *config.Config,
 	reexec reexecManager,
+	statusCtrl status.Controller,
 	uc upgraderControl,
+	agentInfo *info.AgentInfo,
 ) (*Local, error) {
+	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
@@ -74,10 +80,6 @@ func newLocal(
 		if err != nil {
 			return nil, err
 		}
-	}
-	agentInfo, err := info.NewAgentInfo()
-	if err != nil {
-		return nil, err
 	}
 
 	logR := logreporter.NewReporter(log)
@@ -100,7 +102,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor))
+	router, err := router.New(log, stream.Factory(localApplication.bgContext, agentInfo, cfg.Settings, localApplication.srv, reporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -112,16 +114,17 @@ func newLocal(
 	}
 
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	emit, err := emitter(
+	emit, err := emitter.New(
 		localApplication.bgContext,
 		log,
 		agentInfo,
 		composableCtrl,
 		router,
-		&configModifiers{
-			Decorators: []decoratorFunc{injectMonitoring},
-			Filters:    []filterFunc{filters.StreamChecker},
+		&pipeline.ConfigModifiers{
+			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 		},
+		caps,
 		monitor,
 	)
 	if err != nil {
@@ -146,8 +149,9 @@ func newLocal(
 		log,
 		[]context.CancelFunc{localApplication.cancelCtxFn},
 		reexec,
-		newNoopAcker(),
-		reporter)
+		acker.NewAcker(),
+		reporter,
+		caps)
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil

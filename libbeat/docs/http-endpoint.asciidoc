@@ -33,9 +33,9 @@ current user.
 `http.named_pipe.security_descriptor`:: (Optional) Windows Security descriptor string defined in the SDDL format. Default to
 read and write permission for the current user.
 
-This is the list of paths you can access. For pretty JSON output append ?pretty to the URL.
+This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
-You can query a unix socket using the `CURL` command and the `--unix-socket` flag.
+You can query a unix socket using the `cURL` command and the `--unix-socket` flag.
 
 [source,js]
 ----

@@ -55,14 +55,9 @@ processors:
         ignore_missing: true
   - append:
         field: related.hosts
-        value: '{{host.hostname}}'
+        value: '{{host.name}}'
         allow_duplicates: false
-        if: ctx?.host?.hostname && ctx.host?.hostname != ''
-  - append:
-        field: related.hosts
-        value: '{{server.domain}}'
-        allow_duplicates: false
-        if: ctx?.server?.domain && ctx.server?.domain != ''
+        if: ctx.host?.name != null && ctx.host?.name != ''
 on_failure:
   - append:
         field: error.message

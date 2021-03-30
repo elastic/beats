@@ -1,0 +1,23 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: interval
+    default: 60m
+  - name: first_interval
+    default: 24h
+  - name: ssl
+  - name: types
+    default: indicators
+  - name: username
+  - name: password
+  - name: url
+    default: "https://otx.alienvault.com/api/v1/indicators/export"
+  - name: tags
+    default: [threatintel-anomali, forwarded]
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

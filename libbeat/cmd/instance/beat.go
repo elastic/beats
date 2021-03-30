@@ -42,7 +42,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -82,6 +84,8 @@ type Beat struct {
 
 	keystore   keystore.Keystore
 	processing processing.Supporter
+
+	InputQueueSize int // Size of the producer queue used by most queues.
 }
 
 type beatConfig struct {
@@ -235,7 +239,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			Name:            hostname,
 			Hostname:        hostname,
 			ID:              id,
-			EphemeralID:     ephemeralID,
+			EphemeralID:     metrics.EphemeralID(),
 		},
 		Fields: fields,
 	}
@@ -314,7 +318,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = setupMetrics(b.Info.Beat)
+	err = metrics.SetupMetrics(b.Info.Beat)
 	if err != nil {
 		return nil, err
 	}
@@ -334,29 +338,37 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			return nil, errors.New(msg)
 		}
 	}
-	pipeline, err := pipeline.Load(b.Info,
-		pipeline.Monitors{
-			Metrics:   reg,
-			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-			Logger:    logp.L().Named("publisher"),
-			Tracer:    b.Instrumentation.Tracer(),
-		},
-		b.Config.Pipeline,
-		b.processing,
-		b.makeOutputFactory(b.Config.Output),
-	)
 
+	var publisher *pipeline.Pipeline
+	monitors := pipeline.Monitors{
+		Metrics:   reg,
+		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
+		Logger:    logp.L().Named("publisher"),
+		Tracer:    b.Instrumentation.Tracer(),
+	}
+	outputFactory := b.makeOutputFactory(b.Config.Output)
+	settings := pipeline.Settings{
+		WaitClose:      0,
+		WaitCloseMode:  pipeline.NoWaitOnClose,
+		Processors:     b.processing,
+		InputQueueSize: b.InputQueueSize,
+	}
+	if settings.InputQueueSize > 0 {
+		publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
+	} else {
+		publisher, err = pipeline.Load(b.Info, monitors, b.Config.Pipeline, b.processing, outputFactory)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
-	reload.Register.MustRegister("output", b.makeOutputReloader(pipeline.OutputReloader()))
+	reload.Register.MustRegister("output", b.makeOutputReloader(publisher.OutputReloader()))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
 	// defer pipeline.Close()
 
-	b.Publisher = pipeline
+	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
 	if err != nil {
 		return nil, err
@@ -579,6 +591,8 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
+	b.InputQueueSize = settings.InputQueueSize
+
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
@@ -774,10 +788,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
-		kibanaConfig, err := initKibanaConfig(b.Config)
-		if err != nil {
-			return fmt.Errorf("error initKibanaConfig: %v", err)
-		}
+		kibanaConfig := InitKibanaConfig(b.Config)
 
 		client, err := kibana.NewKibanaClient(kibanaConfig)
 		if err != nil {
@@ -1041,7 +1052,7 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
 
-func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
+func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	var esConfig *common.Config
 	if beatConfig.Output.Name() == "elasticsearch" {
 		esConfig = beatConfig.Output.Config()
@@ -1064,7 +1075,7 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 			kibanaConfig.SetString("password", -1, password)
 		}
 	}
-	return kibanaConfig, nil
+	return kibanaConfig
 }
 
 func initPaths(cfg *common.Config) error {
@@ -1073,12 +1084,21 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path paths.Path `config:"path"`
+		Path   paths.Path `config:"path"`
+		Hostfs string     `config:"system.hostfs"`
 	}{}
+
+	if paths.IsCLISet() {
+		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
+	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
+
+	// Read the value for hostfs as `system.hostfs`
+	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
+	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

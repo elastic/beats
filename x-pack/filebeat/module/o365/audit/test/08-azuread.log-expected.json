@@ -91,6 +91,8 @@
         "o365.audit.Id": "8f6eb24b-6e61-4ee2-a376-31368c300613",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -140,6 +142,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -235,6 +238,8 @@
         "o365.audit.Id": "8f6eb24b-6e61-4ee2-a376-31368c300613",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -284,6 +289,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -379,6 +385,8 @@
         "o365.audit.Id": "8f6eb24b-6e61-4ee2-a376-31368c300613",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -428,6 +436,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -583,6 +592,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -738,6 +748,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -900,6 +911,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1062,6 +1074,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1224,6 +1237,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1386,6 +1400,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1548,6 +1563,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1710,6 +1726,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -1872,6 +1889,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2034,6 +2052,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2196,6 +2215,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2358,6 +2378,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2520,6 +2541,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2682,6 +2704,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2844,6 +2867,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -2939,6 +2963,8 @@
         "o365.audit.Id": "fe115c66-3e08-4ab4-8a00-84ae25a59078",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2988,6 +3014,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3083,6 +3110,8 @@
         "o365.audit.Id": "fe115c66-3e08-4ab4-8a00-84ae25a59078",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3132,6 +3161,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3287,6 +3317,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3382,6 +3413,8 @@
         "o365.audit.Id": "d6ad8dba-dd88-499e-a1e1-e649bf8eeb71",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3431,6 +3464,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3526,6 +3560,8 @@
         "o365.audit.Id": "d6ad8dba-dd88-499e-a1e1-e649bf8eeb71",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3575,6 +3611,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3670,6 +3707,8 @@
         "o365.audit.Id": "d6ad8dba-dd88-499e-a1e1-e649bf8eeb71",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3719,6 +3758,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -3874,6 +3914,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4036,6 +4077,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4198,6 +4240,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4360,6 +4403,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4522,6 +4566,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4684,6 +4729,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -4846,6 +4892,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -5008,6 +5055,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -5170,6 +5218,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -5333,6 +5382,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -5496,13 +5546,14 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
     {
         "@timestamp": "2020-02-10T15:15:04.000Z",
-        "event.action": "Update user.",
-        "event.category": "web",
+        "event.action": "modified-user-account",
+        "event.category": "iam",
         "event.code": "AzureActiveDirectory",
         "event.dataset": "o365.audit",
         "event.id": "83c924c1-f2e2-4b39-8eda-b80c3823a875",
@@ -5510,7 +5561,10 @@
         "event.module": "o365",
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
-        "event.type": "info",
+        "event.type": [
+            "user",
+            "change"
+        ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "host.name": "support.onmicrosoft.com",
@@ -5582,6 +5636,8 @@
         "o365.audit.Id": "83c924c1-f2e2-4b39-8eda-b80c3823a875",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "StrongAuthenticationPhoneAppDetail",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.StrongAuthenticationPhoneAppDetail.NewValue": "[\r\n  {\r\n    \"DeviceName\": \"NO_DEVICE\",\r\n    \"DeviceToken\": \"NO_DEVICE_TOKEN\",\r\n    \"DeviceTag\": \"SoftwareTokenActivated\",\r\n    \"PhoneAppVersion\": \"NO_PHONE_APP_VERSION\",\r\n    \"OathTokenTimeDrift\": -1,\r\n    \"DeviceId\": null,\r\n    \"Id\": \"3b539b10-3846-4f9b-877d-55b0b8e76147\",\r\n    \"TimeInterval\": null,\r\n    \"AuthenticationType\": 2,\r\n    \"NotificationType\": 1,\r\n    \"SecuredPartitionId\": 0,\r\n    \"SecuredKeyId\": 0\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.StrongAuthenticationPhoneAppDetail.OldValue": "[\r\n  {\r\n    \"DeviceName\": \"NO_DEVICE\",\r\n    \"DeviceToken\": \"NO_DEVICE_TOKEN\",\r\n    \"DeviceTag\": \"SoftwareTokenActivated\",\r\n    \"PhoneAppVersion\": \"NO_PHONE_APP_VERSION\",\r\n    \"OathTokenTimeDrift\": 0,\r\n    \"DeviceId\": null,\r\n    \"Id\": \"3b539b10-3846-4f9b-877d-55b0b8e76147\",\r\n    \"TimeInterval\": null,\r\n    \"AuthenticationType\": 2,\r\n    \"NotificationType\": 1,\r\n    \"SecuredPartitionId\": 0,\r\n    \"SecuredKeyId\": 0\r\n  }\r\n]",
         "o365.audit.ModifiedProperties.TargetId_UserType.NewValue": "Member",
         "o365.audit.ModifiedProperties.TargetId_UserType.OldValue": "",
         "o365.audit.ObjectId": "asr@testsiem.onmicrosoft.com",
@@ -5619,14 +5675,22 @@
         "o365.audit.Version": 1,
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
-        "related.user": "fim_password_service",
+        "related.user": [
+            "fim_password_service",
+            "asr"
+        ],
         "service.type": "o365",
         "tags": [
             "forwarded"
         ],
         "user.domain": "support.onmicrosoft.com",
+        "user.email": "fim_password_service@support.onmicrosoft.com",
         "user.id": "fim_password_service@support.onmicrosoft.com",
-        "user.name": "fim_password_service"
+        "user.name": "fim_password_service",
+        "user.target.domain": "testsiem.onmicrosoft.com",
+        "user.target.email": "asr@testsiem.onmicrosoft.com",
+        "user.target.id": "asr@testsiem.onmicrosoft.com",
+        "user.target.name": "asr"
     },
     {
         "@timestamp": "2020-02-10T15:16:18.000Z",
@@ -5787,6 +5851,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -5949,6 +6014,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6111,6 +6177,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6273,6 +6340,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6435,6 +6503,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6597,6 +6666,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6759,6 +6829,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -6921,6 +6992,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7083,6 +7155,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7245,6 +7318,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7407,6 +7481,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7569,6 +7644,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7731,6 +7807,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -7893,6 +7970,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8055,6 +8133,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8218,6 +8297,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8381,6 +8461,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8543,6 +8624,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8705,6 +8787,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -8867,6 +8950,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9029,6 +9113,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9191,6 +9276,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9353,6 +9439,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9515,6 +9602,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9677,6 +9765,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9839,6 +9928,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -9932,8 +10022,16 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "689aaff0-b34f-4077-9244-0563b9f9c03b",
+        "o365.audit.ModifiedProperties.AppId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.NewValue": "[\r\n  false\r\n]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AppId, AvailableToOtherTenants, DisplayName, RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Add application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -9983,6 +10081,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10076,8 +10175,16 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "689aaff0-b34f-4077-9244-0563b9f9c03b",
+        "o365.audit.ModifiedProperties.AppId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.NewValue": "[\r\n  false\r\n]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AppId, AvailableToOtherTenants, DisplayName, RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Add application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -10127,6 +10234,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10220,8 +10328,16 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "689aaff0-b34f-4077-9244-0563b9f9c03b",
+        "o365.audit.ModifiedProperties.AppId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.NewValue": "[\r\n  false\r\n]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AppId, AvailableToOtherTenants, DisplayName, RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Add application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -10271,6 +10387,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10364,8 +10481,16 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "689aaff0-b34f-4077-9244-0563b9f9c03b",
+        "o365.audit.ModifiedProperties.AppId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.NewValue": "[\r\n  false\r\n]",
+        "o365.audit.ModifiedProperties.AvailableToOtherTenants.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AppId, AvailableToOtherTenants, DisplayName, RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Add application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -10415,6 +10540,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10569,6 +10695,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10663,8 +10790,18 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "48403af8-b712-4e63-a999-686b631240ac",
+        "o365.audit.ModifiedProperties.AccountEnabled.NewValue": "[\r\n  true\r\n]",
+        "o365.audit.ModifiedProperties.AccountEnabled.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.Credential.NewValue": "[\r\n  {\r\n    \"CredentialType\": 2,\r\n    \"KeyStoreId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\",\r\n    \"KeyGroupId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\"\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.Credential.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.OldValue": "[]",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.NewValue": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.OldValue": "",
         "o365.audit.ObjectId": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
@@ -10724,6 +10861,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10818,8 +10956,18 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "48403af8-b712-4e63-a999-686b631240ac",
+        "o365.audit.ModifiedProperties.AccountEnabled.NewValue": "[\r\n  true\r\n]",
+        "o365.audit.ModifiedProperties.AccountEnabled.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.Credential.NewValue": "[\r\n  {\r\n    \"CredentialType\": 2,\r\n    \"KeyStoreId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\",\r\n    \"KeyGroupId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\"\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.Credential.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.OldValue": "[]",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.NewValue": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.OldValue": "",
         "o365.audit.ObjectId": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
@@ -10879,6 +11027,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -10973,8 +11122,18 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "48403af8-b712-4e63-a999-686b631240ac",
+        "o365.audit.ModifiedProperties.AccountEnabled.NewValue": "[\r\n  true\r\n]",
+        "o365.audit.ModifiedProperties.AccountEnabled.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.Credential.NewValue": "[\r\n  {\r\n    \"CredentialType\": 2,\r\n    \"KeyStoreId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\",\r\n    \"KeyGroupId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\"\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.Credential.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.OldValue": "[]",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.NewValue": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.OldValue": "",
         "o365.audit.ObjectId": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
@@ -11034,6 +11193,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11128,8 +11288,18 @@
         "o365.audit.ExtendedProperties.teamName": "MSODS.",
         "o365.audit.ExtendedProperties.version": "2",
         "o365.audit.Id": "48403af8-b712-4e63-a999-686b631240ac",
+        "o365.audit.ModifiedProperties.AccountEnabled.NewValue": "[\r\n  true\r\n]",
+        "o365.audit.ModifiedProperties.AccountEnabled.OldValue": "[]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.AppPrincipalId.OldValue": "[]",
+        "o365.audit.ModifiedProperties.Credential.NewValue": "[\r\n  {\r\n    \"CredentialType\": 2,\r\n    \"KeyStoreId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\",\r\n    \"KeyGroupId\": \"291154f0-a9f5-45bb-87be-9c8ee5b6d62c\"\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.Credential.OldValue": "[]",
+        "o365.audit.ModifiedProperties.DisplayName.NewValue": "[\r\n  \"siem2\"\r\n]",
+        "o365.audit.ModifiedProperties.DisplayName.OldValue": "[]",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "AccountEnabled, AppPrincipalId, DisplayName, ServicePrincipalName, Credential",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.NewValue": "[\r\n  \"7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40\"\r\n]",
+        "o365.audit.ModifiedProperties.ServicePrincipalName.OldValue": "[]",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.NewValue": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
         "o365.audit.ModifiedProperties.TargetId_ServicePrincipalNames.OldValue": "",
         "o365.audit.ObjectId": "7d74cd19-0dc4-4e59-a2d7-ba6fdb44ac40",
@@ -11189,6 +11359,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11331,6 +11502,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11426,6 +11598,8 @@
         "o365.audit.Id": "20a82fa1-625b-491a-a3e8-54d779a9b17e",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "KeyDescription",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.KeyDescription.NewValue": "[\r\n  \"[KeyIdentifier=6d944a5f-234c-4879-8de4-39f089d8b96b,KeyType=AsymmetricX509Cert,KeyUsage=Verify,DisplayName=E=asr@example.net, CN=testsiem.onmicrosoft.com, OU=SIEM, O=Elastic, L=Barcelona, S=Barce]\"\r\n]",
+        "o365.audit.ModifiedProperties.KeyDescription.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application \u2013 Certificates and secrets management ",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -11475,6 +11649,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11570,6 +11745,8 @@
         "o365.audit.Id": "20a82fa1-625b-491a-a3e8-54d779a9b17e",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "KeyDescription",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.KeyDescription.NewValue": "[\r\n  \"[KeyIdentifier=6d944a5f-234c-4879-8de4-39f089d8b96b,KeyType=AsymmetricX509Cert,KeyUsage=Verify,DisplayName=E=asr@example.net, CN=testsiem.onmicrosoft.com, OU=SIEM, O=Elastic, L=Barcelona, S=Barce]\"\r\n]",
+        "o365.audit.ModifiedProperties.KeyDescription.OldValue": "[]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application \u2013 Certificates and secrets management ",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -11619,6 +11796,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11774,6 +11952,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -11929,6 +12108,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12084,6 +12264,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12179,6 +12360,8 @@
         "o365.audit.Id": "d23b201c-5436-4ecc-a789-18d3f00ea76c",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -12228,6 +12411,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12323,6 +12507,8 @@
         "o365.audit.Id": "d23b201c-5436-4ecc-a789-18d3f00ea76c",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -12372,6 +12558,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12467,6 +12654,8 @@
         "o365.audit.Id": "d23b201c-5436-4ecc-a789-18d3f00ea76c",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.NewValue": "RequiredResourceAccess",
         "o365.audit.ModifiedProperties.Included_Updated_Properties.OldValue": "",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.NewValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  },\r\n  {\r\n    \"ResourceAppId\": \"c5393580-f805-4401-95e8-94b7a6ef2fc2\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"594c1fb6-4f81-4475-ae41-0c394909246c\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"4807a72c-ad38-4250-94c9-4eabfe26cd55\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      },\r\n      {\r\n        \"EntitlementId\": \"e2cea78f-e743-4d8f-a16a-75b629a038ae\",\r\n        \"DirectAccessGrant\": true,\r\n        \"ImpersonationAccessGrants\": []\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
+        "o365.audit.ModifiedProperties.RequiredResourceAccess.OldValue": "[\r\n  {\r\n    \"ResourceAppId\": \"00000003-0000-0000-c000-000000000000\",\r\n    \"RequiredAppPermissions\": [\r\n      {\r\n        \"EntitlementId\": \"e1fe6dd8-ba31-4d61-89e7-88639da4683d\",\r\n        \"DirectAccessGrant\": false,\r\n        \"ImpersonationAccessGrants\": [\r\n          20\r\n        ]\r\n      }\r\n    ],\r\n    \"EncodingVersion\": 1\r\n  }\r\n]",
         "o365.audit.ObjectId": "Not Available",
         "o365.audit.Operation": "Update application.",
         "o365.audit.OrganizationId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -12516,6 +12705,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12671,6 +12861,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12826,6 +13017,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -12981,6 +13173,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13143,6 +13336,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13305,6 +13499,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13467,6 +13662,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13629,6 +13825,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13791,6 +13988,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -13953,6 +14151,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14115,6 +14314,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14277,6 +14477,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14439,6 +14640,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14601,6 +14803,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14763,6 +14966,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -14926,6 +15130,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -15089,6 +15294,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -15252,6 +15458,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -15412,6 +15619,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -15572,6 +15780,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     },
@@ -15732,6 +15941,7 @@
             "forwarded"
         ],
         "user.domain": "testsiem.onmicrosoft.com",
+        "user.email": "asr@testsiem.onmicrosoft.com",
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr"
     }

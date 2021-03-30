@@ -9,7 +9,7 @@
       description: >
        Index of the instance the metric belongs to.
     - name: cpu.pct
-      type: float
+      type: scaled_float
       description: >
         CPU usage percentage.
     - name: memory.bytes
