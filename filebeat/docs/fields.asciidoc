@@ -133815,13 +133815,7 @@ type: keyword
 --
 
 [float]
-=== sophos
-
-
-
-
-[float]
-=== xg
+=== sophos.xg
 
 Module for parsing sophosxg syslog.
 
@@ -134617,7 +134611,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_url`*::
+*`sophos.xg.ftp_url`*::
 +
 --
 FTP URL from which virus was downloaded
@@ -134627,7 +134621,7 @@ type: keyword
 
 --
 
-*`sophos.xg.FTP_direction`*::
+*`sophos.xg.ftp_direction`*::
 +
 --
 Direction of FTP transfer: Upload or Download
@@ -135681,6 +135675,26 @@ type: keyword
 +
 --
 clients connection ssid
+
+
+type: keyword
+
+--
+
+*`sophos.xg.sqli`*::
++
+--
+The related SQLI caught by the WAF
+
+
+type: keyword
+
+--
+
+*`sophos.xg.xss`*::
++
+--
+The related XSS caught by the WAF
 
 
 type: keyword

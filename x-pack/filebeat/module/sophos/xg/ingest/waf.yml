@@ -263,6 +263,14 @@ processors:
 #############
 ## Cleanup ##
 #############
+- rename:
+    field: sophos.xg.SQLi
+    target_field: sophos.xg.sqli
+    ignore_missing: true
+- rename:
+    field: sophos.xg.XSS
+    target_field: sophos.xg.xss
+    ignore_missing: true
 - remove:
     field:
      - sophos.xg.bytesrcv
