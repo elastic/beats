@@ -193,11 +193,6 @@ func addClusterStateFields(idx *Index, clusterStateBytes []byte) error {
 		return err
 	}
 
-	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
-	if err != nil {
-		return errors.Wrap(err, "failed to get index metadata from cluster state")
-	}
-
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
 		return errors.Wrap(err, "failed to get index routing table from cluster state")
@@ -207,15 +202,6 @@ func addClusterStateFields(idx *Index, clusterStateBytes []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get shards from routing table")
 	}
-
-	created, err := getIndexCreated(indexMetadata)
-	if err != nil {
-		return errors.Wrap(err, "failed to get index creation time")
-	}
-	idx.Created = created
-
-	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
-	// "index_stats.version.upgraded", <--- don't think this is being used in the UI, so can we skip it?
 
 	status, err := getIndexStatus(shards)
 	if err != nil {

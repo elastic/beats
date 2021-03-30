@@ -64,7 +64,7 @@ func (c *clusterStatsResponseCache) GetClusterState(http *helper.HTTP, resetURI 
 	if elapsedFromLastFetch == 0 || elapsedFromLastFetch >= (time.Duration(float64(c.configuredModulePeriod)*FetchPeriodThreshold)) {
 		//Fetch data again
 		var err error
-		if c.responseData, err = fetchPath(http, resetURI, "_cluster/state", ""); err != nil {
+		if c.responseData, err = fetchPath(http, resetURI, "_cluster/state/version,nodes,master_node,routing_table", ""); err != nil {
 			return nil, err
 		}
 
