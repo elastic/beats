@@ -19,7 +19,6 @@ package state
 
 import (
 	"encoding/json"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
@@ -34,6 +33,11 @@ var (
 	schema = s.Schema{
 		"management": c.Dict("management", s.Schema{
 			"enabled": c.Bool("enabled"),
+		}),
+		"service": c.Dict("service", s.Schema{
+			"id":      c.Str("id"),
+			"name":    c.Str("name"),
+			"version": c.Str("version"),
 		}),
 		"module": c.Dict("module", s.Schema{
 			"count": c.Int("count"),

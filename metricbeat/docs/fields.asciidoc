@@ -5747,6 +5747,192 @@ Beat module
 
 
 
+
+
+*`beats_state.beat.host`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.host
+
+--
+
+*`beats_state.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.name
+
+--
+
+*`beats_state.beat.type`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.type
+
+--
+
+*`beats_state.beat.uuid`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.uuid
+
+--
+
+*`beats_state.beat.version`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.version
+
+--
+
+*`beats_state.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+
+*`beats_state.state.beat.name`*::
++
+--
+type: alias
+
+alias to: beat.state.beat.name
+
+--
+
+
+*`beats_state.state.host.architecture`*::
++
+--
+type: alias
+
+alias to: host.architecture
+
+--
+
+*`beats_state.state.host.hostname`*::
++
+--
+type: alias
+
+alias to: host.hostname
+
+--
+
+*`beats_state.state.host.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+
+*`beats_state.state.host.os.platform`*::
++
+--
+type: alias
+
+alias to: beat.state.host.os.platform
+
+--
+
+*`beats_state.state.host.os.version`*::
++
+--
+type: alias
+
+alias to: beat.state.host.os.version
+
+--
+
+*`beats_state.state.input.count`*::
++
+--
+type: alias
+
+alias to: beat.state.input.count
+
+--
+
+*`beats_state.state.input.names`*::
++
+--
+type: alias
+
+alias to: beat.state.input.names
+
+--
+
+*`beats_state.state.module.count`*::
++
+--
+type: alias
+
+alias to: beat.state.module.count
+
+--
+
+*`beats_state.state.module.names`*::
++
+--
+type: alias
+
+alias to: beat.state.module.names
+
+--
+
+*`beats_state.state.output.name`*::
++
+--
+type: alias
+
+alias to: beat.state.output.name
+
+--
+
+
+*`beats_state.state.service.id`*::
++
+--
+type: alias
+
+alias to: beat.state.service.id
+
+--
+
+*`beats_state.state.service.name`*::
++
+--
+type: alias
+
+alias to: beat.state.service.name
+
+--
+
+*`beats_state.state.service.version`*::
++
+--
+type: alias
+
+alias to: beat.state.service.version
+
+--
+
 [float]
 === beat
 
@@ -5779,6 +5965,43 @@ type: keyword
 Beat state
 
 
+
+
+*`beat.state.service.id`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.service.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.service.version`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.input.count`*::
++
+--
+type: long
+
+--
+
+*`beat.state.input.names`*::
++
+--
+type: keyword
+
+--
 
 
 *`beat.state.beat.host`*::
@@ -5877,6 +6100,13 @@ Number of modules enabled
 
 
 type: integer
+
+--
+
+*`beat.state.module.names`*::
++
+--
+type: keyword
 
 --
 
@@ -30240,109 +30470,10 @@ alias to: kibana.stats.response_time.avg.ms
 --
 type: alias
 
-alias to: kibana.stats.uuid
+alias to: service.id
 
 --
 
-
-
-*`kibana.stats.uuid`*::
-+
---
-type: keyword
-
---
-
-
-
-*`kibana.stats.process.event_loop_delay.ms`*::
-+
---
-type: float
-
---
-
-
-
-*`kibana.stats.process.memory.resident_set_size.bytes`*::
-+
---
-type: long
-
---
-
-
-*`kibana.stats.os.distro`*::
-+
---
-type: keyword
-
---
-
-*`kibana.stats.os.distroRelease`*::
-+
---
-type: keyword
-
---
-
-*`kibana.stats.os.platform`*::
-+
---
-type: keyword
-
---
-
-*`kibana.stats.os.platformRelease`*::
-+
---
-type: keyword
-
---
-
-
-*`kibana.stats.os.memory.free_in_bytes`*::
-+
---
-type: long
-
---
-
-*`kibana.stats.os.memory.total_in_bytes`*::
-+
---
-type: long
-
---
-
-*`kibana.stats.os.memory.used_in_bytes`*::
-+
---
-type: long
-
---
-
-
-*`kibana.stats.os.load.1m`*::
-+
---
-type: half_float
-
---
-
-*`kibana.stats.os.load.5m`*::
-+
---
-type: half_float
-
---
-
-*`kibana.stats.os.load.15m`*::
-+
---
-type: half_float
-
---
 
 [float]
 === settings
@@ -30601,21 +30732,21 @@ type: long
 *`kibana.stats.os.load.1m`*::
 +
 --
-type: double
+type: half_float
 
 --
 
 *`kibana.stats.os.load.5m`*::
 +
 --
-type: double
+type: half_float
 
 --
 
 *`kibana.stats.os.load.15m`*::
 +
 --
-type: double
+type: half_float
 
 --
 
@@ -30635,6 +30766,13 @@ type: long
 Process metrics
 
 
+
+*`kibana.stats.process.memory.resident_set_size.bytes`*::
++
+--
+type: long
+
+--
 
 *`kibana.stats.process.uptime.ms`*::
 +

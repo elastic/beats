@@ -4,6 +4,22 @@
     Beat state
   release: ga
   fields:
+    - name: service
+      type: group
+      fields:
+        - name: id
+          type: keyword
+        - name: name
+          type: keyword
+        - name: version
+          type: keyword
+    - name: input
+      type: group
+      fields:
+        - name: count
+          type: long
+        - name: names
+          type: keyword
     - name: beat
       type: group
       fields:
@@ -43,6 +59,8 @@
       type: integer
       description: >
         Number of modules enabled
+    - name: module.names
+      type: keyword
     - name: output.name
       type: keyword
       description: >

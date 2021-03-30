@@ -76,11 +76,11 @@
           type: group
           fields:
             - name: 1m
-              type: double
+              type: half_float
             - name: 5m
-              type: double
+              type: half_float
             - name: 15m
-              type: double
+              type: half_float
     - name: concurrent_connections
       type: long
       description: >
@@ -90,6 +90,8 @@
       description: >
         Process metrics
       fields:
+      - name: memory.resident_set_size.bytes
+        type: long
       - name: uptime.ms
         type: long
       - name: event_loop_delay.ms

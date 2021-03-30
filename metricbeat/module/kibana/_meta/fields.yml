@@ -59,57 +59,7 @@
           path: kibana.stats.response_time.avg.ms
         - name: kibana.uuid
           type: alias
-          path: kibana.stats.uuid
+          path: service.id
     - name: kibana
       type: group
       fields:
-        - name: stats
-          type: group
-          fields:
-            - name: uuid
-              type: keyword
-            - name: process
-              type: group
-              fields:
-                - name: event_loop_delay
-                  type: group
-                  fields:
-                    - name: ms
-                      type: float
-                - name: memory
-                  type: group
-                  fields:
-                    - name: resident_set_size
-                      type: group
-                      fields:
-                        - name: bytes
-                          type: long
-            - name: os
-              type: group
-              fields:
-                - name: distro
-                  type: keyword
-                - name: distroRelease
-                  type: keyword
-                - name: platform
-                  type: keyword
-                - name: platformRelease
-                  type: keyword
-                - name: memory
-                  type: group
-                  fields:
-                    - name: free_in_bytes
-                      type: long
-                    - name: total_in_bytes
-                      type: long
-                    - name: used_in_bytes
-                      type: long
-                - name: load
-                  type: group
-                  fields:
-                    - name: 1m
-                      type: half_float
-                    - name: 5m
-                      type: half_float
-                    - name: 15m
-                      type: half_float
