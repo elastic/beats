@@ -34,6 +34,11 @@ processors:
     field: event.category
     value: network
     allow_duplicates: false
+- append:
+    field: event.category
+    value: intrusion_detection
+    allow_duplicates: false
+    if: ctx.fortinet?.firewall?.subtype == 'ips'
 - rename:
     field: fortinet.firewall.dstip
     target_field: destination.ip

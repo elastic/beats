@@ -206,6 +206,31 @@ processors:
     field: fortinet.firewall.proto
     target_field: network.iana_number
     ignore_missing: true
+- set:
+    field: network.transport
+    value: icmp
+    ignore_empty_value: true
+    if: ctx?.network?.iana_number == '1'
+- set:
+    field: network.transport
+    value: igmp
+    ignore_empty_value: true
+    if: ctx?.network?.iana_number == '2'
+- set:
+    field: network.transport
+    value: tcp
+    ignore_empty_value: true
+    if: ctx?.network?.iana_number == '6'
+- set:
+    field: network.transport
+    value: ipv6-icmp
+    ignore_empty_value: true
+    if: ctx?.network?.iana_number == '58'
+- set:
+    field: network.transport
+    value: udp
+    ignore_empty_value: true
+    if: ctx?.network?.iana_number == '17'
 - rename:
     field: fortinet.firewall.group
     target_field: source.user.group.name
@@ -237,6 +262,7 @@ processors:
     if: ctx.source?.ip != null && ctx.source?.ip.contains(':') || (ctx.destination?.ip != null && ctx.destination?.ip.contains(':'))
 - community_id:
     ignore_missing: true
+    ignore_failure: true
 - user_agent:
     field: fortinet.firewall.agent
     ignore_missing: true

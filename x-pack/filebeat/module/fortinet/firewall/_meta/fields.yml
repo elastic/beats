@@ -766,6 +766,11 @@
           description: >
             ESP Transform
 
+        - name: eventtype
+          type: keyword
+          description: >
+            UTM Event Type
+
         - name: exch
           type: keyword
           description: >
@@ -2010,7 +2015,6 @@
           type: keyword
           description: >
             Reference to UTM
-
 
         - name: vap
           type: keyword
