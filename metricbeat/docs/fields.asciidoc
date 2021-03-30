@@ -3263,6 +3263,18 @@ type: long
 
 
 
+*`aws.rds.burst_balance.pct`*::
++
+--
+The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`aws.rds.cpu.total.pct`*::
 +
 --

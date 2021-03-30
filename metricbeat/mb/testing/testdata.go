@@ -19,7 +19,6 @@ package testing
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -337,7 +336,7 @@ func checkDocumented(data []common.MapStr, omitFields []string) error {
 	for _, d := range data {
 		flat := d.Flatten()
 		if err := documentedFieldCheck(flat, keys, omitFields); err != nil {
-			fmt.Println("----- err = ", err)
+			return err
 		}
 	}
 
