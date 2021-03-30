@@ -503,7 +503,7 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 					msgCount = 0
 					log.Info(waitingForAgent)
 				} else {
-					msgCount += 1
+					msgCount++
 					if msgCount > 5 {
 						msgCount = 0
 						log.Infof("%s: %s", waitingForAgent, err)
@@ -520,7 +520,7 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 					msgCount = 0
 					log.Info(waitingForFleetServer)
 				} else {
-					msgCount += 1
+					msgCount++
 					if msgCount > 5 {
 						msgCount = 0
 						log.Infof("%s: %s", waitingForFleetServer, err)
@@ -551,7 +551,7 @@ func waitForFleetServer(ctx context.Context, log *logger.Logger) error {
 					msgCount = 0
 					log.Info(appMsg)
 				} else {
-					msgCount += 1
+					msgCount++
 					if msgCount > 5 {
 						msgCount = 0
 						log.Info(appMsg)
