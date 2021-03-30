@@ -63,6 +63,12 @@ func (z *ZipURLSource) Fetch() error {
 		return err
 	}
 
+	// run as the local job after extracting the files
+	err = setupOnlineDir(z.TargetDirectory)
+	if err != nil {
+		return fmt.Errorf("failed to install dependencies at: '%s' %w", z.TargetDirectory, err)
+	}
+
 	return nil
 }
 

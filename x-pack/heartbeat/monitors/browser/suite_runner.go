@@ -12,7 +12,6 @@ import (
 	"net/http"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type JourneyLister func(ctx context.Context, suitePath string, params common.MapStr) (journeyNames []string, err error)
@@ -51,7 +50,7 @@ func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
 		Params: s.suiteCfg.Params,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("could not marshal cloud body", err)
+		return nil, fmt.Errorf("could not marshal cloud body: %w", err)
 	}
 	req, err := http.NewRequest("POST", locUrl, bytes.NewReader(body))
 	if err != nil {
@@ -67,7 +66,6 @@ func (s *SyntheticSuite) CloudExec(locUrl string) (*http.Response, error) {
 }
 
 func (s *SyntheticSuite) Fetch() error {
-	logp.Warn("Did not reach here")
 	return s.suiteCfg.Source.Active().Fetch()
 }
 
