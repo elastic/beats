@@ -5770,6 +5770,86 @@ Beat state
 
 
 
+
+*`beat.state.beat.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.beat.version`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.cluster.uuid`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.host.containerized`*::
++
+--
+type: keyword
+
+--
+
+
+*`beat.state.host.os.kernel`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.platform`*::
++
+--
+type: keyword
+
+--
+
+*`beat.state.host.os.version`*::
++
+--
+type: keyword
+
+--
+
 *`beat.state.management.enabled`*::
 +
 --
@@ -5816,6 +5896,35 @@ type: keyword
 Beat stats
 
 
+
+
+*`beat.stats.memstats.gc_next`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.memory.alloc`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.memory.total`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.memstats.rss`*::
++
+--
+type: long
+
+--
 
 *`beat.stats.uptime.ms`*::
 +
