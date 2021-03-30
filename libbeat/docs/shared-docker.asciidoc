@@ -190,7 +190,7 @@ docker run -d \
   --volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
   --volume="/proc:/hostfs/proc:ro" \
   --volume="/:/hostfs:ro" \
-  {dockerimage} {beatname_lc} -e \
+  {dockerimage} {beatname_lc} -e -strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 --------------------------------------------
 endif::[]
