@@ -230,6 +230,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use rfc6587 framing for fortinet firewall and clientendpoint filesets when transferring over tcp. {pull}23837[23837]
 - Fix httpjson input logging so it doesn't conflict with ECS. {pull}23972[23972]
 - Fix Okta default date formatting. {issue}24018[24018] {pull}24025[24025]
+- Fix netflow module ignoring detect_sequence_reset flag. {issue}24268[24268] {pull}24270[24270]
+- Fix Cisco ASA parser for message 722051. {pull}24410[24410]
+- Fix `google_workspace` pagination. {pull}24668[24668]
+- Fix Cisco ASA parser for message 302022. {issue}24405[24405] {pull}24697[24697]
+- Fix Cisco AMP `@metadata._id` calculation {issue}24717[24717] {pull}24718[24718]
+- Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
+- Fix date parsing in GSuite/login and Google Workspace/login filesets. {issue}24694[24694]
+- Fix date parsing in GSuite/login fileset. {issue}24694[24694]
+- Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Updating Oauth2 flow for m365_defender fileset. {pull}24829[24829]
 
 *Heartbeat*
 
