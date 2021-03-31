@@ -63,7 +63,7 @@ func (v *Vars) Replace(value string) (Node, error) {
 					result += value[lastIndex:r[0]] + val.Value()
 					set = true
 				case *varString:
-					node, ok := Lookup(v.tree, val.Value())
+					node, ok := v.lookupNode(val.Value())
 					if ok {
 						node := nodeToValue(node)
 						if v.processorsKey != "" && varPrefixMatched(val.Value(), v.processorsKey) {
@@ -93,6 +93,14 @@ func (v *Vars) Replace(value string) (Node, error) {
 
 // Lookup returns the value from the vars.
 func (v *Vars) Lookup(name string) (interface{}, bool) {
+	// lookup in the AST tree
+	return v.tree.Lookup(name)
+}
+
+// lookupNode performs a lookup on the AST, but keeps the result as a `Node`.
+//
+// This is different from `Lookup` which returns the actual type, not the AST type.
+func (v *Vars) lookupNode(name string) (Node, bool) {
 	// check if the value can be retrieved from a FetchContextProvider
 	for providerName, provider := range v.fetchContextProviders {
 		if varPrefixMatched(name, providerName) {
@@ -106,7 +114,7 @@ func (v *Vars) Lookup(name string) (interface{}, bool) {
 		}
 	}
 	// lookup in the AST tree
-	return v.tree.Lookup(name)
+	return Lookup(v.tree, name)
 }
 
 // nodeToValue ensures that the node is an actual value.
